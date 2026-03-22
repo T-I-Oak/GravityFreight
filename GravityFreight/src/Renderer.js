@@ -1,3 +1,5 @@
+import { CATEGORY_COLORS } from './Data.js';
+
 export class Renderer {
     constructor(canvas) {
         this.canvas = canvas;
@@ -9,20 +11,54 @@ export class Renderer {
     resize() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        this.generateBgStars();
     }
+
+    generateBgStars() {
+        this.bgStars = [];
+        const count = 200;
+        for (let i = 0; i < count; i++) {
+            this.bgStars.push({
+                x: Math.random() * 4000 - 2000, // 広めに散らす
+                y: Math.random() * 4000 - 2000,
+                size: Math.random() * 1.5 + 0.5,
+                alpha: Math.random() * 0.5 + 0.3
+            });
+        }
+    }
+
 
     clear() {
         this.ctx.fillStyle = '#050510';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    drawStars() {
-        // 固定の星々（背景）
-        this.ctx.fillStyle = '#ffffff';
-        // 簡易的な実装: シード値に基づかないが、本来は生成すべき。
-        // 今回はフレームごとに描画するのではなく、一度だけ描画するか
-        // ここでは単純にランダムに描画する（デモ用）
+    applyCamera(zoom) {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        this.ctx.save();
+        this.ctx.translate(centerX, centerY);
+        this.ctx.scale(zoom, zoom);
+        this.ctx.translate(-centerX, -centerY);
     }
+
+    restoreCamera() {
+        this.ctx.restore();
+    }
+
+
+    drawStars() {
+        if (!this.bgStars) return;
+        this.ctx.save();
+        for (const star of this.bgStars) {
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+            this.ctx.beginPath();
+            this.ctx.arc(star.x + this.canvas.width / 2, star.y + this.canvas.height / 2, star.size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        this.ctx.restore();
+    }
+
 
     drawBody(body, color, glowColor) {
         const { x, y } = body.position;
@@ -39,6 +75,35 @@ export class Renderer {
         this.ctx.beginPath();
         this.ctx.arc(x, y, radius, 0, Math.PI * 2);
         this.ctx.fill();
+
+        // アイテム保持時の縁取り (未取得の場合のみ)
+        if (!body.isCollected && body.items && body.items.length > 0) {
+            const itemCount = body.items.length;
+            const angleStep = (Math.PI * 2) / itemCount;
+
+            for (let i = 0; i < itemCount; i++) {
+                const itemData = body.items[i];
+                if (!itemData || !CATEGORY_COLORS[itemData.category]) continue;
+
+                const startAngle = i * angleStep;
+                // 複数アイテム時は少し隙間を空ける
+                const gap = itemCount > 1 ? 0.1 : 0;
+                const endAngle = startAngle + angleStep - gap;
+
+                this.ctx.save();
+                this.ctx.strokeStyle = CATEGORY_COLORS[itemData.category];
+                this.ctx.lineWidth = 2;
+                this.ctx.shadowBlur = 10;
+                this.ctx.shadowColor = CATEGORY_COLORS[itemData.category];
+                
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, radius + 4, startAngle, endAngle);
+                this.ctx.stroke();
+                
+                this.ctx.restore();
+            }
+        }
+
         this.ctx.restore();
     }
 
@@ -68,27 +133,41 @@ export class Renderer {
         this.ctx.fill();
 
         this.ctx.restore();
+
+        // アイテム追従エフェクトの描画
+        this.drawCollectedItems(ship);
     }
 
-    drawPortal(portal) {
-        const { x, y, radius, startAngle, endAngle } = portal;
+    drawGoals(goals, boundaryRadius) {
         this.ctx.save();
         
-        // 境界線全体（失敗エリア）を暗い赤で描画
-        this.ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
-        this.ctx.lineWidth = 2;
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+
+        // 境界線全体を暗いグレーで描画
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        this.ctx.lineWidth = 1;
         this.ctx.beginPath();
-        this.ctx.arc(x, y, radius, 0, Math.PI * 2);
+        this.ctx.arc(centerX, centerY, boundaryRadius, 0, Math.PI * 2);
         this.ctx.stroke();
 
-        // ゴールポータル（成功エリア）を明るいシアンで描画
-        this.ctx.strokeStyle = '#00ffcc';
-        this.ctx.lineWidth = 4;
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowColor = '#00ffcc';
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, radius, startAngle, endAngle);
-        this.ctx.stroke();
+        goals.forEach(goal => {
+            const startAngle = goal.angle - goal.width / 2;
+            const endAngle = goal.angle + goal.width / 2;
+
+            // 外周への発光エフェクト
+            this.ctx.save();
+            this.ctx.strokeStyle = goal.color;
+            this.ctx.lineWidth = 6;
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowColor = goal.color;
+            this.ctx.beginPath();
+            this.ctx.arc(centerX, centerY, boundaryRadius, startAngle, endAngle);
+            this.ctx.stroke();
+            
+            // ラベル表示 (削除)
+            this.ctx.restore();
+        });
         
         this.ctx.restore();
     }
@@ -109,4 +188,71 @@ export class Renderer {
         this.ctx.stroke();
         this.ctx.restore();
     }
+
+    drawCollectedItems(ship) {
+        if (!ship.collectedItems || ship.collectedItems.length === 0) return;
+        if (!ship.trail || ship.trail.length < 5) return;
+
+        // 連なる感じで描画 (10フレームずつの間隔)
+        ship.collectedItems.forEach((item, i) => {
+            const gap = 8; // ドット間の間隔（トレイルのインデックス数）
+            const trailIdx = Math.max(0, ship.trail.length - 1 - (i + 1) * gap);
+            if (trailIdx >= 0) {
+                const pos = ship.trail[trailIdx];
+                this.ctx.save();
+                this.ctx.shadowBlur = 8;
+                this.ctx.shadowColor = item.color;
+                this.ctx.fillStyle = item.color;
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.restore();
+            }
+        });
+    }
+
+    drawTrail(points) {
+        if (!points || points.length < 2) return;
+        this.ctx.save();
+        this.ctx.lineWidth = 2;
+        
+        // 後ろから前へ描画し、徐々に透明にする
+        for (let i = 1; i < points.length; i++) {
+            const alpha = (i / points.length) * 0.5; // 0.0から0.5まで
+            this.ctx.strokeStyle = `rgba(68, 136, 255, ${alpha})`;
+            this.ctx.beginPath();
+            this.ctx.moveTo(points[i-1].x, points[i-1].y);
+            this.ctx.lineTo(points[i].x, points[i].y);
+            this.ctx.stroke();
+        }
+        this.ctx.restore();
+    }
+
+    drawVersion(version, score = 0) {
+        this.ctx.save();
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        this.ctx.font = '12px Inter, sans-serif';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(`VER ${version}`, 10, this.canvas.height - 25);
+        this.ctx.fillText(`© T.I.OAK 2026`, 10, this.canvas.height - 10);
+
+        // スコア表示 (中央上)
+        this.ctx.font = 'bold 24px Inter, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'top';
+        this.ctx.fillStyle = '#00ffcc';
+        this.ctx.shadowBlur = 10;
+        this.ctx.shadowColor = '#00ffcc';
+        const displayScore = isNaN(score) ? 0 : score;
+        this.ctx.fillText(`SCORE: ${Math.floor(displayScore).toLocaleString()}`, this.canvas.width / 2, 20);
+
+
+
+        this.ctx.restore();
+    }
+
+
 }
+
+
+
