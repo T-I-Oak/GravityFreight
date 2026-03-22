@@ -1,4 +1,4 @@
-import { PhysicsEngine, Body, Vector2 } from './Physics.js';
+import { PhysicsEngine, Body, Vector2, G } from './Physics.js';
 
 export class Game {
     constructor(canvas, ui) {
@@ -8,8 +8,12 @@ export class Game {
         this.state = 'aiming'; // aiming, flying, crashed, cleared
         this.bodies = [];
         this.ship = null;
+        this.homeStar = null;
         this.portal = null;
         this.mousePos = new Vector2();
+        this.launchTime = 0;
+        this.accumulator = 0;
+        this.fixedDt = 0.002; // 2ms (超高精度モード)
 
         this.initStage();
         this.setupListeners();
@@ -19,39 +23,55 @@ export class Game {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
 
-        // 星（重力源）の配置
-        this.bodies = [
-            new Body(new Vector2(centerX + 200, centerY - 100), 5000, true),
-            new Body(new Vector2(centerX - 150, centerY + 150), 3000, true)
-        ];
-        this.bodies.forEach(b => this.physics.bodies.push(b));
+        this.homeStar = new Body(new Vector2(centerX, centerY), 4000, true);
+        this.homeStar.radius = 25;
+        this.homeStar.isHome = true;
 
-        // 脱出ポータル（弧）
+        this.bodies = [
+            this.homeStar,
+            new Body(new Vector2(centerX + 350, centerY - 250), 18000, true),
+            new Body(new Vector2(centerX - 400, centerY + 200), 15000, true),
+            new Body(new Vector2(centerX - 100, centerY - 450), 12000, true),
+            new Body(new Vector2(centerX + 500, centerY + 300), 20000, true),
+            new Body(new Vector2(centerX - 600, centerY - 200), 14000, true),
+            new Body(new Vector2(centerX + 150, centerY + 500), 10000, true),
+            new Body(new Vector2(centerX - 300, centerY - 600), 16000, true)
+        ];
+        this.physics.bodies = [...this.bodies];
+
         this.portal = {
             x: centerX,
             y: centerY,
-            radius: Math.min(this.canvas.width, this.canvas.height) * 0.45,
-            startAngle: -Math.PI / 4,
-            endAngle: Math.PI / 4
+            radius: Math.min(this.canvas.width, this.canvas.height) * 0.95,
+            startAngle: -Math.PI / 6,
+            endAngle: Math.PI / 6
         };
 
-        // 自機ポテンシャル位置（中央）
-        this.ship = new Body(new Vector2(centerX, centerY), 10);
+        this.ship = new Body(new Vector2(centerX, centerY - this.homeStar.radius - 12), 10);
         this.state = 'aiming';
+        this.accumulator = 0;
     }
 
     setupListeners() {
         window.addEventListener('mousemove', (e) => {
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
+            
+            if (this.state === 'aiming') {
+                const dir = this.mousePos.sub(this.homeStar.position).normalize();
+                this.ship.position = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
+                this.ship.rotation = Math.atan2(dir.y, dir.x);
+            }
         });
 
         const launch = () => {
             if (this.state === 'aiming') {
-                const dir = this.mousePos.sub(this.ship.position).normalize();
-                this.ship.velocity = dir.scale(300); // 初期速度
+                const dir = this.mousePos.sub(this.homeStar.position).normalize();
+                this.ship.velocity = dir.scale(1200);
                 this.physics.bodies.push(this.ship);
                 this.state = 'flying';
+                this.launchTime = Date.now();
+                this.accumulator = 0;
                 this.ui.status.textContent = 'FLYING...';
             } else if (this.state === 'crashed' || this.state === 'cleared') {
                 this.reset();
@@ -73,30 +93,37 @@ export class Game {
 
     update(dt) {
         if (this.state === 'flying') {
-            this.physics.update(dt);
+            this.accumulator += dt;
+            if (this.accumulator > 0.1) this.accumulator = 0.1;
+            
+            while (this.accumulator >= this.fixedDt) {
+                this.physics.update(this.fixedDt);
+                this.accumulator -= this.fixedDt;
+            }
             this.checkCollisions();
         }
     }
 
     checkCollisions() {
         const shipPos = this.ship.position;
+        const now = Date.now();
 
-        // 星との衝突
         for (const body of this.bodies) {
+            if (body === this.homeStar && now - this.launchTime < 800) continue;
+
             const dist = shipPos.sub(body.position).length();
-            const radius = Math.sqrt(body.mass) / 5 + 2;
+            const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
             if (dist < radius + 5) {
                 this.state = 'crashed';
                 this.ui.message.textContent = 'CRASHED';
                 this.ui.status.textContent = 'CLICK TO RESTART';
+                return;
             }
         }
 
-        // ポータル（外周）との接触判定
         const distFromCenter = shipPos.sub(new Vector2(this.canvas.width / 2, this.canvas.height / 2)).length();
         if (distFromCenter >= this.portal.radius) {
             const angle = Math.atan2(shipPos.y - this.portal.y, shipPos.x - this.portal.x);
-            // 角度がポータルの範囲内かチェック (簡易的)
             if (angle > this.portal.startAngle && angle < this.portal.endAngle) {
                 this.state = 'cleared';
                 this.ui.message.textContent = 'STAGE CLEAR';
@@ -112,28 +139,47 @@ export class Game {
     getPredictionPoints() {
         if (this.state !== 'aiming') return [];
         
-        // 簡易的な将来予測
         const points = [];
-        const dir = this.mousePos.sub(this.ship.position).normalize();
-        let tempPos = new Vector2(this.ship.position.x, this.ship.position.y);
-        let tempVel = dir.scale(300);
-        const simDt = 0.1;
+        const dir = this.mousePos.sub(this.homeStar.position).normalize();
+        let tempPos = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
+        let tempVel = dir.scale(1200);
+        const simDt = this.fixedDt; 
 
-        for (let i = 0; i < 50; i++) {
-            points.push(new Vector2(tempPos.x, tempPos.y));
+        for (let i = 0; i < 4000; i++) { 
+            // 5ステップ (10ms) ごとに記録（滑らかさの向上）
+            if (i % 5 === 0) points.push(new Vector2(tempPos.x, tempPos.y));
             
             let totalForce = new Vector2();
             for (const body of this.bodies) {
                 const diff = body.position.sub(tempPos);
                 const distSq = diff.lengthSq();
+                
+                // 衝突判定 (シミュレーション内)
+                const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
+                if (distSq < (radius + 5) ** 2) {
+                    if (body === this.homeStar && i * simDt < 0.8) {
+                        // 離脱時は重力を無視せず計算は続ける
+                    } else {
+                        // 衝突地点で終了
+                        return points;
+                    }
+                }
+
                 if (distSq < 100) continue;
-                const forceMag = (1000 * 10 * body.mass) / distSq;
+                const forceMag = (G * 10 * body.mass) / distSq;
                 totalForce = totalForce.add(diff.normalize().scale(forceMag));
             }
             
             const acc = totalForce.scale(1 / 10);
             tempVel = tempVel.add(acc.scale(simDt));
             tempPos = tempPos.add(tempVel.scale(simDt));
+
+            const d = tempPos.sub(new Vector2(this.canvas.width / 2, this.canvas.height / 2)).length();
+            if (d > this.portal.radius) {
+                // ポータル到達点で終了
+                points.push(new Vector2(tempPos.x, tempPos.y));
+                break;
+            }
         }
         return points;
     }

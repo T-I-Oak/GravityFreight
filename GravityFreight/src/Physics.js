@@ -31,7 +31,7 @@ export class Vector2 {
     }
 }
 
-export const G = 1000; // 重力定数（ゲーム向けに調整）
+export const G = 4000; // 星を増やしたためのバランス調整
 
 /**
  * 逆二乗則に基づく重力を計算する

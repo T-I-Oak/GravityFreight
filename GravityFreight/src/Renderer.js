@@ -26,25 +26,35 @@ export class Renderer {
 
     drawBody(body, color, glowColor) {
         const { x, y } = body.position;
-        const radius = Math.sqrt(body.mass) / 5 + 2;
+        const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
+        
+        // 母星は赤く表示
+        const finalColor = body.isHome ? '#ff4444' : color;
+        const finalGlow = body.isHome ? '#ff0000' : (glowColor || color);
 
         this.ctx.save();
-        this.ctx.shadowBlur = 10;
-        this.ctx.shadowColor = glowColor || color;
-        this.ctx.fillStyle = color;
+        this.ctx.shadowBlur = 20;
+        this.ctx.shadowColor = finalGlow;
+        this.ctx.fillStyle = finalColor;
         this.ctx.beginPath();
         this.ctx.arc(x, y, radius, 0, Math.PI * 2);
         this.ctx.fill();
         this.ctx.restore();
     }
 
+
+
     drawShip(ship) {
         const { x, y } = ship.position;
-        const angle = Math.atan2(ship.velocity.y, ship.velocity.x);
+        // 速度がある場合はその方向、ない場合は rotation プロパティを使用
+        const angle = (ship.velocity.lengthSq() > 0.1) 
+            ? Math.atan2(ship.velocity.y, ship.velocity.x)
+            : (ship.rotation || 0);
 
         this.ctx.save();
         this.ctx.translate(x, y);
         this.ctx.rotate(angle);
+
         
         // 船体（三角形）
         this.ctx.shadowBlur = 5;
@@ -63,6 +73,15 @@ export class Renderer {
     drawPortal(portal) {
         const { x, y, radius, startAngle, endAngle } = portal;
         this.ctx.save();
+        
+        // 境界線全体（失敗エリア）を暗い赤で描画
+        this.ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, radius, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        // ゴールポータル（成功エリア）を明るいシアンで描画
         this.ctx.strokeStyle = '#00ffcc';
         this.ctx.lineWidth = 4;
         this.ctx.shadowBlur = 15;
@@ -70,15 +89,19 @@ export class Renderer {
         this.ctx.beginPath();
         this.ctx.arc(x, y, radius, startAngle, endAngle);
         this.ctx.stroke();
+        
         this.ctx.restore();
     }
+
 
     drawPrediction(points) {
         if (points.length < 2) return;
         this.ctx.save();
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        this.ctx.setLineDash([5, 5]);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        this.ctx.lineWidth = 1.5;
+        // 破線を廃止（高密度な描画により実線の方が滑らかに見えるため）
         this.ctx.beginPath();
+
         this.ctx.moveTo(points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++) {
             this.ctx.lineTo(points[i].x, points[i].y);
