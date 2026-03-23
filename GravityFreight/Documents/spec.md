@@ -29,7 +29,8 @@
     1. $Velocity_{new} = Velocity_{old} + Acceleration \cdot dt$
     2. $Position_{new} = Position_{old} + Velocity_{new} \cdot dt$
 - **衝突判定**:
-    - 星の半径 + 5px の範囲に入った場合に「衝突 (Crashed)」とする。
+    - 移動前と移動後の位置を結ぶ線分を用いた連続衝突検知（CCD）を採用。星の中心から半径 + 5px の範囲に入った場合に「衝突 (Crashed)」とする。
+    - 衝突時、一部の「Module」を保有している場合は効果が自動的に発動し、衝突を回避（星の破壊、またはバウンド）する。
     - ただし、発射直後の母星 (Home Star) との衝突判定は、シミュレーション開始から 0.8 秒間は無視する。
 
 ## 4. パーツ構成 (Parts Data)
@@ -59,9 +60,14 @@
 | | Deep Logic | `sensor_long` | 10 | 1 | 0 | 4500 | **0.1** | **20** | - | 予測特化の高精度型。取得範囲は限定的。 |
 | **Accelerator** | Standard Acc. | `pad_standard` | 10 | 1 | 0 | 0 | - | 0 | - | パワー: 1200, 耐久度: 2 |
 | | Steady Acc. | `pad_precision` | 10 | 1 | 0 | 0 | **0.05** | 0 | - | パワー: 1000, 耐久度: 2, 予測線強化。 |
-| **Logic Add-on** | Range Extender | `opt_range_up` | 10 | 1 | 0 | 0 | **0.2** | 10 | - | 予測線を大幅延長。 |
-| | Add-on Expander | `opt_extender` | 10 | 2 | 2 | 0 | - | 0 | - | 拡張スロットを2つ追加. |
-| **Accelerator Add-on** | Reaction Fuel | `opt_fuel` | 10 | 1 | 0 | 0 | - | 0 | - | 加速時の耐久減少を無効化。 |
+| **Module** | Slot Expander | `mod_capacity` | 10 | 1 | 2 | - | - | - | - | 拡張スロットを2つ追加。重量が増加。 |
+| | Star Breaker | `mod_star_breaker` | 5 | 2 | 1 | - | - | - | - | 衝突時に星を破壊して回避 (耐久2)。 |
+| | Impact Cushion | `mod_cushion` | 5 | 1 | 1 | - | - | - | - | 衝突時にバウンドして回避 (耐久1)。 |
+| | Emergency Thruster | `mod_emergency` | 5 | 1 | 1 | - | - | - | - | ロスト時に中心へ自動方向転換 (耐久1)。 |
+| | Trajectory Stabilizer | `mod_stabilizer` | 8 | 1 | 1 | - | - | - | - | 自機にかかる重力の影響を0.8倍に軽減する。 |
+| **Booster** | Reaction Fuel | `opt_fuel` | 10 | 1 | 0 | - | - | - | - | 加速時の耐久減少を自動で無効化する。 |
+| | Magnetic Pulse | `boost_magnet` | 5 | 1 | 0 | - | - | - | - | 飛行時間と共にアイテム回収範囲（波紋）が拡大。 |
+| | Goal Expander | `boost_expander` | 5 | 1 | 0 | - | - | - | - | ゴールのアーク角度判定を1.2倍に拡大する。 |
 | **Cargo** | Safe Cargo | `cargo_safe` | 5 | 1 | 0 | 0 | - | 0 | - | 安全出口への配送用(緑)。 |
 | | Normal Cargo | `cargo_normal` | 5 | 2 | 0 | 0 | - | 0 | - | 通常出口への配送用(青)。 |
 | | Danger Cargo | `cargo_danger` | 5 | 4 | 0 | 0 | - | 0 | - | 危険出口への配送用(赤)。 |
@@ -82,7 +88,7 @@
     - **追従ドット**: 取得したアイテムは、カテゴリ色を持つドットとして自機の軌跡を連なって追従する。
 - **ミッション結果によるアイテム確定と還元**:
     - **成功 (SUCCESS)**: ポータル到達時、フライト中に取得したアイテムが正式にインベントリに全加算される。
-    - **遭遇失敗 (LOST / CRASHED)**:
+    - **遭遇失敗 (LOST / CRASHED)** (※ Module効果による回避を除く):
         - **遭難 (LOST)**: 画面外（進行不能）に出た場合、取得していた仮アイテムはすべて**消滅**し（元の星にも戻らない）、Unitを失う。
         - **衝突 (CRASHED)**: 障害物（星）に衝突した場合、取得していた仮アイテムは全て**衝突先の星**に散布（追加）される。さらに、出撃していた機体（Unit）の構成部品（各パーツ・アドオン）が**部品ごとに独立して50%の確率で**衝突先の星にアイテムとして残るか、ロストする。
     - **帰還 (RETURNED)**: 母星（自機が発射された星）に命中した場合。
