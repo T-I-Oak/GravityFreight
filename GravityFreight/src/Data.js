@@ -13,9 +13,9 @@ export const CATEGORY_COLORS = {
 
 export const PARTS = {
     CHASSIS: [
-        { id: 'hull_light', name: 'Lite Chassis', mass: 3, slots: 0, precision: 100, precisionMultiplier: 1.0, pickupRange: 0, pickupMultiplier: 1.0, appearanceRate: 10, color: 'rgba(255, 171, 64, 0.15)', description: '性能重視の軽量体。重力の影響を受けやすい。' },
-        { id: 'hull_medium', name: 'Standard Chassis', mass: 8, slots: 1, precision: 100, precisionMultiplier: 1.0, pickupRange: 0, pickupMultiplier: 1.0, appearanceRate: 10, color: 'rgba(255, 171, 64, 0.15)', description: '汎用性の高い標準体。1スロット。' },
-        { id: 'hull_heavy', name: 'Tough Chassis', mass: 18, slots: 2, precision: 100, precisionMultiplier: 1.0, pickupRange: 0, pickupMultiplier: 1.0, appearanceRate: 10, color: 'rgba(255, 171, 64, 0.15)', description: '堅牢な重厚体。2スロット。' }
+        { id: 'hull_light', name: 'Lite Chassis', mass: 3, slots: 0, precision: 100, pickupRange: 0, appearanceRate: 10, color: 'rgba(255, 171, 64, 0.15)', description: '性能重視の軽量体。重力の影響を受けやすい。' },
+        { id: 'hull_medium', name: 'Standard Chassis', mass: 8, slots: 1, precision: 100, pickupRange: 0, appearanceRate: 10, color: 'rgba(255, 171, 64, 0.15)', description: '汎用性の高い標準体。1スロット。' },
+        { id: 'hull_heavy', name: 'Tough Chassis', mass: 18, slots: 2, precision: 100, pickupRange: 0, appearanceRate: 10, color: 'rgba(255, 171, 64, 0.15)', description: '堅牢な重厚体。2スロット。' }
     ],
     LOGIC: [
         { id: 'sensor_short', name: 'Entry Logic', mass: 1, slots: 0, precision: 150, pickupRange: 80, pickupMultiplier: 1.2, appearanceRate: 10, color: 'rgba(0, 188, 212, 0.15)', description: '取得特化の広域収集型。予測精度は低い。' },
