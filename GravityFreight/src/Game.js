@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.2.0'; // β版 (CCD実装済み)
+        this.version = '0.3.0'; // Add-on Update (v0.3.0)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -37,14 +37,14 @@ export class Game {
             }),
             accelerators: INITIAL_INVENTORY.accelerators.map(p => {
                 const base = PARTS.ACCELERATORS.find(bp => bp.id === p.id);
-                return { ...base, hp: p.hp };
+                return { ...base, charges: p.charges };
             }),
-            logicOptions: INITIAL_INVENTORY.logicOptions.map(o => {
-                const base = PARTS.LOGIC_OPTIONS.find(bo => bo.id === o.id);
+            modules: INITIAL_INVENTORY.modules.map(o => {
+                const base = PARTS.MODULES.find(bo => bo.id === o.id);
                 return { ...base, count: o.count };
             }),
-            accOptions: INITIAL_INVENTORY.accOptions.map(o => {
-                const base = PARTS.ACC_OPTIONS.find(bo => bo.id === o.id);
+            boosters: INITIAL_INVENTORY.boosters.map(o => {
+                const base = PARTS.BOOSTERS.find(bo => bo.id === o.id);
                 return { ...base, count: o.count };
             }),
             rockets: []
@@ -60,8 +60,8 @@ export class Game {
             logic: null,
             accelerator: null,
             rocket: null,
-            logicOption: {}, // { id: count } 複数選択対応
-            accOption: null
+            modules: {}, // { id: count } 複数選択対応
+            booster: null
         };
 
 
@@ -253,15 +253,15 @@ export class Game {
                 this.ship.velocity = dir.scale(power * massFactor);
 
                 // 耐久度消費ロジック
-                if (this.selection.accOption && this.selection.accOption.id === 'opt_fuel') {
-                    this.selection.accOption.count--;
-                    if (this.selection.accOption.count <= 0) {
-                        this.inventory.accOptions = this.inventory.accOptions.filter(o => o.count > 0);
-                        this.selection.accOption = null;
+                if (this.selection.booster && this.selection.booster.id === 'opt_fuel') {
+                    this.selection.booster.count--;
+                    if (this.selection.booster.count <= 0) {
+                        this.inventory.boosters = this.inventory.boosters.filter(o => o.count > 0);
+                        this.selection.booster = null;
                     }
                 } else if (this.selection.accelerator) {
-                    this.selection.accelerator.hp--;
-                    if (this.selection.accelerator.hp <= 0) {
+                    this.selection.accelerator.charges--;
+                    if (this.selection.accelerator.charges <= 0) {
                         this.inventory.accelerators = this.inventory.accelerators.filter(p => p !== this.selection.accelerator);
                         this.selection.accelerator = null;
                     }
@@ -330,43 +330,42 @@ export class Game {
 
 
     selectOption(type, id) {
-        if (type === 'logicOption') {
+        if (type === 'modules') {
             const baseSlots = this.selection.chassis ? this.selection.chassis.slots : 0;
-            const itemInInv = this.inventory.logicOptions.find(o => o.id === id);
+            const itemInInv = this.inventory.modules.find(o => o.id === id);
             if (!itemInInv || itemInInv.count <= 0) return;
 
             // 現在の使用数と、追加スロットの合計を算出
             let extraSlots = 0;
             let usedCount = 0;
-            for (const [optId, count] of Object.entries(this.selection.logicOption)) {
-                const optBase = PARTS.LOGIC_OPTIONS.find(o => o.id === optId);
+            for (const [optId, count] of Object.entries(this.selection.modules)) {
+                const optBase = PARTS.MODULES.find(o => o.id === optId);
                 if (optBase) extraSlots += (optBase.slots || 0) * count;
                 usedCount += count;
             }
 
             const totalCapacity = baseSlots + extraSlots;
-            const alreadySelected = this.selection.logicOption[id] || 0;
+            const alreadySelected = this.selection.modules[id] || 0;
 
             if (usedCount < totalCapacity && alreadySelected < itemInInv.count) {
                 // 空きスロットがあり、かつ在庫がある場合は追加
-                this.selection.logicOption[id] = alreadySelected + 1;
+                this.selection.modules[id] = alreadySelected + 1;
             } else {
                 // 上限に達している、または在庫がない場合はそのアイテムを 0 にリセット
-                delete this.selection.logicOption[id];
+                delete this.selection.modules[id];
             }
 
             // スロット超過のバリデーション (拡張パーツを外した際などのためのパージ)
-            this.validateLogicOptions();
+            this.validateModules();
         }
-        if (type === 'accOption') {
-            // アクセラレータオプション（現在は重複なし想定）
-            const opt = this.inventory.accOptions.find(o => o.id === id);
-            this.selection.accOption = (this.selection.accOption === opt) ? null : opt;
+        if (type === 'booster') {
+            const opt = this.inventory.boosters.find(o => o.id === id);
+            this.selection.booster = (this.selection.booster === opt) ? null : opt;
         }
         this.updateUI();
     }
 
-    validateLogicOptions() {
+    validateModules() {
         if (!this.selection.chassis) return;
 
         const baseSlots = this.selection.chassis.slots;
@@ -374,8 +373,8 @@ export class Game {
         let usedCount = 0;
 
         // 現在の状態を確認
-        for (const [optId, count] of Object.entries(this.selection.logicOption)) {
-            const optBase = PARTS.LOGIC_OPTIONS.find(o => o.id === optId);
+        for (const [optId, count] of Object.entries(this.selection.modules)) {
+            const optBase = PARTS.MODULES.find(o => o.id === optId);
             if (optBase) extraSlots += (optBase.slots || 0) * count;
             usedCount += count;
         }
@@ -383,31 +382,25 @@ export class Game {
         let overflow = usedCount - (baseSlots + extraSlots);
         if (overflow > 0) {
             // 超過分を削除 (登録順の逆から削る)
-            const optIds = Object.keys(this.selection.logicOption);
+            const optIds = Object.keys(this.selection.modules);
             for (let i = optIds.length - 1; i >= 0 && overflow > 0; i--) {
                 const oid = optIds[i];
-                let count = this.selection.logicOption[oid];
+                let count = this.selection.modules[oid];
                 const toRemove = Math.min(count, overflow);
-                this.selection.logicOption[oid] -= toRemove;
-                if (this.selection.logicOption[oid] <= 0) delete this.selection.logicOption[oid];
+                this.selection.modules[oid] -= toRemove;
+                if (this.selection.modules[oid] <= 0) delete this.selection.modules[oid];
                 overflow -= toRemove;
-                
-                // 再計算 (削除したパーツ自体がスロットを提供していた場合に備えて)
-                // ただし、今回は単純なループで足りるはず (1つ削除するごとに overflow が 1 減るため)
-                // ※もし1パーツで複数スロット提供・消費がある場合は再計算が必要だが、現状は1パーツ1消費のためこれでOK
             }
         }
     }
-
-
 
     assembleUnit() {
         if (this.selection.chassis && this.selection.logic) {
             // アドオン（複数）のクローンを作成
             const chassis = this.selection.chassis;
             const logic = this.selection.logic;
-            const options = { ...this.selection.logicOption };
-            const accOpt = this.selection.accOption;
+            const modules = { ...this.selection.modules };
+            const booster = this.selection.booster;
 
             // 合計パラメータの算出
             let totalMass = (chassis.mass || 0) + (logic.mass || 0);
@@ -416,9 +409,13 @@ export class Game {
             let totalMultiplier = (chassis.precisionMultiplier || 0) + (logic.precisionMultiplier || 0);
             let totalPickupRange = (chassis.pickupRange || 0) + (logic.pickupRange || 0);
             let totalPickupMultiplier = (chassis.pickupMultiplier || 0) + (logic.pickupMultiplier || 0);
+            
+            // 特殊補正
+            let totalGravityMultiplier = 1.0;
+            let arcMultiplier = 1.0;
 
-            for (const [optId, count] of Object.entries(options)) {
-                const optBase = PARTS.LOGIC_OPTIONS.find(o => o.id === optId);
+            for (const [optId, count] of Object.entries(modules)) {
+                const optBase = PARTS.MODULES.find(o => o.id === optId);
                 if (optBase) {
                     totalMass += (optBase.mass || 0) * count;
                     totalSlots += (optBase.slots || 0) * count;
@@ -426,29 +423,36 @@ export class Game {
                     totalMultiplier += (optBase.precisionMultiplier || 0) * count;
                     totalPickupRange += (optBase.pickupRange || 0) * count;
                     totalPickupMultiplier += (optBase.pickupMultiplier || 0) * count;
+                    
+                    if (optBase.gravityMultiplier) {
+                        for(let i=0; i<count; i++) totalGravityMultiplier *= optBase.gravityMultiplier;
+                    }
                 }
             }
 
-            // アクセラレータアドオンの加算
-            if (accOpt) {
-                totalMass += (accOpt.mass || 0);
-                totalSlots += (accOpt.slots || 0);
-                totalPrecision += (accOpt.precision || 0);
-                totalMultiplier += (accOpt.precisionMultiplier || 0);
+            // ブースターアドオンの加算
+            if (booster) {
+                totalMass += (booster.mass || 0);
+                totalSlots += (booster.slots || 0);
+                totalPrecision += (booster.precision || 0);
+                totalMultiplier += (booster.precisionMultiplier || 0);
+                if (booster.arcMultiplier) arcMultiplier *= booster.arcMultiplier;
             }
 
             const rocket = {
                 id: Date.now(),
                 chassis,
                 logic,
-                logicOption: options,
-                accOption: accOpt ? { ...accOpt } : null,
+                modules,
+                booster: booster ? { ...booster } : null,
                 totalMass,
                 totalSlots,
                 totalPrecision,
                 totalMultiplier,
                 totalPickupRange,
                 totalPickupMultiplier,
+                totalGravityMultiplier,
+                arcMultiplier,
                 name: `${chassis.name} + ${logic.name}`
             };
             this.inventory.rockets.push(rocket);
@@ -456,33 +460,31 @@ export class Game {
             // 消費
             chassis.count--;
             logic.count--;
-            for (const [optId, count] of Object.entries(options)) {
-                const optInv = this.inventory.logicOptions.find(o => o.id === optId);
+            for (const [optId, count] of Object.entries(modules)) {
+                const optInv = this.inventory.modules.find(o => o.id === optId);
                 if (optInv) optInv.count -= count;
             }
-            if (accOpt) {
-                const accOptInv = this.inventory.accOptions.find(o => o.id === accOpt.id);
-                if (accOptInv) accOptInv.count--;
+            if (booster) {
+                const boosterInv = this.inventory.boosters.find(o => o.id === booster.id);
+                if (boosterInv) boosterInv.count--;
             }
 
             // 在庫が0になったものを除外 (UI更新のため)
             this.inventory.chassis = this.inventory.chassis.filter(c => c.count > 0);
             this.inventory.logic = this.inventory.logic.filter(l => l.count > 0);
-            this.inventory.logicOptions = this.inventory.logicOptions.filter(o => o.count > 0);
-            this.inventory.accOptions = this.inventory.accOptions.filter(o => o.count > 0);
+            this.inventory.modules = this.inventory.modules.filter(o => o.count > 0);
+            this.inventory.boosters = this.inventory.boosters.filter(o => o.count > 0);
 
             this.selection.chassis = null;
             this.selection.logic = null;
-            this.selection.logicOption = {};
-            this.selection.accOption = null;
+            this.selection.modules = {};
+            this.selection.booster = null;
 
             this.isFactoryOpen = false;
             this.updateUI();
             this.checkGameOver();
         }
     }
-
-
 
     checkReadyToAim() {
         if (this.selection.rocket && this.selection.accelerator) {
@@ -499,6 +501,22 @@ export class Game {
             this.ship.mass = this.selection.rocket.totalMass;
             this.ship.pickupRange = this.selection.rocket.totalPickupRange;
             this.ship.pickupMultiplier = this.selection.rocket.totalPickupMultiplier;
+            this.ship.gravityMultiplier = this.selection.rocket.totalGravityMultiplier;
+            this.ship.arcMultiplier = this.selection.rocket.arcMultiplier;
+            
+            // 飛行用のアドオンインスタンス化 (残り回数管理のため)
+            // モジュールは { id, charges, maxCharges, ... } のリストにする
+            this.ship.equippedModules = [];
+            for (const [id, count] of Object.entries(this.selection.rocket.modules)) {
+                const base = PARTS.MODULES.find(m => m.id === id);
+                for (let i = 0; i < count; i++) {
+                    this.ship.equippedModules.push({ 
+                        ...base, 
+                        charges: base.maxCharges !== undefined ? base.maxCharges : 1 
+                    });
+                }
+            }
+
             // 仮保存リストから引き継いで視覚エフェクトを生成（帰還後の再開用）
             this.ship.collectedItems = this.pendingItems.map(p => ({
                 color: CATEGORY_COLORS[p.itemData.category] || '#fff',
@@ -522,17 +540,32 @@ export class Game {
             const el = document.getElementById(id);
             if (!el) return;
             el.innerHTML = '';
-            items.forEach(data => {
+            
+            // アイテム集約ロジック (ID + charges でグループ化)
+            const groups = [];
+            items.forEach(item => {
+                const charges = item.charges !== undefined ? item.charges : -1;
+                let group = groups.find(g => g.id === item.id && g.charges === charges);
+                if (!group) {
+                    group = { ...item, count: 0, instances: [] };
+                    groups.push(group);
+                }
+                group.count += (item.count !== undefined ? item.count : 1);
+                group.instances.push(item);
+            });
+
+            groups.forEach(data => {
                 const div = document.createElement('div');
                 
                 // 選択状態の判定
                 let selectionCount = 0;
                 let isSelected = false;
-                if (type === 'logicOption') {
-                    selectionCount = this.selection.logicOption[data.id] || 0;
+                if (type === 'modules') {
+                    selectionCount = this.selection.modules[data.id] || 0;
                     isSelected = selectionCount > 0;
                 } else {
-                    isSelected = (selected === data);
+                    // 全インスタンスのいずれかが選択されているか
+                    isSelected = data.instances.some(inst => inst === selected);
                 }
 
                 div.className = `part-item ${isSelected ? 'selected' : ''}`;
@@ -554,9 +587,10 @@ export class Game {
                 });
 
                 div.onclick = () => {
-                    if (type === 'logicOption' || type === 'accOption') {
+                    if (type === 'modules' || type === 'booster') {
                         this.selectOption(type, data.id);
                     } else {
+                        // 集約された中から未選択のインスタンスを優先的に選ぶ（簡易化のため最初の１つ）
                         this.selectPart(type, data.id);
                     }
                 };
@@ -564,24 +598,17 @@ export class Game {
             });
         };
 
-
-
         const factory = document.getElementById('factory-panel');
         if (this.isFactoryOpen) factory.classList.remove('hidden');
         else factory.classList.add('hidden');
 
         renderList('chassis-list', this.inventory.chassis, 'chassis', this.selection.chassis);
         renderList('logic-list', this.inventory.logic, 'logic', this.selection.logic);
-
-        
-        renderList('logic-option-list', this.inventory.logicOptions, 'logicOption', this.selection.logicOption);
-        renderList('acc-option-list', this.inventory.accOptions, 'accOption', this.selection.accOption);
-
-
+        renderList('logic-option-list', this.inventory.modules, 'modules', this.selection.modules);
+        renderList('acc-option-list', this.inventory.boosters, 'booster', this.selection.booster);
 
         const buildBtn = document.getElementById('build-btn');
         if (buildBtn) buildBtn.disabled = !(this.selection.chassis && this.selection.logic);
-
 
         const rList = document.getElementById('rocket-list');
         if (rList) {
@@ -589,7 +616,6 @@ export class Game {
             if (this.inventory.rockets.length === 0) {
                 rList.innerHTML = '<div class="slot-placeholder">No Units Built</div>';
             } else {
-
                 const unitColor = 'rgba(224, 224, 255, 0.15)';
                 this.inventory.rockets.forEach(rocket => {
                     const div = document.createElement('div');
@@ -607,14 +633,14 @@ export class Game {
                     
                     // アドオン詳細の追加
                     let addonDetails = [];
-                    if (rocket.logicOption) {
-                        for (const optId in rocket.logicOption) {
-                            const optBase = PARTS.LOGIC_OPTIONS.find(o => o.id === optId);
-                            if (optBase) addonDetails.push(`${optBase.name} × ${rocket.logicOption[optId]}`);
+                    if (rocket.modules) {
+                        for (const optId in rocket.modules) {
+                            const optBase = PARTS.MODULES.find(o => o.id === optId);
+                            if (optBase) addonDetails.push(`${optBase.name} × ${rocket.modules[optId]}`);
                         }
                     }
-                    if (rocket.accOption) {
-                        addonDetails.push(`${rocket.accOption.name} × 1`);
+                    if (rocket.booster) {
+                        addonDetails.push(`${rocket.booster.name} × 1`);
                     }
                     
                     if (addonDetails.length > 0) {
@@ -622,16 +648,12 @@ export class Game {
                     }
 
                     div.onclick = () => this.selectPart('rocket', rocket.id);
-
                     rList.appendChild(div);
                 });
-
             }
         }
 
         renderList('accelerator-list', this.inventory.accelerators, 'accelerator', this.selection.accelerator);
-
-
 
         const toggleBtn = document.getElementById('toggle-factory-btn');
         if (toggleBtn) toggleBtn.textContent = this.isFactoryOpen ? 'CLOSE BAY' : 'ASSEMBLE NEW';
@@ -643,22 +665,22 @@ export class Game {
         
         let invInfo = "";
         if (showInventory) {
-            // インベントリのアクセラレータ(hp保持) または星のアクセラレータ本体(durability保持)
-            if (item.hp !== undefined || item.durability !== undefined) {
-                // PARTS.ACCELERATORS から定義を引くか、自身が定義ならそのまま使用
-                const baseAcc = typeof PARTS !== 'undefined' && PARTS.ACCELERATORS 
-                                ? PARTS.ACCELERATORS.find(a => a.id === item.id) || item 
-                                : item;
-                const maxHp = baseAcc.durability || 2;
-                const currentHp = item.hp !== undefined ? item.hp : maxHp;
+            // チャージ（charges）を持つアイテムの場合
+            if (item.charges !== undefined || item.maxCharges !== undefined) {
+                const max = item.maxCharges || 2;
+                const current = item.charges !== undefined ? item.charges : max;
 
                 let segments = '';
-                for (let i = 0; i < maxHp; i++) {
-                    segments += `<div class="hp-segment ${i < currentHp ? 'active' : ''}"></div>`;
+                for (let i = 0; i < max; i++) {
+                    segments += `<div class="hp-segment ${i < current ? 'active' : ''}"></div>`;
                 }
                 invInfo = `<div class="hp-gauge">${segments}</div>`;
             } else {
-                invInfo = `<span class="inventory-badge">× ${item.count || 0}</span>`;
+                // 数量表示（x1は省略）
+                const count = item.count || 0;
+                if (count > 1) {
+                    invInfo = `<span class="inventory-badge">× ${count}</span>`;
+                }
             }
         }
 
@@ -698,6 +720,14 @@ export class Game {
         if (this.state === 'flying') {
             // アイテム取得判定
             if (this.ship) {
+                // Magnetic Pulse 効果: 時間経過で範囲拡大
+                const booster = this.selection.rocket.booster;
+                if (booster && booster.id === 'boost_magnet') {
+                    const elapsed = this.simulatedTime - this.launchTime;
+                    // 秒間20pxずつ拡大（上限なし）
+                    this.ship.pickupRange = (this.selection.rocket.totalPickupRange || 0) + elapsed * 20;
+                }
+
                 this.bodies.forEach(body => {
                     if (body === this.homeStar) return;
                     
@@ -716,7 +746,17 @@ export class Game {
             if (this.accumulator > 0.1) this.accumulator = 0.1;
             while (this.accumulator >= this.fixedDt) {
                 const prevPos = new Vector2(this.ship.position.x, this.ship.position.y);
-                this.physics.update(this.fixedDt);
+                
+                // 物理演算への重力補正適用
+                const gravityStep = (pos, bodies, mass) => {
+                    const acc = calculateAcceleration(pos, bodies, mass);
+                    return acc.scale(this.ship.gravityMultiplier || 1.0);
+                };
+
+                const acc = gravityStep(this.ship.position, this.bodies, this.ship.mass);
+                this.ship.velocity = this.ship.velocity.add(acc.scale(this.fixedDt));
+                this.ship.position = this.ship.position.add(this.ship.velocity.scale(this.fixedDt));
+
                 this.simulatedTime += this.fixedDt;
                 this.accumulator -= this.fixedDt;
                 this.score += 1; 
@@ -745,7 +785,7 @@ export class Game {
                 }
                 
                 this.selection.accelerator = null;
-                this.selection.accOption = null;
+                this.selection.booster = null; // v0.3.0 rename
 
                 this.ui.message.textContent = ''; // メッセージをクリア
                 if (this.ship) this.ship.trail = []; // 軌跡をクリア
@@ -772,8 +812,6 @@ export class Game {
             
             const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
             const collisionDist = radius + 5;
-            
-            // CCD: 前の位置から現在の位置への線分と、星の中心との距離をチェック
             const distSq = getDistanceSqToSegment(body.position, startPos, shipPos);
             
             if (distSq < collisionDist * collisionDist) {
@@ -784,6 +822,31 @@ export class Game {
                     this.ui.status.textContent = 'RELOADING...';
                     this.resolveItems('returned'); 
                 } else {
+                    // アドオンによる衝突回避判定
+                    // 1. Star Breaker (星破壊)
+                    const breaker = this.ship.equippedModules.find(m => m.id === 'mod_star_breaker' && m.charges > 0);
+                    if (breaker) {
+                        breaker.charges--;
+                        this.bodies = this.bodies.filter(b => b !== body); // 星を消滅
+                        this.physics.bodies = [...this.bodies, this.ship]; // 物理エンジン同期
+                        this.ui.message.textContent = 'STAR DESTROYED!';
+                        setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                        return false; // 衝突しなかったことにする
+                    }
+
+                    // 2. Impact Cushion (バウンド)
+                    const cushion = this.ship.equippedModules.find(m => m.id === 'mod_cushion' && m.charges > 0);
+                    if (cushion) {
+                        cushion.charges--;
+                        // 反転・跳ね返り処理（簡易：速度ベクトルを反転させて減速）
+                        const normal = shipPos.sub(body.position).normalize();
+                        const dot = this.ship.velocity.dot(normal);
+                        this.ship.velocity = this.ship.velocity.sub(normal.scale(2 * dot)).scale(0.5);
+                        this.ui.message.textContent = 'IMPACT ABSORBED!';
+                        setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                        return false; // 衝突しなかったことにする
+                    }
+
                     this.state = 'crashed';
                     this.stateTimer = 2.0; 
                     this.ui.message.textContent = 'CRASHED';
@@ -797,17 +860,30 @@ export class Game {
 
         const distFromCenter = shipPos.sub(new Vector2(this.canvas.width / 2, this.canvas.height / 2)).length();
         if (distFromCenter >= this.boundaryRadius) {
+            // 3. Emergency Thruster (境界での戻り)
+            const emergency = this.ship.equippedModules.find(m => m.id === 'mod_emergency' && m.charges > 0);
+            if (emergency) {
+                emergency.charges--;
+                const center = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+                const toCenter = center.sub(shipPos).normalize();
+                this.ship.velocity = toCenter.scale(this.ship.velocity.length() * 0.8);
+                this.ui.message.textContent = 'EMERGENCY THRUST!';
+                setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                return false;
+            }
             const shipAngle = Math.atan2(shipPos.y - this.canvas.height / 2, shipPos.x - this.canvas.width / 2);
             
             // いずれかのゴール内に入っているかチェック
             let hitGoal = null;
+            const arcBonus = this.ship.arcMultiplier || 1.0;
+
             for (const goal of this.goals) {
                 // 角度の差分を -PI to PI に正規化
                 let diff = shipAngle - goal.angle;
                 while (diff > Math.PI) diff -= Math.PI * 2;
                 while (diff < -Math.PI) diff += Math.PI * 2;
                 
-                if (Math.abs(diff) < goal.width / 2) {
+                if (Math.abs(diff) < (goal.width * arcBonus) / 2) {
                     hitGoal = goal;
                     break;
                 }
@@ -856,11 +932,14 @@ export class Game {
         const accBonus = acc ? (acc.precisionMultiplier || 0) : 0;
         const precision = (rocket.totalPrecision || 0) * ((rocket.totalMultiplier || 0) + accBonus);
 
+        const gravityMultiplier = rocket.totalGravityMultiplier || 1.0;
+
         for (let i = 0; i < precision; i++) { 
             if (i % 5 === 0) points.push(new Vector2(tempPos.x, tempPos.y));
             
             const prevTempPos = new Vector2(tempPos.x, tempPos.y); // 前の座標を保存
-            const acc = calculateAcceleration(tempPos, this.bodies, mass);
+            const grav = calculateAcceleration(tempPos, this.bodies, mass);
+            const acc = grav.scale(gravityMultiplier);
             tempVel = tempVel.add(acc.scale(simDt));
             tempPos = tempPos.add(tempVel.scale(simDt));
             
@@ -991,22 +1070,22 @@ export class Game {
                 if (category === 'CHASSIS') targetList = this.inventory.chassis;
                 if (category === 'LOGIC') targetList = this.inventory.logic;
                 if (category === 'ACCELERATORS') targetList = this.inventory.accelerators;
-                if (category === 'LOGIC_OPTIONS') targetList = this.inventory.logicOptions;
-                if (category === 'ACC_OPTIONS') targetList = this.inventory.accOptions;
+                if (category === 'MODULES') targetList = this.inventory.modules;
+                if (category === 'BOOSTERS') targetList = this.inventory.boosters;
 
                 if (targetList) {
                     const existing = targetList.find(i => i.id === item.id);
                     if (existing) {
                         if (category === 'ACCELERATORS') {
-                            if (existing.hp !== undefined) existing.hp++;
-                            else existing.hp = item.durability || 2;
+                            if (existing.charges !== undefined) existing.charges++;
+                            else existing.charges = item.maxCharges || 2;
                         } else {
                             if (existing.count !== undefined) existing.count++;
                             else existing.count = 2; // 初回取得
                         }
                     } else {
                         if (category === 'ACCELERATORS') {
-                            targetList.push({ ...item, hp: item.durability || 2 });
+                            targetList.push({ ...item, charges: item.maxCharges || 2 });
                         } else {
                             targetList.push({ ...item, count: 1 });
                         }
@@ -1036,18 +1115,18 @@ export class Game {
                     const parts = [];
                     if (rocket.chassis && Math.random() < 0.5) parts.push({ category: 'CHASSIS', item: rocket.chassis });
                     if (rocket.logic && Math.random() < 0.5) parts.push({ category: 'LOGIC', item: rocket.logic });
-                    if (rocket.logicOption) {
-                        for (const [optId, count] of Object.entries(rocket.logicOption)) {
-                            const optBase = PARTS.LOGIC_OPTIONS.find(o => o.id === optId);
+                    if (rocket.modules) {
+                        for (const [optId, count] of Object.entries(rocket.modules)) {
+                            const optBase = PARTS.MODULES.find(o => o.id === optId);
                             if (optBase) {
                                 for(let c=0; c<count; c++) {
-                                    if (Math.random() < 0.5) parts.push({ category: 'LOGIC_OPTIONS', item: optBase });
+                                    if (Math.random() < 0.5) parts.push({ category: 'MODULES', item: optBase });
                                 }
                             }
                         }
                     }
-                    if (rocket.accOption && Math.random() < 0.5) {
-                        parts.push({ category: 'ACC_OPTIONS', item: rocket.accOption });
+                    if (rocket.booster && Math.random() < 0.5) {
+                        parts.push({ category: 'BOOSTERS', item: rocket.booster });
                     }
                     
                     const droppedParts = parts;

@@ -134,8 +134,33 @@ export class Renderer {
 
         this.ctx.restore();
 
+        // ソナー波紋（アイテム回収範囲）の描画
+        this.drawScannerRipple(ship);
+
         // アイテム追従エフェクトの描画
         this.drawCollectedItems(ship);
+    }
+
+    drawScannerRipple(ship) {
+        const radius = (ship.pickupRange || 0) * (ship.pickupMultiplier || 1);
+        if (radius <= 0) return;
+
+        const now = Date.now();
+        const duration = 2000; // 2秒で1周
+
+        [0, 0.5].forEach(offset => {
+            const t = ((now + offset * duration) % duration) / duration;
+            const rippleRadius = radius * t;
+            const alpha = (1 - t) * 0.4;
+
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(ship.position.x, ship.position.y, rippleRadius, 0, Math.PI * 2);
+            this.ctx.strokeStyle = `rgba(0, 255, 204, ${alpha})`;
+            this.ctx.lineWidth = 1.5;
+            this.ctx.stroke();
+            this.ctx.restore();
+        });
     }
 
     drawGoals(goals, boundaryRadius) {
