@@ -54,25 +54,25 @@
 
 | カテゴリ | 名称 | ID | 出現率 | 重量 | Slot | 予測精度 | 予測倍率 | 取得範囲 | 取得倍率 | アーク倍率 | 重力倍率 | 耐久(回数) | 備考 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Chassis** | Lite Chassis | `hull_light` | 10 | 3 | 0| 100 | - | 0 | - | - | - | - | 性能重視の軽量体。重力の影響大。 |
-| | Standard Chassis | `hull_medium` | 10 | 8 | 1 | 100 | - | 0 | - | - | - | - | 汎用性の高い標準体。1スロット。 |
-| | Tough Chassis | `hull_heavy` | 10 | 18 | 2 | 100 | - | 0 | - | - | - | - | 堅牢な重厚体。2スロット。 |
-| **Logic** | Entry Logic | `sensor_short` | 10 | 1 | 0 | 150 | - | **80** | **0.2** | - | - | - | 取得特化の広域収集型。予測精度は低い。 |
-| | Sync Logic | `sensor_normal` | 10 | 1 | 0 | 250 | - | 40 | **0.1** | - | - | - | 標準的な予測精度。 |
-| | Deep Logic | `sensor_long` | 10 | 1 | 0 | 4500 | **0.1** | **20** | - | - | - | - | 予測特化の高精度型。取得範囲は限定的。 |
-| **Accelerator** | Standard Acc. | `pad_standard` | 10 | 1 | 0 | 0 | - | 0 | - | - | - | 2 | パワー: 1200 |
-| | Steady Acc. | `pad_precision` | 10 | 1 | 0 | 0 | **0.05** | 0 | - | - | - | 2 | パワー: 1000, 予測線強化。 |
+| **Chassis** | Lite Chassis | `hull_light` | 10 | 3 | - | 100 | - | - | - | - | - | - | 性能重視の軽量体。重力の影響大。 |
+| | Standard Chassis | `hull_medium` | 10 | 8 | 1 | 100 | - | - | - | - | - | - | 汎用性の高い標準体。1スロット。 |
+| | Tough Chassis | `hull_heavy` | 10 | 18 | 2 | 100 | - | - | - | - | - | - | 堅牢な重厚体。2スロット。 |
+| **Logic** | Entry Logic | `sensor_short` | 10 | 1 | - | 150 | - | **80** | **0.2** | - | - | - | 取得特化の広域収集型。予測精度は低い。 |
+| | Sync Logic | `sensor_normal` | 10 | 1 | - | 250 | - | 40 | **0.1** | - | - | - | 標準的な予測精度。 |
+| | Deep Logic | `sensor_long` | 10 | 1 | - | 4500 | **0.1** | **20** | - | - | - | - | 予測特化の高精度型。取得範囲は限定的。 |
+| **Accelerator** | Standard Acc. | `pad_standard` | 10 | 1 | - | - | - | - | - | - | - | 2 | パワー: 1200 |
+| | Steady Acc. | `pad_precision` | 10 | 1 | - | - | - | - | - | - | - | 2 | パワー: 1000, 予測線強化。 |
 | **Module** | Slot Expander | `mod_capacity` | 10 | 1 | 2 | - | - | - | - | - | - | - | 拡張スロットを2つ追加。重量が増加。 |
-| | Star Breaker | `mod_star_breaker` | 5 | 2 | 1 | - | - | - | - | - | - | 2 | 衝突時に星を破壊して回避。 |
-| | Impact Cushion | `mod_cushion` | 5 | 1 | 1 | - | - | - | - | - | - | 1 | 衝突時にバウンドして回避。 |
-| | Emergency Thruster | `mod_emergency` | 5 | 1 | 1 | - | - | - | - | - | - | 1 | ロスト時に中心へ自動方向転換。 |
-| | Trajectory Stabilizer | `mod_stabilizer` | 8 | 1 | 1 | - | - | - | - | - | **0.8** | - | 自機にかかる重力の影響を0.8倍に軽減。 |
-| **Booster** | Reaction Fuel | `opt_fuel` | 10 | 1 | 0 | - | - | - | - | - | - | - | 加速時の耐久減少を自動で無効化。 |
-| | Magnetic Pulse | `boost_magnet` | 5 | 1 | 0 | - | - | - | - | - | - | - | 飛行時間と共にアイテム回収範囲（波紋）が拡大。 |
-| | Goal Expander | `boost_expander` | 5 | 1 | 0 | - | - | - | - | **1.2** | - | - | ゴールのサイズ（アーク角度）を拡大。 |
-| **Cargo** | Safe Cargo | `cargo_safe` | 5 | 1 | 0 | 0 | - | 0 | - | - | - | - | 安全出口への配送用(緑)。 |
-| | Normal Cargo | `cargo_normal` | 5 | 2 | 0 | 0 | - | 0 | - | - | - | - | 通常出口への配送用(青)。 |
-| | Danger Cargo | `cargo_danger` | 5 | 4 | 0 | 0 | - | 0 | - | - | - | - | 危険出口への配送用(赤)。 |
+| | Star Breaker | `mod_star_breaker` | 5 | 2 | - | - | - | - | - | - | - | 2 | 衝突時に星を破壊して回避。 |
+| | Impact Cushion | `mod_cushion` | 5 | 1 | - | - | - | - | - | - | - | 1 | 衝突時にバウンドして回避。 |
+| | Emergency Thruster | `mod_emergency` | 5 | 1 | - | - | - | - | - | - | - | 1 | ロスト時に中心へ自動方向転換。 |
+| | Trajectory Stabilizer | `mod_stabilizer` | 8 | 1 | - | - | - | - | - | - | **0.8** | - | 自機にかかる重力の影響を0.8倍に軽減。 |
+| **Booster** | Reaction Fuel | `opt_fuel` | 10 | 1 | - | - | - | - | - | - | - | - | 加速時の耐久減少を自動で無効化。 |
+| | Magnetic Pulse | `boost_magnet` | 5 | 1 | - | - | - | - | - | - | - | - | 飛行時間と共にアイテム回収範囲（波紋）が拡大。 |
+| | Goal Expander | `boost_expander` | 5 | 1 | - | - | - | - | - | **1.2** | - | - | ゴールのサイズ（アーク角度）を拡大。 |
+| **Cargo** | Safe Cargo | `cargo_safe` | 5 | 1 | - | - | - | - | - | - | - | - | 安全出口への配送用(緑)。 |
+| | Normal Cargo | `cargo_normal` | 5 | 2 | - | - | - | - | - | - | - | - | 通常出口への配送用(青)。 |
+| | Danger Cargo | `cargo_danger` | 5 | 4 | - | - | - | - | - | - | - | - | 危険出口への配送用(赤)。 |
 
 
 ## 5. 軌道予測 (Orbit Prediction)

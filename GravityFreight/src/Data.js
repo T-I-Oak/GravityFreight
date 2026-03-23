@@ -28,10 +28,10 @@ export const PARTS = {
     ],
     MODULES: [
         { id: 'mod_capacity', name: 'Slot Expander', mass: 1, slots: 2, appearanceRate: 10, color: 'rgba(156, 39, 176, 0.15)', description: '拡張スロットを2つ追加する。重量が増加する。' },
-        { id: 'mod_star_breaker', name: 'Star Breaker', mass: 2, slots: 1, maxCharges: 2, appearanceRate: 5, color: 'rgba(255, 87, 34, 0.15)', description: '衝突の瞬間、チャージを消費して星を破壊し、クラッシュを回避する。' },
-        { id: 'mod_cushion', name: 'Impact Cushion', mass: 1, slots: 1, maxCharges: 1, appearanceRate: 5, color: 'rgba(156, 39, 176, 0.15)', description: '衝突時、チャージを消費してバウンドし、破壊を防ぐ。' },
-        { id: 'mod_emergency', name: 'Emergency Thruster', mass: 1, slots: 1, maxCharges: 1, appearanceRate: 5, color: 'rgba(255, 193, 7, 0.15)', description: '境界線での消失(LOST)を防ぎ、コース内へ逆噴射する。' },
-        { id: 'mod_stabilizer', name: 'Trajectory Stabilizer', mass: 1, slots: 1, gravityMultiplier: 0.8, appearanceRate: 8, color: 'rgba(0, 188, 212, 0.15)', description: '重力の影響を0.8倍に軽減し、軌道を安定させる。' }
+        { id: 'mod_star_breaker', name: 'Star Breaker', mass: 2, maxCharges: 2, appearanceRate: 5, color: 'rgba(255, 87, 34, 0.15)', description: '衝突の瞬間、チャージを消費して星を破壊し、クラッシュを回避する。' },
+        { id: 'mod_cushion', name: 'Impact Cushion', mass: 1, maxCharges: 1, appearanceRate: 5, color: 'rgba(156, 39, 176, 0.15)', description: '衝突時、チャージを消費してバウンドし、破壊を防ぐ。' },
+        { id: 'mod_emergency', name: 'Emergency Thruster', mass: 1, maxCharges: 1, appearanceRate: 5, color: 'rgba(255, 193, 7, 0.15)', description: '境界線での消失(LOST)を防ぎ、コース内へ逆噴射する。' },
+        { id: 'mod_stabilizer', name: 'Trajectory Stabilizer', mass: 1, gravityMultiplier: 0.8, appearanceRate: 8, color: 'rgba(0, 188, 212, 0.15)', description: '重力の影響を0.8倍に軽減し、軌道を安定させる。' }
     ],
     BOOSTERS: [
         { id: 'opt_fuel', name: 'Reaction Fuel', mass: 1, slots: 0, appearanceRate: 10, color: 'rgba(121, 85, 72, 0.15)', description: 'Acceleratorの摩耗を防ぎ、耐久減少を自動で無効化する。' },
