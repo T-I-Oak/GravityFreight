@@ -151,13 +151,16 @@ export class Renderer {
         [0, 0.5].forEach(offset => {
             const t = ((now + offset * duration) % duration) / duration;
             const rippleRadius = radius * t;
-            const alpha = (1 - t) * 0.4;
+            // 不透明度と線幅を上げて視認性を高める
+            const alpha = (1 - t) * 0.9;
 
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(ship.position.x, ship.position.y, rippleRadius, 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(0, 255, 204, ${alpha * 0.15})`; // わずかに塗りつぶしを追加
             this.ctx.strokeStyle = `rgba(0, 255, 204, ${alpha})`;
-            this.ctx.lineWidth = 1.5;
+            this.ctx.lineWidth = 2.5;
+            this.ctx.fill();
             this.ctx.stroke();
             this.ctx.restore();
         });
