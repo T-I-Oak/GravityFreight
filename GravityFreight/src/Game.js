@@ -24,6 +24,8 @@ export class Game {
         this.width = canvas.width;
         this.height = canvas.height;
         this.isPointerDown = false;
+        this.activePointers = new Map();
+        this.lastPinchDist = 0;
 
 
         // インベントリの初期化 (数量管理)
@@ -261,7 +263,6 @@ export class Game {
             }
         };
 
-        window.addEventListener('pointermove', updatePointer);
 
         const launch = () => {
             if (this.state === 'aiming') {
@@ -300,7 +301,14 @@ export class Game {
         };
 
         window.addEventListener('pointerdown', (e) => {
+            this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
             this.isPointerDown = true;
+
+            if (this.activePointers.size === 2) {
+                const pts = Array.from(this.activePointers.values());
+                this.lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+            }
+
             // UI上のクリックはスルー
             if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) return;
             
@@ -312,13 +320,39 @@ export class Game {
             }
         });
 
-        window.addEventListener('pointerup', () => {
-            this.isPointerDown = false;
+        window.addEventListener('pointermove', (e) => {
+            if (this.activePointers.has(e.pointerId)) {
+                this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            }
+
+            if (this.activePointers.size === 2) {
+                const pts = Array.from(this.activePointers.values());
+                const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+                
+                if (this.lastPinchDist > 0) {
+                    const factor = dist / this.lastPinchDist;
+                    this.zoom *= factor;
+                    this.zoom = Math.max(0.3, Math.min(this.zoom, 5.0));
+                }
+                this.lastPinchDist = dist;
+            } else {
+                updatePointer(e);
+            }
         });
 
-        window.addEventListener('pointercancel', () => {
-            this.isPointerDown = false;
-        });
+        const endPointer = (e) => {
+            this.activePointers.delete(e.pointerId);
+            if (this.activePointers.size === 0) {
+                this.isPointerDown = false;
+            }
+            if (this.activePointers.size < 2) {
+                this.lastPinchDist = 0;
+            }
+        };
+
+        window.addEventListener('pointerup', endPointer);
+        window.addEventListener('pointercancel', endPointer);
+        window.addEventListener('pointerout', endPointer);
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') launch();
