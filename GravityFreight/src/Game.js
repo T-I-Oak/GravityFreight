@@ -23,6 +23,7 @@ export class Game {
         this.currentStarCount = starCount;
         this.width = canvas.width;
         this.height = canvas.height;
+        this.isPointerDown = false;
 
 
         // インベントリの初期化 (数量管理)
@@ -240,6 +241,16 @@ export class Game {
 
     setupListeners() {
         const updatePointer = (e) => {
+            // UI上の操作（ボタン等）の時はエイムを更新しない
+            if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) {
+                return;
+            }
+
+            // エイム中かつドラッグ中でない場合は更新しない（iPad等でのボタン移動対策）
+            if (this.state === 'aiming' && !this.isPointerDown) {
+                return;
+            }
+
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
             
@@ -290,15 +301,24 @@ export class Game {
         };
 
         window.addEventListener('pointerdown', (e) => {
+            this.isPointerDown = true;
             // UI上のクリックはスルー
-            if (e.target.closest('#build-overlay')) return;
+            if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) return;
             
             // ポインター位置を更新（タップした瞬間に照準を合わせるため）
             updatePointer(e);
 
-            if (this.state === 'aiming' || this.state === 'building') {
+            if (this.state === 'crashed' || this.state === 'cleared') {
                 launch();
             }
+        });
+
+        window.addEventListener('pointerup', () => {
+            this.isPointerDown = false;
+        });
+
+        window.addEventListener('pointercancel', () => {
+            this.isPointerDown = false;
         });
 
         window.addEventListener('keydown', (e) => {
@@ -312,6 +332,11 @@ export class Game {
         }, { passive: false });
 
         document.getElementById('build-btn').onclick = () => this.assembleUnit();
+
+        document.getElementById('launch-btn').onclick = (e) => {
+            e.stopPropagation();
+            launch();
+        };
 
         document.getElementById('toggle-factory-btn').onclick = () => {
             this.isFactoryOpen = !this.isFactoryOpen;
