@@ -238,17 +238,19 @@ export class Game {
     }
 
     setupListeners() {
-        window.addEventListener('mousemove', (e) => {
+        const updatePointer = (e) => {
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
             
             if (this.state === 'aiming') {
-                const worldMouse = this.getWorldPos(this.mousePos);
-                const dir = worldMouse.sub(this.homeStar.position).normalize();
+                const worldPos = this.getWorldPos(this.mousePos);
+                const dir = worldPos.sub(this.homeStar.position).normalize();
                 this.ship.position = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
                 this.ship.rotation = Math.atan2(dir.y, dir.x);
             }
-        });
+        };
+
+        window.addEventListener('pointermove', updatePointer);
 
         const launch = () => {
             if (this.state === 'aiming') {
@@ -256,11 +258,9 @@ export class Game {
                 const dir = worldMouse.sub(this.homeStar.position).normalize();
                 const power = this.selection.accelerator ? this.selection.accelerator.power : 1200;
                 
-                // 質量補正初速
                 const massFactor = Math.sqrt(10 / this.ship.mass);
                 this.ship.velocity = dir.scale(power * massFactor);
 
-                // 耐久度消費ロジック
                 if (this.selection.booster && this.selection.booster.id === 'opt_fuel') {
                     this.selection.booster.count--;
                     if (this.selection.booster.count <= 0) {
@@ -274,7 +274,6 @@ export class Game {
                         this.selection.accelerator = null;
                     }
                 }
-
                 
                 this.ship.trail = [];
                 this.physics.bodies.push(this.ship);
@@ -289,15 +288,17 @@ export class Game {
             }
         };
 
-        window.addEventListener('mousedown', (e) => {
+        window.addEventListener('pointerdown', (e) => {
+            // UI上のクリックはスルー
             if (e.target.closest('#build-overlay')) return;
-            // 飛行中以外（建造中・狙い中）なら発射を試みる
-            // クラッシュ/クリア状態でのクリックによる「即時リトライ」は排除（自動遷移に任せる）
+            
+            // ポインター位置を更新（タップした瞬間に照準を合わせるため）
+            updatePointer(e);
+
             if (this.state === 'aiming' || this.state === 'building') {
                 launch();
             }
         });
-
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') launch();
