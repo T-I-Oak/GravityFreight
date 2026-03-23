@@ -1,5 +1,5 @@
-import { PhysicsEngine, Body, Vector2, G, calculateAcceleration, getDistanceSqToSegment } from './Physics.js';
-import { PARTS, INITIAL_INVENTORY, CATEGORY_COLORS } from './Data.js';
+import { PhysicsEngine, Body, Vector2, calculateAcceleration, getDistanceSqToSegment } from './Physics.js';
+import { PARTS, CATEGORY_COLORS, INITIAL_INVENTORY, RARITY } from './Data.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
@@ -68,6 +68,7 @@ export class Game {
 
         this.isFactoryOpen = true; // 建造パネルの表示状態
 
+        this.stageLevel = 1; // ステージ進行度
         this.initStage(this.currentStarCount);
         this.setupListeners();
         this.updateUI();
@@ -163,11 +164,18 @@ export class Game {
 
     getWeightedRandomItem() {
         let pool = [];
+        // スタート時点ではRAREと同じ値（15）。ステージが進むごとに上限が解放・出現率が増加していく
+        const THRESHOLD = RARITY.RARE + (this.stageLevel - 1); 
+        
         for (const [category, items] of Object.entries(PARTS)) {
             items.forEach(item => {
-                const weight = item.appearanceRate !== undefined ? item.appearanceRate : 10;
-                if (weight > 0) {
-                    pool.push({ item, category, weight });
+                const rarity = item.rarity;
+                // レアリティが設定されているアイテムのみ自然出現させる
+                if (rarity !== undefined) {
+                    const weight = Math.max(0, THRESHOLD - rarity);
+                    if (weight > 0) {
+                        pool.push({ item, category, weight });
+                    }
                 }
             });
         }
@@ -781,6 +789,7 @@ export class Game {
             if (this.stateTimer <= 0) {
                 const prevState = this.state;
                 if (prevState === 'cleared') {
+                    this.stageLevel += 1;
                     this.initStage(this.currentStarCount); // 成功時はリセット
                 }
                 // 失敗時は星を維持してリトライ
