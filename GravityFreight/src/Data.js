@@ -38,7 +38,8 @@ export const PARTS = {
         { id: 'mod_star_breaker', name: 'Star Breaker', mass: 2, maxCharges: 2, rarity: RARITY.RARE, color: 'rgba(255, 87, 34, 0.15)', description: '衝突の瞬間、チャージを消費して星を破壊し、クラッシュを回避する。' },
         { id: 'mod_cushion', name: 'Impact Cushion', mass: 1, maxCharges: 1, rarity: RARITY.RARE, color: 'rgba(156, 39, 176, 0.15)', description: '衝突時、チャージを消費してバウンドし、破壊を防ぐ。' },
         { id: 'mod_emergency', name: 'Emergency Thruster', mass: 1, maxCharges: 1, rarity: RARITY.RARE, color: 'rgba(255, 193, 7, 0.15)', description: '境界線での消失(LOST)を防ぎ、コース内へ逆噴射する。' },
-        { id: 'mod_stabilizer', name: 'Trajectory Stabilizer', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.RARE, color: 'rgba(0, 188, 212, 0.15)', description: '重力の影響を0.8倍に軽減し、軌道を安定させる。' }
+        { id: 'mod_stabilizer', name: 'Trajectory Stabilizer', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.RARE, color: 'rgba(0, 188, 212, 0.15)', description: '重力の影響を0.8倍に軽減し、軌道を安定させる。' },
+        { id: 'mod_predictor', name: 'Trajectory Predictor', mass: 1, precision: 500, rarity: RARITY.UNCOMMON, color: 'rgba(255, 255, 255, 0.15)', description: '予測精度を向上させ、軌道予測線を延長する。' }
     ],
     BOOSTERS: [
         { id: 'opt_fuel', name: 'Reaction Fuel', mass: 1, slots: 0, rarity: RARITY.UNCOMMON, color: 'rgba(121, 85, 72, 0.15)', description: 'Acceleratorの摩耗を防ぎ、耐久減少を自動で無効化する。' },
@@ -55,29 +56,21 @@ export const PARTS = {
 // 初期所持アイテムの定義 (数量管理)
 export const INITIAL_INVENTORY = {
     chassis: [
-        { id: 'hull_light', count: 3 },
-        { id: 'hull_medium', count: 2 },
-        { id: 'hull_heavy', count: 1 }
+        { id: 'hull_light', count: 1 },
+        { id: 'hull_medium', count: 1 }
     ],
     logic: [
-        { id: 'sensor_short', count: 3 },
-        { id: 'sensor_normal', count: 2 },
-        { id: 'sensor_long', count: 1 }
+        { id: 'sensor_short', count: 1 },
+        { id: 'sensor_normal', count: 1 }
     ],
     accelerators: [
         { id: 'pad_standard', charges: 2 },
         { id: 'pad_precision', charges: 2 }
     ],
     modules: [
-        { id: 'mod_capacity', count: 2 },
-        { id: 'mod_star_breaker', count: 1 },
-        { id: 'mod_stabilizer', count: 1 },
-        { id: 'mod_cushion', count: 1 },
-        { id: 'mod_emergency', count: 1 }
+        { id: 'mod_predictor', count: 1 }
     ],
     boosters: [
-        { id: 'opt_fuel', count: 2 },
-        { id: 'boost_magnet', count: 1 },
-        { id: 'boost_expander', count: 1 }
+        { id: 'opt_fuel', count: 1 }
     ]
 };

@@ -68,6 +68,7 @@
 | | Impact Cushion | `mod_cushion` | RARE | 1 | - | - | - | - | - | - | - | 1 | 衝突時にバウンドして回避。 |
 | | Emergency Thruster | `mod_emergency` | RARE | 1 | - | - | - | - | - | - | - | 1 | ロスト時に中心へ自動方向転換。 |
 | | Trajectory Stabilizer | `mod_stabilizer` | RARE | 1 | - | - | - | - | - | - | **0.8** | - | 自機にかかる重力の影響を0.8倍に軽減。 |
+| | Trajectory Predictor | `mod_predictor` | UNCOMMON | 1 | - | **500** | - | - | - | - | - | - | 予測精度を向上させ、軌道予測線を延長する。 |
 | **Booster** | Reaction Fuel | `opt_fuel` | UNCOMMON | 1 | - | - | - | - | - | - | - | - | 加速時の耐久減少を自動で無効化。 |
 | | Magnetic Pulse | `boost_magnet` | RARE | 1 | - | - | - | - | - | - | - | - | 飛行時間と共にアイテム回収範囲（波紋）が拡大。 |
 | | Goal Expander | `boost_expander` | RARE | 1 | - | - | - | - | - | **1.2** | - | - | ゴールのサイズ（アーク角度）を拡大。 |
