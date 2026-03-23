@@ -402,15 +402,15 @@ export class Game {
             const modules = { ...this.selection.modules };
             const booster = this.selection.booster;
 
-            // 合計パラメータの算出
+            // 合計パラメータの算出 (重量、スロット、精度、取得範囲は加算)
             let totalMass = (chassis.mass || 0) + (logic.mass || 0);
             let totalSlots = (chassis.slots || 0) + (logic.slots || 0);
             let totalPrecision = (chassis.precision || 0) + (logic.precision || 0);
-            let totalMultiplier = (chassis.precisionMultiplier || 0) + (logic.precisionMultiplier || 0);
             let totalPickupRange = (chassis.pickupRange || 0) + (logic.pickupRange || 0);
-            let totalPickupMultiplier = (chassis.pickupMultiplier || 0) + (logic.pickupMultiplier || 0);
             
-            // 特殊補正
+            // 倍率補正 (全てベース1.0からの乗算)
+            let totalMultiplier = (chassis.precisionMultiplier || 1.0) * (logic.precisionMultiplier || 1.0);
+            let totalPickupMultiplier = (chassis.pickupMultiplier || 1.0) * (logic.pickupMultiplier || 1.0);
             let totalGravityMultiplier = 1.0;
             let arcMultiplier = 1.0;
 
@@ -420,22 +420,29 @@ export class Game {
                     totalMass += (optBase.mass || 0) * count;
                     totalSlots += (optBase.slots || 0) * count;
                     totalPrecision += (optBase.precision || 0) * count;
-                    totalMultiplier += (optBase.precisionMultiplier || 0) * count;
                     totalPickupRange += (optBase.pickupRange || 0) * count;
-                    totalPickupMultiplier += (optBase.pickupMultiplier || 0) * count;
                     
+                    if (optBase.precisionMultiplier) {
+                        for(let i=0; i<count; i++) totalMultiplier *= optBase.precisionMultiplier;
+                    }
+                    if (optBase.pickupMultiplier) {
+                        for(let i=0; i<count; i++) totalPickupMultiplier *= optBase.pickupMultiplier;
+                    }
                     if (optBase.gravityMultiplier) {
                         for(let i=0; i<count; i++) totalGravityMultiplier *= optBase.gravityMultiplier;
                     }
                 }
             }
 
-            // ブースターアドオンの加算
+            // ブースターアドオンの加算および倍率乗算
             if (booster) {
                 totalMass += (booster.mass || 0);
                 totalSlots += (booster.slots || 0);
                 totalPrecision += (booster.precision || 0);
-                totalMultiplier += (booster.precisionMultiplier || 0);
+                
+                if (booster.precisionMultiplier) totalMultiplier *= booster.precisionMultiplier;
+                if (booster.pickupMultiplier) totalPickupMultiplier *= booster.pickupMultiplier;
+                if (booster.gravityMultiplier) totalGravityMultiplier *= booster.gravityMultiplier;
                 if (booster.arcMultiplier) arcMultiplier *= booster.arcMultiplier;
             }
 
@@ -929,8 +936,8 @@ export class Game {
         
         // 合計された精度と倍率を使用
         const acc = this.selection.accelerator;
-        const accBonus = acc ? (acc.precisionMultiplier || 0) : 0;
-        const precision = (rocket.totalPrecision || 0) * ((rocket.totalMultiplier || 0) + accBonus);
+        const accBonus = acc ? (acc.precisionMultiplier || 1.0) : 1.0;
+        const precision = (rocket.totalPrecision || 0) * ((rocket.totalMultiplier || 1.0) * accBonus);
 
         const gravityMultiplier = rocket.totalGravityMultiplier || 1.0;
 

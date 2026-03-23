@@ -18,13 +18,13 @@ export const PARTS = {
         { id: 'hull_heavy', name: 'Tough Chassis', mass: 18, slots: 2, precision: 100, precisionMultiplier: 1.0, pickupRange: 0, pickupMultiplier: 1.0, appearanceRate: 10, color: 'rgba(255, 171, 64, 0.15)', description: '堅牢な重厚体。2スロット。' }
     ],
     LOGIC: [
-        { id: 'sensor_short', name: 'Entry Logic', mass: 1, slots: 0, precision: 150, precisionMultiplier: 0.0, pickupRange: 80, pickupMultiplier: 0.2, appearanceRate: 10, color: 'rgba(0, 188, 212, 0.15)', description: '取得範囲と倍率が高い広域収集型。予測精度は低い。' },
-        { id: 'sensor_normal', name: 'Sync Logic', mass: 1, slots: 0, precision: 250, precisionMultiplier: 0.0, pickupRange: 40, pickupMultiplier: 0.1, appearanceRate: 10, color: 'rgba(0, 188, 212, 0.15)', description: '標準的な予測精度を持つ同期ユニット。' },
-        { id: 'sensor_long', name: 'Deep Logic', mass: 1, slots: 0, precision: 4500, precisionMultiplier: 0.1, pickupRange: 20, pickupMultiplier: 0.0, appearanceRate: 10, color: 'rgba(0, 188, 212, 0.15)', description: '超長距離予測に特化した高精度演算ユニット。取得範囲は限定的。' }
+        { id: 'sensor_short', name: 'Entry Logic', mass: 1, slots: 0, precision: 150, pickupRange: 80, pickupMultiplier: 1.2, appearanceRate: 10, color: 'rgba(0, 188, 212, 0.15)', description: '取得特化の広域収集型。予測精度は低い。' },
+        { id: 'sensor_normal', name: 'Sync Logic', mass: 1, slots: 0, precision: 250, pickupRange: 40, pickupMultiplier: 1.1, appearanceRate: 10, color: 'rgba(0, 188, 212, 0.15)', description: '標準的な予測精度。' },
+        { id: 'sensor_long', name: 'Deep Logic', mass: 1, slots: 0, precision: 4500, precisionMultiplier: 1.1, pickupRange: 20, appearanceRate: 10, color: 'rgba(0, 188, 212, 0.15)', description: '超長距離予測に特化した高精度演算ユニット。取得範囲は限定的。' }
     ],
     ACCELERATORS: [
-        { id: 'pad_standard', name: 'Standard Accelerator', power: 1200, maxCharges: 2, mass: 1, slots: 0, precision: 0, precisionMultiplier: 0.0, pickupRange: 0, pickupMultiplier: 0.0, appearanceRate: 10, color: 'rgba(76, 175, 80, 0.15)', description: '標準的な初期加速。' },
-        { id: 'pad_precision', name: 'Steady Accelerator', power: 1000, maxCharges: 2, mass: 1, slots: 0, precision: 0, precisionMultiplier: 0.05, pickupRange: 0, pickupMultiplier: 0.0, appearanceRate: 10, color: 'rgba(76, 175, 80, 0.15)', description: '低速だが安定した射出が可能な安定型。' }
+        { id: 'pad_standard', name: 'Standard Accelerator', power: 1200, maxCharges: 2, mass: 1, slots: 0, precision: 0, appearanceRate: 10, color: 'rgba(76, 175, 80, 0.15)', description: '標準的な初期加速。' },
+        { id: 'pad_precision', name: 'Steady Accelerator', power: 1000, maxCharges: 2, mass: 1, slots: 0, precision: 0, precisionMultiplier: 1.05, appearanceRate: 10, color: 'rgba(76, 175, 80, 0.15)', description: '低速だが安定した小回りが可能な安定型。' }
     ],
     MODULES: [
         { id: 'mod_capacity', name: 'Slot Expander', mass: 1, slots: 2, appearanceRate: 10, color: 'rgba(156, 39, 176, 0.15)', description: '拡張スロットを2つ追加する。重量が増加する。' },
