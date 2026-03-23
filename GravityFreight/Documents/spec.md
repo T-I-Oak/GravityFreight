@@ -68,13 +68,41 @@
 | | Impact Cushion | `mod_cushion` | RARE | 1 | - | - | - | - | - | - | - | 1 | 衝突時にバウンドして回避。 |
 | | Emergency Thruster | `mod_emergency` | RARE | 1 | - | - | - | - | - | - | - | 1 | ロスト時に中心へ自動方向転換。 |
 | | Trajectory Stabilizer | `mod_stabilizer` | RARE | 1 | - | - | - | - | - | - | **0.8** | - | 自機にかかる重力の影響を0.8倍に軽減。 |
-| | Trajectory Predictor | `mod_predictor` | UNCOMMON | 1 | - | **500** | - | - | - | - | - | - | 予測精度を向上させ、軌道予測線を延長する。 |
+| | Orbit Analyst | `mod_analyzer` | UNCOMMON | 1 | - | - | **1.2** | - | - | - | - | - | 軌道解析を行い、予測倍率を1.2倍に強化。 |
 | **Booster** | Reaction Fuel | `opt_fuel` | UNCOMMON | 1 | - | - | - | - | - | - | - | - | 加速時の耐久減少を自動で無効化。 |
 | | Magnetic Pulse | `boost_magnet` | RARE | 1 | - | - | - | - | - | - | - | - | 飛行時間と共にアイテム回収範囲（波紋）が拡大。 |
 | | Goal Expander | `boost_expander` | RARE | 1 | - | - | - | - | - | **1.2** | - | - | ゴールのサイズ（アーク角度）を拡大。 |
 | **Cargo** | Safe Cargo | `cargo_safe` | - | 1 | - | - | - | - | - | - | - | - | 安全出口への配送用(緑)。※自然出現なし |
 | | Normal Cargo | `cargo_normal` | - | 2 | - | - | - | - | - | - | - | - | 通常出口への配送用(青)。※自然出現なし |
 | | Danger Cargo | `cargo_danger` | - | 4 | - | - | - | - | - | - | - | - | 危険出口への配送用(赤)。※自然出現なし |
+| | | | | | | | | | | | | | |
+
+### 4.2 初期所持アイテム (Initial Inventory)
+ゲーム開始時にプレイヤーが所持しているアイテム（計8個）の内訳です。
+
+1. **Lite Chassis** (`hull_light`) × 1
+2. **Standard Chassis** (`hull_medium`) × 1
+3. **Entry Logic** (`sensor_short`) × 1
+4. **Sync Logic** (`sensor_normal`) × 1
+5. **Standard Accelerator** (`pad_standard`) × 1 (耐久: 2)
+6. **Steady Accelerator** (`pad_precision`) × 1 (耐久: 2)
+7. **Orbit Analyst** (`mod_analyzer`) × 1
+8. **Reaction Fuel** (`opt_fuel`) × 1
+
+### 4.3 カテゴリーイメージカラー (Category Colors)
+各パーツ・アイテムは、そのカテゴリーに応じた固有のイメージカラーを持ち、UIやエフェクト（星の縁取り、アイテムの追跡ドット等）に使用されます。
+
+| カテゴリー | イメージカラー | コード |
+| :--- | :--- | :--- |
+| **Chassis** | オレンジ | `#ffab40` |
+| **Logic** | シアン | `#00bcd4` |
+| **Module** | パープル | `#9c27b0` |
+| **Accelerator** | グリーン | `#4caf50` |
+| **Booster** | ブラウン | `#795548` |
+| **Cargo (Safe)** | エメラルド | `#00e676` |
+| **Cargo (Normal)** | ブルー | `#2979ff` |
+| **Cargo (Danger)** | レッド | `#ff1744` |
+| **Unit** | ライトブルー | `#e0e0ff` |
 
 
 ## 5. 軌道予測 (Orbit Prediction)

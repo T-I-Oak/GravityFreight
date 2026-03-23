@@ -1,5 +1,6 @@
 import { Game } from './Game.js';
 import { Renderer } from './Renderer.js';
+import { CATEGORY_COLORS, hexToRgba } from './Data.js';
 
 function main() {
     const canvas = document.getElementById('gameCanvas');
@@ -102,18 +103,11 @@ function main() {
                 mergedItems.forEach(mergedItem => {
                     const data = mergedItem.data;
                     const type = mergedItem.type;
-                    
-                    const bgColors = {
-                        'CHASSIS': 'rgba(255, 171, 64, 0.15)',
-                        'LOGIC': 'rgba(0, 188, 212, 0.15)',
-                        'LOGIC_OPTIONS': 'rgba(156, 39, 176, 0.15)',
-                        'ACCELERATORS': 'rgba(76, 175, 80, 0.15)',
-                        'ACC_OPTIONS': 'rgba(121, 85, 72, 0.15)'
-                    };
+                    const categoryColor = CATEGORY_COLORS[type];
 
                     const div = document.createElement('div');
                     div.className = 'part-item'; // ビルド時と同じ表示形式
-                    div.style.backgroundColor = data.color || bgColors[type] || 'rgba(255, 255, 255, 0.15)';
+                    div.style.backgroundColor = hexToRgba(categoryColor, 0.15);
                     
                     div.innerHTML = game.generateCardHTML(data, {
                         showInventory: true // アイテム数をバッヂとして表示 [x 1]や[x 2]

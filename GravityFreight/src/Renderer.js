@@ -229,8 +229,8 @@ export class Renderer {
                 const pos = ship.trail[trailIdx];
                 this.ctx.save();
                 this.ctx.shadowBlur = 8;
-                this.ctx.shadowColor = item.color;
-                this.ctx.fillStyle = item.color;
+                this.ctx.shadowColor = CATEGORY_COLORS[item.category];
+                this.ctx.fillStyle = CATEGORY_COLORS[item.category];
                 this.ctx.beginPath();
                 this.ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
                 this.ctx.fill();

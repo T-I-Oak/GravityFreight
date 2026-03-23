@@ -4,6 +4,7 @@
   "description": "2D物理演算ベースの宇宙航行ローグライク",
   "type": "module",
   "scripts": {
+    "dev": "vite",
     "test": "vitest run"
   },
   "devDependencies": {

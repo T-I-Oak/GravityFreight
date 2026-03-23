@@ -1,12 +1,12 @@
+import { PARTS, CATEGORY_COLORS, INITIAL_INVENTORY, RARITY, hexToRgba } from './Data.js';
 import { PhysicsEngine, Body, Vector2, calculateAcceleration, getDistanceSqToSegment } from './Physics.js';
-import { PARTS, CATEGORY_COLORS, INITIAL_INVENTORY, RARITY } from './Data.js';
 
 export class Game {
-    constructor(canvas, ui, starCount = 5) {
+    constructor(canvas, ui, starCount = 8) {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.3.0'; // Add-on Update (v0.3.0)
+        this.version = '0.3.0'; // Module/Booster Update (v0.3.0)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -587,14 +587,14 @@ export class Game {
 
                 div.className = `part-item ${isSelected ? 'selected' : ''}`;
                 
-                // 背景色（イメージカラー）の適用と選択ハイライト
-                if (data.color) {
-                    const baseColor = data.color;
+                // カテゴリーに基づく背景色の適用
+                const categoryColor = CATEGORY_COLORS[data.category];
+                if (categoryColor) {
                     if (isSelected) {
-                        div.style.backgroundColor = baseColor.replace('0.15', '0.45');
-                        div.style.borderColor = baseColor.replace('0.15', '0.8');
+                        div.style.backgroundColor = hexToRgba(categoryColor, 0.45);
+                        div.style.borderColor = hexToRgba(categoryColor, 0.8);
                     } else {
-                        div.style.backgroundColor = baseColor;
+                        div.style.backgroundColor = hexToRgba(categoryColor, 0.15);
                     }
                 }
 
@@ -633,17 +633,17 @@ export class Game {
             if (this.inventory.rockets.length === 0) {
                 rList.innerHTML = '<div class="slot-placeholder">No Units Built</div>';
             } else {
-                const unitColor = 'rgba(224, 224, 255, 0.15)';
+                const unitColor = CATEGORY_COLORS.UNIT;
                 this.inventory.rockets.forEach(rocket => {
                     const div = document.createElement('div');
                     const isSelected = (this.selection.rocket === rocket);
                     div.className = `unit-item ${isSelected ? 'selected' : ''}`;
                     
                     if (isSelected) {
-                        div.style.backgroundColor = unitColor.replace('0.15', '0.45');
-                        div.style.borderColor = 'rgba(224, 224, 255, 0.8)';
+                        div.style.backgroundColor = hexToRgba(unitColor, 0.45);
+                        div.style.borderColor = hexToRgba(unitColor, 0.8);
                     } else {
-                        div.style.backgroundColor = unitColor;
+                        div.style.backgroundColor = hexToRgba(unitColor, 0.15);
                     }
 
                     div.innerHTML = `<span class="part-name">${rocket.name}</span>`;
