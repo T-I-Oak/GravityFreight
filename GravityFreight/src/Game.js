@@ -23,6 +23,7 @@ export class Game {
         this.currentStarCount = starCount;
         this.width = canvas.width;
         this.height = canvas.height;
+        this.isPointerDown = false;
 
 
         // インベントリの初期化 (数量管理)
@@ -245,6 +246,10 @@ export class Game {
                 return;
             }
 
+            // エイム中かつドラッグ中でない場合は更新しない（iPad等でのボタン移動対策）
+            if (this.state === 'aiming' && !this.isPointerDown) {
+                return;
+            }
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
             
@@ -295,6 +300,7 @@ export class Game {
         };
 
         window.addEventListener('pointerdown', (e) => {
+            this.isPointerDown = true;
             // UI上のクリックはスルー
             if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) return;
             
@@ -304,6 +310,14 @@ export class Game {
             if (this.state === 'crashed' || this.state === 'cleared') {
                 launch();
             }
+        });
+
+        window.addEventListener('pointerup', () => {
+            this.isPointerDown = false;
+        });
+
+        window.addEventListener('pointercancel', () => {
+            this.isPointerDown = false;
         });
 
         window.addEventListener('keydown', (e) => {
