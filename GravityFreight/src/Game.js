@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.4.0'; // Tablet & UX Update (v0.4.0)
+        this.version = '0.4.1'; // Bug Fix & UX Update (v0.4.1)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -288,6 +288,7 @@ export class Game {
                 }
                 
                 this.ship.trail = [];
+                this.ship.isSafeToReturn = false; // 発射直後は帰還判定を無効化
                 this.physics.bodies.push(this.ship);
                 this.state = 'flying';
                 this.launchTime = this.simulatedTime;
@@ -380,8 +381,8 @@ export class Game {
     selectPart(type, id) {
         if (type === 'chassis') {
             this.selection.chassis = this.inventory.chassis.find(p => p.id === id);
-            // シャーシ変更時はスロット数が変わるためアドオンをリセット
-            this.selection.logicOption = {};
+            // シャーシ変更時はスロット数制限に合わせてアドオンを自動調整
+            this.validateModules();
         }
         if (type === 'logic') this.selection.logic = this.inventory.logic.find(p => p.id === id);
         if (type === 'accelerator') {
@@ -563,13 +564,6 @@ export class Game {
 
     checkReadyToAim() {
         if (this.selection.rocket && this.selection.accelerator) {
-            // ホームに預けていたアイテムがあれば回収する
-            if (this.homeStar.items && this.homeStar.items.length > 0) {
-                this.homeStar.items.forEach(itemData => {
-                    this.pendingItems.push({ itemData, originalBody: this.homeStar });
-                });
-                this.homeStar.items = [];
-            }
 
             this.state = 'aiming';
             this.ui.status.textContent = 'READY TO LAUNCH';
@@ -831,6 +825,13 @@ export class Game {
                 });
             }
 
+            if (this.ship && !this.ship.isSafeToReturn) {
+                const dist = this.ship.position.sub(this.homeStar.position).length();
+                if (dist > this.homeStar.radius + 30) {
+                    this.ship.isSafeToReturn = true;
+                }
+            }
+
             this.accumulator += dt;
             if (this.accumulator > 0.1) this.accumulator = 0.1;
             while (this.accumulator >= this.fixedDt) {
@@ -898,10 +899,12 @@ export class Game {
         const startPos = prevPos || shipPos; // 初期位置または前ステップの座標
 
         for (const body of this.bodies) {
-            if (body === this.homeStar && this.simulatedTime - this.launchTime < 0.8) continue;
+            // 母星の衝突判定：離れるまでは保護する（isSafeToReturn）
+            if (body === this.homeStar && !this.ship.isSafeToReturn) continue;
             
             const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
-            const collisionDist = radius + 5;
+            const shipRadius = this.ship.radius || 2;
+            const collisionDist = radius + shipRadius + 1; // 1px margin
             const distSq = getDistanceSqToSegment(body.position, startPos, shipPos);
             
             if (distSq < collisionDist * collisionDist) {
@@ -1034,14 +1037,21 @@ export class Game {
             tempPos = tempPos.add(tempVel.scale(simDt));
             
             for (const body of this.bodies) {
-                const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
-                const collisionDist = radius + 5;
-                
                 // 予測線でもCCDを適用
+                // 母星の衝突判定：離れるまでは保護する
+                if (body === this.homeStar && i * simDt < 0.8) {
+                    // 予測線では現在の位置関係ではなく時間で簡易的に判定（i*simDtは経過時間相当）
+                    // 本来は軌道全体を考慮すべきだが、発射直後の衝突回避が主目的
+                    continue; 
+                }
+
+                const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
+                const shipRadius = this.ship.radius || 2;
+                const collisionDist = radius + shipRadius + 1;
+                
                 const distSq = getDistanceSqToSegment(body.position, prevTempPos, tempPos);
                 
                 if (distSq < collisionDist * collisionDist) {
-                    if (body === this.homeStar && i * simDt < 0.8) continue;
                     return points;
                 }
             }
@@ -1229,12 +1239,9 @@ export class Game {
             }
 
         } else if (result === 'returned') {
-            // 帰還: 取得中のアイテムをホームの星に一時的に預ける（中身を確認できるようにするため）
+            // 帰還: 取得中のアイテムを即座にインベントリに加算する
             if (this.pendingItems && this.pendingItems.length > 0) {
-                this.pendingItems.forEach(({ itemData }) => {
-                    this.homeStar.items.push(itemData);
-                });
-                this.pendingItems = [];
+                this.resolveItems('success');
             }
         }
 
