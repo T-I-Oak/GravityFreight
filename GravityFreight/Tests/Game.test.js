@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Game } from '../src/Game.js';
+import { Vector2 } from '../src/Physics.js';
 import { RARITY, PARTS } from '../src/Data.js';
 
 // DOM環境のモック
@@ -73,5 +74,21 @@ describe('Game Item Rarity Logic', () => {
         
         // Cargoアイテム群はrarity属性を持たないため自然出現しないこと
         expect(spawnedCategories.includes('CARGO')).toBe(false);
+    });
+
+    it('All stars should be generated within boundaryRadius', () => {
+        const game = new Game(mockCanvas, mockUI, 20); // 20個生成してチェック
+        const centerX = mockCanvas.width / 2;
+        const centerY = mockCanvas.height / 2;
+        
+        game.bodies.forEach(body => {
+            const dist = body.position.sub(new Vector2(centerX, centerY)).length();
+            // boundaryRadius(900) 以内に収まっていること
+            // HomeStar(中心)以外をチェック
+            if (body !== game.homeStar) {
+                expect(dist).toBeLessThanOrEqual(game.boundaryRadius);
+                expect(dist).toBeGreaterThanOrEqual(150); // 最低距離
+            }
+        });
     });
 });

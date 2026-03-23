@@ -84,7 +84,7 @@ export class Game {
         this.homeStar.isHome = true;
 
         this.bodies = [this.homeStar];
-        this.boundaryRadius = Math.min(this.canvas.width, this.canvas.height) * 0.95;
+        this.boundaryRadius = 900; // 世界座標での固定半径（リサイズに依存しない）
         this.goals = [];
         this.initGoals();
 
@@ -203,7 +203,8 @@ export class Game {
                 attempts++;
                 tooClose = false;
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 150 + Math.random() * (this.boundaryRadius - 200);
+                // 境界線(900)から確実に内側(最大800程度)に収まるように配置
+                const dist = 180 + Math.random() * (this.boundaryRadius - 380);
                 pos = new Vector2(centerX + Math.cos(angle) * dist, centerY + Math.sin(angle) * dist);
                 for (const body of this.bodies) {
                     if (pos.sub(body.position).length() < minDistance) {
@@ -1033,7 +1034,7 @@ export class Game {
             goal.x = newCenter.x;
             goal.y = newCenter.y;
         });
-        this.boundaryRadius = Math.min(width, height) * 0.95;
+        // boundaryRadius は固定値（900）を維持するため、ここでは更新しない
 
         // 保存しているサイズを更新し、キャンバスに適用
         this.width = width;
