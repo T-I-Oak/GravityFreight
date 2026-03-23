@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.4.1'; // Bug Fix & UX Update (v0.4.1)
+        this.version = '0.4.2'; // UX Improvement & Refinement (v0.4.2)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -54,8 +54,11 @@ export class Game {
         };
 
         this.score = 0;
-        this.stateValid = true;
-
+        this.displayScore = 0; // 表示用スコア（アニメーション用）
+        this.sector = 1; // セクター数
+        this.cameraOffset = new Vector2(0, 0); // マップのパン用
+        this.isPanning = false;
+        this.panStart = new Vector2(0, 0);
 
 
         this.selection = {
@@ -111,6 +114,7 @@ export class Game {
         // ロケットがない場合はパネルを強制的に開く
         if (this.inventory.rockets.length === 0) {
             this.isFactoryOpen = true;
+            this.updateUI();
         }
     }
 
@@ -235,9 +239,10 @@ export class Game {
     getWorldPos(screenPos) {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
+        // カメラオフセットとズームを考慮して変換
         return new Vector2(
-            (screenPos.x - centerX) / this.zoom + centerX,
-            (screenPos.y - centerY) / this.zoom + centerY
+            (screenPos.x - centerX - this.cameraOffset.x) / this.zoom + centerX,
+            (screenPos.y - centerY - this.cameraOffset.y) / this.zoom + centerY
         );
     }
 
@@ -293,7 +298,6 @@ export class Game {
                 this.state = 'flying';
                 this.launchTime = this.simulatedTime;
                 this.accumulator = 0;
-                this.ui.status.textContent = 'FLYING...';
                 this.isFactoryOpen = false;
                 this.updateUI();
             } else if (this.state === 'crashed' || this.state === 'cleared') {
@@ -304,6 +308,17 @@ export class Game {
         window.addEventListener('pointerdown', (e) => {
             this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
             this.isPointerDown = true;
+
+            // 中ボタン(1)またはShift+左ボタン(0)でパン開始
+            if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+                if (e.target === this.canvas) {
+                    this.isPanning = true;
+                    this.panStart = new Vector2(e.clientX, e.clientY);
+                    this.canvas.style.cursor = 'grabbing';
+                    e.preventDefault(); // オートスクロール防止
+                    return;
+                }
+            }
 
             if (this.activePointers.size === 2) {
                 const pts = Array.from(this.activePointers.values());
@@ -322,6 +337,15 @@ export class Game {
         });
 
         window.addEventListener('pointermove', (e) => {
+            if (this.isPanning) {
+                const dx = e.clientX - this.panStart.x;
+                const dy = e.clientY - this.panStart.y;
+                this.cameraOffset.x += dx;
+                this.cameraOffset.y += dy;
+                this.panStart = new Vector2(e.clientX, e.clientY);
+                return;
+            }
+
             if (this.activePointers.has(e.pointerId)) {
                 this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
             }
@@ -342,6 +366,10 @@ export class Game {
         });
 
         const endPointer = (e) => {
+            if (this.isPanning) {
+                this.isPanning = false;
+                this.canvas.style.cursor = 'crosshair';
+            }
             this.activePointers.delete(e.pointerId);
             if (this.activePointers.size === 0) {
                 this.isPointerDown = false;
@@ -354,6 +382,20 @@ export class Game {
         window.addEventListener('pointerup', endPointer);
         window.addEventListener('pointercancel', endPointer);
         window.addEventListener('pointerout', endPointer);
+
+        document.querySelectorAll('.panel-header').forEach(header => {
+            if (header.closest('.panel.static')) return;
+            header.addEventListener('click', (e) => {
+                const panel = e.target.closest('.panel');
+                panel.classList.toggle('collapsed');
+                e.stopPropagation();
+            });
+        });
+
+        // オートスクロール防止用のダミーリスナー（中ボタン用）
+        this.canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 1) e.preventDefault();
+        });
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') launch();
@@ -566,7 +608,6 @@ export class Game {
         if (this.selection.rocket && this.selection.accelerator) {
 
             this.state = 'aiming';
-            this.ui.status.textContent = 'READY TO LAUNCH';
             this.ship.mass = this.selection.rocket.totalMass;
             this.ship.pickupRange = this.selection.rocket.totalPickupRange;
             this.ship.pickupMultiplier = this.selection.rocket.totalPickupMultiplier;
@@ -599,7 +640,6 @@ export class Game {
             this.ship.rotation = Math.atan2(dir.y, dir.x);
         } else {
             this.state = 'building';
-            this.ui.status.textContent = 'SELECT UNIT & ACCELERATOR';
         }
     }
 
@@ -610,6 +650,37 @@ export class Game {
             if (!el) return;
             el.innerHTML = '';
             
+            if (items.length === 0) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'slot-placeholder';
+                
+                let mainText = 'EMPTY';
+                let subText = 'No items in stock';
+                
+                if (type === 'CHASSIS') {
+                    mainText = 'NO CHASSIS';
+                    subText = 'Available at the Space Dock';
+                } else if (type === 'LOGIC') {
+                    mainText = 'NO LOGIC UNITS';
+                    subText = 'Requires salvaged electronics';
+                } else if (type === 'MODULES') {
+                    mainText = 'NO MODULES';
+                    subText = 'Scavenging mission required';
+                } else if (type === 'BOOSTERS') {
+                    mainText = 'NO BOOSTERS';
+                    subText = 'Propulsion research needed';
+                }
+                
+                placeholder.innerHTML = `
+                    <div class="part-header">
+                        <span class="part-name" style="opacity: 0.5;">${mainText}</span>
+                    </div>
+                    <span class="part-info">${subText}</span>
+                `;
+                el.appendChild(placeholder);
+                return;
+            }
+
             // アイテム集約ロジック (ID + charges でグループ化)
             const groups = [];
             items.forEach(item => {
@@ -643,10 +714,10 @@ export class Game {
                 const categoryColor = CATEGORY_COLORS[data.category];
                 if (categoryColor) {
                     if (isSelected) {
-                        div.style.backgroundColor = hexToRgba(categoryColor, 0.45);
-                        div.style.borderColor = hexToRgba(categoryColor, 0.8);
+                        div.style.backgroundColor = hexToRgba(categoryColor, 0.25);
+                        div.style.borderColor = categoryColor;
                     } else {
-                        div.style.backgroundColor = hexToRgba(categoryColor, 0.15);
+                        div.style.backgroundColor = hexToRgba(categoryColor, 0.08);
                     }
                 }
 
@@ -666,6 +737,12 @@ export class Game {
                 el.appendChild(div);
             });
         };
+
+        // 新HUDの更新
+        const sectorDisplay = document.getElementById('sector-display');
+        const scoreDisplay = document.getElementById('score-display');
+        if (sectorDisplay) sectorDisplay.textContent = this.sector;
+        if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore).toLocaleString();
 
         const factory = document.getElementById('factory-panel');
         if (this.isFactoryOpen) factory.classList.remove('hidden');
@@ -697,7 +774,14 @@ export class Game {
         if (rList) {
             rList.innerHTML = '';
             if (this.inventory.rockets.length === 0) {
-                rList.innerHTML = '<div class="slot-placeholder">No Units Built</div>';
+                rList.innerHTML = `
+                    <div class="slot-placeholder">
+                        <div class="part-header">
+                            <span class="part-name" style="opacity: 0.5;">NO UNITS READY</span>
+                        </div>
+                        <span class="part-info">Assemble your craft in the bay</span>
+                    </div>
+                `;
             } else {
                 const unitColor = CATEGORY_COLORS.UNIT;
                 this.inventory.rockets.forEach(rocket => {
@@ -781,7 +865,6 @@ export class Game {
     reset() {
         this.physics.bodies = [];
         this.initStage(this.currentStarCount);
-        this.ui.status.textContent = 'SELECT UNIT & ACCELERATOR';
 
         this.ui.message.textContent = '';
         this.accumulator = 0;
@@ -790,11 +873,26 @@ export class Game {
     }
 
     update(dt) {
+        // スコア表示の更新
+        const scoreDiff = this.score - this.displayScore;
+        if (Math.abs(scoreDiff) > 0.1) {
+            this.displayScore += scoreDiff * 0.1; // 線形補間
+            this.updateUI(); // 表示更新
+        } else if (this.displayScore !== this.score) {
+            this.displayScore = this.score;
+            this.updateUI();
+        }
+
         // マウスホバー判定 (全ステート共通)
         const worldMouse = this.getWorldPos(this.mousePos);
         this.hoveredStar = null;
         for (const body of this.bodies) {
-            if (worldMouse.sub(body.position).length() < (body.radius || 20) + 10) {
+            const distWorld = worldMouse.sub(body.position).length();
+            const distScreen = distWorld * this.zoom;
+            // ボディ半径（スクリーン換算） + マージン（スクリーン基準で最低20px確保）
+            const hitRadius = (body.radius || 20) * this.zoom + 15;
+            
+            if (distScreen < hitRadius) {
                 this.hoveredStar = body;
                 break;
             }
@@ -923,7 +1021,6 @@ export class Game {
                 this.state = 'returned';
                 this.stateTimer = 2.0; 
                 this.ui.message.textContent = 'RETURNED TO BASE';
-                this.ui.status.textContent = 'RELOADING...';
                 this.resolveItems('returned'); 
             } else {
                 // アドオンによる衝突回避判定
@@ -954,7 +1051,6 @@ export class Game {
                 this.state = 'crashed';
                 this.stateTimer = 2.0; 
                 this.ui.message.textContent = 'CRASHED';
-                this.ui.status.textContent = 'WAITING...';
                 this.consumeRocketOnFailure(); 
                 this.resolveItems('crashed', body); 
             }
@@ -996,14 +1092,13 @@ export class Game {
                 this.state = 'cleared';
                 this.stateTimer = 2.0;
                 this.score += hitGoal.score;
+                this.sector++; // セクター進行
                 this.ui.message.textContent = `SUCCESS! (+${hitGoal.score})`;
-                this.ui.status.textContent = 'NEXT STAGE IN 2s...';
                 this.resolveItems('success', hitGoal); 
             } else {
                 this.state = 'lost';
                 this.stateTimer = 2.0;
                 this.ui.message.textContent = 'LOST IN SPACE';
-                this.ui.status.textContent = 'RETRYING IN 2s...';
                 this.consumeRocketOnFailure();
                 this.resolveItems('lost');
             }
@@ -1089,7 +1184,6 @@ export class Game {
         if (!(hasBuiltRockets || canBuildRockets) || !hasLaunchers) {
 
             this.state = 'gameover';
-            this.ui.status.textContent = 'GAME OVER - OUT OF RESOURCES';
             this.ui.message.textContent = 'MISSION FAILED';
         }
     }

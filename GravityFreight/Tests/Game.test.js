@@ -5,25 +5,31 @@ import { RARITY, PARTS } from '../src/Data.js';
 
 // DOM環境のモック
 global.document = {
-    getElementById: () => ({
+    getElementById: vi.fn(() => ({
         onclick: vi.fn(),
         appendChild: vi.fn(),
-        classList: { add: vi.fn(), remove: vi.fn() },
-        innerHTML: ''
-    }),
-    createElement: () => ({
-        onclick: vi.fn(),
-        appendChild: vi.fn(),
+        classList: { add: vi.fn(), remove: vi.fn(), contains: vi.fn() },
+        innerHTML: '',
         style: {}
-    })
+    })),
+    createElement: vi.fn(() => ({
+        onclick: vi.fn(),
+        appendChild: vi.fn(),
+        style: {},
+        className: '',
+        innerHTML: ''
+    })),
+    querySelectorAll: vi.fn(() => [])
 };
 global.window = {
-    addEventListener: vi.fn()
+    addEventListener: vi.fn(),
+    innerWidth: 1024,
+    innerHeight: 768
 };
 
 describe('Game Item Rarity Logic', () => {
     // 依存オブジェクトのモック
-    const mockCanvas = { width: 800, height: 600 };
+    const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn() };
     const mockUI = { status: {}, message: {} };
 
     it('Stage 1 should NOT spawn RARE items', () => {
@@ -89,6 +95,26 @@ describe('Game Item Rarity Logic', () => {
                 expect(dist).toBeLessThanOrEqual(game.boundaryRadius);
                 expect(dist).toBeGreaterThanOrEqual(150); // 最低距離
             }
+        });
+    });
+
+    describe('v0.4.2 New Features', () => {
+        it('Initial state should have sector 1 and score 0', () => {
+            const game = new Game(mockCanvas, mockUI);
+            expect(game.sector).toBe(1);
+            expect(game.score).toBe(0);
+            expect(game.displayScore).toBe(0);
+        });
+
+        it('Camera offset should be initialized to zero', () => {
+            const game = new Game(mockCanvas, mockUI);
+            expect(game.cameraOffset.x).toBe(0);
+            expect(game.cameraOffset.y).toBe(0);
+        });
+
+        it('Zoom should be initialized to 0.5', () => {
+            const game = new Game(mockCanvas, mockUI);
+            expect(game.zoom).toBe(0.5);
         });
     });
 });

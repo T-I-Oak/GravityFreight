@@ -30,11 +30,11 @@ function main() {
         // 描画
         renderer.clear();
 
-        // カメラ適用
-        renderer.applyCamera(game.zoom);
+        // 背景の星（カメラ適用前に描画し、パララックスのみ摘要）
+        renderer.drawStars(game.cameraOffset, timestamp);
 
-        // 背景の星（簡易）
-        renderer.drawStars();
+        // カメラ適用（天体、自機、軌跡など）
+        renderer.applyCamera(game.zoom, game.cameraOffset);
 
         // 重力源の描画
         for (const body of game.bodies) {
@@ -68,7 +68,7 @@ function main() {
         renderer.restoreCamera();
 
         // UI情報の描画（カメラ空間外）
-        renderer.drawVersion(game.version, game.score);
+        renderer.drawVersion(game.version);
 
         // --- ホバーされた星の情報パネル更新 ---
         const isHoverableStar = game.hoveredStar && (
@@ -148,6 +148,7 @@ function main() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         if (game) game.handleResize(canvas.width, canvas.height);
+        if (renderer) renderer.generateBgStars();
     }
 
     window.addEventListener('resize', resize);

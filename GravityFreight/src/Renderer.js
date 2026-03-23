@@ -16,13 +16,19 @@ export class Renderer {
 
     generateBgStars() {
         this.bgStars = [];
-        const count = 200;
+        const count = 400; // 星の数を増やして密度を確保
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        
         for (let i = 0; i < count; i++) {
             this.bgStars.push({
-                x: Math.random() * 4000 - 2000, // 広めに散らす
-                y: Math.random() * 4000 - 2000,
+                x: (Math.random() - 0.5) * 2000,
+                y: (Math.random() - 0.5) * 2000,
+                z: Math.random() * 2000, // 奥行き
                 size: Math.random() * 1.5 + 0.5,
-                alpha: Math.random() * 0.5 + 0.3
+                alpha: Math.random() * 0.7 + 0.3,
+                pulseRate: 0.5 + Math.random() * 2.0,
+                pulseOffset: Math.random() * Math.PI * 2
             });
         }
     }
@@ -33,11 +39,11 @@ export class Renderer {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    applyCamera(zoom) {
+    applyCamera(zoom, offset = { x: 0, y: 0 }) {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
         this.ctx.save();
-        this.ctx.translate(centerX, centerY);
+        this.ctx.translate(centerX + offset.x, centerY + offset.y);
         this.ctx.scale(zoom, zoom);
         this.ctx.translate(-centerX, -centerY);
     }
@@ -47,15 +53,44 @@ export class Renderer {
     }
 
 
-    drawStars() {
+    drawStars(offset = { x: 0, y: 0 }, timestamp = 0) {
         if (!this.bgStars) return;
+        
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const speed = 0.05; // 0.05まで減速（極めて微細な動きに）
+        const maxZ = 2000;
+
         this.ctx.save();
+        
         for (const star of this.bgStars) {
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+            // Zを減少させて手前に移動
+            star.z -= speed;
+            if (star.z <= 0) {
+                star.z = maxZ;
+                star.x = (Math.random() - 0.5) * 2000;
+                star.y = (Math.random() - 0.5) * 2000;
+            }
+
+            // 透視投影
+            const scale = 200 / (star.z || 1); // 投影係数
+            const px = centerX + star.x * scale + offset.x * 0.2;
+            const py = centerY + star.y * scale + offset.y * 0.2;
+
+            // 画面外チェック
+            if (px < 0 || px > this.canvas.width || py < 0 || py > this.canvas.height) continue;
+
+            // 明滅と輝度計算（手前ほど明るく、大きく）
+            const twinkle = 0.8 + 0.2 * Math.sin((timestamp / 1000) * star.pulseRate + star.pulseOffset);
+            const brightness = (1 - star.z / maxZ) * star.alpha * twinkle;
+            const size = star.size * scale * 2;
+
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
             this.ctx.beginPath();
-            this.ctx.arc(star.x + this.canvas.width / 2, star.y + this.canvas.height / 2, star.size, 0, Math.PI * 2);
+            this.ctx.arc(px, py, Math.max(0.2, size), 0, Math.PI * 2);
             this.ctx.fill();
         }
+        
         this.ctx.restore();
     }
 
@@ -256,26 +291,13 @@ export class Renderer {
         this.ctx.restore();
     }
 
-    drawVersion(version, score = 0) {
+    drawVersion(version) {
         this.ctx.save();
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         this.ctx.font = '12px Inter, sans-serif';
         this.ctx.textAlign = 'left';
         this.ctx.fillText(`VER ${version}`, 10, this.canvas.height - 25);
         this.ctx.fillText(`© T.I.OAK 2026`, 10, this.canvas.height - 10);
-
-        // スコア表示 (中央上)
-        this.ctx.font = 'bold 24px Inter, sans-serif';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'top';
-        this.ctx.fillStyle = '#00ffcc';
-        this.ctx.shadowBlur = 10;
-        this.ctx.shadowColor = '#00ffcc';
-        const displayScore = isNaN(score) ? 0 : score;
-        this.ctx.fillText(`SCORE: ${Math.floor(displayScore).toLocaleString()}`, this.canvas.width / 2, 20);
-
-
-
         this.ctx.restore();
     }
 
