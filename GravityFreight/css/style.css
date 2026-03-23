@@ -58,6 +58,42 @@ body, html {
     pointer-events: none;
 }
 
+#launch-btn {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, #ff4400, #ff8800);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    color: white;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(255, 68, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.2);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+#launch-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 68, 0, 0.7);
+    background: linear-gradient(135deg, #ff5500, #ffaa00);
+}
+
+#launch-btn:active {
+    transform: translateX(-50%) scale(0.95);
+}
+
+#launch-btn.hidden {
+    display: none;
+}
+
 /* Build System UI */
 #build-overlay {
     position: absolute;

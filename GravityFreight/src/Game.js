@@ -291,12 +291,12 @@ export class Game {
 
         window.addEventListener('pointerdown', (e) => {
             // UI上のクリックはスルー
-            if (e.target.closest('#build-overlay')) return;
+            if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) return;
             
             // ポインター位置を更新（タップした瞬間に照準を合わせるため）
             updatePointer(e);
 
-            if (this.state === 'aiming' || this.state === 'building') {
+            if (this.state === 'crashed' || this.state === 'cleared') {
                 launch();
             }
         });
@@ -312,6 +312,11 @@ export class Game {
         }, { passive: false });
 
         document.getElementById('build-btn').onclick = () => this.assembleUnit();
+
+        document.getElementById('launch-btn').onclick = (e) => {
+            e.stopPropagation();
+            launch();
+        };
 
         document.getElementById('toggle-factory-btn').onclick = () => {
             this.isFactoryOpen = !this.isFactoryOpen;
@@ -619,6 +624,20 @@ export class Game {
         if (this.isFactoryOpen) factory.classList.remove('hidden');
         else factory.classList.add('hidden');
 
+        const buildOverlay = document.getElementById('build-overlay');
+        const launchBtn = document.getElementById('launch-btn');
+
+        if (this.state === 'building' || this.state === 'aiming') {
+            buildOverlay.classList.remove('hidden');
+        } else {
+            buildOverlay.classList.add('hidden');
+        }
+
+        if (this.state === 'aiming') {
+            launchBtn.classList.remove('hidden');
+        } else {
+            launchBtn.classList.add('hidden');
+        }
         renderList('chassis-list', this.inventory.chassis, 'chassis', this.selection.chassis);
         renderList('logic-list', this.inventory.logic, 'logic', this.selection.logic);
         renderList('logic-option-list', this.inventory.modules, 'modules', this.selection.modules);
