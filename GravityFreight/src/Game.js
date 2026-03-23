@@ -240,6 +240,11 @@ export class Game {
 
     setupListeners() {
         const updatePointer = (e) => {
+            // UI上の操作（ボタン等）の時はエイムを更新しない
+            if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) {
+                return;
+            }
+
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
             
