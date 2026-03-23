@@ -49,11 +49,13 @@ export const PARTS = {
 export const INITIAL_INVENTORY = {
     chassis: [
         { id: 'hull_light', count: 3 },
-        { id: 'hull_medium', count: 2 }
+        { id: 'hull_medium', count: 2 },
+        { id: 'hull_heavy', count: 1 }
     ],
     logic: [
         { id: 'sensor_short', count: 3 },
-        { id: 'sensor_normal', count: 2 }
+        { id: 'sensor_normal', count: 2 },
+        { id: 'sensor_long', count: 1 }
     ],
     accelerators: [
         { id: 'pad_standard', charges: 2 },
@@ -62,7 +64,9 @@ export const INITIAL_INVENTORY = {
     modules: [
         { id: 'mod_capacity', count: 2 },
         { id: 'mod_star_breaker', count: 1 },
-        { id: 'mod_stabilizer', count: 1 }
+        { id: 'mod_stabilizer', count: 1 },
+        { id: 'mod_cushion', count: 1 },
+        { id: 'mod_emergency', count: 1 }
     ],
     boosters: [
         { id: 'opt_fuel', count: 2 },
