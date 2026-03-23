@@ -1,4 +1,4 @@
-# GRAVITY FREIGHT: ORBITAL ECHOES - 技術仕様書
+# GRAVITY FREIGHT: ORBITAL ECHOES - 技術仕様書 (v0.4.0)
 
 本ドキュメントは、本プロジェクトのソースコードが紛失した場合でも、同様のゲーム体験を再現できるように定義された仕様書です。
 

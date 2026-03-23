@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.3.0'; // Module/Booster Update (v0.3.0)
+        this.version = '0.4.0'; // Tablet & UX Update (v0.4.0)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
