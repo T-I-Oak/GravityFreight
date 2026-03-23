@@ -893,62 +893,72 @@ export class Game {
         }
     }
 
+    findBodyCollision(pos, prevPos, isSafeToReturn) {
+        for (const body of this.bodies) {
+            // 母星の衝突判定：離れるまでは保護する（isSafeToReturn）
+            if (body === this.homeStar && !isSafeToReturn) continue;
+            
+            const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
+            const shipRadius = this.ship ? (this.ship.radius || 2) : 2;
+            const collisionDist = radius + shipRadius + 1; // 1px margin
+            const distSq = getDistanceSqToSegment(body.position, prevPos, pos);
+            
+            if (distSq < collisionDist * collisionDist) {
+                return body;
+            }
+        }
+        return null;
+    }
+
     checkCollisions(prevPos = null) {
         if (!this.ship) return false;
         const shipPos = this.ship.position;
         const startPos = prevPos || shipPos; // 初期位置または前ステップの座標
 
-        for (const body of this.bodies) {
-            // 母星の衝突判定：離れるまでは保護する（isSafeToReturn）
-            if (body === this.homeStar && !this.ship.isSafeToReturn) continue;
-            
-            const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
-            const shipRadius = this.ship.radius || 2;
-            const collisionDist = radius + shipRadius + 1; // 1px margin
-            const distSq = getDistanceSqToSegment(body.position, startPos, shipPos);
-            
-            if (distSq < collisionDist * collisionDist) {
-                if (body === this.homeStar) {
-                    this.state = 'returned';
-                    this.stateTimer = 2.0; 
-                    this.ui.message.textContent = 'RETURNED TO BASE';
-                    this.ui.status.textContent = 'RELOADING...';
-                    this.resolveItems('returned'); 
-                } else {
-                    // アドオンによる衝突回避判定
-                    // 1. Star Breaker (星破壊)
-                    const breaker = this.ship.equippedModules.find(m => m.id === 'mod_star_breaker' && m.charges > 0);
-                    if (breaker) {
-                        breaker.charges--;
-                        this.bodies = this.bodies.filter(b => b !== body); // 星を消滅
-                        this.physics.bodies = [...this.bodies, this.ship]; // 物理エンジン同期
-                        this.ui.message.textContent = 'STAR DESTROYED!';
-                        setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
-                        return false; // 衝突しなかったことにする
-                    }
-
-                    // 2. Impact Cushion (バウンド)
-                    const cushion = this.ship.equippedModules.find(m => m.id === 'mod_cushion' && m.charges > 0);
-                    if (cushion) {
-                        cushion.charges--;
-                        // 反転・跳ね返り処理（簡易：速度ベクトルを反転させて減速）
-                        const normal = shipPos.sub(body.position).normalize();
-                        const dot = this.ship.velocity.dot(normal);
-                        this.ship.velocity = this.ship.velocity.sub(normal.scale(2 * dot)).scale(0.5);
-                        this.ui.message.textContent = 'IMPACT ABSORBED!';
-                        setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
-                        return false; // 衝突しなかったことにする
-                    }
-
-                    this.state = 'crashed';
-                    this.stateTimer = 2.0; 
-                    this.ui.message.textContent = 'CRASHED';
-                    this.ui.status.textContent = 'WAITING...';
-                    this.consumeRocketOnFailure(); 
-                    this.resolveItems('crashed', body); 
+        const hitBody = this.findBodyCollision(shipPos, startPos, this.ship.isSafeToReturn);
+        
+        if (hitBody) {
+            const body = hitBody;
+            if (body === this.homeStar) {
+                this.state = 'returned';
+                this.stateTimer = 2.0; 
+                this.ui.message.textContent = 'RETURNED TO BASE';
+                this.ui.status.textContent = 'RELOADING...';
+                this.resolveItems('returned'); 
+            } else {
+                // アドオンによる衝突回避判定
+                // 1. Star Breaker (星破壊)
+                const breaker = this.ship.equippedModules.find(m => m.id === 'mod_star_breaker' && m.charges > 0);
+                if (breaker) {
+                    breaker.charges--;
+                    this.bodies = this.bodies.filter(b => b !== body); // 星を消滅
+                    this.physics.bodies = [...this.bodies, this.ship]; // 物理エンジン同期
+                    this.ui.message.textContent = 'STAR DESTROYED!';
+                    setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                    return false; // 衝突しなかったことにする
                 }
-                return true;
+
+                // 2. Impact Cushion (バウンド)
+                const cushion = this.ship.equippedModules.find(m => m.id === 'mod_cushion' && m.charges > 0);
+                if (cushion) {
+                    cushion.charges--;
+                    // 反転・跳ね返り処理（簡易：速度ベクトルを反転させて減速）
+                    const normal = shipPos.sub(body.position).normalize();
+                    const dot = this.ship.velocity.dot(normal);
+                    this.ship.velocity = this.ship.velocity.sub(normal.scale(2 * dot)).scale(0.5);
+                    this.ui.message.textContent = 'IMPACT ABSORBED!';
+                    setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                    return false; // 衝突しなかったことにする
+                }
+
+                this.state = 'crashed';
+                this.stateTimer = 2.0; 
+                this.ui.message.textContent = 'CRASHED';
+                this.ui.status.textContent = 'WAITING...';
+                this.consumeRocketOnFailure(); 
+                this.resolveItems('crashed', body); 
             }
+            return true;
         }
 
         const distFromCenter = shipPos.sub(new Vector2(this.canvas.width / 2, this.canvas.height / 2)).length();
@@ -1027,6 +1037,8 @@ export class Game {
 
         const gravityMultiplier = rocket.totalGravityMultiplier || 1.0;
 
+        let tempIsSafeToReturn = false;
+        
         for (let i = 0; i < precision; i++) { 
             if (i % 5 === 0) points.push(new Vector2(tempPos.x, tempPos.y));
             
@@ -1035,25 +1047,19 @@ export class Game {
             const acc = grav.scale(gravityMultiplier);
             tempVel = tempVel.add(acc.scale(simDt));
             tempPos = tempPos.add(tempVel.scale(simDt));
-            
-            for (const body of this.bodies) {
-                // 予測線でもCCDを適用
-                // 母星の衝突判定：離れるまでは保護する
-                if (body === this.homeStar && i * simDt < 0.8) {
-                    // 予測線では現在の位置関係ではなく時間で簡易的に判定（i*simDtは経過時間相当）
-                    // 本来は軌道全体を考慮すべきだが、発射直後の衝突回避が主目的
-                    continue; 
-                }
 
-                const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
-                const shipRadius = this.ship.radius || 2;
-                const collisionDist = radius + shipRadius + 1;
-                
-                const distSq = getDistanceSqToSegment(body.position, prevTempPos, tempPos);
-                
-                if (distSq < collisionDist * collisionDist) {
-                    return points;
+            // 予測線内でも距離ベースの保護状態をシミュレーション
+            if (!tempIsSafeToReturn) {
+                const dist = tempPos.sub(this.homeStar.position).length();
+                if (dist > this.homeStar.radius + 30) {
+                    tempIsSafeToReturn = true;
                 }
+            }
+            
+            // 共通メソッドを使用して衝突判定
+            const hitBody = this.findBodyCollision(tempPos, prevTempPos, tempIsSafeToReturn);
+            if (hitBody) {
+                return points;
             }
 
             const d = tempPos.sub(new Vector2(this.canvas.width / 2, this.canvas.height / 2)).length();
