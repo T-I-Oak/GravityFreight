@@ -158,8 +158,8 @@ export class Renderer {
         
         // 船体（三角形）
         this.ctx.shadowBlur = 5;
-        this.ctx.shadowColor = '#4488ff';
-        this.ctx.fillStyle = '#4488ff';
+        this.ctx.shadowColor = CATEGORY_COLORS.UNIT;
+        this.ctx.fillStyle = CATEGORY_COLORS.UNIT;
         this.ctx.beginPath();
         this.ctx.moveTo(10, 0);
         this.ctx.lineTo(-5, 5);
@@ -201,7 +201,7 @@ export class Renderer {
         });
     }
 
-    drawGoals(goals, boundaryRadius) {
+    drawGoals(goals, boundaryRadius, arcMultiplier = 1.0) {
         this.ctx.save();
         
         const centerX = this.canvas.width / 2;
@@ -215,8 +215,9 @@ export class Renderer {
         this.ctx.stroke();
 
         goals.forEach(goal => {
-            const startAngle = goal.angle - goal.width / 2;
-            const endAngle = goal.angle + goal.width / 2;
+            const width = goal.width * arcMultiplier;
+            const startAngle = goal.angle - width / 2;
+            const endAngle = goal.angle + width / 2;
 
             // 外周への発光エフェクト
             this.ctx.save();
@@ -264,8 +265,8 @@ export class Renderer {
                 const pos = ship.trail[trailIdx];
                 this.ctx.save();
                 this.ctx.shadowBlur = 8;
-                this.ctx.shadowColor = CATEGORY_COLORS[item.category];
-                this.ctx.fillStyle = CATEGORY_COLORS[item.category];
+                this.ctx.shadowColor = item.color;
+                this.ctx.fillStyle = item.color;
                 this.ctx.beginPath();
                 this.ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
                 this.ctx.fill();

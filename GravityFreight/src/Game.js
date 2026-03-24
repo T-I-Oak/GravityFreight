@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.4.2'; // UX Improvement & Refinement (v0.4.2)
+        this.version = '0.4.5'; // Fix booster stacking & duration logic (v0.4.5)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -293,6 +293,11 @@ export class Game {
                 this.ship.gravityMultiplier = this.selection.rocket.totalGravityMultiplier;
                 this.ship.pickupRange = this.selection.rocket.totalPickupRange;
                 this.ship.pickupMultiplier = this.selection.rocket.totalPickupMultiplier;
+                this.ship.arcMultiplier = this.selection.rocket.arcMultiplier || 1.0;
+
+                if (this.selection.booster && this.selection.booster.arcMultiplier) {
+                    this.ship.arcMultiplier *= this.selection.booster.arcMultiplier;
+                }
                 
                 this.activeBoosterAtLaunch = this.selection.booster ? { ...this.selection.booster } : null;
                 
@@ -314,7 +319,7 @@ export class Game {
                     this.ship.activeBoosterEffect = {
                         type: 'gravityMultiplier',
                         value: this.selection.booster.gravityMultiplier,
-                        duration: this.selection.booster.duration || 100
+                        duration: this.selection.booster.duration // デフォルト値を廃止し、undefined を許容
                     };
                 }
 
@@ -1060,10 +1065,15 @@ export class Game {
                     let mult = this.ship.gravityMultiplier || 1.0;
                     
                     if (this.ship.activeBoosterEffect && this.ship.activeBoosterEffect.type === 'gravityMultiplier') {
-                        mult = this.ship.activeBoosterEffect.value;
-                        this.ship.activeBoosterEffect.duration--;
-                        if (this.ship.activeBoosterEffect.duration <= 0) {
-                            this.ship.activeBoosterEffect = null;
+                        // 上書きではなく乗算（機体性能と重複可能にする）
+                        mult *= this.ship.activeBoosterEffect.value;
+                        
+                        // duration が指定されている場合のみ減少させる
+                        if (this.ship.activeBoosterEffect.duration !== undefined) {
+                            this.ship.activeBoosterEffect.duration--;
+                            if (this.ship.activeBoosterEffect.duration <= 0) {
+                                this.ship.activeBoosterEffect = null;
+                            }
                         }
                     }
                     
@@ -1084,6 +1094,13 @@ export class Game {
                 if (this.ship && this.simulatedTime % 0.01 < this.fixedDt) {
                     this.ship.trail.push(new Vector2(this.ship.position.x, this.ship.position.y));
                     if (this.ship.trail.length > 40) this.ship.trail.shift();
+                }
+
+                // ブースター特殊効果 (マグネティック・パルス)
+                if (this.activeBoosterAtLaunch && this.activeBoosterAtLaunch.id === 'boost_magnet') {
+                    const flightDuration = this.simulatedTime - this.launchTime;
+                    // 1秒につき20pxずつ範囲を拡大
+                    this.ship.pickupRange = (this.selection.rocket.totalPickupRange) + (flightDuration * 20);
                 }
             }
         } else if (['cleared', 'crashed', 'lost', 'returned'].includes(this.state)) {

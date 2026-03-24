@@ -41,8 +41,14 @@ function main() {
             renderer.drawBody(body, '#ffcc00', '#ff8800');
         }
 
-        // ゴールの描画
-        renderer.drawGoals(game.goals, game.boundaryRadius);
+        // ゴールの描画 (ブースター効果を考慮)
+        let currentArcMultiplier = 1.0;
+        if (game.state === 'flying' && game.ship) {
+            currentArcMultiplier = game.ship.arcMultiplier || 1.0;
+        } else if (game.state === 'aiming' && game.selection.booster) {
+            currentArcMultiplier = game.selection.booster.arcMultiplier || 1.0;
+        }
+        renderer.drawGoals(game.goals, game.boundaryRadius, currentArcMultiplier);
 
         // 予測線の描画 (エイム中のみ)
         if (game.state === 'aiming') {

@@ -1,4 +1,3 @@
-// レアリティの定数定義
 export const hexToRgba = (hex, alpha) => {
     if (!hex) return `rgba(255, 255, 255, ${alpha})`;
     const r = parseInt(hex.slice(1, 3), 16);
@@ -13,14 +12,14 @@ export const RARITY = {
     RARE: 15
 };
 
-// カテゴリ別のイメージカラー定義
+// カテゴリ別のイメージカラー定義（spec.mdと同期）
 export const CATEGORY_COLORS = {
-    CHASSIS: '#4488ff',
-    LOGIC: '#ffcc00',
-    LAUNCHERS: '#00ffcc',
-    MODULES: '#ff44aa',
-    BOOSTERS: '#aaff44',
-    UNIT: '#ffffff',
+    CHASSIS: '#ffab40',
+    LOGIC: '#00bcd4',
+    LAUNCHERS: '#4caf50',
+    MODULES: '#9c27b0',
+    BOOSTERS: '#795548',
+    UNIT: '#e0e0ff',
     COIN: '#ffd700',
     CARGO: '#00e5ff'
 };
@@ -48,11 +47,11 @@ export const PARTS = {
     ],
     LAUNCHERS: [
         { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LNC-2]', power: 1200, maxCharges: 2, mass: 0, slots: 0, precision: 0, rarity: RARITY.COMMON, description: '標準的な性能。初期装備。' },
-        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PRC-2]', power: 1000, maxCharges: 2, mass: 0, slots: 0, precision: 500, precisionMultiplier: 1.1, rarity: RARITY.COMMON, description: '予測線を大幅に延長し、精密な制御が可能。' },
+        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PRC-2]', power: 1000, maxCharges: 2, mass: 0, slots: 0, precision: 500, precisionMultiplier: 1.2, rarity: RARITY.COMMON, description: '予測線を大幅に延長し、精密な制御が可能。' },
         { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LNC-3]', power: 1200, maxCharges: 3, mass: 0, slots: 0, precision: 0, rarity: RARITY.UNCOMMON, description: '改良型。耐久力が向上。' },
-        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PRC-3]', power: 1000, maxCharges: 3, mass: 0, slots: 0, precision: 500, precisionMultiplier: 1.1, rarity: RARITY.UNCOMMON, description: '改良型。予測性能と耐久力が向上。' },
+        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PRC-3]', power: 1000, maxCharges: 3, mass: 0, slots: 0, precision: 500, precisionMultiplier: 1.2, rarity: RARITY.UNCOMMON, description: '改良型。予測性能と耐久力が向上。' },
         { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LNC-4]', power: 1200, maxCharges: 4, mass: 0, slots: 0, precision: 0, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' },
-        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PRC-4]', power: 1000, maxCharges: 4, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' }
+        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PRC-4]', power: 1000, maxCharges: 4, mass: 0, slots: 0, precision: 500, precisionMultiplier: 1.2, rarity: RARITY.RARE, description: '最終型。最高の予測性能と耐久力を誇る。' }
     ],
     MODULES: [
         { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: '拡張スロットを2つ追加。' },
