@@ -34,9 +34,9 @@ export const PARTS = {
         { id: 'hull_heavy', category: 'CHASSIS', name: '堅牢シャーシ', mass: 18, slots: 2, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '堅牢な重厚体。2スロット。' }
     ],
     LOGIC: [
-        { id: 'sensor_short', category: 'LOGIC', name: 'エントリー・ロジック', mass: 1, slots: 0, precision: 150, pickupRange: 80, pickupMultiplier: 1.2, rarity: RARITY.COMMON, description: '取得特化の広域収集型。予測精度は低い。' },
-        { id: 'sensor_normal', category: 'LOGIC', name: 'シンク・ロジック', mass: 1, slots: 0, precision: 250, pickupRange: 40, pickupMultiplier: 1.1, rarity: RARITY.COMMON, description: '標準的な予測精度。' },
-        { id: 'sensor_long', category: 'LOGIC', name: 'ディープ・ロジック', mass: 1, slots: 0, precision: 4500, precisionMultiplier: 1.1, pickupRange: 20, rarity: RARITY.COMMON, description: '超長距離予測に特化した高精度演算ユニット。取得範囲は限定的。' }
+        { id: 'sensor_short', category: 'LOGIC', name: '広域回収ロジック', mass: 1, slots: 0, precision: 150, pickupRange: 80, pickupMultiplier: 1.2, rarity: RARITY.COMMON, description: '物資回収に特化した広域収集型。予測精度は低い。' },
+        { id: 'sensor_normal', category: 'LOGIC', name: '標準航法ロジック', mass: 1, slots: 0, precision: 250, pickupRange: 40, pickupMultiplier: 1.1, rarity: RARITY.COMMON, description: '汎用性の高い標準的な予測精度を持つロジック。' },
+        { id: 'sensor_long', category: 'LOGIC', name: '精密予測ロジック', mass: 1, slots: 0, precision: 600, precisionMultiplier: 1.1, pickupRange: 20, rarity: RARITY.COMMON, description: '長距離の軌道予測に特化した高精度演算ユニット。取得範囲は限定的。' }
     ],
     LAUNCHERS: [
         { id: 'pad_standard', category: 'LAUNCHERS', name: '標準発射台', power: 1200, maxCharges: 2, mass: 1, slots: 0, precision: 0, rarity: RARITY.COMMON, description: '標準的な初期加速。' },
