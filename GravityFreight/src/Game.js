@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.4.5'; // Fix booster stacking & duration logic (v0.4.5)
+        this.version = '0.4.12'; // Unified prediction & launch direction (v0.4.12)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -255,19 +255,17 @@ export class Game {
 
     setupListeners() {
         const updatePointer = (e) => {
-            // UI上の操作（ボタン等）の時はエイムを更新しない
+            // マウス座標はホバー判定のために常に最新を追跡する
+            this.mousePos.x = e.clientX;
+            this.mousePos.y = e.clientY;
+
+            // UI上の操作（ボタン等）の時はエイム操作（自機の向き変更）をスキップする
             if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) {
                 return;
             }
 
-            // エイム中かつドラッグ中でない場合は更新しない（iPad等でのボタン移動対策）
-            if (this.state === 'aiming' && !this.isPointerDown) {
-                return;
-            }
-            this.mousePos.x = e.clientX;
-            this.mousePos.y = e.clientY;
-            
-            if (this.state === 'aiming') {
+            // エイム操作自体の実行 (クリック中のみ)
+            if (this.state === 'aiming' && this.isPointerDown) {
                 const worldPos = this.getWorldPos(this.mousePos);
                 const dir = worldPos.sub(this.homeStar.position).normalize();
                 this.ship.position = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
@@ -278,8 +276,8 @@ export class Game {
 
         const launch = () => {
             if (this.state === 'aiming') {
-                const worldMouse = this.getWorldPos(this.mousePos);
-                const dir = worldMouse.sub(this.homeStar.position).normalize();
+                // 方向計算の根拠を mousePos から ship.rotation (ドラッグで確定した向き) に変更
+                const dir = new Vector2(Math.cos(this.ship.rotation), Math.sin(this.ship.rotation));
                 
                 let power = this.selection.launcher ? this.selection.launcher.power : 1200;
                 if (this.selection.booster && this.selection.booster.powerMultiplier) {
@@ -323,7 +321,7 @@ export class Game {
                     };
                 }
 
-                // 消費処理
+                // ブースターの消費処理
                 if (this.selection.booster) {
                     const b = this.selection.booster;
                     if (b.maxCharges && b.maxCharges > 1) {
@@ -342,8 +340,11 @@ export class Game {
                             this.selection.booster = null;
                         }
                     }
-                } else if (this.selection.launcher) {
-                    // ブースターがない場合は発射台が摩耗する
+                }
+
+                // ランチャーの消費処理 (耐久減少を防ぐブースターを使用していない場合のみ)
+                const preventsWear = this.selection.booster && this.selection.booster.preventsLauncherWear;
+                if (this.selection.launcher && !preventsWear) {
                     this.selection.launcher.charges--;
                     if (this.selection.launcher.charges <= 0) {
                         this.inventory.launchers = this.inventory.launchers.filter(p => p !== this.selection.launcher);
@@ -356,11 +357,13 @@ export class Game {
 
                 // 母星に預けていたアイテムがあれば再装填
                 if (this.homeStar.items && this.homeStar.items.length > 0) {
-                    this.ship.pendingItems = this.homeStar.items.map(itemData => ({
-                        itemData: itemData,
-                        position: new Vector2(this.homeStar.position.x, this.homeStar.position.y),
-                        collectedTime: this.simulatedTime
-                    }));
+                    this.homeStar.items.forEach(itemData => {
+                        this.pendingItems.push({ 
+                            itemData: itemData,
+                            originalBody: this.homeStar,
+                            collectedTime: this.simulatedTime
+                        });
+                    });
                     this.homeStar.items = []; // ホームを空にする
                 }
 
@@ -465,7 +468,7 @@ export class Game {
 
         window.addEventListener('pointerup', endPointer);
         window.addEventListener('pointercancel', endPointer);
-        window.addEventListener('pointerout', endPointer);
+        // pointeroutはHUD等のUIに重なっただけで発生するため、ドラッグ終了判定には使用しない
 
         // タブ切り替え処理の追加
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1276,8 +1279,8 @@ export class Game {
     getPredictionPoints() {
         if (this.state !== 'aiming') return [];
         const points = [];
-        const worldMouse = this.getWorldPos(this.mousePos);
-        const dir = worldMouse.sub(this.homeStar.position).normalize();
+        // 方向計算の根拠を mousePos から ship.rotation (ドラッグで確定した向き) に変更
+        const dir = new Vector2(Math.cos(this.ship.rotation), Math.sin(this.ship.rotation));
         
         const rocket = this.selection.rocket;
         if (!rocket) return [];
@@ -1400,8 +1403,12 @@ export class Game {
         body.items.forEach(itemData => {
             const category = itemData.category;
 
-            // 仮保存リストへの追加
-            this.pendingItems.push({ itemData, originalBody: body });
+            // 仮保存リストへの追加 (構造を統一)
+            this.pendingItems.push({ 
+                itemData, 
+                originalBody: body,
+                collectedTime: this.simulatedTime 
+            });
 
             // 視覚エフェクト用リストに追加
             this.ship.collectedItems.push({
@@ -1439,13 +1446,11 @@ export class Game {
                 if (category === 'CARGO') {
                     if (hitGoal) {
                         // ゴール到達時：特殊効果または配送報酬
-                        if (item.id === 'cargo_lucky') {
-                            this.nextSectorThresholdBonus = item.nextSectorThresholdBonus || 5;
+                        if (item.nextSectorThresholdBonus) {
+                            this.nextSectorThresholdBonus = item.nextSectorThresholdBonus;
                             this.ui.message.textContent += ` LUCKY NEXT SECTOR!`;
-                        } else {
-                            // IDから貨物タイプを抽出 (cargo_safe -> SAFE)
-                            const cargoType = item.id.replace('cargo_', '').toUpperCase(); 
-                            if (hitGoal.id === cargoType) {
+                        } else if (item.deliveryGoalId) {
+                            if (hitGoal.id === item.deliveryGoalId) {
                                 this.score += 1500;
                                 this.coins += 100;
                                 this.ui.message.textContent += ` +DELIVERY BONUS! (+1500)`;
@@ -1503,7 +1508,7 @@ export class Game {
                 }
                 // LOSTの場合：保険金（もしあれば）を計算
                 if (result === 'lost' && this.ship && this.ship.equippedModules) {
-                    const insuranceModules = this.ship.equippedModules.filter(m => m.id === 'mod_insurance');
+                    const insuranceModules = this.ship.equippedModules.filter(m => m.onLostBonus);
                     const rocket = this.selection.rocket;
                     
                     if (insuranceModules.length > 0 && rocket) {

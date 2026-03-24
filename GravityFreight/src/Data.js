@@ -32,12 +32,12 @@ export const GOAL_COLORS = {
 
 export const PARTS = {
     CHASSIS: [
-        { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 0, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '性能重視の軽量体。重力の影響を受けやすい。' },
-        { id: 'hull_medium', category: 'CHASSIS', name: '標準シャーシ', mass: 8, slots: 1, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '汎用性の高い標準体。1スロット。' },
-        { id: 'hull_heavy', category: 'CHASSIS', name: '堅牢シャーシ', mass: 18, slots: 2, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '堅牢な重厚体。2スロット。' },
-        { id: 'hull_light_plus', category: 'CHASSIS', name: '軽量シャーシ＋', mass: 3, slots: 0, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型。予測と取得が20%強化されている。' },
-        { id: 'hull_medium_plus', category: 'CHASSIS', name: '標準シャーシ＋', mass: 8, slots: 1, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型。予測と取得が20%強化されている。' },
-        { id: 'hull_heavy_plus', category: 'CHASSIS', name: '堅牢シャーシ＋', mass: 18, slots: 2, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型。予測と取得が20%強化されている。' }
+        { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 1, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '性能重視の軽量体。重力の影響を受けやすい。' },
+        { id: 'hull_medium', category: 'CHASSIS', name: '標準シャーシ', mass: 8, slots: 2, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '汎用性の高い標準体。2スロット。' },
+        { id: 'hull_heavy', category: 'CHASSIS', name: '堅牢シャーシ', mass: 18, slots: 3, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '堅牢な重厚体。3スロット。' },
+        { id: 'hull_light_plus', category: 'CHASSIS', name: '軽量シャーシ＋', mass: 3, slots: 1, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型。予測と取得が20%強化されている。' },
+        { id: 'hull_medium_plus', category: 'CHASSIS', name: '標準シャーシ＋', mass: 8, slots: 2, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型。予測と取得が20%強化されている。' },
+        { id: 'hull_heavy_plus', category: 'CHASSIS', name: '堅牢シャーシ＋', mass: 18, slots: 3, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型。予測と取得が20%強化されている。' }
     ],
     LOGIC: [
         { id: 'sensor_short', category: 'LOGIC', name: '広域回収ロジック', mass: 1, slots: 0, precision: 150, pickupRange: 80, pickupMultiplier: 1.2, rarity: RARITY.COMMON, description: '物資回収に特化した広域収集型。' },
@@ -66,10 +66,10 @@ export const PARTS = {
         { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '境界復帰時の予測軌道を表示。' }
     ],
     BOOSTERS: [
-        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, maxCharges: 1, rarity: RARITY.COMMON, description: '発射時の耐久減少を無効化する。' },
-        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', mass: 0, slots: 0, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '2回分使用可能な燃料パック。' },
+        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '発射時の耐久減少を無効化する。' },
+        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', mass: 0, slots: 0, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '2回分使用可能な燃料パック。' },
         { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', mass: 0, slots: 0, gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間重力を無視して直進する。' },
-        { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', mass: 0, slots: 0, powerMultiplier: 1.3, rarity: RARITY.RARE, description: '発射パワーを1.3倍に強化。' },
+        { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', mass: 0, slots: 0, powerMultiplier: 1.3, rarity: RARITY.COMMON, description: '発射パワーを1.3倍に強化。' },
         { id: 'boost_magnet', category: 'BOOSTERS', name: 'マグネティック・パルス', mass: 0, slots: 0, rarity: RARITY.RARE, description: '航行時間とともにアイテム回収範囲が拡大。' },
         { id: 'boost_expander', category: 'BOOSTERS', name: 'ゴール・エクスパンダー', mass: 0, slots: 0, arcMultiplier: 1.2, rarity: RARITY.RARE, description: '出口サイズを1.2倍に拡大。' }
     ],
@@ -78,9 +78,9 @@ export const PARTS = {
         { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO', name: 'セーフ・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '安全区域への配送用荷物。' },
-        { id: 'cargo_normal', category: 'CARGO', name: 'ノーマル・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '通常区域への配送用荷物。' },
-        { id: 'cargo_danger', category: 'CARGO', name: 'デンジャー・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '危険区域への配送用荷物。' },
+        { id: 'cargo_safe', category: 'CARGO', name: 'セーフ・カーゴ', mass: 1, deliveryGoalId: 'SAFE', rarity: RARITY.UNCOMMON, description: '安全区域への配送用荷物。' },
+        { id: 'cargo_normal', category: 'CARGO', name: 'ノーマル・カーゴ', mass: 1, deliveryGoalId: 'NORMAL', rarity: RARITY.UNCOMMON, description: '通常区域への配送用荷物。' },
+        { id: 'cargo_danger', category: 'CARGO', name: 'デンジャー・カーゴ', mass: 1, deliveryGoalId: 'DANGER', rarity: RARITY.UNCOMMON, description: '危険区域への配送用荷物。' },
         { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, nextSectorThresholdBonus: 5, rarity: RARITY.UNCOMMON, description: 'ゴール到達時に保持していると、次セクターの出現率を大幅に向上。' }
     ]
 };
@@ -103,6 +103,7 @@ export const INITIAL_INVENTORY = {
         { id: 'mod_analyzer', count: 1 }
     ],
     boosters: [
-        { id: 'opt_fuel', count: 1 }
+        { id: 'opt_fuel', count: 1 },
+        { id: 'boost_power', count: 3 }
     ]
 };
