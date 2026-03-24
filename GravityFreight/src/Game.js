@@ -1443,10 +1443,29 @@ export class Game {
                 }
                 // LOSTの場合：保険金（もしあれば）を計算
                 if (result === 'lost' && this.ship && this.ship.equippedModules) {
-                    const insurance = this.ship.equippedModules.filter(m => m.id === 'mod_insurance');
-                    if (insurance.length > 0) {
-                        let totalPayout = 0;
-                        insurance.forEach(m => totalPayout += (m.onLostBonus || 50));
+                    const insuranceModules = this.ship.equippedModules.filter(m => m.id === 'mod_insurance');
+                    const rocket = this.selection.rocket;
+                    
+                    if (insuranceModules.length > 0 && rocket) {
+                        const calculateValue = (item) => {
+                            let base = 10;
+                            if (item.rarity === RARITY.UNCOMMON) base = 20;
+                            if (item.rarity === RARITY.RARE) base = 30;
+                            const cur = item.charges !== undefined ? item.charges : 0;
+                            const max = item.maxCharges !== undefined ? item.maxCharges : 0;
+                            return Math.floor(base * (cur + 1) / (max + 1));
+                        };
+
+                        let totalUnitValue = 0;
+                        if (rocket.chassis) totalUnitValue += calculateValue(rocket.chassis);
+                        if (rocket.logic) totalUnitValue += calculateValue(rocket.logic);
+                        if (this.ship.equippedModules) {
+                            this.ship.equippedModules.forEach(m => {
+                                totalUnitValue += calculateValue(m);
+                            });
+                        }
+
+                        const totalPayout = totalUnitValue * insuranceModules.length;
                         this.coins += totalPayout;
                         this.ui.message.textContent += ` (INSURANCE: +${totalPayout})`;
                     }
