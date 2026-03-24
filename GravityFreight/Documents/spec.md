@@ -66,8 +66,8 @@
 | **Logic** | Entry Logic | `sensor_short` | COMMON | 1 | - | 150 | - | **80** | **1.2** | - | - | - | 取得特化の広域収集型。予測精度は低い。 |
 | | Sync Logic | `sensor_normal` | COMMON | 1 | - | 250 | - | 40 | **1.1** | - | - | - | 標準的な予測精度。 |
 | | Deep Logic | `sensor_long` | COMMON | 1 | - | 4500 | **1.1** | **20** | - | - | - | - | 予測特化の高精度型。取得範囲は限定的。 |
-| **Launcher** | Standard Acc. | `pad_standard` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1200 |
-| | Steady Acc. | `pad_precision` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1000, 予測線強化。 |
+| **Launcher** | Standard Launcher | `pad_standard` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1200 |
+| | Steady Launcher | `pad_precision` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1000, 予測線強化。 |
 | **Module** | Slot Expander | `mod_capacity` | UNCOMMON | 1 | 2 | - | - | - | - | - | - | - | 拡張スロットを2つ追加。重量が増加。 |
 | | Star Breaker | `mod_star_breaker` | RARE | 2 | - | - | - | - | - | - | - | 2 | 衝突時に星を破壊して回避。 |
 | | Impact Cushion | `mod_cushion` | RARE | 1 | - | - | - | - | - | - | - | 1 | 衝突時にバウンドして回避。 |
@@ -140,7 +140,7 @@
         - **挙動**: Unitは喪失せず、取得中の仮アイテムはすべて**ホームの星（Home）に一時的に預けられる**。
         - **確認**: ホームにマウスホバーすることで、持ち帰ったアイテムの中身をいつでも確認できる。
         - **再回収**: 再び出撃（発射準備完了）すると、ホームに預けていたアイテムは自動的に自機の `pendingItems` として回収・再装備される。
-        - **コスト**: 発射時に消費されたアクセラレーターの耐久値のみが減少する。
+        - **コスト**: 発射時に消費された発射台（Launcher）の耐久値のみが減少する。
 
 ## 7. スコアシステム
 - **飛行加点**: 飛行中、1フレームにつき 1点 加算。
