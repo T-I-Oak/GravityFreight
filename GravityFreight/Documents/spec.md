@@ -40,7 +40,7 @@
 機体を構成するパーツ（Chassis, Logic, Module）はアセンブリ時に決定されます。一方で、発射時に選択するアクセサリ（Launcher, Booster）は、フライト準備時に動的にスペックへ反映されます。
 
 - **重量 (mass) [加算]**: 機体の物理的慣性（加速度の減衰）に影響します。
-- **スロット数 (slots) [加算]**: Chassis は正の値（空き枠）を持ち、Module は1枠を消費（基本0枠付与）しますが、Slot Expander等で追加枠を提供することもあります。
+- **スロット数 (slots) [加算]**: Chassis は正の値（空き枠）を持ち、Module は1枠を消費（基本0枠付与）しますが、スロット拡張基板等で追加枠を提供することもあります。
 - **予測精度 (precision) [加算]**: 基礎となる軌道シミュレーションのステップ数。
 - **予測倍率 (precisionMultiplier) [乗算]**: 最終的な予測射程への倍率補正。
 - **取得範囲 (pickupRange) [加算]**: アイテムを回収できる範囲（波紋）の広さ。
@@ -60,39 +60,39 @@
 
 | カテゴリ | 名称 | ID | レアリティ | 重量 | Slot | 予測精度 | 予測倍率 | 取得範囲 | 取得倍率 | アーク倍率 | 重力倍率 | 耐久(回数) | 備考 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Chassis** | Lite Chassis | `hull_light` | COMMON | 3 | - | 100 | - | - | - | - | - | - | 性能重視の軽量体。重力の影響大。 |
-| | Standard Chassis | `hull_medium` | COMMON | 8 | 1 | 100 | - | - | - | - | - | - | 汎用性の高い標準体。1スロット。 |
-| | Tough Chassis | `hull_heavy` | COMMON | 18 | 2 | 100 | - | - | - | - | - | - | 堅牢な重厚体。2スロット。 |
-| **Logic** | Entry Logic | `sensor_short` | COMMON | 1 | - | 150 | - | **80** | **1.2** | - | - | - | 取得特化の広域収集型。予測精度は低い。 |
-| | Sync Logic | `sensor_normal` | COMMON | 1 | - | 250 | - | 40 | **1.1** | - | - | - | 標準的な予測精度。 |
-| | Deep Logic | `sensor_long` | COMMON | 1 | - | 4500 | **1.1** | **20** | - | - | - | - | 予測特化の高精度型。取得範囲は限定的。 |
-| **Launcher** | Standard Launcher | `pad_standard` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1200 |
-| | Steady Launcher | `pad_precision` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1000, 予測線強化。 |
-| **Module** | Slot Expander | `mod_capacity` | UNCOMMON | 1 | 2 | - | - | - | - | - | - | - | 拡張スロットを2つ追加。重量が増加。 |
-| | Star Breaker | `mod_star_breaker` | RARE | 2 | - | - | - | - | - | - | - | 2 | 衝突時に星を破壊して回避。 |
-| | Impact Cushion | `mod_cushion` | RARE | 1 | - | - | - | - | - | - | - | 1 | 衝突時にバウンドして回避。 |
-| | Emergency Thruster | `mod_emergency` | RARE | 1 | - | - | - | - | - | - | - | 1 | ロスト時に中心へ自動方向転換。 |
-| | Trajectory Stabilizer | `mod_stabilizer` | RARE | 1 | - | - | - | - | - | - | **0.8** | - | 自機にかかる重力の影響を0.8倍に軽減。 |
-| | Orbit Analyst | `mod_analyzer` | UNCOMMON | 1 | - | - | **1.2** | - | - | - | - | - | 軌道解析を行い、予測倍率を1.2倍に強化。 |
-| **Booster** | Reaction Fuel | `opt_fuel` | UNCOMMON | 1 | - | - | - | - | - | - | - | - | 加速時の耐久減少を自動で無効化。 |
-| | Magnetic Pulse | `boost_magnet` | RARE | 1 | - | - | - | - | - | - | - | - | 飛行時間と共にアイテム回収範囲（波紋）が拡大。 |
-| | Goal Expander | `boost_expander` | RARE | 1 | - | - | - | - | - | **1.2** | - | - | ゴールのサイズ（アーク角度）を拡大。 |
-| **Cargo** | Safe Cargo | `cargo_safe` | - | 1 | - | - | - | - | - | - | - | - | 安全出口への配送用(緑)。※自然出現なし |
-| | Normal Cargo | `cargo_normal` | - | 2 | - | - | - | - | - | - | - | - | 通常出口への配送用(青)。※自然出現なし |
-| | Danger Cargo | `cargo_danger` | - | 4 | - | - | - | - | - | - | - | - | 危険出口への配送用(赤)。※自然出現なし |
+| **Chassis** | 軽量シャーシ | `hull_light` | COMMON | 3 | - | 100 | - | - | - | - | - | - | 性能重視の軽量体。重力の影響大。 |
+| | 標準シャーシ | `hull_medium` | COMMON | 8 | 1 | 100 | - | - | - | - | - | - | 汎用性の高い標準体。1スロット。 |
+| | 堅牢シャーシ | `hull_heavy` | COMMON | 18 | 2 | 100 | - | - | - | - | - | - | 堅牢な重厚体。2スロット。 |
+| **Logic** | エントリー・ロジック | `sensor_short` | COMMON | 1 | - | 150 | - | **80** | **1.2** | - | - | - | 取得特化の広域収集型。予測精度は低い。 |
+| | シンク・ロジック | `sensor_normal` | COMMON | 1 | - | 250 | - | 40 | **1.1** | - | - | - | 標準的な予測精度。 |
+| | ディープ・ロジック | `sensor_long` | COMMON | 1 | - | 4500 | **1.1** | **20** | - | - | - | - | 予測特化の高精度型。取得範囲は限定的。 |
+| **Launcher** | 標準発射台 | `pad_standard` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1200 |
+| | 精密発射台 | `pad_precision` | COMMON | 1 | - | - | - | - | - | - | - | 2 | パワー: 1000, 予測線強化。 |
+| **Module** | スロット拡張基板 | `mod_capacity` | UNCOMMON | 1 | 2 | - | - | - | - | - | - | - | 拡張スロットを2つ追加。重量が増加。 |
+| | スター・ブレイカー | `mod_star_breaker` | RARE | 2 | - | - | - | - | - | - | - | 2 | 衝突時に星を破壊して回避。 |
+| | インパクト・クッション | `mod_cushion` | RARE | 1 | - | - | - | - | - | - | - | 1 | 衝突時にバウンドして回避。 |
+| | 緊急スラスター | `mod_emergency` | RARE | 1 | - | - | - | - | - | - | - | 1 | ロスト時に中心へ自動方向転換。 |
+| | 軌道安定化装置 | `mod_stabilizer` | RARE | 1 | - | - | - | - | - | - | **0.8** | - | 自機にかかる重力の影響を0.8倍に軽減。 |
+| | オービット・アナリスト | `mod_analyzer` | UNCOMMON | 1 | - | - | **1.2** | - | - | - | - | - | 軌道解析を行い、予測倍率を1.2倍に強化。 |
+| **Booster** | 高反応燃料 | `opt_fuel` | UNCOMMON | 1 | - | - | - | - | - | - | - | - | 加速時の耐久減少を自動で無効化。 |
+| | マグネティック・パルス | `boost_magnet` | RARE | 1 | - | - | - | - | - | - | - | - | 飛行時間と共にアイテム回収範囲（波紋）が拡大。 |
+| | ゴール・エクスパンダー | `boost_expander` | RARE | 1 | - | - | - | - | - | **1.2** | - | - | ゴールのサイズ（アーク角度）を拡大。 |
+| **Cargo** | セーフ・カーゴ | `cargo_safe` | - | 1 | - | - | - | - | - | - | - | - | 安全出口への配送用(緑)。※自然出現なし |
+| | ノーマル・カーゴ | `cargo_normal` | - | 2 | - | - | - | - | - | - | - | - | 通常出口への配送用(青)。※自然出現なし |
+| | デンジャー・カーゴ | `cargo_danger` | - | 4 | - | - | - | - | - | - | - | - | 危険出口への配送用(赤)。※自然出現なし |
 | | | | | | | | | | | | | | |
 
 ### 4.2 初期所持アイテム (Initial Inventory)
 ゲーム開始時にプレイヤーが所持しているアイテム（計8個）の内訳です。
 
-1. **Lite Chassis** (`hull_light`) × 1
-2. **Standard Chassis** (`hull_medium`) × 1
-3. **Entry Logic** (`sensor_short`) × 1
-4. **Sync Logic** (`sensor_normal`) × 1
-5. **Standard Launcher** (`pad_standard`) × 1 (耐久: 2)
-6. **Steady Launcher** (`pad_precision`) × 1 (耐久: 2)
-7. **Orbit Analyst** (`mod_analyzer`) × 1
-8. **Reaction Fuel** (`opt_fuel`) × 1
+1. **軽量シャーシ** (`hull_light`) × 1
+2. **標準シャーシ** (`hull_medium`) × 1
+3. **エントリー・ロジック** (`sensor_short`) × 1
+4. **シンク・ロジック** (`sensor_normal`) × 1
+5. **標準発射台** (`pad_standard`) × 1 (耐久: 2)
+6. **精密発射台** (`pad_precision`) × 1 (耐久: 2)
+7. **オービット・アナリスト** (`mod_analyzer`) × 1
+8. **高反応燃料** (`opt_fuel`) × 1
 
 | **Unit** | ライトブルー | `#e0e0ff` |
 
