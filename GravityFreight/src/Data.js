@@ -44,12 +44,12 @@ export const PARTS = {
         { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, slots: 0, precision: 250, gravityMultiplier: 0.8, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
     ],
     LAUNCHERS: [
-        { id: 'pad_standard', category: 'LAUNCHERS', name: '標準発射台', power: 1200, maxCharges: 2, mass: 0, slots: 0, precision: 0, rarity: RARITY.COMMON, description: '標準的な性能。初期装備。' },
-        { id: 'pad_precision', category: 'LAUNCHERS', name: '精密発射台', power: 1000, maxCharges: 2, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.COMMON, description: '予測線を延長し、安定した制御が可能。' },
-        { id: 'pad_standard_t2', category: 'LAUNCHERS', name: '標準発射台[T2]', power: 1200, maxCharges: 3, mass: 0, slots: 0, precision: 0, rarity: RARITY.UNCOMMON, description: '改良型。耐久力が向上。' },
-        { id: 'pad_precision_t2', category: 'LAUNCHERS', name: '精密発射台[T2]', power: 1000, maxCharges: 3, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.UNCOMMON, description: '改良型。耐久力が向上。' },
-        { id: 'pad_standard_t3', category: 'LAUNCHERS', name: '標準発射台[T3]', power: 1200, maxCharges: 4, mass: 0, slots: 0, precision: 0, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' },
-        { id: 'pad_precision_t3', category: 'LAUNCHERS', name: '精密発射台[T3]', power: 1000, maxCharges: 4, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' }
+        { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台[D2]', power: 1200, maxCharges: 2, mass: 0, slots: 0, precision: 0, rarity: RARITY.COMMON, description: '標準的な性能。初期装備。' },
+        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台[D2]', power: 1000, maxCharges: 2, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.COMMON, description: '予測線を延長し、安定した制御が可能。' },
+        { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台[D3]', power: 1200, maxCharges: 3, mass: 0, slots: 0, precision: 0, rarity: RARITY.UNCOMMON, description: '改良型。耐久力が向上。' },
+        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台[D3]', power: 1000, maxCharges: 3, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.UNCOMMON, description: '改良型。耐久力が向上。' },
+        { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台[D4]', power: 1200, maxCharges: 4, mass: 0, slots: 0, precision: 0, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' },
+        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台[D4]', power: 1000, maxCharges: 4, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' }
     ],
     MODULES: [
         { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: '拡張スロットを2つ追加。' },
@@ -94,8 +94,8 @@ export const INITIAL_INVENTORY = {
         { id: 'sensor_normal', count: 1 }
     ],
     launchers: [
-        { id: 'pad_standard', charges: 2 },
-        { id: 'pad_precision', charges: 2 }
+        { id: 'pad_standard_d2', charges: 2 },
+        { id: 'pad_precision_d2', charges: 2 }
     ],
     modules: [
         { id: 'mod_analyzer', count: 1 }
