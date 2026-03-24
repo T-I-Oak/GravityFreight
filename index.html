@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="favicon.png">
     <title>GRAVITY FREIGHT: ORBITAL ECHOES</title>
     <link rel="stylesheet" href="GravityFreight/css/style.css">
 </head>
@@ -21,61 +22,68 @@
 
     <!-- ビルドシステム UI -->
     <div id="build-overlay">
-        <!-- 飛行セクション (右端に固定するため先に記述) -->
-        <div class="panel" id="flight-panel">
+        <div class="panel" id="terminal-panel">
             <div class="panel-header">
-                <h2>FLIGHT TERMINAL</h2>
-                <button class="collapse-btn mini-btn" title="Toggle Panel">∧</button>
-            </div>
-            <div class="category">
-                <div class="category-header">
-                    <h3>UNIT</h3>
-                    <button id="toggle-factory-btn" class="mini-btn">ASSEMBLE NEW</button>
+                <div class="tab-header">
+                    <button class="tab-btn active" data-tab="flight">FLIGHT</button>
+                    <button class="tab-btn" data-tab="factory">ASSEMBLY</button>
                 </div>
-                <div id="rocket-list"></div>
-            </div>
-
-            <div class="category">
-                <h3>ACCELERATOR</h3>
-                <div id="accelerator-list"></div>
-            </div>
-            <div class="category">
-                <h3>BOOSTER</h3>
-                <div id="acc-option-list" class="option-list">
-                    <div class="slot-placeholder">No Booster Equipped</div>
+                <div id="panel-controls">
+                    <button class="collapse-btn" title="Toggle Panel">
+                        <span class="icon">∧</span>
+                    </button>
                 </div>
             </div>
+            
+            <div id="panel-scroll-area">
+                <!-- FLIGHT タブ内容 -->
+                <div id="flight-tab" class="tab-content">
+                    <div class="category">
+                        <div class="category-header">
+                            <h3>UNIT</h3>
+                        </div>
+                        <div id="rocket-list"></div>
+                    </div>
 
-            <button id="launch-btn" class="hidden">LAUNCH ENGINE</button>
+                    <div class="category">
+                        <h3>LAUNCHER</h3>
+                        <div id="launcher-list"></div>
+                    </div>
+                    <div class="category">
+                        <h3>BOOSTER</h3>
+                        <div id="acc-option-list" class="option-list">
+                            <div class="slot-placeholder">No Booster Equipped</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASSEMBLY タブ内容 (初期非表示) -->
+                <div id="factory-tab" class="tab-content hidden">
+                    <div class="category">
+                        <h3>CHASSIS</h3>
+                        <div id="chassis-list"></div>
+                    </div>
+                    <div class="category">
+                        <h3>LOGIC</h3>
+                        <div id="logic-list"></div>
+                    </div>
+
+                    <div class="category">
+                        <h3>MODULE</h3>
+                        <div id="logic-option-list" class="option-list">
+                            <div class="slot-placeholder">Slot Empty (Requires Research)</div>
+                        </div>
+                    </div>
+
+                    <button id="build-btn" disabled>ASSEMBLE UNIT</button>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <!-- 建造セクション (左側に展開) -->
-
-        <div class="panel" id="factory-panel">
-            <div class="panel-header">
-                <h2>ASSEMBLY BAY</h2>
-                <button class="collapse-btn mini-btn" title="Toggle Panel">∧</button>
-            </div>
-            <div class="category">
-                <h3>CHASSIS</h3>
-                <div id="chassis-list"></div>
-            </div>
-            <div class="category">
-                <h3>LOGIC</h3>
-                <div id="logic-list"></div>
-            </div>
-
-
-            <div class="category">
-                <h3>MODULE</h3>
-                <div id="logic-option-list" class="option-list">
-                    <div class="slot-placeholder">Slot Empty (Requires Research)</div>
-                </div>
-            </div>
-
-
-            <button id="build-btn" disabled>ASSEMBLE UNIT</button>
-        </div>
+    <!-- 独立した起動ボタンパネル -->
+    <div id="launch-control">
+        <button id="launch-btn" disabled>LAUNCH ENGINE</button>
     </div>
 
 

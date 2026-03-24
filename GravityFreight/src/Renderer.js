@@ -83,7 +83,7 @@ export class Renderer {
             // 明滅と輝度計算（手前ほど明るく、大きく）
             const twinkle = 0.8 + 0.2 * Math.sin((timestamp / 1000) * star.pulseRate + star.pulseOffset);
             const brightness = (1 - star.z / maxZ) * star.alpha * twinkle;
-            const size = star.size * scale * 2;
+            const size = Math.min(4, star.size * scale * 1.2); // 最大サイズを4pxに制限し、倍率を1.2に抑制
 
             this.ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
             this.ctx.beginPath();

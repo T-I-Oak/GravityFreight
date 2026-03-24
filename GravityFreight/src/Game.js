@@ -38,8 +38,8 @@ export class Game {
                 const base = PARTS.LOGIC.find(bl => bl.id === l.id);
                 return { ...base, count: l.count };
             }),
-            accelerators: INITIAL_INVENTORY.accelerators.map(p => {
-                const base = PARTS.ACCELERATORS.find(bp => bp.id === p.id);
+            launchers: INITIAL_INVENTORY.launchers.map(p => {
+                const base = PARTS.LAUNCHERS.find(bp => bp.id === p.id);
                 return { ...base, charges: p.charges };
             }),
             modules: INITIAL_INVENTORY.modules.map(o => {
@@ -64,7 +64,7 @@ export class Game {
         this.selection = {
             chassis: null,
             logic: null,
-            accelerator: null,
+            launcher: null,
             rocket: null,
             modules: {}, // { id: count } 複数選択対応
             booster: null
@@ -273,22 +273,24 @@ export class Game {
             if (this.state === 'aiming') {
                 const worldMouse = this.getWorldPos(this.mousePos);
                 const dir = worldMouse.sub(this.homeStar.position).normalize();
-                const power = this.selection.accelerator ? this.selection.accelerator.power : 1200;
+                const power = this.selection.launcher ? this.selection.launcher.power : 1200;
                 
                 const massFactor = Math.sqrt(10 / this.ship.mass);
                 this.ship.velocity = dir.scale(power * massFactor);
 
-                if (this.selection.booster && this.selection.booster.id === 'opt_fuel') {
+                // ブースターが選択されている場合は消費
+                if (this.selection.booster) {
                     this.selection.booster.count--;
                     if (this.selection.booster.count <= 0) {
                         this.inventory.boosters = this.inventory.boosters.filter(o => o.count > 0);
                         this.selection.booster = null;
                     }
-                } else if (this.selection.accelerator) {
-                    this.selection.accelerator.charges--;
-                    if (this.selection.accelerator.charges <= 0) {
-                        this.inventory.accelerators = this.inventory.accelerators.filter(p => p !== this.selection.accelerator);
-                        this.selection.accelerator = null;
+                } else if (this.selection.launcher) {
+                    // ブースターがない場合は発射台が摩耗する
+                    this.selection.launcher.charges--;
+                    if (this.selection.launcher.charges <= 0) {
+                        this.inventory.launchers = this.inventory.launchers.filter(p => p !== this.selection.launcher);
+                        this.selection.launcher = null;
                     }
                 }
                 
@@ -354,13 +356,27 @@ export class Game {
                 const pts = Array.from(this.activePointers.values());
                 const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
                 
+                // 2本指でのパン（移動）
+                if (this.lastPointersPos) {
+                    const currentMid = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+                    const lastMid = { x: (this.lastPointersPos[0].x + this.lastPointersPos[1].x) / 2, y: (this.lastPointersPos[0].y + this.lastPointersPos[1].y) / 2 };
+                    this.cameraOffset.x += currentMid.x - lastMid.x;
+                    this.cameraOffset.y += currentMid.y - lastMid.y;
+                }
+
+                // ズーム
                 if (this.lastPinchDist > 0) {
                     const factor = dist / this.lastPinchDist;
                     this.zoom *= factor;
                     this.zoom = Math.max(0.3, Math.min(this.zoom, 5.0));
                 }
                 this.lastPinchDist = dist;
+                this.lastPointersPos = pts;
+                
+                // ブラウザのピンチズームを防止
+                if (e.cancelable) e.preventDefault();
             } else {
+                this.lastPointersPos = null;
                 updatePointer(e);
             }
         });
@@ -383,14 +399,36 @@ export class Game {
         window.addEventListener('pointercancel', endPointer);
         window.addEventListener('pointerout', endPointer);
 
-        document.querySelectorAll('.panel-header').forEach(header => {
-            if (header.closest('.panel.static')) return;
-            header.addEventListener('click', (e) => {
-                const panel = e.target.closest('.panel');
-                panel.classList.toggle('collapsed');
-                e.stopPropagation();
-            });
+        // タブ切り替え処理の追加
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                const tab = btn.getAttribute('data-tab');
+                this.isFactoryOpen = (tab === 'factory');
+                this.updateUI();
+            };
         });
+
+        // パネル全体の最小化（ヘッダー部分クリック）
+        const terminalPanel = document.getElementById('terminal-panel');
+        const panelHeader = terminalPanel.querySelector('.panel-header');
+        const collapseBtnIcon = terminalPanel.querySelector('.collapse-btn .icon');
+
+        const toggleCollapse = () => {
+            terminalPanel.classList.toggle('collapsed');
+            if (collapseBtnIcon) {
+                collapseBtnIcon.textContent = terminalPanel.classList.contains('collapsed') ? '☰' : '∧';
+            }
+        };
+
+        panelHeader.onclick = (e) => {
+            // タブボタンクリック時は開閉しない (ただし、最小化中ならヘッダー全体で復元)
+            if (terminalPanel.classList.contains('collapsed')) {
+                toggleCollapse();
+                return;
+            }
+            if (e.target.classList.contains('tab-btn')) return;
+            toggleCollapse();
+        };
 
         // オートスクロール防止用のダミーリスナー（中ボタン用）
         this.canvas.addEventListener('mousedown', (e) => {
@@ -414,10 +452,6 @@ export class Game {
             launch();
         };
 
-        document.getElementById('toggle-factory-btn').onclick = () => {
-            this.isFactoryOpen = !this.isFactoryOpen;
-            this.updateUI();
-        };
     }
 
     selectPart(type, id) {
@@ -427,8 +461,8 @@ export class Game {
             this.validateModules();
         }
         if (type === 'logic') this.selection.logic = this.inventory.logic.find(p => p.id === id);
-        if (type === 'accelerator') {
-            this.selection.accelerator = this.inventory.accelerators.find(p => p.id === id);
+        if (type === 'launcher') {
+            this.selection.launcher = this.inventory.launchers.find(p => p.id === id);
             this.checkReadyToAim();
         }
         if (type === 'rocket') {
@@ -511,7 +545,6 @@ export class Game {
             const chassis = this.selection.chassis;
             const logic = this.selection.logic;
             const modules = { ...this.selection.modules };
-            const booster = this.selection.booster;
 
             // 合計パラメータの算出 (重量、スロット、精度、取得範囲は加算)
             let totalMass = (chassis.mass || 0) + (logic.mass || 0);
@@ -545,24 +578,11 @@ export class Game {
                 }
             }
 
-            // ブースターアドオンの加算および倍率乗算
-            if (booster) {
-                totalMass += (booster.mass || 0);
-                totalSlots += (booster.slots || 0);
-                totalPrecision += (booster.precision || 0);
-                
-                if (booster.precisionMultiplier) totalMultiplier *= booster.precisionMultiplier;
-                if (booster.pickupMultiplier) totalPickupMultiplier *= booster.pickupMultiplier;
-                if (booster.gravityMultiplier) totalGravityMultiplier *= booster.gravityMultiplier;
-                if (booster.arcMultiplier) arcMultiplier *= booster.arcMultiplier;
-            }
-
             const rocket = {
                 id: Date.now(),
                 chassis,
                 logic,
                 modules,
-                booster: booster ? { ...booster } : null,
                 totalMass,
                 totalSlots,
                 totalPrecision,
@@ -582,10 +602,6 @@ export class Game {
                 const optInv = this.inventory.modules.find(o => o.id === optId);
                 if (optInv) optInv.count -= count;
             }
-            if (booster) {
-                const boosterInv = this.inventory.boosters.find(o => o.id === booster.id);
-                if (boosterInv) boosterInv.count--;
-            }
 
             // 在庫が0になったものを除外 (UI更新のため)
             this.inventory.chassis = this.inventory.chassis.filter(c => c.count > 0);
@@ -596,7 +612,7 @@ export class Game {
             this.selection.chassis = null;
             this.selection.logic = null;
             this.selection.modules = {};
-            this.selection.booster = null;
+            // ブースターはFLIGHTタブの選択状態として維持するため、ここではクリアしない
 
             this.isFactoryOpen = false;
             this.updateUI();
@@ -605,14 +621,32 @@ export class Game {
     }
 
     checkReadyToAim() {
-        if (this.selection.rocket && this.selection.accelerator) {
+        if (this.selection.rocket && this.selection.launcher) {
+            const rocket = this.selection.rocket;
+            const booster = this.selection.booster;
 
             this.state = 'aiming';
-            this.ship.mass = this.selection.rocket.totalMass;
-            this.ship.pickupRange = this.selection.rocket.totalPickupRange;
-            this.ship.pickupMultiplier = this.selection.rocket.totalPickupMultiplier;
-            this.ship.gravityMultiplier = this.selection.rocket.totalGravityMultiplier;
-            this.ship.arcMultiplier = this.selection.rocket.arcMultiplier;
+            
+            // ロケットの基本スペックにブースターの効果を適用 (乗算/加算)
+            this.ship.mass = rocket.totalMass + (booster ? (booster.mass || 0) : 0);
+            this.ship.pickupRange = rocket.totalPickupRange + (booster ? (booster.pickupRange || 0) : 0);
+            
+            let pMult = rocket.totalMultiplier;
+            let pickMult = rocket.totalPickupMultiplier;
+            let gMult = rocket.totalGravityMultiplier;
+            let aMult = rocket.arcMultiplier;
+
+            if (booster) {
+                if (booster.precisionMultiplier) pMult *= booster.precisionMultiplier;
+                if (booster.pickupMultiplier) pickMult *= booster.pickupMultiplier;
+                if (booster.gravityMultiplier) gMult *= booster.gravityMultiplier;
+                if (booster.arcMultiplier) aMult *= booster.arcMultiplier;
+            }
+
+            this.ship.pickupMultiplier = pickMult;
+            this.ship.gravityMultiplier = gMult;
+            this.ship.arcMultiplier = aMult;
+            this.ship.precision = rocket.totalPrecision * pMult;
             
             // 飛行用のアドオンインスタンス化 (残り回数管理のため)
             // モジュールは { id, charges, maxCharges, ... } のリストにする
@@ -655,20 +689,23 @@ export class Game {
                 placeholder.className = 'slot-placeholder';
                 
                 let mainText = 'EMPTY';
-                let subText = 'No items in stock';
+                let subText = '在庫なし';
                 
                 if (type === 'CHASSIS') {
-                    mainText = 'NO CHASSIS';
-                    subText = 'Available at the Space Dock';
+                    mainText = 'シャーシなし';
+                    subText = 'スペースドックで調達可能';
                 } else if (type === 'LOGIC') {
-                    mainText = 'NO LOGIC UNITS';
-                    subText = 'Requires salvaged electronics';
+                    mainText = 'ロジックユニットなし';
+                    subText = 'サルベージが必要です';
+                } else if (type === 'LAUNCHERS') {
+                    mainText = '発射台なし';
+                    subText = '回収ミッションが必要です';
                 } else if (type === 'MODULES') {
-                    mainText = 'NO MODULES';
-                    subText = 'Scavenging mission required';
+                    mainText = 'モジュールなし';
+                    subText = '探索ミッションが必要です';
                 } else if (type === 'BOOSTERS') {
-                    mainText = 'NO BOOSTERS';
-                    subText = 'Propulsion research needed';
+                    mainText = 'ブースターなし';
+                    subText = '推進技術の研究が必要です';
                 }
                 
                 placeholder.innerHTML = `
@@ -744,9 +781,20 @@ export class Game {
         if (sectorDisplay) sectorDisplay.textContent = this.sector;
         if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore).toLocaleString();
 
-        const factory = document.getElementById('factory-panel');
-        if (this.isFactoryOpen) factory.classList.remove('hidden');
-        else factory.classList.add('hidden');
+        // タブの表示切り替え
+        const flightTab = document.getElementById('flight-tab');
+        const factoryTab = document.getElementById('factory-tab');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        if (this.isFactoryOpen) {
+            if (flightTab) flightTab.classList.add('hidden');
+            if (factoryTab) factoryTab.classList.remove('hidden');
+            tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'factory'));
+        } else {
+            if (flightTab) flightTab.classList.remove('hidden');
+            if (factoryTab) factoryTab.classList.add('hidden');
+            tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'flight'));
+        }
 
         const buildOverlay = document.getElementById('build-overlay');
         const launchBtn = document.getElementById('launch-btn');
@@ -757,10 +805,10 @@ export class Game {
             buildOverlay.classList.add('hidden');
         }
 
-        if (this.state === 'aiming') {
+        if (launchBtn) {
+            launchBtn.disabled = (this.state !== 'aiming');
+            // 常に表示するため hidden クラスの操作は行わない
             launchBtn.classList.remove('hidden');
-        } else {
-            launchBtn.classList.add('hidden');
         }
         renderList('chassis-list', this.inventory.chassis, 'chassis', this.selection.chassis);
         renderList('logic-list', this.inventory.logic, 'logic', this.selection.logic);
@@ -777,9 +825,9 @@ export class Game {
                 rList.innerHTML = `
                     <div class="slot-placeholder">
                         <div class="part-header">
-                            <span class="part-name" style="opacity: 0.5;">NO UNITS READY</span>
+                            <span class="part-name" style="opacity: 0.5;">待機中の機体なし</span>
                         </div>
-                        <span class="part-info">Assemble your craft in the bay</span>
+                        <span class="part-info">ASSEMBLY BAYで機体を建造してください</span>
                     </div>
                 `;
             } else {
@@ -820,10 +868,9 @@ export class Game {
             }
         }
 
-        renderList('accelerator-list', this.inventory.accelerators, 'accelerator', this.selection.accelerator);
+        renderList('launcher-list', this.inventory.launchers, 'launcher', this.selection.launcher);
 
-        const toggleBtn = document.getElementById('toggle-factory-btn');
-        if (toggleBtn) toggleBtn.textContent = this.isFactoryOpen ? 'CLOSE BAY' : 'ASSEMBLE NEW';
+        // 最小化ボタンのテキスト同期はCSS側で処理するか、toggleCollapse内で行う
     }
 
     // アイテムカードUIの共通化
@@ -973,7 +1020,7 @@ export class Game {
                     this.selection.rocket = null;
                 }
                 
-                this.selection.accelerator = null;
+                this.selection.launcher = null;
                 this.selection.booster = null; // v0.3.0 rename
 
                 this.ui.message.textContent = ''; // メッセージをクリア
@@ -1040,6 +1087,7 @@ export class Game {
                 if (cushion) {
                     cushion.charges--;
                     // 反転・跳ね返り処理（簡易：速度ベクトルを反転させて減速）
+                    const shipPos = this.ship.position;
                     const normal = shipPos.sub(body.position).normalize();
                     const dot = this.ship.velocity.dot(normal);
                     this.ship.velocity = this.ship.velocity.sub(normal.scale(2 * dot)).scale(0.5);
@@ -1116,7 +1164,7 @@ export class Game {
         const rocket = this.selection.rocket;
         if (!rocket) return [];
 
-        const power = this.selection.accelerator ? this.selection.accelerator.power : 1200;
+        const power = this.selection.launcher ? this.selection.launcher.power : 1200;
         const mass = rocket.totalMass;
         
         const massFactor = Math.sqrt(10 / mass);
@@ -1126,7 +1174,7 @@ export class Game {
         const simDt = this.fixedDt;
         
         // 合計された精度と倍率を使用
-        const acc = this.selection.accelerator;
+        const acc = this.selection.launcher;
         const accBonus = acc ? (acc.precisionMultiplier || 1.0) : 1.0;
         const precision = (rocket.totalPrecision || 0) * ((rocket.totalMultiplier || 1.0) * accBonus);
 
@@ -1179,7 +1227,7 @@ export class Game {
         const logicCount = this.inventory.logic.reduce((sum, l) => sum + (l.count || 0), 0);
         
         const canBuildRockets = chassisCount > 0 && logicCount > 0;
-        const hasLaunchers = this.inventory.accelerators.length > 0;
+        const hasLaunchers = this.inventory.launchers.length > 0;
 
         if (!(hasBuiltRockets || canBuildRockets) || !hasLaunchers) {
 
@@ -1269,14 +1317,14 @@ export class Game {
                 let targetList = null;
                 if (category === 'CHASSIS') targetList = this.inventory.chassis;
                 if (category === 'LOGIC') targetList = this.inventory.logic;
-                if (category === 'ACCELERATORS') targetList = this.inventory.accelerators;
+                if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
                 if (category === 'MODULES') targetList = this.inventory.modules;
                 if (category === 'BOOSTERS') targetList = this.inventory.boosters;
 
                 if (targetList) {
                     const existing = targetList.find(i => i.id === item.id);
                     if (existing) {
-                        if (category === 'ACCELERATORS') {
+                        if (category === 'LAUNCHERS') {
                             if (existing.charges !== undefined) existing.charges++;
                             else existing.charges = item.maxCharges || 2;
                         } else {
@@ -1284,7 +1332,7 @@ export class Game {
                             else existing.count = 2; // 初回取得
                         }
                     } else {
-                        if (category === 'ACCELERATORS') {
+                        if (category === 'LAUNCHERS') {
                             targetList.push({ ...item, charges: item.maxCharges || 2 });
                         } else {
                             targetList.push({ ...item, count: 1 });
