@@ -25,6 +25,12 @@ export const CATEGORY_COLORS = {
     CARGO: '#00e5ff'
 };
 
+export const GOAL_COLORS = {
+    SAFE: '#00e676',
+    NORMAL: '#2979ff',
+    DANGER: '#ff1744'
+};
+
 export const PARTS = {
     CHASSIS: [
         { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 0, precision: 100, pickupRange: 0, rarity: RARITY.COMMON, description: '性能重視の軽量体。重力の影響を受けやすい。' },

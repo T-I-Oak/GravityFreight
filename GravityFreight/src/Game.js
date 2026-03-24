@@ -1,4 +1,4 @@
-import { PARTS, CATEGORY_COLORS, INITIAL_INVENTORY, RARITY, hexToRgba } from './Data.js';
+import { PARTS, CATEGORY_COLORS, GOAL_COLORS, INITIAL_INVENTORY, RARITY, hexToRgba } from './Data.js';
 import { PhysicsEngine, Body, Vector2, calculateAcceleration, getDistanceSqToSegment } from './Physics.js';
 
 export class Game {
@@ -128,9 +128,9 @@ export class Game {
         
         // 3つの出口タイプ
         const goalTypes = [
-            { id: 'SAFE', color: CATEGORY_COLORS.CARGO_SAFE, angleWidth: 60, score: 2000, label: 'SAFE' },
-            { id: 'NORMAL', color: CATEGORY_COLORS.CARGO_NORMAL, angleWidth: 40, score: 3000, label: 'NORMAL' },
-            { id: 'DANGER', color: CATEGORY_COLORS.CARGO_DANGER, angleWidth: 20, score: 5000, label: 'DANGER' }
+            { id: 'SAFE', color: GOAL_COLORS.SAFE, angleWidth: 60, score: 2000, label: 'SAFE' },
+            { id: 'NORMAL', color: GOAL_COLORS.NORMAL, angleWidth: 40, score: 3000, label: 'NORMAL' },
+            { id: 'DANGER', color: GOAL_COLORS.DANGER, angleWidth: 20, score: 5000, label: 'DANGER' }
         ];
 
         this.goals = [];
