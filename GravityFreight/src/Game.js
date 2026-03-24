@@ -186,7 +186,9 @@ export class Game {
                 if (rarity !== undefined) {
                     const weight = Math.max(0, THRESHOLD - rarity);
                     if (weight > 0) {
-                        pool.push({ item, category, weight });
+                        // アイテム定義側に category があればそれを優先 (CARGO_SAFE等)、なければループのキー (CHASSIS等) を使用
+                        const finalCategory = item.category || category;
+                        pool.push({ item, category: finalCategory, weight });
                     }
                 }
             });
@@ -1387,8 +1389,15 @@ export class Game {
 
                 // 貨物（CARGO）の配送判定
                 if (category.startsWith('CARGO')) {
-                    const cargoType = category.replace('CARGO_', ''); // SAFE, NORMAL, DANGER or CARGO
-                    // 既にゴール到達時にスコア加算済みだが、ミスマッチ時のペナルティ等をここに記述可能
+                    const cargoType = category.replace('CARGO_', ''); // SAFE, NORMAL, DANGER
+                    if (hitGoal && hitGoal.id === cargoType) {
+                        // 配送成功：ボーナス付与
+                        const bonusScore = 1500;
+                        const bonusCoins = 100;
+                        this.score += bonusScore;
+                        this.coins += bonusCoins;
+                        this.ui.message.textContent += ` +DELIVERY BONUS! (+${bonusScore})`;
+                    }
                     return;
                 }
 
