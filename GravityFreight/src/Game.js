@@ -347,7 +347,18 @@ export class Game {
                 }
                 
                 this.ship.trail = [];
-                this.ship.isSafeToReturn = false; // 発射直後は帰還判定を無効化
+                this.ship.isSafeToReturn = false; 
+
+                // 母星に預けていたアイテムがあれば再装填
+                if (this.homeStar.items && this.homeStar.items.length > 0) {
+                    this.ship.pendingItems = this.homeStar.items.map(itemData => ({
+                        itemData: itemData,
+                        position: new Vector2(this.homeStar.position.x, this.homeStar.position.y),
+                        collectedTime: this.simulatedTime
+                    }));
+                    this.homeStar.items = []; // ホームを空にする
+                }
+
                 this.physics.bodies.push(this.ship);
                 this.state = 'flying';
                 this.launchTime = this.simulatedTime;
@@ -978,11 +989,15 @@ export class Game {
     update(dt) {
         // スコア表示の更新
         const scoreDiff = this.score - this.displayScore;
-        if (Math.abs(scoreDiff) > 0.1) {
-            this.displayScore += scoreDiff * 0.1; // 線形補間
-            this.updateUI(); // 表示更新
-        } else if (this.displayScore !== this.score) {
+        const coinDiff = this.coins - this.displayCoins;
+
+        if (Math.abs(scoreDiff) > 0.1 || Math.abs(coinDiff) > 0.1) {
+            this.displayScore += scoreDiff * 0.1;
+            this.displayCoins += coinDiff * 0.1;
+            this.updateUI();
+        } else if (this.displayScore !== this.score || this.displayCoins !== this.coins) {
             this.displayScore = this.score;
+            this.displayCoins = this.coins;
             this.updateUI();
         }
 
@@ -1033,9 +1048,6 @@ export class Game {
                 }
             }
 
-            // スコアとコインの表示アニメーション（補間処理）
-            this.displayScore += (this.score - this.displayScore) * 0.1;
-            this.displayCoins += (this.coins - this.displayCoins) * 0.1;
 
             this.accumulator += dt;
             if (this.accumulator > 0.1) this.accumulator = 0.1;
@@ -1370,37 +1382,53 @@ export class Game {
 
     resolveItems(result, hitGoal = null) {
         if (result === 'success') {
-            // 幸運ブースター等の「成功時」効果を適用
-            if (this.activeBoosterAtLaunch && this.activeBoosterAtLaunch.nextSectorThresholdBonus) {
+            // 幸運ブースター等の「成功時」効果を適用 (ゴール到達時のみ)
+            if (hitGoal && this.activeBoosterAtLaunch && this.activeBoosterAtLaunch.nextSectorThresholdBonus) {
                 this.nextSectorThresholdBonus = this.activeBoosterAtLaunch.nextSectorThresholdBonus;
                 this.activeBoosterAtLaunch = null;
             }
 
-            if (!this.pendingItems || this.pendingItems.length === 0) return;
+            if (!this.pendingItems || this.pendingItems.length === 0) {
+                this.updateUI(); // 報酬なしでもUI更新
+                return;
+            }
             
-            this.pendingItems.forEach(({ itemData }) => {
+            this.pendingItems.forEach((pItem) => {
+                const itemData = pItem.itemData;
                 const { category, item } = itemData;
 
-                // コイン（COIN）の処理
+                // 1. コイン（COIN）の処理：常に即座に加算
                 if (category === 'COIN') {
                     this.coins += item.score || 0;
                     return;
                 }
 
-                // 貨物（CARGO）の配送判定
+                // 2. 貨物（CARGO）の処理
                 if (category.startsWith('CARGO')) {
-                    const cargoType = category.replace('CARGO_', ''); // SAFE, NORMAL, DANGER
-                    if (hitGoal && hitGoal.id === cargoType) {
-                        // 配送成功：ボーナス付与
-                        const bonusScore = 1500;
-                        const bonusCoins = 100;
-                        this.score += bonusScore;
-                        this.coins += bonusCoins;
-                        this.ui.message.textContent += ` +DELIVERY BONUS! (+${bonusScore})`;
+                    if (hitGoal) {
+                        // ゴール到達時：特殊効果または配送報酬
+                        if (category === 'CARGO_LUCKY') {
+                            this.nextSectorThresholdBonus = item.nextSectorThresholdBonus || 5;
+                            this.ui.message.textContent += ` LUCKY NEXT SECTOR!`;
+                        } else {
+                            const cargoType = category.replace('CARGO_', ''); 
+                            if (hitGoal.id === cargoType) {
+                                this.score += 1500;
+                                this.coins += 100;
+                                this.ui.message.textContent += ` +DELIVERY BONUS! (+1500)`;
+                            }
+                        }
+                        return; // 消費
+                    } else {
+                        // 帰還時：母星に一時保管（リング表示）
+                        if (!this.homeStar.items) this.homeStar.items = [];
+                        this.homeStar.items.push(itemData);
+                        this.homeStar.isCollected = false;
+                        return;
                     }
-                    return;
                 }
 
+                // 3. その他パーツ・ブースター（拾い物）：常にインベントリに加算
                 let targetList = null;
                 if (category === 'CHASSIS') targetList = this.inventory.chassis;
                 if (category === 'LOGIC') targetList = this.inventory.logic;
@@ -1411,14 +1439,13 @@ export class Game {
                 if (targetList) {
                     const existing = targetList.find(i => i.id === item.id);
                     if (existing) {
-                        // チャージ（耐久）を持つアイテムの場合
                         if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
                             if (existing.charges !== undefined) existing.charges++;
                             else existing.charges = (item.maxCharges || 2);
                             if (existing.charges > (item.maxCharges || 2)) existing.charges = (item.maxCharges || 2);
                         } else {
                             if (existing.count !== undefined) existing.count++;
-                            else existing.count = 2; // 初回取得
+                            else existing.count = 2;
                         }
                     } else {
                         if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
@@ -1504,10 +1531,11 @@ export class Game {
             }
 
         } else if (result === 'returned') {
-            // 帰還: 取得中のアイテムを即座にインベントリに加算する
+            // 帰還: 取得中のアイテムを振り分ける
             if (this.pendingItems && this.pendingItems.length > 0) {
                 this.resolveItems('success');
             }
+            this.activeBoosterAtLaunch = null;
         }
 
         this.updateUI();
