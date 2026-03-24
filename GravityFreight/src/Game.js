@@ -1383,10 +1383,6 @@ export class Game {
     resolveItems(result, hitGoal = null) {
         if (result === 'success') {
             // 幸運ブースター等の「成功時」効果を適用 (ゴール到達時のみ)
-            if (hitGoal && this.activeBoosterAtLaunch && this.activeBoosterAtLaunch.nextSectorThresholdBonus) {
-                this.nextSectorThresholdBonus = this.activeBoosterAtLaunch.nextSectorThresholdBonus;
-                this.activeBoosterAtLaunch = null;
-            }
 
             if (!this.pendingItems || this.pendingItems.length === 0) {
                 this.updateUI(); // 報酬なしでもUI更新
@@ -1404,14 +1400,15 @@ export class Game {
                 }
 
                 // 2. 貨物（CARGO）の処理
-                if (category.startsWith('CARGO')) {
+                if (category === 'CARGO') {
                     if (hitGoal) {
                         // ゴール到達時：特殊効果または配送報酬
-                        if (category === 'CARGO_LUCKY') {
+                        if (item.id === 'cargo_lucky') {
                             this.nextSectorThresholdBonus = item.nextSectorThresholdBonus || 5;
                             this.ui.message.textContent += ` LUCKY NEXT SECTOR!`;
                         } else {
-                            const cargoType = category.replace('CARGO_', ''); 
+                            // IDから貨物タイプを抽出 (cargo_safe -> SAFE)
+                            const cargoType = item.id.replace('cargo_', '').toUpperCase(); 
                             if (hitGoal.id === cargoType) {
                                 this.score += 1500;
                                 this.coins += 100;

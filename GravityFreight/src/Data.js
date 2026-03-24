@@ -22,10 +22,7 @@ export const CATEGORY_COLORS = {
     BOOSTERS: '#aaff44',
     UNIT: '#ffffff',
     COIN: '#ffd700',
-    CARGO_SAFE: '#00cc00',
-    CARGO_NORMAL: '#0088ff',
-    CARGO_DANGER: '#ff4400',
-    CARGO_LUCKY: '#00e5ff'
+    CARGO: '#00e5ff'
 };
 
 export const PARTS = {
@@ -76,10 +73,10 @@ export const PARTS = {
         { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO_SAFE', name: 'セーフ・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '安全区域への配送用荷物。' },
-        { id: 'cargo_normal', category: 'CARGO_NORMAL', name: 'ノーマル・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '通常区域への配送用荷物。' },
-        { id: 'cargo_danger', category: 'CARGO_DANGER', name: 'デンジャー・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '危険区域への配送用荷物。' },
-        { id: 'cargo_lucky', category: 'CARGO_LUCKY', name: '幸運の導き', mass: 1, nextSectorThresholdBonus: 5, rarity: RARITY.UNCOMMON, description: 'ゴール到達時に保持していると、次セクターの出現率を大幅に向上。' }
+        { id: 'cargo_safe', category: 'CARGO', name: 'セーフ・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '安全区域への配送用荷物。' },
+        { id: 'cargo_normal', category: 'CARGO', name: 'ノーマル・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '通常区域への配送用荷物。' },
+        { id: 'cargo_danger', category: 'CARGO', name: 'デンジャー・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '危険区域への配送用荷物。' },
+        { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, nextSectorThresholdBonus: 5, rarity: RARITY.UNCOMMON, description: 'ゴール到達時に保持していると、次セクターの出現率を大幅に向上。' }
     ]
 };
 
