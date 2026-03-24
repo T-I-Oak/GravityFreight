@@ -1116,6 +1116,25 @@ export class Game {
                 }
                 
                 this.updateUI();
+
+                // 次の発射準備に向けてパネルを復元（最小化されていたら開く）
+                if (this.state !== 'gameover') {
+                    this.ensurePanelExpanded();
+                }
+            }
+        }
+    }
+
+    /**
+     * サイドパネル（terminal-panel）が最小化されている場合、強制的に展開する
+     */
+    ensurePanelExpanded() {
+        const terminalPanel = document.getElementById('terminal-panel');
+        if (terminalPanel && terminalPanel.classList.contains('collapsed')) {
+            terminalPanel.classList.remove('collapsed');
+            const collapseBtnIcon = terminalPanel.querySelector('.collapse-btn .icon');
+            if (collapseBtnIcon) {
+                collapseBtnIcon.textContent = '∧';
             }
         }
     }
