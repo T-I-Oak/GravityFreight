@@ -55,8 +55,12 @@ export class Game {
 
         this.score = 0;
         this.displayScore = 0; // 表示用スコア（アニメーション用）
+        this.coins = 0;
+        this.displayCoins = 0; // 表示用コイン
         this.sector = 1; // セクター数
         this.cameraOffset = new Vector2(0, 0); // マップのパン用
+        this.nextSectorThresholdBonus = 0; // 次セクターへの出現率ボーナス
+        this.activeBoosterAtLaunch = null; // 発射時に使用していたブースター
         this.isPanning = false;
         this.panStart = new Vector2(0, 0);
 
@@ -172,7 +176,8 @@ export class Game {
     getWeightedRandomItem() {
         let pool = [];
         // スタート時点ではRAREと同じ値（15）。ステージが進むごとに上限が解放・出現率が増加していく
-        const THRESHOLD = RARITY.RARE + (this.stageLevel - 1); 
+        const THRESHOLD = RARITY.RARE + (this.stageLevel - 1) + (this.nextSectorThresholdBonus || 0); 
+        this.nextSectorThresholdBonus = 0; // 消費
         
         for (const [category, items] of Object.entries(PARTS)) {
             items.forEach(item => {
@@ -273,17 +278,62 @@ export class Game {
             if (this.state === 'aiming') {
                 const worldMouse = this.getWorldPos(this.mousePos);
                 const dir = worldMouse.sub(this.homeStar.position).normalize();
-                const power = this.selection.launcher ? this.selection.launcher.power : 1200;
+                
+                let power = this.selection.launcher ? this.selection.launcher.power : 1200;
+                if (this.selection.booster && this.selection.booster.powerMultiplier) {
+                    power *= this.selection.booster.powerMultiplier;
+                }
                 
                 const massFactor = Math.sqrt(10 / this.ship.mass);
                 this.ship.velocity = dir.scale(power * massFactor);
 
-                // ブースターが選択されている場合は消費
+                // 性能と特殊効果の引き継ぎ
+                this.ship.gravityMultiplier = this.selection.rocket.totalGravityMultiplier;
+                this.ship.pickupRange = this.selection.rocket.totalPickupRange;
+                this.ship.pickupMultiplier = this.selection.rocket.totalPickupMultiplier;
+                
+                this.activeBoosterAtLaunch = this.selection.booster ? { ...this.selection.booster } : null;
+                
+                // 装備モジュールをBody側へ展開（charges管理のため）
+                this.ship.equippedModules = [];
+                for (const id in this.selection.rocket.modules) {
+                    const count = this.selection.rocket.modules[id];
+                    const base = PARTS.MODULES.find(m => m.id === id);
+                    if (base) {
+                        for (let i = 0; i < count; i++) {
+                            this.ship.equippedModules.push({ ...base, charges: base.maxCharges || 0 });
+                        }
+                    }
+                }
+
+                // ブースター特殊効果 (例: 閃光推進剤)
+                this.ship.activeBoosterEffect = null;
+                if (this.selection.booster && this.selection.booster.gravityMultiplier !== undefined) {
+                    this.ship.activeBoosterEffect = {
+                        type: 'gravityMultiplier',
+                        value: this.selection.booster.gravityMultiplier,
+                        duration: this.selection.booster.duration || 100
+                    };
+                }
+
+                // 消費処理
                 if (this.selection.booster) {
-                    this.selection.booster.count--;
-                    if (this.selection.booster.count <= 0) {
-                        this.inventory.boosters = this.inventory.boosters.filter(o => o.count > 0);
-                        this.selection.booster = null;
+                    const b = this.selection.booster;
+                    if (b.maxCharges && b.maxCharges > 1) {
+                        // 有耐久ブースター
+                        if (b.charges === undefined) b.charges = b.maxCharges;
+                        b.charges--;
+                        if (b.charges <= 0) {
+                            this.inventory.boosters = this.inventory.boosters.filter(o => o !== b);
+                            this.selection.booster = null;
+                        }
+                    } else {
+                        // 通常消費型
+                        b.count--;
+                        if (b.count <= 0) {
+                            this.inventory.boosters = this.inventory.boosters.filter(o => o.count > 0);
+                            this.selection.booster = null;
+                        }
                     }
                 } else if (this.selection.launcher) {
                     // ブースターがない場合は発射台が摩耗する
@@ -555,7 +605,7 @@ export class Game {
             // 倍率補正 (全てベース1.0からの乗算)
             let totalMultiplier = (chassis.precisionMultiplier || 1.0) * (logic.precisionMultiplier || 1.0);
             let totalPickupMultiplier = (chassis.pickupMultiplier || 1.0) * (logic.pickupMultiplier || 1.0);
-            let totalGravityMultiplier = 1.0;
+            let totalGravityMultiplier = (chassis.gravityMultiplier || 1.0) * (logic.gravityMultiplier || 1.0);
             let arcMultiplier = 1.0;
 
             for (const [optId, count] of Object.entries(modules)) {
@@ -779,6 +829,10 @@ export class Game {
         const sectorDisplay = document.getElementById('sector-display');
         const scoreDisplay = document.getElementById('score-display');
         if (sectorDisplay) sectorDisplay.textContent = this.sector;
+        if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore);
+        
+        const coinDisplay = document.getElementById('coin-display');
+        if (coinDisplay) coinDisplay.textContent = Math.floor(this.displayCoins);
         if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore).toLocaleString();
 
         // タブの表示切り替え
@@ -977,6 +1031,10 @@ export class Game {
                 }
             }
 
+            // スコアとコインの表示アニメーション（補間処理）
+            this.displayScore += (this.score - this.displayScore) * 0.1;
+            this.displayCoins += (this.coins - this.displayCoins) * 0.1;
+
             this.accumulator += dt;
             if (this.accumulator > 0.1) this.accumulator = 0.1;
             while (this.accumulator >= this.fixedDt) {
@@ -985,7 +1043,17 @@ export class Game {
                 // 物理演算への重力補正適用
                 const gravityStep = (pos, bodies, mass) => {
                     const acc = calculateAcceleration(pos, bodies, mass);
-                    return acc.scale(this.ship.gravityMultiplier || 1.0);
+                    let mult = this.ship.gravityMultiplier || 1.0;
+                    
+                    if (this.ship.activeBoosterEffect && this.ship.activeBoosterEffect.type === 'gravityMultiplier') {
+                        mult = this.ship.activeBoosterEffect.value;
+                        this.ship.activeBoosterEffect.duration--;
+                        if (this.ship.activeBoosterEffect.duration <= 0) {
+                            this.ship.activeBoosterEffect = null;
+                        }
+                    }
+                    
+                    return acc.scale(mult);
                 };
 
                 const acc = gravityStep(this.ship.position, this.bodies, this.ship.mass);
@@ -1164,7 +1232,10 @@ export class Game {
         const rocket = this.selection.rocket;
         if (!rocket) return [];
 
-        const power = this.selection.launcher ? this.selection.launcher.power : 1200;
+        let power = this.selection.launcher ? this.selection.launcher.power : 1200;
+        if (this.selection.booster && this.selection.booster.powerMultiplier) {
+            power *= this.selection.booster.powerMultiplier;
+        }
         const mass = rocket.totalMass;
         
         const massFactor = Math.sqrt(10 / mass);
@@ -1176,7 +1247,7 @@ export class Game {
         // 合計された精度と倍率を使用
         const acc = this.selection.launcher;
         const accBonus = acc ? (acc.precisionMultiplier || 1.0) : 1.0;
-        const precision = (rocket.totalPrecision || 0) * ((rocket.totalMultiplier || 1.0) * accBonus);
+        const precision = ((rocket.totalPrecision || 0) + (acc ? (acc.precision || 0) : 0)) * ((rocket.totalMultiplier || 1.0) * accBonus);
 
         const gravityMultiplier = rocket.totalGravityMultiplier || 1.0;
 
@@ -1297,20 +1368,27 @@ export class Game {
 
     resolveItems(result, hitGoal = null) {
         if (result === 'success') {
+            // 幸運ブースター等の「成功時」効果を適用
+            if (this.activeBoosterAtLaunch && this.activeBoosterAtLaunch.nextSectorThresholdBonus) {
+                this.nextSectorThresholdBonus = this.activeBoosterAtLaunch.nextSectorThresholdBonus;
+                this.activeBoosterAtLaunch = null;
+            }
+
             if (!this.pendingItems || this.pendingItems.length === 0) return;
             
             this.pendingItems.forEach(({ itemData }) => {
                 const { category, item } = itemData;
 
+                // コイン（COIN）の処理
+                if (category === 'COIN') {
+                    this.coins += item.score || 0;
+                    return;
+                }
+
                 // 貨物（CARGO）の配送判定
-                if (category.startsWith('CARGO_')) {
-                    const cargoType = category.replace('CARGO_', ''); // SAFE, NORMAL, DANGER
-                    if (hitGoal && cargoType === hitGoal.id) {
-                        // 色が一致：追加ボーナスやインベントリ加算不要（使い捨て）
-                        // ※既に exit 入船時にスコア加算済み。追加でメッセージを出すなどの拡張が可能
-                    } else {
-                        // 色が不一致：スコア減点などのペナルティ（現在は単に無視）
-                    }
+                if (category.startsWith('CARGO')) {
+                    const cargoType = category.replace('CARGO_', ''); // SAFE, NORMAL, DANGER or CARGO
+                    // 既にゴール到達時にスコア加算済みだが、ミスマッチ時のペナルティ等をここに記述可能
                     return;
                 }
 
@@ -1324,15 +1402,17 @@ export class Game {
                 if (targetList) {
                     const existing = targetList.find(i => i.id === item.id);
                     if (existing) {
-                        if (category === 'LAUNCHERS') {
+                        // チャージ（耐久）を持つアイテムの場合
+                        if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
                             if (existing.charges !== undefined) existing.charges++;
-                            else existing.charges = item.maxCharges || 2;
+                            else existing.charges = (item.maxCharges || 2);
+                            if (existing.charges > (item.maxCharges || 2)) existing.charges = (item.maxCharges || 2);
                         } else {
                             if (existing.count !== undefined) existing.count++;
                             else existing.count = 2; // 初回取得
                         }
                     } else {
-                        if (category === 'LAUNCHERS') {
+                        if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
                             targetList.push({ ...item, charges: item.maxCharges || 2 });
                         } else {
                             targetList.push({ ...item, count: 1 });
@@ -1352,7 +1432,16 @@ export class Game {
                         hitGoal.isCollected = false;
                     });
                 }
-                // LOSTの場合は何もしない（アイテムロスト）
+                // LOSTの場合：保険金（もしあれば）を計算
+                if (result === 'lost' && this.ship && this.ship.equippedModules) {
+                    const insurance = this.ship.equippedModules.filter(m => m.id === 'mod_insurance');
+                    if (insurance.length > 0) {
+                        let totalPayout = 0;
+                        insurance.forEach(m => totalPayout += (m.onLostBonus || 50));
+                        this.coins += totalPayout;
+                        this.ui.message.textContent += ` (INSURANCE: +${totalPayout})`;
+                    }
+                }
                 this.pendingItems = [];
             }
 

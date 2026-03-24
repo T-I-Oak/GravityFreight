@@ -210,7 +210,7 @@ body, html {
     font-weight: 800;
 }
 
-#sector-display, #score-display {
+#sector-display, #score-display, #coin-display {
     font-size: 18px;
     font-weight: 900;
     color: #fff;
@@ -221,6 +221,11 @@ body, html {
 #score-display {
     color: #00ffcc;
     text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+}
+
+#coin-display {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 #title {
