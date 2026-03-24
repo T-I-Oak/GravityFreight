@@ -48,9 +48,9 @@ export const PARTS = {
     ],
     LAUNCHERS: [
         { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LNC-2]', power: 1200, maxCharges: 2, mass: 0, slots: 0, precision: 0, rarity: RARITY.COMMON, description: '標準的な性能。初期装備。' },
-        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PRC-2]', power: 1000, maxCharges: 2, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.COMMON, description: '予測線を延長し、安定した制御が可能。' },
+        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PRC-2]', power: 1000, maxCharges: 2, mass: 0, slots: 0, precision: 500, precisionMultiplier: 1.1, rarity: RARITY.COMMON, description: '予測線を大幅に延長し、精密な制御が可能。' },
         { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LNC-3]', power: 1200, maxCharges: 3, mass: 0, slots: 0, precision: 0, rarity: RARITY.UNCOMMON, description: '改良型。耐久力が向上。' },
-        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PRC-3]', power: 1000, maxCharges: 3, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.UNCOMMON, description: '改良型。耐久力が向上。' },
+        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PRC-3]', power: 1000, maxCharges: 3, mass: 0, slots: 0, precision: 500, precisionMultiplier: 1.1, rarity: RARITY.UNCOMMON, description: '改良型。予測性能と耐久力が向上。' },
         { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LNC-4]', power: 1200, maxCharges: 4, mass: 0, slots: 0, precision: 0, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' },
         { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PRC-4]', power: 1000, maxCharges: 4, mass: 0, slots: 0, precision: 250, precisionMultiplier: 1.05, rarity: RARITY.RARE, description: '最終型。高い耐久力を誇る。' }
     ],
