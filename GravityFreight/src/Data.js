@@ -73,8 +73,8 @@ export const PARTS = {
         { id: 'boost_expander', category: 'BOOSTERS', name: 'ゴール・エクスパンダー', mass: 0, slots: 0, arcMultiplier: 1.2, rarity: RARITY.RARE, description: '出口サイズを1.2倍に拡大。' }
     ],
     COIN: [
-        { id: 'coin_100', category: 'COIN', name: '100コイン', score: 100, rarity: RARITY.UNCOMMON, description: '通貨。100点分。' },
-        { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。200点分。' }
+        { id: 'coin_100', category: 'COIN', name: '100コイン', score: 100, rarity: RARITY.UNCOMMON, description: '通貨。獲得時に100コイン加算される。' },
+        { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
         { id: 'cargo_safe', category: 'CARGO_SAFE', name: 'セーフ・カーゴ', mass: 1, rarity: RARITY.UNCOMMON, description: '安全区域への配送用荷物。' },
