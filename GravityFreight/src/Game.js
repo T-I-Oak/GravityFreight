@@ -839,20 +839,10 @@ export class Game {
 
                 div.className = `part-item ${isSelected ? 'selected' : ''}`;
                 
-                // カテゴリーに基づく背景色の適用
-                const categoryColor = CATEGORY_COLORS[data.category];
-                if (categoryColor) {
-                    if (isSelected) {
-                        div.style.backgroundColor = hexToRgba(categoryColor, 0.25);
-                        div.style.borderColor = categoryColor;
-                    } else {
-                        div.style.backgroundColor = hexToRgba(categoryColor, 0.08);
-                    }
-                }
-
                 div.innerHTML = this.generateCardHTML(data, {
                     showInventory: true,
-                    selectionCount: selectionCount
+                    selectionCount: selectionCount,
+                    isSelected: isSelected
                 });
 
                 div.onclick = () => {
@@ -983,21 +973,21 @@ export class Game {
     generateCardHTML(itemData, options = {}) {
         if (!itemData) return '';
         
-        // フラット化されたデータを優先、なければネストも許容しつつ正規化
         const item = itemData.item || itemData; 
         const category = itemData.category || item.category || 'UNIT';
         const categoryColor = CATEGORY_COLORS[category] || '#fff';
         const isEnhanced = (item.enhancementCount || 0) > 0;
-        const selectionCount = itemData.selectionCount || 0;
+        const selectionCount = options.selectionCount || 0;
         const showInventory = options.showInventory || false;
+        const isSelected = options.isSelected || false;
 
-        // --- 1. バッジ・強化星印の生成 ---
+        // --- 1. バッジ・強化星印 ---
         let badge = '';
         if (isEnhanced) {
             badge = `<div class="rarity-badge-star" style="position:absolute; top:-6px; right:-6px; font-size:12px; filter:drop-shadow(0 0 4px ${categoryColor}); z-index:2;">${'★'.repeat(item.enhancementCount)}</div>`;
         }
 
-        // --- 2. 数量・耐久表示 (インベントリ用) ---
+        // --- 2. 数量・耐久表示 ---
         let invInfo = "";
         if (showInventory) {
             if (item.charges !== undefined || item.maxCharges !== undefined) {
@@ -1014,15 +1004,20 @@ export class Game {
         }
         const selTag = (selectionCount > 0) ? ` <span class="selection-badge" style="color: #ffcc00; font-weight: bold;">[${selectionCount}]</span>` : '';
 
-        // --- 3. デザインの統一（左枠強調） ---
+        // --- 3. デザインの集約（コンパクトかつプレミアム） ---
         const itemContainerStyle = `
             position: relative;
             border-left: 5px solid ${categoryColor};
-            padding: 8px 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 2px 4px 4px 2px;
-            margin-bottom: 6px;
-            min-width: 200px;
+            padding: 10px 12px;
+            background: ${isSelected ? hexToRgba(categoryColor, 0.25) : 'rgba(255,255,255,0.03)'};
+            border-radius: 4px;
+            margin-bottom: 2px;
+            min-width: 220px;
+            transition: all 0.2s ease;
+            ${isSelected ? `box-shadow: inset 0 0 15px ${hexToRgba(categoryColor, 0.2)}, 0 0 10px ${hexToRgba(categoryColor, 0.2)};` : ''}
+            border-top: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
+            border-right: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
+            border-bottom: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
         `;
 
         return `
@@ -2022,9 +2017,10 @@ export class Game {
                 const categoryColor = CATEGORY_COLORS[item.category] || '#fff';
                 const card = document.createElement('div');
                 card.className = 'part-item reward-item-card stagger-in';
-                card.style.cssText = `animation-delay:${delay}s; background-color:${hexToRgba(categoryColor, 0.1)}; border-color:${hexToRgba(categoryColor, 0.3)}; cursor:default;`;
+                card.style.animationDelay = `${delay}s`; // Keep animation delay
                 const displayData = { ...item.data, count: item.count };
-                card.innerHTML = this.generateCardHTML(displayData, { showInventory: true });
+                // Pass category color for styling inside generateCardHTML
+                card.innerHTML = this.generateCardHTML(displayData, { showInventory: true, categoryColor: categoryColor });
                 if (itemsList) itemsList.appendChild(card);
                 delay += 0.07;
             });
@@ -2132,12 +2128,9 @@ export class Game {
             const card = document.createElement('div');
             card.className = `event-card ${isSale ? 'sale' : ''}`;
             
-            const categoryColor = CATEGORY_COLORS[itemData.category] || '#fff';
-            card.style.borderColor = hexToRgba(categoryColor, 0.4);
-
             card.innerHTML = `
                 <div class="card-body">
-                    ${this.generateCardHTML(itemData)}
+                    ${this.generateCardHTML(itemData, { isSelected: isSale })}
                     <div class="card-price">
                         <span class="price-val">${buyPrice}</span><span class="currency">c</span>
                         ${isSale ? '<span class="sale-badge">30% OFF</span>' : ''}
