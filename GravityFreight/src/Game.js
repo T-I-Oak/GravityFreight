@@ -58,6 +58,20 @@ export class Game {
         this.coins = 0;
         this.displayCoins = 0; // 表示用コイン
         this.sector = 1; // セクター数
+        this.launchScore = 0; // 発射時のスコア
+        this.launchCoins = 0; // 発射時のコイン
+        this.pendingGoalBonus = 0; // ゴールボーナスの保留
+        this.pendingScore = 0; // その他のボーナスの保留
+        this.pendingCoins = 0; // コイン報酬の保留
+
+        // リザルト追跡用
+        this.flightResults = {
+            baseScore: 0,
+            bonuses: [],
+            items: [],
+            status: '',
+            isHome: false
+        };
         this.cameraOffset = new Vector2(0, 0); // マップのパン用
         this.nextSectorThresholdBonus = 0; // 次セクターへの出現率ボーナス
         this.activeBoosterAtLaunch = null; // 発射時に使用していたブースター
@@ -283,6 +297,17 @@ export class Game {
                 const massFactor = Math.sqrt(10 / this.ship.mass);
                 this.ship.velocity = dir.scale(power * massFactor);
 
+                // リザルトの初期化
+                this.flightResults = {
+                    baseScore: 0,
+                    bonuses: [],
+                    items: [],
+                    status: '',
+                    isHome: false
+                };
+                this.launchScore = this.score;
+                this.launchCoins = this.coins;
+
                 // 性能と特殊効果の引き継ぎ
                 this.ship.gravityMultiplier = this.selection.rocket.totalGravityMultiplier;
                 this.ship.pickupRange = this.selection.rocket.totalPickupRange;
@@ -448,6 +473,26 @@ export class Game {
             }
         });
 
+        // マップ確認ボタンの制御（リザルト画面トグル）
+        const viewMapBtn = document.getElementById('result-view-map-btn');
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        const resultOverlay = document.getElementById('result-overlay');
+        const launchBtn = document.getElementById('launch-btn');
+
+        if (viewMapBtn && backToResultBtn && resultOverlay) {
+            viewMapBtn.onclick = (e) => {
+                if (e) e.stopPropagation();
+                resultOverlay.classList.add('minimized');
+                backToResultBtn.classList.remove('hidden');
+                if (launchBtn) launchBtn.classList.add('hidden');
+            };
+            backToResultBtn.onclick = (e) => {
+                if (e) e.stopPropagation();
+                resultOverlay.classList.remove('minimized');
+                backToResultBtn.classList.add('hidden');
+            };
+        }
+
         const endPointer = (e) => {
             if (this.isPanning) {
                 this.isPanning = false;
@@ -518,6 +563,11 @@ export class Game {
             e.stopPropagation();
             launch();
         };
+
+        const resultCloseBtn = document.getElementById('result-close-btn');
+        if (resultCloseBtn) {
+            resultCloseBtn.onclick = () => this.closeResult();
+        }
 
     }
 
@@ -1113,35 +1163,9 @@ export class Game {
         } else if (['cleared', 'crashed', 'lost', 'returned'].includes(this.state)) {
             this.stateTimer -= dt;
             if (this.stateTimer <= 0) {
-                const prevState = this.state;
-                if (prevState === 'cleared') {
-                    this.stageLevel += 1;
-                    this.initStage(this.currentStarCount); // 成功時はリセット
-                }
-                // 失敗時は星を維持してリトライ
-                this.state = 'building';
-                
-                if (prevState !== 'returned') {
-                    // 帰還以外はロケットの選択状態をクリア
-                    this.selection.rocket = null;
-                }
-                
-                this.selection.launcher = null;
-                this.selection.booster = null; // v0.3.0 rename
-
-                this.ui.message.textContent = ''; // メッセージをクリア
-                if (this.ship) this.ship.trail = []; // 軌跡をクリア
-                this.checkReadyToAim(); // UIステータスを更新 (SELECT ROCKET...)
-                this.checkGameOver();
-                
-                // 以前はここでロケットが0機かつゲームオーバーでないなら工場を自動で開いていたが、仕様変更により廃止 (v0.4.13)
-                
+                this.showResult(this.state);
+                this.state = 'result';
                 this.updateUI();
-
-                // 次の発射準備に向けてパネルを復元（最小化されていたら開く）
-                if (this.state !== 'gameover') {
-                    this.ensurePanelExpanded();
-                }
             }
         }
     }
@@ -1188,8 +1212,8 @@ export class Game {
             const body = hitBody;
             if (body === this.homeStar) {
                 this.state = 'returned';
-                this.stateTimer = 2.0; 
-                this.ui.message.textContent = 'RETURNED TO BASE';
+                this.stateTimer = 0.8; 
+                this.ui.message.textContent = '';
                 this.resolveItems('returned'); 
             } else {
                 // アドオンによる衝突回避判定
@@ -1219,8 +1243,8 @@ export class Game {
                 }
 
                 this.state = 'crashed';
-                this.stateTimer = 2.0; 
-                this.ui.message.textContent = 'CRASHED';
+                this.stateTimer = 0.8; 
+                this.ui.message.textContent = '';
                 this.consumeRocketOnFailure(); 
                 this.resolveItems('crashed', body); 
             }
@@ -1260,15 +1284,17 @@ export class Game {
 
             if (hitGoal) {
                 this.state = 'cleared';
-                this.stateTimer = 2.0;
-                this.score += hitGoal.score;
+                this.stateTimer = 0.8;
+                this.pendingGoalBonus = hitGoal.score; // ボーナスを一時保留
+                // ボーナスリストにゴールボーナスを追加
+                this.flightResults.bonuses.push({ name: 'Goal Bonus', value: hitGoal.score });
                 this.sector++; // セクター進行
-                this.ui.message.textContent = `SUCCESS! (+${hitGoal.score})`;
+                this.ui.message.textContent = ''; // 冗長なメッセージを削除
                 this.resolveItems('success', hitGoal); 
             } else {
                 this.state = 'lost';
-                this.stateTimer = 2.0;
-                this.ui.message.textContent = 'LOST IN SPACE';
+                this.stateTimer = 0.8;
+                this.ui.message.textContent = ''; // 冗長なメッセージを削除
                 this.consumeRocketOnFailure();
                 this.resolveItems('lost');
             }
@@ -1416,6 +1442,9 @@ export class Game {
                 color: CATEGORY_COLORS[category] || '#fff',
                 timestamp: Date.now()
             });
+
+            // リザルト用データの蓄積
+            this.flightResults.items.push({ ...itemData });
         });
 
         // 星側のアイテムを空にして、返還や取得時の重複を防止
@@ -1449,12 +1478,12 @@ export class Game {
                         // ゴール到達時：特殊効果または配送報酬
                         if (item.nextSectorThresholdBonus) {
                             this.nextSectorThresholdBonus = item.nextSectorThresholdBonus;
-                            this.ui.message.textContent += ` LUCKY NEXT SECTOR!`;
+                            this.flightResults.bonuses.push({ name: 'Lucky Encounter', value: 0 });
                         } else if (item.deliveryGoalId) {
                             if (hitGoal.id === item.deliveryGoalId) {
-                                this.score += 1500;
-                                this.coins += 100;
-                                this.ui.message.textContent += ` +DELIVERY BONUS! (+1500)`;
+                                this.pendingScore += 1500; // 報酬を一時保留
+                                this.pendingCoins += 100; // コインも保留
+                                this.flightResults.bonuses.push({ name: 'Delivery Bonus', value: 1500 });
                             }
                         }
                         return; // 消費
@@ -1498,6 +1527,9 @@ export class Game {
             this.pendingItems = [];
 
         } else if (result === 'crashed' || result === 'lost') {
+            // 大破・行方不明時は獲得アイテムを全て失うため、リザルト表示用リストをクリア
+            this.flightResults.items = [];
+
             // 仮保存アイテムの処理
             if (this.pendingItems && this.pendingItems.length > 0) {
                 if (result === 'crashed' && hitGoal) {
@@ -1533,7 +1565,7 @@ export class Game {
 
                         const totalPayout = totalUnitValue * insuranceModules.length;
                         this.coins += totalPayout;
-                        this.ui.message.textContent += ` (INSURANCE: +${totalPayout})`;
+                        this.flightResults.bonuses.push({ name: 'Insurance Payout', value: totalPayout });
                     }
                 }
                 this.pendingItems = [];
@@ -1577,6 +1609,202 @@ export class Game {
             this.activeBoosterAtLaunch = null;
         }
 
+        this.updateUI();
+    }
+
+    showResult(resultType, details = '') {
+        const overlay = document.getElementById('result-overlay');
+        const titleEl = document.getElementById('result-title');
+        const subtitleEl = document.getElementById('result-subtitle');
+        const statsList = document.getElementById('result-stats-list');
+        const itemsList = document.getElementById('result-items-list');
+        const scoreTotalEl = document.getElementById('result-total-score');
+        const coinTotalEl = document.getElementById('result-total-coin');
+
+        if (!overlay) return;
+
+        // 保存用
+        this.flightResults.status = resultType;
+
+        // テーマ設定
+        overlay.classList.remove('success-theme', 'failure-theme');
+        overlay.classList.add((resultType === 'success' || resultType === 'cleared' || resultType === 'returned') ? 'success-theme' : 'failure-theme');
+
+        const statusText = {
+            'success': `SECTOR ${this.sector - 1} COMPLETED`,
+            'cleared': `SECTOR ${this.sector - 1} COMPLETED`,
+            'returned': 'UNIT RECOVERED',
+            'crashed': 'SHIP CRASHED',
+            'lost': 'LOST IN SPACE'
+        };
+
+        titleEl.textContent = statusText[resultType] || 'MISSION END';
+        subtitleEl.textContent = '';
+        subtitleEl.style.display = 'none';
+
+        // --- スコア・コイン内訳の計算（加算前のデータを使用）---
+        const pendingScore = (this.pendingGoalBonus || 0) + (this.pendingScore || 0);
+        const pendingCoins = (this.pendingCoins || 0);
+
+        // 飛行中に増えた純粋スコア（ボーナス除く）
+        const scoreBonusTotal = this.flightResults.bonuses
+            .filter(b => !b.name.toLowerCase().includes('coin') && !b.name.toLowerCase().includes('payout'))
+            .reduce((sum, b) => sum + b.value, 0);
+        const pureFlightScore = Math.max(0, (this.score - this.launchScore) - scoreBonusTotal);
+
+        // コイン内訳: 拾った分 = (現在のコイン - 発射時) - ボーナス分
+        const coinBonusTotal = this.flightResults.bonuses
+            .filter(b => b.name.toLowerCase().includes('coin') || b.name.toLowerCase().includes('payout'))
+            .reduce((sum, b) => sum + b.value, 0);
+        const pickedCoins = Math.max(0, (this.coins - this.launchCoins) - coinBonusTotal);
+
+        // アニメーション用の現在地
+        const scoreBeforeBonus = this.score - this.launchScore;
+        const coinsBeforeBonus = this.coins - this.launchCoins;
+
+        // アニメーション用初期値を設定
+        if (scoreTotalEl) scoreTotalEl.textContent = scoreBeforeBonus.toLocaleString();
+        if (coinTotalEl) coinTotalEl.textContent = coinsBeforeBonus.toLocaleString();
+
+        // 実際の加算（HUDと同期）
+        this.score += pendingScore;
+        this.coins += pendingCoins;
+        this.pendingGoalBonus = 0;
+        this.pendingScore = 0;
+        this.pendingCoins = 0;
+
+        // --- 内訳リストの生成 ---
+        if (statsList) statsList.innerHTML = '';
+        if (itemsList) itemsList.innerHTML = '';
+
+        let delay = 0.4;
+
+        const addRow = (parent, label, value, colorClass) => {
+            const row = document.createElement('div');
+            row.className = 'result-row stagger-in';
+            row.style.animationDelay = `${delay}s`;
+            const sign = value >= 0 ? '+' : '';
+            row.innerHTML = `
+                <span class="label">${label}</span>
+                <span class="value ${colorClass}">${sign}${value.toLocaleString()}</span>
+            `;
+            parent.appendChild(row);
+            delay += 0.1;
+        };
+
+        const addDivider = (parent) => {
+            const div = document.createElement('div');
+            div.className = 'result-divider stagger-in';
+            div.style.animationDelay = `${delay}s`;
+            parent.appendChild(div);
+            delay += 0.05;
+        };
+
+        // スコア内訳
+        addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
+        this.flightResults.bonuses
+            .filter(b => !b.name.toLowerCase().includes('coin') && !b.name.toLowerCase().includes('payout'))
+            .forEach(b => addRow(statsList, b.name, b.value, 'score'));
+
+        // 区切り線
+        addDivider(statsList);
+
+        // コイン内訳
+        addRow(statsList, 'Collected Coins', pickedCoins, 'coin');
+        this.flightResults.bonuses
+            .filter(b => b.name.toLowerCase().includes('coin') || b.name.toLowerCase().includes('payout'))
+            .forEach(b => addRow(statsList, b.name, b.value, 'coin'));
+
+        // --- 獲得アイテム ---
+        const merged = new Map();
+        if (resultType !== 'crashed' && resultType !== 'lost') {
+            this.flightResults.items.forEach(itemData => {
+                const id = itemData.item.id;
+                if (merged.has(id)) {
+                    merged.get(id).count++;
+                } else {
+                    merged.set(id, { data: itemData.item, category: itemData.category, count: 1 });
+                }
+            });
+        }
+
+        if (merged.size === 0) {
+            if (itemsList) itemsList.innerHTML = '<div class="part-info" style="opacity:0.3;text-align:center;padding:20px;">NO ITEMS COLLECTED</div>';
+        } else {
+            merged.forEach(item => {
+                const categoryColor = CATEGORY_COLORS[item.category] || '#fff';
+                const card = document.createElement('div');
+                card.className = 'part-item reward-item-card stagger-in';
+                card.style.cssText = `animation-delay:${delay}s; background-color:${hexToRgba(categoryColor, 0.1)}; border-color:${hexToRgba(categoryColor, 0.3)}; cursor:default;`;
+                const displayData = { ...item.data, count: item.count };
+                card.innerHTML = this.generateCardHTML(displayData, { showInventory: true });
+                if (itemsList) itemsList.appendChild(card);
+                delay += 0.05;
+            });
+        }
+
+        // リザルト表示
+        overlay.classList.remove('hidden');
+
+        // カウントアップアニメーション
+        const finalScore = this.score;
+        const finalCoins = this.coins;
+        setTimeout(() => {
+            if (scoreTotalEl) this.animateValue(scoreTotalEl, this.score - pendingScore - this.launchScore, finalScore, 800);
+            if (coinTotalEl) this.animateValue(coinTotalEl, this.coins - pendingCoins - this.launchCoins, finalCoins, 800);
+        }, delay * 1000);
+    }
+
+    /**
+     * 数値をカウントアップアニメーションで表示する
+     */
+    animateValue(el, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const value = Math.floor(progress * (end - start) + start);
+            el.textContent = value.toLocaleString();
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    closeResult() {
+        const overlay = document.getElementById('result-overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('minimized');
+        }
+        
+        const backBtn = document.getElementById('back-to-result-btn');
+        if (backBtn) backBtn.classList.add('hidden');
+
+        const prevState = this.flightResults.status;
+        
+        if (prevState === 'success' || prevState === 'cleared') {
+            this.stageLevel += 1;
+            this.initStage(this.currentStarCount); // 成功時はリセット（星とアイテムの再抽選）
+        }
+        
+        // 失敗時は星を維持してリトライ
+        this.state = 'building';
+        
+        if (prevState !== 'returned') {
+            // 帰還以外はロケットの選択状態をクリア
+            this.selection.rocket = null;
+        }
+        
+        this.selection.launcher = null;
+        this.selection.booster = null; 
+
+        this.ui.message.textContent = ''; 
+        if (this.ship) this.ship.trail = []; 
+        this.checkReadyToAim(); 
+        this.checkGameOver();
+        this.ensurePanelExpanded();
         this.updateUI();
     }
 }

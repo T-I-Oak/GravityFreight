@@ -20,6 +20,51 @@
     </div>
 
     <div id="message"></div>
+    
+    <!-- リザルト画面オーバーレイ -->
+    <div id="result-overlay" class="hidden">
+        <div id="result-panel">
+            <div id="result-header">
+                <h2 id="result-title">MISSION STATUS</h2>
+                <div id="result-subtitle">SECTOR COMPLETED</div>
+            </div>
+            <div id="result-content">
+                <div class="result-columns">
+                    <!-- 左カラム: 内訳と合計 -->
+                    <div class="res-col-left">
+                        <div class="result-section">
+                            <h3>FLIGHT DATA</h3>
+                            <div id="result-stats-list"></div>
+                        </div>
+                        <div class="result-summary">
+                            <div class="total-score-box">
+                                <span class="label">FINAL SCORE</span>
+                                <span id="result-total-score">0</span>
+                            </div>
+                            <div class="total-coin-box">
+                                <span class="label">TOTAL COINS</span>
+                                <span id="result-total-coin">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右カラム: 獲得アイテム -->
+                    <div class="res-col-right">
+                        <div class="result-section">
+                            <h3>COLLECTED ITEMS</h3>
+                            <div id="result-items-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="result-footer">
+                <div class="result-actions">
+                    <button id="result-view-map-btn">VIEW MAP</button>
+                    <button id="result-close-btn">CONTINUE</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ビルドシステム UI -->
     <div id="build-overlay">
@@ -84,7 +129,8 @@
 
     <!-- 独立した起動ボタンパネル -->
     <div id="launch-control">
-        <button id="launch-btn" disabled>LAUNCH ENGINE</button>
+        <button id="launch-btn" class="hidden" disabled>LAUNCH ENGINE</button>
+        <button id="back-to-result-btn" class="hidden">BACK TO RESULT</button>
     </div>
 
 
