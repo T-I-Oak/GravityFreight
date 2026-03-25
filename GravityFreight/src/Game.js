@@ -76,7 +76,7 @@ export class Game {
 
 
 
-        this.isFactoryOpen = true; // 建造パネルの表示状態
+        this.isFactoryOpen = false; // 建造パネルの表示状態 (初期表示はFLIGHTタブ)
 
         this.stageLevel = 1; // ステージ進行度
         this.initStage(this.currentStarCount);
@@ -115,11 +115,7 @@ export class Game {
         this.accumulator = 0;
         this.pendingItems = [];
 
-        // ロケットがない場合はパネルを強制的に開く
-        if (this.inventory.rockets.length === 0) {
-            this.isFactoryOpen = true;
-            this.updateUI();
-        }
+        // 以前はここでロケットがない場合にパネルを強制的に開いていたが、仕様変更により廃止 (v0.4.13)
     }
 
     initGoals() {
@@ -898,13 +894,21 @@ export class Game {
             rList.innerHTML = '';
             if (this.inventory.rockets.length === 0) {
                 rList.innerHTML = `
-                    <div class="slot-placeholder">
+                    <div class="slot-placeholder" id="no-rocket-placeholder" style="cursor: pointer;">
                         <div class="part-header">
                             <span class="part-name" style="opacity: 0.5;">待機中の機体なし</span>
                         </div>
                         <span class="part-info">ASSEMBLY BAYで機体を建造してください</span>
+                        <div class="part-info" style="margin-top: 8px; color: #00bcd4; font-size: 0.8em;">[CLICK TO OPEN ASSEMBLY]</div>
                     </div>
                 `;
+                const placeholder = document.getElementById('no-rocket-placeholder');
+                if (placeholder) {
+                    placeholder.onclick = () => {
+                        this.isFactoryOpen = true;
+                        this.updateUI();
+                    };
+                }
             } else {
                 const unitColor = CATEGORY_COLORS.UNIT;
                 this.inventory.rockets.forEach(rocket => {
@@ -1130,10 +1134,7 @@ export class Game {
                 this.checkReadyToAim(); // UIステータスを更新 (SELECT ROCKET...)
                 this.checkGameOver();
                 
-                // ロケットが0機かつゲームオーバーでないなら工場を自動で開く
-                if (this.inventory.rockets.length === 0 && this.state !== 'gameover') {
-                    this.isFactoryOpen = true;
-                }
+                // 以前はここでロケットが0機かつゲームオーバーでないなら工場を自動で開いていたが、仕様変更により廃止 (v0.4.13)
                 
                 this.updateUI();
 
