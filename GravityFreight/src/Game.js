@@ -813,6 +813,8 @@ export class Game {
             // アイテム集約ロジック (ID + charges でグループ化)
             const groups = [];
             items.forEach(item => {
+                if (!item || !item.id) return;
+                
                 const charges = item.charges !== undefined ? item.charges : -1;
                 let group = groups.find(g => g.id === item.id && g.charges === charges);
                 if (!group) {
@@ -973,10 +975,9 @@ export class Game {
     generateCardHTML(itemData, options = {}) {
         if (!itemData) return '';
         
-        const item = itemData.item || itemData; 
-        const category = itemData.category || item.category || 'UNIT';
+        const category = itemData.category || 'CHASSIS';
         const categoryColor = CATEGORY_COLORS[category] || '#fff';
-        const isEnhanced = (item.enhancementCount || 0) > 0;
+        const isEnhanced = (itemData.enhancementCount || 0) > 0;
         const selectionCount = options.selectionCount || 0;
         const showInventory = options.showInventory || false;
         const isSelected = options.isSelected || false;
@@ -984,15 +985,15 @@ export class Game {
         // --- 1. バッジ・強化星印 ---
         let badge = '';
         if (isEnhanced) {
-            badge = `<div class="rarity-badge-star" style="position:absolute; top:-6px; right:-6px; font-size:12px; filter:drop-shadow(0 0 4px ${categoryColor}); z-index:2;">${'★'.repeat(item.enhancementCount)}</div>`;
+            badge = `<div class="rarity-badge-star" style="position:absolute; top:-6px; right:-6px; font-size:12px; filter:drop-shadow(0 0 4px ${categoryColor}); z-index:2;">${'★'.repeat(itemData.enhancementCount)}</div>`;
         }
 
         // --- 2. 数量・耐久表示 ---
         let invInfo = "";
         if (showInventory) {
-            if (item.charges !== undefined || item.maxCharges !== undefined) {
-                const max = item.maxCharges || 2;
-                const current = item.charges !== undefined ? item.charges : max;
+            if (itemData.charges !== undefined || itemData.maxCharges !== undefined) {
+                const max = itemData.maxCharges || 2;
+                const current = itemData.charges !== undefined ? itemData.charges : max;
                 let segments = '';
                 for (let i = 0; i < max; i++) {
                     segments += `<div class="hp-segment ${i < current ? 'active' : ''}" style="width:8px; height:4px; background:${i < current ? categoryColor : 'rgba(255,255,255,0.1)'}; border-radius:1px;"></div>`;
@@ -1793,20 +1794,20 @@ export class Game {
                 const rocket = this.selection.rocket;
                 if (rocket && hitGoal) {
                     const parts = [];
-                    if (rocket.chassis && Math.random() < 0.5) parts.push({ category: 'CHASSIS', item: rocket.chassis });
-                    if (rocket.logic && Math.random() < 0.5) parts.push({ category: 'LOGIC', item: rocket.logic });
+                    if (rocket.chassis && Math.random() < 0.5) parts.push({ ...rocket.chassis, category: 'CHASSIS' });
+                    if (rocket.logic && Math.random() < 0.5) parts.push({ ...rocket.logic, category: 'LOGIC' });
                     if (rocket.modules) {
                         for (const [optId, count] of Object.entries(rocket.modules)) {
                             const optBase = ITEM_REGISTRY[optId];
                             if (optBase) {
                                 for(let c=0; c<count; c++) {
-                                    if (Math.random() < 0.5) parts.push({ category: 'MODULES', item: optBase });
+                                    if (Math.random() < 0.5) parts.push({ ...optBase, category: 'MODULES' });
                                 }
                             }
                         }
                     }
                     if (rocket.booster && Math.random() < 0.5) {
-                        parts.push({ category: 'BOOSTERS', item: rocket.booster });
+                        parts.push({ ...rocket.booster, category: 'BOOSTERS' });
                     }
                     
                     const droppedParts = parts;
@@ -1942,16 +1943,18 @@ export class Game {
         const otherItems = new Map();
 
         if (resultType !== 'crashed' && resultType !== 'lost') {
-            this.flightResults.items.forEach(itemData => {
-                if (itemData.category === 'CARGO') {
-                    cargoItems.push(itemData);
+            this.flightResults.items.forEach(item => {
+                if (!item || !item.id) return;
+
+                if (item.category === 'CARGO') {
+                    cargoItems.push(item);
                 } else {
-                    const id = itemData.id;
-                    const key = `${id}-${itemData.enhancementCount || 0}`; // 強化レベルも考慮
+                    const id = item.id;
+                    const key = `${id}-${item.enhancementCount || 0}`; // 強化レベルも考慮
                     if (otherItems.has(key)) {
                         otherItems.get(key).count++;
                     } else {
-                        otherItems.set(key, { data: itemData, category: itemData.category, count: 1 });
+                        otherItems.set(key, { data: item, category: item.category, count: 1 });
                     }
                 }
             });

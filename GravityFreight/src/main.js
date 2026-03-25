@@ -95,6 +95,8 @@ function main() {
                 // 同一アイテムをマージする
                 const mergedItems = new Map();
                 game.hoveredStar.items.forEach(item => {
+                    if (!item || !item.id) return;
+                    
                     if (mergedItems.has(item.id)) {
                         mergedItems.get(item.id).count++;
                     } else {
