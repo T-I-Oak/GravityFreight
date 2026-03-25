@@ -975,6 +975,7 @@ export class Game {
     generateCardHTML(itemData, options = {}) {
         if (!itemData) return '';
         
+        const item = itemData; // テンプレート内での参照用
         const category = itemData.category || 'CHASSIS';
         const categoryColor = CATEGORY_COLORS[category] || '#fff';
         const isEnhanced = (itemData.enhancementCount || 0) > 0;
