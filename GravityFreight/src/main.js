@@ -96,7 +96,7 @@ function main() {
                 game.hoveredStar.items.forEach(itemData => {
                     const data = itemData.item;
                     if (mergedItems.has(data.id)) {
-                        mergedItems.get(data.id).count++;
+                        mergedItems.get(data.id).data.count++;
                     } else {
                         // 元のデータを破壊しないようコピーを作成
                         mergedItems.set(data.id, {

@@ -138,9 +138,9 @@ export class Game {
         
         // 3つの出口タイプ
         const goalTypes = [
-            { id: 'SAFE', color: GOAL_COLORS.SAFE, angleWidth: 60, score: 2000, label: 'SAFE' },
-            { id: 'NORMAL', color: GOAL_COLORS.NORMAL, angleWidth: 40, score: 3000, label: 'NORMAL' },
-            { id: 'DANGER', color: GOAL_COLORS.DANGER, angleWidth: 20, score: 5000, label: 'DANGER' }
+            { id: 'SAFE', color: GOAL_COLORS.SAFE, angleWidth: 60, score: 2000, coins: 20, bonusItems: 1, label: 'SAFE' },
+            { id: 'NORMAL', color: GOAL_COLORS.NORMAL, angleWidth: 40, score: 3000, coins: 30, bonusItems: 2, label: 'NORMAL' },
+            { id: 'DANGER', color: GOAL_COLORS.DANGER, angleWidth: 20, score: 5000, coins: 50, bonusItems: 3, label: 'DANGER' }
         ];
 
         this.goals = [];
@@ -213,6 +213,37 @@ export class Game {
         return pool[0];
     }
 
+    /**
+     * CARGOカテゴリを除外した重み付きランダムアイテム抽選
+     * @param {number} thresholdBonus - しきい値へのボーナス（高いほどレアが出やすい）
+     */
+    getWeightedRandomItemNoCargo(thresholdBonus = 0) {
+        let pool = [];
+        const THRESHOLD = RARITY.RARE + (this.stageLevel - 1) + (this.nextSectorThresholdBonus || 0) + thresholdBonus;
+
+        for (const [category, items] of Object.entries(PARTS)) {
+            if (category === 'CARGO') continue; // CARGOを除外
+            items.forEach(item => {
+                const rarity = item.rarity;
+                if (rarity !== undefined) {
+                    const weight = Math.max(0, THRESHOLD - rarity);
+                    if (weight > 0) {
+                        const finalCategory = item.category || category;
+                        pool.push({ item, category: finalCategory, weight });
+                    }
+                }
+            });
+        }
+        if (pool.length === 0) return null;
+        const totalWeight = pool.reduce((sum, p) => sum + p.weight, 0);
+        let rand = Math.random() * totalWeight;
+        for (const p of pool) {
+            rand -= p.weight;
+            if (rand <= 0) return p;
+        }
+        return pool[0];
+    }
+
     generateStars(count) {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
@@ -243,9 +274,12 @@ export class Game {
                 const mass = 5000 + Math.random() * 15000;
                 const body = new Body(pos, mass, true);
                 
-                const itemData = this.getWeightedRandomItem();
-                if (itemData) {
-                    body.items.push(itemData);
+                // 各星に2個のアイテムを配置
+                for (let j = 0; j < 2; j++) {
+                    const itemData = this.getWeightedRandomItem();
+                    if (itemData) {
+                        body.items.push(itemData);
+                    }
                 }
                 
                 this.bodies.push(body);
@@ -1038,6 +1072,35 @@ export class Game {
         `;
     }
 
+    /**
+     * アイテムをカテゴリに応じてインベントリに追加するヘルパー
+     */
+    _addItemToInventory({ item, category }) {
+        let targetList = null;
+        if (category === 'CHASSIS') targetList = this.inventory.chassis;
+        if (category === 'LOGIC') targetList = this.inventory.logic;
+        if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
+        if (category === 'MODULES') targetList = this.inventory.modules;
+        if (category === 'BOOSTERS') targetList = this.inventory.boosters;
+        if (!targetList) return;
+
+        const existing = targetList.find(i => i.id === item.id);
+        if (existing) {
+            if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
+                existing.charges = Math.min((existing.charges || 0) + 1, item.maxCharges || 2);
+            } else {
+                if (existing.count !== undefined) existing.count++;
+                else existing.count = 2;
+            }
+        } else {
+            if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
+                targetList.push({ ...item, charges: item.maxCharges || 2 });
+            } else {
+                targetList.push({ ...item, count: 1 });
+            }
+        }
+    }
+
     reset() {
         this.physics.bodies = [];
         this.initStage(this.currentStarCount);
@@ -1286,8 +1349,9 @@ export class Game {
                 this.state = 'cleared';
                 this.stateTimer = 0.8;
                 this.pendingGoalBonus = hitGoal.score; // ボーナスを一時保留
+                this.pendingCoins += (hitGoal.coins || 0); // ゴールコインを保留
                 // ボーナスリストにゴールボーナスを追加
-                this.flightResults.bonuses.push({ name: 'Goal Bonus', value: hitGoal.score });
+                this.flightResults.bonuses.push({ name: 'Goal Bonus', value: hitGoal.score, coins: hitGoal.coins || 0 });
                 this.sector++; // セクター進行
                 this.ui.message.textContent = ''; // 冗長なメッセージを削除
                 this.resolveItems('success', hitGoal); 
@@ -1443,8 +1507,10 @@ export class Game {
                 timestamp: Date.now()
             });
 
-            // リザルト用データの蓄積
-            this.flightResults.items.push({ ...itemData });
+            // リザルト用データの蓄積（CARGOはresolveItemsで別途処理するので除く）
+            if (category !== 'CARGO') {
+                this.flightResults.items.push({ ...itemData });
+            }
         });
 
         // 星側のアイテムを空にして、返還や取得時の重複を防止
@@ -1477,13 +1543,38 @@ export class Game {
                     if (hitGoal) {
                         // ゴール到達時：特殊効果または配送報酬
                         if (item.nextSectorThresholdBonus) {
+                            // 幸運の導き
                             this.nextSectorThresholdBonus = item.nextSectorThresholdBonus;
-                            this.flightResults.bonuses.push({ name: 'Lucky Encounter', value: 0 });
+                            this.flightResults.items.push({ ...itemData, bonusItems: [] });
                         } else if (item.deliveryGoalId) {
-                            if (hitGoal.id === item.deliveryGoalId) {
-                                this.pendingScore += 1500; // 報酬を一時保留
-                                this.pendingCoins += 100; // コインも保留
-                                this.flightResults.bonuses.push({ name: 'Delivery Bonus', value: 1500 });
+                            const isMatch = hitGoal.id === item.deliveryGoalId;
+                            if (isMatch) {
+                                // 一致配送ボーナス
+                                this.pendingScore += 1500;
+                                this.pendingCoins += 100;
+                                // ボーナスアイテム抽選（threshold +5、CARGO除外）
+                                const bonusItemCount = hitGoal.bonusItems || 1;
+                                const bonusItems = [];
+                                for (let k = 0; k < bonusItemCount; k++) {
+                                    const bonus = this.getWeightedRandomItemNoCargo(5);
+                                    if (bonus) {
+                                        bonusItems.push(bonus);
+                                        // コインはすぐに加算
+                                        if (bonus.category === 'COIN') {
+                                            this.pendingCoins += bonus.item.score || 0;
+                                        } else {
+                                            // その他アイテムはインベントリへ
+                                            this._addItemToInventory(bonus);
+                                        }
+                                    }
+                                }
+                                this.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: true, bonusItems });
+                                this.flightResults.bonuses.push({ name: 'Delivery Bonus', value: 1500, coins: 100 });
+                            } else {
+                                // 不一致カーゴ: +0pt / +10コイン
+                                this.pendingCoins += 10;
+                                this.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false, bonusItems: [] });
+                                this.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: 10 });
                             }
                         }
                         return; // 消費
@@ -1564,8 +1655,8 @@ export class Game {
                         }
 
                         const totalPayout = totalUnitValue * insuranceModules.length;
-                        this.coins += totalPayout;
-                        this.flightResults.bonuses.push({ name: 'Insurance Payout', value: totalPayout });
+                        this.pendingCoins += totalPayout;
+                        this.flightResults.bonuses.push({ name: 'Insurance Payout', value: 0, coins: totalPayout });
                     }
                 }
                 this.pendingItems = [];
@@ -1703,7 +1794,7 @@ export class Game {
         // スコア内訳
         addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
         this.flightResults.bonuses
-            .filter(b => !b.name.toLowerCase().includes('coin') && !b.name.toLowerCase().includes('payout'))
+            .filter(b => b.value > 0 && !b.name.toLowerCase().includes('unmatched') && !b.name.toLowerCase().includes('payout') && !(b.coins && b.value === 0))
             .forEach(b => addRow(statsList, b.name, b.value, 'score'));
 
         // 区切り線
@@ -1711,27 +1802,94 @@ export class Game {
 
         // コイン内訳
         addRow(statsList, 'Collected Coins', pickedCoins, 'coin');
+        // Goal Bonus / Delivery Bonus のコイン分
         this.flightResults.bonuses
-            .filter(b => b.name.toLowerCase().includes('coin') || b.name.toLowerCase().includes('payout'))
-            .forEach(b => addRow(statsList, b.name, b.value, 'coin'));
+            .filter(b => b.coins && b.coins > 0)
+            .forEach(b => addRow(statsList, b.name, b.coins, 'coin'));
+        // Unmatched Cargo の+10コイン
+        this.flightResults.bonuses
+            .filter(b => b.name.toLowerCase().includes('unmatched'))
+            .forEach(b => addRow(statsList, 'Cargo Reward', b.coins, 'coin'));
 
-        // --- 獲得アイテム ---
-        const merged = new Map();
+        // --- 獲得アイテム (右カラム) ---
+        // CARGOは個別表示、それ以外は集約表示
+        const cargoItems = [];
+        const otherItems = new Map();
+
         if (resultType !== 'crashed' && resultType !== 'lost') {
             this.flightResults.items.forEach(itemData => {
-                const id = itemData.item.id;
-                if (merged.has(id)) {
-                    merged.get(id).count++;
+                if (itemData.category === 'CARGO') {
+                    cargoItems.push(itemData);
                 } else {
-                    merged.set(id, { data: itemData.item, category: itemData.category, count: 1 });
+                    const id = itemData.item.id;
+                    if (otherItems.has(id)) {
+                        otherItems.get(id).count++;
+                    } else {
+                        otherItems.set(id, { data: itemData.item, category: itemData.category, count: 1 });
+                    }
                 }
             });
         }
 
-        if (merged.size === 0) {
+        const hasAnyItem = cargoItems.length > 0 || otherItems.size > 0;
+
+        if (!hasAnyItem) {
             if (itemsList) itemsList.innerHTML = '<div class="part-info" style="opacity:0.3;text-align:center;padding:20px;">NO ITEMS COLLECTED</div>';
         } else {
-            merged.forEach(item => {
+            // CARGOアイテムを表示（配送結果付き）
+            cargoItems.forEach(itemData => {
+                const categoryColor = CATEGORY_COLORS['CARGO'] || '#00e5ff';
+                const card = document.createElement('div');
+                card.className = 'reward-item-card stagger-in';
+                card.style.animationDelay = `${delay}s`;
+                delay += 0.07;
+
+                const isDelivery = itemData.isDelivery;
+                const isMatch = itemData.isMatch;
+                let badge = '';
+                if (isDelivery) {
+                    badge = isMatch
+                        ? `<span style="color:#44ffbb;font-size:10px;font-weight:800;">✓ DELIVERED</span>`
+                        : `<span style="color:#ff7755;font-size:10px;font-weight:800;">✗ UNMATCHED</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="part-item" style="border-left:4px solid ${categoryColor};cursor:default;margin-bottom:4px;">
+                        <div class="part-header">
+                            <span class="part-name">${itemData.item.name}</span>
+                            ${badge}
+                        </div>
+                        <span class="part-info">${itemData.item.description || ''}</span>
+                    </div>
+                `;
+                if (itemsList) itemsList.appendChild(card);
+
+                // ボーナスアイテムをインデント表示
+                if (isMatch && itemData.bonusItems && itemData.bonusItems.length > 0) {
+                    itemData.bonusItems.forEach(bonus => {
+                        const bonusColor = CATEGORY_COLORS[bonus.category] || '#fff';
+                        const bonusCard = document.createElement('div');
+                        bonusCard.className = 'reward-item-card stagger-in';
+                        bonusCard.style.animationDelay = `${delay}s`;
+                        delay += 0.07;
+
+                        bonusCard.innerHTML = `
+                            <div style="padding-left:16px;">
+                                <div class="part-item" style="border-left:4px solid ${bonusColor};cursor:default;background:rgba(255,255,255,0.03);">
+                                    <div class="part-header">
+                                        <span class="part-name" style="font-size:12px;">${bonus.item.name}</span>
+                                    </div>
+                                    <span class="part-info">${bonus.category}</span>
+                                </div>
+                            </div>
+                        `;
+                        if (itemsList) itemsList.appendChild(bonusCard);
+                    });
+                }
+            });
+
+            // 通常アイテムを集約表示
+            otherItems.forEach(item => {
                 const categoryColor = CATEGORY_COLORS[item.category] || '#fff';
                 const card = document.createElement('div');
                 card.className = 'part-item reward-item-card stagger-in';
@@ -1739,7 +1897,7 @@ export class Game {
                 const displayData = { ...item.data, count: item.count };
                 card.innerHTML = this.generateCardHTML(displayData, { showInventory: true });
                 if (itemsList) itemsList.appendChild(card);
-                delay += 0.05;
+                delay += 0.07;
             });
         }
 
