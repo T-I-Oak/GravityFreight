@@ -25,9 +25,15 @@ export const CATEGORY_COLORS = {
 };
 
 export const GOAL_COLORS = {
-    SAFE: '#00e676',
-    NORMAL: '#2979ff',
-    DANGER: '#ff1744'
+    SAFE: '#00e676',   // TRADING POST
+    NORMAL: '#2979ff', // REPAIR DOCK
+    DANGER: '#ff1744'  // BLACK MARKET
+};
+
+export const GOAL_NAMES = {
+    SAFE: 'TRADING POST',
+    NORMAL: 'REPAIR DOCK',
+    DANGER: 'BLACK MARKET'
 };
 
 export const PARTS = {
@@ -78,9 +84,9 @@ export const PARTS = {
         { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO', name: 'セーフ・カーゴ', mass: 1, deliveryGoalId: 'SAFE', rarity: RARITY.UNCOMMON, description: '安全区域への配送用荷物。' },
-        { id: 'cargo_normal', category: 'CARGO', name: 'ノーマル・カーゴ', mass: 1, deliveryGoalId: 'NORMAL', rarity: RARITY.UNCOMMON, description: '通常区域への配送用荷物。' },
-        { id: 'cargo_danger', category: 'CARGO', name: 'デンジャー・カーゴ', mass: 1, deliveryGoalId: 'DANGER', rarity: RARITY.UNCOMMON, description: '危険区域への配送用荷物。' },
+        { id: 'cargo_safe', category: 'CARGO', name: 'TRADE SUPPLIES', mass: 1, deliveryGoalId: 'SAFE', rarity: RARITY.UNCOMMON, description: '交易所への配送用物資。' },
+        { id: 'cargo_normal', category: 'CARGO', name: 'REPAIR PARTS', mass: 1, deliveryGoalId: 'NORMAL', rarity: RARITY.UNCOMMON, description: '整備ドックへの配送用パーツ。' },
+        { id: 'cargo_danger', category: 'CARGO', name: 'ENCRYPTED DATA', mass: 1, deliveryGoalId: 'DANGER', rarity: RARITY.UNCOMMON, description: '闇市場への配送用データ。' },
         { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, nextSectorThresholdBonus: 5, rarity: RARITY.UNCOMMON, description: 'ゴール到達時に保持していると、次セクターの出現率を大幅に向上。' }
     ]
 };
@@ -107,3 +113,10 @@ export const INITIAL_INVENTORY = {
         { id: 'boost_power', count: 3 }
     ]
 };
+// IDをキーにしたハッシュ（高速検索用）
+export const ITEM_REGISTRY = {};
+Object.values(PARTS).forEach(categoryList => {
+    categoryList.forEach(item => {
+        ITEM_REGISTRY[item.id] = item;
+    });
+});

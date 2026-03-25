@@ -12,6 +12,7 @@ function main() {
 
     const renderer = new Renderer(canvas);
     const game = new Game(canvas, ui, 5); // 星を5個生成
+    window.game = game;
 
     const starPanel = document.getElementById('star-info-panel');
     const starList = document.getElementById('star-info-list');
@@ -93,33 +94,24 @@ function main() {
                 starList.innerHTML = '';
                 // 同一アイテムをマージする
                 const mergedItems = new Map();
-                game.hoveredStar.items.forEach(itemData => {
-                    const data = itemData.item;
-                    if (mergedItems.has(data.id)) {
-                        mergedItems.get(data.id).data.count++;
+                game.hoveredStar.items.forEach(item => {
+                    if (mergedItems.has(item.id)) {
+                        mergedItems.get(item.id).count++;
                     } else {
-                        // 元のデータを破壊しないようコピーを作成
-                        mergedItems.set(data.id, {
-                            data: { ...data, count: 1 },
-                            type: itemData.category
-                        });
+                        mergedItems.set(item.id, { ...item, count: 1 });
                     }
                 });
 
-                mergedItems.forEach(mergedItem => {
-                    const data = mergedItem.data;
-                    const type = mergedItem.type;
-                    const categoryColor = CATEGORY_COLORS[type];
-
-                    const div = document.createElement('div');
-                    div.className = 'part-item'; // ビルド時と同じ表示形式
-                    div.style.backgroundColor = hexToRgba(categoryColor, 0.15);
+                mergedItems.forEach(item => {
+                    const cardWrapper = document.createElement('div');
+                    cardWrapper.className = 'tooltip-card-wrapper';
+                    cardWrapper.style.marginBottom = '4px';
                     
-                    div.innerHTML = game.generateCardHTML(data, {
-                        showInventory: true // アイテム数をバッヂとして表示 [x 1]や[x 2]
+                    cardWrapper.innerHTML = game.generateCardHTML(item, {
+                        showInventory: true
                     });
                     
-                    starList.appendChild(div);
+                    starList.appendChild(cardWrapper);
                 });
             }
 

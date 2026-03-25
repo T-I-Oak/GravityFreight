@@ -998,3 +998,237 @@ body, html {
     0% { transform: translateX(-10px); opacity: 0; }
     100% { transform: translateX(0); opacity: 1; }
 }
+/* --- Event Screen --- */
+#event-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 6000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+}
+
+.event-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.event-modal {
+    background: rgba(15, 20, 35, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    width: 700px;
+    max-width: 90vw;
+    max-height: 85vh;
+    padding: 40px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(68, 136, 255, 0.1);
+    animation: eventSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes eventSlideIn {
+    0% { transform: translateY(50px) scale(0.95); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.event-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#event-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-title-group h2 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: 4px;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-family: 'Orbitron', sans-serif;
+}
+
+#event-description {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 1px;
+}
+
+/* 拠点別テーマカラー */
+.theme-trading #event-location { color: #44ffbb; text-shadow: 0 0 20px rgba(68, 255, 187, 0.4); }
+.theme-trading #event-icon { border-color: #44ffbb; color: #44ffbb; box-shadow: inset 0 0 20px rgba(68, 255, 187, 0.1); }
+
+.theme-repair #event-location { color: #4488ff; text-shadow: 0 0 20px rgba(68, 136, 255, 0.4); }
+.theme-repair #event-icon { border-color: #4488ff; color: #4488ff; box-shadow: inset 0 0 20px rgba(68, 136, 255, 0.1); }
+
+.theme-blackmarket #event-location { color: #ff4455; text-shadow: 0 0 20px rgba(255, 68, 85, 0.4); }
+.theme-blackmarket #event-icon { border-color: #ff4455; color: #ff4455; box-shadow: inset 0 0 20px rgba(255, 68, 85, 0.1); }
+
+.event-content {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding-right: 10px;
+}
+
+.event-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-credits {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.player-credits .label {
+    font-size: 12px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 2px;
+}
+
+.player-credits .value {
+    font-size: 32px;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.player-credits .currency {
+    font-size: 14px;
+    color: #ffd700;
+    opacity: 0.7;
+}
+
+.premium-button {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 15px 35px;
+    border-radius: 50px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.premium-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* イベントアイテムカード (Shop/Repair等で使用) */
+.event-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s;
+}
+
+.event-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.event-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.event-card h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.event-card .price-tag {
+    background: rgba(255, 215, 0, 0.1);
+    color: #ffd700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.event-card .card-desc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.5;
+}
+
+.event-card button {
+    margin-top: 5px;
+    padding: 10px;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.event-card button:hover:not(:disabled) {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+.event-card button:disabled {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.2);
+    cursor: not-allowed;
+}
+
+/* レアリティ別ボーダー */
+.rarity-0 { border-left: 4px solid #888; }
+.rarity-1 { border-left: 4px solid #44ffbb; }
+.rarity-2 { border-left: 4px solid #4488ff; }
+.rarity-3 { border-left: 4px solid #cc44ff; }
+.rarity-4 { border-left: 4px solid #ffd700; }

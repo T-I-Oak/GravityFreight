@@ -6,6 +6,79 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <title>GRAVITY FREIGHT: ORBITAL ECHOES</title>
     <link rel="stylesheet" href="GravityFreight/css/style.css">
+    <style>
+        /* 強化バッヂ */
+        .enhancement-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: rgba(255, 215, 0, 0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+            padding: 2px 6px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+        .enhancement-badge .stars {
+            color: #ffd700;
+            font-size: 10px;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+        .enhancement-badge .extra-count {
+            color: #fff;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        /* イベント補助テキスト */
+        .event-subtext {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .cost-val {
+            color: #ffcc00;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* 戻るボタン */
+        .event-back-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 8px 24px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+        .event-back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+
+        /* アイテムカード修正 */
+        .item-card-inner {
+            position: relative;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+    </style>
 </head>
 <body>
     <div id="mission-hud" class="panel static">
@@ -143,6 +216,35 @@
         </div>
     </div>
 
+    <!-- Event Screen (Overlay) -->
+    <div id="event-screen" class="hidden">
+        <div class="event-backdrop"></div>
+        <div class="event-modal">
+            <div class="event-header">
+                <div class="event-icon" id="event-icon"></div>
+                <div class="event-title-group">
+                    <h2 id="event-location">TRADING POST</h2>
+                    <p id="event-description">Orbital supply station for cargo trading.</p>
+                </div>
+            </div>
+            
+            <div class="event-content" id="event-content">
+                <!-- Shop items or repair options will be injected here -->
+            </div>
+            
+            <div class="event-footer">
+                <div class="player-credits">
+                    <span class="label">CREDITS:</span>
+                    <span class="value" id="event-player-credits">0</span>
+                    <span class="currency">c</span>
+                </div>
+                <button id="event-continue-btn" class="premium-button">DEPART FROM STATION</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ui-layer"></div>
+    <div id="status"></div>
     <canvas id="gameCanvas"></canvas>
     <script type="module" src="GravityFreight/src/main.js?v=0.4.12"></script>
 </body>

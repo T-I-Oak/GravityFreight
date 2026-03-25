@@ -1,4 +1,4 @@
-import { PARTS, CATEGORY_COLORS, GOAL_COLORS, INITIAL_INVENTORY, RARITY, hexToRgba } from './Data.js';
+import { PARTS, ITEM_REGISTRY, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, INITIAL_INVENTORY, RARITY, hexToRgba } from './Data.js';
 import { PhysicsEngine, Body, Vector2, calculateAcceleration, getDistanceSqToSegment } from './Physics.js';
 
 export class Game {
@@ -138,9 +138,9 @@ export class Game {
         
         // 3つの出口タイプ
         const goalTypes = [
-            { id: 'SAFE', color: GOAL_COLORS.SAFE, angleWidth: 60, score: 2000, coins: 20, bonusItems: 1, label: 'SAFE' },
-            { id: 'NORMAL', color: GOAL_COLORS.NORMAL, angleWidth: 40, score: 3000, coins: 30, bonusItems: 2, label: 'NORMAL' },
-            { id: 'DANGER', color: GOAL_COLORS.DANGER, angleWidth: 20, score: 5000, coins: 50, bonusItems: 3, label: 'DANGER' }
+            { id: 'SAFE', color: GOAL_COLORS.SAFE, angleWidth: 60, score: 2000, coins: 20, bonusItems: 1, label: GOAL_NAMES.SAFE },
+            { id: 'NORMAL', color: GOAL_COLORS.NORMAL, angleWidth: 40, score: 3000, coins: 30, bonusItems: 2, label: GOAL_NAMES.NORMAL },
+            { id: 'DANGER', color: GOAL_COLORS.DANGER, angleWidth: 20, score: 5000, coins: 50, bonusItems: 3, label: GOAL_NAMES.DANGER }
         ];
 
         this.goals = [];
@@ -183,66 +183,7 @@ export class Game {
     }
 
 
-    getWeightedRandomItem() {
-        let pool = [];
-        // スタート時点ではRAREと同じ値（15）。ステージが進むごとに上限が解放・出現率が増加していく
-        const THRESHOLD = RARITY.RARE + (this.stageLevel - 1) + (this.nextSectorThresholdBonus || 0); 
-        this.nextSectorThresholdBonus = 0; // 消費
-        
-        for (const [category, items] of Object.entries(PARTS)) {
-            items.forEach(item => {
-                const rarity = item.rarity;
-                // レアリティが設定されているアイテムのみ自然出現させる
-                if (rarity !== undefined) {
-                    const weight = Math.max(0, THRESHOLD - rarity);
-                    if (weight > 0) {
-                        // アイテム定義側に category があればそれを優先 (CARGO_SAFE等)、なければループのキー (CHASSIS等) を使用
-                        const finalCategory = item.category || category;
-                        pool.push({ item, category: finalCategory, weight });
-                    }
-                }
-            });
-        }
-        if (pool.length === 0) return null;
-        const totalWeight = pool.reduce((sum, p) => sum + p.weight, 0);
-        let rand = Math.random() * totalWeight;
-        for (const p of pool) {
-            rand -= p.weight;
-            if (rand <= 0) return p;
-        }
-        return pool[0];
-    }
 
-    /**
-     * CARGOカテゴリを除外した重み付きランダムアイテム抽選
-     * @param {number} thresholdBonus - しきい値へのボーナス（高いほどレアが出やすい）
-     */
-    getWeightedRandomItemNoCargo(thresholdBonus = 0) {
-        let pool = [];
-        const THRESHOLD = RARITY.RARE + (this.stageLevel - 1) + (this.nextSectorThresholdBonus || 0) + thresholdBonus;
-
-        for (const [category, items] of Object.entries(PARTS)) {
-            if (category === 'CARGO') continue; // CARGOを除外
-            items.forEach(item => {
-                const rarity = item.rarity;
-                if (rarity !== undefined) {
-                    const weight = Math.max(0, THRESHOLD - rarity);
-                    if (weight > 0) {
-                        const finalCategory = item.category || category;
-                        pool.push({ item, category: finalCategory, weight });
-                    }
-                }
-            });
-        }
-        if (pool.length === 0) return null;
-        const totalWeight = pool.reduce((sum, p) => sum + p.weight, 0);
-        let rand = Math.random() * totalWeight;
-        for (const p of pool) {
-            rand -= p.weight;
-            if (rand <= 0) return p;
-        }
-        return pool[0];
-    }
 
     generateStars(count) {
         const centerX = this.canvas.width / 2;
@@ -1036,46 +977,81 @@ export class Game {
         // 最小化ボタンのテキスト同期はCSS側で処理するか、toggleCollapse内で行う
     }
 
-    // アイテムカードUIの共通化
-    generateCardHTML(item, options = {}) {
-        const { showInventory = false, selectionCount = 0 } = options;
+    /**
+     * 各種UIで共通して使用する、プレミアム感のあるアイテムカードのHTMLを生成
+     */
+    generateCardHTML(itemData, options = {}) {
+        if (!itemData) return '';
         
+        // フラット化されたデータを優先、なければネストも許容しつつ正規化
+        const item = itemData.item || itemData; 
+        const category = itemData.category || item.category || 'UNIT';
+        const categoryColor = CATEGORY_COLORS[category] || '#fff';
+        const isEnhanced = (item.enhancementCount || 0) > 0;
+        const selectionCount = itemData.selectionCount || 0;
+        const showInventory = options.showInventory || false;
+
+        // --- 1. バッジ・強化星印の生成 ---
+        let badge = '';
+        if (isEnhanced) {
+            badge = `<div class="rarity-badge-star" style="position:absolute; top:-6px; right:-6px; font-size:12px; filter:drop-shadow(0 0 4px ${categoryColor}); z-index:2;">${'★'.repeat(item.enhancementCount)}</div>`;
+        }
+
+        // --- 2. 数量・耐久表示 (インベントリ用) ---
         let invInfo = "";
         if (showInventory) {
-            // チャージ（charges）を持つアイテムの場合
             if (item.charges !== undefined || item.maxCharges !== undefined) {
                 const max = item.maxCharges || 2;
                 const current = item.charges !== undefined ? item.charges : max;
-
                 let segments = '';
                 for (let i = 0; i < max; i++) {
-                    segments += `<div class="hp-segment ${i < current ? 'active' : ''}"></div>`;
+                    segments += `<div class="hp-segment ${i < current ? 'active' : ''}" style="width:8px; height:4px; background:${i < current ? categoryColor : 'rgba(255,255,255,0.1)'}; border-radius:1px;"></div>`;
                 }
-                invInfo = `<div class="hp-gauge">${segments}</div>`;
-            } else {
-                // 数量表示（x1は省略）
-                const count = item.count || 0;
-                if (count > 1) {
-                    invInfo = `<span class="inventory-badge">× ${count}</span>`;
-                }
+                invInfo = `<div class="hp-gauge" style="display: flex; gap: 2px;">${segments}</div>`;
+            } else if (itemData.count > 1) {
+                invInfo = `<span class="inventory-badge" style="font-size: 10px; color: rgba(255,255,255,0.6); font-weight:bold;">x ${itemData.count}</span>`;
             }
         }
+        const selTag = (selectionCount > 0) ? ` <span class="selection-badge" style="color: #ffcc00; font-weight: bold;">[${selectionCount}]</span>` : '';
 
-        const selTag = (selectionCount > 0) ? ` <span class="selection-badge">[${selectionCount}]</span>` : '';
+        // --- 3. デザインの統一（左枠強調） ---
+        const itemContainerStyle = `
+            position: relative;
+            border-left: 5px solid ${categoryColor};
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 2px 4px 4px 2px;
+            margin-bottom: 6px;
+            min-width: 200px;
+        `;
 
         return `
-            <div class="part-header">
-                <span class="part-name">${item.name}</span>
-                <div class="part-meta">${invInfo}${selTag}</div>
+            <div class="part-item-container" style="${itemContainerStyle}">
+                ${badge}
+                <div class="part-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <span class="part-name" style="font-weight: 800; font-size: 13px; color: #fff;">${item.name || 'Unknown'}${selTag}</span>
+                    ${invInfo}
+                </div>
+                <div class="part-info" style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 6px;">${item.description || ''}</div>
+                <div class="part-stats" style="display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px;">
+                    ${(item.slots !== undefined && item.slots > 0) ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">SLOTS</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">${item.slots}</span></div>` : ''}
+                    ${item.score ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">COINS</span><span class="val" style="font-size: 10px; color: #ffd700; font-weight: bold;">+${item.score}</span></div>` : ''}
+                    ${item.precisionMultiplier !== undefined ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">PRECISION</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">x${item.precisionMultiplier.toFixed(1)}</span></div>` : ''}
+                    ${item.pickupMultiplier !== undefined ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">PICKUP</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">x${item.pickupMultiplier.toFixed(1)}</span></div>` : ''}
+                    ${item.gravityMultiplier !== undefined ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">GRAVITY</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">x${item.gravityMultiplier.toFixed(1)}</span></div>` : ''}
+                </div>
             </div>
-            <span class="part-info">${item.description || ''}</span>
         `;
     }
+
+
 
     /**
      * アイテムをカテゴリに応じてインベントリに追加するヘルパー
      */
-    _addItemToInventory({ item, category }) {
+    _addItemToInventory(item) {
+        if (!item) return;
+        const category = item.category;
         let targetList = null;
         if (category === 'CHASSIS') targetList = this.inventory.chassis;
         if (category === 'LOGIC') targetList = this.inventory.logic;
@@ -1084,7 +1060,7 @@ export class Game {
         if (category === 'BOOSTERS') targetList = this.inventory.boosters;
         if (!targetList) return;
 
-        const existing = targetList.find(i => i.id === item.id);
+        const existing = targetList.find(i => i.id === item.id && !!i.isEnhanced === !!item.isEnhanced && i.enhancementCount === item.enhancementCount);
         if (existing) {
             if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
                 existing.charges = Math.min((existing.charges || 0) + 1, item.maxCharges || 2);
@@ -1097,6 +1073,31 @@ export class Game {
                 targetList.push({ ...item, charges: item.maxCharges || 2 });
             } else {
                 targetList.push({ ...item, count: 1 });
+            }
+        }
+    }
+
+    /**
+     * アイテムをカテゴリに応じてインベントリから削除するヘルパー
+     */
+    _removeItemFromInventory(category, id, isEnhanced = false) {
+        let targetList = null;
+        if (category === 'CHASSIS') targetList = this.inventory.chassis;
+        if (category === 'LOGIC') targetList = this.inventory.logic;
+        if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
+        if (category === 'MODULES') targetList = this.inventory.modules;
+        if (category === 'BOOSTERS') targetList = this.inventory.boosters;
+        if (!targetList) return;
+
+        const index = targetList.findIndex(i => i.id === id && !!i.isEnhanced === isEnhanced);
+        if (index !== -1) {
+            const item = targetList[index];
+            if (item.count !== undefined && item.count > 1) {
+                item.count--;
+            } else if (item.charges !== undefined && item.charges > 1) {
+                item.charges--;
+            } else {
+                targetList.splice(index, 1);
             }
         }
     }
@@ -1348,6 +1349,7 @@ export class Game {
             if (hitGoal) {
                 this.state = 'cleared';
                 this.stateTimer = 0.8;
+                this.lastHitGoal = hitGoal; // 拠点を保存
                 this.pendingGoalBonus = hitGoal.score; // ボーナスを一時保留
                 this.pendingCoins += (hitGoal.coins || 0); // ゴールコインを保留
                 // ボーナスリストにゴールボーナスを追加
@@ -1427,6 +1429,136 @@ export class Game {
             }
         }
         return points;
+    }
+
+    /**
+     * パーツの査定額（保険・売買価格のベース）を算出
+     */
+    calculateValue(item) {
+        if (!item) return 0;
+        
+        // 1. マスタデータの特定 (Data.js の ITEM_REGISTRY からID直接参照)
+        const master = ITEM_REGISTRY[item.id] || item;
+
+        // 2. 属性の決定 (個別情報を優先し、なければマスタのデフォルト値を使用)
+        const rarity = item.rarity !== undefined ? item.rarity : (master.rarity || RARITY.COMMON);
+        const max = item.maxCharges !== undefined ? item.maxCharges : (master.maxCharges || 0);
+        const cur = item.charges !== undefined ? item.charges : 0;
+        
+        // 3. ベース価格の算出 (以前の正しかった仕様: 10/20/30)
+        let base = 10;
+        if (rarity === RARITY.UNCOMMON) base = 20;
+        if (rarity === RARITY.RARE) base = 30;
+        
+        // 4. コンディション補正 (耐久度)
+        const condition = (max > 0) ? (cur + 1) / (max + 1) : 1.0;
+
+        // 5. 強化ボーナス (以前の仕様: 1回につき10%増)
+        const enhancementBonus = (item.upgradeCount || item.enhancementCount || 0) * 0.1;
+        
+        return Math.floor(base * condition * (1 + enhancementBonus));
+    }
+
+
+
+    /**
+     * セクター半径に応じたアイテム出現閾値を取得 (v0.5.1 修正)
+     */
+    getSectorItemThreshold(radius) {
+        // SECTOR_BOUNDS は Data.js で定義されているはずだが、
+        // もし参照できない場合や簡略化のために動的に計算
+        if (radius < 1000) return 3;
+        if (radius < 2000) return 4;
+        return 5;
+    }
+
+    /**
+     * 指定されたアイテムを強化する (v0.5.1 新規追加)
+     * @param {Object} item 強化対象のパーツオブジェクト
+     */
+    enhanceItem(item) {
+        if (!item) return;
+        
+        // 強化回数の管理
+        item.enhancementCount = (item.enhancementCount || 0) + 1;
+        
+        // 有効な強化オプションのリストアップ
+        const options = [];
+        if (item.slots !== undefined) options.push('slots');
+        if (item.precisionMultiplier !== undefined) options.push('precision');
+        if (item.pickupMultiplier !== undefined) options.push('pickup');
+        if (item.gravityMultiplier !== undefined && item.gravityMultiplier > 0.1) options.push('gravity');
+        if (item.maxCharges !== undefined) options.push('charges');
+
+        if (options.length === 0) return;
+
+        // ランダムに1つ適用
+        const chosen = options[Math.floor(Math.random() * options.length)];
+        
+        switch (chosen) {
+            case 'slots':
+                item.slots += 1;
+                break;
+            case 'precision':
+                item.precisionMultiplier += 0.2;
+                break;
+            case 'pickup':
+                item.pickupMultiplier += 0.2;
+                break;
+            case 'gravity':
+                item.gravityMultiplier = Math.max(0.1, item.gravityMultiplier - 0.1);
+                break;
+            case 'charges':
+                item.maxCharges += 1;
+                item.charges = (item.charges || 0) + 1; // 現在のチャージも増やす
+                break;
+        }
+    }
+
+    /**
+     * 重み付きアイテム抽選（汎用版）
+     */
+    getWeightedRandomItem(options = {}) {
+        const { 
+            thresholdBonus = 0, 
+            excludeCargo = false, 
+            excludeCoin = false 
+        } = options;
+
+        const baseThreshold = this.getSectorItemThreshold();
+        const threshold = baseThreshold + thresholdBonus;
+        
+        // 全パーツリストからフィルタリング
+        const pools = [
+            { category: 'CHASSIS', list: PARTS.CHASSIS },
+            { category: 'LOGIC', list: PARTS.LOGIC },
+            { category: 'LAUNCHERS', list: PARTS.LAUNCHERS },
+            { category: 'MODULES', list: PARTS.MODULES },
+            { category: 'BOOSTERS', list: PARTS.BOOSTERS }
+        ];
+
+        if (!excludeCargo) pools.push({ category: 'CARGO', list: PARTS.CARGO });
+        if (!excludeCoin) pools.push({ category: 'COIN', list: PARTS.COIN });
+
+        const items = [];
+        pools.forEach(p => {
+            p.list.forEach(item => {
+                let weight = 0;
+                if (item.rarity === RARITY.COMMON) weight = 100;
+                else if (item.rarity === RARITY.UNCOMMON && threshold >= 5) weight = 30;
+                else if (item.rarity === RARITY.RARE && threshold >= 10) weight = 10;
+                
+                if (weight > 0) items.push({ ...item, category: p.category, weight });
+            });
+        });
+
+        const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
+        let rand = Math.random() * totalWeight;
+        for (const i of items) {
+            rand -= i.weight;
+            if (rand <= 0) return i;
+        }
+        return items[0];
     }
 
     consumeRocketOnFailure() {
@@ -1530,7 +1662,8 @@ export class Game {
             
             this.pendingItems.forEach((pItem) => {
                 const itemData = pItem.itemData;
-                const { category, item } = itemData;
+                const { category } = itemData;
+                const item = itemData; // フラット化されているので itemData = item
 
                 // 1. コイン（COIN）の処理：常に即座に加算
                 if (category === 'COIN') {
@@ -1556,7 +1689,7 @@ export class Game {
                                 const bonusItemCount = hitGoal.bonusItems || 1;
                                 const bonusItems = [];
                                 for (let k = 0; k < bonusItemCount; k++) {
-                                    const bonus = this.getWeightedRandomItemNoCargo(5);
+                                    const bonus = this.getWeightedRandomItem({ thresholdBonus: 5, excludeCargo: true });
                                     if (bonus) {
                                         bonusItems.push(bonus);
                                         // コインはすぐに加算
@@ -1587,6 +1720,13 @@ export class Game {
                     }
                 }
 
+                // 2. コイン（COIN）：リザルト演出用に pendingCoins へ蓄積 ＆ アイテムリストに含める
+                if (category === 'COIN') {
+                    this.pendingCoins += item.score || 0;
+                    this.flightResults.items.push(itemData);
+                    return;
+                }
+
                 // 3. その他パーツ・ブースター（拾い物）：常にインベントリに加算
                 let targetList = null;
                 if (category === 'CHASSIS') targetList = this.inventory.chassis;
@@ -1596,7 +1736,7 @@ export class Game {
                 if (category === 'BOOSTERS') targetList = this.inventory.boosters;
 
                 if (targetList) {
-                    const existing = targetList.find(i => i.id === item.id);
+                    const existing = targetList.find(i => i.id === item.id && !!i.isEnhanced === !!item.isEnhanced && i.enhancementCount === item.enhancementCount);
                     if (existing) {
                         if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
                             if (existing.charges !== undefined) existing.charges++;
@@ -1636,21 +1776,12 @@ export class Game {
                     const rocket = this.selection.rocket;
                     
                     if (insuranceModules.length > 0 && rocket) {
-                        const calculateValue = (item) => {
-                            let base = 10;
-                            if (item.rarity === RARITY.UNCOMMON) base = 20;
-                            if (item.rarity === RARITY.RARE) base = 30;
-                            const cur = item.charges !== undefined ? item.charges : 0;
-                            const max = item.maxCharges !== undefined ? item.maxCharges : 0;
-                            return Math.floor(base * (cur + 1) / (max + 1));
-                        };
-
                         let totalUnitValue = 0;
-                        if (rocket.chassis) totalUnitValue += calculateValue(rocket.chassis);
-                        if (rocket.logic) totalUnitValue += calculateValue(rocket.logic);
+                        if (rocket.chassis) totalUnitValue += this.calculateValue(rocket.chassis);
+                        if (rocket.logic) totalUnitValue += this.calculateValue(rocket.logic);
                         if (this.ship.equippedModules) {
                             this.ship.equippedModules.forEach(m => {
-                                totalUnitValue += calculateValue(m);
+                                totalUnitValue += this.calculateValue(m);
                             });
                         }
 
@@ -1671,7 +1802,7 @@ export class Game {
                     if (rocket.logic && Math.random() < 0.5) parts.push({ category: 'LOGIC', item: rocket.logic });
                     if (rocket.modules) {
                         for (const [optId, count] of Object.entries(rocket.modules)) {
-                            const optBase = PARTS.MODULES.find(o => o.id === optId);
+                            const optBase = ITEM_REGISTRY[optId];
                             if (optBase) {
                                 for(let c=0; c<count; c++) {
                                     if (Math.random() < 0.5) parts.push({ category: 'MODULES', item: optBase });
@@ -1733,31 +1864,28 @@ export class Game {
         subtitleEl.textContent = '';
         subtitleEl.style.display = 'none';
 
-        // --- スコア・コイン内訳の計算（加算前のデータを使用）---
+        // --- スコア・コイン内訳の計算 ---
         const pendingScore = (this.pendingGoalBonus || 0) + (this.pendingScore || 0);
         const pendingCoins = (this.pendingCoins || 0);
 
-        // 飛行中に増えた純粋スコア（ボーナス除く）
-        const scoreBonusTotal = this.flightResults.bonuses
-            .filter(b => !b.name.toLowerCase().includes('coin') && !b.name.toLowerCase().includes('payout'))
-            .reduce((sum, b) => sum + b.value, 0);
-        const pureFlightScore = Math.max(0, (this.score - this.launchScore) - scoreBonusTotal);
+        // 合計増加分（HUDへの最終反映用）
+        const scoreIncrease = (this.score - this.launchScore) + pendingScore;
+        const coinIncrease = (this.coins - this.launchCoins) + pendingCoins;
 
-        // コイン内訳: 拾った分 = (現在のコイン - 発射時) - ボーナス分
-        const coinBonusTotal = this.flightResults.bonuses
-            .filter(b => b.name.toLowerCase().includes('coin') || b.name.toLowerCase().includes('payout'))
-            .reduce((sum, b) => sum + b.value, 0);
-        const pickedCoins = Math.max(0, (this.coins - this.launchCoins) - coinBonusTotal);
+        // 1. 純粋な飛行継続スコア (ボーナス含まない増加分)
+        const pureFlightScore = Math.max(0, this.score - this.launchScore);
 
-        // アニメーション用の現在地
-        const scoreBeforeBonus = this.score - this.launchScore;
-        const coinsBeforeBonus = this.coins - this.launchCoins;
+        // 2. アイテムとして拾ったコインの合計
+        const itemCoinTotal = this.flightResults.items
+            .filter(i => i.category === 'COIN')
+            .reduce((sum, i) => sum + (i.score || 0), 0);
 
-        // アニメーション用初期値を設定
-        if (scoreTotalEl) scoreTotalEl.textContent = scoreBeforeBonus.toLocaleString();
-        if (coinTotalEl) coinTotalEl.textContent = coinsBeforeBonus.toLocaleString();
+        // アニメーション用の初期値を HUD にセット
+        this.displayScore = this.launchScore;
+        this.displayCoins = this.launchCoins;
+        this.updateUI();
 
-        // 実際の加算（HUDと同期）
+        // 内部値の最終確定
         this.score += pendingScore;
         this.coins += pendingCoins;
         this.pendingGoalBonus = 0;
@@ -1801,7 +1929,9 @@ export class Game {
         addDivider(statsList);
 
         // コイン内訳
-        addRow(statsList, 'Collected Coins', pickedCoins, 'coin');
+        if (itemCoinTotal > 0) {
+            addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
+        }
         // Goal Bonus / Delivery Bonus のコイン分
         this.flightResults.bonuses
             .filter(b => b.coins && b.coins > 0)
@@ -1821,11 +1951,12 @@ export class Game {
                 if (itemData.category === 'CARGO') {
                     cargoItems.push(itemData);
                 } else {
-                    const id = itemData.item.id;
-                    if (otherItems.has(id)) {
-                        otherItems.get(id).count++;
+                    const id = itemData.id;
+                    const key = `${id}-${itemData.enhancementCount || 0}`; // 強化レベルも考慮
+                    if (otherItems.has(key)) {
+                        otherItems.get(key).count++;
                     } else {
-                        otherItems.set(id, { data: itemData.item, category: itemData.category, count: 1 });
+                        otherItems.set(key, { data: itemData, category: itemData.category, count: 1 });
                     }
                 }
             });
@@ -1856,13 +1987,11 @@ export class Game {
                 card.innerHTML = `
                     <div class="part-item" style="border-left:4px solid ${categoryColor};cursor:default;margin-bottom:4px;">
                         <div class="part-header">
-                            <span class="part-name">${itemData.item.name}</span>
-                            ${badge}
+                            <span class="part-name">${itemData.name} ${badge}</span>
                         </div>
-                        <span class="part-info">${itemData.item.description || ''}</span>
+                        <span class="part-info">${itemData.description || ''}</span>
                     </div>
                 `;
-                if (itemsList) itemsList.appendChild(card);
 
                 // ボーナスアイテムをインデント表示
                 if (isMatch && itemData.bonusItems && itemData.bonusItems.length > 0) {
@@ -1877,7 +2006,7 @@ export class Game {
                             <div style="padding-left:16px;">
                                 <div class="part-item" style="border-left:4px solid ${bonusColor};cursor:default;background:rgba(255,255,255,0.03);">
                                     <div class="part-header">
-                                        <span class="part-name" style="font-size:12px;">${bonus.item.name}</span>
+                                        <span class="part-name" style="font-size:12px;">${bonus.name}</span>
                                     </div>
                                     <span class="part-info">${bonus.category}</span>
                                 </div>
@@ -1930,6 +2059,395 @@ export class Game {
         window.requestAnimationFrame(step);
     }
 
+    /**
+     * イベント画面の開始
+     */
+    handleEvent(goal) {
+        const screen = document.getElementById('event-screen');
+        if (!screen) return;
+
+        this.currentEventGoal = goal;
+        this.state = 'event';
+        this.hasDismantled = false; // 訪問ごとにリセット
+
+        // UI初期化
+        const titleEl = document.getElementById('event-location');
+        const descEl = document.getElementById('event-description');
+        const creditsEl = document.getElementById('event-player-credits');
+        const contentEl = document.getElementById('event-content');
+        const continueBtn = document.getElementById('event-continue-btn');
+
+        if (creditsEl) creditsEl.textContent = this.coins.toLocaleString();
+        if (contentEl) contentEl.innerHTML = ''; // クリア
+
+        // 拠点タイプに応じた初期設定
+        const goalLabel = GOAL_NAMES[goal.id];
+        titleEl.textContent = goalLabel;
+
+        if (goalLabel === 'TRADING POST') {
+            descEl.textContent = 'Orbital supply station for cargo trading.';
+            screen.className = 'trading-post-theme';
+            this.initTradingPost(contentEl);
+        } else if (goalLabel === 'REPAIR DOCK') {
+            descEl.textContent = 'Advanced maintenance and modification facility.';
+            screen.className = 'repair-dock-theme';
+            this.initRepairDock(contentEl);
+        } else if (goalLabel === 'BLACK MARKET') {
+            descEl.textContent = 'Unregulated trade hub for rare equipment.';
+            screen.className = 'black-market-theme';
+            this.initBlackMarket(contentEl);
+        }
+
+        continueBtn.onclick = () => this.closeEvent();
+        screen.classList.remove('hidden');
+        this.updateUI();
+    }
+
+    /**
+     * TRADING POST の初期化
+     */
+    initTradingPost(container) {
+        // 在庫生成 (6個, Parts Only)
+        const inventory = [];
+        for (let i = 0; i < 6; i++) {
+            inventory.push(this.getWeightedRandomItem({ excludeCargo: true, excludeCoin: true }));
+        }
+        
+        // 1個をセール品に (30% off)
+        const saleIndex = Math.floor(Math.random() * 6);
+        
+        const shopSection = document.createElement('div');
+        shopSection.className = 'event-shop-section';
+        shopSection.innerHTML = '<h3>AVAILABLE STOCK</h3>';
+        
+        const grid = document.createElement('div');
+        grid.className = 'event-grid';
+        
+        inventory.forEach((itemData, idx) => {
+            const isSale = (idx === saleIndex);
+            const baseValue = this.calculateValue(itemData);
+            let buyPrice = baseValue * 2;
+            if (isSale) buyPrice = Math.floor(buyPrice * 0.7);
+
+            const card = document.createElement('div');
+            card.className = `event-card ${isSale ? 'sale' : ''}`;
+            
+            const categoryColor = CATEGORY_COLORS[itemData.category] || '#fff';
+            card.style.borderColor = hexToRgba(categoryColor, 0.4);
+
+            card.innerHTML = `
+                <div class="card-body">
+                    ${this.generateCardHTML(itemData)}
+                    <div class="card-price">
+                        <span class="price-val">${buyPrice}</span><span class="currency">c</span>
+                        ${isSale ? '<span class="sale-badge">30% OFF</span>' : ''}
+                    </div>
+                </div>
+                <button class="buy-btn" ${this.coins < buyPrice ? 'disabled' : ''}>BUY</button>
+            `;
+
+            const btn = card.querySelector('.buy-btn');
+            btn.onclick = () => {
+                if (this.coins >= buyPrice) {
+                    this.coins -= buyPrice;
+                    this._addItemToInventory(itemData);
+                    btn.disabled = true;
+                    btn.textContent = 'SOLD OUT';
+                    document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
+                    this.updateUI();
+                }
+            };
+
+            grid.appendChild(card);
+        });
+        
+        shopSection.appendChild(grid);
+        container.appendChild(shopSection);
+
+        // 売却セクション (インベントリから)
+        const sellSection = document.createElement('div');
+        sellSection.className = 'event-sell-section';
+        sellSection.innerHTML = '<h3>SELL YOUR PARTS</h3>';
+        
+        const sellGrid = document.createElement('div');
+        sellGrid.className = 'event-grid';
+        
+        // 売却可能なアイテムを抽出 (インベントリ全体)
+        const allHoldings = [
+            ...this.inventory.chassis.map(i => ({...i, cat:'CHASSIS'})),
+            ...this.inventory.logic.map(i => ({...i, cat:'LOGIC'})),
+            ...this.inventory.launchers.map(i => ({...i, cat:'LAUNCHERS'})),
+            ...this.inventory.modules.map(i => ({...i, cat:'MODULES'})),
+            ...this.inventory.boosters.map(i => ({...i, cat:'BOOSTERS'}))
+        ];
+
+        allHoldings.forEach(item => {
+            if ((item.count || 0) <= 0 && item.charges === undefined) return;
+            
+            const sellPrice = this.calculateValue(item);
+            const card = document.createElement('div');
+            card.className = 'event-card sell-card';
+            card.innerHTML = `
+                <div class="card-body">
+                    ${this.generateCardHTML(item, { showInventory: true })}
+                    <div class="card-price sell">
+                        <span class="label">SELL FOR:</span>
+                        <span class="price-val">${sellPrice}</span><span class="currency">c</span>
+                    </div>
+                </div>
+                <button class="sell-btn">SELL</button>
+            `;
+
+            card.querySelector('.sell-btn').onclick = () => {
+                this.coins += sellPrice;
+                // インベントリから削除
+                this._removeItemFromInventory(item.cat, item.id, item.isEnhanced);
+                document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
+                this.initTradingPost(container); // リフレッシュ
+                this.updateUI();
+            };
+            sellGrid.appendChild(card);
+        });
+
+        sellSection.appendChild(sellGrid);
+        container.appendChild(sellSection);
+    }
+
+    /**
+     * インベントリからアイテムを1つ削除するヘルパー
+     */
+    _removeItemFromInventory(category, id, isEnhanced = false) {
+        let targetList = null;
+        if (category === 'CHASSIS') targetList = this.inventory.chassis;
+        if (category === 'LOGIC') targetList = this.inventory.logic;
+        if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
+        if (category === 'MODULES') targetList = this.inventory.modules;
+        if (category === 'BOOSTERS') targetList = this.inventory.boosters;
+        if (!targetList) return;
+
+        const idx = targetList.findIndex(i => i.id === id && !!i.isEnhanced === isEnhanced);
+        if (idx !== -1) {
+            const item = targetList[idx];
+            if (item.count > 1) {
+                item.count--;
+            } else {
+                targetList.splice(idx, 1);
+            }
+        }
+    }
+
+    /**
+     * REPAIR DOCK の初期化
+     */
+    initRepairDock(container) {
+        this.hasDismantled = this.hasDismantled || false;
+        
+        container.innerHTML = `
+            <div class="repair-dock-layout">
+                <div class="repair-section">
+                    <h3>MAINTENANCE</h3>
+                    <div id="repair-list" class="event-grid"></div>
+                </div>
+                <div class="dismantle-section">
+                    <h3>DISMANTLE & RETRIEVE</h3>
+                    <div id="dismantle-list" class="event-grid"></div>
+                </div>
+            </div>
+        `;
+
+        const repairList = document.getElementById('repair-list');
+        const dismantleList = document.getElementById('dismantle-list');
+
+        // 1. 修理対象 (耐久度があるもの)
+        const repairables = [
+            ...this.inventory.launchers,
+            ...this.inventory.boosters.filter(b => b.maxCharges > 1)
+        ].filter(i => (i.charges !== undefined && i.charges < (i.maxCharges || 2)));
+
+        if (repairables.length === 0) {
+            repairList.innerHTML = '<div class="part-info" style="opacity:0.3; padding:20px;">ALL SYSTEMS INTEGRAL</div>';
+        } else {
+            repairables.forEach(item => {
+                const cost = 20; // 修理固定費
+                const card = document.createElement('div');
+                card.className = 'event-card repair-card';
+                card.innerHTML = `
+                    <div class="card-body">
+                        ${this.generateCardHTML(item, { showInventory: true })}
+                        <div class="card-price">
+                            <span class="label">REPAIR COST:</span>
+                            <span class="price-val">${cost}</span><span class="currency">c</span>
+                        </div>
+                    </div>
+                    <button class="repair-btn" ${this.coins < cost ? 'disabled' : ''}>RESTORE</button>
+                `;
+                card.querySelector('.repair-btn').onclick = () => {
+                    if (this.coins >= cost) {
+                        this.coins -= cost;
+                        item.charges = item.maxCharges || 2;
+                        document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
+                        this.initRepairDock(container);
+                        this.updateUI();
+                    }
+                };
+                repairList.appendChild(card);
+            });
+        }
+
+        // 2. 解体対象 (インベントリ + 装備中のパーツ)
+        const dismantleCandidates = [];
+
+        // インベントリ分
+        [   ...this.inventory.chassis.map(i => ({...i, cat:'CHASSIS', source:'INV'})),
+            ...this.inventory.logic.map(i => ({...i, cat:'LOGIC', source:'INV'})),
+            ...this.inventory.launchers.map(i => ({...i, cat:'LAUNCHERS', source:'INV'})),
+            ...this.inventory.modules.map(i => ({...i, cat:'MODULES', source:'INV'})),
+            ...this.inventory.boosters.map(i => ({...i, cat:'BOOSTERS', source:'INV'}))
+        ].forEach(i => dismantleCandidates.push(i));
+
+        // 装備中の機体パーツ (重要: ユーザー要望)
+        const rocket = this.selection.rocket;
+        if (rocket) {
+            if (rocket.chassis) dismantleCandidates.push({ ...rocket.chassis, cat:'CHASSIS', source:'EQUIPPED', label:'[EQUIPPED]' });
+            if (rocket.logic) dismantleCandidates.push({ ...rocket.logic, cat:'LOGIC', source:'EQUIPPED', label:'[EQUIPPED]' });
+            if (rocket.modules) {
+                for (const [modId, count] of Object.entries(rocket.modules)) {
+                    const master = ITEM_REGISTRY[modId];
+                    if (master) dismantleCandidates.push({ ...master, cat:'MODULES', count, source:'EQUIPPED', label:'[EQUIPPED]' });
+                }
+            }
+            if (rocket.booster) dismantleCandidates.push({ ...rocket.booster, cat:'BOOSTERS', source:'EQUIPPED', label:'[EQUIPPED]' });
+        }
+
+        dismantleCandidates.forEach(item => {
+            if ((item.count || 0) <= 0 && item.charges === undefined && item.source !== 'EQUIPPED') return;
+
+            const card = document.createElement('div');
+            card.className = 'event-card dismantle-card';
+            const displayItem = { ...item, name: (item.label ? `${item.label} ` : '') + (item.name || 'Unknown') };
+            
+            card.innerHTML = `
+                <div class="card-body">
+                    ${this.generateCardHTML(displayItem, { showInventory: true })}
+                    <div class="card-price dismantle">
+                        <span class="label">DISMANTLE FOR:</span>
+                        <span class="price-val">SCRAP</span>
+                    </div>
+                </div>
+                <button class="dismantle-btn">DISMANTLE</button>
+            `;
+
+            card.querySelector('.dismantle-btn').onclick = () => {
+                // 装備中なら解除
+                if (item.source === 'EQUIPPED') {
+                    this.selection.rocket = null;
+                    // 他の装備中パーツをインベントリに戻す必要があるが、
+                    // ここでは単純化のため「今のパーツそのもの」はインベントリに戻るor消える
+                    this.ui.message.textContent = 'UNIT DISASSEMBLED';
+                } else {
+                    this._removeItemFromInventory(item.cat, item.id, item.isEnhanced);
+                }
+                
+                // 還元（現在は簡易的にコイン+50）
+                this.coins += 50;
+                document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
+                this.initRepairDock(container);
+                this.updateUI();
+            };
+            dismantleList.appendChild(card);
+        });
+    }
+
+    /**
+     * BLACK MARKET の初期化
+     */
+    initBlackMarket(container) {
+        container.innerHTML = `
+            <div class="black-market-options">
+                <div class="market-option">
+                    <h3>STREET DEAL</h3>
+                    <p>Total value ~100c items.</p>
+                    <button id="market-btn-100" class="premium-button" ${this.coins < 100 ? 'disabled' : ''}>PAY 100c</button>
+                </div>
+                <div class="market-option highlighted">
+                    <h3>PREMIUM HAUL</h3>
+                    <p>Total value ~600c items (Rarity Bonus).</p>
+                    <button id="market-btn-500" class="premium-button" ${this.coins < 500 ? 'disabled' : ''}>PAY 500c</button>
+                </div>
+            </div>
+            <div id="market-results" class="market-results-area hidden">
+                <h3>OBTAINED ITEMS</h3>
+                <div id="market-results-list" class="event-grid"></div>
+            </div>
+        `;
+
+        document.getElementById('market-btn-100').onclick = () => this.runBlackMarket(100, 100, 0);
+        document.getElementById('market-btn-500').onclick = () => this.runBlackMarket(500, 600, 5);
+    }
+
+    /**
+     * BLACK MARKET の抽選実行
+     */
+    runBlackMarket(cost, targetValue, bonus) {
+        if (this.coins < cost) return;
+        this.coins -= cost;
+        document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
+
+        const obtained = [];
+        let currentValue = 0;
+        
+        while (currentValue < targetValue) {
+            const itemData = this.getWeightedRandomItem({ thresholdBonus: bonus, excludeCargo: true, excludeCoin: true });
+            obtained.push(itemData);
+            currentValue += this.calculateValue(itemData);
+        }
+
+        // インベントリへ追加
+        obtained.forEach(i => this._addItemToInventory(i));
+
+        // 結果表示
+        const resultsArea = document.getElementById('market-results');
+        const list = document.getElementById('market-results-list');
+        resultsArea.classList.remove('hidden');
+        list.innerHTML = '';
+        
+        obtained.forEach(i => {
+            const card = document.createElement('div');
+            card.className = 'event-card obtained-card';
+            card.innerHTML = `
+                <div class="card-body">
+                    ${this.generateCardHTML(i)}
+                </div>
+            `;
+            list.appendChild(card);
+        });
+        
+        // ボタン無効化（1回のみ）
+        document.getElementById('market-btn-100').disabled = true;
+        document.getElementById('market-btn-500').disabled = true;
+        this.updateUI();
+    }
+
+    closeEvent() {
+        const screen = document.getElementById('event-screen');
+        if (screen) screen.classList.add('hidden');
+
+        // 次のステージへ進行
+        this.stageLevel += 1;
+        this.initStage(this.currentStarCount);
+        
+        this.state = 'building';
+        this.selection.rocket = null;
+        this.selection.launcher = null;
+        this.selection.booster = null; 
+        this.ui.message.textContent = ''; 
+        if (this.ship) this.ship.trail = []; 
+        this.checkReadyToAim(); 
+        this.checkGameOver();
+        this.ensurePanelExpanded();
+        this.updateUI();
+    }
+
     closeResult() {
         const overlay = document.getElementById('result-overlay');
         if (overlay) {
@@ -1942,19 +2460,18 @@ export class Game {
 
         const prevState = this.flightResults.status;
         
-        if (prevState === 'success' || prevState === 'cleared') {
-            this.stageLevel += 1;
-            this.initStage(this.currentStarCount); // 成功時はリセット（星とアイテムの再抽選）
+        if (prevState === 'success' || (this.state === 'cleared' || prevState === 'cleared')) {
+            const goal = this.lastHitGoal; 
+            if (goal) {
+                this.handleEvent(goal);
+                return;
+            }
         }
         
-        // 失敗時は星を維持してリトライ
         this.state = 'building';
-        
         if (prevState !== 'returned') {
-            // 帰還以外はロケットの選択状態をクリア
             this.selection.rocket = null;
         }
-        
         this.selection.launcher = null;
         this.selection.booster = null; 
 

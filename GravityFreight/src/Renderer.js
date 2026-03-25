@@ -229,7 +229,79 @@ export class Renderer {
             this.ctx.arc(centerX, centerY, boundaryRadius, startAngle, endAngle);
             this.ctx.stroke();
             
-            // ラベル表示 (削除)
+            // ラベル表示 (曲線配置 - 視認性・順読性 最終改良版)
+            if (goal.label) {
+                this.ctx.save();
+                this.ctx.font = 'bold 30px Orbitron, sans-serif';
+                this.ctx.fillStyle = goal.color;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = goal.color;
+                
+                const text = goal.label;
+                const textRadius = boundaryRadius + 45; 
+                
+                let totalWidth = 0;
+                const charWidths = [];
+                for (let i = 0; i < text.length; i++) {
+                    const w = this.ctx.measureText(text[i]).width + 6;
+                    charWidths.push(w);
+                    totalWidth += w;
+                }
+                const totalTextAngle = totalWidth / textRadius;
+
+                // 2PIで正規化した角度
+                const normalizedAngle = ((goal.angle % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+                
+                // 下半分（概ね 0〜PI：右〜下〜左）かどうかの判定
+                const isBottom = normalizedAngle > 0.0 * Math.PI && normalizedAngle < 1.0 * Math.PI;
+
+                if (isBottom) {
+                    // 下半分：円の外側から見て「左から右」に正立して読めるようにする
+                    // 下半分では角度が増えると右から左へ移動するため、
+                    // 左端（角度大）から開始して、角度を減らしながら（右へ）描画する
+                    let currentAngle = goal.angle + totalTextAngle / 2;
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        const charWidth = charWidths[i];
+                        const charAngle = currentAngle - (charWidth / 2) / textRadius;
+                        
+                        this.ctx.save();
+                        this.ctx.translate(
+                            centerX + Math.cos(charAngle) * textRadius,
+                            centerY + Math.sin(charAngle) * textRadius
+                        );
+                        // 文字を180度反転させて正立させる
+                        this.ctx.rotate(charAngle - Math.PI / 2);
+                        this.ctx.fillText(char, 0, 0);
+                        this.ctx.restore();
+                        
+                        currentAngle -= charWidth / textRadius;
+                    }
+                } else {
+                    // 上半分：通常通り（左端＝角度小 から開始して、角度を増やしながら右へ）
+                    let currentAngle = goal.angle - totalTextAngle / 2;
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        const charWidth = charWidths[i];
+                        const charAngle = currentAngle + (charWidth / 2) / textRadius;
+                        
+                        this.ctx.save();
+                        this.ctx.translate(
+                            centerX + Math.cos(charAngle) * textRadius,
+                            centerY + Math.sin(charAngle) * textRadius
+                        );
+                        // 通常の外向き配置
+                        this.ctx.rotate(charAngle + Math.PI / 2);
+                        this.ctx.fillText(char, 0, 0);
+                        this.ctx.restore();
+                        
+                        currentAngle += charWidth / textRadius;
+                    }
+                }
+                this.ctx.restore();
+            }
             this.ctx.restore();
         });
         
