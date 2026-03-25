@@ -52,8 +52,8 @@ describe('Game Item Rarity Logic', () => {
         let spawnedItems = [];
         for(let i=0; i<100; i++) {
             const result = game.getWeightedRandomItem();
-            if (result && result.item.rarity) {
-                spawnedItems.push(result.item.rarity);
+            if (result && result.rarity) {
+                spawnedItems.push(result.rarity);
             }
         }
         
@@ -69,8 +69,8 @@ describe('Game Item Rarity Logic', () => {
         let spawnedItems = [];
         for(let i=0; i<1000; i++) {
             const result = game.getWeightedRandomItem();
-            if (result && result.item.rarity) {
-                spawnedItems.push(result.item.rarity);
+            if (result && result.rarity) {
+                spawnedItems.push(result.rarity);
             }
         }
         expect(spawnedItems.includes(RARITY.RARE)).toBe(true);

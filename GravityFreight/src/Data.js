@@ -19,7 +19,7 @@ export const CATEGORY_COLORS = {
     LAUNCHERS: '#4caf50',
     MODULES: '#9c27b0',
     BOOSTERS: '#795548',
-    UNIT: '#e0e0ff',
+    UNIT: '#ffffff',
     COIN: '#ffd700',
     CARGO: '#00e5ff'
 };
