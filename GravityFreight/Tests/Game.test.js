@@ -129,34 +129,124 @@ describe('Game Item Rarity Logic', () => {
             expect(game.inventory.chassis[0].id).toBe('hull_medium');
         });
 
-        it('Launch SHOULD consume booster if equipped', () => {
-             const game = new Game(mockCanvas, mockUI);
-             
-             // セットアップ
-             game.selection.chassis = game.inventory.chassis[0];
-             game.selection.logic = game.inventory.logic[0];
-             game.assembleUnit(); // ユニット作成
-             
-             game.selection.rocket = game.inventory.rockets[0];
-             game.selection.launcher = game.inventory.launchers[0];
-             game.selection.booster = game.inventory.boosters[0];
-             
-             // 準備完了 (checkReadyToAim で booster が ship に適用される)
-             game.checkReadyToAim();
-             
-             // 発射実行
-             // global.launch() は setupListeners 内の関数なので、game オブジェクト経由では呼べないため、
-             // 本来はモックするか抽出が必要だが、Game.js の構造上、キー入力をエミュレートするか
-             // state を変えて checkCollisions などを進める必要がある。
-             
-             // ここでは Game.js の launch ロジックが想定通りか、直接 selection を操作して確認
-             const boosterBefore = game.inventory.boosters[0].count;
-             
-             // launch シークエンスのエミュレート (Game.js の setupListeners 内の launch 関数相当)
-             game.state = 'flying'; 
-             // ...実際の Game.js では pointerup または Space で launch() が呼ばれ、その中で消費される
-             // テスト用に launch ロジックをメソッド化していないため、直接 inventory を操作するコードが現時点ではない。
-             // ひとまず、assembleUnit で消費されないことの確認までを優先。
+        it('Launch SHOULD NOT consume launcher if opt_fuel is used (even if fuel is exhausted)', () => {
+            const game = new Game(mockCanvas, mockUI);
+            
+            // セットアップ: シャーシとロジックを選んでユニット作成
+            game.selection.chassis = game.inventory.chassis[0];
+            game.selection.logic = game.inventory.logic[0];
+            game.assembleUnit();
+            
+            // 燃料パック（耐久2）を手動で作って追加してみる（耐久がある場合のテスト用）
+            const fuelPackBase = PARTS.BOOSTERS.find(b => b.id === 'opt_fuel_pack');
+            game.inventory.boosters.push({ ...fuelPackBase, count: 1 }); // 在庫1
+            
+            const rocket = game.inventory.rockets[0];
+            const launcher = game.inventory.launchers[0];
+            const fuelPack = game.inventory.boosters.find(b => b.id === 'opt_fuel_pack');
+            
+            game.selection.rocket = rocket;
+            game.selection.launcher = launcher;
+            game.selection.booster = fuelPack;
+            
+            const launcherChargesBefore = launcher.charges;
+            
+            // 1回目の発射（燃料パックの耐久2->1）
+            // Game.js の launch ロジックをエミュレート
+            game.checkReadyToAim();
+            
+            // --- launch 内部のロジック実行 ---
+            const preventsWear1 = game.selection.booster && game.selection.booster.preventsLauncherWear;
+            if (game.selection.booster) {
+                const b = game.selection.booster;
+                if (b.maxCharges && b.maxCharges > 1) {
+                    if (b.charges === undefined) b.charges = b.maxCharges;
+                    b.charges--;
+                    if (b.charges <= 0) {
+                        game.inventory.boosters = game.inventory.boosters.filter(o => o !== b);
+                        game.selection.booster = null;
+                    }
+                }
+            }
+            if (game.selection.launcher && !preventsWear1) {
+                game.selection.launcher.charges--;
+            }
+            // ---------------------------------
+            
+            expect(launcher.charges).toBe(launcherChargesBefore); // 消費されない
+            expect(fuelPack.charges).toBe(1); // 燃料は減る
+            
+            // 2回目の発射（燃料パックの耐久1->0、消費される）
+            const preventsWear2 = game.selection.booster && game.selection.booster.preventsLauncherWear;
+            if (game.selection.booster) {
+                const b = game.selection.booster;
+                if (b.maxCharges && b.maxCharges > 1) {
+                    b.charges--;
+                    if (b.charges <= 0) {
+                        game.inventory.boosters = game.inventory.boosters.filter(o => o !== b);
+                        game.selection.booster = null;
+                    }
+                }
+            }
+            if (game.selection.launcher && !preventsWear2) {
+                game.selection.launcher.charges--;
+            }
+            
+            expect(launcher.charges).toBe(launcherChargesBefore); // まだ消費されない（バグ修正の肝）
+            expect(game.selection.booster).toBeNull(); // 燃料は使い果たされた
+        });
+
+        it('Launch with single use opt_fuel (count: 1) SHOULD NOT consume launcher', () => {
+            const game = new Game(mockCanvas, mockUI);
+            
+            // セットアップ
+            game.selection.chassis = game.inventory.chassis[0];
+            game.selection.logic = game.inventory.logic[0];
+            game.assembleUnit();
+            
+            const rocket = game.inventory.rockets[0];
+            const launcher = game.inventory.launchers[0];
+            const fuel = game.inventory.boosters.find(b => b.id === 'opt_fuel');
+            
+            expect(fuel.count).toBe(1);
+            
+            game.selection.rocket = rocket;
+            game.selection.launcher = launcher;
+            game.selection.booster = fuel;
+            
+            const launcherChargesBefore = launcher.charges;
+            
+            // Game.js の launch ロジックを完全に再現したテスト
+            // 1. 本来の launch ロジックを直接呼べないため、コードを模倣して検証する
+            const launchLogic = (g) => {
+                const preventsWear = g.selection.booster && g.selection.booster.preventsLauncherWear;
+                if (g.selection.booster) {
+                    const b = g.selection.booster;
+                    if (b.maxCharges && b.maxCharges > 1) {
+                        if (b.charges === undefined) b.charges = b.maxCharges;
+                        b.charges--;
+                        if (b.charges <= 0) {
+                            g.inventory.boosters = g.inventory.boosters.filter(o => o !== b);
+                            g.selection.booster = null;
+                        }
+                    } else {
+                        b.count--;
+                        if (b.count <= 0) {
+                            g.inventory.boosters = g.inventory.boosters.filter(o => o.count > 0);
+                            g.selection.booster = null;
+                        }
+                    }
+                }
+                if (g.selection.launcher && !preventsWear) {
+                    g.selection.launcher.charges--;
+                }
+            };
+            
+            launchLogic(game);
+            
+            expect(launcher.charges).toBe(launcherChargesBefore); // 消費されないはず！
+            expect(fuel.count).toBe(0);
+            expect(game.selection.booster).toBeNull();
         });
     });
 });

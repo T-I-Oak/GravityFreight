@@ -322,6 +322,7 @@ export class Game {
                 }
 
                 // ブースターの消費処理
+                const preventsWear = this.selection.booster && this.selection.booster.preventsLauncherWear;
                 if (this.selection.booster) {
                     const b = this.selection.booster;
                     if (b.maxCharges && b.maxCharges > 1) {
@@ -343,7 +344,6 @@ export class Game {
                 }
 
                 // ランチャーの消費処理 (耐久減少を防ぐブースターを使用していない場合のみ)
-                const preventsWear = this.selection.booster && this.selection.booster.preventsLauncherWear;
                 if (this.selection.launcher && !preventsWear) {
                     this.selection.launcher.charges--;
                     if (this.selection.launcher.charges <= 0) {
