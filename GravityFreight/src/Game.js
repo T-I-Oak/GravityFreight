@@ -63,6 +63,8 @@ export class Game {
         this.pendingGoalBonus = 0; // ゴールボーナスの保留
         this.pendingScore = 0; // その他のボーナスの保留
         this.pendingCoins = 0; // コイン報酬の保留
+        this.isAnimatingScore = false;
+        this.isAnimatingCoins = false;
 
         // リザルト追跡用
         this.flightResults = {
@@ -1167,8 +1169,8 @@ export class Game {
         const coinDiff = this.coins - this.displayCoins;
 
         if (Math.abs(scoreDiff) > 0.1 || Math.abs(coinDiff) > 0.1) {
-            this.displayScore += scoreDiff * 0.1;
-            this.displayCoins += coinDiff * 0.1;
+            if (!this.isAnimatingScore) this.displayScore += scoreDiff * 0.1;
+            if (!this.isAnimatingCoins) this.displayCoins += coinDiff * 0.1;
             this.updateUI();
         } else if (this.displayScore !== this.score || this.displayCoins !== this.coins) {
             this.displayScore = this.score;
@@ -2124,14 +2126,31 @@ export class Game {
             el.textContent = end.toLocaleString();
             return;
         }
+
+        // フラグセット
+        if (el.id === 'coin-display' || el.id === 'event-player-credits') this.isAnimatingCoins = true;
+        if (el.id === 'score-display' || el.id === 'score-total') this.isAnimatingScore = true;
+
         let startTimestamp = null;
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
             const value = Math.floor(progress * (end - start) + start);
             el.textContent = value.toLocaleString();
+
+            // --- 追加: 表示用変数との同期 (v0.5.4 共通化対応) ---
+            if (el.id === 'coin-display' || el.id === 'event-player-credits') {
+                this.displayCoins = value;
+            } else if (el.id === 'score-display' || el.id === 'score-total') {
+                this.displayScore = value;
+            }
+
             if (progress < 1) {
                 window.requestAnimationFrame(step);
+            } else {
+                // 完了時にフラグ解除
+                if (el.id === 'coin-display' || el.id === 'event-player-credits') this.isAnimatingCoins = false;
+                if (el.id === 'score-display' || el.id === 'score-total') this.isAnimatingScore = false;
             }
         };
         window.requestAnimationFrame(step);
@@ -2500,8 +2519,7 @@ export class Game {
             this.animateValue(hudCoinsEl, startVal, endVal, 800);
         }
 
-        // displayCoins を即座に更新し、update(dt) によるデフォルトアニメーション（競合）を防止
-        this.displayCoins = endVal;
+
 
         // アニメーション用の浮遊テキスト生成
         const popup = document.createElement('div');
