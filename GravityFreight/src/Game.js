@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.5.1'; // UI Refinement & Enhanced Card Icons (v0.5.1)
+        this.version = '0.5.2'; // UI Overlap Fix & Layout Adjustments (v0.5.2)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
