@@ -24,7 +24,6 @@ export class Game {
         this.width = canvas.width;
         this.height = canvas.height;
         this.isPointerDown = false;
-        this.isAimingDrag = false;
         this.activePointers = new Map();
         this.lastPinchDist = 0;
 
@@ -246,13 +245,8 @@ export class Game {
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
 
-            // UI上の操作（ボタン等）の時はエイム操作（自機の向き変更）をスキップする
-            if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) {
-                return;
-            }
-
-            // エイム操作自体の実行 (マップ上からドラッグ中のみ)
-            if (this.state === 'aiming' && this.isAimingDrag) {
+            // エイム操作自体の実行 (マップ上からドラッグ中のみ | pointerdown時にUI外ならisPointerDownがtrueになる)
+            if (this.state === 'aiming' && this.isPointerDown) {
                 const worldPos = this.getWorldPos(this.mousePos);
                 const dir = worldPos.sub(this.homeStar.position).normalize();
                 this.ship.position = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
@@ -404,10 +398,7 @@ export class Game {
             
             if (isUI) return;
             
-            // マップ上からのドラッグ開始としてマーク
-            if (this.state === 'aiming') {
-                this.isAimingDrag = true;
-            }
+            this.isPointerDown = true;
 
             // ポインター位置を更新（タップした瞬間に照準を合わせるため）
             updatePointer(e);
@@ -488,7 +479,6 @@ export class Game {
             this.activePointers.delete(e.pointerId);
             if (this.activePointers.size === 0) {
                 this.isPointerDown = false;
-                this.isAimingDrag = false;
             }
             if (this.activePointers.size < 2) {
                 this.lastPinchDist = 0;
