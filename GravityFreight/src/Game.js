@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.4.12'; // Unified prediction & launch direction (v0.4.12)
+        this.version = '0.5.1'; // UI Refinement & Enhanced Card Icons (v0.5.1)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -877,7 +877,11 @@ export class Game {
         if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore);
         
         const coinDisplay = document.getElementById('coin-display');
-        if (coinDisplay) coinDisplay.textContent = Math.floor(this.displayCoins);
+        const eventCredits = document.getElementById('event-player-credits');
+        const displayVal = Math.floor(this.displayCoins);
+        
+        if (coinDisplay) coinDisplay.textContent = displayVal.toLocaleString();
+        if (eventCredits) eventCredits.textContent = displayVal.toLocaleString();
         if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore).toLocaleString();
 
         // タブの表示切り替え
@@ -964,40 +968,38 @@ export class Game {
     generateCardHTML(itemData, options = {}) {
         if (!itemData) return '';
         
-        const item = itemData; // テンプレート内での参照用
+        const item = itemData;
         const category = itemData.category || 'CHASSIS';
         const categoryColor = CATEGORY_COLORS[category] || '#fff';
-        const isEnhanced = (itemData.enhancementCount || 0) > 0;
         const selectionCount = options.selectionCount || 0;
         const showInventory = options.showInventory || false;
         const isSelected = options.isSelected || false;
+        const enhancements = itemData.enhancements || {};
+        const isUnit = category === 'UNIT';
 
-        // --- 1. バッジ・強化星印 ---
-        let badge = '';
-        if (isEnhanced) {
-            badge = `<div class="rarity-badge-star" style="position:absolute; top:-6px; right:-6px; font-size:12px; filter:drop-shadow(0 0 4px ${categoryColor}); z-index:2;">${'★'.repeat(itemData.enhancementCount)}</div>`;
-        }
-
-        // --- 2. 数量・耐久表示 ---
+        // --- 1. 数量・耐久表示 (右肩ゲージ) ---
         let invInfo = "";
-        if (showInventory) {
-            if (itemData.charges !== undefined || itemData.maxCharges !== undefined) {
-                const max = itemData.maxCharges || 2;
-                const current = itemData.charges !== undefined ? itemData.charges : max;
-                let segments = '';
-                for (let i = 0; i < max; i++) {
-                    segments += `<div class="hp-segment ${i < current ? 'active' : ''}" style="width:8px; height:4px; background:${i < current ? '#fff' : 'rgba(255,255,255,0.1)'}; border-radius:1px;"></div>`;
-                }
-                invInfo = `<div class="hp-gauge" style="display: flex; gap: 2px;">${segments}</div>`;
-            } else if (itemData.count > 1) {
-                invInfo = `<span class="inventory-badge" style="font-size: 10px; color: rgba(255,255,255,0.6); font-weight:bold;">x ${itemData.count}</span>`;
+        const hasCharges = itemData.charges !== undefined || itemData.maxCharges !== undefined;
+        if (showInventory && hasCharges) {
+            const max = itemData.maxCharges || 2;
+            const current = itemData.charges !== undefined ? item.charges : max;
+            const isChargeEnhanced = enhancements.charges > 0;
+            
+            let segments = '';
+            for (let i = 0; i < max; i++) {
+                segments += `<div class="hp-segment ${i < current ? 'active' : ''}" style="width:8px; height:4px; background:${i < current ? (isChargeEnhanced ? '#ffd700' : '#fff') : 'rgba(255,255,255,0.1)'}; border-radius:1px;"></div>`;
             }
+            // 強化時は枠線を表示
+            invInfo = `<div class="hp-gauge ${isChargeEnhanced ? 'enhanced-frame' : ''}" style="display: flex; gap: 2px; padding: 2px;">${segments}</div>`;
+        } else if (showInventory && itemData.count > 1) {
+            invInfo = `<span class="inventory-badge" style="font-size: 10px; color: rgba(255,255,255,0.6); font-weight:bold;">[x ${itemData.count}]</span>`;
         }
+
         const selTag = (selectionCount > 0) ? ` <span class="selection-badge" style="color: #ffcc00; font-weight: bold;">[${selectionCount}]</span>` : '';
         const extraBadge = options.badge || '';
         const indent = options.indent || 0;
 
-        // --- 3. デザインの集約（コンパクトかつプレミアム） ---
+        // --- 2. コンテナスタイル ---
         const itemContainerStyle = `
             position: relative;
             border-left: 5px solid ${categoryColor};
@@ -1014,22 +1016,73 @@ export class Game {
             border-bottom: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
         `;
 
+        // --- 3. パラメータタグの生成 (4項目) ---
+        const stats = [];
+        if (item.slots !== undefined && item.slots > 0) {
+            stats.push({ label: 'SLOTS', val: item.slots, enhanced: enhancements.slots > 0 });
+        }
+        if (item.precisionMultiplier !== undefined && item.precisionMultiplier !== 1.0) {
+            stats.push({ label: 'PRECISION', val: `x${item.precisionMultiplier.toFixed(1)}`, enhanced: enhancements.precision > 0 });
+        }
+        if (item.pickupMultiplier !== undefined && item.pickupMultiplier !== 1.0) {
+            stats.push({ label: 'PICKUP', val: `x${item.pickupMultiplier.toFixed(1)}`, enhanced: enhancements.pickup > 0 });
+        }
+        if (item.gravityMultiplier !== undefined && item.gravityMultiplier !== 1.0) {
+            stats.push({ label: 'GRAVITY', val: `x${item.gravityMultiplier.toFixed(1)}`, enhanced: enhancements.gravity > 0 });
+        }
+
+        const statsHtml = stats.map(s => `
+            <div class="stat-tag ${s.enhanced ? 'enhanced-border' : ''}">
+                <span class="stat-label">${s.label}</span>
+                <span class="stat-val">${s.val}${s.enhanced ? '<span style="color:#00d4ff; font-size:8px; margin-left:2px;">✦</span>' : ''}</span>
+            </div>
+        `).join('');
+
+        // --- 4. ユニット詳細 (モジュールリスト) ---
+        let unitDetailsHtml = '';
+        if (isUnit && item.modules) {
+            const moduleRows = [];
+            for (const [modId, count] of Object.entries(item.modules)) {
+                const master = ITEM_REGISTRY[modId];
+                if (master) {
+                    let mGauge = '';
+                    if (master.maxCharges) {
+                        const totalMax = master.maxCharges * count;
+                        // ユニット内での各モジュールの現在値管理が実装されていない場合は、とりあえず最大値を表示
+                        // 本来は unit.moduleCharges[modId] などで管理すべき
+                        const current = totalMax; 
+                        let mSegments = '';
+                        for(let i=0; i<totalMax; i++) {
+                            mSegments += `<div style="width:4px; height:3px; background:#fff; border-radius:1px; flex-shrink:0;"></div>`;
+                        }
+                        mGauge = `<div style="display:flex; gap:1px; margin-left:8px; opacity:0.6;">${mSegments}</div>`;
+                    }
+                    moduleRows.push(`
+                        <div class="unit-module-row">
+                            <span class="unit-module-name">${master.name}</span>
+                            <div style="display:flex; align-items:center;">
+                                <span class="inventory-badge">[x ${count}]</span>
+                                ${mGauge}
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+            unitDetailsHtml = `<div class="unit-details">${moduleRows.join('')}</div>`;
+        }
+
         return `
             <div class="part-item-container" style="${itemContainerStyle}">
-                ${badge}
                 ${extraBadge ? `<div style="position:absolute; top:4px; right:4px;">${extraBadge}</div>` : ''}
                 <div class="part-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                     <span class="part-name" style="font-weight: 800; font-size: 13px; color: #fff;">${item.name || 'Unknown'}${selTag}</span>
                     ${invInfo}
                 </div>
                 <div class="part-info" style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 6px;">${item.description || ''}</div>
-                <div class="part-stats" style="display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px;">
-                    ${(item.slots !== undefined && item.slots > 0) ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">SLOTS</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">${item.slots}</span></div>` : ''}
-                    ${item.score ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">COINS</span><span class="val" style="font-size: 10px; color: #ffd700; font-weight: bold;">+${item.score}</span></div>` : ''}
-                    ${item.precisionMultiplier !== undefined ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">PRECISION</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">x${item.precisionMultiplier.toFixed(1)}</span></div>` : ''}
-                    ${item.pickupMultiplier !== undefined ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">PICKUP</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">x${item.pickupMultiplier.toFixed(1)}</span></div>` : ''}
-                    ${item.gravityMultiplier !== undefined ? `<div class="stat"><span class="label" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-right: 4px;">GRAVITY</span><span class="val" style="font-size: 10px; color: #fff; font-weight: bold;">x${item.gravityMultiplier.toFixed(1)}</span></div>` : ''}
+                <div class="part-stats" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    ${statsHtml}
                 </div>
+                ${unitDetailsHtml}
             </div>
         `;
     }
@@ -1468,6 +1521,7 @@ export class Game {
         
         // 強化回数の管理
         item.enhancementCount = (item.enhancementCount || 0) + 1;
+        item.enhancements = item.enhancements || {};
         
         // 有効な強化オプションのリストアップ
         const options = [];
@@ -1482,6 +1536,9 @@ export class Game {
         // ランダムに1つ適用
         const chosen = options[Math.floor(Math.random() * options.length)];
         let log = "";
+        
+        // 個別強化カウントの更新
+        item.enhancements[chosen] = (item.enhancements[chosen] || 0) + 1;
         
         switch (chosen) {
             case 'slots':
@@ -2069,7 +2126,7 @@ export class Game {
         const contentEl = document.getElementById('event-content');
         const continueBtn = document.getElementById('event-continue-btn');
 
-        if (creditsEl) creditsEl.textContent = this.coins.toLocaleString();
+        // creditsElはupdateUIで更新されるため、ここでは不要
         if (contentEl) contentEl.innerHTML = ''; // クリア
 
         // 拠点タイプに応じた初期設定
@@ -2138,11 +2195,11 @@ export class Game {
             const btn = card.querySelector('.buy-btn');
             btn.onclick = () => {
                 if (this.coins >= buyPrice) {
+                    this.animateCoinChange(-buyPrice);
                     this.coins -= buyPrice;
                     this._addItemToInventory(itemData);
                     btn.disabled = true;
                     btn.textContent = 'SOLD OUT';
-                    document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
                     this.updateUI();
                 }
             };
@@ -2188,10 +2245,10 @@ export class Game {
             `;
 
             card.querySelector('.sell-btn').onclick = () => {
+                this.animateCoinChange(sellPrice);
                 this.coins += sellPrice;
                 // インベントリから削除
                 this._removeItemFromInventory(item.cat, item.id, item.isEnhanced);
-                document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
                 this.initTradingPost(container); // リフレッシュ
                 this.updateUI();
             };
@@ -2281,9 +2338,9 @@ export class Game {
                 `;
                 card.querySelector('.repair-btn').onclick = () => {
                     if (this.coins >= cost) {
+                        this.animateCoinChange(-cost);
                         this.coins -= cost;
                         item.charges = Math.min(item.charges + 1, item.maxCharges || 2);
-                        document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
                         addLog(`RESTORED: ${item.name} (+1 charge)`);
                         this.initRepairDock(container);
                         this.updateUI();
@@ -2327,9 +2384,9 @@ export class Game {
                 card.querySelector('.dismantle-btn').onclick = () => {
                     if (this.coins < cost) return;
 
+                    this.animateCoinChange(-cost);
                     this.coins -= cost;
                     this.dismantleCount++;
-                    document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
                     
                     addLog(`--- DISMANTLING: ${unit.name} ---`);
                     
@@ -2395,12 +2452,49 @@ export class Game {
     }
 
     /**
+     * コインの増減アニメーション
+     */
+    animateCoinChange(amount) {
+        if (amount === 0) return;
+        
+        const creditsEl = document.getElementById('event-player-credits');
+        const hudCoinsEl = document.getElementById('coin-display');
+        
+        // アニメーション用の浮遊テキスト生成
+        const popup = document.createElement('div');
+        popup.className = `coin-popup ${amount > 0 ? 'coin-plus' : 'coin-minus'}`;
+        popup.textContent = (amount > 0 ? '+' : '') + amount.toLocaleString();
+        
+        // 表示位置の決定
+        if (creditsEl && creditsEl.offsetParent !== null) {
+            const rect = creditsEl.getBoundingClientRect();
+            popup.style.left = (rect.left + rect.width / 2) + 'px';
+            popup.style.top = rect.top + 'px';
+            
+            // クレジット数値にパルス効果
+            creditsEl.classList.add('pulse');
+            setTimeout(() => creditsEl.classList.remove('pulse'), 300);
+        } else if (hudCoinsEl) {
+            const rect = hudCoinsEl.getBoundingClientRect();
+            popup.style.left = (rect.left + rect.width / 2) + 'px';
+            popup.style.top = rect.top + 'px';
+            
+            hudCoinsEl.classList.add('pulse');
+            setTimeout(() => hudCoinsEl.classList.remove('pulse'), 300);
+        }
+        
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 800);
+    }
+
+    /**
      * BLACK MARKET の抽選実行
      */
     runBlackMarket(cost, targetValue, bonus) {
         if (this.coins < cost) return;
+        this.animateCoinChange(-cost);
         this.coins -= cost;
-        document.getElementById('event-player-credits').textContent = this.coins.toLocaleString();
+        this.updateUI();
 
         const obtained = [];
         let currentValue = 0;
