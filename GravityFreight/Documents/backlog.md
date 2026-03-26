@@ -77,18 +77,16 @@
 - [ ] **背景のワープ演出**: ステージクリア（セクター移動）時、背景の星が加速し、現在のステージが手前に拡大消去、次のステージが奥から拡大出現する演出。
 - [ ] **状況に応じた動的エフェクト**: 加速時やアイテム取得時、および境界付近での警告演出などの強化。
 
-## 7. 最新仕様 (spec.md v1.0.0) に基づく修正タスク
+## 7. 最新仕様 (spec.md v1.0.0) に基づく修正タスク - [完了]
 
-仕様書 (`spec.md`) v1.0.0 への刷新に伴い、現在の実装コードと乖離が生じている箇所の修正、および実装済み項目の確認結果を管理します。
+仕様書 (`spec.md`) v1.0.0 への刷新に伴い必要となった、抽選アルゴリズムの刷新を完了しました。
 
-- [ ] **`getSectorItemThreshold()` の修正**
-    - 現状: `9 + (this.stageLevel || 1)` (第1ステージで 10)
-    - 目標: `RARITY.RARE + (this.stageLevel - 1)` 等、RARE の出現率（定数 `15`）をベースに算出するように変更する。
-- [ ] **`getWeightedRandomItem()` の修正**
-    - 現状: 固定重み分岐（COMMON=100, UNCOMMON=30, RARE=10）
-    - 目標: 重み計算を `const weight = Math.max(0, threshold - item.rarity)` に変更する「逆転方式」への刷新。
-- [ ] **アイテムの除外ロジックの強化**: 重みが 0 以下の場合は抽選リストから確実に除外すること。
-- [ ] **thresholdBonus の反映確認**: Black Market 等のボーナスが、新重み計算に正しく反映されることを再検証。
+- [x] **`getSectorItemThreshold()` の修正**
+    - `RARITY.RARE + (this.stageLevel - 1)` 等、RARE の出現率（定数 `15`）をベースに算出するように変更。
+- [x] **`getWeightedRandomItem()` の修正**
+    - 重み計算を `const weight = Math.max(1, threshold - item.rarity)` に変更する「逆転方式」へ刷新。
+- [x] **アイテムの除外ロジックの強化**: 重みが 0 以下の場合は抽選リストから確実に除外。
+- [x] **thresholdBonus の反映確認**: Black Market や Delivery Bonus のボーナスが、新重み計算に正しく反映されることを検証済み。
 
 ## 8. v2 以降に向けた機能要望 (Future Roadmap)
 - [ ] **アイテムごとの画像設定**: カード背景に各アイテムの個別画像を表示し、視認性と没入感を向上。

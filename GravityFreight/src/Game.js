@@ -1514,8 +1514,8 @@ export class Game {
      * セクター半径に応じたアイテム出現閾値を取得 (v0.5.1 修正)
      */
     getSectorItemThreshold() {
-        // ステージ1で10、そこからステージごとに1ずつ加算
-        return 9 + (this.stageLevel || 1);
+        // ステージ1で RARITY.RARE (15)、以降ステージごとに+1 (spec.md 7.2 準拠)
+        return RARITY.RARE + ((this.stageLevel || 1) - 1);
     }
 
     /**
@@ -1599,13 +1599,14 @@ export class Game {
 
         const items = [];
         pools.forEach(p => {
+            if (!p.list) return;
             p.list.forEach(item => {
-                let weight = 0;
-                if (item.rarity === RARITY.COMMON) weight = 100;
-                else if (item.rarity === RARITY.UNCOMMON && threshold >= 10) weight = 30;
-                else if (item.rarity === RARITY.RARE && threshold >= 12) weight = 10;
-                
-                if (weight > 0) items.push({ ...item, category: p.category, weight });
+                // 出現しきい値以上のアイテムのみを対象とする
+                if (threshold >= item.rarity) {
+                    // 重み計算: しきい値とレアリティの差分 (最小 1)
+                    const weight = Math.max(1, threshold - item.rarity);
+                    items.push({ ...item, category: p.category, weight });
+                }
             });
         });
 
