@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.5.3'; // Dynamic Labels & Game Over Logic (v0.5.3)
+        this.version = '0.5.4'; // Coin Animation Sync & Game Over Improvements (v0.5.4)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -2482,6 +2482,20 @@ export class Game {
         const creditsEl = document.getElementById('event-player-credits');
         const hudCoinsEl = document.getElementById('coin-display');
         
+        // --- 数値のカウントアップ/ダウンアニメーション (v0.5.4 共通化) ---
+        const startVal = this.displayCoins;
+        const endVal = this.displayCoins + amount;
+
+        if (creditsEl) {
+            this.animateValue(creditsEl, startVal, endVal, 800);
+        }
+        if (hudCoinsEl) {
+            this.animateValue(hudCoinsEl, startVal, endVal, 800);
+        }
+
+        // displayCoins を即座に更新し、update(dt) によるデフォルトアニメーション（競合）を防止
+        this.displayCoins = endVal;
+
         // アニメーション用の浮遊テキスト生成
         const popup = document.createElement('div');
         popup.className = `coin-popup ${amount > 0 ? 'coin-plus' : 'coin-minus'}`;

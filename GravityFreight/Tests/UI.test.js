@@ -30,7 +30,8 @@ global.document = {
 global.window = {
     addEventListener: vi.fn(),
     innerWidth: 1024,
-    innerHeight: 768
+    innerHeight: 768,
+    requestAnimationFrame: vi.fn()
 };
 
 import { Game } from '../src/Game.js';
