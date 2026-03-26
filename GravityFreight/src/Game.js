@@ -1494,10 +1494,10 @@ export class Game {
         const max = item.maxCharges !== undefined ? item.maxCharges : (master.maxCharges || 0);
         const cur = item.charges !== undefined ? item.charges : max;
         
-        // 3. ベース価格の算出 (以前の正しかった仕様: 10/20/30)
-        let base = 10;
-        if (rarity === RARITY.UNCOMMON) base = 20;
-        if (rarity === RARITY.RARE) base = 30;
+        // 3. ベース価格の算出 (新仕様: 20/40/60)
+        let base = 20;
+        if (rarity === RARITY.UNCOMMON) base = 40;
+        if (rarity === RARITY.RARE) base = 60;
         
         // 4. コンディション補正 (耐久度)
         const condition = (max > 0) ? (cur + 1) / (max + 1) : 1.0;
