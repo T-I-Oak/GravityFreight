@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.5.4'; // Coin Animation Sync & Game Over Improvements (v0.5.4)
+        this.version = '0.5.5'; // UI Panel Aim Interference Fix (v0.5.5)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -245,12 +245,7 @@ export class Game {
             this.mousePos.x = e.clientX;
             this.mousePos.y = e.clientY;
 
-            // UI上の操作（ボタン等）の時はエイム操作（自機の向き変更）をスキップする
-            if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) {
-                return;
-            }
-
-            // エイム操作自体の実行 (クリック中のみ)
+            // エイム操作自体の実行 (マップ上からドラッグ中のみ | pointerdown時にUI外ならisPointerDownがtrueになる)
             if (this.state === 'aiming' && this.isPointerDown) {
                 const worldPos = this.getWorldPos(this.mousePos);
                 const dir = worldPos.sub(this.homeStar.position).normalize();
@@ -396,8 +391,15 @@ export class Game {
             }
 
             // UI上のクリックはスルー
-            if (e.target.closest('#build-overlay') || e.target.closest('#launch-btn')) return;
+            const isUI = e.target.closest('#build-overlay') || 
+                         e.target.closest('#launch-control') || 
+                         e.target.closest('#result-overlay') || 
+                         e.target.closest('#event-screen');
             
+            if (isUI) return;
+            
+            this.isPointerDown = true;
+
             // ポインター位置を更新（タップした瞬間に照準を合わせるため）
             updatePointer(e);
 
@@ -723,6 +725,7 @@ export class Game {
     }
 
     checkReadyToAim() {
+        const prevState = this.state;
         if (this.selection.rocket && this.selection.launcher) {
             const rocket = this.selection.rocket;
             const booster = this.selection.booster;
@@ -771,10 +774,13 @@ export class Game {
             }));
             
             // 角度の初期同期 (マウス位置に基づく)
-            const worldMouse = this.getWorldPos(this.mousePos);
-            const dir = worldMouse.sub(this.homeStar.position).normalize();
-            this.ship.position = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
-            this.ship.rotation = Math.atan2(dir.y, dir.x);
+            // ただし、既にエイム中の場合は現在の向きを維持し、UIクリックによる意図しない向きの変更を防ぐ
+            if (prevState !== 'aiming') {
+                const worldMouse = this.getWorldPos(this.mousePos);
+                const dir = worldMouse.sub(this.homeStar.position).normalize();
+                this.ship.position = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
+                this.ship.rotation = Math.atan2(dir.y, dir.x);
+            }
         } else {
             this.state = 'building';
         }
