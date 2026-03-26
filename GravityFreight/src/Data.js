@@ -12,6 +12,8 @@ export const RARITY = {
     RARE: 15
 };
 
+export const ANIMATION_DURATION = 800; // ミリ秒単位
+
 // カテゴリ別のイメージカラー定義（spec.mdと同期）
 export const CATEGORY_COLORS = {
     CHASSIS: '#ffab40',

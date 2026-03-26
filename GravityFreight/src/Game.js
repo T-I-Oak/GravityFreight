@@ -1,4 +1,4 @@
-import { PARTS, ITEM_REGISTRY, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, INITIAL_INVENTORY, RARITY, hexToRgba } from './Data.js';
+import { PARTS, ITEM_REGISTRY, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, INITIAL_INVENTORY, RARITY, ANIMATION_DURATION, hexToRgba } from './Data.js';
 import { PhysicsEngine, Body, Vector2, calculateAcceleration, getDistanceSqToSegment } from './Physics.js';
 
 export class Game {
@@ -1327,7 +1327,7 @@ export class Game {
             const body = hitBody;
             if (body === this.homeStar) {
                 this.state = 'returned';
-                this.stateTimer = 0.8; 
+                this.stateTimer = ANIMATION_DURATION / 1000; 
                 this.ui.message.textContent = '';
                 this.resolveItems('returned'); 
             } else {
@@ -1358,7 +1358,7 @@ export class Game {
                 }
 
                 this.state = 'crashed';
-                this.stateTimer = 0.8; 
+                this.stateTimer = ANIMATION_DURATION / 1000; 
                 this.ui.message.textContent = '';
                 this.consumeRocketOnFailure(); 
                 this.resolveItems('crashed', body); 
@@ -1399,7 +1399,7 @@ export class Game {
 
             if (hitGoal) {
                 this.state = 'cleared';
-                this.stateTimer = 0.8;
+                this.stateTimer = ANIMATION_DURATION / 1000; 
                 this.lastHitGoal = hitGoal; // 拠点を保存
                 this.pendingGoalBonus = hitGoal.score; // ボーナスを一時保留
                 this.pendingCoins += (hitGoal.coins || 0); // ゴールコインを保留
@@ -1410,7 +1410,7 @@ export class Game {
                 this.resolveItems('success', hitGoal); 
             } else {
                 this.state = 'lost';
-                this.stateTimer = 0.8;
+                this.stateTimer = ANIMATION_DURATION / 1000; 
                 this.ui.message.textContent = ''; // 冗長なメッセージを削除
                 this.consumeRocketOnFailure();
                 this.resolveItems('lost');
@@ -1913,6 +1913,10 @@ export class Game {
         const scoreTotalEl = document.getElementById('result-total-score');
         const coinTotalEl = document.getElementById('result-total-coin');
 
+        // --- 初期値のセット (0表示防止 & カウントアップ開始値固定) ---
+        if (scoreTotalEl) scoreTotalEl.textContent = this.launchScore.toLocaleString();
+        if (coinTotalEl) coinTotalEl.textContent = this.launchCoins.toLocaleString();
+
         if (!overlay) return;
 
         // 保存用
@@ -2113,8 +2117,8 @@ export class Game {
         const finalScore = this.score;
         const finalCoins = this.coins;
         setTimeout(() => {
-            if (scoreTotalEl) this.animateValue(scoreTotalEl, this.launchScore, finalScore, 800);
-            if (coinTotalEl) this.animateValue(coinTotalEl, this.launchCoins, finalCoins, 800);
+            if (scoreTotalEl) this.animateValue(scoreTotalEl, this.launchScore, finalScore, ANIMATION_DURATION);
+            if (coinTotalEl) this.animateValue(coinTotalEl, this.launchCoins, finalCoins, ANIMATION_DURATION);
         }, delay * 1000);
     }
 
@@ -2513,10 +2517,10 @@ export class Game {
         const endVal = this.displayCoins + amount;
 
         if (creditsEl) {
-            this.animateValue(creditsEl, startVal, endVal, 800);
+            this.animateValue(creditsEl, startVal, endVal, ANIMATION_DURATION);
         }
         if (hudCoinsEl) {
-            this.animateValue(hudCoinsEl, startVal, endVal, 800);
+            this.animateValue(hudCoinsEl, startVal, endVal, ANIMATION_DURATION);
         }
 
 
@@ -2545,7 +2549,7 @@ export class Game {
         }
         
         document.body.appendChild(popup);
-        setTimeout(() => popup.remove(), 800);
+        setTimeout(() => popup.remove(), ANIMATION_DURATION);
     }
 
     /**
