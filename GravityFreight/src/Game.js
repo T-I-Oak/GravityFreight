@@ -6,7 +6,7 @@ export class Game {
         this.physics = new PhysicsEngine();
         this.canvas = canvas;
         this.ui = ui;
-        this.version = '0.5.2'; // UI Overlap Fix & Layout Adjustments (v0.5.2)
+        this.version = '0.5.3'; // Dynamic Labels & Game Over Logic (v0.5.3)
         this.state = 'building'; // building, aiming, flying, crashed, cleared
 
         this.bodies = [];
@@ -1625,7 +1625,7 @@ export class Game {
         }
     }
 
-    checkGameOver() {
+    isGameOver() {
         const hasBuiltRockets = this.inventory.rockets.length > 0;
         // 各カテゴリーの在庫合計を確認
         const chassisCount = this.inventory.chassis.reduce((sum, c) => sum + (c.count || 0), 0);
@@ -1634,8 +1634,11 @@ export class Game {
         const canBuildRockets = chassisCount > 0 && logicCount > 0;
         const hasLaunchers = this.inventory.launchers.length > 0;
 
-        if (!(hasBuiltRockets || canBuildRockets) || !hasLaunchers) {
+        return !(hasBuiltRockets || canBuildRockets) || !hasLaunchers;
+    }
 
+    checkGameOver() {
+        if (this.isGameOver()) {
             this.state = 'gameover';
             this.ui.message.textContent = 'MISSION FAILED';
         }
@@ -1921,6 +1924,25 @@ export class Game {
         titleEl.textContent = statusText[resultType] || 'MISSION END';
         subtitleEl.textContent = '';
         subtitleEl.style.display = 'none';
+
+        // --- 次へボタンのラベル動的化 ---
+        const closeBtn = document.getElementById('result-close-btn');
+        if (closeBtn) {
+            let label = 'CONTINUE';
+            if (resultType === 'success' || resultType === 'cleared') {
+                const goalNames = { 'SAFE': 'TRADING POST', 'NORMAL': 'REPAIR DOCK', 'DANGER': 'BLACK MARKET' };
+                label = `TO ${goalNames[this.lastHitGoal?.id] || 'NEXT SECTOR'}`;
+            } else if (resultType === 'gameover') {
+                label = 'RESTART ADVENTURE';
+            } else if (this.isGameOver()) {
+                label = 'ABANDON MISSION';
+            } else if (resultType === 'returned') {
+                label = 'BACK TO BASE';
+            } else {
+                label = 'RETRY MISSION';
+            }
+            closeBtn.textContent = label;
+        }
 
         // --- スコア・コイン内訳の計算 ---
         const pendingScore = (this.pendingGoalBonus || 0) + (this.pendingScore || 0);
@@ -2534,6 +2556,12 @@ export class Game {
     closeEvent() {
         const screen = document.getElementById('event-screen');
         if (screen) screen.classList.add('hidden');
+
+        if (this.isGameOver()) {
+            // イベント中に詰み状態になった場合はリザルト画面を再表示
+            this.showResult('gameover');
+            return;
+        }
 
         // 次のステージへ進行
         this.stageLevel += 1;
