@@ -2190,6 +2190,16 @@ export class Game {
         if (goalLabel === 'TRADING POST') {
             descEl.textContent = 'Orbital supply station for cargo trading.';
             screen.className = 'trading-post-theme';
+            // 在庫の初期化
+            if (!this.currentShopStock) {
+                this.currentShopStock = [];
+                for (let i = 0; i < 6; i++) {
+                    const item = this.getWeightedRandomItem({ excludeCargo: true, excludeCoin: true });
+                    this.currentShopStock.push({ ...item, isSold: false, isSale: false });
+                }
+                const saleIdx = Math.floor(Math.random() * 6);
+                this.currentShopStock[saleIdx].isSale = true;
+            }
             this.initTradingPost(contentEl);
         } else if (goalLabel === 'REPAIR DOCK') {
             descEl.textContent = 'Advanced maintenance and modification facility.';
@@ -2211,15 +2221,17 @@ export class Game {
      */
     initTradingPost(container) {
         container.innerHTML = '';
-        // 在庫生成 (6個, Parts Only)
-        const inventory = [];
-        for (let i = 0; i < 6; i++) {
-            inventory.push(this.getWeightedRandomItem({ excludeCargo: true, excludeCoin: true }));
+        
+        // 在庫の取得（handleEventで生成済みのはずだが、手動呼び出し等のためのフォールバック）
+        if (!this.currentShopStock) {
+            this.currentShopStock = [];
+            for (let i = 0; i < 6; i++) {
+                const item = this.getWeightedRandomItem({ excludeCargo: true, excludeCoin: true });
+                this.currentShopStock.push({ ...item, isSold: false });
+            }
+            this.currentShopStock[Math.floor(Math.random() * 6)].isSale = true;
         }
-        
-        // 1個をセール品に (30% off)
-        const saleIndex = Math.floor(Math.random() * 6);
-        
+
         const shopSection = document.createElement('div');
         shopSection.className = 'event-shop-section';
         shopSection.innerHTML = '<h3>AVAILABLE STOCK</h3>';
@@ -2227,8 +2239,9 @@ export class Game {
         const grid = document.createElement('div');
         grid.className = 'event-grid';
         
-        inventory.forEach((itemData, idx) => {
-            const isSale = (idx === saleIndex);
+        this.currentShopStock.forEach((itemData) => {
+            const isSale = itemData.isSale;
+            const isSold = itemData.isSold;
             const baseValue = this.calculateValue(itemData);
             let buyPrice = baseValue * 2;
             if (isSale) buyPrice = Math.floor(buyPrice * 0.7);
@@ -2240,21 +2253,21 @@ export class Game {
                 <div class="card-body">
                     ${this.generateCardHTML(itemData, { isSelected: isSale })}
                     <div class="card-price">
-                        <span class="price-val">${buyPrice}</span><span class="currency">c</span>
+                        <span class="price-val">${isSold ? '---' : buyPrice}</span><span class="currency">c</span>
                         ${isSale ? '<span class="sale-badge">30% OFF</span>' : ''}
                     </div>
                 </div>
-                <button class="buy-btn" ${this.coins < buyPrice ? 'disabled' : ''}>BUY</button>
+                <button class="buy-btn" ${ (this.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD OUT' : 'BUY'}</button>
             `;
 
             const btn = card.querySelector('.buy-btn');
             btn.onclick = () => {
-                if (this.coins >= buyPrice) {
+                if (this.coins >= buyPrice && !isSold) {
                     this.animateCoinChange(-buyPrice);
                     this.coins -= buyPrice;
                     this._addItemToInventory(itemData);
-                    btn.disabled = true;
-                    btn.textContent = 'SOLD OUT';
+                    itemData.isSold = true; // 在庫データを「売却済み」に更新
+                    this.initTradingPost(container); // リフレッシュ（在庫のSOLD OUTと、売却リストへの追加を同時に反映）
                     this.updateUI();
                 }
             };
@@ -2611,6 +2624,9 @@ export class Game {
     }
 
     closeEvent() {
+        // イベント終了時に一時データをクリア
+        this.currentShopStock = null;
+        
         const screen = document.getElementById('event-screen');
         if (screen) screen.classList.add('hidden');
 
