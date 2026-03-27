@@ -79,7 +79,9 @@ describe('UI Logic & Component Rendering', () => {
             const unit = {
                 name: 'Test Unit',
                 category: 'UNIT',
-                modules: { 'mod_capacity': 2 }
+                modules: { 
+                    'mod_capacity_inst': { id: 'mod_capacity', name: 'スロット拡張基板', count: 2 }
+                }
             };
             
             const html = game.generateCardHTML(unit);

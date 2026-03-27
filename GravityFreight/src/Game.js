@@ -38,7 +38,7 @@ export class Game {
             if (category === 'rockets') return;
             const targetList = this.inventory[category];
             const upperCategory = category.toUpperCase();
-            
+
             this.inventory[category] = targetList.map(item => {
                 const base = PARTS[upperCategory]?.find(p => p.id === item.id);
                 // 既存の charges や count を維持しつつ、ベースの全プロパティをマージ
@@ -136,7 +136,7 @@ export class Game {
     initGoals() {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
-        
+
         // 3つの出口タイプ
         const goalTypes = [
             { id: 'SAFE', color: GOAL_COLORS.SAFE, angleWidth: 60, score: 2000, coins: 20, bonusItems: 1, label: GOAL_NAMES.SAFE },
@@ -146,7 +146,7 @@ export class Game {
 
         this.goals = [];
         const baseAngle = Math.random() * Math.PI * 2;
-        
+
         goalTypes.forEach((type, i) => {
             // 互いに120度ほど離した位置に配置
             const targetAngle = baseAngle + (i * Math.PI * 2 / 3) + (Math.random() - 0.5) * 0.4;
@@ -154,8 +154,8 @@ export class Game {
                 ...type,
                 x: centerX,
                 y: centerY,
-                angle: targetAngle, 
-                width: type.angleWidth * Math.PI / 180 
+                angle: targetAngle,
+                width: type.angleWidth * Math.PI / 180
             });
         });
     }
@@ -163,7 +163,7 @@ export class Game {
     resetStage() {
         // ステージリセット時にゴールを再生成
         this.initGoals();
-        
+
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
 
@@ -191,7 +191,7 @@ export class Game {
         const centerY = this.canvas.height / 2;
         const minDistance = 180;
         const cargoTypes = ['cargo_safe', 'cargo_normal', 'cargo_danger'];
-        
+
         for (let i = 0; i < count; i++) {
             let attempts = 0;
             let pos;
@@ -211,11 +211,11 @@ export class Game {
                 }
                 if (attempts > 100) break;
             } while (tooClose);
-            
+
             if (!tooClose) {
                 const mass = 5000 + Math.random() * 15000;
                 const body = new Body(pos, mass, true);
-                
+
                 // 各星に 1～2個のアイテムを配置
                 const itemNum = 1 + Math.floor(Math.random() * 2);
                 for (let j = 0; j < itemNum; j++) {
@@ -224,7 +224,7 @@ export class Game {
                         body.items.push(itemData);
                     }
                 }
-                
+
                 this.bodies.push(body);
             }
         }
@@ -260,12 +260,12 @@ export class Game {
             if (this.state === 'aiming') {
                 // 方向計算の根拠を mousePos から ship.rotation (ドラッグで確定した向き) に変更
                 const dir = new Vector2(Math.cos(this.ship.rotation), Math.sin(this.ship.rotation));
-                
+
                 let power = this.selection.launcher ? this.selection.launcher.power : 1200;
                 if (this.selection.booster && this.selection.booster.powerMultiplier) {
                     power *= this.selection.booster.powerMultiplier;
                 }
-                
+
                 const massFactor = Math.sqrt(10 / this.ship.mass);
                 this.ship.velocity = dir.scale(power * massFactor);
 
@@ -289,9 +289,9 @@ export class Game {
                 if (this.selection.booster && this.selection.booster.arcMultiplier) {
                     this.ship.arcMultiplier *= this.selection.booster.arcMultiplier;
                 }
-                
+
                 this.activeBoosterAtLaunch = this.selection.booster ? { ...this.selection.booster } : null;
-                
+
                 // 装備モジュールをBody側へ展開（charges管理のため）
                 this.ship.equippedModules = [];
                 for (const id in this.selection.rocket.modules) {
@@ -344,14 +344,14 @@ export class Game {
                         this.selection.launcher = null;
                     }
                 }
-                
+
                 this.ship.trail = [];
-                this.ship.isSafeToReturn = false; 
+                this.ship.isSafeToReturn = false;
 
                 // 母星に預けていたアイテムがあれば再装填
                 if (this.homeStar.items && this.homeStar.items.length > 0) {
                     this.homeStar.items.forEach(itemData => {
-                        this.pendingItems.push({ 
+                        this.pendingItems.push({
                             itemData: itemData,
                             originalBody: this.homeStar,
                             collectedTime: this.simulatedTime
@@ -373,16 +373,16 @@ export class Game {
 
         window.addEventListener('pointerdown', (e) => {
             this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-            
+
             // UI上のクリック判定
-            const isUI = e.target !== this.canvas || 
-                         e.target.closest('#terminal-panel') ||
-                         e.target.closest('#build-overlay') || 
-                         e.target.closest('#launch-control') || 
-                         e.target.closest('#result-overlay') || 
-                         e.target.closest('#event-screen') ||
-                         e.target.closest('.tooltip-card-wrapper');
-            
+            const isUI = e.target !== this.canvas ||
+                e.target.closest('#terminal-panel') ||
+                e.target.closest('#build-overlay') ||
+                e.target.closest('#launch-control') ||
+                e.target.closest('#result-overlay') ||
+                e.target.closest('#event-screen') ||
+                e.target.closest('.tooltip-card-wrapper');
+
             // マップ上で開始された場合のみエイムインタラクションとしてマーク
             this.isAimingInteraction = !isUI;
 
@@ -429,7 +429,7 @@ export class Game {
             if (this.activePointers.size === 2) {
                 const pts = Array.from(this.activePointers.values());
                 const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-                
+
                 // 2本指でのパン（移動）
                 if (this.lastPointersPos) {
                     const currentMid = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
@@ -446,12 +446,12 @@ export class Game {
                 }
                 this.lastPinchDist = dist;
                 this.lastPointersPos = pts;
-                
+
                 // ブラウザのピンチズームを防止
                 if (e.cancelable) e.preventDefault();
             } else {
                 this.lastPointersPos = null;
-                
+
                 // マウス位置はホバー判定等のために常に更新する
                 updatePointer(e);
             }
@@ -654,7 +654,7 @@ export class Game {
             let totalSlots = (chassis.slots || 0) + (logic.slots || 0);
             let totalPrecision = (chassis.precision || 0) + (logic.precision || 0);
             let totalPickupRange = (chassis.pickupRange || 0) + (logic.pickupRange || 0);
-            
+
             // 倍率補正 (全てベース1.0からの乗算)
             let totalMultiplier = (chassis.precisionMultiplier || 1.0) * (logic.precisionMultiplier || 1.0);
             let totalPickupMultiplier = (chassis.pickupMultiplier || 1.0) * (logic.pickupMultiplier || 1.0);
@@ -668,15 +668,15 @@ export class Game {
                     totalSlots += (item.slots || 0) * count;
                     totalPrecision += (item.precision || 0) * count;
                     totalPickupRange += (item.pickupRange || 0) * count;
-                    
+
                     if (item.precisionMultiplier) {
-                        for(let i=0; i<count; i++) totalMultiplier *= item.precisionMultiplier;
+                        for (let i = 0; i < count; i++) totalMultiplier *= item.precisionMultiplier;
                     }
                     if (item.pickupMultiplier) {
-                        for(let i=0; i<count; i++) totalPickupMultiplier *= item.pickupMultiplier;
+                        for (let i = 0; i < count; i++) totalPickupMultiplier *= item.pickupMultiplier;
                     }
                     if (item.gravityMultiplier) {
-                        for(let i=0; i<count; i++) totalGravityMultiplier *= item.gravityMultiplier;
+                        for (let i = 0; i < count; i++) totalGravityMultiplier *= item.gravityMultiplier;
                     }
                 }
             }
@@ -740,11 +740,11 @@ export class Game {
             const booster = this.selection.booster;
 
             this.state = 'aiming';
-            
+
             // ロケットの基本スペックにブースターの効果を適用 (乗算/加算)
             this.ship.mass = rocket.mass + (booster ? (booster.mass || 0) : 0);
             this.ship.pickupRange = rocket.pickupRange + (booster ? (booster.pickupRange || 0) : 0);
-            
+
             let pMult = rocket.precisionMultiplier;
             let mass = rocket.mass;
             let pickMult = rocket.pickupMultiplier;
@@ -762,7 +762,7 @@ export class Game {
             this.ship.gravityMultiplier = gMult;
             this.ship.arcMultiplier = aMult;
             this.ship.precision = rocket.totalPrecision * pMult;
-            
+
             // 飛行用のアドオンインスタンス化 (残り回数管理のため)
             // モジュールは { id, charges, maxCharges, ... } のリストにする
             this.ship.equippedModules = [];
@@ -771,9 +771,9 @@ export class Game {
                     // itemDataはassembleUnitで既にインスタンス情報がコピーされている
                     // chargesは個別に管理されるため、maxChargesから初期化
                     for (let i = 0; i < itemData.count; i++) {
-                        this.ship.equippedModules.push({ 
-                            ...itemData, 
-                            charges: itemData.maxCharges !== undefined ? itemData.maxCharges : 1 
+                        this.ship.equippedModules.push({
+                            ...itemData,
+                            charges: itemData.maxCharges !== undefined ? itemData.maxCharges : 1
                         });
                     }
                 }
@@ -784,7 +784,7 @@ export class Game {
                 color: CATEGORY_COLORS[p.itemData.category] || '#fff',
                 timestamp: Date.now()
             }));
-            
+
             // 角度の初期同期 (マウス位置に基づく)
             // ただし、既にエイム中の場合は現在の向きを維持し、UIクリックによる意図しない向きの変更を防ぐ
             if (prevState !== 'aiming') {
@@ -804,14 +804,14 @@ export class Game {
             const el = document.getElementById(id);
             if (!el) return;
             el.innerHTML = '';
-            
+
             if (items.length === 0) {
                 const placeholder = document.createElement('div');
                 placeholder.className = 'slot-placeholder';
-                
+
                 let mainText = 'EMPTY';
                 let subText = '在庫なし';
-                
+
                 if (type === 'chassis') { // typeを小文字に修正
                     mainText = 'シャーシなし';
                     subText = 'スペースドックで調達可能';
@@ -831,7 +831,7 @@ export class Game {
                     mainText = '待機中の機体なし';
                     subText = 'ASSEMBLY BAYで機体を建造してください';
                 }
-                
+
                 placeholder.innerHTML = `
                     <div class="part-header">
                         <span class="part-name" style="opacity: 0.5;">${mainText}</span>
@@ -849,13 +849,13 @@ export class Game {
 
                 // instanceIdはユニークなので、グループ化のキーには含めない
                 // ただし、選択状態の判定にはinstanceIdを使う
-                
+
                 const charges = item.charges !== undefined ? item.charges : -1;
                 const enhancementsStr = JSON.stringify(item.enhancements || {});
-                
-                let group = groups.find(g => 
-                    g.id === item.id && 
-                    g.charges === charges && 
+
+                let group = groups.find(g =>
+                    g.id === item.id &&
+                    g.charges === charges &&
                     JSON.stringify(g.enhancements || {}) === enhancementsStr
                 );
 
@@ -870,7 +870,7 @@ export class Game {
 
             groups.forEach(data => {
                 const div = document.createElement('div');
-                
+
                 // 選択状態の判定
                 let selectionCount = 0;
                 let isSelected = false;
@@ -886,7 +886,7 @@ export class Game {
                 }
 
                 div.className = `part-item ${isSelected ? 'selected' : ''}`;
-                
+
                 div.innerHTML = this.generateCardHTML(data, {
                     showInventory: true,
                     selectionCount: selectionCount,
@@ -910,11 +910,11 @@ export class Game {
         const scoreDisplay = document.getElementById('score-display');
         if (sectorDisplay) sectorDisplay.textContent = this.sector;
         if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore);
-        
+
         const coinDisplay = document.getElementById('coin-display');
         const eventCredits = document.getElementById('event-player-credits');
         const displayVal = Math.floor(this.displayCoins);
-        
+
         if (coinDisplay) coinDisplay.textContent = displayVal.toLocaleString();
         if (eventCredits) eventCredits.textContent = displayVal.toLocaleString();
         if (scoreDisplay) scoreDisplay.textContent = Math.floor(this.displayScore).toLocaleString();
@@ -981,7 +981,7 @@ export class Game {
                     const div = document.createElement('div');
                     const isSelected = (this.selection.rocket === rocket);
                     div.className = `unit-item ${isSelected ? 'selected' : ''}`;
-                    
+
                     div.innerHTML = this.generateCardHTML(rocket, { isSelected });
 
                     div.onclick = () => {
@@ -1002,7 +1002,7 @@ export class Game {
      */
     generateCardHTML(itemData, options = {}) {
         if (!itemData) return '';
-        
+
         const item = itemData;
         const category = itemData.category || 'CHASSIS';
         const categoryColor = CATEGORY_COLORS[category] || '#fff';
@@ -1019,7 +1019,7 @@ export class Game {
             const max = itemData.maxCharges || 2;
             const current = itemData.charges !== undefined ? item.charges : max;
             const isChargeEnhanced = enhancements.charges > 0;
-            
+
             let segments = '';
             for (let i = 0; i < max; i++) {
                 segments += `<div class="hp-segment ${i < current ? 'active' : ''}" style="width:8px; height:4px; background:${i < current ? (isChargeEnhanced ? '#ffd700' : '#fff') : 'rgba(255,255,255,0.1)'}; border-radius:1px;"></div>`;
@@ -1088,7 +1088,7 @@ export class Game {
                             existing.charges = (existing.charges || 0) + ((moduleInstanceData.charges !== undefined ? moduleInstanceData.charges : moduleInstanceData.maxCharges) * (moduleInstanceData.count || 1));
                         }
                     } else {
-                        mergedModules.set(mid, { 
+                        mergedModules.set(mid, {
                             name: moduleInstanceData.name,
                             count: moduleInstanceData.count || 1,
                             maxCharges: moduleInstanceData.maxCharges ? (moduleInstanceData.maxCharges * (moduleInstanceData.count || 1)) : undefined,
@@ -1167,8 +1167,8 @@ export class Game {
 
         // 同一性の判定 (ID, 耐久度, 強化内容がすべて一致する場合のみスタック)
         const enhancementsStr = JSON.stringify(item.enhancements || {});
-        const existing = targetList.find(i => 
-            i.id === item.id && 
+        const existing = targetList.find(i =>
+            i.id === item.id &&
             (i.charges === item.charges || (i.charges === undefined && item.charges === undefined)) &&
             JSON.stringify(i.enhancements || {}) === enhancementsStr
         );
@@ -1191,11 +1191,11 @@ export class Game {
         if (!instanceId) return false;
         const targetId = String(instanceId).trim();
         const categories = ['chassis', 'logic', 'launchers', 'modules', 'boosters'];
-        
+
         for (const catKey of categories) {
             const list = this.inventory[catKey];
             if (!list) continue;
-            
+
             console.log(`DEBUG _removeItem CATEGORY: ${catKey}, Items in list: ${list.length}`);
             list.forEach((i, idx) => {
                 const match = String(i.instanceId).trim() === targetId;
@@ -1248,7 +1248,7 @@ export class Game {
             const distScreen = distWorld * this.zoom;
             // ボディ半径（スクリーン換算） + マージン（スクリーン基準で最低20px確保）
             const hitRadius = (body.radius || 20) * this.zoom + 15;
-            
+
             if (distScreen < hitRadius) {
                 this.hoveredStar = body;
                 break;
@@ -1268,11 +1268,11 @@ export class Game {
 
                 this.bodies.forEach(body => {
                     if (body === this.homeStar) return;
-                    
+
                     const dist = this.ship.position.sub(body.position).length();
                     const surfaceDist = dist - body.radius;
                     const pickupRadius = (this.ship.pickupRange || 0) * (this.ship.pickupMultiplier || 1);
-                    
+
                     if (surfaceDist <= pickupRadius && !body.isCollected) {
                         this.collectItems(body);
                         body.isCollected = true;
@@ -1292,16 +1292,16 @@ export class Game {
             if (this.accumulator > 0.1) this.accumulator = 0.1;
             while (this.accumulator >= this.fixedDt) {
                 const prevPos = new Vector2(this.ship.position.x, this.ship.position.y);
-                
+
                 // 物理演算への重力補正適用
                 const gravityStep = (pos, bodies, mass) => {
                     const acc = calculateAcceleration(pos, bodies, mass);
                     let mult = this.ship.gravityMultiplier || 1.0;
-                    
+
                     if (this.ship.activeBoosterEffect && this.ship.activeBoosterEffect.type === 'gravityMultiplier') {
                         // 上書きではなく乗算（機体性能と重複可能にする）
                         mult *= this.ship.activeBoosterEffect.value;
-                        
+
                         // duration が指定されている場合のみ減少させる
                         if (this.ship.activeBoosterEffect.duration !== undefined) {
                             this.ship.activeBoosterEffect.duration--;
@@ -1310,7 +1310,7 @@ export class Game {
                             }
                         }
                     }
-                    
+
                     return acc.scale(mult);
                 };
 
@@ -1320,7 +1320,7 @@ export class Game {
 
                 this.simulatedTime += this.fixedDt;
                 this.accumulator -= this.fixedDt;
-                this.score += 1; 
+                this.score += 1;
 
                 // 衝突判定をループ内に移動（1ステップごとの判定）
                 if (this.checkCollisions(prevPos)) return;
@@ -1365,12 +1365,12 @@ export class Game {
         for (const body of this.bodies) {
             // 母星の衝突判定：離れるまでは保護する（isSafeToReturn）
             if (body === this.homeStar && !isSafeToReturn) continue;
-            
+
             const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
             const shipRadius = this.ship ? (this.ship.radius || 2) : 2;
             const collisionDist = radius + shipRadius + 1; // 1px margin
             const distSq = getDistanceSqToSegment(body.position, prevPos, pos);
-            
+
             if (distSq < collisionDist * collisionDist) {
                 return body;
             }
@@ -1384,14 +1384,14 @@ export class Game {
         const startPos = prevPos || shipPos; // 初期位置または前ステップの座標
 
         const hitBody = this.findBodyCollision(shipPos, startPos, this.ship.isSafeToReturn);
-        
+
         if (hitBody) {
             const body = hitBody;
             if (body === this.homeStar) {
                 this.state = 'returned';
-                this.stateTimer = ANIMATION_DURATION / 1000; 
+                this.stateTimer = ANIMATION_DURATION / 1000;
                 this.ui.message.textContent = '';
-                this.resolveItems('returned'); 
+                this.resolveItems('returned');
             } else {
                 // アドオンによる衝突回避判定
                 // 1. Star Breaker (星破壊)
@@ -1401,7 +1401,7 @@ export class Game {
                     this.bodies = this.bodies.filter(b => b !== body); // 星を消滅
                     this.physics.bodies = [...this.bodies, this.ship]; // 物理エンジン同期
                     this.ui.message.textContent = 'STAR DESTROYED!';
-                    setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                    setTimeout(() => { if (this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
                     return false; // 衝突しなかったことにする
                 }
 
@@ -1415,15 +1415,15 @@ export class Game {
                     const dot = this.ship.velocity.dot(normal);
                     this.ship.velocity = this.ship.velocity.sub(normal.scale(2 * dot)).scale(0.5);
                     this.ui.message.textContent = 'IMPACT ABSORBED!';
-                    setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                    setTimeout(() => { if (this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
                     return false; // 衝突しなかったことにする
                 }
 
                 this.state = 'crashed';
-                this.stateTimer = ANIMATION_DURATION / 1000; 
+                this.stateTimer = ANIMATION_DURATION / 1000;
                 this.ui.message.textContent = '';
-                this.consumeRocketOnFailure(); 
-                this.resolveItems('crashed', body); 
+                this.consumeRocketOnFailure();
+                this.resolveItems('crashed', body);
             }
             return true;
         }
@@ -1438,11 +1438,11 @@ export class Game {
                 const toCenter = center.sub(shipPos).normalize();
                 this.ship.velocity = toCenter.scale(this.ship.velocity.length() * 0.8);
                 this.ui.message.textContent = 'EMERGENCY THRUST!';
-                setTimeout(() => { if(this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
+                setTimeout(() => { if (this.state === 'flying') this.ui.message.textContent = ''; }, 1000);
                 return false;
             }
             const shipAngle = Math.atan2(shipPos.y - this.canvas.height / 2, shipPos.x - this.canvas.width / 2);
-            
+
             // いずれかのゴール内に入っているかチェック
             let hitGoal = null;
             const arcBonus = this.ship.arcMultiplier || 1.0;
@@ -1452,7 +1452,7 @@ export class Game {
                 let diff = shipAngle - goal.angle;
                 while (diff > Math.PI) diff -= Math.PI * 2;
                 while (diff < -Math.PI) diff += Math.PI * 2;
-                
+
                 if (Math.abs(diff) < (goal.width * arcBonus) / 2) {
                     hitGoal = goal;
                     break;
@@ -1461,7 +1461,7 @@ export class Game {
 
             if (hitGoal) {
                 this.state = 'cleared';
-                this.stateTimer = ANIMATION_DURATION / 1000; 
+                this.stateTimer = ANIMATION_DURATION / 1000;
                 this.lastHitGoal = hitGoal; // 拠点を保存
                 this.pendingGoalBonus = hitGoal.score; // ボーナスを一時保留
                 this.pendingCoins += (hitGoal.coins || 0); // ゴールコインを保留
@@ -1469,10 +1469,10 @@ export class Game {
                 this.flightResults.bonuses.push({ name: 'Goal Bonus', value: hitGoal.score, coins: hitGoal.coins || 0 });
                 this.sector++; // セクター進行
                 this.ui.message.textContent = ''; // 冗長なメッセージを削除
-                this.resolveItems('success', hitGoal); 
+                this.resolveItems('success', hitGoal);
             } else {
                 this.state = 'lost';
-                this.stateTimer = ANIMATION_DURATION / 1000; 
+                this.stateTimer = ANIMATION_DURATION / 1000;
                 this.ui.message.textContent = ''; // 冗長なメッセージを削除
                 this.consumeRocketOnFailure();
                 this.resolveItems('lost');
@@ -1487,7 +1487,7 @@ export class Game {
         const points = [];
         // 方向計算の根拠を mousePos から ship.rotation (ドラッグで確定した向き) に変更
         const dir = new Vector2(Math.cos(this.ship.rotation), Math.sin(this.ship.rotation));
-        
+
         const rocket = this.selection.rocket;
         if (!rocket) return [];
 
@@ -1496,13 +1496,13 @@ export class Game {
             power *= this.selection.booster.powerMultiplier;
         }
         const mass = rocket.mass;
-        
+
         const massFactor = Math.sqrt(10 / mass);
         let tempVel = dir.scale(power * massFactor);
         let tempPos = this.homeStar.position.add(dir.scale(this.homeStar.radius + 12));
-        
+
         const simDt = this.fixedDt;
-        
+
         // 合計された精度と倍率を使用
         const acc = this.selection.launcher;
         const accBonus = acc ? (acc.precisionMultiplier || 1.0) : 1.0;
@@ -1511,10 +1511,10 @@ export class Game {
         const gravityMultiplier = rocket.gravityMultiplier || 1.0;
 
         let tempIsSafeToReturn = false;
-        
-        for (let i = 0; i < precision; i++) { 
+
+        for (let i = 0; i < precision; i++) {
             if (i % 5 === 0) points.push(new Vector2(tempPos.x, tempPos.y));
-            
+
             const prevTempPos = new Vector2(tempPos.x, tempPos.y); // 前の座標を保存
             const grav = calculateAcceleration(tempPos, this.bodies, mass);
             const acc = grav.scale(gravityMultiplier);
@@ -1528,7 +1528,7 @@ export class Game {
                     tempIsSafeToReturn = true;
                 }
             }
-            
+
             // 共通メソッドを使用して衝突判定
             const hitBody = this.findBodyCollision(tempPos, prevTempPos, tempIsSafeToReturn);
             if (hitBody) {
@@ -1549,7 +1549,7 @@ export class Game {
      */
     calculateValue(item) {
         if (!item) return 0;
-        
+
         // 1. マスタデータの特定 (Data.js の ITEM_REGISTRY からID直接参照)
         const master = ITEM_REGISTRY[item.id] || item;
 
@@ -1557,18 +1557,18 @@ export class Game {
         const rarity = item.rarity !== undefined ? item.rarity : (master.rarity || RARITY.COMMON);
         const max = item.maxCharges !== undefined ? item.maxCharges : (master.maxCharges || 0);
         const cur = item.charges !== undefined ? item.charges : max;
-        
+
         // 3. ベース価格の算出 (新仕様: 20/40/60)
         let base = 20;
         if (rarity === RARITY.UNCOMMON) base = 40;
         if (rarity === RARITY.RARE) base = 60;
-        
+
         // 4. コンディション補正 (耐久度)
         const condition = (max > 0) ? (cur + 1) / (max + 1) : 1.0;
 
         // 5. 強化ボーナス (以前の仕様: 1回につき10%増)
         const enhancementBonus = (item.upgradeCount || item.enhancementCount || 0) * 0.1;
-        
+
         return Math.floor(base * condition * (1 + enhancementBonus));
     }
 
@@ -1588,47 +1588,60 @@ export class Game {
      */
     enhanceItem(item) {
         if (!item) return null;
-        
+
         // 強化回数の管理
         item.enhancementCount = (item.enhancementCount || 0) + 1;
         item.enhancements = item.enhancements || {};
-        
-        // 有効な強化オプションのリストアップ
+
+        // 有効な強化オプションのリストアップ (v0.5.5 仕様に合わせて拡張)
         const options = [];
-        if (item.slots !== undefined) options.push('slots');
-        if (item.precisionMultiplier !== undefined) options.push('precision');
-        if (item.pickupMultiplier !== undefined) options.push('pickup');
-        if (item.gravityMultiplier !== undefined && item.gravityMultiplier > 0.1) options.push('gravity');
-        if (item.maxCharges !== undefined) options.push('charges');
+
+        options.push('precision');
+        options.push('pickup');
+        if (item.gravityMultiplier !== undefined && item.gravityMultiplier > 0.1) {
+            options.push('gravity');
+        }
+
+        options.push('slots');
+
+        if (item.maxCharges !== undefined) {
+            options.push('charges');
+        }
 
         if (options.length === 0) return `${item.name}: NO STAT CHANGE`;
 
         // ランダムに1つ適用
         const chosen = options[Math.floor(Math.random() * options.length)];
         let log = "";
-        
+
         // 個別強化カウントの更新
         item.enhancements[chosen] = (item.enhancements[chosen] || 0) + 1;
-        
+
         switch (chosen) {
             case 'slots':
-                item.slots += 1;
+                item.slots = (item.slots || 0) + 1;
                 log = "SLOTS +1";
                 break;
             case 'precision':
+                // 未定義の場合は基本倍率 1.0 から開始
+                if (item.precisionMultiplier === undefined) item.precisionMultiplier = 1.0;
                 item.precisionMultiplier += 0.2;
-                log = "PRECISION x1.2";
+                log = "PRECISION x" + item.precisionMultiplier.toFixed(1);
                 break;
             case 'pickup':
+                // 未定義の場合は基本倍率 1.0 から開始
+                if (item.pickupMultiplier === undefined) item.pickupMultiplier = 1.0;
                 item.pickupMultiplier += 0.2;
-                log = "PICKUP x1.2";
+                log = "PICKUP x" + item.pickupMultiplier.toFixed(1);
                 break;
             case 'gravity':
+                // 未定義の場合は基本倍率 1.0 から開始
+                if (item.gravityMultiplier === undefined) item.gravityMultiplier = 1.0;
                 item.gravityMultiplier = Math.max(0.1, item.gravityMultiplier - 0.1);
                 log = "GRAVITY STABILIZED";
                 break;
             case 'charges':
-                item.maxCharges += 1;
+                item.maxCharges = (item.maxCharges || 0) + 1;
                 item.charges = (item.charges || 0) + 1;
                 log = "MAX DURABILITY +1";
                 break;
@@ -1640,15 +1653,15 @@ export class Game {
      * 重み付きアイテム抽選（汎用版）
      */
     getWeightedRandomItem(options = {}) {
-        const { 
-            thresholdBonus = 0, 
-            excludeCargo = false, 
-            excludeCoin = false 
+        const {
+            thresholdBonus = 0,
+            excludeCargo = false,
+            excludeCoin = false
         } = options;
 
         const baseThreshold = this.getSectorItemThreshold();
         const threshold = baseThreshold + thresholdBonus;
-        
+
         // 全パーツリストからフィルタリング
         const pools = [
             { category: 'CHASSIS', list: PARTS.CHASSIS },
@@ -1700,7 +1713,7 @@ export class Game {
         // 各カテゴリーの在庫合計を確認
         const chassisCount = this.inventory.chassis.reduce((sum, c) => sum + (c.count || 0), 0);
         const logicCount = this.inventory.logic.reduce((sum, l) => sum + (l.count || 0), 0);
-        
+
         const canBuildRockets = chassisCount > 0 && logicCount > 0;
         const hasLaunchers = this.inventory.launchers.length > 0;
 
@@ -1758,10 +1771,10 @@ export class Game {
             const category = itemData.category;
 
             // 仮保存リストへの追加 (構造を統一)
-            this.pendingItems.push({ 
-                itemData, 
+            this.pendingItems.push({
+                itemData,
                 originalBody: body,
-                collectedTime: this.simulatedTime 
+                collectedTime: this.simulatedTime
             });
 
             // 視覚エフェクト用リストに追加
@@ -1790,7 +1803,7 @@ export class Game {
                 this.updateUI(); // 報酬なしでもUI更新
                 return;
             }
-            
+
             this.pendingItems.forEach((pItem) => {
                 const itemData = pItem.itemData;
                 const { category } = itemData;
@@ -1876,25 +1889,23 @@ export class Game {
                         hitGoal.isCollected = false;
                     });
                 }
-                // LOSTの場合：保険金（もしあれば）を計算
-                if (result === 'lost' && this.ship && this.ship.equippedModules) {
-                    const insuranceModules = this.ship.equippedModules.filter(m => m.onLostBonus);
-                    const rocket = this.selection.rocket;
-                    
-                    if (insuranceModules.length > 0 && rocket) {
-                        let totalUnitValue = 0;
-                        if (rocket.chassis) totalUnitValue += this.calculateValue(rocket.chassis);
-                        if (rocket.logic) totalUnitValue += this.calculateValue(rocket.logic);
-                        if (this.ship.equippedModules) {
-                            this.ship.equippedModules.forEach(m => {
-                                totalUnitValue += this.calculateValue(m);
-                            });
-                        }
+                // LOST または CRASHED の場合：保険金（もしあれば）を計算
+                const insuranceModules = this.ship.equippedModules ? this.ship.equippedModules.filter(m => m.onLostBonus) : [];
+                const rocket = this.selection.rocket;
 
-                        const totalPayout = totalUnitValue * insuranceModules.length;
-                        this.pendingCoins += totalPayout;
-                        this.flightResults.bonuses.push({ name: 'Insurance Payout', value: 0, coins: totalPayout });
+                if (insuranceModules.length > 0 && rocket) {
+                    let totalUnitValue = 0;
+                    if (rocket.chassis) totalUnitValue += this.calculateValue(rocket.chassis);
+                    if (rocket.logic) totalUnitValue += this.calculateValue(rocket.logic);
+                    if (this.ship.equippedModules) {
+                        this.ship.equippedModules.forEach(m => {
+                            totalUnitValue += this.calculateValue(m);
+                        });
                     }
+
+                    const totalPayout = totalUnitValue * insuranceModules.length;
+                    this.pendingCoins += totalPayout;
+                    this.flightResults.bonuses.push({ name: 'Insurance Payout', value: 0, coins: totalPayout });
                 }
                 this.pendingItems = [];
             }
@@ -1910,7 +1921,7 @@ export class Game {
                         for (const [optId, count] of Object.entries(rocket.modules)) {
                             const optBase = ITEM_REGISTRY[optId];
                             if (optBase) {
-                                for(let c=0; c<count; c++) {
+                                for (let c = 0; c < count; c++) {
                                     if (Math.random() < 0.5) parts.push({ ...optBase, category: 'MODULES' });
                                 }
                             }
@@ -1919,7 +1930,7 @@ export class Game {
                     if (rocket.booster && Math.random() < 0.5) {
                         parts.push({ ...rocket.booster, category: 'BOOSTERS' });
                     }
-                    
+
                     const droppedParts = parts;
 
                     droppedParts.forEach(partData => {
@@ -2255,7 +2266,7 @@ export class Game {
      */
     initTradingPost(container) {
         container.innerHTML = '';
-        
+
         // 在庫の取得（handleEventで生成済みのはずだが、手動呼び出し等のためのフォールバック）
         if (!this.currentShopStock) {
             this.currentShopStock = [];
@@ -2269,10 +2280,10 @@ export class Game {
         const shopSection = document.createElement('div');
         shopSection.className = 'event-shop-section';
         shopSection.innerHTML = '<h3>AVAILABLE STOCK</h3>';
-        
+
         const grid = document.createElement('div');
         grid.className = 'event-grid';
-        
+
         this.currentShopStock.forEach((itemData) => {
             const isSale = itemData.isSale;
             const isSold = itemData.isSold;
@@ -2282,7 +2293,7 @@ export class Game {
 
             const card = document.createElement('div');
             card.className = `event-card ${isSale ? 'sale' : ''}`;
-            
+
             card.innerHTML = `
                 <div class="card-body">
                     ${this.generateCardHTML(itemData, { isSelected: isSale })}
@@ -2291,7 +2302,7 @@ export class Game {
                         ${isSale ? '<span class="sale-badge">30% OFF</span>' : ''}
                     </div>
                 </div>
-                <button class="buy-btn" ${ (this.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD OUT' : 'BUY'}</button>
+                <button class="buy-btn" ${(this.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD OUT' : 'BUY'}</button>
             `;
 
             const btn = card.querySelector('.buy-btn');
@@ -2308,7 +2319,7 @@ export class Game {
 
             grid.appendChild(card);
         });
-        
+
         shopSection.appendChild(grid);
         container.appendChild(shopSection);
 
@@ -2316,22 +2327,22 @@ export class Game {
         const sellSection = document.createElement('div');
         sellSection.className = 'event-sell-section';
         sellSection.innerHTML = '<h3>SELL YOUR PARTS</h3>';
-        
+
         const sellGrid = document.createElement('div');
         sellGrid.className = 'event-grid';
-        
+
         // 売却可能なアイテムを抽出 (インベントリ全体)
         const allHoldings = [
-            ...this.inventory.chassis.map(i => ({...i, cat:'CHASSIS'})),
-            ...this.inventory.logic.map(i => ({...i, cat:'LOGIC'})),
-            ...this.inventory.launchers.map(i => ({...i, cat:'LAUNCHERS'})),
-            ...this.inventory.modules.map(i => ({...i, cat:'MODULES'})),
-            ...this.inventory.boosters.map(i => ({...i, cat:'BOOSTERS'}))
+            ...this.inventory.chassis.map(i => ({ ...i, cat: 'CHASSIS' })),
+            ...this.inventory.logic.map(i => ({ ...i, cat: 'LOGIC' })),
+            ...this.inventory.launchers.map(i => ({ ...i, cat: 'LAUNCHERS' })),
+            ...this.inventory.modules.map(i => ({ ...i, cat: 'MODULES' })),
+            ...this.inventory.boosters.map(i => ({ ...i, cat: 'BOOSTERS' }))
         ];
 
         allHoldings.forEach(item => {
             if ((item.count || 0) <= 0 && item.charges === undefined) return;
-            
+
             const sellPrice = this.calculateValue(item);
             const card = document.createElement('div');
             card.className = 'event-card sell-card';
@@ -2450,7 +2461,7 @@ export class Game {
                 const cost = Math.floor(baseCost * (1 - this.currentCoinDiscount));
                 const card = document.createElement('div');
                 card.className = 'event-card dismantle-card';
-                
+
                 card.innerHTML = `
                     <div class="card-body">
                         ${this.generateCardHTML(unit, { badge: unit.label })}
@@ -2469,9 +2480,9 @@ export class Game {
                     this.animateCoinChange(-cost);
                     this.coins -= cost;
                     this.dismantleCount++;
-                    
+
                     addLog(`--- DISMANTLING: ${unit.name} ---`);
-                    
+
                     // 分解・強化・返却
                     const partsToReturn = [];
                     if (unit.chassis) partsToReturn.push({ ...unit.chassis, category: 'CHASSIS', count: 1 });
@@ -2543,10 +2554,10 @@ export class Game {
      */
     animateCoinChange(amount) {
         if (amount === 0) return;
-        
+
         const creditsEl = document.getElementById('event-player-credits');
         const hudCoinsEl = document.getElementById('coin-display');
-        
+
         // --- 数値のカウントアップ/ダウンアニメーション (v0.5.4 共通化) ---
         const startVal = this.displayCoins;
         const endVal = this.displayCoins + amount;
@@ -2564,13 +2575,13 @@ export class Game {
         const popup = document.createElement('div');
         popup.className = `coin-popup ${amount > 0 ? 'coin-plus' : 'coin-minus'}`;
         popup.textContent = (amount > 0 ? '+' : '') + amount.toLocaleString();
-        
+
         // 表示位置の決定
         if (creditsEl && creditsEl.offsetParent !== null) {
             const rect = creditsEl.getBoundingClientRect();
             popup.style.left = (rect.left + rect.width / 2) + 'px';
             popup.style.top = rect.top + 'px';
-            
+
             // クレジット数値にパルス効果
             creditsEl.classList.add('pulse');
             setTimeout(() => creditsEl.classList.remove('pulse'), 300);
@@ -2578,11 +2589,11 @@ export class Game {
             const rect = hudCoinsEl.getBoundingClientRect();
             popup.style.left = (rect.left + rect.width / 2) + 'px';
             popup.style.top = rect.top + 'px';
-            
+
             hudCoinsEl.classList.add('pulse');
             setTimeout(() => hudCoinsEl.classList.remove('pulse'), 300);
         }
-        
+
         document.body.appendChild(popup);
         setTimeout(() => popup.remove(), ANIMATION_DURATION);
     }
@@ -2598,7 +2609,7 @@ export class Game {
 
         const obtained = [];
         let currentValue = 0;
-        
+
         while (currentValue < targetValue) {
             const itemData = this.getWeightedRandomItem({ thresholdBonus: bonus, excludeCargo: true, excludeCoin: true });
             obtained.push(itemData);
@@ -2613,7 +2624,7 @@ export class Game {
         const list = document.getElementById('market-results-list');
         resultsArea.classList.remove('hidden');
         list.innerHTML = '';
-        
+
         obtained.forEach(i => {
             const card = document.createElement('div');
             card.className = 'event-card obtained-card';
@@ -2624,7 +2635,7 @@ export class Game {
             `;
             list.appendChild(card);
         });
-        
+
         // ボタン無効化（1回のみ）
         document.getElementById('market-btn-100').disabled = true;
         document.getElementById('market-btn-500').disabled = true;
@@ -2634,7 +2645,7 @@ export class Game {
     closeEvent() {
         // イベント終了時に一時データをクリア
         this.currentShopStock = null;
-        
+
         const screen = document.getElementById('event-screen');
         if (screen) screen.classList.add('hidden');
 
@@ -2647,14 +2658,14 @@ export class Game {
         // 次のステージへ進行
         this.stageLevel += 1;
         this.initStage(this.currentStarCount);
-        
+
         this.state = 'building';
         this.selection.rocket = null;
         this.selection.launcher = null;
-        this.selection.booster = null; 
-        this.ui.message.textContent = ''; 
-        if (this.ship) this.ship.trail = []; 
-        this.checkReadyToAim(); 
+        this.selection.booster = null;
+        this.ui.message.textContent = '';
+        if (this.ship) this.ship.trail = [];
+        this.checkReadyToAim();
         this.checkGameOver();
         this.ensurePanelExpanded();
         this.updateUI();
@@ -2666,30 +2677,30 @@ export class Game {
             overlay.classList.add('hidden');
             overlay.classList.remove('minimized');
         }
-        
+
         const backBtn = document.getElementById('back-to-result-btn');
         if (backBtn) backBtn.classList.add('hidden');
 
         const prevState = this.flightResults.status;
-        
+
         if (prevState === 'success' || (this.state === 'cleared' || prevState === 'cleared')) {
-            const goal = this.lastHitGoal; 
+            const goal = this.lastHitGoal;
             if (goal) {
                 this.handleEvent(goal);
                 return;
             }
         }
-        
+
         this.state = 'building';
         if (prevState !== 'returned') {
             this.selection.rocket = null;
         }
         this.selection.launcher = null;
-        this.selection.booster = null; 
+        this.selection.booster = null;
 
-        this.ui.message.textContent = ''; 
-        if (this.ship) this.ship.trail = []; 
-        this.checkReadyToAim(); 
+        this.ui.message.textContent = '';
+        if (this.ship) this.ship.trail = [];
+        this.checkReadyToAim();
         this.checkGameOver();
         this.ensurePanelExpanded();
         this.updateUI();
