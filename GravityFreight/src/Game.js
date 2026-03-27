@@ -23,6 +23,7 @@ export class Game {
         this.width = canvas.width;
         this.height = canvas.height;
         this.isPointerDown = false;
+        this.isAimingInteraction = false; // エイム操作として開始されたかどうかのフラグ
         this.activePointers = new Map();
         this.lastPinchDist = 0;
         this.zoom = 0.5;
@@ -371,33 +372,36 @@ export class Game {
 
         window.addEventListener('pointerdown', (e) => {
             this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            
+            // UI上のクリック判定
+            const isUI = e.target !== this.canvas || 
+                         e.target.closest('#terminal-panel') ||
+                         e.target.closest('#build-overlay') || 
+                         e.target.closest('#launch-control') || 
+                         e.target.closest('#result-overlay') || 
+                         e.target.closest('#event-screen') ||
+                         e.target.closest('.tooltip-card-wrapper');
+            
+            // マップ上で開始された場合のみエイムインタラクションとしてマーク
+            this.isAimingInteraction = !isUI;
+
+            if (isUI) return;
+
             this.isPointerDown = true;
 
             // 中ボタン(1)またはShift+左ボタン(0)でパン開始
             if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
-                if (e.target === this.canvas) {
-                    this.isPanning = true;
-                    this.panStart = new Vector2(e.clientX, e.clientY);
-                    this.canvas.style.cursor = 'grabbing';
-                    e.preventDefault(); // オートスクロール防止
-                    return;
-                }
+                this.isPanning = true;
+                this.panStart = new Vector2(e.clientX, e.clientY);
+                this.canvas.style.cursor = 'grabbing';
+                e.preventDefault(); // オートスクロール防止
+                return;
             }
 
             if (this.activePointers.size === 2) {
                 const pts = Array.from(this.activePointers.values());
                 this.lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
             }
-
-            // UI上のクリックはスルー
-            const isUI = e.target.closest('#build-overlay') || 
-                         e.target.closest('#launch-control') || 
-                         e.target.closest('#result-overlay') || 
-                         e.target.closest('#event-screen');
-            
-            if (isUI) return;
-            
-            this.isPointerDown = true;
 
             // ポインター位置を更新（タップした瞬間に照準を合わせるため）
             updatePointer(e);
@@ -446,7 +450,11 @@ export class Game {
                 if (e.cancelable) e.preventDefault();
             } else {
                 this.lastPointersPos = null;
-                updatePointer(e);
+                
+                // マップ上で開始されたインタラクションのみエイムを更新する
+                if (this.isAimingInteraction) {
+                    updatePointer(e);
+                }
             }
         });
 
@@ -478,6 +486,7 @@ export class Game {
             this.activePointers.delete(e.pointerId);
             if (this.activePointers.size === 0) {
                 this.isPointerDown = false;
+                this.isAimingInteraction = false; // インタラクション終了時にリセット
             }
             if (this.activePointers.size < 2) {
                 this.lastPinchDist = 0;
