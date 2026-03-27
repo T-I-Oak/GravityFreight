@@ -2210,6 +2210,7 @@ export class Game {
      * TRADING POST の初期化
      */
     initTradingPost(container) {
+        container.innerHTML = '';
         // 在庫生成 (6個, Parts Only)
         const inventory = [];
         for (let i = 0; i < 6; i++) {
@@ -2299,12 +2300,14 @@ export class Game {
             `;
 
             card.querySelector('.sell-btn').onclick = () => {
-                this.animateCoinChange(sellPrice);
-                this.coins += sellPrice;
-                // インベントリから削除
-                this._removeItemFromInventory(item.cat, item.id, item.isEnhanced);
-                this.initTradingPost(container); // リフレッシュ
-                this.updateUI();
+                // インベントリから削除（成功した場合のみコイン加算）
+                const success = this._removeItemFromInventory(item.cat, item.id, item.isEnhanced);
+                if (success) {
+                    this.animateCoinChange(sellPrice);
+                    this.coins += sellPrice;
+                    this.initTradingPost(container); // リフレッシュ
+                    this.updateUI();
+                }
             };
             sellGrid.appendChild(card);
         });
@@ -2323,7 +2326,7 @@ export class Game {
         if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
         if (category === 'MODULES') targetList = this.inventory.modules;
         if (category === 'BOOSTERS') targetList = this.inventory.boosters;
-        if (!targetList) return;
+        if (!targetList) return false;
 
         const idx = targetList.findIndex(i => i.id === id && !!i.isEnhanced === isEnhanced);
         if (idx !== -1) {
@@ -2333,7 +2336,9 @@ export class Game {
             } else {
                 targetList.splice(idx, 1);
             }
+            return true;
         }
+        return false;
     }
 
     /**
