@@ -1043,7 +1043,7 @@ export class Game {
             border-bottom: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
         `;
 
-        // --- 3. パラメータタグの生成 (4項目) ---
+        // --- 3. パラメータタグの生成 ---
         const stats = [];
         if (item.slots !== undefined && item.slots > 0) {
             stats.push({ label: 'SLOTS', val: item.slots, enhanced: enhancements.slots > 0 });
@@ -1068,35 +1068,52 @@ export class Game {
         // --- 4. ユニット詳細 (モジュールリスト) ---
         let unitDetailsHtml = '';
         if (isUnit && item.modules) {
-            const moduleRows = [];
-            for (const [modInstId, moduleInstanceData] of Object.entries(item.modules)) { // modIdをmodInstIdに、masterをmoduleInstanceDataに
-                // moduleInstanceDataはassembleUnitで既にインスタンス情報がコピーされている
+            const mergedModules = new Map();
+            for (const [modInstId, moduleInstanceData] of Object.entries(item.modules)) {
                 if (moduleInstanceData) {
-                    let mGauge = '';
-                    if (moduleInstanceData.maxCharges) {
-                        const totalMax = moduleInstanceData.maxCharges * moduleInstanceData.count;
-                        // ユニット内での各モジュールの現在値管理が実装されていない場合は、とりあえず最大値を表示
-                        // 本来は unit.moduleCharges[modId] などで管理すべき
-                        const current = totalMax; 
-                        let mSegments = '';
-                        for(let i=0; i<totalMax; i++) {
-                            mSegments += `<div style="width:4px; height:3px; background:#fff; border-radius:1px; flex-shrink:0;"></div>`;
+                    const mid = moduleInstanceData.id;
+                    if (mergedModules.has(mid)) {
+                        const existing = mergedModules.get(mid);
+                        existing.count += moduleInstanceData.count || 1;
+                        if (moduleInstanceData.maxCharges) {
+                            existing.maxCharges = (existing.maxCharges || 0) + (moduleInstanceData.maxCharges * (moduleInstanceData.count || 1));
+                            existing.charges = (existing.charges || 0) + ((moduleInstanceData.charges !== undefined ? moduleInstanceData.charges : moduleInstanceData.maxCharges) * (moduleInstanceData.count || 1));
                         }
-                        mGauge = `<div style="display:flex; gap:1px; margin-left:8px; opacity:0.6;">${mSegments}</div>`;
+                    } else {
+                        mergedModules.set(mid, { 
+                            name: moduleInstanceData.name,
+                            count: moduleInstanceData.count || 1,
+                            maxCharges: moduleInstanceData.maxCharges ? (moduleInstanceData.maxCharges * (moduleInstanceData.count || 1)) : undefined,
+                            charges: (moduleInstanceData.maxCharges !== undefined) ? ((moduleInstanceData.charges !== undefined ? moduleInstanceData.charges : moduleInstanceData.maxCharges) * (moduleInstanceData.count || 1)) : undefined
+                        });
                     }
-                    moduleRows.push(`
-                        <div class="unit-module-row">
-                            <span class="unit-module-name">${moduleInstanceData.name}</span>
-                            <div style="display:flex; align-items:center;">
-                                <span class="inventory-badge">[x ${moduleInstanceData.count}]</span>
-                                ${mGauge}
-                            </div>
-                        </div>
-                    `);
                 }
             }
-            unitDetailsHtml = `<div class="unit-details">${moduleRows.join('')}</div>`;
+
+            const moduleRows = [];
+            mergedModules.forEach(mod => {
+                let mGauge = '';
+                if (mod.maxCharges) {
+                    let mSegments = '';
+                    for (let i = 0; i < mod.maxCharges; i++) {
+                        mSegments += `<div class="hp-segment ${i < mod.charges ? 'active' : ''}" style="width:6px; height:3px; background:${i < mod.charges ? '#fff' : 'rgba(255,255,255,0.1)'}; border-radius:1px; flex-shrink:0;"></div>`;
+                    }
+                    mGauge = `<div class="hp-gauge" style="display:flex; gap:1.5px; margin-left:8px;">${mSegments}</div>`;
+                }
+                moduleRows.push(`
+                    <div class="unit-module-row" style="display:flex; align-items:center; justify-content:space-between;">
+                        <span class="unit-module-name" style="font-size:10px; color:rgba(255,255,255,0.8);">${mod.name}</span>
+                        <div style="display:flex; align-items:center;">
+                            <span class="inventory-badge" style="font-size:9px; color:rgba(255,255,255,0.5);">[x ${mod.count}]</span>
+                            ${mGauge}
+                        </div>
+                    </div>
+                `);
+            });
+            unitDetailsHtml = `<div class="unit-details" style="margin-top:4px;">${moduleRows.join('')}</div>`;
         }
+
+        const description = isUnit ? '' : (item.description || '');
 
         return `
             <div class="part-item-container" style="${itemContainerStyle}">
@@ -1105,7 +1122,7 @@ export class Game {
                     <span class="part-name" style="font-weight: 800; font-size: 13px; color: #fff;">${item.name || 'Unknown'}${selTag}</span>
                     ${invInfo}
                 </div>
-                <div class="part-info" style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 6px;">${item.description || ''}</div>
+                ${description ? `<div class="part-info" style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 6px;">${description}</div>` : ''}
                 <div class="part-stats" style="display: flex; flex-wrap: wrap; gap: 6px;">
                     ${statsHtml}
                 </div>
