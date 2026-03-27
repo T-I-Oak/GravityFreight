@@ -76,6 +76,7 @@ export class Game {
         };
         this.cameraOffset = new Vector2(0, 0); // マップのパン用
         this.nextSectorThresholdBonus = 0; // 次セクターへの出現率ボーナス
+        this.currentCoinDiscount = 0; // 施設でのコイン割引率 (0.0 - 0.5)
         this.activeBoosterAtLaunch = null; // 発射時に使用していたブースター
         this.isPanning = false;
         this.panStart = new Vector2(0, 0);
@@ -118,6 +119,7 @@ export class Game {
 
         this.generateStars(starCount);
         this.physics.bodies = [...this.bodies];
+        this.currentCoinDiscount = 0; // 新規セクター開始時に割引をリセット
 
         // 自機の初期設定
         this.ship = new Body(new Vector2(centerX, centerY - this.homeStar.radius - 12), 10);
@@ -218,8 +220,9 @@ export class Game {
                 const mass = 5000 + Math.random() * 15000;
                 const body = new Body(pos, mass, true);
                 
-                // 各星に2個のアイテムを配置
-                for (let j = 0; j < 2; j++) {
+                // 各星に 1～2個のアイテムを配置
+                const itemNum = 1 + Math.floor(Math.random() * 2);
+                for (let j = 0; j < itemNum; j++) {
                     const itemData = this.getWeightedRandomItem();
                     if (itemData) {
                         body.items.push(itemData);
@@ -1745,9 +1748,9 @@ export class Game {
                 if (category === 'CARGO') {
                     if (hitGoal) {
                         // ゴール到達時：特殊効果または配送報酬
-                        if (item.nextSectorThresholdBonus) {
-                            // 幸運の導き
-                            this.nextSectorThresholdBonus = item.nextSectorThresholdBonus;
+                        if (item.coinDiscount) {
+                            // 幸運の導き: 施設での消費コインを減額（最大 50% = 0.5）
+                            this.currentCoinDiscount = Math.min(0.5, this.currentCoinDiscount + item.coinDiscount);
                             this.flightResults.items.push({ ...itemData, bonusItems: [] });
                         } else if (item.deliveryGoalId) {
                             const isMatch = hitGoal.id === item.deliveryGoalId;
@@ -2375,7 +2378,8 @@ export class Game {
             repairList.innerHTML = '<div class="part-info" style="opacity:0.3; padding:20px; text-align:center;">ALL LAUNCHERS READY</div>';
         } else {
             repairables.forEach(item => {
-                const cost = 20; // 1回復あたりのコスト
+                const baseCost = 20;
+                const cost = Math.floor(baseCost * (1 - this.currentCoinDiscount));
                 const card = document.createElement('div');
                 card.className = 'event-card repair-card';
                 card.innerHTML = `
@@ -2384,6 +2388,7 @@ export class Game {
                         <div class="card-price">
                             <span class="label">REPAIR (+1 CHG):</span>
                             <span class="price-val">${cost}</span><span class="currency">c</span>
+                            ${this.currentCoinDiscount > 0 ? `<span class="discount-tag" style="color:#00ffcc; font-size:10px; margin-left:5px;">(-${Math.round(this.currentCoinDiscount * 100)}%)</span>` : ''}
                         </div>
                     </div>
                     <button class="repair-btn" ${this.coins < cost ? 'disabled' : ''}>RESTORE</button>
@@ -2418,7 +2423,8 @@ export class Game {
             dismantleList.innerHTML = '<div class="part-info" style="opacity:0.3; padding:20px; text-align:center;">NO ASSEMBLED UNITS</div>';
         } else {
             dismantleCandidates.forEach(unit => {
-                const cost = (this.dismantleCount + 1) * 50;
+                const baseCost = (this.dismantleCount + 1) * 50;
+                const cost = Math.floor(baseCost * (1 - this.currentCoinDiscount));
                 const card = document.createElement('div');
                 card.className = 'event-card dismantle-card';
                 
@@ -2428,6 +2434,7 @@ export class Game {
                         <div class="card-price dismantle">
                             <span class="label">DISMANTLE COST:</span>
                             <span class="price-val">${cost}</span><span class="currency">c</span>
+                            ${this.currentCoinDiscount > 0 ? `<span class="discount-tag" style="color:#00ffcc; font-size:10px; margin-left:5px;">(-${Math.round(this.currentCoinDiscount * 100)}%)</span>` : ''}
                         </div>
                     </div>
                     <button class="dismantle-btn" ${this.coins < cost ? 'disabled' : ''}>BRING TO SCRAP</button>
@@ -2480,17 +2487,20 @@ export class Game {
      * BLACK MARKET の初期化
      */
     initBlackMarket(container) {
+        const cost100 = Math.floor(100 * (1 - this.currentCoinDiscount));
+        const cost500 = Math.floor(500 * (1 - this.currentCoinDiscount));
+
         container.innerHTML = `
             <div class="black-market-options">
                 <div class="market-option">
                     <h3>STREET DEAL</h3>
-                    <p>Total value ~100c items.</p>
-                    <button id="market-btn-100" class="premium-button" ${this.coins < 100 ? 'disabled' : ''}>PAY 100c</button>
+                    <p>Total value ~100c items. ${this.currentCoinDiscount > 0 ? `<span style="color:#00ffcc;">(-${Math.round(this.currentCoinDiscount * 100)}%)</span>` : ''}</p>
+                    <button id="market-btn-100" class="premium-button" ${this.coins < cost100 ? 'disabled' : ''}>PAY ${cost100}c</button>
                 </div>
                 <div class="market-option highlighted">
                     <h3>PREMIUM HAUL</h3>
-                    <p>Total value ~600c items (Rarity Bonus).</p>
-                    <button id="market-btn-500" class="premium-button" ${this.coins < 500 ? 'disabled' : ''}>PAY 500c</button>
+                    <p>Total value ~600c items. ${this.currentCoinDiscount > 0 ? `<span style="color:#00ffcc;">(-${Math.round(this.currentCoinDiscount * 100)}%)</span>` : ''}</p>
+                    <button id="market-btn-500" class="premium-button" ${this.coins < cost500 ? 'disabled' : ''}>PAY ${cost500}c</button>
                 </div>
             </div>
             <div id="market-results" class="market-results-area hidden">
@@ -2499,8 +2509,8 @@ export class Game {
             </div>
         `;
 
-        document.getElementById('market-btn-100').onclick = () => this.runBlackMarket(100, 100, 0);
-        document.getElementById('market-btn-500').onclick = () => this.runBlackMarket(500, 600, 5);
+        document.getElementById('market-btn-100').onclick = () => this.runBlackMarket(cost100, 100, 0);
+        document.getElementById('market-btn-500').onclick = () => this.runBlackMarket(cost500, 600, 5);
     }
 
     /**

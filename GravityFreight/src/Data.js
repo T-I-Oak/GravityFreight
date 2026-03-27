@@ -89,7 +89,7 @@ export const PARTS = {
         { id: 'cargo_safe', category: 'CARGO', name: 'TRADE SUPPLIES', mass: 1, deliveryGoalId: 'SAFE', rarity: RARITY.UNCOMMON, description: '交易所への配送用物資。' },
         { id: 'cargo_normal', category: 'CARGO', name: 'REPAIR PARTS', mass: 1, deliveryGoalId: 'NORMAL', rarity: RARITY.UNCOMMON, description: '整備ドックへの配送用パーツ。' },
         { id: 'cargo_danger', category: 'CARGO', name: 'ENCRYPTED DATA', mass: 1, deliveryGoalId: 'DANGER', rarity: RARITY.UNCOMMON, description: '闇市場への配送用データ。' },
-        { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, nextSectorThresholdBonus: 5, rarity: RARITY.UNCOMMON, description: 'ゴール到達時に保持していると、次セクターの出現率を大幅に向上。' }
+        { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: 'ゴール到達時に保持していると、施設（拠点イベント）での消費コインが -10% される（重複可、最大 -50%）。' }
     ]
 };
 
@@ -112,7 +112,7 @@ export const INITIAL_INVENTORY = {
     ],
     boosters: [
         { id: 'opt_fuel', count: 1 },
-        { id: 'boost_power', count: 3 }
+        { id: 'boost_power', count: 1 }
     ]
 };
 // IDをキーにしたハッシュ（高速検索用）
