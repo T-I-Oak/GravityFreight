@@ -249,4 +249,55 @@ describe('Game Item Rarity Logic', () => {
             expect(game.selection.booster).toBeNull();
         });
     });
+
+    describe('v1.0.1 Balance Refinement (Latest)', () => {
+        const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn() };
+        const mockUI = { status: {}, message: {} };
+
+        it('INITIAL_INVENTORY should have reduced boost_power count', () => {
+            const game = new Game(mockCanvas, mockUI);
+            const boostPower = game.inventory.boosters.find(b => b.id === 'boost_power');
+            expect(boostPower).toBeDefined();
+            expect(boostPower.count).toBe(1); // 3 -> 1
+        });
+
+        it('generateStars should randomize item counts to 1 or 2', () => {
+            const game = new Game(mockCanvas, mockUI);
+            game.generateStars(20);
+            
+            const counts = game.bodies
+                .filter(b => b !== game.homeStar)
+                .map(b => b.items.length);
+
+            expect(counts.every(c => c >= 1 && c <= 2)).toBe(true);
+            // 20個生成すれば、統計的に1と2の両方が含まれるはず
+            expect(counts.includes(1)).toBe(true);
+            expect(counts.includes(2)).toBe(true);
+        });
+
+        it('resolveItems should accumulate coin discount from cargo_lucky', () => {
+            const game = new Game(mockCanvas, mockUI);
+            game.pendingItems = [
+                { itemData: { id: 'cargo_lucky', category: 'CARGO', coinDiscount: 0.1 } },
+                { itemData: { id: 'cargo_lucky', category: 'CARGO', coinDiscount: 0.1 } }
+            ];
+
+            const hitGoal = { id: 'SAFE' };
+            game.resolveItems('success', hitGoal);
+
+            // 0.1 * 2 = 0.2
+            expect(game.currentCoinDiscount).toBeCloseTo(0.2);
+        });
+
+        it('coin discount should be capped at 50%', () => {
+            const game = new Game(mockCanvas, mockUI);
+            game.pendingItems = [];
+            for (let i = 0; i < 7; i++) {
+                game.pendingItems.push({ itemData: { id: 'cargo_lucky', category: 'CARGO', coinDiscount: 0.1 } });
+            }
+
+            game.resolveItems('success', { id: 'SAFE' });
+            expect(game.currentCoinDiscount).toBe(0.5); // Max 0.5
+        });
+    });
 });

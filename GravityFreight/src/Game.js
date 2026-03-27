@@ -1606,10 +1606,9 @@ export class Game {
         pools.forEach(p => {
             if (!p.list) return;
             p.list.forEach(item => {
-                // 出現しきい値以上のアイテムのみを対象とする
-                if (threshold >= item.rarity) {
-                    // 重み計算: しきい値とレアリティの差分 (最小 1)
-                    const weight = Math.max(1, threshold - item.rarity);
+                // 出現しきい値より高いレアリティ（出現率）のアイテムのみを対象とする
+                const weight = threshold - item.rarity;
+                if (weight > 0) {
                     items.push({ ...item, category: p.category, weight });
                 }
             });
