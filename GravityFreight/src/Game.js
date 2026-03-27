@@ -115,6 +115,7 @@ export class Game {
         this.generateStars(starCount);
         this.physics.bodies = [...this.bodies];
         this.currentCoinDiscount = 0; // 新規セクター開始時に割引をリセット
+        this.dismantleCount = 0; // 新規セクター開始時に解体回数をリセット
 
         // 自機の初期設定
         this.ship = new Body(new Vector2(centerX, centerY - this.homeStar.radius - 12), 10);
@@ -451,10 +452,8 @@ export class Game {
             } else {
                 this.lastPointersPos = null;
                 
-                // マップ上で開始されたインタラクションのみエイムを更新する
-                if (this.isAimingInteraction) {
-                    updatePointer(e);
-                }
+                // マウス位置はホバー判定等のために常に更新する
+                updatePointer(e);
             }
         });
 
@@ -2438,13 +2437,9 @@ export class Game {
         // 2. 解体対象 (組み立て済みユニットのみ)
         const dismantleCandidates = [];
 
-        // 装備中
-        if (this.selection.rocket) {
-            dismantleCandidates.push({ ...this.selection.rocket, category: 'UNIT', source: 'EQUIPPED' });
-        }
-        // インベントリ内 (もしあれば)
+        // インベントリ内 (装備中も基本ここに含まれる)
         this.inventory.rockets.forEach(r => {
-            dismantleCandidates.push({ ...r, category: 'UNIT', source: 'INV' });
+            dismantleCandidates.push({ ...r, category: 'UNIT' });
         });
 
         if (dismantleCandidates.length === 0) {
@@ -2495,13 +2490,15 @@ export class Game {
                     });
 
                     // ユニットの削除
-                    if (unit.source === 'EQUIPPED') {
+                    // 装備中の機体と同じインスタンスであれば装備解除
+                    if (this.selection.rocket && this.selection.rocket.instanceId === unit.instanceId) {
                         this.selection.rocket = null;
                         this.ui.message.textContent = 'UNIT DISASSEMBLED & ENHANCED';
-                    } else {
-                        const idx = this.inventory.rockets.findIndex(r => r.id === unit.id);
-                        if (idx !== -1) this.inventory.rockets.splice(idx, 1);
                     }
+
+                    // インベントリから削除
+                    const idx = this.inventory.rockets.findIndex(r => r.instanceId === unit.instanceId);
+                    if (idx !== -1) this.inventory.rockets.splice(idx, 1);
 
                     this.initRepairDock(container);
                     this.updateUI();
