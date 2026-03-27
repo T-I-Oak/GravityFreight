@@ -18,40 +18,34 @@ export class Game {
         this.simulatedTime = 0;
         this.accumulator = 0;
 
-        this.fixedDt = 0.002;
-        this.zoom = 0.5;
         this.currentStarCount = starCount;
+        this.instanceCounter = 0; // ユニークインスタンスID用カウンタ
         this.width = canvas.width;
         this.height = canvas.height;
         this.isPointerDown = false;
         this.activePointers = new Map();
         this.lastPinchDist = 0;
+        this.zoom = 0.5;
+        this.fixedDt = 0.002;
 
+        // インベントリの初期化 (Data.js の INITIAL_INVENTORY をディープコピー)
+        this.inventory = JSON.parse(JSON.stringify(INITIAL_INVENTORY));
+        if (!this.inventory.rockets) this.inventory.rockets = [];
 
-        // インベントリの初期化 (数量管理)
-        this.inventory = {
-            chassis: INITIAL_INVENTORY.chassis.map(c => {
-                const base = PARTS.CHASSIS.find(bc => bc.id === c.id);
-                return { ...base, count: c.count };
-            }),
-            logic: INITIAL_INVENTORY.logic.map(l => {
-                const base = PARTS.LOGIC.find(bl => bl.id === l.id);
-                return { ...base, count: l.count };
-            }),
-            launchers: INITIAL_INVENTORY.launchers.map(p => {
-                const base = PARTS.LAUNCHERS.find(bp => bp.id === p.id);
-                return { ...base, charges: p.charges };
-            }),
-            modules: INITIAL_INVENTORY.modules.map(o => {
-                const base = PARTS.MODULES.find(bo => bo.id === o.id);
-                return { ...base, count: o.count };
-            }),
-            boosters: INITIAL_INVENTORY.boosters.map(o => {
-                const base = PARTS.BOOSTERS.find(bo => bo.id === o.id);
-                return { ...base, count: o.count };
-            }),
-            rockets: []
-        };
+        // 初期アイテムにインスタンスIDを付与し、マスタデータをマージ
+        Object.keys(this.inventory).forEach(category => {
+            if (category === 'rockets') return;
+            const targetList = this.inventory[category];
+            const upperCategory = category.toUpperCase();
+            
+            this.inventory[category] = targetList.map(item => {
+                const base = PARTS[upperCategory]?.find(p => p.id === item.id);
+                // 既存の charges や count を維持しつつ、ベースの全プロパティをマージ
+                const enrichedItem = { ...base, ...item };
+                this._assignInstanceId(enrichedItem);
+                return enrichedItem;
+            });
+        });
 
         this.score = 0;
         this.displayScore = 0; // 表示用スコア（アニメーション用）
@@ -554,19 +548,19 @@ export class Game {
 
     }
 
-    selectPart(type, id) {
+    selectPart(type, instanceId) {
         if (type === 'chassis') {
-            this.selection.chassis = this.inventory.chassis.find(p => p.id === id);
+            this.selection.chassis = this.inventory.chassis.find(p => p.instanceId === instanceId);
             // シャーシ変更時はスロット数制限に合わせてアドオンを自動調整
             this.validateModules();
         }
-        if (type === 'logic') this.selection.logic = this.inventory.logic.find(p => p.id === id);
+        if (type === 'logic') this.selection.logic = this.inventory.logic.find(p => p.instanceId === instanceId);
         if (type === 'launcher') {
-            this.selection.launcher = this.inventory.launchers.find(p => p.id === id);
+            this.selection.launcher = this.inventory.launchers.find(p => p.instanceId === instanceId);
             this.checkReadyToAim();
         }
         if (type === 'rocket') {
-            this.selection.rocket = this.inventory.rockets.find(r => r.id === id);
+            this.selection.rocket = this.inventory.rockets.find(r => r.instanceId === instanceId); // RocketはinstanceIdで管理
             this.checkReadyToAim();
         }
         this.updateUI();
@@ -574,37 +568,38 @@ export class Game {
 
 
 
-    selectOption(type, id) {
+    selectOption(type, instanceId) {
         if (type === 'modules') {
             const baseSlots = this.selection.chassis ? this.selection.chassis.slots : 0;
-            const itemInInv = this.inventory.modules.find(o => o.id === id);
+            const itemInInv = this.inventory.modules.find(o => o.instanceId === instanceId);
             if (!itemInInv || itemInInv.count <= 0) return;
+
+            const alreadySelected = this.selection.modules[instanceId] || 0;
 
             // 現在の使用数と、追加スロットの合計を算出
             let extraSlots = 0;
             let usedCount = 0;
-            for (const [optId, count] of Object.entries(this.selection.modules)) {
-                const optBase = PARTS.MODULES.find(o => o.id === optId);
-                if (optBase) extraSlots += (optBase.slots || 0) * count;
+            for (const [mInstId, count] of Object.entries(this.selection.modules)) {
+                const optInst = this.inventory.modules.find(o => o.instanceId === mInstId);
+                if (optInst) extraSlots += (optInst.slots || 0) * count;
                 usedCount += count;
             }
 
             const totalCapacity = baseSlots + extraSlots;
-            const alreadySelected = this.selection.modules[id] || 0;
 
             if (usedCount < totalCapacity && alreadySelected < itemInInv.count) {
                 // 空きスロットがあり、かつ在庫がある場合は追加
-                this.selection.modules[id] = alreadySelected + 1;
+                this.selection.modules[instanceId] = alreadySelected + 1;
             } else {
                 // 上限に達している、または在庫がない場合はそのアイテムを 0 にリセット
-                delete this.selection.modules[id];
+                delete this.selection.modules[instanceId];
             }
 
             // スロット超過のバリデーション (拡張パーツを外した際などのためのパージ)
             this.validateModules();
         }
         if (type === 'booster') {
-            const opt = this.inventory.boosters.find(o => o.id === id);
+            const opt = this.inventory.boosters.find(o => o.instanceId === instanceId);
             this.selection.booster = (this.selection.booster === opt) ? null : opt;
         }
         this.updateUI();
@@ -618,9 +613,9 @@ export class Game {
         let usedCount = 0;
 
         // 現在の状態を確認
-        for (const [optId, count] of Object.entries(this.selection.modules)) {
-            const optBase = PARTS.MODULES.find(o => o.id === optId);
-            if (optBase) extraSlots += (optBase.slots || 0) * count;
+        for (const [mInstId, count] of Object.entries(this.selection.modules)) {
+            const optInst = this.inventory.modules.find(o => o.instanceId === mInstId);
+            if (optInst) extraSlots += (optInst.slots || 0) * count;
             usedCount += count;
         }
 
@@ -658,28 +653,29 @@ export class Game {
             let totalGravityMultiplier = (chassis.gravityMultiplier || 1.0) * (logic.gravityMultiplier || 1.0);
             let arcMultiplier = 1.0;
 
-            for (const [optId, count] of Object.entries(modules)) {
-                const optBase = PARTS.MODULES.find(o => o.id === optId);
-                if (optBase) {
-                    totalMass += (optBase.mass || 0) * count;
-                    totalSlots += (optBase.slots || 0) * count;
-                    totalPrecision += (optBase.precision || 0) * count;
-                    totalPickupRange += (optBase.pickupRange || 0) * count;
+            for (const [mInstId, count] of Object.entries(modules)) {
+                const item = this.inventory.modules.find(o => o.instanceId === mInstId);
+                if (item) {
+                    totalMass += (item.mass || 0) * count;
+                    totalSlots += (item.slots || 0) * count;
+                    totalPrecision += (item.precision || 0) * count;
+                    totalPickupRange += (item.pickupRange || 0) * count;
                     
-                    if (optBase.precisionMultiplier) {
-                        for(let i=0; i<count; i++) totalMultiplier *= optBase.precisionMultiplier;
+                    if (item.precisionMultiplier) {
+                        for(let i=0; i<count; i++) totalMultiplier *= item.precisionMultiplier;
                     }
-                    if (optBase.pickupMultiplier) {
-                        for(let i=0; i<count; i++) totalPickupMultiplier *= optBase.pickupMultiplier;
+                    if (item.pickupMultiplier) {
+                        for(let i=0; i<count; i++) totalPickupMultiplier *= item.pickupMultiplier;
                     }
-                    if (optBase.gravityMultiplier) {
-                        for(let i=0; i<count; i++) totalGravityMultiplier *= optBase.gravityMultiplier;
+                    if (item.gravityMultiplier) {
+                        for(let i=0; i<count; i++) totalGravityMultiplier *= item.gravityMultiplier;
                     }
                 }
             }
 
             const rocket = {
-                id: Date.now(),
+                id: Date.now(), // 旧ID (互換性のため残す)
+                instanceId: `unit_${Date.now()}_${this.instanceCounter++}`, // 新しいインスタンスID
                 category: 'UNIT',
                 name: `${chassis.name} + ${logic.name}`,
                 mass: totalMass,
@@ -690,34 +686,34 @@ export class Game {
                 pickupMultiplier: totalPickupMultiplier,
                 gravityMultiplier: totalGravityMultiplier,
                 arcMultiplier: arcMultiplier,
-                chassis,
-                logic,
-                modules
+                chassis: { ...chassis }, // 参照ではなくコピー
+                logic: { ...logic },
+                modules: {} // インスタンスコピーの保持
             };
 
-            // モジュール構成を縦並びで説明文に設定
+            // モジュール構成を縦並びで説明文に設定 & 実体コピーの保持
             let addonDetails = [];
-            for (const optId in modules) {
-                const optBase = PARTS.MODULES.find(o => o.id === optId);
-                if (optBase) addonDetails.push(`${optBase.name} × ${modules[optId]}`);
+            for (const [mInstId, count] of Object.entries(modules)) {
+                const item = this.inventory.modules.find(o => o.instanceId === mInstId);
+                if (item) {
+                    addonDetails.push(`${item.name} × ${count}`);
+                    // 強化内容を維持するためにIDではなくインスタンス情報を保持
+                    rocket.modules[mInstId] = { ...item, count: count };
+                }
             }
             rocket.description = addonDetails.join('<br>');
             this.inventory.rockets.push(rocket);
 
-            // 消費
-            chassis.count--;
-            logic.count--;
-            for (const [optId, count] of Object.entries(modules)) {
-                const optInv = this.inventory.modules.find(o => o.id === optId);
-                if (optInv) optInv.count -= count;
+            // 消費 (instanceId を使用)
+            this._removeItemFromInventory('CHASSIS', chassis.instanceId);
+            this._removeItemFromInventory('LOGIC', logic.instanceId);
+            for (const [mInstId, count] of Object.entries(modules)) {
+                for (let i = 0; i < count; i++) {
+                    this._removeItemFromInventory('MODULES', mInstId);
+                }
             }
 
-            // 在庫が0になったものを除外 (UI更新のため)
-            this.inventory.chassis = this.inventory.chassis.filter(c => c.count > 0);
-            this.inventory.logic = this.inventory.logic.filter(l => l.count > 0);
-            this.inventory.modules = this.inventory.modules.filter(o => o.count > 0);
-            this.inventory.boosters = this.inventory.boosters.filter(o => o.count > 0);
-
+            // ブースターはクリアしない
             this.selection.chassis = null;
             this.selection.logic = null;
             this.selection.modules = {};
@@ -762,13 +758,16 @@ export class Game {
             // 飛行用のアドオンインスタンス化 (残り回数管理のため)
             // モジュールは { id, charges, maxCharges, ... } のリストにする
             this.ship.equippedModules = [];
-            for (const [id, count] of Object.entries(this.selection.rocket.modules)) {
-                const base = PARTS.MODULES.find(m => m.id === id);
-                for (let i = 0; i < count; i++) {
-                    this.ship.equippedModules.push({ 
-                        ...base, 
-                        charges: base.maxCharges !== undefined ? base.maxCharges : 1 
-                    });
+            if (this.selection.rocket.modules) {
+                for (const [mInstId, itemData] of Object.entries(this.selection.rocket.modules)) {
+                    // itemDataはassembleUnitで既にインスタンス情報がコピーされている
+                    // chargesは個別に管理されるため、maxChargesから初期化
+                    for (let i = 0; i < itemData.count; i++) {
+                        this.ship.equippedModules.push({ 
+                            ...itemData, 
+                            charges: itemData.maxCharges !== undefined ? itemData.maxCharges : 1 
+                        });
+                    }
                 }
             }
 
@@ -805,21 +804,24 @@ export class Game {
                 let mainText = 'EMPTY';
                 let subText = '在庫なし';
                 
-                if (type === 'CHASSIS') {
+                if (type === 'chassis') { // typeを小文字に修正
                     mainText = 'シャーシなし';
                     subText = 'スペースドックで調達可能';
-                } else if (type === 'LOGIC') {
+                } else if (type === 'logic') { // typeを小文字に修正
                     mainText = 'ロジックユニットなし';
                     subText = 'サルベージが必要です';
-                } else if (type === 'LAUNCHERS') {
+                } else if (type === 'launcher') { // typeを小文字に修正
                     mainText = '発射台なし';
                     subText = '回収ミッションが必要です';
-                } else if (type === 'MODULES') {
+                } else if (type === 'modules') { // typeを小文字に修正
                     mainText = 'モジュールなし';
                     subText = '探索ミッションが必要です';
-                } else if (type === 'BOOSTERS') {
+                } else if (type === 'booster') { // typeを小文字に修正
                     mainText = 'ブースターなし';
                     subText = '推進技術の研究が必要です';
+                } else if (type === 'rocket') { // typeを小文字に修正
+                    mainText = '待機中の機体なし';
+                    subText = 'ASSEMBLY BAYで機体を建造してください';
                 }
                 
                 placeholder.innerHTML = `
@@ -832,14 +834,25 @@ export class Game {
                 return;
             }
 
-            // アイテム集約ロジック (ID + charges でグループ化)
+            // アイテム集約ロジック (ID + charges + enhancements でグループ化)
             const groups = [];
             items.forEach(item => {
-                if (!item || !item.id) return;
+                if (!item || !item.id) return; // instanceIdではなくidでグループ化のキーを生成
+
+                // instanceIdはユニークなので、グループ化のキーには含めない
+                // ただし、選択状態の判定にはinstanceIdを使う
                 
                 const charges = item.charges !== undefined ? item.charges : -1;
-                let group = groups.find(g => g.id === item.id && g.charges === charges);
+                const enhancementsStr = JSON.stringify(item.enhancements || {});
+                
+                let group = groups.find(g => 
+                    g.id === item.id && 
+                    g.charges === charges && 
+                    JSON.stringify(g.enhancements || {}) === enhancementsStr
+                );
+
                 if (!group) {
+                    // グループの代表アイテムとして最初のインスタンスをコピー
                     group = { ...item, count: 0, instances: [] };
                     groups.push(group);
                 }
@@ -854,11 +867,14 @@ export class Game {
                 let selectionCount = 0;
                 let isSelected = false;
                 if (type === 'modules') {
-                    selectionCount = this.selection.modules[data.id] || 0;
+                    // モジュールは複数選択可能なので、instanceIdごとの選択数をチェック
+                    selectionCount = this.selection.modules[data.instanceId] || 0;
                     isSelected = selectionCount > 0;
                 } else {
-                    // 全インスタンスのいずれかが選択されているか
-                    isSelected = data.instances.some(inst => inst === selected);
+                    // その他のアイテムは単一選択なので、選択中のアイテムのinstanceIdと一致するかチェック
+                    if (selected && selected.instanceId === data.instanceId) {
+                        isSelected = true;
+                    }
                 }
 
                 div.className = `part-item ${isSelected ? 'selected' : ''}`;
@@ -871,10 +887,10 @@ export class Game {
 
                 div.onclick = () => {
                     if (type === 'modules' || type === 'booster') {
-                        this.selectOption(type, data.id);
+                        this.selectOption(type, data.instanceId);
                     } else {
-                        // 集約された中から未選択のインスタンスを優先的に選ぶ（簡易化のため最初の１つ）
-                        this.selectPart(type, data.id);
+                        // 集約された中から代表インスタンスを選択
+                        this.selectPart(type, data.instanceId);
                     }
                 };
                 el.appendChild(div);
@@ -961,7 +977,7 @@ export class Game {
                     div.innerHTML = this.generateCardHTML(rocket, { isSelected });
 
                     div.onclick = () => {
-                        this.selectPart('rocket', rocket.id);
+                        this.selectPart('rocket', rocket.instanceId); // instanceIdで選択
                     };
                     rList.appendChild(div);
                 });
@@ -1053,12 +1069,12 @@ export class Game {
         let unitDetailsHtml = '';
         if (isUnit && item.modules) {
             const moduleRows = [];
-            for (const [modId, count] of Object.entries(item.modules)) {
-                const master = ITEM_REGISTRY[modId];
-                if (master) {
+            for (const [modInstId, moduleInstanceData] of Object.entries(item.modules)) { // modIdをmodInstIdに、masterをmoduleInstanceDataに
+                // moduleInstanceDataはassembleUnitで既にインスタンス情報がコピーされている
+                if (moduleInstanceData) {
                     let mGauge = '';
-                    if (master.maxCharges) {
-                        const totalMax = master.maxCharges * count;
+                    if (moduleInstanceData.maxCharges) {
+                        const totalMax = moduleInstanceData.maxCharges * moduleInstanceData.count;
                         // ユニット内での各モジュールの現在値管理が実装されていない場合は、とりあえず最大値を表示
                         // 本来は unit.moduleCharges[modId] などで管理すべき
                         const current = totalMax; 
@@ -1070,9 +1086,9 @@ export class Game {
                     }
                     moduleRows.push(`
                         <div class="unit-module-row">
-                            <span class="unit-module-name">${master.name}</span>
+                            <span class="unit-module-name">${moduleInstanceData.name}</span>
                             <div style="display:flex; align-items:center;">
-                                <span class="inventory-badge">[x ${count}]</span>
+                                <span class="inventory-badge">[x ${moduleInstanceData.count}]</span>
                                 ${mGauge}
                             </div>
                         </div>
@@ -1101,6 +1117,16 @@ export class Game {
 
 
     /**
+     * インスタンスIDを付与する
+     */
+    _assignInstanceId(item) {
+        if (!item.instanceId) {
+            item.instanceId = `inst_${Date.now()}_${this.instanceCounter++}`;
+        }
+        return item;
+    }
+
+    /**
      * アイテムをカテゴリに応じてインベントリに追加するヘルパー
      */
     _addItemToInventory(item) {
@@ -1114,46 +1140,54 @@ export class Game {
         if (category === 'BOOSTERS') targetList = this.inventory.boosters;
         if (!targetList) return;
 
-        const existing = targetList.find(i => i.id === item.id && !!i.isEnhanced === !!item.isEnhanced && i.enhancementCount === item.enhancementCount);
+        // 同一性の判定 (ID, 耐久度, 強化内容がすべて一致する場合のみスタック)
+        const enhancementsStr = JSON.stringify(item.enhancements || {});
+        const existing = targetList.find(i => 
+            i.id === item.id && 
+            (i.charges === item.charges || (i.charges === undefined && item.charges === undefined)) &&
+            JSON.stringify(i.enhancements || {}) === enhancementsStr
+        );
+
         if (existing) {
-            if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
-                existing.charges = Math.min((existing.charges || 0) + 1, item.maxCharges || 2);
-            } else {
-                if (existing.count !== undefined) existing.count++;
-                else existing.count = 2;
-            }
+            if (existing.count !== undefined) existing.count += (item.count || 1);
+            else existing.count = (item.count || 1) + 1;
         } else {
-            if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
-                targetList.push({ ...item, charges: item.maxCharges || 2 });
-            } else {
-                targetList.push({ ...item, count: 1 });
-            }
+            const newItem = { ...item };
+            if (newItem.count === undefined) newItem.count = 1;
+            this._assignInstanceId(newItem);
+            targetList.push(newItem);
         }
     }
 
     /**
      * アイテムをカテゴリに応じてインベントリから削除するヘルパー
      */
-    _removeItemFromInventory(category, id, isEnhanced = false) {
-        let targetList = null;
-        if (category === 'CHASSIS') targetList = this.inventory.chassis;
-        if (category === 'LOGIC') targetList = this.inventory.logic;
-        if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
-        if (category === 'MODULES') targetList = this.inventory.modules;
-        if (category === 'BOOSTERS') targetList = this.inventory.boosters;
-        if (!targetList) return;
-
-        const index = targetList.findIndex(i => i.id === id && !!i.isEnhanced === isEnhanced);
-        if (index !== -1) {
-            const item = targetList[index];
-            if (item.count !== undefined && item.count > 1) {
-                item.count--;
-            } else if (item.charges !== undefined && item.charges > 1) {
-                item.charges--;
-            } else {
-                targetList.splice(index, 1);
+    _removeItemFromInventory(category, instanceId) {
+        if (!instanceId) return false;
+        const targetId = String(instanceId).trim();
+        const categories = ['chassis', 'logic', 'launchers', 'modules', 'boosters'];
+        
+        for (const catKey of categories) {
+            const list = this.inventory[catKey];
+            if (!list) continue;
+            
+            console.log(`DEBUG _removeItem CATEGORY: ${catKey}, Items in list: ${list.length}`);
+            list.forEach((i, idx) => {
+                const match = String(i.instanceId).trim() === targetId;
+                console.log(`  [${idx}] ItemID: ${i.id}, InstanceID: "${i.instanceId}", Target: "${targetId}", Match: ${match}`);
+            });
+            const index = list.findIndex(i => i.instanceId && String(i.instanceId).trim() === targetId);
+            if (index !== -1) {
+                const item = list[index];
+                if (item.count !== undefined && item.count > 1) {
+                    item.count--;
+                } else {
+                    list.splice(index, 1);
+                }
+                return true;
             }
         }
+        return false;
     }
 
     reset() {
@@ -1800,32 +1834,7 @@ export class Game {
                 }
 
                 // 3. その他パーツ・ブースター（拾い物）：常にインベントリに加算
-                let targetList = null;
-                if (category === 'CHASSIS') targetList = this.inventory.chassis;
-                if (category === 'LOGIC') targetList = this.inventory.logic;
-                if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
-                if (category === 'MODULES') targetList = this.inventory.modules;
-                if (category === 'BOOSTERS') targetList = this.inventory.boosters;
-
-                if (targetList) {
-                    const existing = targetList.find(i => i.id === item.id && !!i.isEnhanced === !!item.isEnhanced && i.enhancementCount === item.enhancementCount);
-                    if (existing) {
-                        if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
-                            if (existing.charges !== undefined) existing.charges++;
-                            else existing.charges = (item.maxCharges || 2);
-                            if (existing.charges > (item.maxCharges || 2)) existing.charges = (item.maxCharges || 2);
-                        } else {
-                            if (existing.count !== undefined) existing.count++;
-                            else existing.count = 2;
-                        }
-                    } else {
-                        if (category === 'LAUNCHERS' || (category === 'BOOSTERS' && item.maxCharges > 1)) {
-                            targetList.push({ ...item, charges: item.maxCharges || 2 });
-                        } else {
-                            targetList.push({ ...item, count: 1 });
-                        }
-                    }
-                }
+                this._addItemToInventory(item);
             });
             this.pendingItems = [];
 
@@ -2314,7 +2323,7 @@ export class Game {
 
             card.querySelector('.sell-btn').onclick = () => {
                 // インベントリから削除（成功した場合のみコイン加算）
-                const success = this._removeItemFromInventory(item.cat, item.id, item.isEnhanced);
+                const success = this._removeItemFromInventory(item.cat, item.instanceId);
                 if (success) {
                     this.animateCoinChange(sellPrice);
                     this.coins += sellPrice;
@@ -2329,30 +2338,6 @@ export class Game {
         container.appendChild(sellSection);
     }
 
-    /**
-     * インベントリからアイテムを1つ削除するヘルパー
-     */
-    _removeItemFromInventory(category, id, isEnhanced = false) {
-        let targetList = null;
-        if (category === 'CHASSIS') targetList = this.inventory.chassis;
-        if (category === 'LOGIC') targetList = this.inventory.logic;
-        if (category === 'LAUNCHERS') targetList = this.inventory.launchers;
-        if (category === 'MODULES') targetList = this.inventory.modules;
-        if (category === 'BOOSTERS') targetList = this.inventory.boosters;
-        if (!targetList) return false;
-
-        const idx = targetList.findIndex(i => i.id === id && !!i.isEnhanced === isEnhanced);
-        if (idx !== -1) {
-            const item = targetList[idx];
-            if (item.count > 1) {
-                item.count--;
-            } else {
-                targetList.splice(idx, 1);
-            }
-            return true;
-        }
-        return false;
-    }
 
     /**
      * REPAIR DOCK の初期化
