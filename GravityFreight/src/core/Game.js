@@ -14,7 +14,7 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.5.5";
+        this.version = "0.5.6";
         this.state = 'building';
 
         // システムの初期化
