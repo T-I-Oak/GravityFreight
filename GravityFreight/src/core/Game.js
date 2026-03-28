@@ -1,5 +1,5 @@
 import { Vector2 } from '../utils/Physics.js';
-import { INITIAL_COINS } from './Data.js';
+import { INITIAL_COINS, ITEM_REGISTRY, RARITY, ANIMATION_DURATION } from './Data.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { EconomySystem } from '../systems/EconomySystem.js';
 import { AssemblySystem } from '../systems/AssemblySystem.js';
@@ -26,7 +26,7 @@ export class Game {
         this.uiSystem = new UISystem(this);
         this.eventSystem = new EventSystem(this);
 
-        this.renderer = new Renderer(canvas);
+        this.renderer = new Renderer(canvas, this);
         this.bodies = [];
         this.ship = null;
         this.homeStar = null;
@@ -46,6 +46,7 @@ export class Game {
         this.lastPinchDist = 0;
         this.zoom = 0.5;
         this.cameraOffset = new Vector2(0, 0);
+        this.mapRotation = 0; // マップの回転角（ラジアン）
 
         this.inventory = this.inventorySystem.inventory;
         this.coins = INITIAL_COINS;
@@ -100,6 +101,7 @@ export class Game {
     // --- Delegation to Inventory/EconomySystem ---
     selectPart(type, id) { this.inventorySystem.selectPart(type, id); }
     calculateValue(item) { return this.economySystem.calculateValue(item); }
+    enhanceItem(item) { return this.economySystem.enhanceItem(item); }
 
     // --- Delegation to AssemblySystem ---
     assembleRocket() { this.assemblySystem.assembleRocket(); }
@@ -139,22 +141,38 @@ export class Game {
         if (this.renderer) this.renderer.resize();
     }
 
+
     // --- Core Utilities ---
     getWorldPos(screenPos) {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
-        return new Vector2(
-            (screenPos.x - centerX - this.cameraOffset.x) / this.zoom + centerX,
-            (screenPos.y - centerY - this.cameraOffset.y) / this.zoom + centerY
-        );
+        
+        let x = (screenPos.x - centerX - this.cameraOffset.x) / this.zoom;
+        let y = (screenPos.y - centerY - this.cameraOffset.y) / this.zoom;
+        
+        const cos = Math.cos(-this.mapRotation);
+        const sin = Math.sin(-this.mapRotation);
+        const rx = x * cos - y * sin;
+        const ry = x * sin + y * cos;
+        
+        return new Vector2(rx + centerX, ry + centerY);
     }
 
     getScreenPos(worldPos) {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
+        
+        const dx = worldPos.x - centerX;
+        const dy = worldPos.y - centerY;
+        
+        const cos = Math.cos(this.mapRotation);
+        const sin = Math.sin(this.mapRotation);
+        const rx = dx * cos - dy * sin;
+        const ry = dx * sin + dy * cos;
+        
         return new Vector2(
-            (worldPos.x - centerX) * this.zoom + centerX + this.cameraOffset.x,
-            (worldPos.y - centerY) * this.zoom + centerY + this.cameraOffset.y
+            rx * this.zoom + centerX + this.cameraOffset.x,
+            ry * this.zoom + centerY + this.cameraOffset.y
         );
     }
 

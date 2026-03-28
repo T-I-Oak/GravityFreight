@@ -49,11 +49,11 @@ describe('UI Logic & Component Rendering', () => {
     });
 
     describe('generateCardHTML', () => {
-        it('should render enhanced stats with correct CSS classes and icons', () => {
+        it('should render enhanced stats with correct CSS classes and premium star icons (✦)', () => {
             const item = {
                 ...ITEM_REGISTRY['hull_light'],
-                isEnhanced: true,
-                enhancements: { slots: 1 }
+                precisionMultiplier: 1.5,
+                enhancements: { precision: 1 }
             };
             
             const html = game.generateCardHTML(item);
@@ -62,8 +62,25 @@ describe('UI Logic & Component Rendering', () => {
             expect(html).toContain('stat-tag');
             // 強化クラスが含まれているか
             expect(html).toContain('enhanced-border');
-            // 強化アイコンが含まれているか
+            // オリジナルの水色の星 (✦) と色が指定されているか
+            expect(html).toContain('color:#00d4ff');
             expect(html).toContain('✦');
+        });
+
+        it('should render gold durability segments and enhanced-frame for enhanced charges', () => {
+            const item = {
+                ...ITEM_REGISTRY['launcher_basic'],
+                maxCharges: 3,
+                charges: 3,
+                enhancements: { charges: 1 }
+            };
+            
+            const html = game.generateCardHTML(item, { showInventory: true });
+            
+            // ゴールドカラー (#ffd700) が含まれているか
+            expect(html).toContain('#ffd700');
+            // 強化フレームクラスが含まれているか
+            expect(html).toContain('enhanced-frame');
         });
 
         it('should hide internal separators in item cards', () => {
@@ -89,6 +106,38 @@ describe('UI Logic & Component Rendering', () => {
             expect(html).toContain('rocket-details');
             expect(html).toContain('[x 2]'); // 数量バッジ
             expect(html).toContain('rocket-module-row');
+        });
+    });
+
+    describe('showResult', () => {
+        it('should append separate indented cards for bonus items', () => {
+            // itemsList のモックコンテナを作成
+            const itemsList = createMockElement('div');
+            vi.spyOn(document, 'getElementById').mockImplementation((id) => {
+                if (id === 'result-items-list') return itemsList;
+                return createMockElement(id);
+            });
+
+            const cargo = {
+                id: 'cargo_safe',
+                category: 'CARGO',
+                name: 'Supplies',
+                isDelivery: true,
+                isMatch: true,
+                bonusItems: [{ id: 'bonus_item', name: 'Bonus Engine', category: 'MODULES' }]
+            };
+            
+            game.flightResults.items = [cargo];
+            game.flightResults.status = 'success';
+            
+            game.uiSystem.showResult('success');
+            
+            // 1. Cargo本体 2. Bonusアイテム の計2回 appendChild が呼ばれるはず
+            expect(itemsList.appendChild).toHaveBeenCalledTimes(2);
+            
+            // 2枚目のカード（ボーナス）にインデント（margin-left: 16px）が適用されているか
+            const bonusCardHtml = itemsList.appendChild.mock.calls[1][0].innerHTML;
+            expect(bonusCardHtml).toContain('margin-left: 16px');
         });
     });
 

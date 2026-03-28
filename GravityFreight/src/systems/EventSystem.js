@@ -117,6 +117,13 @@ export class EventSystem {
             game.isAimingInteraction = !isUI;
             if (isUI) return;
             game.isPointerDown = true;
+
+            const starScreen = game.getScreenPos(game.homeStar.position);
+            const dist = Math.hypot(e.clientX - starScreen.x, e.clientY - starScreen.y);
+            
+            // 境界（Exit/Lostの円）の現在の画面上の半径を計算
+            const visualBoundary = game.boundaryRadius * game.zoom;
+            
             if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
                 game.isPanning = true;
                 game.panStart = new Vector2(e.clientX, e.clientY);
@@ -124,6 +131,16 @@ export class EventSystem {
                 e.preventDefault();
                 return;
             }
+
+            // 境界外でのドラッグ開始ならマップ回転モード
+            if (dist > visualBoundary && (game.state === 'building' || game.state === 'aiming' || game.state === 'flying')) {
+                game.isRotatingMap = true;
+                game.lastRotationAngle = Math.atan2(e.clientY - starScreen.y, e.clientX - starScreen.x);
+                game.canvas.style.cursor = 'ew-resize';
+            } else {
+                game.isRotatingMap = false;
+            }
+
             if (game.activePointers.size === 2) {
                 const pts = Array.from(game.activePointers.values());
                 game.lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
@@ -133,12 +150,28 @@ export class EventSystem {
         });
 
         window.addEventListener('pointermove', (e) => {
+            const centerX = game.canvas.width / 2;
+            const centerY = game.canvas.height / 2;
+
             if (game.isPanning) {
                 const dx = e.clientX - game.panStart.x;
                 const dy = e.clientY - game.panStart.y;
                 game.cameraOffset.x += dx;
                 game.cameraOffset.y += dy;
                 game.panStart = new Vector2(e.clientX, e.clientY);
+                return;
+            }
+
+            if (game.isRotatingMap) {
+                const starScreen = game.getScreenPos(game.homeStar.position);
+                const currentAngle = Math.atan2(e.clientY - starScreen.y, e.clientX - starScreen.x);
+                let delta = currentAngle - game.lastRotationAngle;
+                // 角度の不連続点（-PIからPIの境界）を考慮
+                while (delta > Math.PI) delta -= Math.PI * 2;
+                while (delta < -Math.PI) delta += Math.PI * 2;
+                
+                game.mapRotation += delta;
+                game.lastRotationAngle = currentAngle;
                 return;
             }
             if (game.activePointers.has(e.pointerId)) game.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -161,6 +194,7 @@ export class EventSystem {
 
         const endPointer = (e) => {
             if (game.isPanning) { game.isPanning = false; game.canvas.style.cursor = 'crosshair'; }
+            if (game.isRotatingMap) { game.isRotatingMap = false; game.canvas.style.cursor = 'crosshair'; }
             game.activePointers.delete(e.pointerId);
             if (game.activePointers.size === 0) { game.isPointerDown = false; game.isAimingInteraction = false; }
             if (game.activePointers.size < 2) game.lastPinchDist = 0;
@@ -177,7 +211,7 @@ export class EventSystem {
 
         const terminalPanel = document.getElementById('terminal-panel');
         const panelHeader = terminalPanel?.querySelector('.panel-header');
-        if (panelHeader) {
+        if (panelHeader && terminalPanel) {
             panelHeader.onclick = (e) => {
                 if (terminalPanel.classList.contains('collapsed')) { terminalPanel.classList.remove('collapsed'); return; }
                 if (e.target.classList.contains('tab-btn')) return;
@@ -194,6 +228,26 @@ export class EventSystem {
         document.getElementById('build-btn').onclick = () => game.assembleRocket();
         document.getElementById('launch-btn').onclick = (e) => { e.stopPropagation(); this.launch(); };
         document.getElementById('result-close-btn').onclick = () => game.closeResult();
+
+        // リザルト画面のマップ確認ボタンの制御
+        const viewMapBtn = document.getElementById('result-view-map-btn');
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        const resultOverlay = document.getElementById('result-overlay');
+        const launchBtn = document.getElementById('launch-btn');
+
+        if (viewMapBtn && backToResultBtn && resultOverlay) {
+            viewMapBtn.onclick = (e) => {
+                if (e) e.stopPropagation();
+                resultOverlay.classList.add('minimized');
+                backToResultBtn.classList.remove('hidden');
+                if (launchBtn) launchBtn.classList.add('hidden');
+            };
+            backToResultBtn.onclick = (e) => {
+                if (e) e.stopPropagation();
+                resultOverlay.classList.remove('minimized');
+                backToResultBtn.classList.add('hidden');
+            };
+        }
     }
 
     selectPart(type, instanceId) {
@@ -271,6 +325,7 @@ export class EventSystem {
         game.selection.launcher = null;
         game.selection.booster = null;
         game.reset();
+        game.missionSystem.checkGameOver();
     }
 
     handleEvent(goal) {

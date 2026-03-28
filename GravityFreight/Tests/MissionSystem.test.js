@@ -2,40 +2,41 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Game } from '../src/core/Game.js';
 import { Vector2 } from '../src/utils/Physics.js';
 
-// DOM環境のモック
-const createMockElement = (tag = 'div') => ({
-    tagName: tag.toUpperCase(),
-    onclick: vi.fn(),
-    appendChild: vi.fn(),
-    classList: { add: vi.fn(), remove: vi.fn(), contains: vi.fn(), toggle: vi.fn() },
-    querySelector: vi.fn(() => createMockElement('div')),
-    querySelectorAll: vi.fn(() => []),
-    innerHTML: '',
-    style: {},
-    textContent: ''
-});
-
-global.document = {
-    getElementById: vi.fn((id) => createMockElement(id)),
-    createElement: vi.fn((tag) => createMockElement(tag)),
-    body: createMockElement('body'),
-    querySelectorAll: vi.fn(() => [])
-};
-global.window = {
-    addEventListener: vi.fn(),
-    innerWidth: 1024,
-    innerHeight: 768,
-    requestAnimationFrame: vi.fn()
-};
-
 describe('Mission & Stage Logic', () => {
-    let game;
-    const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };
-    const mockUI = { status: {}, message: {} };
+    let game, canvas, ui, elementMap;
 
     beforeEach(() => {
+        canvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };
+        ui = { status: {}, message: {} };
+        elementMap = {};
+        
+        global.document = {
+            getElementById: vi.fn((id) => {
+                if (!elementMap[id]) {
+                    elementMap[id] = { 
+                        id, 
+                        onclick: null, 
+                        classList: { add: vi.fn(), remove: vi.fn(), toggle: vi.fn(), contains: vi.fn(() => false) },
+                        style: {},
+                        appendChild: vi.fn(),
+                        innerHTML: '',
+                        querySelector: vi.fn(() => ({})),
+                        textContent: ''
+                    };
+                }
+                return elementMap[id];
+            }),
+            createElement: vi.fn(() => ({ appendChild: vi.fn(), innerHTML: '', style: {}, classList: { add: vi.fn() } })),
+            querySelectorAll: vi.fn(() => [])
+        };
+        global.window = {
+            innerWidth: 1024,
+            innerHeight: 768,
+            addEventListener: vi.fn(),
+            requestAnimationFrame: vi.fn()
+        };
         vi.clearAllMocks();
-        game = new Game(mockCanvas, mockUI);
+        game = new Game(canvas, ui);
     });
 
     it('initStage should create home star and goals', () => {
@@ -77,6 +78,16 @@ describe('Mission & Stage Logic', () => {
         game.inventory.logic = [];
         game.inventory.launchers = [];
         
-        expect(game.isGameOver()).toBe(true);
+        expect(game.missionSystem.isGameOver()).toBe(true);
+    });
+
+    it('checkGameOver should transition to gameover state when resources are exhausted', () => {
+        game.inventory.rockets = [];
+        game.inventory.chassis = [];
+        game.inventory.logic = [];
+        game.inventory.launchers = [];
+        
+        game.missionSystem.checkGameOver();
+        expect(game.state).toBe('gameover');
     });
 });

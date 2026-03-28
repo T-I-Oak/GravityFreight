@@ -96,8 +96,12 @@ export class MissionSystem {
                 // 半径も旧来の公式 (Physics.js の初期 Body クラス準拠)
                 body.radius = Math.sqrt(mass) / 5 + 2;
                 
-                const item = this.getWeightedRandomItem();
-                if (item) body.items = [item];
+                const itemNum = 1 + Math.floor(Math.random() * 2);
+                body.items = [];
+                for (let j = 0; j < itemNum; j++) {
+                    const itemData = this.getWeightedRandomItem();
+                    if (itemData) body.items.push(itemData);
+                }
 
                 game.bodies.push(body);
             }
@@ -144,10 +148,6 @@ export class MissionSystem {
                 const itemData = pItem.itemData;
                 const { category } = itemData;
 
-                if (category === 'COIN') {
-                    game.coins += itemData.score || 0;
-                    return;
-                }
 
                 if (category === 'CARGO') {
                     if (hitGoal) {
@@ -217,12 +217,14 @@ export class MissionSystem {
                     let totalUnitValue = 0;
                     if (rocket.chassis) totalUnitValue += game.calculateValue(rocket.chassis);
                     if (rocket.logic) totalUnitValue += game.calculateValue(rocket.logic);
-                    if (game.ship.equippedModules) {
-                        game.ship.equippedModules.forEach(m => {
-                            totalUnitValue += game.calculateValue(m);
-                        });
-                    }
+                    
+                    // 搭載されている全モジュールの査定額を加算 (Spec 7.3)
+                    const modules = game.ship?.equippedModules || [];
+                    modules.forEach(m => {
+                        totalUnitValue += game.calculateValue(m);
+                    });
 
+                    // 保険モジュール1つにつき1倍の査定額が支払われる (Spec 7.3.324)
                     const totalPayout = totalUnitValue * insuranceModules.length;
                     game.pendingCoins += totalPayout;
                     game.flightResults.bonuses.push({ name: 'Insurance Payout', value: 0, coins: totalPayout });
@@ -332,7 +334,8 @@ export class MissionSystem {
         const logicCount = game.inventory.logic.reduce((sum, l) => sum + (l.count || 0), 0);
 
         const canBuildRockets = chassisCount > 0 && logicCount > 0;
-        const hasLaunchers = game.inventory.launchers.length > 0;
+        // 使用可能な（耐久度が残っている）発射台があるか (Spec 5.3.242)
+        const hasLaunchers = game.inventory.launchers.some(l => (l.charges || 0) > 0);
 
         return !(hasBuiltRockets || canBuildRockets) || !hasLaunchers;
     }
