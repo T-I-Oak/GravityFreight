@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Vector2, calculateGravity, G } from '../src/Physics.js';
+import { Vector2, calculateAcceleration, G } from '../src/utils/Physics.js';
 
 describe('Physics Logic', () => {
     it('Vector2 addition works', () => {
@@ -10,23 +10,24 @@ describe('Physics Logic', () => {
         expect(v3.y).toBe(6);
     });
 
-    it('Gravity follows inverse-square law', () => {
-        const pos1 = new Vector2(0, 0);
-        const pos2 = new Vector2(100, 0);
-        const mass1 = 1;
-        const mass2 = 100;
+    it('Acceleration follows inverse-square law', () => {
+        const pos = new Vector2(0, 0);
+        const star = { position: new Vector2(100, 0), mass: 100 };
+        const bodies = [star];
+        const targetMass = 10; // reference mass
         
-        const force1 = calculateGravity(pos1, mass1, pos2, mass2);
+        const acc = calculateAcceleration(pos, bodies, targetMass);
         
-        // r = 100, F = G * 1 * 100 / 100^2 = 4000 * 100 / 10000 = 40
-        expect(force1.length()).toBeCloseTo(40);
-        expect(force1.x).toBeGreaterThan(0);
-        expect(force1.y).toBe(0);
+        // r = 100, M = 100, G = 4000
+        // a = G * M / r^2 = 4000 * 100 / 10000 = 40
+        expect(acc.length()).toBeCloseTo(40);
+        expect(acc.x).toBeGreaterThan(0);
+        expect(acc.y).toBe(0);
 
-        // 距離を2倍にすると力は1/4になるはず
-        const pos3 = new Vector2(200, 0);
-        const force2 = calculateGravity(pos1, mass1, pos3, mass2);
-        // r = 200, F = G * 1 * 100 / 200^2 = 4000 * 100 / 40000 = 10
-        expect(force2.length()).toBeCloseTo(10);
+        // 距離を2倍にすると加速度は1/4になるはず
+        star.position = new Vector2(200, 0);
+        const acc2 = calculateAcceleration(pos, bodies, targetMass);
+        // r = 200, a = G * M / r^2 = 4000 * 100 / 40000 = 10
+        expect(acc2.length()).toBeCloseTo(10);
     });
 });

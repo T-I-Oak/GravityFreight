@@ -21,7 +21,7 @@ export const CATEGORY_COLORS = {
     LAUNCHERS: '#4caf50',
     MODULES: '#9c27b0',
     BOOSTERS: '#795548',
-    UNIT: '#ffffff',
+    ROCKETS: '#c0c0c0',
     COIN: '#ffd700',
     CARGO: '#00e5ff'
 };
@@ -115,6 +115,10 @@ export const INITIAL_INVENTORY = {
         { id: 'boost_power', count: 1 }
     ]
 };
+
+// 初期所持金
+export const INITIAL_COINS = 0;
+
 // IDをキーにしたハッシュ（高速検索用）
 export const ITEM_REGISTRY = {};
 Object.values(PARTS).forEach(categoryList => {

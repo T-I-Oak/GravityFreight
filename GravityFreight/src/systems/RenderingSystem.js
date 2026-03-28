@@ -1,16 +1,13 @@
-import { CATEGORY_COLORS } from './Data.js';
+import { CATEGORY_COLORS } from '../core/Data.js';
 
 export class Renderer {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        this.resize();
-        window.addEventListener('resize', () => this.resize());
+        this.generateBgStars();
     }
 
     resize() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
         this.generateBgStars();
     }
 
@@ -99,9 +96,9 @@ export class Renderer {
         const { x, y } = body.position;
         const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
         
-        // 母星は赤く表示
-        const finalColor = body.isHome ? '#ff4444' : color;
-        const finalGlow = body.isHome ? '#ff0000' : (glowColor || color);
+        // 母星は赤橙系 (#ff6600) で表示
+        const finalColor = body.isHome ? '#ff6600' : color;
+        const finalGlow = body.isHome ? '#ff3300' : (glowColor || color);
 
         this.ctx.save();
         this.ctx.shadowBlur = 20;
@@ -157,9 +154,9 @@ export class Renderer {
 
         
         // 船体（三角形）
-        this.ctx.shadowBlur = 5;
-        this.ctx.shadowColor = CATEGORY_COLORS.UNIT;
-        this.ctx.fillStyle = CATEGORY_COLORS.UNIT;
+        this.ctx.shadowBlur = 15;
+        this.ctx.shadowColor = CATEGORY_COLORS.ROCKETS;
+        this.ctx.fillStyle = CATEGORY_COLORS.ROCKETS;
         this.ctx.beginPath();
         this.ctx.moveTo(10, 0);
         this.ctx.lineTo(-5, 5);
@@ -309,11 +306,13 @@ export class Renderer {
     }
 
 
-    drawPrediction(points) {
+    drawPrediction(points, zoom = 1) {
         if (points.length < 2) return;
         this.ctx.save();
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-        this.ctx.lineWidth = 1.5;
+        // 点滅演出を復活 (master ブランチの事実に準拠)
+        const alpha = 0.4 + 0.2 * Math.sin(Date.now() / 200);
+        this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+        this.ctx.lineWidth = 1.5 / zoom;
         // 破線を廃止（高密度な描画により実線の方が滑らかに見えるため）
         this.ctx.beginPath();
 
@@ -354,8 +353,9 @@ export class Renderer {
         
         // 後ろから前へ描画し、徐々に透明にする
         for (let i = 1; i < points.length; i++) {
-            const alpha = (i / points.length) * 0.5; // 0.0から0.5まで
-            this.ctx.strokeStyle = `rgba(68, 136, 255, ${alpha})`;
+            // 色を白に変更し、アルファ値を ramping させる (master 準拠)
+            const alpha = (i / points.length); 
+            this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
             this.ctx.beginPath();
             this.ctx.moveTo(points[i-1].x, points[i-1].y);
             this.ctx.lineTo(points[i].x, points[i].y);

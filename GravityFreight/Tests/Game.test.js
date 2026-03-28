@@ -1,6 +1,6 @@
 import { describe, it, test, expect, vi, beforeEach } from 'vitest';
-import { Game } from '../src/Game.js';
-import { PARTS, INITIAL_INVENTORY, ITEM_REGISTRY } from '../src/Data.js';
+import { Game } from '../src/core/Game.js';
+import { PARTS, INITIAL_INVENTORY, ITEM_REGISTRY } from '../src/core/Data.js';
 
 // --- Mocking ---
 const createMockElement = (tag) => {
@@ -45,7 +45,7 @@ describe('Game Logic Tests', () => {
     let canvas, ui;
 
     beforeEach(() => {
-        canvas = { width: 800, height: 600, addEventListener: vi.fn() };
+        canvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };
         ui = {
             status: createMockElement('div'),
             message: createMockElement('div'),
@@ -92,7 +92,7 @@ describe('Game Logic Tests', () => {
     });
 
     describe('v1.0.2 Trading Post Bug Fixes', () => {
-        const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn() };
+        const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };
         const mockUI = { status: {}, message: {} };
 
         it('initTradingPost should clear container before rendering', () => {
@@ -143,7 +143,7 @@ describe('Game Logic Tests', () => {
     });
 
     describe('Enhanced Item Selection (v1.0.3)', () => {
-        const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn() };
+        const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };
         const mockUI = { status: {}, message: {} };
 
         it('should assign unique instanceId to all inventory items', () => {

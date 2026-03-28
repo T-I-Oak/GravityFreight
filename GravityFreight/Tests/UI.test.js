@@ -34,12 +34,12 @@ global.window = {
     requestAnimationFrame: vi.fn()
 };
 
-import { Game } from '../src/Game.js';
-import { ITEM_REGISTRY } from '../src/Data.js';
+import { Game } from '../src/core/Game.js';
+import { ITEM_REGISTRY } from '../src/core/Data.js';
 
 describe('UI Logic & Component Rendering', () => {
     let game;
-    const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn() };
+    const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };
     const mockUI = { status: {}, message: {} };
 
     beforeEach(() => {
@@ -70,25 +70,25 @@ describe('UI Logic & Component Rendering', () => {
             const item = ITEM_REGISTRY['sensor_short'];
             const html = game.generateCardHTML(item);
             
-            // 内部の主要要素（part-stats や unit-details）に border-top が直接設定されていないことを確認
+            // 内部の主要要素（part-stats や rocket-details）に border-top が直接設定されていないことを確認
             expect(html).not.toContain('class="part-stats" style="border-top:');
-            expect(html).not.toContain('class="unit-details" style="border-top:');
+            expect(html).not.toContain('class="rocket-details" style="border-top:');
         });
 
-        it('should render unit details with module badges and gauges', () => {
-            const unit = {
-                name: 'Test Unit',
-                category: 'UNIT',
+        it('should render rocket details with module badges and gauges', () => {
+            const rocket = {
+                name: 'Test Rocket',
+                category: 'ROCKETS',
                 modules: { 
                     'mod_capacity_inst': { id: 'mod_capacity', name: 'スロット拡張基板', count: 2 }
                 }
             };
             
-            const html = game.generateCardHTML(unit);
+            const html = game.generateCardHTML(rocket);
             
-            expect(html).toContain('unit-details');
+            expect(html).toContain('rocket-details');
             expect(html).toContain('[x 2]'); // 数量バッジ
-            expect(html).toContain('unit-module-row');
+            expect(html).toContain('rocket-module-row');
         });
     });
 
