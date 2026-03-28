@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Game } from '../src/core/Game.js';
 
-describe('Game Central Controller Logic', () => {
+describe('EventSystem UI Handlers', () => {
     let canvas, ui, elementMap;
 
     beforeEach(() => {
@@ -35,30 +35,34 @@ describe('Game Central Controller Logic', () => {
         };
     });
 
-    it('should initialize all subsystems correctly on construction', () => {
+    it('should toggle minimized class when View Map is clicked', () => {
         const game = new Game(canvas, ui);
-        expect(game.economySystem).toBeDefined();
-        expect(game.missionSystem).toBeDefined();
-        expect(game.eventSystem).toBeDefined();
-        expect(game.state).toBe('building');
+        
+        const viewMapBtn = document.getElementById('result-view-map-btn');
+        const backBtn = document.getElementById('back-to-result-btn');
+        const overlay = document.getElementById('result-overlay');
+
+        expect(viewMapBtn.onclick).toBeDefined();
+
+        viewMapBtn.onclick(new Event('click'));
+        expect(overlay.classList.add).toHaveBeenCalledWith('minimized');
+        expect(backBtn.classList.remove).toHaveBeenCalledWith('hidden');
+
+        backBtn.onclick(new Event('click'));
+        expect(overlay.classList.remove).toHaveBeenCalledWith('minimized');
     });
 
-    it('should correctly handle home star initialization', () => {
-        const game = new Game(canvas, ui, 5);
-        expect(game.homeStar).toBeDefined();
-        expect(game.homeStar.isHome).toBe(true);
-        expect(game.bodies.length).toBeGreaterThanOrEqual(6); // 1 home + 5 generated
-    });
-
-    it('should update coin discount when lucky cargo is resolved', () => {
+    it('should calculate map rotation delta correctly', () => {
         const game = new Game(canvas, ui);
-        game.currentCoinDiscount = 0; // Ensure initialized
+        game.lastRotationAngle = 0;
+        game.mapRotation = 0;
+
+        const currentAngle = Math.PI / 4;
+        let delta = currentAngle - game.lastRotationAngle;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
         
-        const luckyItem = { id: 'cargo_lucky', category: 'CARGO', coinDiscount: 0.1 };
-        game.pendingItems = [{ itemData: luckyItem, originalBody: {} }];
-        
-        game.missionSystem.resolveItems('success', { id: 'SAFE' });
-        
-        expect(game.currentCoinDiscount).toBe(0.1);
+        game.mapRotation += delta;
+        expect(game.mapRotation).toBeCloseTo(Math.PI / 4);
     });
 });

@@ -29,9 +29,12 @@ export class AssemblySystem {
             if (mData) {
                 equippedModules[mInstId] = { 
                     ...mData, 
-                    count: count,
-                    charges: (mData.charges !== undefined) ? mData.charges : (mData.maxCharges || 0)
+                    count: count
                 };
+                // 耐久力があるアイテムのみ charges を設定
+                if (mData.maxCharges !== undefined) {
+                    equippedModules[mInstId].charges = (mData.charges !== undefined) ? mData.charges : mData.maxCharges;
+                }
                 // モジュールによるステータス加算
                 totalMass += (mData.mass || 0) * count;
                 totalSlots += (mData.slots || 0) * count;

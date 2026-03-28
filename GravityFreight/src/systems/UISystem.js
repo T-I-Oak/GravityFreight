@@ -239,11 +239,13 @@ export class UISystem {
         const hasCharges = itemData.charges !== undefined || itemData.maxCharges !== undefined;
         if (showInventory && hasCharges) {
             const max = itemData.maxCharges || 2;
-            const current = itemData.charges !== undefined ? item.charges : max;
+            const current = itemData.charges !== undefined ? itemData.charges : max;
             const isChargeEnhanced = enhancements.charges > 0;
             let segments = '';
             for (let i = 0; i < max; i++) {
-                segments += `<div class="hp-segment ${i < current ? 'active' : ''}" style="width:8px; height:4px; background:${i < current ? (isChargeEnhanced ? '#ffd700' : '#fff') : 'rgba(255,255,255,0.1)'}; border-radius:1px;"></div>`;
+                const isActive = i < current;
+                const segmentStyle = `width:8px; height:4px; background:${isActive ? (isChargeEnhanced ? '#ffd700' : '#fff') : 'rgba(255,255,255,0.1)'}; border-radius:1px;`;
+                segments += `<div class="hp-segment ${isActive ? 'active' : ''}" style="${segmentStyle}"></div>`;
             }
             invInfo = `<div class="hp-gauge ${isChargeEnhanced ? 'enhanced-frame' : ''}" style="display: flex; gap: 2px; padding: 2px;">${segments}</div>`;
         } else if (showInventory && itemData.count > 1) {
@@ -271,10 +273,18 @@ export class UISystem {
         `;
 
         const stats = [];
-        if (item.slots !== undefined && item.slots > 0) stats.push({ label: 'SLOTS', val: item.slots, enhanced: enhancements.slots > 0 });
-        if (item.precisionMultiplier !== undefined && item.precisionMultiplier !== 1.0) stats.push({ label: 'PRECISION', val: `x${item.precisionMultiplier.toFixed(1)}`, enhanced: enhancements.precision > 0 });
-        if (item.pickupMultiplier !== undefined && item.pickupMultiplier !== 1.0) stats.push({ label: 'PICKUP', val: `x${item.pickupMultiplier.toFixed(1)}`, enhanced: enhancements.pickup > 0 });
-        if (item.gravityMultiplier !== undefined && item.gravityMultiplier !== 1.0) stats.push({ label: 'GRAVITY', val: `x${item.gravityMultiplier.toFixed(1)}`, enhanced: enhancements.gravity > 0 });
+        if (item.slots !== undefined && item.slots > 0) {
+            stats.push({ label: 'SLOTS', val: item.slots, enhanced: enhancements.slots > 0 });
+        }
+        if (item.precisionMultiplier !== undefined && item.precisionMultiplier !== 1.0) {
+            stats.push({ label: 'PRECISION', val: `x${item.precisionMultiplier.toFixed(1)}`, enhanced: enhancements.precision > 0 });
+        }
+        if (item.pickupMultiplier !== undefined && item.pickupMultiplier !== 1.0) {
+            stats.push({ label: 'PICKUP', val: `x${item.pickupMultiplier.toFixed(1)}`, enhanced: enhancements.pickup > 0 });
+        }
+        if (item.gravityMultiplier !== undefined && item.gravityMultiplier !== 1.0) {
+            stats.push({ label: 'GRAVITY', val: `x${item.gravityMultiplier.toFixed(1)}`, enhanced: enhancements.gravity > 0 });
+        }
 
         const statsHtml = stats.map(s => `
             <div class="stat-tag ${s.enhanced ? 'enhanced-border' : ''}">
@@ -384,12 +394,21 @@ export class UISystem {
         const pendingS = (game.pendingGoalBonus || 0) + (game.pendingScore || 0);
         const pendingC = (game.pendingCoins || 0);
 
+        // 航行中に得たポイント（距離/時間ポイント）を確定
+        const pureFlightScore = Math.max(0, game.score - game.launchScore);
+        const pureFlightCoins = Math.max(0, game.coins - game.launchCoins);
+
+        // アニメーションの開始点を離陸時に設定
         game.displayScore = game.launchScore;
         game.displayCoins = game.launchCoins;
         game.updateUI();
 
+        // 最終的な合計値を確定
         game.score += pendingS;
         game.coins += pendingC;
+        const finalScore = game.score;
+        const finalCoins = game.coins;
+
         game.pendingGoalBonus = 0;
         game.pendingScore = 0;
         game.pendingCoins = 0;
@@ -407,7 +426,7 @@ export class UISystem {
             delay += 0.1;
         };
 
-        const pureFlightScore = Math.max(0, game.score - game.launchScore);
+        // 航行スコアの内訳表示
         addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
         game.flightResults.bonuses.filter(b => b.value > 0).forEach(b => addRow(statsList, b.name, b.value, 'score'));
 
@@ -440,6 +459,18 @@ export class UISystem {
                 const badge = item.isDelivery ? (item.isMatch ? `<span style="color:#44ffbb;font-size:10px;font-weight:800;">✓ DELIVERED</span>` : `<span style="color:#ff7755;font-size:10px;font-weight:800;">✗ UNMATCHED</span>`) : '';
                 card.innerHTML = this.generateCardHTML(item, { badge });
                 itemsList.appendChild(card);
+                
+                // ボーナスアイテムをインデントされた別カードとして表示
+                if (item.isMatch && item.bonusItems && item.bonusItems.length > 0) {
+                    item.bonusItems.forEach(bonus => {
+                        const bonusCard = document.createElement('div');
+                        bonusCard.className = 'reward-item-card stagger-in';
+                        bonusCard.style.animationDelay = `${delay}s`;
+                        delay += 0.07;
+                        bonusCard.innerHTML = this.generateCardHTML(bonus, { indent: 16 });
+                        itemsList.appendChild(bonusCard);
+                    });
+                }
             });
             otherItems.forEach(group => {
                 const card = document.createElement('div');
@@ -558,7 +589,10 @@ export class UISystem {
             card.innerHTML = `
                 <div class="card-body">
                     ${this.generateCardHTML(itemData, { isSelected: isSale })}
-                    <div class="card-price"><span class="price-val">${isSold ? '---' : buyPrice}</span><span class="currency">c</span>${isSale ? '<span class="sale-badge">30% OFF</span>' : ''}</div>
+                    <div class="card-price">
+                        <span class="price-val">${isSold ? '---' : buyPrice}</span><span class="currency">c</span>
+                        ${isSale ? '<span class="sale-badge">30% OFF</span>' : ''}
+                    </div>
                 </div>
                 <button class="buy-btn" ${(game.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD OUT' : 'BUY'}</button>
             `;
@@ -702,16 +736,18 @@ export class UISystem {
                     if (rocket.chassis) partsToReturn.push({ ...rocket.chassis, category: 'CHASSIS', count: 1 });
                     if (rocket.logic) partsToReturn.push({ ...rocket.logic, category: 'LOGIC', count: 1 });
                     if (rocket.modules) {
-                        for (const [modId, count] of Object.entries(rocket.modules)) {
-                            // modId は instanceId なので、インベントリから対応する ID を引く
-                            const invMod = game.inventory.modules.find(m => m.instanceId === modId);
-                            const m = invMod ? ITEM_REGISTRY[invMod.id] : null;
-                            if (m) partsToReturn.push({ ...m, category: 'MODULES', count: count });
-                        }
+                        // ロケットに搭載されている全モジュール（耐久度 0 を含む）を返却対象にする
+                        Object.values(rocket.modules).forEach(m => {
+                            partsToReturn.push({ ...m, category: 'MODULES' });
+                        });
                     }
 
                     partsToReturn.forEach(p => {
-                        game._addItemToInventory(p);
+                        // 全パーツ（Chassis, Logic, Modules）を強化 (Spec 8.2)
+                        const enhancementLog = game.enhanceItem(p);
+                        game.inventorySystem.addItem(p);
+                        
+                        if (enhancementLog) addLog(enhancementLog);
                         addLog(`RESTORED: ${p.name}`);
                     });
 

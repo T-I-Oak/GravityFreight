@@ -1,8 +1,9 @@
 import { CATEGORY_COLORS } from '../core/Data.js';
 
 export class Renderer {
-    constructor(canvas) {
+    constructor(canvas, game) {
         this.canvas = canvas;
+        this.game = game;
         this.ctx = canvas.getContext('2d');
         this.generateBgStars();
     }
@@ -40,7 +41,11 @@ export class Renderer {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
         this.ctx.save();
+        
+        // Model A: P_screen = Scale(Rotate(P_world - P_center)) + P_center + offset
+        // ctxの適用順序はその逆
         this.ctx.translate(centerX + offset.x, centerY + offset.y);
+        this.ctx.rotate(this.game ? this.game.mapRotation : 0);
         this.ctx.scale(zoom, zoom);
         this.ctx.translate(-centerX, -centerY);
     }
@@ -51,17 +56,20 @@ export class Renderer {
 
 
     drawStars(offset = { x: 0, y: 0 }, timestamp = 0) {
-        if (!this.bgStars) return;
+        if (!this.bgStars || !this.game) return;
         
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
-        const speed = 0.05; // 0.05まで減速（極めて微細な動きに）
+        const speed = 0.05;
         const maxZ = 2000;
+        const rotation = this.game.mapRotation;
 
         this.ctx.save();
         
+        const cos = Math.cos(rotation);
+        const sin = Math.sin(rotation);
+
         for (const star of this.bgStars) {
-            // Zを減少させて手前に移動
             star.z -= speed;
             if (star.z <= 0) {
                 star.z = maxZ;
@@ -69,18 +77,22 @@ export class Renderer {
                 star.y = (Math.random() - 0.5) * 2000;
             }
 
-            // 透視投影
-            const scale = 200 / (star.z || 1); // 投影係数
-            const px = centerX + star.x * scale + offset.x * 0.2;
-            const py = centerY + star.y * scale + offset.y * 0.2;
+            const scale = 200 / (star.z || 1);
+            
+            // 1. 世界座標系での回転（母星中心）
+            const rx = star.x * cos - star.y * sin;
+            const ry = star.x * sin + star.y * cos;
 
-            // 画面外チェック
+            // 2. 投影と画面上でのオフセット（パララックス）を適用
+            // offsetは画面基準なので、rx*scaleの後にそのまま足す
+            const px = centerX + rx * scale + offset.x * 0.2;
+            const py = centerY + ry * scale + offset.y * 0.2;
+
             if (px < 0 || px > this.canvas.width || py < 0 || py > this.canvas.height) continue;
 
-            // 明滅と輝度計算（手前ほど明るく、大きく）
             const twinkle = 0.8 + 0.2 * Math.sin((timestamp / 1000) * star.pulseRate + star.pulseOffset);
             const brightness = (1 - star.z / maxZ) * star.alpha * twinkle;
-            const size = Math.min(4, star.size * scale * 1.2); // 最大サイズを4pxに制限し、倍率を1.2に抑制
+            const size = Math.min(4, star.size * scale * 1.2);
 
             this.ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
             this.ctx.beginPath();
@@ -248,11 +260,12 @@ export class Renderer {
                 }
                 const totalTextAngle = totalWidth / textRadius;
 
-                // 2PIで正規化した角度
-                const normalizedAngle = ((goal.angle % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
+                // 画面上の絶対的な角度（視覚的な位置）を計算
+                const visualAngle = goal.angle + (this.game ? this.game.mapRotation : 0);
+                const normalizedVisual = ((visualAngle % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
                 
-                // 下半分（概ね 0〜PI：右〜下〜左）かどうかの判定
-                const isBottom = normalizedAngle > 0.0 * Math.PI && normalizedAngle < 1.0 * Math.PI;
+                // 画面の下半分（0.0〜PI）に位置しているか判定
+                const isBottom = normalizedVisual > 0.0 * Math.PI && normalizedVisual < 1.0 * Math.PI;
 
                 if (isBottom) {
                     // 下半分：円の外側から見て「左から右」に正立して読めるようにする
