@@ -1,4 +1,5 @@
 import { INITIAL_INVENTORY, ITEM_REGISTRY } from '../core/Data.js';
+import { ItemUtils } from '../utils/ItemUtils.js';
 
 export class InventorySystem {
     constructor(game) {
@@ -42,11 +43,8 @@ export class InventorySystem {
 
         this._assignInstanceId(item);
 
-        // 重複スタックの判定（強化内容も考慮）
-        const existing = list.find(i => 
-            i.id === item.id && 
-            JSON.stringify(i.enhancements) === JSON.stringify(item.enhancements)
-        );
+        // 重複スタックの判定（共通ロジックを使用）
+        const existing = list.find(i => ItemUtils.areItemsEquivalent(i, item));
 
         if (existing) {
             existing.count = (existing.count || 1) + (item.count || 1);

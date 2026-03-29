@@ -1,6 +1,8 @@
 import { ITEM_REGISTRY } from '../core/Data.js';
 
 export class EconomySystem {
+    static MARKET_VALUE_MULTIPLIER = 2; // ブラックマーケット等での査定額倍率
+
     constructor(game) {
         this.game = game;
     }

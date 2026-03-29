@@ -1,13 +1,20 @@
-import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba } from '../core/Data.js';
+import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba, PARTS, RARITY } from '../core/Data.js';
+import { ItemUtils } from '../utils/ItemUtils.js';
+import { EconomySystem } from './EconomySystem.js';
+import { UIComponents } from './ui/UIComponents.js';
+import { ShopUI } from './ui/ShopUI.js';
+import { MaintenanceUI } from './ui/MaintenanceUI.js';
 
 export class UISystem {
     constructor(game) {
         this.game = game;
+        // サブシステムの初期化
+        this.shopUI = new ShopUI(game, this);
+        this.maintenanceUI = new MaintenanceUI(game, this);
     }
 
     update(dt) {
         const game = this.game;
-        // スコア表示の更新
         const scoreDiff = game.score - game.displayScore;
         const coinDiff = game.coins - game.displayCoins;
 
@@ -111,19 +118,7 @@ export class UISystem {
                 return;
             }
 
-            const groups = [];
-            items.forEach(item => {
-                if (!item || !item.id) return;
-                const charges = item.charges !== undefined ? item.charges : -1;
-                const enhancementsStr = JSON.stringify(item.enhancements || {});
-                let group = groups.find(g => g.id === item.id && g.charges === charges && JSON.stringify(g.enhancements || {}) === enhancementsStr);
-                if (!group) {
-                    group = { ...item, count: 0, instances: [] };
-                    groups.push(group);
-                }
-                group.count += (item.count !== undefined ? item.count : 1);
-                group.instances.push(item);
-            });
+            const groups = ItemUtils.groupItems(items);
 
             groups.forEach(group => {
                 const div = document.createElement('div');
@@ -144,7 +139,7 @@ export class UISystem {
                 });
 
                 div.onclick = () => {
-                    if (game.state === 'event') return; // イベント中は選択不可
+                    if (game.state === 'event') return;
                     if (type === 'modules' || type === 'booster') {
                         game.selectOption(type, group.instanceId);
                     } else {
@@ -222,7 +217,7 @@ export class UISystem {
                     div.className = `rocket-item ${isSelected ? 'selected' : ''}`;
                     div.innerHTML = this.generateCardHTML(rocket, { isSelected });
                     div.onclick = () => {
-                        if (game.state === 'event') return; // イベント中は選択不可
+                        if (game.state === 'event') return;
                         game.selectPart('rocket', rocket.instanceId);
                     };
                     rList.appendChild(div);
@@ -231,134 +226,11 @@ export class UISystem {
         }
     }
 
+    /**
+     * 下位互換性のためのラッパー
+     */
     generateCardHTML(itemData, options = {}) {
-        if (!itemData) return '';
-        const item = itemData;
-        const category = itemData.category || 'CHASSIS';
-        const categoryColor = CATEGORY_COLORS[category] || '#fff';
-        const selectionCount = options.selectionCount || 0;
-        const showInventory = options.showInventory || false;
-        const isSelected = options.isSelected || false;
-        const enhancements = itemData.enhancements || {};
-        const isRocket = category === 'ROCKETS';
-
-        let invInfo = "";
-        const hasCharges = itemData.charges !== undefined || itemData.maxCharges !== undefined;
-        if (showInventory && hasCharges) {
-            const max = itemData.maxCharges || 2;
-            const current = itemData.charges !== undefined ? itemData.charges : max;
-            const isChargeEnhanced = enhancements.charges > 0;
-            let segments = '';
-            for (let i = 0; i < max; i++) {
-                const isActive = i < current;
-                const segmentStyle = `width:8px; height:4px; background:${isActive ? (isChargeEnhanced ? '#ffd700' : '#fff') : 'rgba(255,255,255,0.1)'}; border-radius:1px;`;
-                segments += `<div class="hp-segment ${isActive ? 'active' : ''}" style="${segmentStyle}"></div>`;
-            }
-            invInfo = `<div class="hp-gauge ${isChargeEnhanced ? 'enhanced-frame' : ''}" style="display: flex; gap: 2px; padding: 2px;">${segments}</div>`;
-        } else if (showInventory && itemData.count > 1) {
-            invInfo = `<span class="inventory-badge" style="font-size: 10px; color: rgba(255,255,255,0.6); font-weight:bold;">[x ${itemData.count}]</span>`;
-        }
-
-        const selTag = (selectionCount > 0) ? ` <span class="selection-badge" style="color: #ffcc00; font-weight: bold;">[${selectionCount}]</span>` : '';
-        const extraBadge = options.badge || '';
-        const indent = options.indent || 0;
-
-        const containerStyle = `
-            position: relative;
-            border-left: 5px solid ${categoryColor};
-            padding: 6px 12px;
-            background: ${isSelected ? hexToRgba(categoryColor, 0.25) : 'rgba(255,255,255,0.03)'};
-            border-radius: 4px;
-            margin-bottom: 2px;
-            min-width: 160px;
-            margin-left: ${indent}px;
-            transition: all 0.2s ease;
-            ${isSelected ? `box-shadow: inset 0 0 15px ${hexToRgba(categoryColor, 0.2)}, 0 0 10px ${hexToRgba(categoryColor, 0.2)};` : ''}
-            border-top: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
-            border-right: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
-            border-bottom: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
-        `;
-
-        const stats = [];
-        if (item.slots !== undefined && item.slots > 0) {
-            stats.push({ label: 'SLOTS', val: item.slots, enhanced: enhancements.slots > 0 });
-        }
-        if (item.precisionMultiplier !== undefined && item.precisionMultiplier !== 1.0) {
-            stats.push({ label: 'PRECISION', val: `x${item.precisionMultiplier.toFixed(1)}`, enhanced: enhancements.precision > 0 });
-        }
-        if (item.pickupMultiplier !== undefined && item.pickupMultiplier !== 1.0) {
-            stats.push({ label: 'PICKUP', val: `x${item.pickupMultiplier.toFixed(1)}`, enhanced: enhancements.pickup > 0 });
-        }
-        if (item.gravityMultiplier !== undefined && item.gravityMultiplier !== 1.0) {
-            stats.push({ label: 'GRAVITY', val: `x${item.gravityMultiplier.toFixed(1)}`, enhanced: enhancements.gravity > 0 });
-        }
-
-        const statsHtml = stats.map(s => `
-            <div class="stat-tag ${s.enhanced ? 'enhanced-border' : ''}">
-                <span class="stat-label">${s.label}</span>
-                <span class="stat-val">${s.val}${s.enhanced ? '<span style="color:#00d4ff; font-size:8px; margin-left:2px;">✦</span>' : ''}</span>
-            </div>
-        `).join('');
-
-        let rocketDetailsHtml = '';
-        if (isRocket && item.modules) {
-            const merged = new Map();
-            for (const [id, data] of Object.entries(item.modules)) {
-                if (!data) continue;
-                const mid = data.id;
-                if (merged.has(mid)) {
-                    const e = merged.get(mid);
-                    e.count += data.count || 1;
-                    if (data.maxCharges) {
-                        e.maxCharges = (e.maxCharges || 0) + (data.maxCharges * (data.count || 1));
-                        e.charges = (e.charges || 0) + ((data.charges !== undefined ? data.charges : data.maxCharges) * (data.count || 1));
-                    }
-                } else {
-                    merged.set(mid, {
-                        name: data.name,
-                        count: data.count || 1,
-                        maxCharges: data.maxCharges ? (data.maxCharges * (data.count || 1)) : undefined,
-                        charges: data.maxCharges ? ((data.charges !== undefined ? data.charges : data.maxCharges) * (data.count || 1)) : undefined
-                    });
-                }
-            }
-            const rows = [];
-            merged.forEach(m => {
-                let mGauge = '';
-                if (m.maxCharges) {
-                    let mSegs = '';
-                    for (let i = 0; i < m.maxCharges; i++) mSegs += `<div class="hp-segment ${i < m.charges ? 'active' : ''}" style="width:6px; height:3px; background:${i < m.charges ? '#fff' : 'rgba(255,255,255,0.1)'}; border-radius:1px; flex-shrink:0;"></div>`;
-                    mGauge = `<div class="hp-gauge" style="display:flex; gap:1.5px; margin-left:8px;">${mSegs}</div>`;
-                }
-                rows.push(`
-                    <div class="rocket-module-row" style="display:flex; align-items:center; justify-content:space-between;">
-                        <span class="rocket-module-name" style="font-size:10px; color:rgba(255,255,255,0.8);">${m.name}</span>
-                        <div style="display:flex; align-items:center;">
-                            <span class="inventory-badge" style="font-size:9px; color:rgba(255,255,255,0.5);">[x ${m.count}]</span>
-                            ${mGauge}
-                        </div>
-                    </div>
-                `);
-            });
-            rocketDetailsHtml = `<div class="rocket-details" style="margin-top:4px;">${rows.join('')}</div>`;
-        }
-
-        const desc = isRocket ? '' : (item.description || '');
-
-        return `
-            <div class="part-item-container" style="${containerStyle}">
-                ${extraBadge ? `<div style="position:absolute; top:4px; right:4px;">${extraBadge}</div>` : ''}
-                <div class="part-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-                    <span class="part-name" style="font-weight: 800; font-size: 13px; color: #fff;">${item.name || 'Unknown'}${selTag}</span>
-                    ${invInfo}
-                </div>
-                ${desc ? `<div class="part-info" style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 6px;">${desc}</div>` : ''}
-                <div class="part-stats" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                    ${statsHtml}
-                </div>
-                ${rocketDetailsHtml}
-            </div>
-        `;
+        return UIComponents.generateCardHTML(itemData, options);
     }
 
     showResult(resultType) {
@@ -400,21 +272,15 @@ export class UISystem {
 
         const pendingS = (game.pendingGoalBonus || 0) + (game.pendingScore || 0);
         const pendingC = (game.pendingCoins || 0);
-
-        // 航行中に得たポイント（距離/時間ポイント）を確定
         const pureFlightScore = Math.max(0, game.score - game.launchScore);
         const pureFlightCoins = Math.max(0, game.coins - game.launchCoins);
 
-        // アニメーションの開始点を離陸時に設定
         game.displayScore = game.launchScore;
         game.displayCoins = game.launchCoins;
-        game.updateUI();
+        this.updateUI();
 
-        // 最終的な合計値を確定
         game.score += pendingS;
         game.coins += pendingC;
-        const finalScore = game.score;
-        const finalCoins = game.coins;
 
         game.pendingGoalBonus = 0;
         game.pendingScore = 0;
@@ -433,7 +299,6 @@ export class UISystem {
             delay += 0.1;
         };
 
-        // 航行スコアの内訳表示
         addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
         game.flightResults.bonuses.filter(b => b.value > 0).forEach(b => addRow(statsList, b.name, b.value, 'score'));
 
@@ -445,23 +310,15 @@ export class UISystem {
         if (resultType !== 'crashed' && resultType !== 'lost') {
             game.flightResults.items.forEach(item => {
                 if (!item || !item.id) return;
-                // カテゴリ、ID、強化内容、耐久力、配送状況が一致するものをグループ化
                 const enhStr = JSON.stringify(item.enhancements || {});
                 const key = `${item.category}_${item.id}_${enhStr}_${item.charges || -1}_${item.isDelivery || false}_${item.isMatch || false}`;
                 
                 let group = groupedItems.find(g => g.key === key);
                 if (group) {
                     group.count++;
-                    if (item.bonusItems) {
-                        group.bonusItems = [...(group.bonusItems || []), ...item.bonusItems];
-                    }
+                    if (item.bonusItems) group.bonusItems = [...(group.bonusItems || []), ...item.bonusItems];
                 } else {
-                    groupedItems.push({ 
-                        ...item, 
-                        count: 1, 
-                        key,
-                        bonusItems: item.bonusItems ? [...item.bonusItems] : []
-                    });
+                    groupedItems.push({ ...item, count: 1, key, bonusItems: item.bonusItems ? [...item.bonusItems] : [] });
                 }
             });
         }
@@ -474,16 +331,11 @@ export class UISystem {
                 card.className = 'reward-item-card stagger-in';
                 card.style.animationDelay = `${delay}s`;
                 delay += 0.07;
-                
                 const badge = item.isDelivery ? (item.isMatch ? `<span style="color:#44ffbb;font-size:10px;font-weight:800;">✓ DELIVERED</span>` : `<span style="color:#ff7755;font-size:10px;font-weight:800;">✗ UNMATCHED</span>`) : '';
-                
-                // [x N] 表示のために showInventory: true を渡す
                 card.innerHTML = this.generateCardHTML(item, { badge, showInventory: true });
                 itemsList.appendChild(card);
                 
-                // ボーナスアイテムがあれば表示
                 if (item.bonusItems && item.bonusItems.length > 0) {
-                    // ボーナスアイテム内でもグループ化
                     const groupedBonuses = [];
                     item.bonusItems.forEach(b => {
                         const bKey = `${b.id}_${JSON.stringify(b.enhancements || {})}_${b.charges || -1}`;
@@ -565,302 +417,8 @@ export class UISystem {
         }
     }
 
-    initTradingPost(container) {
-        const game = this.game;
-        container.innerHTML = '';
-        if (!game.currentShopStock) {
-            game.currentShopStock = [];
-            for (let i = 0; i < 6; i++) {
-                const item = game.missionSystem.getWeightedRandomItem({ excludeCargo: true, excludeCoin: true });
-                if (item) {
-                    game.currentShopStock.push({ ...item, isSold: false, isSale: false });
-                }
-            }
-            if (game.currentShopStock.length > 0) {
-                game.currentShopStock[Math.floor(Math.random() * game.currentShopStock.length)].isSale = true;
-            }
-        }
-
-        const shopSection = document.createElement('div');
-        shopSection.className = 'event-shop-section';
-        shopSection.innerHTML = '<h3>販売中のアイテム</h3>';
-        const grid = document.createElement('div');
-        grid.className = 'event-grid';
-
-        game.currentShopStock.forEach((itemData) => {
-            const isSale = itemData.isSale;
-            const isSold = itemData.isSold;
-            const baseValue = game.calculateValue(itemData);
-            
-            // 加算方式の割引計算 (SALE 30% + LUCKY 10% * N、最大 50%)
-            const baseDiscount = isSale ? 0.3 : 0.0;
-            const totalDiscount = Math.min(0.5, baseDiscount + (game.currentCoinDiscount || 0));
-            const buyPrice = Math.floor(baseValue * 2 * (1 - totalDiscount));
-            
-            const displayDiscountPct = Math.round(totalDiscount * 100);
-            const discountLevel = displayDiscountPct >= 50 ? 'high' : (displayDiscountPct >= 30 ? 'mid' : 'low');
-
-            const card = document.createElement('div');
-            card.className = `event-row event-card`;
-            card.innerHTML = `
-                <div class="card-item-column">
-                    ${this.generateCardHTML(itemData, { isSelected: false })}
-                </div>
-                <div class="card-action-column">
-                    <div class="card-price" ${isSold ? 'style="opacity: 0.5;"' : ''}>
-                        <span class="price-val">${buyPrice}</span><span class="currency">c</span>
-                        ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="${discountLevel}"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
-                    </div>
-                    <button class="buy-btn" ${(game.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD' : 'BUY'}</button>
-                </div>
-            `;
-            card.querySelector('.buy-btn').onclick = () => {
-                if (game.coins >= buyPrice && !isSold) {
-                    this.animateCoinChange(-buyPrice);
-                    game.coins -= buyPrice;
-                    game.inventorySystem.addItem(itemData);
-                    itemData.isSold = true;
-                    this.initTradingPost(container);
-                    game.updateUI();
-                }
-            };
-            grid.appendChild(card);
-        });
-        shopSection.appendChild(grid);
-        container.appendChild(shopSection);
-
-        const sellSection = document.createElement('div');
-        sellSection.className = 'event-sell-section';
-        sellSection.innerHTML = '<h3>パーツの売却</h3>';
-        const sellGrid = document.createElement('div');
-        sellGrid.className = 'event-grid';
-
-        const allHoldings = [
-            ...game.inventory.chassis.map(i => ({ ...i, cat: 'CHASSIS' })),
-            ...game.inventory.logic.map(i => ({ ...i, cat: 'LOGIC' })),
-            ...game.inventory.launchers.map(i => ({ ...i, cat: 'LAUNCHER' })),
-            ...game.inventory.modules.map(i => ({ ...i, cat: 'MODULES' })),
-            ...game.inventory.boosters.map(i => ({ ...i, cat: 'BOOSTER' }))
-        ];
-
-        allHoldings.forEach(item => {
-            if ((item.count || 0) <= 0 && item.charges === undefined) return;
-            const sellPrice = game.economySystem.calculateValue(item);
-            const card = document.createElement('div');
-            card.className = 'event-row event-card';
-            card.innerHTML = `
-                <div class="card-item-column">
-                    ${this.generateCardHTML(item, { showInventory: true })}
-                </div>
-                <div class="card-action-column">
-                    <div class="card-price">
-                        <span class="price-val">${sellPrice}</span><span class="currency">c</span>
-                    </div>
-                    <button class="sell-btn">SELL</button>
-                </div>
-            `;
-            card.querySelector('.sell-btn').onclick = () => {
-                const success = game.inventorySystem.removeItem(item.cat, item.instanceId);
-                if (success) {
-                    this.animateCoinChange(sellPrice);
-                    game.coins += sellPrice;
-                    this.initTradingPost(container);
-                    game.updateUI();
-                }
-            };
-            sellGrid.appendChild(card);
-        });
-        sellSection.appendChild(sellGrid);
-        container.appendChild(sellSection);
-    }
-
-    initRepairDock(container) {
-        const game = this.game;
-        container.innerHTML = `
-            <div class="repair-dock-layout" style="display:flex; flex-direction:column; gap:20px;">
-                <div class="repair-section">
-                    <h3 style="color:#4caf50; border-bottom:1px solid rgba(76,175,80,0.3); padding-bottom:5px;">発射台のメンテナンス</h3>
-                    <div id="repair-list" class="event-grid"></div>
-                </div>
-                <div class="dismantle-section">
-                    <h3 style="color:#ffab40; border-bottom:1px solid rgba(255,171,64,0.3); padding-bottom:5px;">機体の解体・強化</h3>
-                    <div id="dismantle-list" class="event-grid"></div>
-                </div>
-                <div id="repair-log" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; font-family:monospace; min-height:60px; max-height:100px; overflow-y:auto; border:1px solid rgba(255,255,255,0.1); display:none;"></div>
-            </div>
-        `;
-
-        const repairList = document.getElementById('repair-list');
-        const dismantleList = document.getElementById('dismantle-list');
-        const logArea = document.getElementById('repair-log');
-
-        const addLog = (msg) => {
-            logArea.style.display = 'block';
-            const line = document.createElement('div');
-            line.style.color = '#00ffcc'; line.style.fontSize = '11px'; line.textContent = `> ${msg}`;
-            logArea.appendChild(line);
-            logArea.scrollTop = logArea.scrollHeight;
-        };
-
-        const repairables = game.inventory.launchers.filter(i => i.charges < (i.maxCharges || 2));
-        if (repairables.length === 0) {
-            repairList.innerHTML = '<div class="part-info" style="opacity:0.3; padding:20px; text-align:center;">ALL LAUNCHERS READY</div>';
-        } else {
-            repairables.forEach(item => {
-                const totalDiscount = Math.min(0.5, game.currentCoinDiscount || 0);
-                const cost = Math.floor(20 * (1 - totalDiscount));
-                const displayDiscountPct = Math.round(totalDiscount * 100);
-                const card = document.createElement('div');
-                card.className = 'event-row event-card';
-                card.innerHTML = `
-                    <div class="card-item-column">
-                        ${this.generateCardHTML(item, { showInventory: true })}
-                    </div>
-                    <div class="card-action-column">
-                        <div class="card-price">
-                            <span class="price-val">${cost}</span><span class="currency">c</span>
-                            ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
-                        </div>
-                        <button class="repair-btn" ${game.coins < cost ? 'disabled' : ''}>REPAIR</button>
-                    </div>
-                `;
-                card.querySelector('.repair-btn').onclick = () => {
-                    if (game.coins >= cost) {
-                        this.animateCoinChange(-cost);
-                        game.coins -= cost;
-                        item.charges = Math.min(item.charges + 1, item.maxCharges || 2);
-                        addLog(`RESTORED: ${item.name} (+1 charge)`);
-                        this.initRepairDock(container);
-                        game.updateUI();
-                    }
-                };
-                repairList.appendChild(card);
-            });
-        }
-
-        const dismantleCandidates = game.inventory.rockets;
-        if (dismantleCandidates.length === 0) {
-            dismantleList.innerHTML = '<div class="part-info" style="opacity:0.3; padding:20px; text-align:center;">NO ASSEMBLED ROCKETS</div>';
-        } else {
-            dismantleCandidates.forEach(rocket => {
-                const totalDiscount = Math.min(0.5, game.currentCoinDiscount || 0);
-                const cost = Math.floor((game.dismantleCount + 1) * 50 * (1 - totalDiscount));
-                const displayDiscountPct = Math.round(totalDiscount * 100);
-                const row = document.createElement('div');
-                row.className = 'event-row event-card';
-                row.style.cssText = 'margin-bottom:8px;';
-                row.innerHTML = `
-                    <div class="card-item-column">
-                        ${this.generateCardHTML(rocket, { badge: rocket.label })}
-                    </div>
-                    <div class="card-action-column">
-                        <div class="card-price">
-                            <span class="price-val">${cost}</span><span class="currency">c</span>
-                            ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
-                        </div>
-                        <button class="common-btn dismantle-btn" style="border-color:#ff5252; color:#ff5252; background:rgba(255,82,82,0.1); width:100%;">DISMANTLE</button>
-                    </div>
-                `;
-
-                row.querySelector('.dismantle-btn').onclick = () => {
-                    const currentCost = Math.floor((game.dismantleCount + 1) * 50 * (1 - totalDiscount));
-                    if (game.coins < currentCost) return;
-                    this.animateCoinChange(-currentCost);
-                    game.coins -= currentCost;
-                    game.dismantleCount++;
-                    addLog(`--- DISMANTLING: ${rocket.name} ---`);
-
-                    const partsToReturn = [];
-                    if (rocket.chassis) partsToReturn.push({ ...rocket.chassis, category: 'CHASSIS', count: 1 });
-                    if (rocket.logic) partsToReturn.push({ ...rocket.logic, category: 'LOGIC', count: 1 });
-                    if (rocket.modules) {
-                        Object.values(rocket.modules).forEach(m => {
-                            if (m) partsToReturn.push({ ...m, category: 'MODULES' });
-                        });
-                    }
-
-                    partsToReturn.forEach(p => {
-                        const enhancementLog = game.enhanceItem(p);
-                        game.inventorySystem.addItem(p);
-                        if (enhancementLog) addLog(enhancementLog);
-                        addLog(`RESTORED: ${p.name}`);
-                    });
-
-                    if (game.selection.rocket?.instanceId === rocket.instanceId) game.selection.rocket = null;
-                    const idx = game.inventory.rockets.findIndex(r => r.instanceId === rocket.instanceId);
-                    if (idx !== -1) game.inventory.rockets.splice(idx, 1);
-                    this.initRepairDock(container);
-                    game.updateUI();
-                };
-                dismantleList.appendChild(row);
-            });
-        }
-    }
-
-    initBlackMarket(container) {
-        const game = this.game;
-        const totalDiscount = Math.min(0.5, game.currentCoinDiscount || 0);
-        const cost100 = Math.floor(100 * (1 - totalDiscount));
-        const cost500 = Math.floor(500 * (1 - totalDiscount));
-        const displayDiscountPct = Math.round(totalDiscount * 100);
-
-        container.innerHTML = `
-            <div class="black-market-options" style="margin-bottom: 20px;">
-                <div class="market-option">
-                    <h3>通常取引 (Street Deal)</h3>
-                    <p>査定総額 100c 以上のアイテムを獲得します。</p>
-                    <div class="card-price" style="justify-content: center; margin-bottom: 4px;">
-                        <span class="price-val">${cost100}</span><span class="currency">c</span>
-                        ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
-                    </div>
-                    <button id="market-btn-100" class="premium-button" ${game.coins < cost100 ? 'disabled' : ''}>${cost100}c を支払う</button>
-                </div>
-                <div class="market-option highlighted" style="margin-top: 10px;">
-                    <h3>プレミアム取引 (Premium Haul)</h3>
-                    <p>査定総額 600c 以上。RARE パーツの出現率が大幅に上昇します。</p>
-                    <div class="card-price" style="justify-content: center; margin-bottom: 4px;">
-                        <span class="price-val">${cost500}</span><span class="currency">c</span>
-                        ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
-                    </div>
-                    <button id="market-btn-500" class="premium-button" ${game.coins < cost500 ? 'disabled' : ''}>${cost500}c を支払う</button>
-                </div>
-            </div>
-            <div id="market-results" class="market-results-area hidden" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0;">
-                <h3>獲得アイテム</h3>
-                <div id="market-results-list" class="event-grid"></div>
-            </div>
-        `;
-        document.getElementById('market-btn-100').onclick = () => this.runBlackMarket(cost100, 100, 0);
-        document.getElementById('market-btn-500').onclick = () => this.runBlackMarket(cost500, 600, 5);
-    }
-
-    runBlackMarket(cost, targetValue, bonus) {
-        const game = this.game;
-        if (game.coins < cost) return;
-        this.animateCoinChange(-cost);
-        game.coins -= cost;
-        game.updateUI();
-        const obtained = [];
-        let currentValue = 0;
-        while (currentValue < targetValue) {
-            const item = game.missionSystem.getWeightedRandomItem({ thresholdBonus: bonus, excludeCargo: true, excludeCoin: true });
-            obtained.push(item);
-            currentValue += game.economySystem.calculateValue(item);
-        }
-        obtained.forEach(i => game.inventorySystem.addItem(i));
-        const resultsArea = document.getElementById('market-results');
-        const list = document.getElementById('market-results-list');
-        resultsArea.classList.remove('hidden');
-        list.innerHTML = '';
-        obtained.forEach(i => {
-            const card = document.createElement('div');
-            card.className = 'event-row event-card';
-            card.style.marginBottom = '6px';
-            card.innerHTML = `<div class="card-item-column">${this.generateCardHTML(i)}</div>`;
-            list.appendChild(card);
-        });
-        document.getElementById('market-btn-100').disabled = true;
-        document.getElementById('market-btn-500').disabled = true;
-        game.updateUI();
-    }
+    // サブモジュールへの委譲
+    initTradingPost(container) { this.shopUI.initTradingPost(container); }
+    initRepairDock(container) { this.maintenanceUI.initRepairDock(container); }
+    initBlackMarket(container) { this.shopUI.initBlackMarket(container); }
 }

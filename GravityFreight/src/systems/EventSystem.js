@@ -346,9 +346,21 @@ export class EventSystem {
         const icon = document.getElementById('event-icon');
         const color = GOAL_COLORS[goal.id] || '#888';
         if (icon) {
-            icon.style.borderColor = color;
-            icon.style.backgroundColor = hexToRgba(color, 0.15);
-            icon.style.boxShadow = `0 0 20px ${hexToRgba(color, 0.2)}`;
+            // ショップごとのダークカラー（V7: 重厚さを追求した暗いトーン）
+            const darkColors = { 
+                'SAFE': '#008b45',    // 深みのある緑
+                'NORMAL': '#1565c0',  // 深みのある青
+                'DANGER': '#b71c1c'   // 深みのある赤
+            };
+            const deepColor = darkColors[goal.id] || color;
+
+            // CSS変数を使用して色と質感を適応
+            icon.style.setProperty('--shop-color', deepColor);
+            icon.style.setProperty('--shop-bg', hexToRgba(deepColor, 0.2));
+            
+            // イニシャルの設定 (UnifrakturMaguntia)
+            const initials = { 'SAFE': 'T', 'NORMAL': 'R', 'DANGER': 'B' };
+            icon.textContent = initials[goal.id] || '';
         }
 
         if (goal.id === 'SAFE') {
@@ -358,7 +370,7 @@ export class EventSystem {
             desc.textContent = '機体の整備やパーツの解体・強化を行える高度な設備。';
             game.uiSystem.initRepairDock(content);
         } else if (goal.id === 'DANGER') {
-            desc.textContent = '規制品や希少なパーツが非公式に取引される取引所。';
+            desc.textContent = '通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。';
             game.uiSystem.initBlackMarket(content);
         }
         document.getElementById('event-continue-btn').onclick = () => this.closeEvent();
@@ -374,6 +386,7 @@ export class EventSystem {
         document.getElementById('terminal-panel')?.classList.remove('collapsed');
 
         game.currentShopStock = null;
+        game.tempDismantleResults = null;
         if (game.missionSystem.isGameOver()) { game.uiSystem.showResult('gameover'); return; }
         game.stageLevel++;
         game.initStage(game.currentStarCount);

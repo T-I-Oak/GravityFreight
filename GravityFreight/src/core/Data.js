@@ -23,7 +23,8 @@ export const CATEGORY_COLORS = {
     BOOSTERS: '#795548',
     ROCKETS: '#c0c0c0',
     COIN: '#ffd700',
-    CARGO: '#00e5ff'
+    CARGO: '#00e5ff',
+    MARKET: '#ff4d4d'
 };
 
 export const GOAL_COLORS = {

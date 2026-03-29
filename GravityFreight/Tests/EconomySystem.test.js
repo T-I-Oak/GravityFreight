@@ -58,19 +58,19 @@ describe('EconomySystem Logic', () => {
         });
     });
 
-    describe('Item Distribution (v1.0.5)', () => {
-        it('should have 1 to 2 items on each star', () => {
+    describe('Item Distribution', () => {
+        it('should have 3 to 4 items on each star (Normal 1-2 + Lucky Spark + 100 Credits)', () => {
             const game = new Game(canvas, ui, 50);
             const counts = new Set();
             game.bodies.forEach(body => {
                 if (body.isHome) return;
                 const len = body.items.length;
                 counts.add(len);
-                expect(len).toBeGreaterThanOrEqual(1);
-                expect(len).toBeLessThanOrEqual(2);
+                expect(len).toBeGreaterThanOrEqual(3);
+                expect(len).toBeLessThanOrEqual(4);
             });
-            expect(counts.has(1)).toBe(true);
-            expect(counts.has(2)).toBe(true);
+            expect(counts.has(3)).toBe(true);
+            expect(counts.has(4)).toBe(true);
         });
     });
 });

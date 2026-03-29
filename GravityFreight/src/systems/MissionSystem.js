@@ -19,12 +19,13 @@ export class MissionSystem {
         game.bodies = [game.homeStar];
         game.boundaryRadius = 900;
         game.goals = [];
-        
+
         this.initGoals();
         this.generateStars(starCount);
 
         game.currentCoinDiscount = 0;
         game.dismantleCount = 0;
+        game.blackMarketUsed = false;
 
         // 自機の初期設定
         game.ship = new Body(new Vector2(centerX, centerY - game.homeStar.radius - 12), 10);
@@ -95,14 +96,18 @@ export class MissionSystem {
                 const body = new Body(pos, mass);
                 // 半径も旧来の公式 (Physics.js の初期 Body クラス準拠)
                 body.radius = Math.sqrt(mass) / 5 + 2;
-                
+
                 const itemNum = 1 + Math.floor(Math.random() * 2);
                 body.items = [];
                 for (let j = 0; j < itemNum; j++) {
-                    // テスト用：すべてのスターアイテムを「幸運の導き」に変更
-                    const luckyCharm = PARTS.CARGO.find(c => c.id === 'cargo_lucky');
-                    if (luckyCharm) body.items.push({ ...luckyCharm, category: 'CARGO' });
+                    const item = this.getWeightedRandomItem();
+                    if (item) body.items.push(item);
                 }
+
+                // テスト用追加
+                const luckyCharm = PARTS.CARGO.find(c => c.id === 'cargo_lucky');
+                if (luckyCharm) body.items.push({ ...luckyCharm, category: 'CARGO' });
+                body.items.push({ id: 'coin_100', category: 'COIN', name: '100 Credits', score: 100, rarity: RARITY.COMMON });
 
                 game.bodies.push(body);
             }
@@ -218,7 +223,7 @@ export class MissionSystem {
                         hitGoal.isCollected = false;
                     });
                 }
-                
+
                 const insuranceModules = game.ship?.equippedModules ? game.ship.equippedModules.filter(m => m.onLostBonus) : [];
                 const rocket = game.selection.rocket;
 
@@ -226,7 +231,7 @@ export class MissionSystem {
                     let totalUnitValue = 0;
                     if (rocket.chassis) totalUnitValue += game.calculateValue(rocket.chassis);
                     if (rocket.logic) totalUnitValue += game.calculateValue(rocket.logic);
-                    
+
                     // 搭載されている全モジュールの査定額を加算 (Spec 7.3)
                     const modules = game.ship?.equippedModules || [];
                     modules.forEach(m => {
