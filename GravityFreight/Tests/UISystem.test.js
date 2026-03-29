@@ -21,8 +21,12 @@ const createMockElement = (tag = 'div') => ({
     offsetParent: {}
 });
 
+const idMap = new Map();
 global.document = {
-    getElementById: vi.fn((id) => createMockElement(id)),
+    getElementById: vi.fn((id) => {
+        if (!idMap.has(id)) idMap.set(id, createMockElement(id));
+        return idMap.get(id);
+    }),
     createElement: vi.fn((tag) => createMockElement(tag)),
     body: createMockElement('body'),
     querySelectorAll: vi.fn(() => [])
@@ -43,6 +47,7 @@ describe('UI Logic & Component Rendering', () => {
     const mockUI = { status: {}, message: {} };
 
     beforeEach(() => {
+        idMap.clear();
         // 各テスト前にモックの中身をリセット
         vi.clearAllMocks();
         game = new Game(mockCanvas, mockUI);
@@ -142,19 +147,30 @@ describe('UI Logic & Component Rendering', () => {
     });
 
     describe('animateCoinChange', () => {
-        it('should create a popup element when coins change', () => {
-            game.animateCoinChange(100);
+        it('should trigger pulse animation on display elements', () => {
+            const creditsEl = createMockElement('credits');
+            const hudCoinsEl = createMockElement('hud');
             
-            // document.createElement('div') が呼ばれたか
-            expect(document.createElement).toHaveBeenCalledWith('div');
-            // document.body.appendChild が呼ばれたか
-            expect(document.body.appendChild).toHaveBeenCalled();
+            // document.getElementById をスパイして特定の要素を返す
+            vi.spyOn(document, 'getElementById').mockImplementation((id) => {
+                if (id === 'event-player-credits') return creditsEl;
+                if (id === 'coin-display') return hudCoinsEl;
+                return null;
+            });
             
-            // ポップアップの内容確認
-            const lastCall = document.body.appendChild.mock.calls.length - 1;
-            const popup = document.body.appendChild.mock.calls[lastCall][0];
-            expect(popup.textContent).toBe('+100');
-            expect(popup.classList.add).not.toHaveBeenCalled(); // className 経由で設定
+            // 状態設定
+            creditsEl.offsetParent = {}; // 表示中
+            
+            game.uiSystem.animateCoinChange(100);
+            
+            // クレジット表示が表示中の場合はそちらがパルスする
+            expect(creditsEl.classList.add).toHaveBeenCalledWith('pulse');
+            
+            // 非表示の場合はHUD側がパルスする
+            vi.clearAllMocks();
+            creditsEl.offsetParent = null;
+            game.uiSystem.animateCoinChange(100);
+            expect(hudCoinsEl.classList.add).toHaveBeenCalledWith('pulse');
         });
     });
 });

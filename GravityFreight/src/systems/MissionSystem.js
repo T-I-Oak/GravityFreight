@@ -99,8 +99,9 @@ export class MissionSystem {
                 const itemNum = 1 + Math.floor(Math.random() * 2);
                 body.items = [];
                 for (let j = 0; j < itemNum; j++) {
-                    const itemData = this.getWeightedRandomItem();
-                    if (itemData) body.items.push(itemData);
+                    // テスト用：すべてのスターアイテムを「幸運の導き」に変更
+                    const luckyCharm = PARTS.CARGO.find(c => c.id === 'cargo_lucky');
+                    if (luckyCharm) body.items.push({ ...luckyCharm, category: 'CARGO' });
                 }
 
                 game.bodies.push(body);
@@ -138,6 +139,7 @@ export class MissionSystem {
 
     resolveItems(result, hitGoal = null) {
         const game = this.game;
+        let luckCount = 0;
         if (result === 'success') {
             if (!game.pendingItems || game.pendingItems.length === 0) {
                 game.updateUI();
@@ -151,10 +153,7 @@ export class MissionSystem {
 
                 if (category === 'CARGO') {
                     if (hitGoal) {
-                        if (itemData.coinDiscount) {
-                            game.currentCoinDiscount = Math.min(0.5, game.currentCoinDiscount + itemData.coinDiscount);
-                            game.flightResults.items.push({ ...itemData, bonusItems: [] });
-                        } else if (itemData.deliveryGoalId) {
+                        if (itemData.deliveryGoalId) {
                             const isMatch = hitGoal.id === itemData.deliveryGoalId;
                             if (isMatch) {
                                 game.pendingScore += 1500;
@@ -179,9 +178,18 @@ export class MissionSystem {
                                 game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false, bonusItems: [] });
                                 game.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: 10 });
                             }
+                        } else {
+                            // 配送IDのない貨物（「幸運の導き」など）
+                            if (itemData.id === 'cargo_lucky') {
+                                luckCount++;
+                            }
+                            // リザルトに一度だけ追加
+                            game.flightResults.items.push({ ...itemData });
+                            // インベントリには追加しない (消費扱い)
                         }
                         return;
                     } else {
+                        // 母星帰還時は以前と同様に母星に保存
                         if (!game.homeStar.items) game.homeStar.items = [];
                         game.homeStar.items.push(itemData);
                         game.homeStar.isCollected = false;
@@ -198,6 +206,7 @@ export class MissionSystem {
                 game._addItemToInventory(itemData);
             });
             game.pendingItems = [];
+            game.currentCoinDiscount = Math.min(0.5, luckCount * 0.1);
 
         } else if (result === 'crashed' || result === 'lost') {
             game.flightResults.items = [];

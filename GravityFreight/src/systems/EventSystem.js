@@ -1,5 +1,5 @@
 import { Vector2 } from '../utils/Physics.js';
-import { PARTS, GOAL_NAMES } from '../core/Data.js';
+import { PARTS, GOAL_NAMES, GOAL_COLORS, hexToRgba } from '../core/Data.js';
 
 export class EventSystem {
     constructor(game) {
@@ -333,29 +333,46 @@ export class EventSystem {
         const screen = document.getElementById('event-screen');
         if (!screen) return;
         game.state = 'event';
+        
+        // 割引率は MissionSystem.resolveItems によって航行終了時に確定済み
+
+        // パネルを最小化してイベント画面を見やすくする
+        document.getElementById('terminal-panel')?.classList.add('collapsed');
+
         const title = document.getElementById('event-location');
         const desc = document.getElementById('event-description');
         const content = document.getElementById('event-content');
         title.textContent = GOAL_NAMES[goal.id];
+        const icon = document.getElementById('event-icon');
+        const color = GOAL_COLORS[goal.id] || '#888';
+        if (icon) {
+            icon.style.borderColor = color;
+            icon.style.backgroundColor = hexToRgba(color, 0.15);
+            icon.style.boxShadow = `0 0 20px ${hexToRgba(color, 0.2)}`;
+        }
+
         if (goal.id === 'SAFE') {
-            desc.textContent = 'Orbital supply station for cargo trading.';
+            desc.textContent = '貨物取引やパーツの売買ができる中継基地。';
             game.uiSystem.initTradingPost(content);
         } else if (goal.id === 'NORMAL') {
-            desc.textContent = 'Advanced maintenance and modification facility.';
+            desc.textContent = '機体の整備やパーツの解体・強化を行える高度な設備。';
             game.uiSystem.initRepairDock(content);
         } else if (goal.id === 'DANGER') {
-            desc.textContent = 'Unregulated trade hub for rare equipment.';
+            desc.textContent = '規制品や希少なパーツが非公式に取引される取引所。';
             game.uiSystem.initBlackMarket(content);
         }
         document.getElementById('event-continue-btn').onclick = () => this.closeEvent();
         screen.classList.remove('hidden');
-        game.uiSystem.ensurePanelExpanded();
         game.updateUI();
     }
 
     closeEvent() {
         const game = this.game;
         document.getElementById('event-screen')?.classList.add('hidden');
+        
+        // パネルを元の状態（展開）に戻す
+        document.getElementById('terminal-panel')?.classList.remove('collapsed');
+
         game.currentShopStock = null;
         if (game.missionSystem.isGameOver()) { game.uiSystem.showResult('gameover'); return; }
         game.stageLevel++;
@@ -365,5 +382,6 @@ export class EventSystem {
         game.selection.launcher = null;
         game.selection.booster = null;
         game.reset();
+        game.updateUI(); // ステート変更を各パネルに反映
     }
 }

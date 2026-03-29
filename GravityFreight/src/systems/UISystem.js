@@ -144,6 +144,7 @@ export class UISystem {
                 });
 
                 div.onclick = () => {
+                    if (game.state === 'event') return; // イベント中は選択不可
                     if (type === 'modules' || type === 'booster') {
                         game.selectOption(type, group.instanceId);
                     } else {
@@ -180,10 +181,13 @@ export class UISystem {
 
         const buildOverlay = document.getElementById('build-overlay');
         const launchBtn = document.getElementById('launch-btn');
-        if (game.state === 'building' || game.state === 'aiming') {
+        if (game.state === 'building' || game.state === 'aiming' || game.state === 'event') {
             buildOverlay?.classList.remove('hidden');
+            if (game.state === 'event') buildOverlay?.classList.add('event-active');
+            else buildOverlay?.classList.remove('event-active');
         } else {
             buildOverlay?.classList.add('hidden');
+            buildOverlay?.classList.remove('event-active');
         }
 
         if (launchBtn) {
@@ -217,7 +221,10 @@ export class UISystem {
                     const isSelected = (game.selection.rocket && game.selection.rocket.instanceId === rocket.instanceId);
                     div.className = `rocket-item ${isSelected ? 'selected' : ''}`;
                     div.innerHTML = this.generateCardHTML(rocket, { isSelected });
-                    div.onclick = () => game.selectPart('rocket', rocket.instanceId);
+                    div.onclick = () => {
+                        if (game.state === 'event') return; // イベント中は選択不可
+                        game.selectPart('rocket', rocket.instanceId);
+                    };
                     rList.appendChild(div);
                 });
             }
@@ -259,11 +266,11 @@ export class UISystem {
         const containerStyle = `
             position: relative;
             border-left: 5px solid ${categoryColor};
-            padding: 10px 12px;
+            padding: 6px 12px;
             background: ${isSelected ? hexToRgba(categoryColor, 0.25) : 'rgba(255,255,255,0.03)'};
             border-radius: 4px;
             margin-bottom: 2px;
-            min-width: 220px;
+            min-width: 160px;
             margin-left: ${indent}px;
             transition: all 0.2s ease;
             ${isSelected ? `box-shadow: inset 0 0 15px ${hexToRgba(categoryColor, 0.2)}, 0 0 10px ${hexToRgba(categoryColor, 0.2)};` : ''}
@@ -434,51 +441,66 @@ export class UISystem {
         if (itemCoinTotal > 0) addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
         game.flightResults.bonuses.filter(b => b.coins && b.coins > 0).forEach(b => addRow(statsList, b.name, b.coins, 'coin'));
 
-        const cargoItems = [];
-        const otherItems = new Map();
+        const groupedItems = [];
         if (resultType !== 'crashed' && resultType !== 'lost') {
             game.flightResults.items.forEach(item => {
                 if (!item || !item.id) return;
-                if (item.category === 'CARGO') cargoItems.push(item);
-                else {
-                    const key = `${item.id}-${item.enhancementCount || 0}`;
-                    if (otherItems.has(key)) otherItems.get(key).count++;
-                    else otherItems.set(key, { data: item, category: item.category, count: 1 });
+                // カテゴリ、ID、強化内容、耐久力、配送状況が一致するものをグループ化
+                const enhStr = JSON.stringify(item.enhancements || {});
+                const key = `${item.category}_${item.id}_${enhStr}_${item.charges || -1}_${item.isDelivery || false}_${item.isMatch || false}`;
+                
+                let group = groupedItems.find(g => g.key === key);
+                if (group) {
+                    group.count++;
+                    if (item.bonusItems) {
+                        group.bonusItems = [...(group.bonusItems || []), ...item.bonusItems];
+                    }
+                } else {
+                    groupedItems.push({ 
+                        ...item, 
+                        count: 1, 
+                        key,
+                        bonusItems: item.bonusItems ? [...item.bonusItems] : []
+                    });
                 }
             });
         }
 
-        if (cargoItems.length === 0 && otherItems.size === 0) {
+        if (groupedItems.length === 0) {
             if (itemsList) itemsList.innerHTML = '<div class="part-info" style="opacity:0.3;text-align:center;padding:20px;">NO ITEMS COLLECTED</div>';
         } else {
-            cargoItems.forEach(item => {
+            groupedItems.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'reward-item-card stagger-in';
                 card.style.animationDelay = `${delay}s`;
                 delay += 0.07;
+                
                 const badge = item.isDelivery ? (item.isMatch ? `<span style="color:#44ffbb;font-size:10px;font-weight:800;">✓ DELIVERED</span>` : `<span style="color:#ff7755;font-size:10px;font-weight:800;">✗ UNMATCHED</span>`) : '';
-                card.innerHTML = this.generateCardHTML(item, { badge });
+                
+                // [x N] 表示のために showInventory: true を渡す
+                card.innerHTML = this.generateCardHTML(item, { badge, showInventory: true });
                 itemsList.appendChild(card);
                 
-                // ボーナスアイテムをインデントされた別カードとして表示
-                if (item.isMatch && item.bonusItems && item.bonusItems.length > 0) {
-                    item.bonusItems.forEach(bonus => {
+                // ボーナスアイテムがあれば表示
+                if (item.bonusItems && item.bonusItems.length > 0) {
+                    // ボーナスアイテム内でもグループ化
+                    const groupedBonuses = [];
+                    item.bonusItems.forEach(b => {
+                        const bKey = `${b.id}_${JSON.stringify(b.enhancements || {})}_${b.charges || -1}`;
+                        let bg = groupedBonuses.find(g => g.key === bKey);
+                        if (bg) bg.count++;
+                        else groupedBonuses.push({ ...b, count: 1, key: bKey });
+                    });
+
+                    groupedBonuses.forEach(bonus => {
                         const bonusCard = document.createElement('div');
                         bonusCard.className = 'reward-item-card stagger-in';
                         bonusCard.style.animationDelay = `${delay}s`;
                         delay += 0.07;
-                        bonusCard.innerHTML = this.generateCardHTML(bonus, { indent: 16 });
+                        bonusCard.innerHTML = this.generateCardHTML(bonus, { indent: 16, showInventory: true });
                         itemsList.appendChild(bonusCard);
                     });
                 }
-            });
-            otherItems.forEach(group => {
-                const card = document.createElement('div');
-                card.className = 'reward-item-card stagger-in';
-                card.style.animationDelay = `${delay}s`;
-                delay += 0.07;
-                card.innerHTML = this.generateCardHTML(group.data, { showInventory: true });
-                itemsList.appendChild(card);
             });
         }
 
@@ -534,25 +556,13 @@ export class UISystem {
         if (creditsEl) this.animateValue(creditsEl, startVal, endVal, ANIMATION_DURATION);
         if (hudCoinsEl) this.animateValue(hudCoinsEl, startVal, endVal, ANIMATION_DURATION);
 
-        const popup = document.createElement('div');
-        popup.className = `coin-popup ${amount > 0 ? 'coin-plus' : 'coin-minus'}`;
-        popup.textContent = (amount > 0 ? '+' : '') + amount.toLocaleString();
-
         if (creditsEl && creditsEl.offsetParent !== null) {
-            const rect = creditsEl.getBoundingClientRect();
-            popup.style.left = (rect.left + rect.width / 2) + 'px';
-            popup.style.top = rect.top + 'px';
             creditsEl.classList.add('pulse');
             setTimeout(() => creditsEl.classList.remove('pulse'), 300);
         } else if (hudCoinsEl) {
-            const rect = hudCoinsEl.getBoundingClientRect();
-            popup.style.left = (rect.left + rect.width / 2) + 'px';
-            popup.style.top = rect.top + 'px';
             hudCoinsEl.classList.add('pulse');
             setTimeout(() => hudCoinsEl.classList.remove('pulse'), 300);
         }
-        document.body.appendChild(popup);
-        setTimeout(() => popup.remove(), ANIMATION_DURATION);
     }
 
     initTradingPost(container) {
@@ -563,7 +573,7 @@ export class UISystem {
             for (let i = 0; i < 6; i++) {
                 const item = game.missionSystem.getWeightedRandomItem({ excludeCargo: true, excludeCoin: true });
                 if (item) {
-                    game.currentShopStock.push({ ...item, isSold: false });
+                    game.currentShopStock.push({ ...item, isSold: false, isSale: false });
                 }
             }
             if (game.currentShopStock.length > 0) {
@@ -573,7 +583,7 @@ export class UISystem {
 
         const shopSection = document.createElement('div');
         shopSection.className = 'event-shop-section';
-        shopSection.innerHTML = '<h3>AVAILABLE STOCK</h3>';
+        shopSection.innerHTML = '<h3>販売中のアイテム</h3>';
         const grid = document.createElement('div');
         grid.className = 'event-grid';
 
@@ -581,20 +591,28 @@ export class UISystem {
             const isSale = itemData.isSale;
             const isSold = itemData.isSold;
             const baseValue = game.calculateValue(itemData);
-            let buyPrice = baseValue * 2;
-            if (isSale) buyPrice = Math.floor(buyPrice * 0.7);
+            
+            // 加算方式の割引計算 (SALE 30% + LUCKY 10% * N、最大 50%)
+            const baseDiscount = isSale ? 0.3 : 0.0;
+            const totalDiscount = Math.min(0.5, baseDiscount + (game.currentCoinDiscount || 0));
+            const buyPrice = Math.floor(baseValue * 2 * (1 - totalDiscount));
+            
+            const displayDiscountPct = Math.round(totalDiscount * 100);
+            const discountLevel = displayDiscountPct >= 50 ? 'high' : (displayDiscountPct >= 30 ? 'mid' : 'low');
 
             const card = document.createElement('div');
-            card.className = `event-card ${isSale ? 'sale' : ''}`;
+            card.className = `event-row event-card`;
             card.innerHTML = `
-                <div class="card-body">
-                    ${this.generateCardHTML(itemData, { isSelected: isSale })}
-                    <div class="card-price">
-                        <span class="price-val">${isSold ? '---' : buyPrice}</span><span class="currency">c</span>
-                        ${isSale ? '<span class="sale-badge">30% OFF</span>' : ''}
-                    </div>
+                <div class="card-item-column">
+                    ${this.generateCardHTML(itemData, { isSelected: false })}
                 </div>
-                <button class="buy-btn" ${(game.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD OUT' : 'BUY'}</button>
+                <div class="card-action-column">
+                    <div class="card-price" ${isSold ? 'style="opacity: 0.5;"' : ''}>
+                        <span class="price-val">${buyPrice}</span><span class="currency">c</span>
+                        ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="${discountLevel}"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
+                    </div>
+                    <button class="buy-btn" ${(game.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD' : 'BUY'}</button>
+                </div>
             `;
             card.querySelector('.buy-btn').onclick = () => {
                 if (game.coins >= buyPrice && !isSold) {
@@ -613,7 +631,7 @@ export class UISystem {
 
         const sellSection = document.createElement('div');
         sellSection.className = 'event-sell-section';
-        sellSection.innerHTML = '<h3>SELL YOUR PARTS</h3>';
+        sellSection.innerHTML = '<h3>パーツの売却</h3>';
         const sellGrid = document.createElement('div');
         sellGrid.className = 'event-grid';
 
@@ -627,15 +645,19 @@ export class UISystem {
 
         allHoldings.forEach(item => {
             if ((item.count || 0) <= 0 && item.charges === undefined) return;
-            const sellPrice = game.calculateValue(item);
+            const sellPrice = game.economySystem.calculateValue(item);
             const card = document.createElement('div');
-            card.className = 'event-card sell-card';
+            card.className = 'event-row event-card';
             card.innerHTML = `
-                <div class="card-body">
+                <div class="card-item-column">
                     ${this.generateCardHTML(item, { showInventory: true })}
-                    <div class="card-price sell"><span class="label">SELL FOR:</span><span class="price-val">${sellPrice}</span><span class="currency">c</span></div>
                 </div>
-                <button class="sell-btn">SELL</button>
+                <div class="card-action-column">
+                    <div class="card-price">
+                        <span class="price-val">${sellPrice}</span><span class="currency">c</span>
+                    </div>
+                    <button class="sell-btn">SELL</button>
+                </div>
             `;
             card.querySelector('.sell-btn').onclick = () => {
                 const success = game.inventorySystem.removeItem(item.cat, item.instanceId);
@@ -657,11 +679,11 @@ export class UISystem {
         container.innerHTML = `
             <div class="repair-dock-layout" style="display:flex; flex-direction:column; gap:20px;">
                 <div class="repair-section">
-                    <h3 style="color:#4caf50; border-bottom:1px solid rgba(76,175,80,0.3); padding-bottom:5px;">MAINTENANCE (LAUNCHERS ONLY)</h3>
+                    <h3 style="color:#4caf50; border-bottom:1px solid rgba(76,175,80,0.3); padding-bottom:5px;">発射台のメンテナンス</h3>
                     <div id="repair-list" class="event-grid"></div>
                 </div>
                 <div class="dismantle-section">
-                    <h3 style="color:#ffab40; border-bottom:1px solid rgba(255,171,64,0.3); padding-bottom:5px;">DISMANTLE (ROCKETS ONLY)</h3>
+                    <h3 style="color:#ffab40; border-bottom:1px solid rgba(255,171,64,0.3); padding-bottom:5px;">機体の解体・強化</h3>
                     <div id="dismantle-list" class="event-grid"></div>
                 </div>
                 <div id="repair-log" style="background:rgba(0,0,0,0.4); padding:10px; border-radius:4px; font-family:monospace; min-height:60px; max-height:100px; overflow-y:auto; border:1px solid rgba(255,255,255,0.1); display:none;"></div>
@@ -685,15 +707,22 @@ export class UISystem {
             repairList.innerHTML = '<div class="part-info" style="opacity:0.3; padding:20px; text-align:center;">ALL LAUNCHERS READY</div>';
         } else {
             repairables.forEach(item => {
-                const cost = Math.floor(20 * (1 - game.currentCoinDiscount));
+                const totalDiscount = Math.min(0.5, game.currentCoinDiscount || 0);
+                const cost = Math.floor(20 * (1 - totalDiscount));
+                const displayDiscountPct = Math.round(totalDiscount * 100);
                 const card = document.createElement('div');
-                card.className = 'event-card repair-card';
+                card.className = 'event-row event-card';
                 card.innerHTML = `
-                    <div class="card-body">
+                    <div class="card-item-column">
                         ${this.generateCardHTML(item, { showInventory: true })}
-                        <div class="card-price"><span class="label">REPAIR (+1 CHG):</span><span class="price-val">${cost}</span><span class="currency">c</span></div>
                     </div>
-                    <button class="repair-btn" ${game.coins < cost ? 'disabled' : ''}>RESTORE</button>
+                    <div class="card-action-column">
+                        <div class="card-price">
+                            <span class="price-val">${cost}</span><span class="currency">c</span>
+                            ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
+                        </div>
+                        <button class="repair-btn" ${game.coins < cost ? 'disabled' : ''}>REPAIR</button>
+                    </div>
                 `;
                 card.querySelector('.repair-btn').onclick = () => {
                     if (game.coins >= cost) {
@@ -714,21 +743,30 @@ export class UISystem {
             dismantleList.innerHTML = '<div class="part-info" style="opacity:0.3; padding:20px; text-align:center;">NO ASSEMBLED ROCKETS</div>';
         } else {
             dismantleCandidates.forEach(rocket => {
+                const totalDiscount = Math.min(0.5, game.currentCoinDiscount || 0);
+                const cost = Math.floor((game.dismantleCount + 1) * 50 * (1 - totalDiscount));
+                const displayDiscountPct = Math.round(totalDiscount * 100);
                 const row = document.createElement('div');
-                row.className = 'dismantle-row';
-                row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding:10px; background:rgba(255,255,255,0.03); border-radius:8px; border:1px solid rgba(255,171,64,0.1);';
+                row.className = 'event-row event-card';
+                row.style.cssText = 'margin-bottom:8px;';
                 row.innerHTML = `
-                    <div style="flex:1;">
+                    <div class="card-item-column">
                         ${this.generateCardHTML(rocket, { badge: rocket.label })}
                     </div>
-                    <button class="mini-btn dismantle-btn" style="margin-left:15px; border-color:#ff5252; color:#ff5252; background:rgba(255,82,82,0.1);">DISMANTLE</button>
+                    <div class="card-action-column">
+                        <div class="card-price">
+                            <span class="price-val">${cost}</span><span class="currency">c</span>
+                            ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
+                        </div>
+                        <button class="common-btn dismantle-btn" style="border-color:#ff5252; color:#ff5252; background:rgba(255,82,82,0.1); width:100%;">DISMANTLE</button>
+                    </div>
                 `;
 
                 row.querySelector('.dismantle-btn').onclick = () => {
-                    const cost = Math.floor((game.dismantleCount + 1) * 50 * (1 - game.currentCoinDiscount));
-                    if (game.coins < cost) return;
-                    this.animateCoinChange(-cost);
-                    game.coins -= cost;
+                    const currentCost = Math.floor((game.dismantleCount + 1) * 50 * (1 - totalDiscount));
+                    if (game.coins < currentCost) return;
+                    this.animateCoinChange(-currentCost);
+                    game.coins -= currentCost;
                     game.dismantleCount++;
                     addLog(`--- DISMANTLING: ${rocket.name} ---`);
 
@@ -736,17 +774,14 @@ export class UISystem {
                     if (rocket.chassis) partsToReturn.push({ ...rocket.chassis, category: 'CHASSIS', count: 1 });
                     if (rocket.logic) partsToReturn.push({ ...rocket.logic, category: 'LOGIC', count: 1 });
                     if (rocket.modules) {
-                        // ロケットに搭載されている全モジュール（耐久度 0 を含む）を返却対象にする
                         Object.values(rocket.modules).forEach(m => {
-                            partsToReturn.push({ ...m, category: 'MODULES' });
+                            if (m) partsToReturn.push({ ...m, category: 'MODULES' });
                         });
                     }
 
                     partsToReturn.forEach(p => {
-                        // 全パーツ（Chassis, Logic, Modules）を強化 (Spec 8.2)
                         const enhancementLog = game.enhanceItem(p);
                         game.inventorySystem.addItem(p);
-                        
                         if (enhancementLog) addLog(enhancementLog);
                         addLog(`RESTORED: ${p.name}`);
                     });
@@ -764,14 +799,36 @@ export class UISystem {
 
     initBlackMarket(container) {
         const game = this.game;
-        const cost100 = Math.floor(100 * (1 - game.currentCoinDiscount));
-        const cost500 = Math.floor(500 * (1 - game.currentCoinDiscount));
+        const totalDiscount = Math.min(0.5, game.currentCoinDiscount || 0);
+        const cost100 = Math.floor(100 * (1 - totalDiscount));
+        const cost500 = Math.floor(500 * (1 - totalDiscount));
+        const displayDiscountPct = Math.round(totalDiscount * 100);
+
         container.innerHTML = `
-            <div class="black-market-options">
-                <div class="market-option"><h3>STREET DEAL</h3><p>Total value ~100c items.</p><button id="market-btn-100" class="premium-button" ${game.coins < cost100 ? 'disabled' : ''}>PAY ${cost100}c</button></div>
-                <div class="market-option highlighted"><h3>PREMIUM HAUL</h3><p>Total value ~600c items.</p><button id="market-btn-500" class="premium-button" ${game.coins < cost500 ? 'disabled' : ''}>PAY ${cost500}c</button></div>
+            <div class="black-market-options" style="margin-bottom: 20px;">
+                <div class="market-option">
+                    <h3>通常取引 (Street Deal)</h3>
+                    <p>査定総額 100c 以上のアイテムを獲得します。</p>
+                    <div class="card-price" style="justify-content: center; margin-bottom: 4px;">
+                        <span class="price-val">${cost100}</span><span class="currency">c</span>
+                        ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
+                    </div>
+                    <button id="market-btn-100" class="premium-button" ${game.coins < cost100 ? 'disabled' : ''}>${cost100}c を支払う</button>
+                </div>
+                <div class="market-option highlighted" style="margin-top: 10px;">
+                    <h3>プレミアム取引 (Premium Haul)</h3>
+                    <p>査定総額 600c 以上。RARE パーツの出現率が大幅に上昇します。</p>
+                    <div class="card-price" style="justify-content: center; margin-bottom: 4px;">
+                        <span class="price-val">${cost500}</span><span class="currency">c</span>
+                        ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
+                    </div>
+                    <button id="market-btn-500" class="premium-button" ${game.coins < cost500 ? 'disabled' : ''}>${cost500}c を支払う</button>
+                </div>
             </div>
-            <div id="market-results" class="market-results-area hidden"><h3>OBTAINED ITEMS</h3><div id="market-results-list" class="event-grid"></div></div>
+            <div id="market-results" class="market-results-area hidden" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0;">
+                <h3>獲得アイテム</h3>
+                <div id="market-results-list" class="event-grid"></div>
+            </div>
         `;
         document.getElementById('market-btn-100').onclick = () => this.runBlackMarket(cost100, 100, 0);
         document.getElementById('market-btn-500').onclick = () => this.runBlackMarket(cost500, 600, 5);
@@ -787,7 +844,8 @@ export class UISystem {
         let currentValue = 0;
         while (currentValue < targetValue) {
             const item = game.missionSystem.getWeightedRandomItem({ thresholdBonus: bonus, excludeCargo: true, excludeCoin: true });
-            obtained.push(item); currentValue += game.economySystem.calculateValue(item);
+            obtained.push(item);
+            currentValue += game.economySystem.calculateValue(item);
         }
         obtained.forEach(i => game.inventorySystem.addItem(i));
         const resultsArea = document.getElementById('market-results');
@@ -795,8 +853,10 @@ export class UISystem {
         resultsArea.classList.remove('hidden');
         list.innerHTML = '';
         obtained.forEach(i => {
-            const card = document.createElement('div'); card.className = 'event-card obtained-card';
-            card.innerHTML = `<div class="card-body">${this.generateCardHTML(i)}</div>`;
+            const card = document.createElement('div');
+            card.className = 'event-row event-card';
+            card.style.marginBottom = '6px';
+            card.innerHTML = `<div class="card-item-column">${this.generateCardHTML(i)}</div>`;
             list.appendChild(card);
         });
         document.getElementById('market-btn-100').disabled = true;
