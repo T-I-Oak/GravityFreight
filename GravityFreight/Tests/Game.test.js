@@ -40,7 +40,7 @@ describe('Game Central Controller Logic', () => {
         expect(game.economySystem).toBeDefined();
         expect(game.missionSystem).toBeDefined();
         expect(game.eventSystem).toBeDefined();
-        expect(game.state).toBe('building');
+        expect(game.state).toBe('title');
     });
 
     it('should correctly handle home star initialization', () => {

@@ -22,7 +22,7 @@ describe('Enhancement and Dismantle Logic', () => {
             getElementById: vi.fn(() => ({ 
                 appendChild: vi.fn(), 
                 innerHTML: '', 
-                classList: { add: vi.fn(), remove: vi.fn(), contains: vi.fn(() => false) },
+                classList: { add: vi.fn(), remove: vi.fn(), contains: vi.fn(() => false), toggle: vi.fn() },
                 style: {},
                 textContent: '',
                 querySelector: vi.fn(() => ({ textContent: '' }))

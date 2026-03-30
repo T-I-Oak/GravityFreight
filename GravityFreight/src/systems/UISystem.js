@@ -1,5 +1,6 @@
 import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba, PARTS, RARITY } from '../core/Data.js';
 import { ItemUtils } from '../utils/ItemUtils.js';
+import { TitleAnimation } from '../utils/TitleAnimation.js';
 import { EconomySystem } from './EconomySystem.js';
 import { UIComponents } from './ui/UIComponents.js';
 import { ShopUI } from './ui/ShopUI.js';
@@ -11,6 +12,7 @@ export class UISystem {
         // サブシステムの初期化
         this.shopUI = new ShopUI(game, this);
         this.maintenanceUI = new MaintenanceUI(game, this);
+        this.titleAnimation = null;
     }
 
     update(dt) {
@@ -173,6 +175,27 @@ export class UISystem {
             if (factoryTab) factoryTab.classList.add('hidden');
             tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'flight'));
         }
+
+        const titleScreen = document.getElementById('title-screen');
+        const missionHud = document.getElementById('mission-hud');
+        if (titleScreen) {
+            const isTitle = game.state === 'title';
+            titleScreen.classList.toggle('hidden', !isTitle);
+            
+            if (isTitle) {
+                if (!this.titleAnimation) {
+                    const bg = document.getElementById('title-bg-canvas');
+                    const fg = document.getElementById('title-fg-canvas');
+                    if (bg && fg) {
+                        this.titleAnimation = new TitleAnimation(bg, fg);
+                    }
+                }
+                this.titleAnimation?.start();
+            } else {
+                this.titleAnimation?.stop();
+            }
+        }
+        if (missionHud) missionHud.classList.toggle('hidden', game.state === 'title');
 
         const buildOverlay = document.getElementById('build-overlay');
         const launchBtn = document.getElementById('launch-btn');

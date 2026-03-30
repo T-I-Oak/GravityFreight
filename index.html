@@ -7,7 +7,7 @@
     <title>GRAVITY FREIGHT: ORBITAL ECHOES</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="GravityFreight/css/base.css">
     <link rel="stylesheet" href="GravityFreight/css/layout.css">
     <link rel="stylesheet" href="GravityFreight/css/ui.css">
@@ -108,9 +108,71 @@
     </style>
 </head>
 <body>
+    <!-- タイトル画面 -->
+    <div id="title-screen">
+        <canvas id="title-bg-canvas"></canvas>
+        <div class="title-container">
+            <h1 class="game-logo">GRAVITY FREIGHT<br><span class="subtitle">ORBITAL ECHOES</span></h1>
+            <div class="menu-buttons">
+                <button id="start-game-btn" class="btn-neon">START ADVENTURE</button>
+                <button id="how-to-play-btn" class="btn-neon outline">HOW TO PLAY</button>
+                <button id="ranking-btn" class="btn-neon outline" disabled>RANKING <span style="font-size: 0.7em; opacity: 0.6;">(COMING SOON)</span></button>
+            </div>
+        </div>
+        <canvas id="title-fg-canvas"></canvas>
+        <div class="title-footer">
+            <span class="version">v0.6.0</span>
+            <span class="copyright">© T.I.OAK 2026</span>
+        </div>
+    </div>
+
+    <!-- 操作説明パネル -->
+    <div id="how-to-play-overlay" class="hidden">
+        <div class="panel" style="max-width: 600px; width: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+            <div class="panel-header">
+                <h2>HOW TO PLAY</h2>
+            </div>
+            <div class="panel-content" style="max-height: 70vh; overflow-y: auto; padding: 20px;">
+                <div class="how-to-grid">
+                    <div class="how-to-item">
+                        <div class="how-to-icon">🖱️</div>
+                        <div class="how-to-text">
+                            <strong>DRAG TO AIM</strong>
+                            <p>画面をドラッグして、発射角度とパワーを調整します。</p>
+                        </div>
+                    </div>
+                    <div class="how-to-item">
+                        <div class="how-to-icon">🚀</div>
+                        <div class="how-to-text">
+                            <strong>LAUNCH</strong>
+                            <p>LAUNCHボタンで機体を発射！中継地点の星を目指しましょう。</p>
+                        </div>
+                    </div>
+                    <div class="how-to-item">
+                        <div class="how-to-icon">📦</div>
+                        <div class="how-to-text">
+                            <strong>COLLECT & DELIVER</strong>
+                            <p>星の近くを通るとアイテムを回収できます。指定の星へ荷物を届けましょう。</p>
+                        </div>
+                    </div>
+                    <div class="how-to-item">
+                        <div class="how-to-icon">🛠️</div>
+                        <div class="how-to-text">
+                            <strong>BUILD & UPGRADE</strong>
+                            <p>回収したパーツで機体を強化。より遠くのセクターを目指しましょう。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer" style="text-align: center; margin-top: 10px; padding: 0 20px 20px;">
+                <button id="close-help-btn" class="btn-neon" style="min-width: 180px; padding: 10px 20px; font-size: 1.1rem;">UNDERSTOOD</button>
+            </div>
+        </div>
+    </div>
+
     <div id="mission-hud" class="panel static">
         <div class="panel-header">
-            <h1 id="title">GRAVITY FREIGHT</h1>
+            <h1 id="title">GRAVITY FREIGHT<span class="subtitle">ORBITAL ECHOES</span></h1>
         </div>
         <div id="hud-metrics">
             <div class="metric"><span class="label">SECTOR</span><span id="sector-display">1</span></div>

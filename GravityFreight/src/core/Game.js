@@ -15,7 +15,6 @@ export class Game {
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
         this.version = "0.6.0";
-        this.state = 'building';
 
         // システムの初期化
         this.inventorySystem = new InventorySystem(this);
@@ -78,6 +77,7 @@ export class Game {
         this.currentCoinDiscount = 0;
 
         this.initStage(this.currentStarCount);
+        this.state = 'title';
         this.eventSystem.setupListeners();
         this.updateUI();
     }

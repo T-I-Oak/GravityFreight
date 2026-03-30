@@ -19,6 +19,7 @@
 }
 
 .panel {
+    font-family: 'Inter', sans-serif;
     background: rgba(10, 15, 25, 0.35);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -47,6 +48,11 @@
     align-items: center;
     margin-bottom: 10px;
     user-select: none;
+}
+
+#mission-hud .panel-header {
+    padding: 6px 12px 2px; /* 上部と下部のパディングを削減 */
+    min-height: auto;
 }
 
 .panel:not(.static) .panel-header {
@@ -129,9 +135,39 @@
 
 .panel h2 {
     margin: 0 0 15px 0;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
     font-size: 14px;
     letter-spacing: 2px;
     color: var(--accent-color);
+    text-transform: uppercase;
+}
+
+#mission-hud h1#title {
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 2.5px;
+    color: #fff;
+    text-shadow: 
+        0 0 10px rgba(0, 212, 255, 0.5),
+        0 0 20px rgba(0, 212, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* タイトル画面に合わせてセンタリング */
+    width: 100%;
+    text-align: center;
+    line-height: 1.1;
+}
+
+#mission-hud h1#title .subtitle {
+    font-size: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.8em; /* タイトル画面の広がりに合わせる */
+    color: rgba(0, 255, 204, 0.8); /* タイトル画面の色に合わせる */
+    margin-top: 2px;
+    text-shadow: 0 0 5px rgba(0, 255, 204, 0.4); /* 発光エフェクトの統一 */
     text-transform: uppercase;
 }
 
@@ -233,6 +269,8 @@
     overflow: hidden;
     pointer-events: auto;
     transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s, background 0.2s, filter 0.2s;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .btn-neon.bounce {
@@ -370,4 +408,241 @@
     width: 7.5px;
     height: 3.8px;
 }
+
+/* --- Title Screen --- */
+#title-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0, 20, 40, 0.7) 0%, rgba(0, 5, 10, 0.95) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+    backdrop-filter: blur(8px);
+    transition: opacity 1s ease, visibility 1s;
+}
+
+#title-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#title-bg-canvas, 
+#title-fg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#title-bg-canvas { z-index: 1; }
+.title-container { z-index: 2; position: relative; }
+#title-fg-canvas { z-index: 3; }
+
+.title-container {
+    text-align: center;
+    animation: titleFloat 6s ease-in-out infinite;
+}
+
+.game-logo {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 4.5rem;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 
+        0 0 15px rgba(0, 212, 255, 0.6),
+        0 0 30px rgba(0, 212, 255, 0.3);
+    margin-bottom: 3rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.game-logo .subtitle {
+    font-size: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    color: rgba(0, 255, 204, 0.8);
+    letter-spacing: 12px;
+    margin-top: 15px;
+    display: block;
+    text-transform: uppercase;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.title-footer {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+}
+
+/* --- Premium Neon Buttons --- */
+.btn-neon {
+    position: relative;
+    padding: 14px 40px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    color: #fff;
+    background: rgba(0, 255, 204, 0.15);
+    border: 2px solid #00ffcc;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 0 8px rgba(0, 255, 204, 0.8);
+    box-shadow: 
+        0 0 10px rgba(0, 255, 204, 0.3),
+        inset 0 0 10px rgba(0, 255, 204, 0.2);
+    min-width: 240px;
+    text-transform: uppercase;
+}
+
+.btn-neon.outline {
+    background: transparent;
+    border-color: rgba(0, 255, 204, 0.4);
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: none;
+    box-shadow: none;
+}
+
+.btn-neon:hover:not(:disabled) {
+    background: rgba(0, 255, 204, 0.3);
+    border-color: #00ffcc;
+    color: #fff;
+    transform: translateY(-3px) scale(1.02);
+    text-shadow: 0 0 12px rgba(0, 255, 204, 1);
+    box-shadow: 
+        0 0 20px rgba(0, 255, 204, 0.5),
+        0 0 40px rgba(0, 255, 204, 0.2);
+}
+
+.btn-neon:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    transition: all 0.1s;
+}
+
+.btn-neon::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(30deg);
+    transition: none;
+}
+
+.btn-neon:hover::after {
+    left: 140%;
+    transition: left 0.6s ease-in-out;
+}
+
+.btn-neon:disabled {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.2);
+    cursor: default;
+    background: rgba(255, 255, 255, 0.02);
+    text-shadow: none;
+    box-shadow: none;
+}
+
+/* --- How to Play --- */
+#how-to-play-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 6000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s;
+}
+
+#how-to-play-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.how-to-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.how-to-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.how-to-icon {
+    font-size: 1.8rem;
+    background: rgba(0, 255, 204, 0.1);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 255, 204, 0.2);
+}
+
+.how-to-text strong {
+    display: block;
+    color: #00ffcc;
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+    letter-spacing: 1px;
+}
+
+.how-to-text p {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+    margin: 0;
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@media (max-width: 600px) {
+    .game-logo { font-size: 3rem; }
+    .game-logo .subtitle { font-size: 1rem; letter-spacing: 6px; }
+    .how-to-grid { grid-template-columns: 1fr; }
+}
+
 

@@ -247,6 +247,40 @@ export class EventSystem {
                 backToResultBtn.classList.add('hidden');
             };
         }
+
+        // タイトル画面のリスナー
+        const startBtn = document.getElementById('start-game-btn');
+        if (startBtn) {
+            startBtn.onclick = () => {
+                const titleScreen = document.getElementById('title-screen');
+                if (titleScreen) {
+                    titleScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        game.state = 'building';
+                        game.updateUI();
+                    }, 1000); // CSSの1s transitionに合わせる
+                } else {
+                    game.state = 'building';
+                    game.updateUI();
+                }
+            };
+        }
+
+        const htpBtn = document.getElementById('how-to-play-btn');
+        if (htpBtn) {
+            htpBtn.onclick = () => {
+                const overlay = document.getElementById('how-to-play-overlay');
+                if (overlay) overlay.classList.remove('hidden');
+            };
+        }
+
+        const closeHtpBtn = document.getElementById('close-help-btn');
+        if (closeHtpBtn) {
+            closeHtpBtn.onclick = () => {
+                const overlay = document.getElementById('how-to-play-overlay');
+                if (overlay) overlay.classList.add('hidden');
+            };
+        }
     }
 
     selectPart(type, instanceId) {
@@ -379,6 +413,7 @@ export class EventSystem {
         screen.classList.remove('hidden');
         game.updateUI();
     }
+
 
     closeEvent() {
         const game = this.game;
