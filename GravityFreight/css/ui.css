@@ -1,0 +1,373 @@
+/* Build System UI */
+/* #build-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    gap: 15px;
+    max-height: calc(100vh - 100px);
+    pointer-events: none;
+} */
+
+#build-overlay .panel {
+    /* パネル自体は操作可能 */
+    pointer-events: auto;
+    /* パネル自体は操作可能 */
+}
+
+.panel {
+    background: rgba(10, 15, 25, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-top: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 12px;
+    padding: 18px;
+    width: 280px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    max-height: 80vh;
+}
+
+.panel:hover {
+    background: rgba(10, 10, 25, 0.55);
+}
+
+.panel-header {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    min-height: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    user-select: none;
+}
+
+.panel:not(.static) .panel-header {
+    cursor: pointer;
+}
+
+.panel.collapsed {
+    /* Header height(48) + padding(8+8) = 64px */
+    max-height: 64px;
+}
+
+.panel.collapsed .panel-header {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.panel.collapsed .category,
+.panel.collapsed #hud-metrics,
+.panel.collapsed #launch-btn {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.collapse-btn {
+    /* 背景を常時表示 */
+    /* 枠線を常時表示 */
+    background: transparent;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
+    transition: transform 0.5s, background 0.2s, box-shadow 0.2s;
+    font-family: monospace;
+}
+
+.collapse-btn:hover {
+    background: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.collapse-btn .icon {
+    font-size: 14px;
+    line-height: 1;
+    transition: transform 0.4s;
+}
+
+.collapsed .collapse-btn {
+    transform: rotate(180deg);
+}
+
+#factory-panel.hidden {
+    display: none;
+}
+
+#star-info-panel {
+    transition: opacity 0.2s ease;
+    opacity: 1;
+}
+
+#star-info-panel.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 表示・非表示のアニメーション用クラス（JSで制御） */
+.panel-slide-enter {
+    transform: translateX(50px);
+    opacity: 0;
+}
+
+
+.panel h2 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+}
+
+.category {
+    margin-bottom: 12px;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.category h3 {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+.mini-btn {
+    background: rgba(68, 136, 255, 0.2);
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    color: var(--accent-color);
+    font-size: 9px;
+    padding: 2px 6px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.mini-btn:hover {
+    background: rgba(68, 136, 255, 0.4);
+}
+
+/* --- Generic Action Buttons --- */
+.btn-action {
+    width: 100%;
+    margin: 0;
+    padding: 2px 0;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-action:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+    background: #555;
+    color: #aaa;
+    border: 1px solid #666;
+    box-shadow: none;
+    transform: none;
+}
+
+.btn-action-primary {
+    background: #2a6ddc; /* 落ち着いたフラットな青 */
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-action-primary:hover:not(:disabled) {
+    background: #3d8aff; /* 少し明るい青 */
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-action-outline {
+    background: #3a4555; /* フラットなグレーブルー */
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-action-outline:hover:not(:disabled) {
+    background: #4c5a6b; /* 少し明るいグレーブルー */
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+/* --- Large Cyber Navigation Buttons --- */
+.btn-neon {
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto;
+    transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s, background 0.2s, filter 0.2s;
+}
+
+.btn-neon.bounce {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-neon-lg {
+    padding: 20px;
+    border-radius: 50px;
+    font-size: 20px;
+    letter-spacing: 3px;
+}
+
+.btn-neon-sm {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+}
+
+/* Base Gradients */
+.btn-grad-green {
+    background: linear-gradient(135deg, #00ffaa, #00cc88);
+    box-shadow: 0 4px 15px rgba(0, 255, 170, 0.3);
+    color: #002211;
+}
+.btn-grad-green.btn-neon-lg {
+    color: white;
+    box-shadow: 0 10px 40px rgba(0, 255, 170, 0.4);
+}
+.btn-grad-green:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(0, 255, 170, 0.5);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+.btn-grad-green.btn-neon-lg:hover:not(:disabled) {
+    box-shadow: 0 15px 50px rgba(0, 255, 170, 0.6);
+    transform: scale(1.05) translateY(-5px);
+}
+
+.btn-grad-orange {
+    background: linear-gradient(135.26deg, #FF3D00 13.92%, #FF8A00 86.08%);
+    color: white;
+    box-shadow: 0 10px 40px rgba(255, 61, 0, 0.4);
+}
+.btn-grad-orange:hover:not(:disabled) {
+    box-shadow: 0 15px 50px rgba(255, 61, 0, 0.6);
+    transform: scale(1.05) translateY(-5px);
+    filter: brightness(1.2);
+}
+
+.btn-neon:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.btn-neon:disabled {
+    opacity: 0.15;
+    filter: grayscale(1);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.btn-neon-lg:disabled {
+    opacity: 1;
+    background: rgba(10, 10, 25, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transform: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    filter: none;
+}
+
+/* Cyber Outline styles */
+.btn-cyber-outline {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    flex: 1;
+}
+.btn-cyber-outline:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
+}
+
+.btn-cyber-outline-success {
+    background: rgba(0, 255, 170, 0.1);
+    border: 1px solid rgba(0, 255, 170, 0.3);
+    color: #00ffaa;
+}
+.btn-cyber-outline-success:hover:not(:disabled) {
+    background: rgba(0, 255, 170, 0.2);
+    border-color: #00ffaa;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 255, 170, 0.2);
+}
+
+/* --- Durability / HP Gauges --- */
+.hp-gauge {
+    display: flex;
+    gap: 2px;
+}
+
+.hp-segment {
+    width: 10px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: skewX(-15deg);
+    transition: all 0.3s ease;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.hp-segment.active {
+    background: #00ffcc; /* ゲーム全体のブランド色 (シアン/グリーン) */
+    box-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+    border-color: #00ffcc;
+}
+
+.hp-gauge.mini {
+    gap: 1.5px;
+}
+
+.hp-gauge.mini .hp-segment {
+    width: 7.5px;
+    height: 3.8px;
+}
+

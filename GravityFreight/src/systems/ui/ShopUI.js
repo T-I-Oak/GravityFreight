@@ -65,7 +65,7 @@ export class ShopUI {
                         <span class="price-val">${buyPrice}</span><span class="currency">c</span>
                         ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="${discountLevel}"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
                     </div>
-                    <button class="buy-btn" ${(game.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD' : 'BUY'}</button>
+                    <button class="btn-action btn-action-primary buy-btn" ${(game.coins < buyPrice || isSold) ? 'disabled' : ''}>${isSold ? 'SOLD' : 'BUY'}</button>
                 </div>
             `;
             card.querySelector('.buy-btn').onclick = () => {
@@ -133,7 +133,7 @@ export class ShopUI {
                         <div class="card-price">
                             <span class="price-val">${sellPrice}</span><span class="currency">c</span>
                         </div>
-                        <button class="sell-btn">SELL</button>
+                        <button class="btn-action btn-action-outline sell-btn">SELL</button>
                     </div>
                 `;
                 card.querySelector('.sell-btn').onclick = () => {
@@ -226,7 +226,7 @@ export class ShopUI {
                         <span class="price-val">${opt.cost}</span><span class="currency">c</span>
                         ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="low"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
                     </div>
-                    <button class="buy-btn" ${game.coins < opt.cost || game.blackMarketUsed ? 'disabled' : ''}>
+                    <button class="btn-action btn-action-primary buy-btn" ${game.coins < opt.cost || game.blackMarketUsed ? 'disabled' : ''}>
                         ${game.blackMarketUsed ? 'SOLD' : 'BUY'}
                     </button>
                 </div>

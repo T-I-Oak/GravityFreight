@@ -1,0 +1,287 @@
+#terminal-panel {
+    width: 320px;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#terminal-panel.collapsed {
+    /* Header height(48) + padding(8+8) = 64px */
+    max-height: 64px;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid transparent;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+#terminal-panel.collapsed .panel-header {
+    background: transparent;
+    border-bottom: 1px solid transparent;
+}
+
+#terminal-panel.collapsed .tab-header {
+    visibility: hidden;
+    opacity: 0;
+}
+
+#terminal-panel.collapsed #panel-scroll-area {
+    display: none;
+}
+
+#terminal-panel.collapsed .collapse-btn {
+    pointer-events: auto;
+}
+
+#panel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.tab-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #00d4ff;
+    border-color: rgba(0, 212, 255, 0.3);
+}
+
+#panel-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+
+
+.tab-content.hidden {
+    display: none;
+}
+
+
+.mini-btn:hover {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+
+.part-item {
+    margin-bottom: 4px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.part-item:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+
+.part-item.selected {
+    transition: all 0.2s ease;
+}
+
+
+.part-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.part-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.part-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hp-segments {
+    font-family: monospace;
+    font-size: 14px;
+    letter-spacing: -2px;
+    color: #00ffaa;
+    text-shadow: 0 0 5px rgba(0, 255, 170, 0.5);
+}
+
+.inventory-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.selection-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: #ffdd44;
+    text-shadow: 0 0 5px rgba(255, 221, 68, 0.5);
+}
+
+.rocket-details {
+    margin-top: 8px;
+    padding-top: 0;
+    font-size: 10px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Inter', sans-serif;
+}
+
+.rocket-module-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+
+.rocket-module-name {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.stat-tag {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2px 8px;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 8px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+}
+
+.stat-val {
+    font-size: 10px;
+    font-weight: 900;
+    color: #fff;
+}
+
+/* 強化状態のグロー効果 */
+.enhanced-border {
+    border-color: #00d4ff !important;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.4), inset 0 0 4px rgba(0, 212, 255, 0.2) !important;
+}
+
+.enhanced-frame {
+    border: 1px solid #ffd700 !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
+    padding: 1px;
+    border-radius: 2px;
+}
+
+.part-info {
+    font-size: 10px;
+    opacity: 0.6;
+    display: block;
+    margin-top: 2px;
+}
+
+
+
+.rocket-item {
+    padding: 0;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rocket-item:hover {
+    filter: brightness(1.1);
+}
+
+.rocket-item.selected {
+    transition: all 0.2s ease;
+}
+
+.selection-info {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    font-size: 11px;
+    color: #88bbff;
+    line-height: 1.6;
+    border: 1px solid rgba(68, 136, 255, 0.2);
+}
+
+.slot-placeholder {
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+
+.option-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* 耐久力ゲージ (セグメント方式) */
+.hp-gauge {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.hp-segment {
+    width: 12px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: skewX(-15deg);
+    transition: all 0.3s ease;
+    border-radius: 1px;
+}
+
+.hp-segment.active {
+    background: #00ffcc;
+    box-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+    border-color: #00ffcc;
+}
+

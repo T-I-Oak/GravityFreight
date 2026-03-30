@@ -23,14 +23,7 @@ export class UIComponents {
         if (showInventory && hasCharges) {
             const max = itemData.maxCharges || 2;
             const current = itemData.charges !== undefined ? itemData.charges : max;
-            const isChargeEnhanced = enhancements.charges > 0;
-            let segments = '';
-            for (let i = 0; i < max; i++) {
-                const isActive = i < current;
-                const segmentStyle = `width:8px; height:4px; background:${isActive ? (isChargeEnhanced ? '#ffd700' : '#fff') : 'rgba(255,255,255,0.1)'}; border-radius:1px;`;
-                segments += `<div class="hp-segment ${isActive ? 'active' : ''}" style="${segmentStyle}"></div>`;
-            }
-            invInfo = `<div class="hp-gauge ${isChargeEnhanced ? 'enhanced-frame' : ''}" style="display: flex; gap: 2px; padding: 2px;">${segments}</div>`;
+            invInfo = UIComponents.generateHPGauge(current, max, enhancements.charges > 0);
         } else if (showInventory && itemData.count > 1) {
             invInfo = `<span class="inventory-badge" style="font-size: 10px; color: rgba(255,255,255,0.6); font-weight:bold;">[x ${itemData.count}]</span>`;
         }
@@ -100,18 +93,13 @@ export class UIComponents {
             }
             const rows = [];
             merged.forEach(m => {
-                let mGauge = '';
-                if (m.maxCharges) {
-                    let mSegs = '';
-                    for (let i = 0; i < m.maxCharges; i++) mSegs += `<div class="hp-segment ${i < m.charges ? 'active' : ''}" style="width:6px; height:3px; background:${i < m.charges ? '#fff' : 'rgba(255,255,255,0.1)'}; border-radius:1px; flex-shrink:0;"></div>`;
-                    mGauge = `<div class="hp-gauge" style="display:flex; gap:1.5px; margin-left:8px;">${mSegs}</div>`;
-                }
+                const mGauge = m.maxCharges ? UIComponents.generateHPGauge(m.charges, m.maxCharges, false, true) : '';
                 rows.push(`
-                    <div class="rocket-module-row" style="display:flex; align-items:center; justify-content:space-between;">
+                    <div class="rocket-module-row" style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 2px;">
                         <span class="rocket-module-name" style="font-size:10px; color:rgba(255,255,255,0.8);">${m.name}</span>
                         <div style="display:flex; align-items:center;">
                             <span class="inventory-badge" style="font-size:9px; color:rgba(255,255,255,0.5);">[x ${m.count}]</span>
-                            ${mGauge}
+                            <div style="margin-left:8px;">${mGauge}</div>
                         </div>
                     </div>
                 `);
@@ -135,5 +123,18 @@ export class UIComponents {
                 ${rocketDetailsHtml}
             </div>
         `;
+    }
+
+    /**
+     * 耐久力ゲージの HTML を生成
+     */
+    static generateHPGauge(current, max, isEnhanced = false, mini = false) {
+        let segments = '';
+        for (let i = 0; i < max; i++) {
+            const isActive = i < current;
+            const enhancedStyle = (isActive && isEnhanced) ? 'background:#ffd700; border-color:#ffd700; box-shadow: 0 0 5px #ffd700;' : '';
+            segments += `<div class="hp-segment ${isActive ? 'active' : ''} ${mini ? 'mini' : ''}" style="${enhancedStyle}"></div>`;
+        }
+        return `<div class="hp-gauge ${isEnhanced ? 'enhanced-frame' : ''} ${mini ? 'mini' : ''}" style="display: flex; gap: 2px; padding: 2px;">${segments}</div>`;
     }
 }

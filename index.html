@@ -5,7 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/png" href="favicon.png">
     <title>GRAVITY FREIGHT: ORBITAL ECHOES</title>
-    <link rel="stylesheet" href="GravityFreight/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="GravityFreight/css/base.css">
+    <link rel="stylesheet" href="GravityFreight/css/layout.css">
+    <link rel="stylesheet" href="GravityFreight/css/ui.css">
+    <link rel="stylesheet" href="GravityFreight/css/build-panel.css">
+    <link rel="stylesheet" href="GravityFreight/css/result-screen.css">
+    <link rel="stylesheet" href="GravityFreight/css/event-screen.css">
+    <link rel="stylesheet" href="GravityFreight/css/animations.css">
+    <link rel="stylesheet" href="GravityFreight/css/responsive.css">
     <style>
         /* 強化バッヂ */
         .enhancement-badge {
@@ -78,6 +88,23 @@
             flex-direction: column;
             gap: 5px;
         }
+
+        /* スタイリッシュな開閉アイコン (原則に基づき直角デザイン) */
+        .icon-chevron {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-bottom: 3.5px solid currentColor;
+            border-right: 3.5px solid currentColor;
+            transform: translateY(-2px) rotate(225deg); /* 基本姿勢 (Open/Up) */
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.9;
+        }
+        /* 親の .collapsed 時に rotate(180deg) されるため、
+           子側でも回転を上書きまたはオフセットして、結果として正しく反転するように調整 */
+        .collapsed .icon-chevron {
+            transform: translateY(2px) rotate(225deg); /* 親が 180度回るので、子はベースの角度を維持 */
+        }
     </style>
 </head>
 <body>
@@ -132,8 +159,8 @@
             </div>
             <div id="result-footer">
                 <div class="result-actions">
-                    <button id="result-view-map-btn">VIEW MAP</button>
-                    <button id="result-close-btn">CONTINUE</button>
+                    <button id="result-view-map-btn" class="btn-cyber-outline">VIEW MAP</button>
+                    <button id="result-close-btn" class="btn-cyber-outline btn-cyber-outline-success">CONTINUE</button>
                 </div>
             </div>
         </div>
@@ -148,8 +175,8 @@
                     <button class="tab-btn" data-tab="factory">ASSEMBLY</button>
                 </div>
                 <div id="panel-controls">
-                    <button class="collapse-btn" title="Toggle Panel">
-                        <span class="icon">∧</span>
+                    <button class="collapse-btn">
+                        <span class="icon-chevron"></span>
                     </button>
                 </div>
             </div>
@@ -192,7 +219,7 @@
                         </div>
                     </div>
 
-                    <button id="build-btn" disabled>ASSEMBLE ROCKET</button>
+                    <button id="build-btn" class="btn-neon btn-neon-sm btn-grad-green" disabled>ASSEMBLE ROCKET</button>
                 </div>
             </div>
         </div>
@@ -200,8 +227,8 @@
 
     <!-- 独立した起動ボタンパネル -->
     <div id="launch-control">
-        <button id="launch-btn" class="hidden" disabled>LAUNCH ENGINE</button>
-        <button id="back-to-result-btn" class="hidden">BACK TO RESULT</button>
+        <button id="launch-btn" class="btn-neon btn-neon-lg btn-grad-orange hidden bounce" disabled>LAUNCH ENGINE</button>
+        <button id="back-to-result-btn" class="btn-neon btn-neon-lg btn-grad-green hidden bounce">BACK TO RESULT</button>
     </div>
 
 
@@ -244,7 +271,7 @@
     <div id="ui-layer"></div>
     <div id="status"></div>
     <canvas id="gameCanvas"></canvas>
-    <script type="module" src="GravityFreight/src/main.js?v=0.5.6"></script>
+    <script type="module" src="GravityFreight/src/main.js?v=0.6.0"></script>
 </body>
 </html>
 

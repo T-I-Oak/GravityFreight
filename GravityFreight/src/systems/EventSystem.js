@@ -210,11 +210,10 @@ export class EventSystem {
         });
 
         const terminalPanel = document.getElementById('terminal-panel');
-        const panelHeader = terminalPanel?.querySelector('.panel-header');
-        if (panelHeader && terminalPanel) {
-            panelHeader.onclick = (e) => {
-                if (terminalPanel.classList.contains('collapsed')) { terminalPanel.classList.remove('collapsed'); return; }
-                if (e.target.classList.contains('tab-btn')) return;
+        const collapseBtn = terminalPanel?.querySelector('.collapse-btn');
+        if (collapseBtn && terminalPanel) {
+            collapseBtn.onclick = (e) => {
+                e.stopPropagation(); // ヘッダー等への伝播防止
                 terminalPanel.classList.toggle('collapsed');
             };
         }
@@ -285,6 +284,9 @@ export class EventSystem {
                     collectedItems: []
                 };
             }
+            // 原則 5.1 に基づき、既存 ship がある場合も velocity を確実に 0 にリセットして不一致を防止
+            game.ship.velocity = new Vector2(0, 0);
+
             if (game.ship.rotation === undefined) game.ship.rotation = -Math.PI / 2;
 
             game.updateUI();

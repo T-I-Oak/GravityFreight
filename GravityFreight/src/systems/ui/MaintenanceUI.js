@@ -63,7 +63,7 @@ export class MaintenanceUI {
                             <span class="price-val">${cost}</span><span class="currency">c</span>
                             ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="${discountLevel}"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
                         </div>
-                        <button class="repair-btn" ${game.coins < cost ? 'disabled' : ''}>REPAIR</button>
+                        <button class="btn-action btn-action-outline repair-btn" ${game.coins < cost ? 'disabled' : ''}>REPAIR</button>
                     </div>
                 `;
                 card.querySelector('.repair-btn').onclick = () => {
@@ -124,7 +124,7 @@ export class MaintenanceUI {
                             <span class="price-val">${cost}</span><span class="currency">c</span>
                             ${displayDiscountPct > 0 ? `<div class="discount-tag" data-level="${discountLevel}"><span class="pct-num">${displayDiscountPct}</span><span class="pct-sym">%</span> OFF</div>` : ''}
                         </div>
-                        <button class="dismantle-btn" ${game.coins < cost ? 'disabled' : ''}>DISMANTLE</button>
+                        <button class="btn-action btn-action-outline dismantle-btn" ${game.coins < cost ? 'disabled' : ''}>DISMANTLE</button>
                     </div>
                 `;
 

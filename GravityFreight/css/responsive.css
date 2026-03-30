@@ -1,0 +1,85 @@
+/* Responsive Adjustments for Tablet/Mobile */
+@media (max-width: 950px) {
+    #event-content {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 15px; /* 親のスクロールバー領域分を確保 */
+    }
+    
+    .event-action-column,
+    .event-results-column {
+        height: auto;
+        min-width: 0;
+        overflow-y: visible;
+        flex: none;
+        padding-right: 0;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .panel {
+        width: 240px;
+        padding: 12px;
+    }
+
+    #mission-hud {
+        top: 10px;
+        left: 10px;
+    }
+
+    #title {
+        font-size: 18px;
+    }
+
+    #launch-control {
+        width: 240px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* 縦画面時の重なり防止：タイトルを最上部に固定、オーバーレイをその下に */
+    #mission-hud {
+        width: calc(100% - 20px);
+        background: rgba(5, 5, 16, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #build-overlay {
+        top: 90px;
+        left: 10px;
+        right: 10px;
+        bottom: 120px;
+        width: auto;
+    }
+
+    #terminal-panel {
+        width: 100%;
+        max-width: 400px;
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .result-columns {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 500px) {
+    #build-overlay {
+        width: 200px;
+    }
+
+    .panel {
+        width: 100%;
+        font-size: 11px;
+    }
+}
+
