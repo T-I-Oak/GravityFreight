@@ -113,7 +113,14 @@ export class EventSystem {
 
         window.addEventListener('pointerdown', (e) => {
             game.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-            const isUI = e.target !== game.canvas || e.target.closest('#terminal-panel') || e.target.closest('#build-overlay') || e.target.closest('#launch-control') || e.target.closest('#result-overlay') || e.target.closest('#event-screen') || e.target.closest('.tooltip-card-wrapper');
+            const isUI = e.target !== game.canvas || 
+                         e.target.closest('#terminal-panel') || 
+                         e.target.closest('#build-overlay') || 
+                         e.target.closest('#launch-control') || 
+                         e.target.closest('#result-overlay') || 
+                         e.target.closest('#event-screen') || 
+                         e.target.closest('#how-to-play-overlay') ||
+                         e.target.closest('.tooltip-card-wrapper');
             game.isAimingInteraction = !isUI;
             if (isUI) return;
             game.isPointerDown = true;
@@ -220,6 +227,17 @@ export class EventSystem {
 
         window.addEventListener('keydown', (e) => { if (e.code === 'Space') this.launch(); });
         window.addEventListener('wheel', (e) => {
+            const isUI = e.target !== game.canvas || 
+                         e.target.closest('#terminal-panel') || 
+                         e.target.closest('#build-overlay') || 
+                         e.target.closest('#launch-control') || 
+                         e.target.closest('#result-overlay') || 
+                         e.target.closest('#event-screen') || 
+                         e.target.closest('#how-to-play-overlay') ||
+                         e.target.closest('.tooltip-card-wrapper');
+            
+            if (isUI) return;
+
             if (e.deltaY < 0) game.zoom *= 1.1; else game.zoom /= 1.1;
             game.zoom = Math.max(0.3, Math.min(game.zoom, 5.0));
         }, { passive: false });
