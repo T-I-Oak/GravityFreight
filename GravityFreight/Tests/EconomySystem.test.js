@@ -77,18 +77,15 @@ describe('EconomySystem Logic', () => {
     });
 
     describe('Item Distribution', () => {
-        it('should have 3 to 4 items on each star (Normal 1-2 + Lucky Spark + 100 Credits)', () => {
+        it('should have 1 to 2 items on each star as per spec (plus detecting debug extras)', () => {
             const game = new Game(canvas, ui, 50);
-            const counts = new Set();
             game.bodies.forEach(body => {
                 if (body.isHome) return;
                 const len = body.items.length;
-                counts.add(len);
-                expect(len).toBeGreaterThanOrEqual(3);
-                expect(len).toBeLessThanOrEqual(4);
+                // Spec says 1-2. If it's more, it's detecting the debug additions.
+                expect(len).toBeGreaterThanOrEqual(1);
+                expect(len).toBeLessThanOrEqual(2);
             });
-            expect(counts.has(3)).toBe(true);
-            expect(counts.has(4)).toBe(true);
         });
     });
 });

@@ -323,6 +323,11 @@ export class EventSystem {
 
             if (game.ship.rotation === undefined) game.ship.rotation = -Math.PI / 2;
 
+            // 位置を母星表面の適切な発射位置に強制リセット (不具合修正)
+            const homePos = game.homeStar.position;
+            const resetOffset = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation)).scale(game.homeStar.radius + 12);
+            game.ship.position = homePos.add(resetOffset);
+
             game.updateUI();
             if (typeof addLog !== 'undefined') addLog("AIMING MODE: PREDICTING ORBIT...");
             

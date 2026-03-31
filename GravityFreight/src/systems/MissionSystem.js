@@ -103,12 +103,6 @@ export class MissionSystem {
                     const item = this.getWeightedRandomItem();
                     if (item) body.items.push(item);
                 }
-
-                // テスト用追加
-                const luckyCharm = PARTS.CARGO.find(c => c.id === 'cargo_lucky');
-                if (luckyCharm) body.items.push({ ...luckyCharm, category: 'CARGO' });
-                body.items.push({ id: 'coin_100', category: 'COIN', name: '100 Credits', score: 100, rarity: RARITY.COMMON });
-
                 game.bodies.push(body);
             }
         }
