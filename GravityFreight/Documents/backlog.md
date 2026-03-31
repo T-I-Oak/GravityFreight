@@ -29,9 +29,7 @@
     - 開始時に手紙を所持。特定の Trading Post に届けることでストーリーが一段階進む仕組み。
 
 
-## ステージイベント・ショップ (Stage Events)
-- [ ] **出口ごとの特殊イベント**:
-    - TRADING POST / REPAIR DOCK: (未実装) 
+
 
 ## 貨物・経済・バランス調整 (Cargo, Economy & Balance)
 - [ ] ロスト保険のバランス調整: Lostしたときだけでなく、Crashしたときにも保険金が受け取れるように変更。
