@@ -10,11 +10,11 @@ import { EventSystem } from '../systems/EventSystem.js';
 import { Renderer } from '../systems/RenderingSystem.js';
 
 export class Game {
-    constructor(canvas, ui, starCount = 8) {
+    constructor(canvas, ui, starCount = 5) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.6.3";
+        this.version = "0.6.4";
 
         // システムの初期化
         this.inventorySystem = new InventorySystem(this);
@@ -196,8 +196,10 @@ export class Game {
         this.score = 0;
         this.displayScore = 0;
         this.displayCoins = 0;
+        this.displayCoins = 0;
         this.sector = 1;
         this.stageLevel = 1;
+        this.currentStarCount = 5;
         this.totalDeliveries = 0;
         this.launchScore = 0;
         this.launchCoins = 0;

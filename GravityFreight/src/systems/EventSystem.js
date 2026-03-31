@@ -435,6 +435,7 @@ export class EventSystem {
             desc.textContent = '機体の整備やパーツの解体・強化を行える高度な設備。';
             game.uiSystem.initRepairDock(content);
         } else if (goal.id === 'DANGER') {
+            game.currentStarCount++;
             desc.textContent = '通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。';
             game.uiSystem.initBlackMarket(content);
         }
