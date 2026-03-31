@@ -114,7 +114,7 @@
         <div class="title-container">
             <h1 class="game-logo">GRAVITY FREIGHT<br><span class="subtitle">ORBITAL ECHOES</span></h1>
             <div class="menu-buttons">
-                <button id="start-game-btn" class="btn-neon">START ADVENTURE</button>
+                <button id="start-game-btn" class="btn-neon">BEGIN CONTRACT</button>
                 <button id="how-to-play-btn" class="btn-neon outline">HOW TO PLAY</button>
                 <button id="ranking-btn" class="btn-neon outline" disabled>RANKING <span style="font-size: 0.7em; opacity: 0.6;">(COMING SOON)</span></button>
             </div>
@@ -332,6 +332,12 @@
 
     <div id="ui-layer"></div>
     <div id="status"></div>
+    <!-- 支払明細（レシート）用オーバーレイ -->
+    <div id="receipt-overlay" class="receipt-view">
+        <div class="receipt-paper" id="receipt-content-area">
+            <!-- JSで動的に生成 -->
+        </div>
+    </div>
     <canvas id="gameCanvas"></canvas>
     <script type="module" src="GravityFreight/src/main.js?v=0.6.0"></script>
 </body>

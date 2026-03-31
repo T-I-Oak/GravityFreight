@@ -205,10 +205,12 @@ export class MissionSystem {
                 if (category === 'COIN') {
                     game.pendingCoins += itemData.score || 0;
                     game.flightResults.items.push(itemData);
+                    game.totalDeliveries++;
                     return;
                 }
 
                 game._addItemToInventory(itemData);
+                game.totalDeliveries++;
             });
             game.pendingItems = [];
             game.currentCoinDiscount = Math.min(0.5, luckCount * 0.1);
@@ -359,6 +361,7 @@ export class MissionSystem {
         if (this.isGameOver()) {
             game.state = 'gameover';
             game.ui.message.textContent = 'MISSION FAILED';
+            game.showResult('gameover');
         }
     }
 }

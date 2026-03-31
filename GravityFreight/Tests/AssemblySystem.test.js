@@ -10,6 +10,11 @@ const createMockElement = (tag = 'div') => ({
     classList: { add: vi.fn(), remove: vi.fn(), contains: vi.fn(), toggle: vi.fn() },
     querySelector: vi.fn(() => createMockElement('div')),
     querySelectorAll: vi.fn(() => []),
+    getContext: vi.fn(() => ({
+        clearRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), 
+        stroke: vi.fn(), fill: vi.fn(), arc: vi.fn(), save: vi.fn(), restore: vi.fn(), 
+        translate: vi.fn(), rotate: vi.fn(), closePath: vi.fn(), setTransform: vi.fn()
+    })),
     innerHTML: '',
     style: {},
     textContent: ''
@@ -25,8 +30,11 @@ global.window = {
     addEventListener: vi.fn(),
     innerWidth: 1024,
     innerHeight: 768,
-    requestAnimationFrame: vi.fn()
+    requestAnimationFrame: vi.fn(),
+    removeEventListener: vi.fn()
 };
+global.requestAnimationFrame = global.window.requestAnimationFrame;
+global.cancelAnimationFrame = vi.fn();
 
 describe('Assembly Logic', () => {
     let game;

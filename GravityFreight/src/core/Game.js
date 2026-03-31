@@ -56,6 +56,7 @@ export class Game {
         this.stageLevel = 1;
         this.launchScore = 0;
         this.launchCoins = 0;
+        this.totalDeliveries = 0;
 
         this.selection = {
             chassis: null,
@@ -186,6 +187,30 @@ export class Game {
         this.pendingItems = [];
         this.accumulator = 0;
         this.eventSystem.checkReadyToAim();
+        this.updateUI();
+    }
+
+    fullReset() {
+        // 基本ステータスの初期化
+        this.coins = INITIAL_COINS;
+        this.score = 0;
+        this.displayScore = 0;
+        this.displayCoins = 0;
+        this.sector = 1;
+        this.stageLevel = 1;
+        this.totalDeliveries = 0;
+        this.launchScore = 0;
+        this.launchCoins = 0;
+
+        // インベントリと選択のリセット
+        this.inventorySystem.inventory = { chassis: [], logic: [], launchers: [], rockets: [], modules: [], boosters: [] };
+        this.inventory = this.inventorySystem.inventory;
+        this.inventorySystem.initStartingInventory();
+        
+        this.selection = { chassis: null, logic: null, launcher: null, rocket: null, modules: {}, booster: null };
+        
+        this.state = 'title';
+        this.initStage(this.currentStarCount);
         this.updateUI();
     }
 

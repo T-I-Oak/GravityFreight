@@ -19,20 +19,38 @@ describe('EventSystem UI Handlers', () => {
                         style: {},
                         appendChild: vi.fn(),
                         innerHTML: '',
-                        querySelector: vi.fn(() => ({}))
+                        querySelector: vi.fn(() => ({})),
+                        getContext: vi.fn(() => ({
+                            clearRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), 
+                            stroke: vi.fn(), fill: vi.fn(), arc: vi.fn(), save: vi.fn(), restore: vi.fn(), 
+                            translate: vi.fn(), rotate: vi.fn(), closePath: vi.fn(), setTransform: vi.fn()
+                        }))
                     };
                 }
                 return elementMap[id];
             }),
-            createElement: vi.fn(() => ({ appendChild: vi.fn(), innerHTML: '', style: {}, classList: { add: vi.fn() } })),
+            createElement: vi.fn(() => ({ 
+                appendChild: vi.fn(), 
+                innerHTML: '', 
+                style: {}, 
+                classList: { add: vi.fn() },
+                getContext: vi.fn(() => ({
+                    clearRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), 
+                    stroke: vi.fn(), fill: vi.fn(), arc: vi.fn(), save: vi.fn(), restore: vi.fn(), 
+                    translate: vi.fn(), rotate: vi.fn(), closePath: vi.fn(), setTransform: vi.fn()
+                }))
+            })),
             querySelectorAll: vi.fn(() => [])
         };
         global.window = {
             innerWidth: 1024,
             innerHeight: 768,
             addEventListener: vi.fn(),
-            requestAnimationFrame: vi.fn()
+            requestAnimationFrame: vi.fn(),
+            removeEventListener: vi.fn()
         };
+        global.requestAnimationFrame = global.window.requestAnimationFrame;
+        global.cancelAnimationFrame = vi.fn();
     });
 
     it('should toggle minimized class when View Map is clicked', () => {

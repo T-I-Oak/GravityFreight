@@ -645,4 +645,93 @@
     .how-to-grid { grid-template-columns: 1fr; }
 }
 
+/* --- Premium Glow Buttons --- */
+.btn-neon {
+    position: relative;
+    padding: 12px 24px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: #fff;
+    background: rgba(0, 255, 204, 0.1);
+    border: 1px solid rgba(0, 255, 204, 0.4);
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
 
+.btn-neon-sm {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.btn-neon-lg {
+    padding: 16px 40px;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+}
+
+.btn-grad-green {
+    background: linear-gradient(135deg, rgba(0, 255, 170, 0.2) 0%, rgba(0, 212, 255, 0.2) 100%);
+    border-color: #00ffaa;
+    box-shadow: 0 0 15px rgba(0, 255, 170, 0.2);
+}
+
+.btn-grad-orange {
+    background: linear-gradient(135deg, rgba(255, 100, 0, 0.2) 0%, rgba(255, 50, 0, 0.2) 100%);
+    border-color: #ff6600;
+    box-shadow: 0 0 15px rgba(255, 100, 0, 0.2);
+    text-shadow: 0 0 8px rgba(255, 100, 0, 0.8);
+}
+
+.btn-neon:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-grad-green:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(0, 255, 170, 0.4) 0%, rgba(0, 212, 255, 0.4) 100%);
+    box-shadow: 0 0 25px rgba(0, 255, 170, 0.4);
+}
+
+.btn-grad-orange:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(255, 100, 0, 0.4) 0%, rgba(255, 50, 0, 0.4) 100%);
+    box-shadow: 0 0 25px rgba(255, 100, 0, 0.4);
+}
+
+.btn-neon:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-neon::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(30deg);
+    transition: none;
+}
+
+.btn-neon:hover::after {
+    left: 140%;
+    transition: left 0.6s ease-in-out;
+}
+
+.btn-neon:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}

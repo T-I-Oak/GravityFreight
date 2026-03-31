@@ -122,14 +122,12 @@
 }
 
 .result-row {
-    /* JSでアニメーション */
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     opacity: 0;
-    /* JSでアニメーション */
 }
 
 .result-divider {
@@ -161,13 +159,9 @@
 }
 
 .reward-item-card {
-    /* JSでアニメーション */
-    /* リザルト画面ではクリック不可 */
     margin-bottom: 8px;
     opacity: 0;
-    /* JSでアニメーション */
     pointer-events: none;
-    /* リザルト画面ではクリック不可 */
 }
 
 #result-footer {
@@ -253,7 +247,6 @@
     transform: scale(0.95);
 }
 
-/* アニメーション用クラス */
 .stagger-in {
     animation: staggerIn 0.5s ease forwards;
 }
@@ -270,3 +263,174 @@
     }
 }
 
+/* --- Terminal Receipt (Payment Advice) --- */
+.receipt-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 6000;
+    padding-bottom: 5vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+.receipt-view.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.receipt-paper {
+    width: 460px;
+    max-width: 95vw;
+    background: #dcdcdc;
+    color: #1a1a1a;
+    padding: 50px 40px;
+    font-family: 'Courier New', Courier, monospace;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transform: translateY(110%);
+    transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+    clip-path: polygon(
+        0% 0%, 2.5% 2%, 5% 0%, 7.5% 2%, 10% 0%, 12.5% 2%, 15% 0%, 17.5% 2%, 20% 0%, 22.5% 2%, 25% 0%, 27.5% 2%, 30% 0%, 32.5% 2%, 35% 0%, 37.5% 2%, 40% 0%, 42.5% 2%, 45% 0%, 47.5% 2%, 50% 0%, 52.5% 2%, 55% 0%, 57.5% 2%, 60% 0%, 62.5% 2%, 65% 0%, 67.5% 2%, 70% 0%, 72.5% 2%, 75% 0%, 77.5% 2%, 80% 0%, 82.5% 2%, 85% 0%, 87.5% 2%, 90% 0%, 92.5% 2%, 95% 0%, 97.5% 2%, 100% 0%, 
+        100% 100%, 0% 100%
+    );
+}
+
+.receipt-view.active .receipt-paper {
+    transform: translateY(0);
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.receipt-title {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.receipt-subtitle {
+    font-size: 12px;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    margin-top: 6px;
+}
+
+.receipt-divider-dotted {
+    border-top: 1px dashed rgba(0, 0, 0, 0.3);
+    margin: 20px 0;
+}
+
+.receipt-divider-solid {
+    border-top: 2px solid #000;
+    margin: 20px 0;
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    margin: 10px 0;
+    font-weight: 600;
+}
+
+.receipt-row.total {
+    font-size: 24px;
+    font-weight: 900;
+    margin-top: 15px;
+}
+
+.ranking-placeholder {
+    font-size: 11px;
+    color: #666;
+    margin-left: 10px;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.receipt-stamp-zone {
+    height: 120px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: 1px dashed rgba(0, 0, 0, 0.03); 
+}
+
+.receipt-stamp-zone::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* Gravity Freight Circular Watermark Logo */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='none' stroke='black' stroke-width='2'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='black' stroke-width='0.5'/%3E%3Ctext x='100' y='105' font-family='monospace' font-size='14' text-anchor='middle' font-weight='900' fill='black'%3EGRAVITY FREIGHT%3C/text%3E%3Ctext x='100' y='125' font-family='monospace' font-size='10' text-anchor='middle' fill='black'%3EOFFICIAL REPORT%3C/text%3E%3Cpath d='M60 90 L140 90' stroke='black' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.08;
+    pointer-events: none;
+}
+
+.barcode-container {
+    margin: 15px 0 10px;
+    height: 55px;
+    width: 100%;
+    background: 
+        linear-gradient(90deg, #000 1px, transparent 1px) 0 0 / 4px 100%,
+        linear-gradient(90deg, #000 2px, transparent 2px) 7px 0 / 12px 100%,
+        linear-gradient(90deg, #000 3px, transparent 3px) 15px 0 / 8px 100%,
+        linear-gradient(90deg, #000 1px, transparent 1px) 22px 0 / 5px 100%,
+        linear-gradient(90deg, #000 4px, transparent 4px) 30px 0 / 15px 100%,
+        linear-gradient(90deg, #000 2px, transparent 2px) 42px 0 / 10px 100%;
+    background-repeat: repeat-x;
+    opacity: 0.8;
+}
+
+.receipt-footer {
+    text-align: center;
+    font-size: 10px;
+    margin-top: 15px;
+    line-height: 1.6;
+}
+
+.receipt-footer .auth-status {
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.receipt-footer .timestamp {
+    opacity: 0.6;
+}
+
+.receipt-btn {
+    display: block;
+    width: 65%;
+    max-width: 280px;
+    margin: 30px auto 0;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    padding: 16px;
+    font-family: inherit;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.receipt-btn:hover {
+    background: #333;
+}

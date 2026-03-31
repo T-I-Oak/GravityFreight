@@ -353,6 +353,12 @@ export class EventSystem {
         const game = this.game;
         document.getElementById('result-overlay')?.classList.add('hidden');
         const status = game.flightResults.status;
+
+        if (status === 'gameover') {
+            window.location.reload();
+            return;
+        }
+
         if (status === 'success' || status === 'cleared') {
             if (game.lastHitGoal) { game.handleEvent(game.lastHitGoal); return; }
         }

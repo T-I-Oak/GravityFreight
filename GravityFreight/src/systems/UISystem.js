@@ -258,6 +258,13 @@ export class UISystem {
 
     showResult(resultType) {
         const game = this.game;
+
+        // ゲームオーバー時は特別なレシート画面を表示
+        if (resultType === 'gameover') {
+            this.showTerminalReport();
+            return;
+        }
+
         const overlay = document.getElementById('result-overlay');
         const titleEl = document.getElementById('result-title');
         const subtitleEl = document.getElementById('result-subtitle');
@@ -272,10 +279,21 @@ export class UISystem {
 
         game.flightResults.status = resultType;
         overlay.classList.remove('success-theme', 'failure-theme');
-        overlay.classList.add((resultType === 'success' || resultType === 'cleared' || resultType === 'returned') ? 'success-theme' : 'failure-theme');
+        if (resultType === 'gameover') {
+            overlay.classList.add('failure-theme');
+        } else {
+            overlay.classList.add((resultType === 'success' || resultType === 'cleared' || resultType === 'returned') ? 'success-theme' : 'failure-theme');
+        }
         overlay.classList.remove('hidden');
 
-        const statusText = { 'success': `SECTOR ${game.sector - 1} COMPLETED`, 'cleared': `SECTOR ${game.sector - 1} COMPLETED`, 'returned': 'ROCKET RECOVERED', 'crashed': 'SHIP CRASHED', 'lost': 'LOST IN SPACE' };
+        const statusText = { 
+            'success': `SECTOR ${game.sector - 1} COMPLETED`, 
+            'cleared': `SECTOR ${game.sector - 1} COMPLETED`, 
+            'returned': 'ROCKET RECOVERED', 
+            'crashed': 'SHIP CRASHED', 
+            'lost': 'LOST IN SPACE',
+            'gameover': 'TERMINAL REPORT'
+        };
         titleEl.textContent = statusText[resultType] || 'MISSION END';
         subtitleEl.textContent = '';
         subtitleEl.style.display = 'none';
@@ -313,21 +331,32 @@ export class UISystem {
         if (itemsList) itemsList.innerHTML = '';
 
         let delay = 0.4;
-        const addRow = (parent, label, value, colorClass) => {
+        const addRow = (parent, label, value, colorClass, unit = '') => {
             const row = document.createElement('div');
             row.className = 'result-row stagger-in';
             row.style.animationDelay = `${delay}s`;
-            row.innerHTML = `<span class="label">${label}</span><span class="value ${colorClass}">${value >= 0 ? '+' : ''}${value.toLocaleString()}</span>`;
+            const displayValue = typeof value === 'number' ? 
+                (value >= 0 ? '+' : '') + value.toLocaleString() : 
+                value;
+            const unitText = unit ? ` ${unit}` : '';
+            row.innerHTML = `<span class="label">${label}</span><span class="value ${colorClass}">${displayValue}${unitText}</span>`;
             parent.appendChild(row);
             delay += 0.1;
         };
 
-        addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
-        game.flightResults.bonuses.filter(b => b.value > 0).forEach(b => addRow(statsList, b.name, b.value, 'score'));
+        if (resultType === 'gameover') {
+            addRow(statsList, 'SECTORS COMPLETED ......', game.sector - 1, 'score', 'SCS');
+            addRow(statsList, 'TOTAL DELIVERIES .......', game.totalDeliveries || 0, 'coin', 'PCS');
+            addRow(statsList, 'FINAL SCORE ............', game.score, 'score', 'PTS');
+        } else {
+            // Standard mission rows
+            addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
+            game.flightResults.bonuses.filter(b => b.value > 0).forEach(b => addRow(statsList, b.name, b.value, 'score'));
 
-        const itemCoinTotal = game.flightResults.items.filter(i => i.category === 'COIN').reduce((sum, i) => sum + (i.score || 0), 0);
-        if (itemCoinTotal > 0) addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
-        game.flightResults.bonuses.filter(b => b.coins && b.coins > 0).forEach(b => addRow(statsList, b.name, b.coins, 'coin'));
+            const itemCoinTotal = game.flightResults.items.filter(i => i.category === 'COIN').reduce((sum, i) => sum + (i.score || 0), 0);
+            if (itemCoinTotal > 0) addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
+            game.flightResults.bonuses.filter(b => b.coins && b.coins > 0).forEach(b => addRow(statsList, b.name, b.coins, 'coin'));
+        }
 
         const groupedItems = [];
         if (resultType !== 'crashed' && resultType !== 'lost') {
@@ -444,4 +473,69 @@ export class UISystem {
     initTradingPost(container) { this.shopUI.initTradingPost(container); }
     initRepairDock(container) { this.maintenanceUI.initRepairDock(container); }
     initBlackMarket(container) { this.shopUI.initBlackMarket(container); }
+
+    showTerminalReport() {
+        const game = this.game;
+        const overlay = document.getElementById('receipt-overlay');
+        const content = document.getElementById('receipt-content-area');
+        if (!overlay || !content) return;
+
+        // 統計データの準備
+        const sectors = game.sector - 1;
+        const deliveries = game.totalDeliveries || 0;
+        const score = Math.floor(game.score);
+        
+        // タイムスタンプ生成 (YYYY/M/D H:m:s)
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+
+        // HTML生成 (スクリーンショット再現 + 不規則バーコード)
+        content.innerHTML = `
+            <div class="receipt-header">
+                <h1 class="receipt-title">PAYMENT ADVICE</h1>
+                <div class="receipt-subtitle">GRAVITY FREIGHT CO. - DELIVERY REPORT</div>
+            </div>
+            
+            <div class="receipt-divider-dotted"></div>
+            
+            <div class="receipt-row">
+                <span>SECTORS COMPLETED</span>
+                <span>${sectors} SCS<span class="ranking-placeholder"></span></span>
+            </div>
+            <div class="receipt-row">
+                <span>TOTAL DELIVERIES</span>
+                <span>${deliveries} PCS<span class="ranking-placeholder"></span></span>
+            </div>
+            
+            <div class="receipt-divider-solid"></div>
+            
+            <div class="receipt-row total">
+                <span>FINAL SCORE</span>
+                <span>${score.toLocaleString()} PTS<span class="ranking-placeholder"></span></span>
+            </div>
+
+            <div class="receipt-stamp-zone"></div>
+            
+            <div class="barcode-container"></div>
+            
+            <div class="receipt-footer">
+                <div class="auth-status">OPERATOR AUTHENTICATION REQUIRED</div>
+                <div class="timestamp">${timestamp}</div>
+            </div>
+            
+            <button class="receipt-btn" id="receipt-exit-btn">END CONTRACT</button>
+        `;
+
+        // オーバーレイとアニメーションのトリガー
+        overlay.classList.add('active');
+
+        // ボタンクリックイベント
+        const exitBtn = document.getElementById('receipt-exit-btn');
+        if (exitBtn) {
+            exitBtn.onclick = () => {
+                overlay.classList.remove('active');
+                game.fullReset(); // 先ほど実装した完全リセットを実行
+            };
+        }
+    }
 }
