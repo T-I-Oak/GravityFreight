@@ -349,13 +349,39 @@ export class UISystem {
             addRow(statsList, 'TOTAL DELIVERIES .......', game.totalDeliveries || 0, 'coin', 'PCS');
             addRow(statsList, 'FINAL SCORE ............', game.score, 'score', 'PTS');
         } else {
-            // Standard mission rows
             addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
-            game.flightResults.bonuses.filter(b => b.value > 0).forEach(b => addRow(statsList, b.name, b.value, 'score'));
 
-            const itemCoinTotal = game.flightResults.items.filter(i => i.category === 'COIN').reduce((sum, i) => sum + (i.score || 0), 0);
+            // ボーナス項目の集計 (グループ化) (Spec 10.2 / 修正)
+            const groupedBonuses = new Map();
+            game.flightResults.bonuses.forEach(b => {
+                const entry = groupedBonuses.get(b.name) || { value: 0, coins: 0, count: 0 };
+                entry.value += (b.value || 0);
+                entry.coins += (b.coins || 0);
+                entry.count++;
+                groupedBonuses.set(b.name, entry);
+            });
+
+            groupedBonuses.forEach((data, name) => {
+                const label = data.count > 1 ? `${name} [x ${data.count}]` : name;
+                if (data.value > 0) addRow(statsList, label, data.value, 'score');
+                if (data.coins > 0) {
+                    const coinLabel = data.value > 0 ? `${label} Coin` : label;
+                    addRow(statsList, coinLabel, data.coins, 'coin');
+                }
+            });
+
+            // アイテムおよびボーナスアイテム内のコインをすべて計上 (不具合修正)
+            let itemCoinTotal = 0;
+            game.flightResults.items.forEach(item => {
+                if (item.category === 'COIN') itemCoinTotal += (item.score || 0);
+                if (item.bonusItems) {
+                    item.bonusItems.forEach(b => {
+                        if (b.category === 'COIN') itemCoinTotal += (b.score || 0);
+                    });
+                }
+            });
+
             if (itemCoinTotal > 0) addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
-            game.flightResults.bonuses.filter(b => b.coins && b.coins > 0).forEach(b => addRow(statsList, b.name, b.coins, 'coin'));
         }
 
         const groupedItems = [];
