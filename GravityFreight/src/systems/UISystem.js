@@ -1,7 +1,6 @@
 import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba, PARTS, RARITY } from '../core/Data.js';
 import { ItemUtils } from '../utils/ItemUtils.js';
 import { TitleAnimation } from '../utils/TitleAnimation.js';
-import { EconomySystem } from './EconomySystem.js';
 import { UIComponents } from './ui/UIComponents.js';
 import { ShopUI } from './ui/ShopUI.js';
 import { MaintenanceUI } from './ui/MaintenanceUI.js';
@@ -91,181 +90,270 @@ export class UISystem {
         }
     }
 
+    // 主要なゲームプレイUI要素の取得 (ルール5.1に基づき、存在を前提とする)
+    _getGameplayElements() {
+        return [
+            document.getElementById('terminal-panel'),
+            document.getElementById('mission-hud'),
+            document.getElementById('build-overlay'),
+            document.getElementById('launch-btn'),
+            document.getElementById('launch-control'),
+            document.getElementById('result-overlay'),
+            document.getElementById('event-screen'),
+            document.getElementById('how-to-play-overlay'),
+            document.getElementById('star-info-panel'),
+            document.getElementById('receipt-overlay')
+        ];
+    }
+
     updateUI() {
         const game = this.game;
-        const renderList = (id, items, type, selected) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.innerHTML = '';
 
-            if (items.length === 0) {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'slot-placeholder';
-                let mainText = 'EMPTY';
-                let subText = '在庫なし';
+        // 1. タイトルステートの早期処理 (以降のプレイ用ロジックとの干渉を遮断)
+        if (game.state === 'title') {
+            this._updateTitleUI();
+            return;
+        }
 
-                if (type === 'chassis') { mainText = 'シャーシなし'; subText = '購入または回収してください'; }
-                else if (type === 'logic') { mainText = 'ロジックなし'; subText = '購入または回収してください'; }
-                else if (type === 'launcher') { mainText = '発射台なし'; subText = '購入または回収してください'; }
-                else if (type === 'modules') { mainText = 'モジュールなし'; subText = '購入または回収してください'; }
-                else if (type === 'booster') { mainText = 'ブースターなし'; subText = '購入または回収してください'; }
+        // 定義済みプレイ系ステート以外の不正ステートは例外を投げる (ルール5.1)
+        const validStates = ['building', 'aiming', 'flying', 'cleared', 'crashed', 'lost', 'returned', 'event', 'result', 'gameover'];
+        if (!validStates.includes(game.state)) {
+            throw new Error(`[v0.6.6] Critical: Invalid game state detected in updateUI: ${game.state}`);
+        }
 
-                placeholder.innerHTML = `
-                    <div class="part-header">
-                        <span class="part-name" style="opacity: 0.5;">${mainText}</span>
-                    </div>
-                    <span class="part-info">${subText}</span>
-                `;
-                el.appendChild(placeholder);
-                return;
+        // 2. 主要要素の取得 (一本化)
+        const titleScreen = document.getElementById('title-screen');
+        const gameplayElements = this._getGameplayElements();
+        const resultOverlay = document.getElementById('result-overlay');
+        const eventScreen = document.getElementById('event-screen');
+        const receiptOverlay = document.getElementById('receipt-overlay');
+
+        // 3. 表示ステータスのサニタイズ (以前のステートの残存スタイルを徹底排除)
+        if (titleScreen) {
+            titleScreen.classList.add('hidden');
+            titleScreen.style.display = 'none';
+            titleScreen.style.opacity = '0';
+            titleScreen.style.pointerEvents = 'none';
+            titleScreen.style.zIndex = '0';
+        }
+        this.titleAnimation?.stop();
+
+        // ミッションUI要素の一括リセット (インラインスタイルのクリアと非表示化)
+        gameplayElements.forEach(el => {
+            if (el) {
+                el.style.display = ''; 
+                el.style.visibility = '';
+                el.style.opacity = '';
+                el.style.pointerEvents = '';
+                el.classList.add('hidden');
             }
+        });
 
-            const groups = ItemUtils.groupItems(items);
+        // 4. ステートに関わらずミッション中に表示すべき基本HUD (常時表示ガード)
+        const isMission = ['building', 'aiming', 'flying', 'event', 'result', 'gameover'].includes(game.state);
+        document.getElementById('terminal-panel').classList.toggle('hidden', !isMission);
+        document.getElementById('mission-hud').classList.toggle('hidden', !isMission);
 
-            groups.forEach(group => {
-                const div = document.createElement('div');
-                let isAnySelected = false;
-                let selectionCount = 0;
-                if (type === 'modules') {
-                    selectionCount = game.selection.modules[group.instanceId] || 0;
-                    isAnySelected = selectionCount > 0;
-                } else {
-                    isAnySelected = (selected && selected.instanceId === group.instanceId);
+        // 5. ステートに基づいた決定論的な表示制御
+        switch (game.state) {
+            case 'building': {
+                const buildOverlay = document.getElementById('build-overlay');
+                const launchBtn = document.getElementById('launch-btn');
+                const lc = document.getElementById('launch-control');
+                
+                if (buildOverlay) buildOverlay.classList.remove('hidden');
+                if (launchBtn) {
+                    launchBtn.classList.remove('hidden');
+                    launchBtn.disabled = true;
                 }
+                if (lc) lc.classList.remove('hidden');
 
-                div.className = `part-item ${isAnySelected ? 'selected' : ''}`;
-                div.innerHTML = this.generateCardHTML(group, {
-                    isSelected: isAnySelected,
-                    showInventory: true,
-                    selectionCount: selectionCount
-                });
+                if (resultOverlay) resultOverlay.classList.add('hidden');
+                if (eventScreen) eventScreen.classList.add('hidden');
+                break;
+            }
+            case 'aiming': {
+                const bo = document.getElementById('build-overlay');
+                const lb = document.getElementById('launch-btn');
+                const lc = document.getElementById('launch-control');
+                
+                if (bo) bo.classList.remove('hidden');
+                if (lb) {
+                    lb.classList.remove('hidden');
+                    lb.disabled = false;
+                }
+                if (lc) lc.classList.remove('hidden');
+                
+                if (resultOverlay) resultOverlay.classList.add('hidden');
+                if (eventScreen) eventScreen.classList.add('hidden');
+                break;
+            }
+            case 'event': {
+                const be = document.getElementById('build-overlay');
+                if (be) {
+                    be.classList.remove('hidden');
+                    be.classList.add('event-active');
+                }
+                if (eventScreen) eventScreen.classList.remove('hidden');
+                if (resultOverlay) resultOverlay.classList.add('hidden');
+                break;
+            }
+            case 'gameover': {
+                if (resultOverlay) resultOverlay.classList.remove('hidden');
+                if (receiptOverlay) receiptOverlay.classList.remove('hidden');
+                break;
+            }
+            case 'result': {
+                if (resultOverlay) resultOverlay.classList.remove('hidden');
+                const backToResultBtn = document.getElementById('back-to-result-btn');
+                const lc = document.getElementById('launch-control');
+                if (backToResultBtn && !backToResultBtn.classList.contains('hidden')) {
+                    if (lc) lc.classList.remove('hidden');
+                }
+                break;
+            }
+            case 'cleared':
+            case 'crashed':
+            case 'lost':
+            case 'returned':
+                if (resultOverlay) resultOverlay.classList.add('hidden');
+                break;
+            default:
+                if (resultOverlay) resultOverlay.classList.add('hidden');
+                if (eventScreen) eventScreen.classList.add('hidden');
+                break;
+        }
 
-                div.onclick = () => {
-                    if (game.state === 'event') return;
-                    if (type === 'modules' || type === 'booster') {
-                        game.selectOption(type, group.instanceId);
-                    } else {
-                        game.selectPart(type, group.instanceId);
-                    }
-                };
-                el.appendChild(div);
-            });
-        };
-
-        const scoreDisplay = document.getElementById('score-display');
-        const coinDisplay = document.getElementById('coin-display');
-        const sectorDisplay = document.getElementById('sector-display');
-        if (scoreDisplay) scoreDisplay.textContent = Math.floor(game.displayScore).toLocaleString();
-        if (coinDisplay) coinDisplay.textContent = Math.floor(game.displayCoins).toLocaleString();
-        const eventCoinDisplay = document.getElementById('event-player-credits');
-        if (eventCoinDisplay) eventCoinDisplay.textContent = Math.floor(game.displayCoins).toLocaleString();
-        if (sectorDisplay) sectorDisplay.textContent = game.sector;
-
-        const terminalPanel = document.getElementById('terminal-panel');
+        // 5. タブ切り替え・リスト描画などの詳細処理
+        const tabBtns = document.querySelectorAll('.tab-btn');
         const flightTab = document.getElementById('flight-tab');
         const factoryTab = document.getElementById('factory-tab');
-        const tabBtns = document.querySelectorAll('.tab-btn');
 
         if (game.isFactoryOpen) {
-            if (flightTab) flightTab.classList.add('hidden');
-            if (factoryTab) factoryTab.classList.remove('hidden');
+            flightTab.classList.add('hidden');
+            factoryTab.classList.remove('hidden');
             tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'factory'));
         } else {
-            if (flightTab) flightTab.classList.remove('hidden');
-            if (factoryTab) factoryTab.classList.add('hidden');
+            flightTab.classList.remove('hidden');
+            factoryTab.classList.add('hidden');
             tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'flight'));
         }
 
-        const titleScreen = document.getElementById('title-screen');
-        const missionHud = document.getElementById('mission-hud');
-        if (titleScreen) {
-            const isTitle = game.state === 'title';
-            titleScreen.classList.toggle('hidden', !isTitle);
-            
-            if (isTitle) {
-                if (!this.titleAnimation) {
-                    const bg = document.getElementById('title-bg-canvas');
-                    const fg = document.getElementById('title-fg-canvas');
-                    if (bg && fg) {
-                        this.titleAnimation = new TitleAnimation(bg, fg);
-                    }
-                }
-                this.titleAnimation?.start();
-            } else {
-                this.titleAnimation?.stop();
-            }
-        }
-        if (missionHud) missionHud.classList.toggle('hidden', game.state === 'title');
+        // 通貨・スコア表示の即時同期 (アニメーション中でない場合)
+        const scoreDisplay = document.getElementById('score-display');
+        const coinDisplay = document.getElementById('coin-display');
+        const sectorDisplay = document.getElementById('sector-display');
+        const eventCoinDisplay = document.getElementById('event-player-credits');
+        
+        scoreDisplay.textContent = Math.floor(game.displayScore).toLocaleString();
+        coinDisplay.textContent = Math.floor(game.displayCoins).toLocaleString();
+        if (eventCoinDisplay) eventCoinDisplay.textContent = Math.floor(game.displayCoins).toLocaleString();
+        sectorDisplay.textContent = game.sector;
 
-        const buildOverlay = document.getElementById('build-overlay');
-        const launchBtn = document.getElementById('launch-btn');
-        if (game.state === 'building' || game.state === 'aiming' || game.state === 'event') {
-            buildOverlay?.classList.remove('hidden');
-            if (game.state === 'event') buildOverlay?.classList.add('event-active');
-            else buildOverlay?.classList.remove('event-active');
-        } else {
-            buildOverlay?.classList.add('hidden');
-            buildOverlay?.classList.remove('event-active');
-        }
-
-        if (launchBtn) {
-            launchBtn.disabled = (game.state !== 'aiming');
-            launchBtn.classList.remove('hidden');
-        }
-
-        renderList('chassis-list', game.inventory.chassis, 'chassis', game.selection.chassis);
-        renderList('logic-list', game.inventory.logic, 'logic', game.selection.logic);
-        renderList('logic-option-list', game.inventory.modules, 'modules', game.selection.modules);
-        renderList('acc-option-list', game.inventory.boosters, 'booster', game.selection.booster);
-        renderList('launcher-list', game.inventory.launchers, 'launcher', game.selection.launcher);
+        // リストレンダリング実行
+        this.renderList('chassis-list', game.inventory.chassis, 'chassis', game.selection.chassis);
+        this.renderList('logic-list', game.inventory.logic, 'logic', game.selection.logic);
+        this.renderList('logic-option-list', game.inventory.modules, 'modules', game.selection.modules);
+        this.renderList('acc-option-list', game.inventory.boosters, 'booster', game.selection.booster);
+        this.renderList('launcher-list', game.inventory.launchers, 'launcher', game.selection.launcher);
 
         const buildBtn = document.getElementById('build-btn');
-        if (buildBtn) buildBtn.disabled = !(game.selection.chassis && game.selection.logic);
+        buildBtn.disabled = !(game.selection.chassis && game.selection.logic);
 
         const rList = document.getElementById('rocket-list');
-        if (rList) {
-            rList.innerHTML = '';
-            if (game.inventory.rockets.length === 0) {
-                rList.innerHTML = `
-                    <div class="slot-placeholder" id="no-rocket-placeholder" style="cursor: pointer;">
-                        <div class="part-header"><span class="part-name" style="opacity: 0.5;">待機中のロケットなし</span></div>
-                        <span class="part-info guide-pulse">ここをクリックしてロケットを建造してください</span>
-                    </div>
-                `;
-                document.getElementById('no-rocket-placeholder').onclick = () => { game.isFactoryOpen = true; this.updateUI(); };
-            } else {
-                game.inventory.rockets.forEach(rocket => {
-                    const div = document.createElement('div');
-                    const isSelected = (game.selection.rocket && game.selection.rocket.instanceId === rocket.instanceId);
-                    div.className = `rocket-item ${isSelected ? 'selected' : ''}`;
-                    div.innerHTML = this.generateCardHTML(rocket, { isSelected });
-                    div.onclick = () => {
-                        if (game.state === 'event') return;
-                        game.selectPart('rocket', rocket.instanceId);
-                    };
-                    rList.appendChild(div);
-                });
-            }
+        rList.innerHTML = '';
+        if (game.inventory.rockets.length === 0) {
+            rList.innerHTML = `
+                <div class="slot-placeholder" id="no-rocket-placeholder" style="cursor: pointer;">
+                    <div class="part-header"><span class="part-name" style="opacity: 0.5;">待機中のロケットなし</span></div>
+                    <span class="part-info guide-pulse">ここをクリックしてロケットを建造してください</span>
+                </div>
+            `;
+            const noRocket = document.getElementById('no-rocket-placeholder');
+            noRocket.onclick = () => { game.isFactoryOpen = true; this.updateUI(); };
+        } else {
+            game.inventory.rockets.forEach(rocket => {
+                const div = document.createElement('div');
+                const isSelected = (game.selection.rocket && game.selection.rocket.instanceId === rocket.instanceId);
+                div.className = `rocket-item ${isSelected ? 'selected' : ''}`;
+                div.innerHTML = this.generateCardHTML(rocket, { isSelected });
+                div.onclick = () => {
+                    if (game.state === 'event') return;
+                    game.selectPart('rocket', rocket.instanceId);
+                };
+                rList.appendChild(div);
+            });
         }
     }
 
-    /**
-     * 下位互換性のためのラッパー
-     */
+    renderList(id, items, type, selected) {
+        const el = document.getElementById(id);
+        el.innerHTML = '';
+
+        if (items.length === 0) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'slot-placeholder';
+            let mainText = 'EMPTY';
+            let subText = '在庫なし';
+
+            if (type === 'chassis') { mainText = 'シャーシなし'; subText = '購入または回収してください'; }
+            else if (type === 'logic') { mainText = 'ロジックなし'; subText = '購入または回収してください'; }
+            else if (type === 'launcher') { mainText = '発射台なし'; subText = '購入または回収してください'; }
+            else if (type === 'modules') { mainText = 'モジュールなし'; subText = '購入または回収してください'; }
+            else if (type === 'booster') { mainText = 'ブースターなし'; subText = '購入または回収してください'; }
+
+            placeholder.innerHTML = `
+                <div class="part-header">
+                    <span class="part-name" style="opacity: 0.5;">${mainText}</span>
+                </div>
+                <span class="part-info">${subText}</span>
+            `;
+            el.appendChild(placeholder);
+            return;
+        }
+
+        const groups = ItemUtils.groupItems(items);
+        groups.forEach(group => {
+            const div = document.createElement('div');
+            let isAnySelected = false;
+            let selectionCount = 0;
+            if (type === 'modules') {
+                selectionCount = this.game.selection.modules[group.instanceId] || 0;
+                isAnySelected = selectionCount > 0;
+            } else {
+                isAnySelected = (selected && selected.instanceId === group.instanceId);
+            }
+
+            div.className = `part-item ${isAnySelected ? 'selected' : ''}`;
+            div.innerHTML = this.generateCardHTML(group, {
+                isSelected: isAnySelected,
+                showInventory: true,
+                selectionCount: selectionCount
+            });
+
+            div.onclick = () => {
+                if (this.game.state === 'event') return;
+                if (type === 'modules' || type === 'booster') {
+                    this.game.selectOption(type, group.instanceId);
+                } else {
+                    this.game.selectPart(type, group.instanceId);
+                }
+            };
+            el.appendChild(div);
+        });
+    }
+
     generateCardHTML(itemData, options = {}) {
         return UIComponents.generateCardHTML(itemData, options);
     }
 
     showResult(resultType) {
         const game = this.game;
-
-        // ゲームオーバー時は特別なレシート画面を表示
-        if (resultType === 'gameover') {
-            this.showTerminalReport();
-            return;
-        }
-
         const overlay = document.getElementById('result-overlay');
+
+        // 表示状態のリセット（マップ確認からの復帰を保証）
+        if (overlay) overlay.classList.remove('minimized');
+
         const titleEl = document.getElementById('result-title');
         const subtitleEl = document.getElementById('result-subtitle');
         const statsList = document.getElementById('result-stats-list');
@@ -277,15 +365,10 @@ export class UISystem {
         if (coinTotalEl) coinTotalEl.textContent = game.launchCoins.toLocaleString();
         if (!overlay) return;
 
-        game.flightResults.status = resultType;
-        overlay.classList.remove('success-theme', 'failure-theme');
-        if (resultType === 'gameover') {
-            overlay.classList.add('failure-theme');
-        } else {
-            overlay.classList.add((resultType === 'success' || resultType === 'cleared' || resultType === 'returned') ? 'success-theme' : 'failure-theme');
-        }
-        overlay.classList.remove('hidden');
-
+        // 【最重要】表示前にすべてのコンテンツ（タイトル等含む）をクリア/更新し、残像を完全に防ぐ
+        if (statsList) statsList.innerHTML = '';
+        if (itemsList) itemsList.innerHTML = '';
+        
         const statusText = { 
             'success': `SECTOR ${game.sector - 1} COMPLETED`, 
             'cleared': `SECTOR ${game.sector - 1} COMPLETED`, 
@@ -311,6 +394,19 @@ export class UISystem {
             closeBtn.textContent = label;
         }
 
+        game.flightResults.status = resultType;
+        overlay.classList.remove('success-theme', 'failure-theme');
+        if (resultType === 'gameover') {
+            overlay.classList.add('failure-theme');
+        } else {
+            overlay.classList.add((resultType === 'success' || resultType === 'cleared' || resultType === 'returned') ? 'success-theme' : 'failure-theme');
+        }
+
+        // ここですべての準備が整ってから表示
+        if (resultType !== 'gameover') {
+            overlay.classList.remove('hidden');
+        }
+
         const pendingS = (game.pendingGoalBonus || 0) + (game.pendingScore || 0);
         const pendingC = (game.pendingCoins || 0);
         const pureFlightScore = Math.max(0, game.score - game.launchScore);
@@ -318,7 +414,16 @@ export class UISystem {
 
         game.displayScore = game.launchScore;
         game.displayCoins = game.launchCoins;
+        
+        // ステートを暫定的に更新して updateUI による非表示化を防ぐ
+        if (game.state !== 'result' && game.state !== 'gameover') {
+            game.state = 'result';
+        }
         this.updateUI();
+        
+        if (resultType === 'gameover') {
+            this.showTerminalReport();
+        }
 
         game.score += pendingS;
         game.coins += pendingC;
@@ -327,10 +432,7 @@ export class UISystem {
         game.pendingScore = 0;
         game.pendingCoins = 0;
 
-        if (statsList) statsList.innerHTML = '';
-        if (itemsList) itemsList.innerHTML = '';
-
-        let delay = 0.4;
+        let delay = 0.1; // 初期ディレイを短縮
         const addRow = (parent, label, value, colorClass, unit = '') => {
             const row = document.createElement('div');
             row.className = 'result-row stagger-in';
@@ -351,7 +453,7 @@ export class UISystem {
         } else {
             addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
 
-            // ボーナス項目の集計 (グループ化) (Spec 10.2 / 修正)
+            // ボーナス項目の集計
             const groupedBonuses = new Map();
             game.flightResults.bonuses.forEach(b => {
                 const entry = groupedBonuses.get(b.name) || { value: 0, coins: 0, count: 0 };
@@ -370,7 +472,6 @@ export class UISystem {
                 }
             });
 
-            // アイテムおよびボーナスアイテム内のコインをすべて計上 (不具合修正)
             let itemCoinTotal = 0;
             game.flightResults.items.forEach(item => {
                 if (item.category === 'COIN') itemCoinTotal += (item.score || 0);
@@ -506,62 +607,84 @@ export class UISystem {
         const content = document.getElementById('receipt-content-area');
         if (!overlay || !content) return;
 
-        // 統計データの準備
         const sectors = game.sector - 1;
         const deliveries = game.totalDeliveries || 0;
         const score = Math.floor(game.score);
         
-        // タイムスタンプ生成 (YYYY/M/D H:m:s)
         const now = new Date();
         const timestamp = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
 
-        // HTML生成 (スクリーンショット再現 + 不規則バーコード)
+        // 一括で内容をセット（オリジナル演出の復活）
         content.innerHTML = `
             <div class="receipt-header">
                 <h1 class="receipt-title">PAYMENT ADVICE</h1>
                 <div class="receipt-subtitle">GRAVITY FREIGHT CO. - DELIVERY REPORT</div>
             </div>
-            
             <div class="receipt-divider-dotted"></div>
-            
-            <div class="receipt-row">
-                <span>SECTORS COMPLETED</span>
-                <span>${sectors} SCS<span class="ranking-placeholder"></span></span>
-            </div>
-            <div class="receipt-row">
-                <span>TOTAL DELIVERIES</span>
-                <span>${deliveries} PCS<span class="ranking-placeholder"></span></span>
-            </div>
-            
+            <div class="receipt-row"><span>SECTORS COMPLETED</span><span>${sectors} SCS</span></div>
+            <div class="receipt-row"><span>TOTAL DELIVERIES</span><span>${deliveries} PCS</span></div>
             <div class="receipt-divider-solid"></div>
-            
-            <div class="receipt-row total">
-                <span>FINAL SCORE</span>
-                <span>${score.toLocaleString()} PTS<span class="ranking-placeholder"></span></span>
-            </div>
-
+            <div class="receipt-row total"><span>FINAL SCORE</span><span>${score.toLocaleString()} PTS</span></div>
             <div class="receipt-stamp-zone"></div>
-            
             <div class="barcode-container"></div>
-            
             <div class="receipt-footer">
                 <div class="auth-status">OPERATOR AUTHENTICATION REQUIRED</div>
                 <div class="timestamp">${timestamp}</div>
             </div>
-            
             <button class="receipt-btn" id="receipt-exit-btn">END CONTRACT</button>
         `;
 
-        // オーバーレイとアニメーションのトリガー
-        overlay.classList.add('active');
+        overlay.classList.remove('hidden');
+        
+        // 2フレーム待機して、確実に計算を走らせてからアニメーションを開始
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                overlay.classList.add('active');
+            });
+        });
 
-        // ボタンクリックイベント
         const exitBtn = document.getElementById('receipt-exit-btn');
         if (exitBtn) {
             exitBtn.onclick = () => {
                 overlay.classList.remove('active');
-                game.fullReset(); // 先ほど実装した完全リセットを実行
+                const resultOverlay = document.getElementById('result-overlay');
+                if (resultOverlay) resultOverlay.classList.add('hidden');
+
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    this.game.fullReset();
+                }, 800);
             };
         }
+    }
+
+    _updateTitleUI() {
+        const titleScreen = document.getElementById('title-screen');
+        const gameplayElements = this._getGameplayElements();
+
+        // ルール5.1に基づき、存在を前提とした警告なしのリセット
+        // 全てのゲームプレイ UI をインラインスタイルで強制非表示
+        gameplayElements.forEach(el => {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+            el.style.visibility = 'hidden';
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+        });
+
+        // タイトル画面を最前面で強制表示
+        titleScreen.classList.remove('hidden');
+        titleScreen.style.display = 'flex';
+        titleScreen.style.visibility = 'visible';
+        titleScreen.style.opacity = '1';
+        titleScreen.style.pointerEvents = 'auto';
+        titleScreen.style.zIndex = '9999'; 
+
+        if (!this.titleAnimation) {
+            const bg = document.getElementById('title-bg-canvas');
+            const fg = document.getElementById('title-fg-canvas');
+            this.titleAnimation = new TitleAnimation(bg, fg);
+        }
+        this.titleAnimation.start();
     }
 }

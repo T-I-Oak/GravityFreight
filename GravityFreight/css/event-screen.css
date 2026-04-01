@@ -561,23 +561,21 @@
 
 
 #event-icon {
-    border-style: solid;
-    color: var(--shop-color, #fff);
-    border-color: var(--shop-color, #fff);
-    font-family: 'UnifrakturMaguntia', cursive;
-    font-size: 44px;
-    transform: none;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 64px;
     height: 64px;
-    border-radius: 12px;
-    margin-right: 20px;
     background: var(--shop-bg, rgba(0, 0, 0, 0.5));
-    border: 2px solid var(--shop-color);
+    border: 4px solid var(--shop-color, #fff);
+    border-radius: 12px;
+    color: var(--shop-color, #fff);
+    font-family: 'UnifrakturMaguntia', serif;
+    font-size: 48px;
+    line-height: 1;
+    margin-right: 20px;
     flex-shrink: 0;
-    box-shadow: none;
-    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.05), -1px -1px 1px rgba(0, 0, 0, 0.8);
-    border-width: 4px;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    transform: none;
 }

@@ -14,7 +14,7 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.6.4";
+        this.version = "0.6.7";
 
         // システムの初期化
         this.inventorySystem = new InventorySystem(this);
@@ -191,12 +191,16 @@ export class Game {
     }
 
     fullReset() {
-        // 基本ステータスの初期化
+        // ステート管理: まずタイマーをクリアして割り込みを阻止
+        this.eventSystem.clearPendingTimers();
+        this.state = 'title';
+
+        // 資金とスコアの初期化 (displayはアニメーションを防ぐために一致させる)
         this.coins = INITIAL_COINS;
+        this.displayCoins = INITIAL_COINS;
         this.score = 0;
         this.displayScore = 0;
-        this.displayCoins = 0;
-        this.displayCoins = 0;
+        
         this.sector = 1;
         this.stageLevel = 1;
         this.currentStarCount = 5;
@@ -209,11 +213,19 @@ export class Game {
         this.inventory = this.inventorySystem.inventory;
         this.inventorySystem.initStartingInventory();
         
+        this.isFactoryOpen = false;
         this.selection = { chassis: null, logic: null, launcher: null, rocket: null, modules: {}, booster: null };
-        
-        this.state = 'title';
+        this.lastHitGoal = null;
+        this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
+        this.pendingItems = [];
+        this.ship = null;
+
+        // ステージ初期化
         this.initStage(this.currentStarCount);
+        
+        // 最終的な描画更新
         this.updateUI();
+        console.log("[v0.6.7] Game fullReset completed. Returning to TITLE.");
     }
 
     update(dt) {

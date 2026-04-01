@@ -95,33 +95,13 @@
     text-shadow: 0 0 10px var(--accent-color);
 }
 
-#status {
-    /* 廃止 */
-    display: none;
-    /* 廃止 */
-}
 
-#message {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 48px;
-    font-weight: 900;
-    color: #ffdd44;
-    text-shadow: 0 0 30px rgba(255, 221, 68, 0.5);
-    pointer-events: none;
-    z-index: 2000;
-    white-space: nowrap;
-    text-align: center;
-    letter-spacing: 4px;
-}
 
 #launch-control {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    z-index: 1000;
+    z-index: 7000; /* リザルト背景(5000)よりも前面に配置 */
     width: 280px;
     pointer-events: none;
     padding-top: 20px;

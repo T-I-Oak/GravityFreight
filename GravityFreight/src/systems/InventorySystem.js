@@ -4,16 +4,24 @@ import { ItemUtils } from '../utils/ItemUtils.js';
 export class InventorySystem {
     constructor(game) {
         this.game = game;
+        this.initStartingInventory();
+    }
+
+    initStartingInventory() {
         // INITIAL_INVENTORY は ID と数量のみなので、ITEM_REGISTRY から詳細をマージする
         this.inventory = {};
         for (const [cat, items] of Object.entries(INITIAL_INVENTORY)) {
-            this.inventory[cat] = items.map(item => ({
+            const list = Array.isArray(items) ? items : Object.values(items);
+            this.inventory[cat] = list.map(item => ({
                 ...ITEM_REGISTRY[item.id],
                 ...item
             }));
         }
         if (!this.inventory.rockets) this.inventory.rockets = [];
         this._initInstanceIds();
+        
+        // Game クラス側の参照も同期させる (fullReset 時のため)
+        this.game.inventory = this.inventory;
     }
 
     _initInstanceIds() {

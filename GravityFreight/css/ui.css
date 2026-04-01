@@ -316,7 +316,9 @@
     color: white;
     box-shadow: 0 10px 40px rgba(255, 61, 0, 0.4);
 }
-.btn-grad-orange:hover:not(:disabled) {
+.btn-neon.btn-grad-orange:hover:not(:disabled) {
+    border-color: #ff6600;
+    background: rgba(255, 61, 0, 0.3);
     box-shadow: 0 15px 50px rgba(255, 61, 0, 0.6);
     transform: scale(1.05) translateY(-5px);
     filter: brightness(1.2);
@@ -327,22 +329,22 @@
 }
 
 .btn-neon:disabled {
-    opacity: 0.15;
+    opacity: 0.5;
     filter: grayscale(1);
     cursor: not-allowed;
     box-shadow: none;
 }
 .btn-neon-lg:disabled {
-    opacity: 1;
-    background: rgba(10, 10, 25, 0.25);
+    opacity: 0.5;
+    background: rgba(40, 45, 60, 0.25); /* 暗すぎない背景 */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
     cursor: not-allowed;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     transform: none;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    filter: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    filter: grayscale(0.5); /* 完全に白黒にせず、わずかに色味を残す */
 }
 
 /* Cyber Outline styles */
@@ -559,14 +561,7 @@
     transition: left 0.6s ease-in-out;
 }
 
-.btn-neon:disabled {
-    border-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.2);
-    cursor: default;
-    background: rgba(255, 255, 255, 0.02);
-    text-shadow: none;
-    box-shadow: none;
-}
+/* Duplicate :disabled removed */
 
 /* --- How to Play --- */
 #how-to-play-overlay {
@@ -730,8 +725,4 @@
     transition: left 0.6s ease-in-out;
 }
 
-.btn-neon:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    filter: grayscale(1);
-}
+/* Duplicate :disabled removed (consolidated at top) */

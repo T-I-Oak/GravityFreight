@@ -34,7 +34,6 @@ export class MissionSystem {
         game.ship.pickupRange = 0;
         game.ship.pickupMultiplier = 1;
 
-        game.state = 'building';
         game.accumulator = 0;
         game.pendingItems = [];
     }
@@ -127,7 +126,7 @@ export class MissionSystem {
                 });
             }
 
-            if (category !== 'CARGO') {
+            if (category !== 'CARGO' && category !== 'COIN') {
                 this.game.flightResults.items.push({ ...itemData });
             }
         });
@@ -172,6 +171,7 @@ export class MissionSystem {
                                 }
                                 game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: true, bonusItems });
                                 game.flightResults.bonuses.push({ name: 'Delivery Bonus', value: 1500, coins: 100 });
+                                game.totalDeliveries++;
                             } else {
                                 game.pendingCoins += 10;
                                 game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false, bonusItems: [] });
@@ -199,12 +199,10 @@ export class MissionSystem {
                 if (category === 'COIN') {
                     game.pendingCoins += itemData.score || 0;
                     game.flightResults.items.push(itemData);
-                    game.totalDeliveries++;
                     return;
                 }
 
                 game._addItemToInventory(itemData);
-                game.totalDeliveries++;
             });
             game.pendingItems = [];
             game.currentCoinDiscount = Math.min(0.5, luckCount * 0.1);
@@ -354,7 +352,6 @@ export class MissionSystem {
         const game = this.game;
         if (this.isGameOver()) {
             game.state = 'gameover';
-            game.ui.message.textContent = 'MISSION FAILED';
             game.showResult('gameover');
         }
     }

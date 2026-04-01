@@ -3,9 +3,7 @@ import { Game } from './core/Game.js';
 function main() {
     const canvas = document.getElementById('gameCanvas');
     const ui = {
-        layer: document.getElementById('ui-layer'),
-        status: document.getElementById('status'),
-        message: document.getElementById('message')
+        layer: document.getElementById('ui-layer')
     };
 
     const game = new Game(canvas, ui, 5); // 星を5個生成

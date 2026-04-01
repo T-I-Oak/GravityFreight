@@ -124,7 +124,6 @@ export class PhysicsOrchestrator {
             if (body === game.homeStar) {
                 game.state = 'returned';
                 game.stateTimer = ANIMATION_DURATION / 1000;
-                game.ui.message.textContent = '';
                 game.resolveItems('returned');
             } else {
                 // アドオンによる衝突回避判定
@@ -132,7 +131,6 @@ export class PhysicsOrchestrator {
 
                 game.state = 'crashed';
                 game.stateTimer = ANIMATION_DURATION / 1000;
-                game.ui.message.textContent = '';
                 game.consumeRocketOnFailure();
                 game.resolveItems('crashed', body);
             }
@@ -167,12 +165,10 @@ export class PhysicsOrchestrator {
                 game.pendingCoins += (hitGoal.coins || 0);
                 game.flightResults.bonuses.push({ name: 'Goal Bonus', value: hitGoal.score, coins: hitGoal.coins || 0 });
                 game.sector++;
-                game.ui.message.textContent = '';
                 game.resolveItems('success', hitGoal);
             } else {
                 game.state = 'lost';
                 game.stateTimer = ANIMATION_DURATION / 1000;
-                game.ui.message.textContent = '';
                 game.consumeRocketOnFailure();
                 game.resolveItems('lost');
             }
@@ -190,8 +186,6 @@ export class PhysicsOrchestrator {
         if (breaker) {
             breaker.charges--;
             game.bodies = game.bodies.filter(b => b !== body);
-            game.ui.message.textContent = 'STAR DESTROYED!';
-            setTimeout(() => { if (game.state === 'flying') game.ui.message.textContent = ''; }, 1000);
             return true;
         }
 
@@ -202,8 +196,6 @@ export class PhysicsOrchestrator {
             const normal = ship.position.sub(body.position).normalize();
             const dot = ship.velocity.dot(normal);
             ship.velocity = ship.velocity.sub(normal.scale(2 * dot)).scale(0.5);
-            game.ui.message.textContent = 'IMPACT ABSORBED!';
-            setTimeout(() => { if (game.state === 'flying') game.ui.message.textContent = ''; }, 1000);
             return true;
         }
         return false;
@@ -218,8 +210,6 @@ export class PhysicsOrchestrator {
             const center = new Vector2(game.canvas.width / 2, game.canvas.height / 2);
             const toCenter = center.sub(shipPos).normalize();
             ship.velocity = toCenter.scale(ship.velocity.length() * 0.8);
-            game.ui.message.textContent = 'EMERGENCY THRUST!';
-            setTimeout(() => { if (game.state === 'flying') game.ui.message.textContent = ''; }, 1000);
             return true;
         }
         return false;

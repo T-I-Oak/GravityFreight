@@ -4,6 +4,12 @@ import { PARTS, GOAL_NAMES, GOAL_COLORS, hexToRgba } from '../core/Data.js';
 export class EventSystem {
     constructor(game) {
         this.game = game;
+        this.pendingTimers = [];
+    }
+
+    clearPendingTimers() {
+        this.pendingTimers.forEach(t => clearTimeout(t));
+        this.pendingTimers = [];
     }
 
     launch() {
@@ -258,11 +264,27 @@ export class EventSystem {
                 resultOverlay.classList.add('minimized');
                 backToResultBtn.classList.remove('hidden');
                 if (launchBtn) launchBtn.classList.add('hidden');
+                
+                // レシートが表示されている場合は一時的に隠す
+                const receiptOverlay = document.getElementById('receipt-overlay');
+                if (receiptOverlay) receiptOverlay.classList.remove('active');
+
+                // UIコンテナの表示状態を同期
+                game.updateUI();
             };
             backToResultBtn.onclick = (e) => {
                 if (e) e.stopPropagation();
                 resultOverlay.classList.remove('minimized');
                 backToResultBtn.classList.add('hidden');
+
+                // ゲームオーバー状態ならレシートを再表示
+                if (game.state === 'gameover') {
+                    const receiptOverlay = document.getElementById('receipt-overlay');
+                    if (receiptOverlay) receiptOverlay.classList.add('active');
+                }
+
+                // UIコンテナの表示状態を同期
+                game.updateUI();
             };
         }
 
@@ -273,10 +295,12 @@ export class EventSystem {
                 const titleScreen = document.getElementById('title-screen');
                 if (titleScreen) {
                     titleScreen.style.opacity = '0';
-                    setTimeout(() => {
+                    const timer = setTimeout(() => {
                         game.state = 'building';
                         game.updateUI();
+                        this.pendingTimers = this.pendingTimers.filter(t => t !== timer);
                     }, 1000); // CSSの1s transitionに合わせる
+                    this.pendingTimers.push(timer);
                 } else {
                     game.state = 'building';
                     game.updateUI();

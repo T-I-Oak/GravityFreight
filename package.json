@@ -1,6 +1,6 @@
 {
   "name": "gravityfreight",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "2D物理演算ベースの宇宙航行ローグライク",
   "type": "module",
   "scripts": {
@@ -8,6 +8,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "jsdom": "^29.0.1",
     "vitest": "^4.1.0"
   },
   "dependencies": {
