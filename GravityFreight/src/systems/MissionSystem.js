@@ -95,9 +95,24 @@ export class MissionSystem {
                 const body = new Body(pos, mass);
                 // 半径も旧来の公式 (Physics.js の初期 Body クラス準拠)
                 body.radius = Math.sqrt(mass) / 5 + 2;
-
+                
                 const itemNum = 1 + Math.floor(Math.random() * 2);
                 body.items = [];
+                // デバッグ用：全ての星にゴール・エクスパンダーを追加
+                // 基底データの初期化順序に依存せず安全に動作させる
+                const expander = { 
+                    id: 'boost_expander', 
+                    category: 'BOOSTERS', 
+                    name: 'ゴール・エクスパンダー', 
+                    mass: 0, 
+                    slots: 0, 
+                    arcMultiplier: 1.2, 
+                    rarity: 15, // RARE
+                    count: 1,
+                    description: '出口サイズを1.2倍に拡大する。'
+                };
+                body.items.push(expander);
+
                 for (let j = 0; j < itemNum; j++) {
                     const item = this.getWeightedRandomItem();
                     if (item) body.items.push(item);
