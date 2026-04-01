@@ -1,5 +1,4 @@
-__*
-!__init__.py
+tmp_*
 local_*
 node_modules/
 dist/

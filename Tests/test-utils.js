@@ -1,0 +1,71 @@
+import { vi } from 'vitest';
+
+export function setupStandardDOM() {
+    document.body.innerHTML = `
+        <div id="title-screen">
+            <canvas id="title-bg-canvas"></canvas>
+            <canvas id="title-fg-canvas"></canvas>
+            <button id="start-game-btn"></button>
+            <button id="how-to-play-btn"></button>
+        </div>
+        <div id="mission-hud"></div>
+        <div id="terminal-panel">
+            <div class="collapse-btn"><span class="icon">∧</span></div>
+            <div id="chassis-list"></div>
+            <div id="logic-list"></div>
+            <div id="launcher-list"></div>
+            <div id="rocket-list"></div>
+            <div id="logic-option-list"></div>
+            <div id="acc-option-list"></div>
+            <button id="build-btn"></button>
+            <button id="launch-btn"></button>
+        </div>
+        <div id="build-overlay"></div>
+        <div id="launch-control"></div>
+        <div id="result-overlay">
+            <div id="result-title"></div>
+            <div id="result-subtitle"></div>
+            <div id="result-stats-list"></div>
+            <div id="result-items-list"></div>
+            <div id="result-total-score"></div>
+            <div id="result-total-coin"></div>
+            <button id="result-close-btn"></button>
+            <button id="result-view-map-btn"></button>
+            <button id="back-to-result-btn" class="hidden"></button>
+        </div>
+        <div id="event-screen">
+            <div id="event-location"></div>
+            <div id="event-description"></div>
+            <div id="event-content"></div>
+            <div id="event-player-credits"></div>
+            <button id="event-continue-btn"></button>
+            <div id="event-icon"></div>
+        </div>
+        <div id="how-to-play-overlay">
+            <button id="close-help-btn"></button>
+        </div>
+        <div id="star-info-panel" data-item-count="0">
+            <div id="star-info-list"></div>
+            <div id="star-info-title"></div>
+        </div>
+        <div id="receipt-overlay">
+            <div id="receipt-content-area"></div>
+        </div>
+        <div id="score-display">0</div>
+        <div id="coin-display">0</div>
+        <div id="sector-display">1</div>
+        <div id="flight-tab" class="tab-btn" data-tab="flight"></div>
+        <div id="factory-tab" class="tab-btn" data-tab="factory"></div>
+    `;
+
+    // Canvas mock for JSDOM
+    if (!HTMLCanvasElement.prototype.getContext) {
+        HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
+            clearRect: vi.fn(), fillRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(),
+            stroke: vi.fn(), fill: vi.fn(), arc: vi.fn(), save: vi.fn(), restore: vi.fn(),
+            translate: vi.fn(), rotate: vi.fn(), scale: vi.fn(), setTransform: vi.fn(),
+            createLinearGradient: vi.fn().mockReturnValue({ addColorStop: vi.fn() }),
+            drawImage: vi.fn()
+        });
+    }
+}
