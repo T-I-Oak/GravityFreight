@@ -234,7 +234,7 @@ describe('Implementation: Game Core Controllers', () => {
     });
 
     it('should have the correct version', () => {
-        expect(game.version).toBe('0.7.0');
+        expect(game.version).toBe('0.9.0');
     });
 
     it('should persist minimized state when viewing map from result overlay', async () => {
