@@ -61,6 +61,22 @@ describe('Spec: Items & Data (Chapter 4)', () => {
             });
         });
 
+        describe('Launcher Names (New Model Numbers)', () => {
+            it('should have correct LN1200 and PR1000 model names', () => {
+                checkItem('pad_standard_d2', { name: '標準発射台 [LN1200-2]' });
+                checkItem('pad_precision_d2', { name: '精密発射台 [PR1000-2]' });
+            });
+        });
+
+        describe('Booster Enhancement (Arc Expander)', () => {
+            it('should have correct Arc Expander name and 2.0x multiplier', () => {
+                checkItem('boost_expander', { 
+                    name: 'アーク・エクスパンダー',
+                    arcMultiplier: 2.0
+                });
+            });
+        });
+
         describe('Chassis accuracy and rarity', () => {
              it('validation of hull rarity', () => {
                 checkItem('hull_light', { rarity: RARITY.COMMON });

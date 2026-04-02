@@ -55,12 +55,12 @@ export const PARTS = {
         { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
     ],
     LAUNCHERS: [
-        { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LNC-2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的な性能の発射台。' },
-        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PRC-2]', power: 1000, maxCharges: 2, precisionMultiplier: 1.5, rarity: RARITY.COMMON, description: '予測精度を50%向上させた発射台。発射速度は遅い。' },
-        { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LNC-3]', power: 1200, maxCharges: 3, rarity: RARITY.UNCOMMON, description: '標準発射台の耐久力を向上させたモデル。' },
-        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PRC-3]', power: 1000, maxCharges: 3, precisionMultiplier: 1.5, rarity: RARITY.UNCOMMON, description: '精密発射台の耐久力を向上させたモデル。' },
-        { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LNC-4]', power: 1200, maxCharges: 4, rarity: RARITY.RARE, description: '標準発射台の耐久力をさらに向上させたモデル。' },
-        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PRC-4]', power: 1000, maxCharges: 4, precisionMultiplier: 1.5, rarity: RARITY.RARE, description: '精密発射台の耐久力をさらに向上させたモデル。' }
+        { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LN1200-2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的な性能の発射台。' },
+        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PR1000-2]', power: 1000, maxCharges: 2, precisionMultiplier: 1.5, rarity: RARITY.COMMON, description: '予測精度を50%向上させた発射台。発射速度は遅い。' },
+        { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LN1200-3]', power: 1200, maxCharges: 3, rarity: RARITY.UNCOMMON, description: '標準発射台の耐久力を向上させたモデル。' },
+        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PR1000-3]', power: 1000, maxCharges: 3, precisionMultiplier: 1.5, rarity: RARITY.UNCOMMON, description: '精密発射台の耐久力を向上させたモデル。' },
+        { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LN1200-4]', power: 1200, maxCharges: 4, rarity: RARITY.RARE, description: '標準発射台の耐久力をさらに向上させたモデル。' },
+        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PR1000-4]', power: 1000, maxCharges: 4, precisionMultiplier: 1.5, rarity: RARITY.RARE, description: '精密発射台の耐久力をさらに向上させたモデル。' }
     ],
     MODULES: [
         { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: '拡張スロットを追加するモジュール。' },
@@ -80,7 +80,7 @@ export const PARTS = {
         { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', mass: 0, slots: 0, gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間重力を無視して直進する。' },
         { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', mass: 0, slots: 0, powerMultiplier: 1.3, rarity: RARITY.COMMON, description: '発射パワーを30%強化する。' },
         { id: 'boost_magnet', category: 'BOOSTERS', name: 'マグネティック・パルス', mass: 0, slots: 0, rarity: RARITY.RARE, description: '航行時間とともにアイテム回収範囲が拡大する。' },
-        { id: 'boost_expander', category: 'BOOSTERS', name: 'ゴール・エクスパンダー', mass: 0, slots: 0, arcMultiplier: 1.2, rarity: RARITY.RARE, description: '出口サイズを1.2倍に拡大する。' }
+        { id: 'boost_expander', category: 'BOOSTERS', name: 'アーク・エクスパンダー', mass: 0, slots: 0, arcMultiplier: 2.0, rarity: RARITY.RARE, description: '出口サイズを2.0倍に拡大する。' }
     ],
     COIN: [
         { id: 'coin_100', category: 'COIN', name: '100コイン', score: 100, rarity: RARITY.UNCOMMON, description: '通貨。獲得時に100コイン加算される。' },
