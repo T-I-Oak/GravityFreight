@@ -98,11 +98,9 @@ export class UISystem {
             document.getElementById('build-overlay'),
             document.getElementById('launch-btn'),
             document.getElementById('launch-control'),
-            document.getElementById('result-overlay'),
             document.getElementById('event-screen'),
             document.getElementById('how-to-play-overlay'),
-            document.getElementById('star-info-panel'),
-            document.getElementById('receipt-overlay')
+            document.getElementById('star-info-panel')
         ];
     }
 
@@ -131,20 +129,11 @@ export class UISystem {
         // 3. 表示ステータスのサニタイズ (以前のステートの残存スタイルを徹底排除)
         if (titleScreen) {
             titleScreen.classList.add('hidden');
-            titleScreen.style.display = 'none';
-            titleScreen.style.opacity = '0';
-            titleScreen.style.pointerEvents = 'none';
-            titleScreen.style.zIndex = '0';
         }
         this.titleAnimation?.stop();
 
-        // ミッションUI要素の一括リセット (インラインスタイルのクリアと非表示化)
         gameplayElements.forEach(el => {
             if (el) {
-                el.style.display = ''; 
-                el.style.visibility = '';
-                el.style.opacity = '';
-                el.style.pointerEvents = '';
                 el.classList.add('hidden');
             }
         });
@@ -168,7 +157,6 @@ export class UISystem {
                 }
                 if (lc) lc.classList.remove('hidden');
 
-                if (resultOverlay) resultOverlay.classList.add('hidden');
                 if (eventScreen) eventScreen.classList.add('hidden');
                 break;
             }
@@ -184,7 +172,16 @@ export class UISystem {
                 }
                 if (lc) lc.classList.remove('hidden');
                 
-                if (resultOverlay) resultOverlay.classList.add('hidden');
+                if (eventScreen) eventScreen.classList.add('hidden');
+                break;
+            }
+            case 'flying': {
+                const bo = document.getElementById('build-overlay');
+                const lc = document.getElementById('launch-control');
+                
+                if (bo) bo.classList.add('hidden');
+                if (lc) lc.classList.add('hidden');
+                
                 if (eventScreen) eventScreen.classList.add('hidden');
                 break;
             }
@@ -193,18 +190,24 @@ export class UISystem {
                 if (be) {
                     be.classList.remove('hidden');
                     be.classList.add('event-active');
+                    // 【憲法 2.7】イベント開始時に一度だけ最小化する。
+                    // その後ユーザーが手動で開いた場合は、updateUI で閉じ直さない。
+                    if (!game.wasEventPanelMinimized) {
+                        be.querySelector('.panel')?.classList.add('collapsed');
+                        game.wasEventPanelMinimized = true;
+                    }
                 }
                 if (eventScreen) eventScreen.classList.remove('hidden');
-                if (resultOverlay) resultOverlay.classList.add('hidden');
                 break;
             }
             case 'gameover': {
-                if (resultOverlay) resultOverlay.classList.remove('hidden');
-                if (receiptOverlay) receiptOverlay.classList.remove('hidden');
+                // 【仕様 2.6】hidden 操作は showTerminalReport() の単独責任。
                 break;
             }
             case 'result': {
-                if (resultOverlay) resultOverlay.classList.remove('hidden');
+                // 【憲法 2.6】hidden 操作は showResult() の単独責任。
+                // updateUI は result-overlay への操作も、
+                // result ステートでの build-overlay 等への干渉も行わない。
                 const backToResultBtn = document.getElementById('back-to-result-btn');
                 const lc = document.getElementById('launch-control');
                 if (backToResultBtn && !backToResultBtn.classList.contains('hidden')) {
@@ -215,13 +218,13 @@ export class UISystem {
             case 'cleared':
             case 'crashed':
             case 'lost':
-            case 'returned':
-                if (resultOverlay) resultOverlay.classList.add('hidden');
+            case 'returned': {
+                // 【憲法 2.6】hidden 操作は showResult() の単独責任。
                 break;
+            }
             default:
-                if (resultOverlay) resultOverlay.classList.add('hidden');
                 if (eventScreen) eventScreen.classList.add('hidden');
-                break;
+                throw new Error(`Invalid game state: ${game.state}`);
         }
 
         // 5. タブ切り替え・リスト描画などの詳細処理
@@ -239,16 +242,8 @@ export class UISystem {
             tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'flight'));
         }
 
-        // 通貨・スコア表示の即時同期 (アニメーション中でない場合)
-        const scoreDisplay = document.getElementById('score-display');
-        const coinDisplay = document.getElementById('coin-display');
-        const sectorDisplay = document.getElementById('sector-display');
-        const eventCoinDisplay = document.getElementById('event-player-credits');
-        
-        scoreDisplay.textContent = Math.floor(game.displayScore).toLocaleString();
-        coinDisplay.textContent = Math.floor(game.displayCoins).toLocaleString();
-        if (eventCoinDisplay) eventCoinDisplay.textContent = Math.floor(game.displayCoins).toLocaleString();
-        sectorDisplay.textContent = game.sector;
+        // 通貨・スコア表示の即時同期 (Spec 5.1/5.3 準拠)
+        this._updateHUD();
 
         // リストレンダリング実行
         this.renderList('chassis-list', game.inventory.chassis, 'chassis', game.selection.chassis);
@@ -350,9 +345,12 @@ export class UISystem {
     showResult(resultType) {
         const game = this.game;
         const overlay = document.getElementById('result-overlay');
+        if (!overlay) return;
 
-        // 表示状態のリセット（マップ確認からの復帰を保証）
-        if (overlay) overlay.classList.remove('minimized');
+        // 【仕様 2.4】新しいリザルト表示開始時に必ず初期化する
+        this.resetResultOverlay();
+        this._resultDelay = 0.1;
+        const ANIMATION_DURATION = 1.0;
 
         const titleEl = document.getElementById('result-title');
         const subtitleEl = document.getElementById('result-subtitle');
@@ -360,10 +358,8 @@ export class UISystem {
         const itemsList = document.getElementById('result-items-list');
         const scoreTotalEl = document.getElementById('result-total-score');
         const coinTotalEl = document.getElementById('result-total-coin');
-
-        if (scoreTotalEl) scoreTotalEl.textContent = game.launchScore.toLocaleString();
-        if (coinTotalEl) coinTotalEl.textContent = game.launchCoins.toLocaleString();
-        if (!overlay) return;
+        if (scoreTotalEl) scoreTotalEl.textContent = (game.launchScore || 0).toLocaleString();
+        if (coinTotalEl) coinTotalEl.textContent = (game.launchCoins || 0).toLocaleString();
 
         // 【最重要】表示前にすべてのコンテンツ（タイトル等含む）をクリア/更新し、残像を完全に防ぐ
         if (statsList) statsList.innerHTML = '';
@@ -377,9 +373,11 @@ export class UISystem {
             'lost': 'LOST IN SPACE',
             'gameover': 'TERMINAL REPORT'
         };
-        titleEl.textContent = statusText[resultType] || 'MISSION END';
-        subtitleEl.textContent = '';
-        subtitleEl.style.display = 'none';
+        if (titleEl) titleEl.textContent = statusText[resultType] || 'MISSION END';
+        if (subtitleEl) {
+            subtitleEl.textContent = '';
+            subtitleEl.style.display = 'none';
+        }
 
         const closeBtn = document.getElementById('result-close-btn');
         if (closeBtn) {
@@ -394,7 +392,7 @@ export class UISystem {
             closeBtn.textContent = label;
         }
 
-        game.flightResults.status = resultType;
+        if (game.flightResults) game.flightResults.status = resultType;
         overlay.classList.remove('success-theme', 'failure-theme');
         if (resultType === 'gameover') {
             overlay.classList.add('failure-theme');
@@ -402,27 +400,15 @@ export class UISystem {
             overlay.classList.add((resultType === 'success' || resultType === 'cleared' || resultType === 'returned') ? 'success-theme' : 'failure-theme');
         }
 
-        // ここですべての準備が整ってから表示
-        if (resultType !== 'gameover') {
-            overlay.classList.remove('hidden');
-        }
-
         const pendingS = (game.pendingGoalBonus || 0) + (game.pendingScore || 0);
         const pendingC = (game.pendingCoins || 0);
         const pureFlightScore = Math.max(0, game.score - game.launchScore);
         const pureFlightCoins = Math.max(0, game.coins - game.launchCoins);
 
-        game.displayScore = game.launchScore;
-        game.displayCoins = game.launchCoins;
-        
         // ステートを暫定的に更新して updateUI による非表示化を防ぐ
+        // 【重要】すべてのデータ計算とDOM初期化が完了したこのタイミングでステートを切り替える
         if (game.state !== 'result' && game.state !== 'gameover') {
-            game.state = 'result';
-        }
-        this.updateUI();
-        
-        if (resultType === 'gameover') {
-            this.showTerminalReport();
+            game.setState('result');
         }
 
         game.score += pendingS;
@@ -432,61 +418,51 @@ export class UISystem {
         game.pendingScore = 0;
         game.pendingCoins = 0;
 
-        let delay = 0.1; // 初期ディレイを短縮
-        const addRow = (parent, label, value, colorClass, unit = '') => {
-            const row = document.createElement('div');
-            row.className = 'result-row stagger-in';
-            row.style.animationDelay = `${delay}s`;
-            const displayValue = typeof value === 'number' ? 
-                (value >= 0 ? '+' : '') + value.toLocaleString() : 
-                value;
-            const unitText = unit ? ` ${unit}` : '';
-            row.innerHTML = `<span class="label">${label}</span><span class="value ${colorClass}">${displayValue}${unitText}</span>`;
-            parent.appendChild(row);
-            delay += 0.1;
-        };
-
         if (resultType === 'gameover') {
-            addRow(statsList, 'SECTORS COMPLETED ......', game.sector - 1, 'score', 'SCS');
-            addRow(statsList, 'TOTAL DELIVERIES .......', game.totalDeliveries || 0, 'coin', 'PCS');
-            addRow(statsList, 'FINAL SCORE ............', game.score, 'score', 'PTS');
+            this.addRow(statsList, 'SECTORS COMPLETED ......', (game.sector || 1) - 1, 'score', 'SCS');
+            this.addRow(statsList, 'TOTAL DELIVERIES .......', game.totalDeliveries || 0, 'coin', 'PCS');
+            this.addRow(statsList, 'FINAL SCORE ............', game.score || 0, 'score', 'PTS');
         } else {
-            addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
+            this.addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
 
             // ボーナス項目の集計
             const groupedBonuses = new Map();
-            game.flightResults.bonuses.forEach(b => {
-                const entry = groupedBonuses.get(b.name) || { value: 0, coins: 0, count: 0 };
-                entry.value += (b.value || 0);
-                entry.coins += (b.coins || 0);
-                entry.count++;
-                groupedBonuses.set(b.name, entry);
-            });
+            if (game.flightResults && game.flightResults.bonuses) {
+                game.flightResults.bonuses.forEach(b => {
+                    const entry = groupedBonuses.get(b.name) || { value: 0, coins: 0, count: 0 };
+                    entry.value += (b.value || 0);
+                    entry.coins += (b.coins || 0);
+                    entry.count++;
+                    groupedBonuses.set(b.name, entry);
+                });
+            }
 
             groupedBonuses.forEach((data, name) => {
                 const label = data.count > 1 ? `${name} [x ${data.count}]` : name;
-                if (data.value > 0) addRow(statsList, label, data.value, 'score');
+                if (data.value > 0) this.addRow(statsList, label, data.value, 'score');
                 if (data.coins > 0) {
                     const coinLabel = data.value > 0 ? `${label} Coin` : label;
-                    addRow(statsList, coinLabel, data.coins, 'coin');
+                    this.addRow(statsList, coinLabel, data.coins, 'coin');
                 }
             });
 
             let itemCoinTotal = 0;
-            game.flightResults.items.forEach(item => {
-                if (item.category === 'COIN') itemCoinTotal += (item.score || 0);
-                if (item.bonusItems) {
-                    item.bonusItems.forEach(b => {
-                        if (b.category === 'COIN') itemCoinTotal += (b.score || 0);
-                    });
-                }
-            });
+            if (game.flightResults && game.flightResults.items) {
+                game.flightResults.items.forEach(item => {
+                    if (item.category === 'COIN') itemCoinTotal += (item.score || 0);
+                    if (item.bonusItems) {
+                        item.bonusItems.forEach(b => {
+                            if (b.category === 'COIN') itemCoinTotal += (b.score || 0);
+                        });
+                    }
+                });
+            }
 
-            if (itemCoinTotal > 0) addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
+            if (itemCoinTotal > 0) this.addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
         }
 
         const groupedItems = [];
-        if (resultType !== 'crashed' && resultType !== 'lost') {
+        if (resultType !== 'crashed' && resultType !== 'lost' && game.flightResults && game.flightResults.items) {
             game.flightResults.items.forEach(item => {
                 if (!item || !item.id) return;
                 const enhStr = JSON.stringify(item.enhancements || {});
@@ -508,8 +484,8 @@ export class UISystem {
             groupedItems.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'reward-item-card stagger-in';
-                card.style.animationDelay = `${delay}s`;
-                delay += 0.07;
+                card.style.animationDelay = `${this._resultDelay}s`;
+                this._resultDelay += 0.07;
                 const badge = item.isDelivery ? (item.isMatch ? `<span style="color:#44ffbb;font-size:10px;font-weight:800;">✓ DELIVERED</span>` : `<span style="color:#ff7755;font-size:10px;font-weight:800;">✗ UNMATCHED</span>`) : '';
                 card.innerHTML = this.generateCardHTML(item, { badge, showInventory: true });
                 itemsList.appendChild(card);
@@ -526,8 +502,8 @@ export class UISystem {
                     groupedBonuses.forEach(bonus => {
                         const bonusCard = document.createElement('div');
                         bonusCard.className = 'reward-item-card stagger-in';
-                        bonusCard.style.animationDelay = `${delay}s`;
-                        delay += 0.07;
+                        bonusCard.style.animationDelay = `${this._resultDelay}s`;
+                        this._resultDelay += 0.07;
                         bonusCard.innerHTML = this.generateCardHTML(bonus, { indent: 16, showInventory: true });
                         itemsList.appendChild(bonusCard);
                     });
@@ -538,7 +514,37 @@ export class UISystem {
         setTimeout(() => {
             if (scoreTotalEl) this.animateValue(scoreTotalEl, game.launchScore, game.score, ANIMATION_DURATION);
             if (coinTotalEl) this.animateValue(coinTotalEl, game.launchCoins, game.coins, ANIMATION_DURATION);
-        }, delay * 1000);
+        }, this._resultDelay * 1000);
+
+        // 【仕様 2.6/2.7】すべての準備（DOM生成）が完了した後に可視化。
+        // updateUI() による自動介入を排除しているため、ここが唯一の表示タイミングとなる。
+        if (resultType !== 'gameover') {
+            requestAnimationFrame(() => {
+                overlay.classList.remove('hidden');
+                this._updateHUD();
+            });
+        } else {
+            // 【憲法 2.6】hidden 操作は showResult/showTerminalReport の責任
+            overlay.classList.remove('hidden');
+            this._updateHUD();
+            this.showTerminalReport();
+        }
+    }
+
+    /**
+     * 【憲法 2.7】ビルドパネルを強制的に展開（開いた状態）にする。
+     * 呼び出し元: EventSystem (セクター開始時)、および初期化時
+     */
+    expandPanel() {
+        const buildOverlay = document.getElementById('build-overlay');
+        const panel = buildOverlay?.querySelector('.panel');
+        if (panel && panel.classList.contains('collapsed')) {
+            panel.classList.remove('collapsed');
+            const icon = panel.querySelector('.collapse-btn .icon');
+            if (icon) icon.textContent = '∧';
+        }
+        // イベント時の最小化済みフラグもリセットして、次のイベントに備える
+        this.game.wasEventPanelMinimized = false;
     }
 
     ensurePanelExpanded() {
@@ -583,6 +589,7 @@ export class UISystem {
         const hudCoinsEl = document.getElementById('coin-display');
         const startVal = game.displayCoins;
         const endVal = game.displayCoins + amount;
+        const ANIMATION_DURATION = 0.5; // 被ダメージ時などは短縮
 
         if (creditsEl) this.animateValue(creditsEl, startVal, endVal, ANIMATION_DURATION);
         if (hudCoinsEl) this.animateValue(hudCoinsEl, startVal, endVal, ANIMATION_DURATION);
@@ -607,6 +614,9 @@ export class UISystem {
         const content = document.getElementById('receipt-content-area');
         if (!overlay || !content) return;
 
+        // 【修正】無限再帰を防ぐため、ここからは showResult を呼ばない。
+        // showResult('gameover') から本メソッドが呼ばれることを前提とする。
+
         const sectors = game.sector - 1;
         const deliveries = game.totalDeliveries || 0;
         const score = Math.floor(game.score);
@@ -624,7 +634,7 @@ export class UISystem {
             <div class="receipt-row"><span>SECTORS COMPLETED</span><span>${sectors} SCS</span></div>
             <div class="receipt-row"><span>TOTAL DELIVERIES</span><span>${deliveries} PCS</span></div>
             <div class="receipt-divider-solid"></div>
-            <div class="receipt-row total"><span>FINAL SCORE</span><span>${score.toLocaleString()} PTS</span></div>
+            <div class="receipt-row total"><span>FINAL SCORE</span><span>${(score || 0).toLocaleString()} PTS</span></div>
             <div class="receipt-stamp-zone"></div>
             <div class="barcode-container"></div>
             <div class="receipt-footer">
@@ -665,20 +675,23 @@ export class UISystem {
         // ルール5.1に基づき、存在を前提とした警告なしのリセット
         // 全てのゲームプレイ UI をインラインスタイルで強制非表示
         gameplayElements.forEach(el => {
+            if (!el) return;
             el.classList.add('hidden');
-            el.style.display = 'none';
-            el.style.visibility = 'hidden';
-            el.style.opacity = '0';
-            el.style.pointerEvents = 'none';
         });
 
-        // タイトル画面を最前面で強制表示
+        // 【新：責任分離後のクリーンアップ】リストに含まれないリザルト系を個別に隠蔽
+        const res = document.getElementById('result-overlay');
+        const rec = document.getElementById('receipt-overlay');
+        const back = document.getElementById('back-to-result-btn');
+        [res, rec, back].forEach(el => {
+            if (el) {
+                el.classList.add('hidden');
+                el.classList.remove('active', 'minimized'); // ステートのリセット
+            }
+        });
+
+        // タイトル画面を最前面で表示
         titleScreen.classList.remove('hidden');
-        titleScreen.style.display = 'flex';
-        titleScreen.style.visibility = 'visible';
-        titleScreen.style.opacity = '1';
-        titleScreen.style.pointerEvents = 'auto';
-        titleScreen.style.zIndex = '9999'; 
 
         if (!this.titleAnimation) {
             const bg = document.getElementById('title-bg-canvas');
@@ -686,5 +699,115 @@ export class UISystem {
             this.titleAnimation = new TitleAnimation(bg, fg);
         }
         this.titleAnimation.start();
+    }
+
+    /**
+     * 【仕様 2.2】VIEW MAP モードへ移行する。
+     * result-overlay / receipt-overlay に .minimized を付与し、BACK TO RESULT ボタンを表示する。
+     * 呼び出し元: EventSystem（VIEW MAP ボタンクリック時）のみ
+     */
+    enterMapViewMode() {
+        const resultOverlay = document.getElementById('result-overlay');
+        const receiptOverlay = document.getElementById('receipt-overlay');
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        if (resultOverlay) resultOverlay.classList.add('minimized');
+        if (receiptOverlay) receiptOverlay.classList.add('minimized');
+        if (backToResultBtn) backToResultBtn.classList.remove('hidden');
+    }
+
+    /**
+     * 【仕様 2.2】VIEW MAP モードからリザルト画面に戻る。
+     * .minimized を削除し、BACK TO RESULT ボタンを非表示にする。
+     * 呼び出し元: EventSystem（BACK TO RESULT ボタンクリック時）のみ
+     */
+    exitMapViewMode() {
+        const resultOverlay = document.getElementById('result-overlay');
+        const receiptOverlay = document.getElementById('receipt-overlay');
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        if (resultOverlay) resultOverlay.classList.remove('minimized');
+        if (receiptOverlay) receiptOverlay.classList.remove('minimized');
+        if (backToResultBtn) backToResultBtn.classList.add('hidden');
+        this.game.updateUI();
+    }
+
+    /**
+     * 【仕様 2.4】新しいリザルト表示開始時に呼び出す。
+     * .minimized を削除し、BACK ボタンを初期化する。
+     * 呼び出し元: showResult() のみ
+     */
+    resetResultOverlay() {
+        const resultOverlay = document.getElementById('result-overlay');
+        const receiptOverlay = document.getElementById('receipt-overlay');
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        
+        // 【重要】クラスだけでなく内容も即座にクリアして残像を防ぐ
+        const titleEl = document.getElementById('result-title');
+        const subtitleEl = document.getElementById('result-subtitle');
+        const statsList = document.getElementById('result-stats-list');
+        const itemsList = document.getElementById('result-items-list');
+
+        if (titleEl) titleEl.textContent = '';
+        if (subtitleEl) subtitleEl.textContent = '';
+        if (statsList) statsList.innerHTML = '';
+        if (itemsList) itemsList.innerHTML = '';
+
+        if (resultOverlay) {
+            resultOverlay.classList.remove('minimized');
+            resultOverlay.classList.add('hidden'); // 一旦隠すことを保証
+            
+            // 【最重要】強制リフロー (Forced Reflow)
+            // ブラウザに「今、この瞬間に隠れた状態である」ことを認識させ、
+            // CSS アニメーションやレンダリング状態を確実にリセットする。
+            void resultOverlay.offsetWidth;
+        }
+        if (receiptOverlay) receiptOverlay.classList.remove('minimized');
+        if (backToResultBtn) backToResultBtn.classList.add('hidden');
+    }
+
+    _updateHUD() {
+        const game = this.game;
+        const scoreDisplay = document.getElementById('score-display');
+        const coinDisplay = document.getElementById('coin-display');
+        const sectorDisplay = document.getElementById('sector-display');
+        const eventCoinDisplay = document.getElementById('event-player-credits');
+        
+        if (scoreDisplay) scoreDisplay.textContent = Math.floor(game.displayScore || 0).toLocaleString();
+        if (coinDisplay) coinDisplay.textContent = Math.floor(game.displayCoins || 0).toLocaleString();
+        if (eventCoinDisplay) eventCoinDisplay.textContent = Math.floor(game.displayCoins || 0).toLocaleString();
+        if (sectorDisplay) sectorDisplay.textContent = game.sector;
+    }
+
+    addRow(parent, label, value, colorClass, unit = '') {
+        if (!parent) return;
+        const row = document.createElement('div');
+        row.className = 'result-row stagger-in';
+        row.style.animationDelay = `${this._resultDelay}s`;
+        const displayValue = typeof value === 'number' ? 
+            (value >= 0 ? '+' : '') + value.toLocaleString() : 
+            value;
+        const unitText = unit ? ` ${unit}` : '';
+        row.innerHTML = `<span class="label">${label}</span><span class="value ${colorClass}">${displayValue}${unitText}</span>`;
+        parent.appendChild(row);
+        this._resultDelay += 0.1;
+    }
+
+    animateValue(element, start, end, duration) {
+        if (!element) return;
+        const startTime = performance.now();
+        const update = (now) => {
+            const elapsed = (now - startTime) / (duration * 1000);
+            if (elapsed < 1) {
+                const current = Math.floor(start + (end - start) * elapsed);
+                element.textContent = current.toLocaleString();
+                requestAnimationFrame(update);
+            } else {
+                element.textContent = end.toLocaleString();
+            }
+        };
+        requestAnimationFrame(update);
+    }
+
+    showStatus(message, type = 'info') {
+        // 現在はログ出力を抑制。将来的に UI でのメッセージ表示に使用可能。
     }
 }

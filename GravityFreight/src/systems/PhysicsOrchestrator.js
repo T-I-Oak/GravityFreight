@@ -86,6 +86,10 @@ export class PhysicsOrchestrator {
 
         // トレイルの更新 (0.01s ごと)
         if (game.simulatedTime % 0.01 < dt) {
+            // 5.1 規約に基づき、ガードではなくアサーティブに振る舞う
+            if (!ship.trail) {
+                throw new Error("Critical: ship.trail is undefined during flight. Check initialization in EventSystem.");
+            }
             ship.trail.push(new Vector2(ship.position.x, ship.position.y));
             if (ship.trail.length > 40) ship.trail.shift();
         }

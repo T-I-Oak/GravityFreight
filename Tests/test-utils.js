@@ -8,8 +8,8 @@ export function setupStandardDOM() {
             <button id="start-game-btn"></button>
             <button id="how-to-play-btn"></button>
         </div>
-        <div id="mission-hud"></div>
-        <div id="terminal-panel">
+        <div id="mission-hud" class="hidden"></div>
+        <div id="terminal-panel" class="hidden">
             <div class="collapse-btn"><span class="icon">∧</span></div>
             <div id="chassis-list"></div>
             <div id="logic-list"></div>
@@ -20,9 +20,9 @@ export function setupStandardDOM() {
             <button id="build-btn"></button>
             <button id="launch-btn"></button>
         </div>
-        <div id="build-overlay"></div>
-        <div id="launch-control"></div>
-        <div id="result-overlay">
+        <div id="build-overlay" class="hidden"></div>
+        <div id="launch-control" class="hidden"></div>
+        <div id="result-overlay" class="hidden">
             <div id="result-title"></div>
             <div id="result-subtitle"></div>
             <div id="result-stats-list"></div>
@@ -33,7 +33,7 @@ export function setupStandardDOM() {
             <button id="result-view-map-btn"></button>
             <button id="back-to-result-btn" class="hidden"></button>
         </div>
-        <div id="event-screen">
+        <div id="event-screen" class="hidden">
             <div id="event-location"></div>
             <div id="event-description"></div>
             <div id="event-content"></div>
@@ -41,14 +41,14 @@ export function setupStandardDOM() {
             <button id="event-continue-btn"></button>
             <div id="event-icon"></div>
         </div>
-        <div id="how-to-play-overlay">
+        <div id="how-to-play-overlay" class="hidden">
             <button id="close-help-btn"></button>
         </div>
-        <div id="star-info-panel" data-item-count="0">
+        <div id="star-info-panel" class="hidden" data-item-count="0">
             <div id="star-info-list"></div>
             <div id="star-info-title"></div>
         </div>
-        <div id="receipt-overlay">
+        <div id="receipt-overlay" class="hidden">
             <div id="receipt-content-area"></div>
         </div>
         <div id="score-display">0</div>

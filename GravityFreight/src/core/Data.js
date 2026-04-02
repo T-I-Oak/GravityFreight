@@ -75,7 +75,7 @@ export const PARTS = {
         { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '境界復帰時の予測軌道を表示。' }
     ],
     BOOSTERS: [
-        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '20%強化された燃料を供給するブースター。' },
+        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, rarity: RARITY.COMMON, description: '20%強化された燃料を供給するブースター。' },
         { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '2回分の高反応燃料を供給するブースター。' },
         { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', mass: 0, slots: 0, gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間重力を無視して直進する。' },
         { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', mass: 0, slots: 0, powerMultiplier: 1.3, rarity: RARITY.COMMON, description: '発射パワーを30%強化する。' },
@@ -87,9 +87,9 @@ export const PARTS = {
         { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO', name: 'TRADE SUPPLIES', mass: 1, deliveryGoalId: 'SAFE', rarity: RARITY.UNCOMMON, description: '交易所への配送用物資。' },
-        { id: 'cargo_normal', category: 'CARGO', name: 'REPAIR PARTS', mass: 1, deliveryGoalId: 'NORMAL', rarity: RARITY.UNCOMMON, description: '整備ドックへの配送用パーツ。' },
-        { id: 'cargo_danger', category: 'CARGO', name: 'ENCRYPTED DATA', mass: 1, deliveryGoalId: 'DANGER', rarity: RARITY.UNCOMMON, description: '闇市場への配送用データ。' },
+        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', mass: 1, deliveryGoalId: 'SAFE', rarity: RARITY.UNCOMMON, description: '交易所への配送用物資。' },
+        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', mass: 1, deliveryGoalId: 'NORMAL', rarity: RARITY.UNCOMMON, description: '整備ドックへの配送用パーツ。' },
+        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', mass: 1, deliveryGoalId: 'DANGER', rarity: RARITY.UNCOMMON, description: '闇市場への配送用データ。' },
         { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: '施設での消費コインが軽減される。重複可。' }
     ]
 };
@@ -105,8 +105,8 @@ export const INITIAL_INVENTORY = {
         { id: 'sensor_normal', count: 1 }
     ],
     launchers: [
-        { id: 'pad_standard_d2', charges: 2 },
-        { id: 'pad_precision_d2', charges: 2 }
+        { id: 'pad_standard_d2', count: 1, charges: 2 },
+        { id: 'pad_precision_d2', count: 1, charges: 2 }
     ],
     modules: [
         { id: 'mod_analyzer', count: 1 }

@@ -1,5 +1,5 @@
+import { GOAL_COLORS, GOAL_NAMES, hexToRgba } from '../core/Data.js';
 import { Vector2 } from '../utils/Physics.js';
-import { PARTS, GOAL_NAMES, GOAL_COLORS, hexToRgba } from '../core/Data.js';
 
 export class EventSystem {
     constructor(game) {
@@ -7,286 +7,122 @@ export class EventSystem {
         this.pendingTimers = [];
     }
 
-    clearPendingTimers() {
-        this.pendingTimers.forEach(t => clearTimeout(t));
-        this.pendingTimers = [];
-    }
-
-    launch() {
-        const game = this.game;
-        if (game.state === 'aiming') {
-            const dir = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation));
-            let power = game.selection.launcher ? game.selection.launcher.power : 1200;
-            if (game.selection.booster?.powerMultiplier) power *= game.selection.booster.powerMultiplier;
-
-            const rocket = game.selection.rocket;
-            game.ship.mass = rocket.mass || 10;
-            const massFactor = Math.sqrt(10 / game.ship.mass);
-            game.ship.velocity = dir.scale(power * massFactor);
-
-            game.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
-            game.launchScore = game.score;
-            game.launchCoins = game.coins;
-
-            game.ship.gravityMultiplier = game.selection.rocket.gravityMultiplier;
-            game.ship.pickupRange = game.selection.rocket.pickupRange;
-            game.ship.pickupMultiplier = game.selection.rocket.pickupMultiplier;
-            game.ship.arcMultiplier = game.selection.rocket.arcMultiplier || 1.0;
-            if (game.selection.booster?.arcMultiplier) game.ship.arcMultiplier *= game.selection.booster.arcMultiplier;
-
-            game.activeBoosterAtLaunch = game.selection.booster ? { ...game.selection.booster } : null;
-            game.ship.equippedModules = [];
-            for (const [mInstId, mData] of Object.entries(game.selection.rocket.modules)) {
-                // mData は組み立て時に作成されたクローンオブジェクト
-                const count = mData.count || 1;
-                for (let i = 0; i < count; i++) {
-                    game.ship.equippedModules.push({ ...mData, instanceId: mInstId });
-                }
-            }
-
-            if (game.selection.booster?.gravityMultiplier !== undefined) {
-                game.ship.activeBoosterEffect = {
-                    type: 'gravityMultiplier',
-                    value: game.selection.booster.gravityMultiplier,
-                    duration: game.selection.booster.duration
-                };
-            }
-
-            if (game.selection.booster) {
-                const b = game.selection.booster;
-                if (b.maxCharges && b.maxCharges > 1) {
-                    if (b.charges === undefined) b.charges = b.maxCharges;
-                    b.charges--;
-                    if (b.charges <= 0) {
-                        game.inventory.boosters = game.inventory.boosters.filter(o => o !== b);
-                        game.selection.booster = null;
-                    }
-                } else {
-                    b.count--;
-                    if (b.count <= 0) {
-                        game.inventory.boosters = game.inventory.boosters.filter(o => o.count > 0);
-                        game.selection.booster = null;
-                    }
-                }
-            }
-
-            if (game.selection.launcher && !(game.selection.booster?.preventsLauncherWear)) {
-                game.selection.launcher.charges--;
-                if (game.selection.launcher.charges <= 0) {
-                    game.inventory.launchers = game.inventory.launchers.filter(p => p !== game.selection.launcher);
-                    game.selection.launcher = null;
-                }
-            }
-
-            game.ship.trail = [];
-            game.ship.isSafeToReturn = false;
-            if (game.homeStar.items?.length > 0) {
-                game.homeStar.items.forEach(item => {
-                    game.pendingItems.push({ itemData: item, originalBody: game.homeStar, collectedTime: game.simulatedTime });
-                });
-                game.homeStar.items = [];
-            }
-
-
-            game.state = 'flying';
-            game.launchTime = game.simulatedTime;
-            game.accumulator = 0;
-            game.isFactoryOpen = false;
-            game.updateUI();
-        } else if (game.state === 'crashed' || game.state === 'cleared') {
-            game.reset();
-        }
-    }
-
     setupListeners() {
         const game = this.game;
 
-        const updatePointer = (e) => {
-            game.mousePos.x = e.clientX;
-            game.mousePos.y = e.clientY;
-            if (game.state === 'aiming' && game.isPointerDown) {
-                const center = game.homeStar.position;
-                const mouseWorld = game.getWorldPos(game.mousePos);
-                game.ship.rotation = Math.atan2(mouseWorld.y - center.y, mouseWorld.x - center.x);
-                
-                // 惑星の表面から一定距離(12)の位置に自機を配置
-                const offset = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation)).scale(game.homeStar.radius + 12);
-                game.ship.position = center.add(offset);
-                
-                game.updateUI();
-            }
+        const canvas = game.canvas;
+        canvas.onmousedown = (e) => game.onMouseDown(e);
+        window.onmousemove = (e) => game.onMouseMove(e);
+        window.onmouseup = (e) => game.onMouseUp(e);
+        canvas.onwheel = (e) => {
+            e.preventDefault();
+            game.onWheel(e);
         };
 
-        window.addEventListener('pointerdown', (e) => {
-            game.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-            const isUI = e.target !== game.canvas || 
-                         e.target.closest('#terminal-panel') || 
-                         e.target.closest('#build-overlay') || 
-                         e.target.closest('#launch-control') || 
-                         e.target.closest('#result-overlay') || 
-                         e.target.closest('#event-screen') || 
-                         e.target.closest('#how-to-play-overlay') ||
-                         e.target.closest('.tooltip-card-wrapper');
-            game.isAimingInteraction = !isUI;
-            if (isUI) return;
-            game.isPointerDown = true;
-
-            const starScreen = game.getScreenPos(game.homeStar.position);
-            const dist = Math.hypot(e.clientX - starScreen.x, e.clientY - starScreen.y);
-            
-            // 境界（Exit/Lostの円）の現在の画面上の半径を計算
-            const visualBoundary = game.boundaryRadius * game.zoom;
-            
-            if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
-                game.isPanning = true;
-                game.panStart = new Vector2(e.clientX, e.clientY);
-                game.canvas.style.cursor = 'grabbing';
-                e.preventDefault();
-                return;
-            }
-
-            // 境界外でのドラッグ開始ならマップ回転モード
-            if (dist > visualBoundary && (game.state === 'building' || game.state === 'aiming' || game.state === 'flying')) {
-                game.isRotatingMap = true;
-                game.lastRotationAngle = Math.atan2(e.clientY - starScreen.y, e.clientX - starScreen.x);
-                game.canvas.style.cursor = 'ew-resize';
-            } else {
-                game.isRotatingMap = false;
-            }
-
-            if (game.activePointers.size === 2) {
-                const pts = Array.from(game.activePointers.values());
-                game.lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-            }
-            updatePointer(e);
-            if (game.state === 'crashed' || game.state === 'cleared') this.launch();
-        });
-
-        window.addEventListener('pointermove', (e) => {
-            const centerX = game.canvas.width / 2;
-            const centerY = game.canvas.height / 2;
-
-            if (game.isPanning) {
-                const dx = e.clientX - game.panStart.x;
-                const dy = e.clientY - game.panStart.y;
-                game.cameraOffset.x += dx;
-                game.cameraOffset.y += dy;
-                game.panStart = new Vector2(e.clientX, e.clientY);
-                return;
-            }
-
-            if (game.isRotatingMap) {
-                const starScreen = game.getScreenPos(game.homeStar.position);
-                const currentAngle = Math.atan2(e.clientY - starScreen.y, e.clientX - starScreen.x);
-                let delta = currentAngle - game.lastRotationAngle;
-                // 角度の不連続点（-PIからPIの境界）を考慮
-                while (delta > Math.PI) delta -= Math.PI * 2;
-                while (delta < -Math.PI) delta += Math.PI * 2;
-                
-                game.mapRotation += delta;
-                game.lastRotationAngle = currentAngle;
-                return;
-            }
-            if (game.activePointers.has(e.pointerId)) game.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-            if (game.activePointers.size === 2) {
-                const pts = Array.from(game.activePointers.values());
-                const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-                if (game.lastPointersPos) {
-                    const currentMid = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
-                    const lastMid = { x: (game.lastPointersPos[0].x + game.lastPointersPos[1].x) / 2, y: (game.lastPointersPos[0].y + game.lastPointersPos[1].y) / 2 };
-                    game.cameraOffset.x += currentMid.x - lastMid.x; game.cameraOffset.y += currentMid.y - lastMid.y;
-                }
-                if (game.lastPinchDist > 0) {
-                    const factor = dist / game.lastPinchDist;
-                    game.zoom = Math.max(0.3, Math.min(game.zoom * factor, 5.0));
-                }
-                game.lastPinchDist = dist; game.lastPointersPos = pts;
-                if (e.cancelable) e.preventDefault();
-            } else { game.lastPointersPos = null; updatePointer(e); }
-        });
-
-        const endPointer = (e) => {
-            if (game.isPanning) { game.isPanning = false; game.canvas.style.cursor = 'crosshair'; }
-            if (game.isRotatingMap) { game.isRotatingMap = false; game.canvas.style.cursor = 'crosshair'; }
-            game.activePointers.delete(e.pointerId);
-            if (game.activePointers.size === 0) { game.isPointerDown = false; game.isAimingInteraction = false; }
-            if (game.activePointers.size < 2) game.lastPinchDist = 0;
-        };
-        window.addEventListener('pointerup', endPointer);
-        window.addEventListener('pointercancel', endPointer);
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        // タブ切り替え
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
             btn.onclick = () => {
                 game.isFactoryOpen = (btn.getAttribute('data-tab') === 'factory');
                 game.updateUI();
             };
         });
 
-        const terminalPanel = document.getElementById('terminal-panel');
-        const collapseBtn = terminalPanel?.querySelector('.collapse-btn');
-        if (collapseBtn && terminalPanel) {
-            collapseBtn.onclick = (e) => {
-                e.stopPropagation(); // ヘッダー等への伝播防止
-                terminalPanel.classList.toggle('collapsed');
+        // 組み立てボタン
+        const buildBtn = document.getElementById('build-btn');
+        if (buildBtn) {
+            buildBtn.onclick = () => {
+                game.assemblySystem.assembleRocket();
             };
         }
 
-        window.addEventListener('keydown', (e) => { if (e.code === 'Space') this.launch(); });
-        window.addEventListener('wheel', (e) => {
-            const isUI = e.target !== game.canvas || 
-                         e.target.closest('#terminal-panel') || 
-                         e.target.closest('#build-overlay') || 
-                         e.target.closest('#launch-control') || 
-                         e.target.closest('#result-overlay') || 
-                         e.target.closest('#event-screen') || 
-                         e.target.closest('#how-to-play-overlay') ||
-                         e.target.closest('.tooltip-card-wrapper');
-            
-            if (isUI) return;
-
-            if (e.deltaY < 0) game.zoom *= 1.1; else game.zoom /= 1.1;
-            game.zoom = Math.max(0.3, Math.min(game.zoom, 5.0));
-        }, { passive: false });
-
-        document.getElementById('build-btn').onclick = () => game.assembleRocket();
-        document.getElementById('launch-btn').onclick = (e) => { e.stopPropagation(); this.launch(); };
-        document.getElementById('result-close-btn').onclick = () => game.closeResult();
-
-        // リザルト画面のマップ確認ボタンの制御
-        const viewMapBtn = document.getElementById('result-view-map-btn');
-        const backToResultBtn = document.getElementById('back-to-result-btn');
-        const resultOverlay = document.getElementById('result-overlay');
+        // 発射ボタン
         const launchBtn = document.getElementById('launch-btn');
-
-        if (viewMapBtn && backToResultBtn && resultOverlay) {
-            viewMapBtn.onclick = (e) => {
-                if (e) e.stopPropagation();
-                resultOverlay.classList.add('minimized');
-                backToResultBtn.classList.remove('hidden');
-                if (launchBtn) launchBtn.classList.add('hidden');
-                
-                // レシートが表示されている場合は一時的に隠す
-                const receiptOverlay = document.getElementById('receipt-overlay');
-                if (receiptOverlay) receiptOverlay.classList.remove('active');
-
-                // UIコンテナの表示状態を同期
-                game.updateUI();
+        if (launchBtn) {
+            launchBtn.onclick = () => {
+                this.launch();
             };
-            backToResultBtn.onclick = (e) => {
-                if (e) e.stopPropagation();
-                resultOverlay.classList.remove('minimized');
-                backToResultBtn.classList.add('hidden');
+        }
 
-                // ゲームオーバー状態ならレシートを再表示
-                if (game.state === 'gameover') {
-                    const receiptOverlay = document.getElementById('receipt-overlay');
-                    if (receiptOverlay) receiptOverlay.classList.add('active');
+        // 結果画面を閉じるボタン
+        const closeResultBtn = document.getElementById('result-close-btn');
+        if (closeResultBtn) {
+            closeResultBtn.onclick = () => {
+                this.closeResult();
+            };
+        }
+
+        // ターミナルパネルの開閉
+        const collapseBtn = document.getElementById('terminal-collapse-btn');
+        if (collapseBtn) {
+            collapseBtn.onclick = () => {
+                const terminalPanel = document.getElementById('terminal-panel');
+                terminalPanel.classList.toggle('collapsed');
+                const icon = collapseBtn.querySelector('.icon');
+                if (icon) {
+                    icon.textContent = terminalPanel.classList.contains('collapsed') ? '∨' : '∧';
                 }
+            };
+        }
 
-                // UIコンテナの表示状態を同期
+        // マップ確認ボタン (リザルト・レシート画面用)
+        const checkMapBtn = document.getElementById('result-view-map-btn');
+        if (checkMapBtn) {
+            checkMapBtn.onclick = () => {
+                // 【仕様 2.6】classList を直接操作せず UISystem の専用メソッドを呼ぶ
+                game.uiSystem.enterMapViewMode();
                 game.updateUI();
             };
         }
+
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        if (backToResultBtn) {
+            backToResultBtn.onclick = () => {
+                // 【仕様 2.2】classList の直接操作は UISystem のメソッドに閉じる
+                // exitMapViewMode() は内部で updateUI() を呼ぶ
+                game.uiSystem.exitMapViewMode();
+            };
+        }
+
+        // インベントリの各タブ
+        const sectionTabs = document.querySelectorAll('.section-tab');
+        sectionTabs.forEach(tab => {
+            tab.onclick = () => {
+                const target = tab.getAttribute('data-section');
+                const lists = document.querySelectorAll('.inventory-list');
+                lists.forEach(l => l.classList.add('hidden'));
+                document.getElementById(`${target}-list`)?.classList.remove('hidden');
+                
+                sectionTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            };
+        });
+
+        // キーボードショートカット
+        window.onkeydown = (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                // Rキーで結果画面を閉じる（ショートカット）
+                if (game.state === 'result') this.closeResult();
+            }
+            if (e.key === 'm' || e.key === 'M') {
+                 // Mキーでマップ確認（トグル）
+                 const backBtn = document.getElementById('back-to-result-btn');
+                 if (backBtn && !backBtn.classList.contains('hidden')) {
+                     backBtn.click();
+                 } else {
+                     checkMapBtn?.click();
+                 }
+            }
+            
+            // ゲームオーバー状態ならレシートを再表示
+            if (game.state === 'gameover') {
+                const receiptOverlay = document.getElementById('receipt-overlay');
+                if (receiptOverlay) receiptOverlay.classList.add('active');
+            }
+
+            // UIコンテナの表示状態を同期
+            game.updateUI();
+        };
 
         // タイトル画面のリスナー
         const startBtn = document.getElementById('start-game-btn');
@@ -294,16 +130,14 @@ export class EventSystem {
             startBtn.onclick = () => {
                 const titleScreen = document.getElementById('title-screen');
                 if (titleScreen) {
-                    titleScreen.style.opacity = '0';
+                    titleScreen.classList.add('hidden'); // CSS transition (1s) が発動
                     const timer = setTimeout(() => {
-                        game.state = 'building';
-                        game.updateUI();
+                        game.setState('building');
                         this.pendingTimers = this.pendingTimers.filter(t => t !== timer);
-                    }, 1000); // CSSの1s transitionに合わせる
+                    }, 1000); 
                     this.pendingTimers.push(timer);
                 } else {
-                    game.state = 'building';
-                    game.updateUI();
+                    game.setState('building');
                 }
             };
         }
@@ -336,32 +170,37 @@ export class EventSystem {
             const item = game.inventory.modules.find(o => o.instanceId === instanceId);
             if (!item) return;
             game.inventorySystem.selectOption(instanceId, (current < item.count) ? current + 1 : 0);
+            game.checkReadyToAim();
         } else if (type === 'booster') {
             const opt = game.inventory.boosters.find(o => o.instanceId === instanceId);
             game.selection.booster = (game.selection.booster === opt) ? null : opt;
-            game.updateUI();
+            game.checkReadyToAim();
         }
     }
 
     checkReadyToAim() {
         const game = this.game;
         if (game.selection.rocket && game.selection.launcher) {
-            game.state = 'aiming';
+            game.setState('aiming');
             
-            // 安全な ship オブジェクトの初期化
+            // 5.1 コーディング原則に基づき、既存 ship オブジェクトがあっても
+            // 新しいエイミング開始時にランタイムプロパティを確実に再初期化する。
             if (!game.ship) {
                 const centerX = game.canvas.width / 2;
                 const centerY = game.canvas.height / 2;
                 game.ship = {
                     position: new Vector2(centerX, centerY - 25 - 12),
                     velocity: new Vector2(),
-                    rotation: -Math.PI / 2,
-                    trail: [],
-                    collectedItems: []
+                    rotation: -Math.PI / 2
                 };
             }
-            // 原則 5.1 に基づき、既存 ship がある場合も velocity を確実に 0 にリセットして不一致を防止
+            
+            // 既存または新規の ship オブジェクトに対してプロパティを保証（初期化漏れを防止）
+            game.ship.trail = [];
+            game.ship.collectedItems = [];
+            game.ship.equippedModules = [];
             game.ship.velocity = new Vector2(0, 0);
+            game.ship.isSafeToReturn = false;
 
             if (game.ship.rotation === undefined) game.ship.rotation = -Math.PI / 2;
 
@@ -370,30 +209,94 @@ export class EventSystem {
             const resetOffset = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation)).scale(game.homeStar.radius + 12);
             game.ship.position = homePos.add(resetOffset);
 
-            game.updateUI();
-            if (typeof addLog !== 'undefined') addLog("AIMING MODE: PREDICTING ORBIT...");
-            
+            // 性能計算 (モジュール・ブースターの影響を統合)
             const r = game.selection.rocket;
+            const l = game.selection.launcher;
             const b = game.selection.booster;
-            game.ship.mass = r.mass + (b?.mass || 0);
-            game.ship.pickupRange = r.pickupRange + (b?.pickupRange || 0);
-            let pMult = r.precisionMultiplier || 1.0;
-            let pickMult = r.pickupMultiplier || 1.0;
-            let gMult = r.gravityMultiplier || 1.0;
-            let aMult = r.arcMultiplier || 1.0;
+
+            let pMult = l.precisionMultiplier || 1.0;
+            let pickMult = 1.0;
+            let gMult = 1.0;
+            let aMult = 1.0;
+
             if (b) {
                 if (b.precisionMultiplier) pMult *= b.precisionMultiplier;
                 if (b.pickupMultiplier) pickMult *= b.pickupMultiplier;
                 if (b.gravityMultiplier) gMult *= b.gravityMultiplier;
                 if (b.arcMultiplier) aMult *= b.arcMultiplier;
             }
-            game.ship.pickupMultiplier = pickMult;
+
+            // 装備中モジュールの効果
+            game.ship.equippedModules = [];
+            if (r.modules) {
+                for (const [mid, count] of Object.entries(r.modules)) {
+                    const m = game.inventory.modules.find(item => item.id === mid);
+                    if (m) {
+                        for (let i = 0; i < count; i++) {
+                            game.ship.equippedModules.push({ ...m });
+                            if (m.precisionMultiplier) pMult *= m.precisionMultiplier;
+                            if (m.pickupMultiplier) pickMult *= m.pickupMultiplier;
+                            if (m.gravityMultiplier) gMult *= m.gravityMultiplier;
+                            if (m.arcMultiplier) aMult *= m.arcMultiplier;
+                        }
+                    }
+                }
+            }
+
+            game.ship.pickupRange = 100 * pickMult;
             game.ship.gravityMultiplier = gMult;
             game.ship.arcMultiplier = aMult;
             game.ship.precision = r.totalPrecision * pMult;
+
+            game.updateUI();
         } else {
-            game.state = 'building';
+            game.setState('building');
         }
+    }
+
+    launch() {
+        const game = this.game;
+        if (game.state !== 'aiming') return;
+
+        const l = game.selection.launcher;
+        const r = game.selection.rocket;
+        const b = game.selection.booster;
+
+        if (l.charges <= 0) {
+            game.showStatus('発射台の残り回数がありません。', 'error');
+            return;
+        }
+
+        game.setState('flying');
+        game.activeBoosterAtLaunch = b ? { ...b } : null;
+
+        let power = l.power * (r.powerMultiplier || 1);
+        if (b && b.powerMultiplier) power *= b.powerMultiplier;
+
+        const angle = game.ship.rotation;
+        const massFactor = Math.sqrt(10 / game.ship.mass);
+        game.ship.velocity = new Vector2(Math.cos(angle) * (power * massFactor), Math.sin(angle) * (power * massFactor));
+
+        l.charges--;
+        if (l.charges <= 0) {
+            game.inventorySystem.removeItem('launchers', l.instanceId);
+            game.selection.launcher = null;
+            game.showStatus('ランチャーの耐久度が尽きました。', 'info');
+        }
+
+        if (b && !b.preventsLauncherWear) {
+            // ブースター自体の回数消費が必要な場合はここで行う
+        }
+
+        // インベントリから使用したブースターを削除 (Spec 5.3.242)
+        if (game.selection.booster) {
+            game.inventorySystem.removeItem('boosters', game.selection.booster.instanceId);
+            game.selection.booster = null;
+        }
+
+        game.launchScore = game.score;
+        game.launchCoins = game.coins;
+        game.updateUI();
     }
 
     closeResult() {
@@ -409,7 +312,7 @@ export class EventSystem {
         if (status === 'success' || status === 'cleared') {
             if (game.lastHitGoal) { game.handleEvent(game.lastHitGoal); return; }
         }
-        game.state = 'building';
+        game.setState('building');
         if (status !== 'returned') game.selection.rocket = null;
         game.selection.launcher = null;
         game.selection.booster = null;
@@ -421,7 +324,7 @@ export class EventSystem {
         const game = this.game;
         const screen = document.getElementById('event-screen');
         if (!screen) return;
-        game.state = 'event';
+        game.setState('event');
         
         // 割引率は MissionSystem.resolveItems によって航行終了時に確定済み
 
@@ -473,19 +376,20 @@ export class EventSystem {
         const game = this.game;
         document.getElementById('event-screen')?.classList.add('hidden');
         
-        // パネルを元の状態（展開）に戻す
-        document.getElementById('terminal-panel')?.classList.remove('collapsed');
-
         game.currentShopStock = null;
         game.tempDismantleResults = null;
         if (game.missionSystem.isGameOver()) { game.uiSystem.showResult('gameover'); return; }
         game.stageLevel++;
         game.initStage(game.currentStarCount);
-        game.state = 'building';
+        game.setState('building');
         game.selection.rocket = null;
         game.selection.launcher = null;
         game.selection.booster = null;
         game.reset();
-        game.updateUI(); // ステート変更を各パネルに反映
+    }
+
+    clearPendingTimers() {
+        this.pendingTimers.forEach(timer => clearTimeout(timer));
+        this.pendingTimers = [];
     }
 }

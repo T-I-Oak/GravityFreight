@@ -57,6 +57,26 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
             // Total weight = 19 + 14 + 9 = 42
             // Probability of RARE = 9 / 42 ~= 21.4% (Higher than sector 2: 1 / (11+6+1) = 5.5%)
         });
+
+        it('Stage Generation: should respect item count and rarity constraints', () => {
+            // 第1セクターの制約検証 (Spec 7.2 / 7.5)
+            game.stageLevel = 1;
+            game.missionSystem.initStage(5); // 5つの星を生成
+            
+            game.bodies.forEach(body => {
+                if (body.isHome) return;
+                
+                // 配置数の検証 (Spec 7.2.290: 1〜2個)
+                const itemCount = body.items.length;
+                expect(itemCount, `Star at (${Math.round(body.position.x)}, ${Math.round(body.position.y)}) should have 1-2 items, but found ${itemCount}`).toBeGreaterThanOrEqual(1);
+                expect(itemCount, `Star at (${Math.round(body.position.x)}, ${Math.round(body.position.y)}) should have 1-2 items, but found ${itemCount}`).toBeLessThanOrEqual(2);
+
+                // レアリティの検証 (Spec 7.5.315: 第1セクターでは RARE 不可)
+                body.items.forEach(item => {
+                    expect(item.rarity, `Item ${item.name} with rarity ${item.rarity} should not appear in Sector 1`).toBeLessThan(15);
+                });
+            });
+        });
     });
 
     describe('7.3 Economy & Insurance', () => {
@@ -96,6 +116,31 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
             game.resolveItems('lost');
             
             expect(game.pendingCoins).toBe(240);
+        });
+    });
+
+    describe('7.1 Goal Passing Reward & Mission Success', () => {
+        it('should grant total rewards (Base + Bonus) when reaching a goal', () => {
+            const dangerGoal = game.goals.find(g => g.id === 'DANGER'); // 基礎: +5000pt, +50c
+            
+            // 状況：DANGER配送用の貨物を持ってDANGERゴール到達
+            game.pendingItems = [{ 
+                itemData: { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', deliveryGoalId: 'DANGER' } 
+            }];
+            game.pendingScore = 0;
+            game.pendingCoins = 0;
+
+            // 1. PhysicsOrchestrator によるゴール通過基礎報酬の加算（実際の挙動を模擬）
+            game.pendingScore += dangerGoal.score;
+            game.pendingCoins += (dangerGoal.coins || 0);
+            
+            // 2. MissionSystem による配送ボーナスの加算
+            game.missionSystem.resolveItems('success', dangerGoal);
+            
+            // 合計: 基礎(5000) + 配送ボーナス(1500) = 6500pt
+            // コイン: 基礎(50) + 配送ボーナス(100) = 150c
+            expect(game.pendingScore, "Total score should be Base(5000) + DeliveryBonus(1500)").toBe(6500);
+            expect(game.pendingCoins, "Total coins should be Base(50) + DeliveryBonus(100)").toBe(150);
         });
     });
 });

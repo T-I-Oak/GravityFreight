@@ -70,18 +70,18 @@ describe('Implementation: UISystem Rendering & Internal Logic', () => {
     });
 
     describe('Heavy Style Resets', () => {
-        it('should apply inline-style reset in title state', () => {
+        it('should apply class-based reset in title state', () => {
             game.state = 'title';
             const missionHud = document.getElementById('mission-hud');
-            missionHud.style.display = 'block';
+            // 一旦手動で表示状態にする
+            missionHud.classList.remove('hidden');
             
             uiSystem.updateUI();
 
-            expect(missionHud.style.display).toBe('none');
             expect(missionHud.classList.contains('hidden')).toBe(true);
         });
 
-        it('should restore display style in building state', () => {
+        it('should restore visibility class in building state', () => {
             game.state = 'title';
             uiSystem.updateUI();
             
@@ -89,7 +89,6 @@ describe('Implementation: UISystem Rendering & Internal Logic', () => {
             uiSystem.updateUI();
 
             const missionHud = document.getElementById('mission-hud');
-            expect(missionHud.style.display).toBe('');
             expect(missionHud.classList.contains('hidden')).toBe(false);
         });
     });

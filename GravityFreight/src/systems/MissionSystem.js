@@ -98,21 +98,6 @@ export class MissionSystem {
                 
                 const itemNum = 1 + Math.floor(Math.random() * 2);
                 body.items = [];
-                // デバッグ用：全ての星にゴール・エクスパンダーを追加
-                // 基底データの初期化順序に依存せず安全に動作させる
-                const expander = { 
-                    id: 'boost_expander', 
-                    category: 'BOOSTERS', 
-                    name: 'ゴール・エクスパンダー', 
-                    mass: 0, 
-                    slots: 0, 
-                    arcMultiplier: 1.2, 
-                    rarity: 15, // RARE
-                    count: 1,
-                    description: '出口サイズを1.2倍に拡大する。'
-                };
-                body.items.push(expander);
-
                 for (let j = 0; j < itemNum; j++) {
                     const item = this.getWeightedRandomItem();
                     if (item) body.items.push(item);
@@ -154,6 +139,21 @@ export class MissionSystem {
         const game = this.game;
         let luckCount = 0;
         if (result === 'success') {
+            // ゴール通過基礎アイテム報酬 (Spec 6.1)
+            if (hitGoal) {
+                const bonusItemCount = hitGoal.bonusItems || 0;
+                for (let k = 0; k < bonusItemCount; k++) {
+                    const bonus = game.getWeightedRandomItem({ thresholdBonus: 5, excludeCargo: true });
+                    if (bonus) {
+                        if (bonus.category === 'COIN') {
+                            game.pendingCoins += bonus.score || 0;
+                        } else {
+                            game._addItemToInventory(bonus);
+                        }
+                    }
+                }
+            }
+
             if (!game.pendingItems || game.pendingItems.length === 0) {
                 game.updateUI();
                 return;
@@ -163,7 +163,6 @@ export class MissionSystem {
                 const itemData = pItem.itemData;
                 const { category } = itemData;
 
-
                 if (category === 'CARGO') {
                     if (hitGoal) {
                         if (itemData.deliveryGoalId) {
@@ -171,39 +170,22 @@ export class MissionSystem {
                             if (isMatch) {
                                 game.pendingScore += 1500;
                                 game.pendingCoins += 100;
-                                const bonusItemCount = hitGoal.bonusItems || 1;
-                                const bonusItems = [];
-                                for (let k = 0; k < bonusItemCount; k++) {
-                                    const bonus = game.getWeightedRandomItem({ thresholdBonus: 5, excludeCargo: true });
-                                    if (bonus) {
-                                        bonusItems.push(bonus);
-                                        if (bonus.category === 'COIN') {
-                                            game.pendingCoins += bonus.score || 0;
-                                        } else {
-                                            game._addItemToInventory(bonus);
-                                        }
-                                    }
-                                }
-                                game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: true, bonusItems });
+                                game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: true });
                                 game.flightResults.bonuses.push({ name: 'Delivery Bonus', value: 1500, coins: 100 });
                                 game.totalDeliveries++;
                             } else {
                                 game.pendingCoins += 10;
-                                game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false, bonusItems: [] });
+                                game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false });
                                 game.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: 10 });
                             }
                         } else {
-                            // 配送IDのない貨物（「幸運の導き」など）
                             if (itemData.id === 'cargo_lucky') {
                                 luckCount++;
                             }
-                            // リザルトに一度だけ追加
                             game.flightResults.items.push({ ...itemData });
-                            // インベントリには追加しない (消費扱い)
                         }
                         return;
                     } else {
-                        // 母星帰還時は以前と同様に母星に保存
                         if (!game.homeStar.items) game.homeStar.items = [];
                         game.homeStar.items.push(itemData);
                         game.homeStar.isCollected = false;
@@ -366,7 +348,7 @@ export class MissionSystem {
     checkGameOver() {
         const game = this.game;
         if (this.isGameOver()) {
-            game.state = 'gameover';
+            game.setState('gameover');
             game.showResult('gameover');
         }
     }

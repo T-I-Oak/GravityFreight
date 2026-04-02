@@ -27,10 +27,13 @@ describe('Spec: Game Cycle & Mission Flow (Chapter 5)', () => {
             displayScore: 0,
             coins: 0,
             displayCoins: 0,
+            launchScore: 0,
+            launchCoins: 0,
             sector: 1,
             isFactoryOpen: false,
             selection: { chassis: null, logic: null, modules: {}, boosters: null },
-            inventory: { chassis: [], logic: [], modules: [], boosters: [], rockets: [], launchers: [] }
+            inventory: { chassis: [], logic: [], modules: [], boosters: [], rockets: [], launchers: [] },
+            flightResults: { status: '', bonuses: [], items: [] }
         };
         uiSystem = new UISystem(game);
     });
@@ -79,16 +82,18 @@ describe('Spec: Game Cycle & Mission Flow (Chapter 5)', () => {
         game.state = 'cleared'; // Intermediate state before result
         uiSystem.updateUI();
         const resultOverlay = document.getElementById('result-overlay');
-        expect(resultOverlay.classList.contains('hidden')).toBe(true);
+        expect(resultOverlay.classList.contains('hidden')).toBe(true, 'Result overlay should be hidden in cleared state before showResult()');
     });
 
-    it('5.3 GAMEOVER: should show both result and receipt overlays', () => {
+    it('5.3 GAMEOVER: should show BOTH result and receipt overlays via showResult("gameover")', () => {
         game.state = 'gameover';
-        uiSystem.updateUI();
+        // showResult('gameover') is the entry point that manages both overlays (Spec 2.6)
+        uiSystem.showResult('gameover');
+        
         const resultOverlay = document.getElementById('result-overlay');
         const receiptOverlay = document.getElementById('receipt-overlay');
-        expect(resultOverlay.classList.contains('hidden')).toBe(false);
-        expect(receiptOverlay.classList.contains('hidden')).toBe(false);
+        expect(resultOverlay.classList.contains('hidden')).toBe(false, 'Result overlay should be visible');
+        expect(receiptOverlay.classList.contains('hidden')).toBe(false, 'Receipt overlay should be visible');
     });
 
     it('Fail-Fast: should throw error for invalid states', () => {

@@ -14,7 +14,7 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.6.7";
+        this.version = "0.7.0";
 
         // システムの初期化
         this.inventorySystem = new InventorySystem(this);
@@ -78,8 +78,24 @@ export class Game {
         this.currentCoinDiscount = 0;
 
         this.initStage(this.currentStarCount);
-        this.state = 'title';
+        this.state = 'title'; // 初期化
         this.eventSystem.setupListeners();
+        this.updateUI();
+    }
+
+    /**
+     * 【重要】ゲームステートを更新し、必要な副作用（UIの自動展開など）を実行する共通メソッド。
+     * 直接 this.state に代入するのではなく、必ずこのメソッドを介して遷移させる。
+     */
+    setState(newState) {
+        if (this.state === newState) return;
+        
+        // 【仕様】ビデオパネルの自動展開 (ビルド開始時)
+        if (newState === 'building') {
+            this.uiSystem.expandPanel();
+        }
+
+        this.state = newState;
         this.updateUI();
     }
 
@@ -159,6 +175,10 @@ export class Game {
         return new Vector2(rx + centerX, ry + centerY);
     }
 
+    showStatus(message, type) {
+        this.uiSystem.showStatus(message, type);
+    }
+
     getScreenPos(worldPos) {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
@@ -225,7 +245,79 @@ export class Game {
         
         // 最終的な描画更新
         this.updateUI();
-        console.log("[v0.6.7] Game fullReset completed. Returning to TITLE.");
+    }
+
+    onMouseDown(e) {
+        this.isPointerDown = true;
+        this.mousePos = new Vector2(e.clientX, e.clientY);
+        
+        const worldPos = this.getWorldPos(this.mousePos);
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const distFromCenter = worldPos.sub(new Vector2(centerX, centerY)).length();
+
+        // 操作モードの判定 (Technical Spec 6 準拠)
+        if (e.shiftKey || e.ctrlKey) {
+            this.interactionMode = 'pan';
+        } else if (distFromCenter >= this.boundaryRadius) {
+            // 外周なら常に回転
+            this.interactionMode = 'rotate';
+        } else if (this.state === 'aiming' && this.ship) {
+            // 内周かつエイミング中ならエイム
+            this.interactionMode = 'aim';
+        } else {
+            // それ以外（内周かつ非エイミング中、または自機なし）ならパン
+            this.interactionMode = 'pan';
+        }
+    }
+
+    onMouseMove(e) {
+        const newPos = new Vector2(e.clientX, e.clientY);
+        const delta = newPos.sub(this.mousePos);
+
+        if (this.isPointerDown) {
+            if (this.interactionMode === 'aim' && this.ship) {
+                // エイム方向の調整
+                const screenShipPos = this.getScreenPos(this.ship.position);
+                const screenAngle = Math.atan2(newPos.y - screenShipPos.y, newPos.x - screenShipPos.x);
+                this.ship.rotation = screenAngle - this.mapRotation;
+                
+                // ロケットの位置を母星表面に同期 (描画の整合性)
+                const angle = this.ship.rotation;
+                const dist = this.homeStar.radius + 12;
+                this.ship.position.x = this.homeStar.position.x + Math.cos(angle) * dist;
+                this.ship.position.y = this.homeStar.position.y + Math.sin(angle) * dist;
+            } else if (this.interactionMode === 'rotate') {
+                // マップの回転
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const prevAngle = Math.atan2(this.mousePos.y - centerY, this.mousePos.x - centerX);
+                const newAngle = Math.atan2(newPos.y - centerY, newPos.x - centerX);
+                this.mapRotation += (newAngle - prevAngle);
+            } else {
+                // カメラの移動（パン）
+                this.cameraOffset.x += delta.x;
+                this.cameraOffset.y += delta.y;
+            }
+        }
+        this.mousePos = newPos;
+    }
+
+    onMouseUp() {
+        this.isPointerDown = false;
+        this.isAimingInteraction = false;
+    }
+
+    onWheel(e) {
+        const zoomSpeed = 0.001;
+        const oldZoom = this.zoom;
+        this.zoom = Math.max(0.1, Math.min(2.0, this.zoom * (1 - e.deltaY * zoomSpeed)));
+        
+        // マウス位置を中心にズームするためのオフセット調整
+        const worldMouse = this.getWorldPos(this.mousePos);
+        const newScreenMouse = this.getScreenPos(worldMouse);
+        this.cameraOffset.x += this.mousePos.x - newScreenMouse.x;
+        this.cameraOffset.y += this.mousePos.y - newScreenMouse.y;
     }
 
     update(dt) {
