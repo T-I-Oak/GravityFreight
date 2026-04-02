@@ -205,6 +205,7 @@ export class Game {
             this.ship.activeBoosterEffect = null;
         }
         this.pendingItems = [];
+        this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
         this.accumulator = 0;
         this.eventSystem.checkReadyToAim();
         this.updateUI();

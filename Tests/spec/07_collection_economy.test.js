@@ -142,5 +142,18 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
             expect(game.pendingScore, "Total score should be Base(5000) + DeliveryBonus(1500)").toBe(6500);
             expect(game.pendingCoins, "Total coins should be Base(50) + DeliveryBonus(100)").toBe(150);
         });
+
+        it('BUG FIX: should clear flightResults bonuses on game.reset() to prevent accumulation', () => {
+            // 1回目のフライトの成果を模擬
+            game.flightResults.bonuses.push({ name: 'Goal Bonus', value: 1000 });
+            expect(game.flightResults.bonuses.length).toBe(1);
+
+            // フライト終了時のリセット処理 (本来ここでクリアされるべき)
+            game.reset();
+
+            // 期待値: 次のフライトのために空になっていること
+            // (注意: 現在の実装ではリセットされないため、このテストは失敗するはずです)
+            expect(game.flightResults.bonuses.length, "flightResults.bonuses should be cleared on reset").toBe(0);
+        });
     });
 });
