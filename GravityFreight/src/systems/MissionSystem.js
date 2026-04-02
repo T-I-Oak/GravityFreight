@@ -207,32 +207,33 @@ export class MissionSystem {
         } else if (result === 'crashed' || result === 'lost') {
             game.flightResults.items = [];
 
+            // 保険モジュール（mod_insurance）を装備しているか確認 (Spec 7.3)
+            const insuranceModules = game.ship?.equippedModules ? game.ship.equippedModules.filter(m => m.onLostBonus) : [];
+            const rocket = game.selection.rocket;
+
+            if (insuranceModules.length > 0 && rocket) {
+                let totalUnitValue = 0;
+                if (rocket.chassis) totalUnitValue += game.calculateValue(rocket.chassis);
+                if (rocket.logic) totalUnitValue += game.calculateValue(rocket.logic);
+
+                // 搭載されている全モジュールの査定額を加算 (Spec 7.3)
+                const modules = game.ship?.equippedModules || [];
+                modules.forEach(m => {
+                    totalUnitValue += game.calculateValue(m);
+                });
+
+                // 保険モジュール1つにつき1倍の査定額が支払われる (Spec 7.3.324)
+                const totalPayout = totalUnitValue * insuranceModules.length;
+                game.pendingCoins += totalPayout;
+                game.flightResults.bonuses.push({ name: 'Insurance Payout', value: 0, coins: totalPayout });
+            }
+
             if (game.pendingItems && game.pendingItems.length > 0) {
                 if (result === 'crashed' && hitGoal) {
                     game.pendingItems.forEach(({ itemData }) => {
                         hitGoal.items.push(itemData);
                         hitGoal.isCollected = false;
                     });
-                }
-
-                const insuranceModules = game.ship?.equippedModules ? game.ship.equippedModules.filter(m => m.onLostBonus) : [];
-                const rocket = game.selection.rocket;
-
-                if (insuranceModules.length > 0 && rocket) {
-                    let totalUnitValue = 0;
-                    if (rocket.chassis) totalUnitValue += game.calculateValue(rocket.chassis);
-                    if (rocket.logic) totalUnitValue += game.calculateValue(rocket.logic);
-
-                    // 搭載されている全モジュールの査定額を加算 (Spec 7.3)
-                    const modules = game.ship?.equippedModules || [];
-                    modules.forEach(m => {
-                        totalUnitValue += game.calculateValue(m);
-                    });
-
-                    // 保険モジュール1つにつき1倍の査定額が支払われる (Spec 7.3.324)
-                    const totalPayout = totalUnitValue * insuranceModules.length;
-                    game.pendingCoins += totalPayout;
-                    game.flightResults.bonuses.push({ name: 'Insurance Payout', value: 0, coins: totalPayout });
                 }
                 game.pendingItems = [];
             }

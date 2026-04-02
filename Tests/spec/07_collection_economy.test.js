@@ -117,6 +117,26 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
             
             expect(game.pendingCoins).toBe(240);
         });
+
+        it('Insurance: should pay even when crashing without cargo (BUG REPRO)', () => {
+            // Setup ship with 1 insurance module
+            game.ship = {
+                equippedModules: [{ id: 'mod_insurance', rarity: RARITY.UNCOMMON, onLostBonus: 1 }]
+            };
+            // Setup rocket parts
+            game.selection.rocket = {
+                chassis: { id: 'h', rarity: RARITY.COMMON }, // 20
+                logic: { id: 'l', rarity: RARITY.COMMON }     // 20
+            };
+            // Total parts value = 20 (chassis) + 20 (logic) + 40 (module) = 80
+            
+            game.pendingItems = []; // CRITICAL: empty cargo
+            game.pendingCoins = 0;
+            game.resolveItems('crashed');
+            
+            // Expected: 80 coins
+            expect(game.pendingCoins, "Should pay insurance even if cargo is empty").toBe(80);
+        });
     });
 
     describe('7.1 Goal Passing Reward & Mission Success', () => {
