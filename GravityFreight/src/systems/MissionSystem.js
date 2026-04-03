@@ -96,11 +96,11 @@ export class MissionSystem {
                 // 半径も旧来の公式 (Physics.js の初期 Body クラス準拠)
                 body.radius = Math.sqrt(mass) / 5 + 2;
                 
-                const itemNum = 1 + Math.floor(Math.random() * 2);
+                // デバッグ用: 全ての星に cargo を2つ強制配置（フラグなし）
                 body.items = [];
-                for (let j = 0; j < itemNum; j++) {
-                    const item = this.getWeightedRandomItem();
-                    if (item) body.items.push(item);
+                for (let j = 0; j < 2; j++) {
+                    const idx = Math.floor(Math.random() * PARTS.CARGO.length);
+                    body.items.push({ ...PARTS.CARGO[idx] });
                 }
                 game.bodies.push(body);
             }
@@ -170,8 +170,23 @@ export class MissionSystem {
                             if (isMatch) {
                                 game.pendingScore += 1500;
                                 game.pendingCoins += 100;
-                                game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: true });
+                                const deliveryItem = { ...itemData, isDelivery: true, isMatch: true, bonusItems: [] };
+                                game.flightResults.items.push(deliveryItem);
                                 game.flightResults.bonuses.push({ name: 'Delivery Bonus', value: 1500, coins: 100 });
+
+                                // Spec 6.2 A: 一致配送ボーナスアイテム (Gacha)
+                                const bonusItemCount = hitGoal.bonusItems || 0;
+                                for (let k = 0; k < bonusItemCount; k++) {
+                                    const bonus = game.getWeightedRandomItem({ thresholdBonus: 5, excludeCargo: true });
+                                    if (!bonus) continue;
+                                    deliveryItem.bonusItems.push({ ...bonus });
+
+                                    if (bonus.category === 'COIN') {
+                                        game.pendingCoins += bonus.score || 0;
+                                    } else {
+                                        game._addItemToInventory(bonus);
+                                    }
+                                }
                                 game.totalDeliveries++;
                             } else {
                                 game.pendingCoins += 10;

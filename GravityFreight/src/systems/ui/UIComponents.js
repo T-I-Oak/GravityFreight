@@ -25,11 +25,17 @@ export class UIComponents {
             const current = itemData.charges !== undefined ? itemData.charges : max;
             invInfo = UIComponents.generateHPGauge(current, max, enhancements.charges > 0);
         } else if (showInventory && itemData.count > 1) {
-            invInfo = `<span class="inventory-badge" style="font-size: 10px; color: rgba(255,255,255,0.6); font-weight:bold;">[x ${itemData.count}]</span>`;
+            invInfo = `<span class="inventory-badge">[x ${itemData.count}]</span>`;
         }
 
         const selTag = (selectionCount > 0) ? ` <span class="selection-badge" style="color: #ffcc00; font-weight: bold;">[${selectionCount}]</span>` : '';
-        const extraBadge = options.badge || '';
+        
+        let extraBadge = options.badge || '';
+        if (!extraBadge && item.isDelivery) {
+            extraBadge = item.isMatch ? 
+                `<span class="status-badge status-delivered">✓ DELIVERED</span>` : 
+                `<span class="status-badge status-unmatched">✗ UNMATCHED</span>`;
+        }
         const indent = options.indent || 0;
 
         const containerStyle = `
@@ -111,10 +117,12 @@ export class UIComponents {
 
         return `
             <div class="part-item-container" style="${containerStyle}">
-                ${extraBadge ? `<div style="position:absolute; top:4px; right:4px;">${extraBadge}</div>` : ''}
-                <div class="part-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-                    <span class="part-name" style="font-weight: 800; font-size: 13px; color: #fff;">${item.name || 'Unknown'}${selTag}</span>
-                    ${invInfo}
+                <div class="part-header">
+                    <span class="part-name">${item.name || 'Unknown'}${selTag}</span>
+                    <div class="part-header-right">
+                        ${extraBadge}
+                        ${invInfo}
+                    </div>
                 </div>
                 ${desc ? `<div class="part-info" style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 6px;">${desc}</div>` : ''}
                 <div class="part-stats" style="display: flex; flex-wrap: wrap; gap: 6px;">

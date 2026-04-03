@@ -53,12 +53,17 @@ export class PhysicsOrchestrator {
             }
 
             game.bodies.forEach(body => {
-                if (body === game.homeStar) return;
                 const dist = ship.position.sub(body.position).length();
                 const surfaceDist = dist - body.radius;
                 const pickupRadius = (ship.pickupRange || 0) * (ship.pickupMultiplier || 1);
 
-                if (surfaceDist <= pickupRadius && !body.isCollected) {
+                // 母星のアイテムは「発射直後の母星表面」でも確実に回収できるようにする。
+                // 通常の星は pickupRadius に依存するが、母星はカーゴの再回収導線として扱う。
+                const isHomeStar = (body === game.homeStar);
+                const isOnLaunchPadSurface = isHomeStar && surfaceDist <= 12;
+                const canPickup = (surfaceDist <= pickupRadius) || isOnLaunchPadSurface;
+
+                if (canPickup && !body.isCollected) {
                     game.collectItems(body);
                     body.isCollected = true;
                 }

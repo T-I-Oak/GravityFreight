@@ -100,18 +100,6 @@
 }
 
 
-.part-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-}
-
-.part-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-}
 
 .part-meta {
     display: flex;
@@ -127,14 +115,6 @@
     text-shadow: 0 0 5px rgba(0, 255, 170, 0.5);
 }
 
-.inventory-badge {
-    font-size: 10px;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1px 6px;
-    border-radius: 4px;
-}
 
 .selection-badge {
     font-size: 10px;

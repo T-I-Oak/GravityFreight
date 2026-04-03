@@ -318,6 +318,50 @@ describe('Implementation: Game Core Controllers', () => {
             'showResult() must call resetResultOverlay() per Tech Spec 2.4');
     });
 
+    it('[Spec 6.2.A] matched deliveries should group cargo and show bonus items indented', async () => {
+        // Prepare 2 matched deliveries with same cargo and same bonus item.
+        // Expectation: cargo card shows [x 2] and bonus item appears under it with [x 2].
+        game.state = 'cleared';
+        game.sector = 2;
+        game.lastHitGoal = { id: 'SAFE', bonusItems: 1 };
+
+        const bonusHull = { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 1, precision: 200 };
+
+        game.flightResults.items = [
+            {
+                id: 'cargo_safe',
+                category: 'CARGO',
+                name: '通商物資',
+                deliveryGoalId: 'SAFE',
+                isDelivery: true,
+                isMatch: true,
+                bonusItems: [bonusHull]
+            },
+            {
+                id: 'cargo_safe',
+                category: 'CARGO',
+                name: '通商物資',
+                deliveryGoalId: 'SAFE',
+                isDelivery: true,
+                isMatch: true,
+                bonusItems: [bonusHull]
+            }
+        ];
+        game.flightResults.bonuses = [{ name: 'Delivery Bonus', value: 1500, coins: 100 }];
+
+        game.uiSystem.showResult('cleared');
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const itemsList = document.getElementById('result-items-list');
+        const html = itemsList.innerHTML;
+
+        expect(html).toContain('通商物資');
+        expect(html).toContain('DELIVERED');
+        expect(html).toContain('軽量シャーシ');
+        // cargo itself should show grouped count
+        expect(html).toContain('[x 2]');
+    });
+
     it('[Spec 2.6] enterMapViewMode() must add minimized and show back button', () => {
         const resultOverlay = document.getElementById('result-overlay');
         const receiptOverlay = document.getElementById('receipt-overlay');

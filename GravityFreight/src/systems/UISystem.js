@@ -518,8 +518,7 @@ export class UISystem {
                 card.className = 'reward-item-card stagger-in';
                 card.style.animationDelay = `${this._resultDelay}s`;
                 this._resultDelay += 0.07;
-                const badge = item.isDelivery ? (item.isMatch ? `<span style="color:#44ffbb;font-size:10px;font-weight:800;">✓ DELIVERED</span>` : `<span style="color:#ff7755;font-size:10px;font-weight:800;">✗ UNMATCHED</span>`) : '';
-                card.innerHTML = this.generateCardHTML(item, { badge, showInventory: true });
+                card.innerHTML = this.generateCardHTML(item, { showInventory: true });
                 itemsList.appendChild(card);
                 
                 if (item.bonusItems && item.bonusItems.length > 0) {

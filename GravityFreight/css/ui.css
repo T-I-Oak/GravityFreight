@@ -437,6 +437,52 @@
     border-color: #00ffcc;
 }
 
+/* --- Status Badges (Delivered/Unmatched) --- */
+.status-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.status-delivered {
+    color: #44ffbb;
+    text-shadow: 0 0 5px rgba(68, 255, 187, 0.3);
+}
+
+.status-unmatched {
+    color: #ff7755;
+    text-shadow: 0 0 5px rgba(255, 119, 85, 0.3);
+}
+
+.inventory-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.part-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.part-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.part-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .hp-gauge.mini {
     gap: 1.5px;
 }
