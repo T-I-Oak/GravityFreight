@@ -14,7 +14,7 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.10.2";
+        this.version = "0.10.4";
 
         // システムの初期化
         this.inventorySystem = new InventorySystem(this);
@@ -290,10 +290,12 @@ export class Game {
                 this.ship.position.y = this.homeStar.position.y + Math.sin(angle) * dist;
             } else if (this.interactionMode === 'rotate') {
                 // マップの回転
-                const centerX = this.canvas.width / 2;
-                const centerY = this.canvas.height / 2;
-                const prevAngle = Math.atan2(this.mousePos.y - centerY, this.mousePos.x - centerX);
-                const newAngle = Math.atan2(newPos.y - centerY, newPos.x - centerX);
+                // 画面上のマップ中心位置（パニング込み）を回転のピボットにする
+                const pivotX = this.canvas.width / 2 + this.cameraOffset.x;
+                const pivotY = this.canvas.height / 2 + this.cameraOffset.y;
+                
+                const prevAngle = Math.atan2(this.mousePos.y - pivotY, this.mousePos.x - pivotX);
+                const newAngle = Math.atan2(newPos.y - pivotY, newPos.x - pivotX);
                 this.mapRotation += (newAngle - prevAngle);
             } else {
                 // カメラの移動（パン）

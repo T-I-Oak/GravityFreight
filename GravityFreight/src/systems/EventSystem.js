@@ -64,25 +64,36 @@ export class EventSystem {
                 if (entries.length >= 2) {
                     const [p1, p2] = entries.slice(0, 2);
                     const m = mid(p1, p2);
-
-                    // hover 判定（star-info）を指の中央に同期
-                    game.mousePos.x = m.x;
-                    game.mousePos.y = m.y;
-
-                    const oldZoom = game.zoom;
                     const currentDist = dist(p1, p2);
+
+                    // 1. パンの更新 (前の中心点からの移動分をオフセットに加算)
+                    // game.mousePos には前フレームでの中心点が保持されている
+                    const dx = m.x - game.mousePos.x;
+                    const dy = m.y - game.mousePos.y;
+                    game.cameraOffset.x += dx;
+                    game.cameraOffset.y += dy;
+
+                    // 2. ズームの更新 (ピンチ距離の変化率を適用)
                     if (game.lastPinchDist > 0 && currentDist > 0) {
                         const scale = currentDist / game.lastPinchDist;
-                        const newZoom = clamp(oldZoom * scale, 0.1, 2.0);
+                        
+                        // 微小な距離変化（ノイズ）によるガタつきを防ぐ閾値を導入
+                        if (Math.abs(currentDist - game.lastPinchDist) > 1.5) {
+                            const oldZoom = game.zoom;
+                            const newZoom = clamp(oldZoom * scale, 0.1, 2.0);
 
-                        // 中央の世界座標を維持するように cameraOffset を補正
-                        const worldMid = game.getWorldPos(m);
-                        game.zoom = newZoom;
-                        const newScreenMid = game.getScreenPos(worldMid);
-                        game.cameraOffset.x += m.x - newScreenMid.x;
-                        game.cameraOffset.y += m.y - newScreenMid.y;
+                            // ズーム中心（現在の中心点 m）の世界座標を固定したままスケールを変更
+                            const worldMid = game.getWorldPos(m);
+                            game.zoom = newZoom;
+                            const newScreenMid = game.getScreenPos(worldMid);
+                            game.cameraOffset.x += m.x - newScreenMid.x;
+                            game.cameraOffset.y += m.y - newScreenMid.y;
+                        }
                     }
 
+                    // ステート更新
+                    game.mousePos.x = m.x;
+                    game.mousePos.y = m.y;
                     game.lastPinchDist = currentDist;
                     return;
                 }
