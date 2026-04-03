@@ -11,9 +11,134 @@ export class EventSystem {
         const game = this.game;
 
         const canvas = game.canvas;
-        canvas.onmousedown = (e) => game.onMouseDown(e);
-        window.onmousemove = (e) => game.onMouseMove(e);
-        window.onmouseup = (e) => game.onMouseUp(e);
+        // iPad / Android 対応:
+        // `mousedown/mousemove/mouseup` はタッチ環境で発火しないことがあるため、
+        // pointer/touch を同じ Game 入力ハンドラへ委譲します。
+        const supportsPointer = typeof window !== 'undefined' && 'PointerEvent' in window;
+        if (supportsPointer) {
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+            const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+
+            canvas.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                // pointer の位置を保持（Game 側にも activePointers がある）
+                game.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+                // 1本指: 既存の onMouse* ロジックで pan/aim/rotate を決定する
+                if (game.activePointers.size === 1) {
+                    game.onMouseDown({
+                        clientX: e.clientX,
+                        clientY: e.clientY,
+                        shiftKey: false,
+                        ctrlKey: false
+                    });
+                    return;
+                }
+
+                // 2本指以上: aim の干渉を止めて、ここからは pinching/panning を専用処理する
+                if (game.activePointers.size >= 2) {
+                    game.onMouseUp();
+                    const [p1, p2] = [...game.activePointers.values()].slice(0, 2);
+                    game.lastPinchDist = dist(p1, p2);
+                    const m = mid(p1, p2);
+                    game.mousePos.x = m.x;
+                    game.mousePos.y = m.y;
+                }
+            }, { passive: false });
+            window.addEventListener('pointermove', (e) => {
+                if (!game.activePointers.has(e.pointerId)) return;
+
+                e.preventDefault();
+                game.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+                const entries = [...game.activePointers.values()];
+
+                // 2本指: ピンチでズーム、中央移動でパン
+                if (entries.length >= 2) {
+                    const [p1, p2] = entries.slice(0, 2);
+                    const m = mid(p1, p2);
+
+                    // hover 判定（star-info）を指の中央に同期
+                    game.mousePos.x = m.x;
+                    game.mousePos.y = m.y;
+
+                    const oldZoom = game.zoom;
+                    const currentDist = dist(p1, p2);
+                    if (game.lastPinchDist > 0 && currentDist > 0) {
+                        const scale = currentDist / game.lastPinchDist;
+                        const newZoom = clamp(oldZoom * scale, 0.1, 2.0);
+
+                        // 中央の世界座標を維持するように cameraOffset を補正
+                        const worldMid = game.getWorldPos(m);
+                        game.zoom = newZoom;
+                        const newScreenMid = game.getScreenPos(worldMid);
+                        game.cameraOffset.x += m.x - newScreenMid.x;
+                        game.cameraOffset.y += m.y - newScreenMid.y;
+                    }
+
+                    game.lastPinchDist = currentDist;
+                    return;
+                }
+
+                // 1本指: 既存の onMouseMove に委譲（aim 中は 1本指=エイム、pan は不可になる）
+                if (entries.length === 1) {
+                    game.onMouseMove({ clientX: e.clientX, clientY: e.clientY });
+                }
+            }, { passive: false });
+            const up = (e) => {
+                if (!game.activePointers.has(e.pointerId)) return;
+                e.preventDefault();
+
+                game.activePointers.delete(e.pointerId);
+
+                if (game.activePointers.size <= 0) {
+                    game.onMouseUp();
+                    game.lastPinchDist = 0;
+                    return;
+                }
+
+                // 2本指から1本指に戻った場合、残りの指で操作を継続
+                if (game.activePointers.size === 1) {
+                    const [p] = [...game.activePointers.values()];
+                    game.lastPinchDist = 0;
+                    game.onMouseDown({
+                        clientX: p.x,
+                        clientY: p.y,
+                        shiftKey: false,
+                        ctrlKey: false
+                    });
+                }
+            };
+            window.addEventListener('pointerup', up, { passive: false });
+            window.addEventListener('pointercancel', up, { passive: false });
+        } else {
+            canvas.onmousedown = (e) => game.onMouseDown(e);
+            window.onmousemove = (e) => game.onMouseMove(e);
+            window.onmouseup = (e) => game.onMouseUp(e);
+
+            // pointer 非対応環境向けフォールバック（タッチ）
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const t = e.touches && e.touches[0];
+                if (!t) return;
+                game.onMouseDown({ clientX: t.clientX, clientY: t.clientY, shiftKey: false, ctrlKey: false });
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const t = e.touches && e.touches[0];
+                if (!t) return;
+                game.onMouseMove({ clientX: t.clientX, clientY: t.clientY });
+            }, { passive: false });
+
+            const onTouchEnd = (e) => {
+                e.preventDefault();
+                game.onMouseUp(e);
+            };
+            window.addEventListener('touchend', onTouchEnd, { passive: false });
+            window.addEventListener('touchcancel', onTouchEnd, { passive: false });
+        }
         canvas.onwheel = (e) => {
             e.preventDefault();
             game.onWheel(e);
