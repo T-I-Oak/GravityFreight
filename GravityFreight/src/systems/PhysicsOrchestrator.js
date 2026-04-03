@@ -19,7 +19,6 @@ export class PhysicsOrchestrator {
 
             if (distScreen < hitRadius) {
                 game.hoveredStar = body;
-                break;
             }
         }
     }

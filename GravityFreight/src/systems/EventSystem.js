@@ -47,6 +47,12 @@ export class EventSystem {
                 }
             }, { passive: false });
             window.addEventListener('pointermove', (e) => {
+                // ホバー判定のために、ボタンが押されているかに関わらず mousePos を最新に保つ
+                if (e.pointerType === 'mouse' && game.activePointers.size === 0) {
+                    game.mousePos.x = e.clientX;
+                    game.mousePos.y = e.clientY;
+                }
+
                 if (!game.activePointers.has(e.pointerId)) return;
 
                 e.preventDefault();
@@ -81,7 +87,7 @@ export class EventSystem {
                     return;
                 }
 
-                // 1本指: 既存の onMouseMove に委譲（aim 中は 1本指=エイム、pan は不可になる）
+                // 1本指 または マウスドラッグ: 既存の onMouseMove に委譲
                 if (entries.length === 1) {
                     game.onMouseMove({ clientX: e.clientX, clientY: e.clientY });
                 }

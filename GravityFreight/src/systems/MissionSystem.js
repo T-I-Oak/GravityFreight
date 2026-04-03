@@ -96,11 +96,14 @@ export class MissionSystem {
                 // 半径も旧来の公式 (Physics.js の初期 Body クラス準拠)
                 body.radius = Math.sqrt(mass) / 5 + 2;
                 
-                // デバッグ用: 全ての星に cargo を2つ強制配置（フラグなし）
+                // 各天体(星)の周囲に 1～2 個のアイテムを配置 (仕様 4.1.3, 7.2 に準拠)
                 body.items = [];
-                for (let j = 0; j < 2; j++) {
-                    const idx = Math.floor(Math.random() * PARTS.CARGO.length);
-                    body.items.push({ ...PARTS.CARGO[idx] });
+                const itemCount = 1 + Math.floor(Math.random() * 2);
+                for (let j = 0; j < itemCount; j++) {
+                    const item = this.getWeightedRandomItem();
+                    if (item) {
+                        body.items.push(item);
+                    }
                 }
                 game.bodies.push(body);
             }

@@ -46,40 +46,50 @@ export class UISystem {
         ) && game.hoveredStar.items && game.hoveredStar.items.length > 0;
 
         if (isHoverableStar) {
-            const currentItemCount = game.hoveredStar.items.length;
-            if (this.currentHoveredStar !== game.hoveredStar || starPanel.dataset.itemCount != currentItemCount) {
-                this.currentHoveredStar = game.hoveredStar;
+            const star = game.hoveredStar;
+            const currentItemCount = star.items.length;
+
+            if (this.currentHoveredStar !== star || starPanel.dataset.itemCount != currentItemCount) {
+                this.currentHoveredStar = star;
                 starPanel.dataset.itemCount = currentItemCount;
 
-                starTitle.textContent = 'STAR ITEMS';
+                starTitle.textContent = star.isHome ? "STAR CORE (STORAGE)" : "STAR ITEMS";
                 starList.innerHTML = '';
-                const mergedItems = new Map();
-                game.hoveredStar.items.forEach(item => {
-                    if (!item || !item.id) return;
-                    if (mergedItems.has(item.id)) {
-                        mergedItems.get(item.id).count++;
-                    } else {
-                        mergedItems.set(item.id, { ...item, count: 1 });
-                    }
-                });
+
+                const mergedItems = ItemUtils.groupItems(star.items);
+                const isCompact = mergedItems.length > 3;
+                starList.className = `category ${isCompact ? 'compact-list' : ''}`;
 
                 mergedItems.forEach(item => {
                     const cardWrapper = document.createElement('div');
                     cardWrapper.className = 'tooltip-card-wrapper';
                     cardWrapper.style.marginBottom = '4px';
-                    cardWrapper.innerHTML = this.generateCardHTML(item, { showInventory: true });
+                    cardWrapper.innerHTML = UIComponents.generateCardHTML(item, { showInventory: true });
                     starList.appendChild(cardWrapper);
                 });
             }
 
             starPanel.classList.remove('hidden');
+            
             const offset = 20;
-            let px = game.mousePos.x + offset;
-            let py = game.mousePos.y + offset;
+            const mouseX = game.mousePos.x || 0;
+            const mouseY = game.mousePos.y || 0;
+            
+            let px = mouseX + offset;
+            let py = mouseY + offset;
 
-            const rect = starPanel.getBoundingClientRect();
-            if (px + rect.width > game.canvas.width) px = game.mousePos.x - rect.width - offset;
-            if (py + rect.height > game.canvas.height) py = game.mousePos.y - rect.height - offset;
+            const panelWidth = starPanel.offsetWidth || 280;
+            const panelHeight = starPanel.offsetHeight || 0;
+
+            if (px + panelWidth > game.canvas.width - 20) {
+                px = mouseX - panelWidth - offset;
+            }
+            if (py + panelHeight > game.canvas.height - 20) {
+                py = mouseY - panelHeight - offset;
+            }
+            
+            px = Math.max(10, px);
+            py = Math.max(10, py);
 
             starPanel.style.left = px + 'px';
             starPanel.style.top = py + 'px';

@@ -117,13 +117,34 @@
 }
 
 #star-info-panel {
-    transition: opacity 0.2s ease;
+    position: absolute;
+    z-index: 9000; /* 全てのメニュー UI よりも前面（マウスに追従するため） */
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
     opacity: 1;
+    max-height: 60vh;
+    overflow-y: auto;
+    width: 320px; /* 少し広げて視認性確保 */
+    scrollbar-width: thin;
 }
 
 #star-info-panel.hidden {
     opacity: 0;
+    transform: scale(0.95);
     pointer-events: none;
+}
+
+/* アイテム数が多い場合のコンパクト表示 */
+.compact-list .part-item-container {
+    padding: 4px 10px;
+}
+
+.compact-list .part-info {
+    display: none; /* 説明文を隠して高さを抑制 */
+}
+
+.compact-list .part-name {
+    font-size: 11px;
 }
 
 /* 表示・非表示のアニメーション用クラス（JSで制御） */

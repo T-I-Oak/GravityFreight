@@ -234,7 +234,7 @@ describe('Implementation: Game Core Controllers', () => {
     });
 
     it('should have the correct version', () => {
-        expect(game.version).toBe('0.10.0');
+        expect(game.version).toBe('0.10.2');
     });
 
     it('should synchronize ship.mass with rocket.mass when aiming starts', () => {
