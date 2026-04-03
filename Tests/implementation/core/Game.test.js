@@ -237,6 +237,38 @@ describe('Implementation: Game Core Controllers', () => {
         expect(game.version).toBe('0.10.0');
     });
 
+    it('should synchronize ship.mass with rocket.mass when aiming starts', () => {
+        // 標準のステージ初期化
+        game.missionSystem.initStage();
+
+        // 質量10以外になるロケットを選択（簡易に直接指定）
+        const heavyRocket = {
+            id: 'test_rocket',
+            name: 'Test Rocket',
+            category: 'ROCKETS',
+            chassis: { id: 'hull_medium', mass: 8, slots: 2 },
+            logic: { id: 'sensor_normal', mass: 1 },
+            modules: {},
+            mass: 8 + 1 + 5, // 10 とは異なる値
+            totalPrecision: 400,
+            precisionMultiplier: 1,
+            pickupRange: 0,
+            pickupMultiplier: 1,
+            gravityMultiplier: 1,
+            arcMultiplier: 1
+        };
+        game.selection.rocket = heavyRocket;
+        game.selection.launcher = { id: 'pad_standard_d2', power: 1200, precisionMultiplier: 1, precision: 0 };
+
+        // aiming に遷移させる
+        game.checkReadyToAim();
+
+        // ロケット質量は 10 とは異なる
+        expect(game.selection.rocket.mass).not.toBe(10);
+        // それに合わせて ship.mass も同期されていること
+        expect(game.ship.mass).toBe(game.selection.rocket.mass);
+    });
+
     it('should persist minimized state when viewing map from result overlay', async () => {
         // 1. Set to result screen (cleared)
         // [Spec 2.6/2.7] state change alone shouldn't show it

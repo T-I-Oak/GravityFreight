@@ -70,3 +70,8 @@
     - `pointer/touch` 経由で入力を受け取り、iOS/Android でもエイミング・回転・パン操作が反映されるように修正
     - エイミング中でも 2本指操作を優先し、2本指ドラッグはパン（`cameraOffset`）、2本指ピンチはズーム（`zoom`）として動作するよう調整
 
+### 物理挙動の整合 (Physics Consistency)
+- [x] [重要・BUG] 予測線と実際の軌道がずれている（予測線では crash していないのに crash した）
+    - `aiming` 開始時にロケットの総質量 (`rocket.mass`) を `ship.mass` に同期し、予測線と実フライト双方が同一の質量パラメータでシミュレーションされるように修正
+    - `Game.test.js` に質量同期テストを追加し、`aiming` 開始後に `ship.mass === rocket.mass` であることを保証
+

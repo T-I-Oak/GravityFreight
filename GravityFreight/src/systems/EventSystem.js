@@ -363,6 +363,11 @@ export class EventSystem {
                 }
             }
 
+            // ロケットの総重量を ship.mass に同期させる
+            if (typeof r.mass === 'number') {
+                game.ship.mass = r.mass;
+            }
+
             game.ship.pickupRange = 100 * pickMult;
             game.ship.gravityMultiplier = gMult;
             game.ship.arcMultiplier = aMult;
