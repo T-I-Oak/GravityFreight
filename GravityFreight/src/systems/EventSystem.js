@@ -274,7 +274,7 @@ export class EventSystem {
 
         l.charges--;
         if (l.charges <= 0) {
-            game.inventorySystem.removeItem('launchers', l.instanceId);
+            game.inventorySystem.takeItem('launchers', l.instanceId);
             game.selection.launcher = null;
             game.showStatus('ランチャーの耐久度が尽きました。', 'info');
         }
@@ -285,7 +285,7 @@ export class EventSystem {
 
         // インベントリから使用したブースターを削除 (Spec 5.3.242)
         if (game.selection.booster) {
-            game.inventorySystem.removeItem('boosters', game.selection.booster.instanceId);
+            game.inventorySystem.takeItem('boosters', game.selection.booster.instanceId);
             game.selection.booster = null;
         }
 

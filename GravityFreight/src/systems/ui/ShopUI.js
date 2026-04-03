@@ -137,7 +137,7 @@ export class ShopUI {
                     </div>
                 `;
                 card.querySelector('.sell-btn').onclick = () => {
-                    const success = game.inventorySystem.removeItem(item.cat, item.instanceId);
+                    const success = game.inventorySystem.takeItem(item.cat, item.instanceId);
                     if (success) {
                         this.uiSystem.animateCoinChange(sellPrice);
                         game.coins += sellPrice;

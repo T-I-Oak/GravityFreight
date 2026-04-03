@@ -28,19 +28,24 @@ export class InventorySystem {
         ['chassis', 'logic', 'launchers', 'modules', 'boosters', 'rockets'].forEach(cat => {
             if (this.inventory[cat]) {
                 if (Array.isArray(this.inventory[cat])) {
-                    this.inventory[cat].forEach(item => this._assignInstanceId(item));
+                    this.inventory[cat].forEach(item => this._ensureInstanceId(item));
                 } else if (typeof this.inventory[cat] === 'object') {
                     // modules might be key-value in some contexts, but INITIAL_INVENTORY should be array or handled
-                    Object.values(this.inventory[cat]).forEach(item => this._assignInstanceId(item));
+                    Object.values(this.inventory[cat]).forEach(item => this._ensureInstanceId(item));
                 }
             }
         });
     }
 
-    _assignInstanceId(item) {
+    _ensureInstanceId(item) {
         if (!item.instanceId) {
             item.instanceId = `inst_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
         }
+        return item.instanceId;
+    }
+
+    _reassignInstanceId(item) {
+        item.instanceId = `inst_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
         return item.instanceId;
     }
 
@@ -49,7 +54,7 @@ export class InventorySystem {
         const list = this.inventory[category];
         if (!list) return;
 
-        this._assignInstanceId(item);
+        this._ensureInstanceId(item);
 
         // 重複スタックの判定（共通ロジックを使用）
         const existing = list.find(i => ItemUtils.areItemsEquivalent(i, item));
@@ -63,19 +68,34 @@ export class InventorySystem {
     }
 
     removeItem(category, instanceId) {
+        return Boolean(this.takeItem(category, instanceId));
+    }
+
+    takeItem(category, instanceId, takeCount = 1) {
         const cat = this._getCategory(category);
         const list = this.inventory[cat];
-        if (!list) return false;
+        if (!list) return null;
 
         const idx = list.findIndex(i => i.instanceId === instanceId);
-        if (idx === -1) return false;
+        if (idx === -1) return null;
 
-        if ((list[idx].count || 0) > 1) {
-            list[idx].count--;
+        const current = list[idx];
+        const currentCount = current.count !== undefined ? current.count : 1;
+        const actualTake = Math.min(currentCount, takeCount);
+        if (actualTake <= 0) return null;
+
+        // 取り出した側は「元の instanceId を保持」する
+        const taken = { ...current, count: actualTake };
+
+        const remainingCount = currentCount - actualTake;
+        if (remainingCount > 0) {
+            current.count = remainingCount;
+            this._reassignInstanceId(current);
         } else {
             list.splice(idx, 1);
         }
-        return true;
+
+        return taken;
     }
 
     selectPart(type, instanceId) {

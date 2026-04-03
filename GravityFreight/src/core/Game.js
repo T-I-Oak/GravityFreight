@@ -132,7 +132,7 @@ export class Game {
     resolveItems(res, goal) { this.missionSystem.resolveItems(res, goal); }
     getWeightedRandomItem(opts) { return this.missionSystem.getWeightedRandomItem(opts); }
     _addItemToInventory(item) { this.inventorySystem.addItem(item); }
-    _removeItemFromInventory(cat, id) { return this.inventorySystem.removeItem(cat, id); }
+    _removeItemFromInventory(cat, id) { return this.inventorySystem.takeItem(cat, id); }
 
     consumeRocketOnFailure() { this.missionSystem.consumeRocketOnFailure(); }
     getPredictionPoints() { return this.physicsOrchestrator.getPredictionPoints(); }
