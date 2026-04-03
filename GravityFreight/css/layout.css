@@ -102,7 +102,7 @@
     bottom: 20px;
     right: 20px;
     z-index: 7000; /* リザルト背景(5000)よりも前面に配置 */
-    width: 280px;
+    width: 320px;
     pointer-events: none;
     padding-top: 20px;
 }

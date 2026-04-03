@@ -143,6 +143,11 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
         it('should grant total rewards (Base + Bonus) when reaching a goal', () => {
             const dangerGoal = game.goals.find(g => g.id === 'DANGER'); // 基礎: +5000pt, +50c
             
+            // ランダムなボーナスアイテム抽選がコイン加算に干渉しないようスパイで固定
+            vi.spyOn(game, 'getWeightedRandomItem').mockReturnValue(
+                { id: 'test_part', category: 'CHASSIS', name: 'Test Part', rarity: RARITY.COMMON }
+            );
+
             // 状況：DANGER配送用の貨物を持ってDANGERゴール到達
             game.pendingItems = [{ 
                 itemData: { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', deliveryGoalId: 'DANGER' } 
