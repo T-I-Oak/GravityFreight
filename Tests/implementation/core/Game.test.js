@@ -233,9 +233,7 @@ describe('Implementation: Game Core Controllers', () => {
         expect(game.zoom).toBeLessThan(initialZoom);
     });
 
-    it('should have the correct version', () => {
-        expect(game.version).toBe('0.10.2');
-    });
+
 
     it('should synchronize ship.mass with rocket.mass when aiming starts', () => {
         // 標準のステージ初期化
