@@ -12,6 +12,7 @@ export class UISystem {
         this.shopUI = new ShopUI(game, this);
         this.maintenanceUI = new MaintenanceUI(game, this);
         this.titleAnimation = null;
+        this.notificationTimer = null;
     }
 
     update(dt) {
@@ -281,8 +282,32 @@ export class UISystem {
         }
     }
 
+    /**
+     * セクター開始通知を表示。
+     */
+    showSectorNotification(text) {
+        const el = document.getElementById('sector-notification');
+        if (!el) return;
+        
+        el.textContent = text;
+        el.classList.remove('hidden', 'animate');
+        void el.offsetWidth; // 強制リフロー
+        el.classList.add('animate');
+        
+        if (this.notificationTimer) clearTimeout(this.notificationTimer);
+        this.notificationTimer = setTimeout(() => {
+            const currentEl = document.getElementById('sector-notification');
+            if (currentEl) {
+                currentEl.classList.add('hidden');
+                currentEl.classList.remove('animate');
+            }
+            this.notificationTimer = null;
+        }, 3600); // アニメーション時間(3.5s)より少し長く。
+    }
+
     renderList(id, items, type, selected) {
         const el = document.getElementById(id);
+        if (!el) return;
         el.innerHTML = '';
 
         if (items.length === 0) {
@@ -307,6 +332,7 @@ export class UISystem {
             return;
         }
 
+        const fragment = document.createDocumentFragment();
         const groups = ItemUtils.groupItems(items);
         groups.forEach(group => {
             const div = document.createElement('div');
@@ -334,8 +360,9 @@ export class UISystem {
                     this.game.selectPart(type, group.instanceId);
                 }
             };
-            el.appendChild(div);
+            fragment.appendChild(div);
         });
+        el.appendChild(fragment);
     }
 
     generateCardHTML(itemData, options = {}) {
@@ -479,7 +506,12 @@ export class UISystem {
         }
 
         if (groupedItems.length === 0) {
-            if (itemsList) itemsList.innerHTML = '<div class="part-info" style="opacity:0.3;text-align:center;padding:20px;">NO ITEMS COLLECTED</div>';
+            if (itemsList) itemsList.innerHTML = `
+                <div class="slot-placeholder">
+                    <div class="part-header"><span class="part-name" style="opacity: 0.5;">NO ITEMS COLLECTED</span></div>
+                    <span class="part-info">回収アイテムなし</span>
+                </div>
+            `;
         } else {
             groupedItems.forEach(item => {
                 const card = document.createElement('div');

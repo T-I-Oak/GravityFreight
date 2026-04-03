@@ -131,14 +131,9 @@ export class EventSystem {
                 const titleScreen = document.getElementById('title-screen');
                 if (titleScreen) {
                     titleScreen.classList.add('hidden'); // CSS transition (1s) が発動
-                    const timer = setTimeout(() => {
-                        game.setState('building');
-                        this.pendingTimers = this.pendingTimers.filter(t => t !== timer);
-                    }, 1000); 
-                    this.pendingTimers.push(timer);
-                } else {
-                    game.setState('building');
                 }
+                game.setState('building');
+                game.uiSystem.showSectorNotification(`SECTOR ${game.sector} READY`);
             };
         }
 
@@ -380,8 +375,10 @@ export class EventSystem {
         game.tempDismantleResults = null;
         if (game.missionSystem.isGameOver()) { game.uiSystem.showResult('gameover'); return; }
         game.stageLevel++;
+        game.sector = game.stageLevel;
         game.initStage(game.currentStarCount);
         game.setState('building');
+        game.uiSystem.showSectorNotification(`SECTOR ${game.sector} READY`);
         game.selection.rocket = null;
         game.selection.launcher = null;
         game.selection.booster = null;

@@ -121,7 +121,7 @@
         </div>
         <canvas id="title-fg-canvas"></canvas>
         <div class="title-footer">
-            <span class="version">v0.9.1</span>
+            <span class="version">v0.9.2</span>
             <span class="copyright">© T.I.OAK 2026</span>
         </div>
     </div>
@@ -170,7 +170,7 @@
         </div>
     </div>
 
-    <div id="mission-hud" class="panel static">
+    <div id="mission-hud" class="panel static hidden">
         <div class="panel-header">
             <h1 id="title">GRAVITY FREIGHT<span class="subtitle">ORBITAL ECHOES</span></h1>
         </div>
@@ -228,7 +228,7 @@
     </div>
 
     <!-- ビルドシステム UI -->
-    <div id="build-overlay">
+    <div id="build-overlay" class="hidden">
         <div class="panel" id="terminal-panel">
             <div class="panel-header">
                 <div class="tab-header">
@@ -290,7 +290,7 @@
     </div>
 
     <!-- 独立した起動ボタンパネル -->
-    <div id="launch-control">
+    <div id="launch-control" class="hidden">
         <button id="launch-btn" class="btn-neon btn-neon-lg btn-grad-orange hidden bounce" disabled>
             <span class="btn-label">LAUNCH ENGINE</span>
             <span class="btn-subtext">ロケットと発射台を選択すると発射できます</span>
@@ -335,15 +335,18 @@
         </div>
     </div>
 
+    <!-- セクター開始通知用オーバーレイ -->
+    <div id="sector-notification" class="sector-notif hidden"></div>
+
     <div id="ui-layer"></div>
     <!-- 支払明細（レシート）用オーバーレイ -->
-    <div id="receipt-overlay" class="receipt-view">
+    <div id="receipt-overlay" class="receipt-view hidden">
         <div class="receipt-paper" id="receipt-content-area">
             <!-- JSで動的に生成 -->
         </div>
     </div>
     <canvas id="gameCanvas"></canvas>
-    <script type="module" src="GravityFreight/src/main.js?v=0.9.1"></script>
+    <script type="module" src="GravityFreight/src/main.js?v=0.9.2"></script>
 </body>
 </html>
 

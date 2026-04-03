@@ -761,3 +761,51 @@
 }
 
 /* Duplicate :disabled removed (consolidated at top) */
+
+/* セクター開始通知用 (Sector Ready Notification) */
+.sector-notif {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Orbitron', 'Inter', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 
+        0 0 10px rgba(0, 240, 255, 0.8),
+        0 0 20px rgba(0, 240, 255, 0.4),
+        0 0 40px rgba(0, 240, 255, 0.2);
+    z-index: 10000;
+    pointer-events: none;
+    letter-spacing: 0.8rem;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+.sector-notif.animate {
+    animation: sector-toast 3.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes sector-toast {
+    0% { 
+        opacity: 0; 
+        filter: blur(20px); 
+        transform: translate(-50%, -65%) scale(0.85); 
+    }
+    15% { 
+        opacity: 1; 
+        filter: blur(0px); 
+        transform: translate(-50%, -50%) scale(1); 
+    }
+    85% { 
+        opacity: 1; 
+        filter: blur(0px); 
+        transform: translate(-50%, -50%) scale(1); 
+    }
+    100% { 
+        opacity: 0; 
+        filter: blur(10px); 
+        transform: translate(-50%, -35%) scale(1.1); 
+    }
+}
