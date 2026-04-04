@@ -141,16 +141,16 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
 
     describe('7.1 Goal Passing Reward & Mission Success', () => {
         it('should grant total rewards (Base + Bonus) when reaching a goal', () => {
-            const dangerGoal = game.goals.find(g => g.id === 'DANGER'); // 基礎: +5000pt, +50c
+            const dangerGoal = game.goals.find(g => g.id === 'BLACK_MARKET'); // 基礎: +5000pt, +50c
             
             // ランダムなボーナスアイテム抽選がコイン加算に干渉しないようスパイで固定
-            vi.spyOn(game, 'getWeightedRandomItem').mockReturnValue(
+            vi.spyOn(game.missionSystem, 'getWeightedRandomItem').mockReturnValue(
                 { id: 'test_part', category: 'CHASSIS', name: 'Test Part', rarity: RARITY.COMMON }
             );
 
-            // 状況：DANGER配送用の貨物を持ってDANGERゴール到達
+            // 状況：BLACK_MARKET配送用の貨物を持ってBLACK_MARKETゴール到達
             game.pendingItems = [{ 
-                itemData: { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', deliveryGoalId: 'DANGER' } 
+                itemData: { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', deliveryGoalId: 'BLACK_MARKET' } 
             }];
             game.pendingScore = 0;
             game.pendingCoins = 0;
@@ -167,6 +167,7 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
             expect(game.pendingScore, "Total score should be Base(5000) + DeliveryBonus(1500)").toBe(6500);
             expect(game.pendingCoins, "Total coins should be Base(50) + DeliveryBonus(100)").toBe(150);
         });
+
 
         it('BUG FIX: should clear flightResults bonuses on game.reset() to prevent accumulation', () => {
             // 1回目のフライトの成果を模擬

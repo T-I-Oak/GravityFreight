@@ -1,6 +1,7 @@
 {
   "name": "gravityfreight",
-  "version": "0.10.5",
+  "version": "0.10.20",
+
   "description": "2D物理演算ベースの宇宙航行ローグライク",
   "type": "module",
   "scripts": {
