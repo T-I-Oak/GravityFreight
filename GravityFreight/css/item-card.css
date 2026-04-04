@@ -157,13 +157,53 @@
 }
 
 /* Badges and Themes */
-.item-card .inventory-badge {
+.item-card .stack-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 900;
+    color: #050a1a;
+    background: color-mix(in srgb, var(--item-color, #44ccff), #fff 10%);
+    border: none; /* 枠線を削除 */
+    padding: 0px 8px;
+    border-radius: 3px;
+    box-shadow: 0 0 15px color-mix(in srgb, var(--item-color, #44ccff), transparent 40%); /* 少し光を強める */
+    position: relative;
+    min-width: 28px;
+    height: 18px;
+    line-height: 1;
+}
+
+.item-card .stack-badge::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    background: #050a1a;
+    clip-path: polygon(
+        0% 25%, 75% 25%, 75% 100%, 0% 100%, 0% 25%, 
+        25% 25%, 25% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 25%
+    );
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.item-card .stack-badge.mini {
     font-size: 10px;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1px 6px;
-    border-radius: 4px;
+    padding: 0px 6px;
+    min-width: 22px;
+    height: 14px;
+    gap: 3px;
+    border: none; /* 枠線を削除 */
+}
+.item-card .stack-badge.mini::before {
+    width: 6px;
+    height: 6px;
+}
+
+.item-card .stack-count {
+    letter-spacing: 0.2px;
 }
 
 .item-card .selection-badge {

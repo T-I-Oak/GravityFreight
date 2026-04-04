@@ -93,7 +93,6 @@ export class MissionSystem {
             if (!tooClose) {
                 const mass = 5000 + Math.random() * 15000;
                 const body = new Body(pos, mass);
-                // 半径も旧来の公式 (Physics.js の初期 Body クラス準拠)
                 body.radius = Math.sqrt(mass) / 5 + 2;
                 
                 // 各天体(星)の周囲に 1～2 個のアイテムを配置 (仕様 4.1.3, 7.2 に準拠)
@@ -105,6 +104,7 @@ export class MissionSystem {
                         body.items.push(item);
                     }
                 }
+
                 game.bodies.push(body);
             }
         }

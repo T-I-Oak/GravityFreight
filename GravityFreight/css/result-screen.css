@@ -244,9 +244,15 @@
 .result-actions {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 20px;
     margin-top: 5px;
     z-index: 7000;
+    width: 100%;
+}
+
+.result-actions .btn-neon {
+    margin: 0;
 }
 
 

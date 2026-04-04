@@ -23,12 +23,21 @@ export class UIComponents {
 
         let invInfo = "";
         const hasCharges = itemData.charges !== undefined || itemData.maxCharges !== undefined;
-        if (showInventory && hasCharges) {
-            const max = itemData.maxCharges || 2;
-            const current = itemData.charges !== undefined ? itemData.charges : max;
-            invInfo = UIComponents.generateHPGauge(current, max, enhancements.charges > 0);
-        } else if (showInventory && itemData.count > 1) {
-            invInfo = `<span class="inventory-badge">[x ${itemData.count}]</span>`;
+        if (showInventory) {
+            let gauges = "";
+            let stack = "";
+            
+            if (hasCharges) {
+                const max = itemData.maxCharges || 2;
+                const current = itemData.charges !== undefined ? itemData.charges : max;
+                gauges = UIComponents.generateHPGauge(current, max, enhancements.charges > 0);
+            }
+            
+            if (itemData.count > 1) {
+                stack = `<div class="stack-badge"><span class="stack-count">${itemData.count}</span></div>`;
+            }
+            
+            invInfo = `${stack}${gauges}`;
         }
 
         const selTag = (selectionCount > 0) ? ` <span class="selection-badge">[${selectionCount}]</span>` : '';
@@ -89,12 +98,13 @@ export class UIComponents {
             const rows = [];
             merged.forEach(m => {
                 const mGauge = m.maxCharges ? UIComponents.generateHPGauge(m.charges, m.maxCharges, false, true) : '';
+                const mStack = m.count > 1 ? `<div class="stack-badge mini"><span class="stack-count">${m.count}</span></div>` : '';
                 rows.push(`
                     <div class="rocket-module-row">
                         <span class="rocket-module-name">${m.name}</span>
-                        <div style="display:flex; align-items:center;">
-                            <span class="inventory-badge">[x ${m.count}]</span>
-                            <div style="margin-left:8px;">${mGauge}</div>
+                        <div style="display:flex; align-items:center; gap: 8px;">
+                            ${mStack}
+                            ${mGauge}
                         </div>
                     </div>
                 `);
