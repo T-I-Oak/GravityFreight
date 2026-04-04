@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { setupStandardDOM } from '../../test-utils.js';
 import { InventorySystem } from '../../../GravityFreight/src/systems/InventorySystem.js';
 import { UISystem } from '../../../GravityFreight/src/systems/UISystem.js';
@@ -23,6 +23,7 @@ describe('InventorySystem.takeItem: instanceId identity', () => {
             },
             checkReadyToAim: () => {},
             validateModules: () => {},
+            incrementCollectedItems: vi.fn(),
             updateUI: () => {}
         };
 

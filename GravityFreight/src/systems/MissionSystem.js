@@ -159,6 +159,7 @@ export class MissionSystem {
                 const { category } = itemData;
 
                 if (category === 'CARGO') {
+                    game.incrementCollectedItems(itemData.count || 1);
                     if (hitGoal && itemData.deliveryGoalId) {
                         const isMatch = hitGoal.id === itemData.deliveryGoalId;
                         if (isMatch) {
@@ -207,6 +208,7 @@ export class MissionSystem {
                 }
 
                 if (category === 'COIN') {
+                    game.incrementCollectedItems(itemData.count || 1);
                     game.pendingCoins += itemData.score || 0;
                     game.flightResults.items.push(itemData);
                     return;

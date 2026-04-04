@@ -61,13 +61,18 @@ export class InventorySystem {
 
         this._ensureInstanceId(item);
 
+        const count = item.count !== undefined ? item.count : 1;
+        if (isNew) {
+            this.game.incrementCollectedItems(count);
+        }
+
         // 重複スタックの判定（共通ロジックを使用）
         const existing = list.find(i => ItemUtils.areItemsEquivalent(i, item));
 
         if (existing) {
-            existing.count = (existing.count || 1) + (item.count || 1);
+            existing.count = (existing.count || 1) + count;
         } else {
-            if (item.count === undefined) item.count = 1;
+            item.count = count;
             list.push(item);
         }
     }

@@ -356,8 +356,9 @@ describe('Implementation: Game Core Controllers', () => {
         expect(html).toContain('通商物資');
         expect(html).toContain('DELIVERED');
         expect(html).toContain('軽量シャーシ');
-        // cargo itself should show grouped count
-        expect(html).toContain('[x 2]');
+        expect(html).toContain('stack-badge');
+        expect(html).toContain('stack-count');
+        expect(html).toContain('2');
     });
 
     it('[Spec 2.6] enterMapViewMode() must add minimized and show back button', () => {

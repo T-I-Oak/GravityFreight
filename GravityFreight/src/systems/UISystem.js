@@ -481,9 +481,23 @@ export class UISystem {
         game.pendingCoins = 0;
 
         if (resultType === 'gameover') {
-            this.addRow(statsList, 'SECTORS COMPLETED ......', (game.sector || 1) - 1, 'score', 'SCS');
-            this.addRow(statsList, 'TOTAL DELIVERIES .......', game.totalDeliveries || 0, 'coin', 'PCS');
-            this.addRow(statsList, 'FINAL SCORE ............', game.score || 0, 'score', 'PTS');
+            const sectors = (game.sector || 1) - 1;
+            const collected = game.totalCollectedItems || 0;
+            const score = Math.floor(game.score || 0);
+
+            // 各項目のグレード情報を事前に取得
+            const sInfo = this._getGradeInfo(sectors, 10);
+            const cInfo = this._getGradeInfo(collected, 30);
+            const pInfo = this._getGradeInfo(score, 50000);
+
+            // ランキング順位を取得（保存自体は showTerminalReport で行うのでここでは checkRank）
+            const sRank = game.rankingSystem.checkRank('sector', sectors);
+            const cRank = game.rankingSystem.checkRank('collected', collected);
+            const pRank = game.rankingSystem.checkRank('score', score);
+
+            this.addRow(statsList, 'SECTORS COMPLETED', sectors, 'score', 'SCS', { grade: sInfo.grade, rank: sRank });
+            this.addRow(statsList, 'TOTAL COLLECTED', collected, 'coin', 'PCS', { grade: cInfo.grade, rank: cRank });
+            this.addRow(statsList, 'FINAL SCORE', score, 'score', 'PTS', { grade: pInfo.grade, rank: pRank });
         } else {
             this.addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
 
@@ -674,37 +688,101 @@ export class UISystem {
     initRepairDock(container) { this.maintenanceUI.initRepairDock(container); }
     initBlackMarket(container) { this.shopUI.initBlackMarket(container); }
 
+    _getGradeInfo(value, target, type = 'single') {
+        const score = type === 'single' ? Math.sqrt(value / target) * 100 : value;
+        const grades = ['E', 'D', 'C', 'B', 'A', 'S', 'SS'];
+        const step = type === 'single' ? 20 : 50;
+        const index = Math.min(grades.length - 1, Math.floor(score / step));
+        return {
+            grade: grades[index],
+            score: score,
+            className: `grade-${grades[index].toLowerCase()}`
+        };
+    }
+
     showTerminalReport() {
         const game = this.game;
         const overlay = document.getElementById('receipt-overlay');
         const content = document.getElementById('receipt-content-area');
         if (!overlay || !content) return;
 
-        // 【修正】無限再帰を防ぐため、ここからは showResult を呼ばない。
-        // showResult('gameover') から本メソッドが呼ばれることを前提とする。
-
         const sectors = game.sector - 1;
-        const deliveries = game.totalDeliveries || 0;
+        const collected = game.totalCollectedItems || 0;
         const score = Math.floor(game.score);
-        
+
+        // ランキングの保存
+        const sectorRank = game.rankingSystem.addEntry('sector', sectors);
+        const collectedRank = game.rankingSystem.addEntry('collected', collected);
+        const scoreRank = game.rankingSystem.addEntry('score', score);
+
+        // 各項目の評価計算 (目標値 15, 50, 100000)
+        const sectorInfo = this._getGradeInfo(sectors, 15);
+        const collectedInfo = this._getGradeInfo(collected, 50);
+        const scoreInfo = this._getGradeInfo(score, 100000);
+
+        const totalScoreVal = sectorInfo.score + collectedInfo.score + scoreInfo.score;
+        const totalInfo = this._getGradeInfo(totalScoreVal, 1, 'total');
+
         const now = new Date();
         const timestamp = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
 
-        // 一括で内容をセット（オリジナル演出の復活）
+        const getRankText = (rankInfo, label) => {
+            if (!rankInfo || !rankInfo.rank) return `${label} OUT OF TOP 20`;
+            const isTop = rankInfo.rank <= 3;
+            const suffix = ['st', 'nd', 'rd'][(rankInfo.rank - 1) % 10] || 'th';
+            const realSuffix = (rankInfo.rank >= 11 && rankInfo.rank <= 13) ? 'th' : suffix;
+            const topClass = isTop ? 'top-rank' : '';
+            return `<span class="${topClass}">${label} RANKING <span class="rank-value">${rankInfo.rank}${realSuffix}</span></span>`;
+        };
+
+        const stampRotation = -10 - (Math.random() * 15); // -10 to -25 deg
+        const stampOffsetX = (Math.random() - 0.5) * 20; // -10 to +10 px
+        const stampOffsetY = (Math.random() - 0.5) * 15; // -7.5 to +7.5 px
+        
+        // Grade size variant (huge / normal / mini)
+        let sizeVariant = 'normal';
+        if (totalInfo.grade === 'SS') sizeVariant = 'huge';
+        if (totalInfo.grade === 'E') sizeVariant = 'mini';
+
         content.innerHTML = `
             <div class="receipt-header">
-                <h1 class="receipt-title">PAYMENT ADVICE</h1>
-                <div class="receipt-subtitle">GRAVITY FREIGHT CO. - DELIVERY REPORT</div>
+                <h1 class="receipt-title">TERMINAL REPORT</h1>
+                <div class="receipt-subtitle">GRAVITY FREIGHT CO. - FINAL EVALUATION</div>
             </div>
             <div class="receipt-divider-dotted"></div>
-            <div class="receipt-row"><span>SECTORS COMPLETED</span><span>${sectors} SCS</span></div>
-            <div class="receipt-row"><span>TOTAL DELIVERIES</span><span>${deliveries} PCS</span></div>
+            
+            <div class="receipt-item-group">
+                <div class="receipt-row"><span>SECTORS COMPLETED</span><span>${sectors} SCS</span></div>
+                <div class="receipt-detail">${getRankText(sectorRank, 'SECTOR')} / GRADE <span class="grade-value receipt-grade-${sectorInfo.grade.toLowerCase()}">${sectorInfo.grade}</span></div>
+            </div>
+
+            <div class="receipt-item-group">
+                <div class="receipt-row"><span>TOTAL COLLECTED</span><span>${collected} PCS</span></div>
+                <div class="receipt-detail">${getRankText(collectedRank, 'COLLECTION')} / GRADE <span class="grade-value receipt-grade-${collectedInfo.grade.toLowerCase()}">${collectedInfo.grade}</span></div>
+            </div>
+
             <div class="receipt-divider-solid"></div>
-            <div class="receipt-row total"><span>FINAL SCORE</span><span>${(score || 0).toLocaleString()} PTS</span></div>
-            <div class="receipt-stamp-zone"></div>
+            <div class="receipt-row total"><span>FINAL SCORE</span><span>${score.toLocaleString()} PTS</span></div>
+            <div class="receipt-detail">${getRankText(scoreRank, 'SCORE')} / GRADE <span class="grade-value receipt-grade-${scoreInfo.grade.toLowerCase()}">${scoreInfo.grade}</span></div>
+
+            <div class="receipt-stamp-zone">
+                <div class="receipt-official-seal stamp-${totalInfo.grade.toLowerCase()} ${sizeVariant}" 
+                     id="report-stamp"
+                     style="--stamp-rot: ${stampRotation}deg; --stamp-x: ${stampOffsetX}px; --stamp-y: ${stampOffsetY}px;">
+                    <div class="receipt-stamp-left-half">
+                        <div class="receipt-stamp-text-line small">OPERATOR AUTH.</div>
+                        <div class="receipt-stamp-text-line medium">CONTRACT VERIFIED</div>
+                        <div class="receipt-stamp-text-line large">GRADE</div>
+                    </div>
+                    <div class="receipt-stamp-right-half">
+                        ${totalInfo.grade}
+                    </div>
+                </div>
+            </div>
+
             <div class="barcode-container"></div>
             <div class="receipt-footer">
-                <div class="auth-status">OPERATOR AUTHENTICATION REQUIRED</div>
+                <div class="auth-status">OFFICIAL PERFORMANCE LOG GRANTED</div>
                 <div class="timestamp">${timestamp}</div>
             </div>
             <button class="receipt-btn" id="receipt-exit-btn">END CONTRACT</button>
@@ -712,10 +790,13 @@ export class UISystem {
 
         overlay.classList.remove('hidden');
         
-        // 2フレーム待機して、確実に計算を走らせてからアニメーションを開始
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 overlay.classList.add('active');
+                setTimeout(() => {
+                    const stamp = document.getElementById('report-stamp');
+                    if (stamp) stamp.classList.add('active');
+                }, 800);
             });
         });
 
@@ -843,16 +924,37 @@ export class UISystem {
         if (sectorDisplay) sectorDisplay.textContent = game.sector;
     }
 
-    addRow(parent, label, value, colorClass, unit = '') {
+    addRow(parent, label, value, colorClass, unit = '', extra = null) {
         if (!parent) return;
         const row = document.createElement('div');
         row.className = 'result-row stagger-in';
+        if (extra) row.classList.add('terminal-report-row');
+
         row.style.animationDelay = `${this._resultDelay}s`;
         const displayValue = typeof value === 'number' ? 
             (value >= 0 ? '+' : '') + value.toLocaleString() : 
             value;
         const unitText = unit ? ` ${unit}` : '';
-        row.innerHTML = `<span class="label">${label}</span><span class="value ${colorClass}">${displayValue}${unitText}</span>`;
+        
+        let html = `
+            <div class="main-content">
+                <span class="label">${label}</span>
+                <span class="value ${colorClass}">${displayValue}${unitText}</span>
+            </div>
+        `;
+
+        if (extra) {
+            const rankText = extra.rank ? `${extra.rank}${(extra.rank === 1 ? 'st' : (extra.rank === 2 ? 'nd' : (extra.rank === 3 ? 'rd' : 'th')))}` : 'OUT OF RANK';
+            const rankClass = extra.rank <= 3 ? 'top-rank' : '';
+            html += `
+                <div class="extra-info">
+                    <span class="rank-label ${rankClass}">${rankText} IN RANKINGS</span>
+                    <span class="grade-tag grade-${extra.grade.toLowerCase()}">${extra.grade}</span>
+                </div>
+            `;
+        }
+
+        row.innerHTML = html;
         parent.appendChild(row);
         this._resultDelay += 0.1;
     }

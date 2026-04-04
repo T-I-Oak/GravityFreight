@@ -68,4 +68,31 @@ export function setupStandardDOM() {
             drawImage: vi.fn()
         });
     }
+
+    // Mock localStorage
+    const mockStorage = {
+        getItem: vi.fn(),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn()
+    };
+
+    if (typeof localStorage !== 'undefined') {
+        try {
+            Object.defineProperty(window, 'localStorage', {
+                value: mockStorage,
+                writable: true,
+                configurable: true
+            });
+        } catch (e) {
+            // Fallback for strict environments
+            ['getItem', 'setItem', 'removeItem', 'clear'].forEach(method => {
+                try {
+                    Object.defineProperty(localStorage, method, { value: vi.fn(), configurable: true });
+                } catch (e2) {}
+            });
+        }
+    } else {
+        global.localStorage = mockStorage;
+    }
 }

@@ -180,6 +180,56 @@
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
+/* --- Terminal Report Specific Row Styles --- */
+.terminal-report-row {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 0;
+}
+
+.terminal-report-row .main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.terminal-report-row .extra-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 4px;
+    padding-right: 10px; /* Slight indentation from right */
+}
+
+.terminal-report-row .rank-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+}
+
+.terminal-report-row .rank-label.top-rank {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6), 0 0 20px rgba(255, 215, 0, 0.3);
+    font-size: 13px;
+    font-weight: 900;
+    animation: goldPulse 2s infinite ease-in-out;
+}
+
+@keyframes goldPulse {
+    0%, 100% { filter: brightness(1) drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
+    50% { filter: brightness(1.3) drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)); }
+}
+
+
+.terminal-report-row .grade-tag {
+    margin-top: 4px;
+    font-size: 12px;
+    padding: 2px 8px;
+}
+
+
 .reward-item-card {
     margin-bottom: 8px;
     opacity: 0;

@@ -8,13 +8,15 @@ import { PhysicsOrchestrator } from '../systems/PhysicsOrchestrator.js';
 import { UISystem } from '../systems/UISystem.js';
 import { EventSystem } from '../systems/EventSystem.js';
 import { Renderer } from '../systems/RenderingSystem.js';
+import { RankingSystem } from '../systems/RankingSystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
+        console.log("DEBUG: Game instance creating (v0.13.0+)");
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.12.0";
+        this.version = "0.13.0";
 
 
 
@@ -27,6 +29,7 @@ export class Game {
         this.physicsOrchestrator = new PhysicsOrchestrator(this);
         this.uiSystem = new UISystem(this);
         this.eventSystem = new EventSystem(this);
+        this.rankingSystem = new RankingSystem(this);
 
         this.renderer = new Renderer(canvas, this);
         this.bodies = [];
@@ -60,6 +63,7 @@ export class Game {
         this.launchScore = 0;
         this.launchCoins = 0;
         this.totalDeliveries = 0;
+        this.totalCollectedItems = 0;
 
         this.selection = {
             chassis: null,
@@ -139,6 +143,10 @@ export class Game {
 
     consumeRocketOnFailure() { this.missionSystem.consumeRocketOnFailure(); }
     getPredictionPoints() { return this.physicsOrchestrator.getPredictionPoints(); }
+
+    incrementCollectedItems(count = 1) {
+        this.totalCollectedItems += count;
+    }
 
     handleResize(w, h) {
         const oldW = this.canvas.width;
@@ -231,6 +239,7 @@ export class Game {
         this.totalDeliveries = 0;
         this.launchScore = 0;
         this.launchCoins = 0;
+        this.totalCollectedItems = 0;
 
         // インベントリと選択のリセット
         this.inventorySystem.inventory = { chassis: [], logic: [], launchers: [], rockets: [], modules: [], boosters: [] };
