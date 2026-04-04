@@ -175,9 +175,6 @@ export class PhysicsOrchestrator {
                 game.state = 'cleared';
                 game.stateTimer = ANIMATION_DURATION / 1000;
                 game.lastHitGoal = hitGoal;
-                game.pendingGoalBonus = hitGoal.score;
-                game.pendingCoins += (hitGoal.coins || 0);
-                game.flightResults.bonuses.push({ name: 'Goal Bonus', value: hitGoal.score, coins: hitGoal.coins || 0 });
                 game.sector++;
                 game.resolveItems('success', hitGoal);
             } else {

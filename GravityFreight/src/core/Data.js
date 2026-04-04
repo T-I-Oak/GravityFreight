@@ -55,12 +55,12 @@ export const PARTS = {
         { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
     ],
     LAUNCHERS: [
-        { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LN1200-2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的な性能の発射台。' },
-        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PR1000-2]', power: 1000, maxCharges: 2, precisionMultiplier: 1.5, rarity: RARITY.COMMON, description: '予測精度を50%向上させた発射台。発射速度は遅い。' },
-        { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LN1200-3]', power: 1200, maxCharges: 3, rarity: RARITY.UNCOMMON, description: '標準発射台の耐久力を向上させたモデル。' },
-        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PR1000-3]', power: 1000, maxCharges: 3, precisionMultiplier: 1.5, rarity: RARITY.UNCOMMON, description: '精密発射台の耐久力を向上させたモデル。' },
-        { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LN1200-4]', power: 1200, maxCharges: 4, rarity: RARITY.RARE, description: '標準発射台の耐久力をさらに向上させたモデル。' },
-        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PR1000-4]', power: 1000, maxCharges: 4, precisionMultiplier: 1.5, rarity: RARITY.RARE, description: '精密発射台の耐久力をさらに向上させたモデル。' }
+        { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LN-1200/2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的な性能の発射台。' },
+        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PR-1000/2]', power: 1000, maxCharges: 2, precisionMultiplier: 1.5, rarity: RARITY.COMMON, description: '予測精度を50%向上させた発射台。発射速度は遅い。' },
+        { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LN-1210/3]', power: 1210, maxCharges: 3, rarity: RARITY.UNCOMMON, description: '標準発射台のスピードと容量を向上した改良版。' },
+        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PR-1010/3]', power: 1010, maxCharges: 3, precisionMultiplier: 1.5, rarity: RARITY.UNCOMMON, description: '精密発射台のスピードと容量を向上した改良版。' },
+        { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LN-1220/4]', power: 1220, maxCharges: 4, rarity: RARITY.RARE, description: '標準発射台のスピードと容量をさらに向上した改良版。' },
+        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PR-1020/4]', power: 1020, maxCharges: 4, precisionMultiplier: 1.5, rarity: RARITY.RARE, description: '精密発射台のスピードと容量をさらに向上した改良版。' }
     ],
     MODULES: [
         { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: '拡張スロットを追加するモジュール。' },

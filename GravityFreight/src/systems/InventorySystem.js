@@ -49,7 +49,12 @@ export class InventorySystem {
         return item.instanceId;
     }
 
-    addItem(item) {
+    /**
+     * インベントリにアイテムを追加します。
+     * @param {Object} item 追加するアイテム
+     * @param {Object} options オプション (isNew: true の場合のみ取得数としてカウントする用途に使用)
+     */
+    addItem(item, { isNew = true } = {}) {
         const category = (item.category || '').toLowerCase();
         const list = this.inventory[category];
         if (!list) return;

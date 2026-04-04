@@ -414,12 +414,19 @@ export class EventSystem {
         const massFactor = Math.sqrt(10 / game.ship.mass);
         game.ship.velocity = new Vector2(Math.cos(angle) * (power * massFactor), Math.sin(angle) * (power * massFactor));
 
-        l.charges--;
-        if (l.charges <= 0) {
-            game.inventorySystem.takeItem('launchers', l.instanceId);
-            game.selection.launcher = null;
-            game.showStatus('ランチャーの耐久度が尽きました。', 'info');
+        // スタック対応：1個だけ取り出して使用、残れば再マージする
+        const taken = game.inventorySystem.takeItem('launchers', l.instanceId, 1);
+        if (taken) {
+            taken.charges--;
+            if (taken.charges > 0) {
+                game.inventorySystem.addItem(taken, { isNew: false });
+            } else {
+                game.showStatus('ランチャーの耐久度が尽きました。', 'info');
+            }
         }
+
+        // 使用後は選択を解除（インベントリ内の状態が変わるため）
+        game.selection.launcher = null;
 
         if (b && !b.preventsLauncherWear) {
             // ブースター自体の回数消費が必要な場合はここで行う

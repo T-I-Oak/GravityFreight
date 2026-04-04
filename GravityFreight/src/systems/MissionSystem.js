@@ -140,26 +140,18 @@ export class MissionSystem {
 
     resolveItems(result, hitGoal = null) {
         const game = this.game;
-        let luckCount = 0;
         if (result === 'success') {
-            // ゴール通過基礎アイテム報酬 (Spec 6.1)
-            if (hitGoal) {
-                const bonusItemCount = hitGoal.bonusItems || 0;
-                for (let k = 0; k < bonusItemCount; k++) {
-                    const bonus = game.getWeightedRandomItem({ thresholdBonus: 5, excludeCargo: true });
-                    if (bonus) {
-                        if (bonus.category === 'COIN') {
-                            game.pendingCoins += bonus.score || 0;
-                        } else {
-                            game._addItemToInventory(bonus);
-                        }
-                    }
-                }
-            }
+            let luckCount = 0;
 
-            if (!game.pendingItems || game.pendingItems.length === 0) {
-                game.updateUI();
-                return;
+            // 【Spec 6.1】ゴールの基本報酬（スコア・コイン）は貨物に関係なく常に 1 回だけ付与する
+            if (hitGoal) {
+                game.pendingScore += (hitGoal.score || 0);
+                game.pendingCoins += (hitGoal.coins || 0);
+                game.flightResults.bonuses.push({ 
+                    name: `${hitGoal.label} Reward`, 
+                    value: hitGoal.score || 0, 
+                    coins: hitGoal.coins || 0 
+                });
             }
 
             game.pendingItems.forEach((pItem) => {
@@ -167,48 +159,51 @@ export class MissionSystem {
                 const { category } = itemData;
 
                 if (category === 'CARGO') {
-                    if (hitGoal) {
-                        if (itemData.deliveryGoalId) {
-                            const isMatch = hitGoal.id === itemData.deliveryGoalId;
-                            if (isMatch) {
-                                game.pendingScore += 1500;
-                                game.pendingCoins += 100;
-                                const deliveryItem = { ...itemData, isDelivery: true, isMatch: true, bonusItems: [] };
-                                game.flightResults.items.push(deliveryItem);
-                                game.flightResults.bonuses.push({ name: 'Delivery Bonus', value: 1500, coins: 100 });
+                    if (hitGoal && itemData.deliveryGoalId) {
+                        const isMatch = hitGoal.id === itemData.deliveryGoalId;
+                        if (isMatch) {
+                            // 【Spec 6.2】配送ボーナスは一致する貨物の数 (N) に応じて個別に加算（N倍）
+                            game.pendingScore += 1500;
+                            game.pendingCoins += 100;
+                            game.flightResults.bonuses.push({ 
+                                name: 'Delivery Bonus', 
+                                value: 1500, 
+                                coins: 100 
+                            });
 
-                                // Spec 6.2 A: 一致配送ボーナスアイテム (Gacha)
-                                const bonusItemCount = hitGoal.bonusItems || 0;
-                                for (let k = 0; k < bonusItemCount; k++) {
-                                    const bonus = game.getWeightedRandomItem({ thresholdBonus: 5, excludeCargo: true });
-                                    if (!bonus) continue;
-                                    deliveryItem.bonusItems.push({ ...bonus });
+                            const deliveryItem = { ...itemData, isDelivery: true, isMatch: true, bonusItems: [] };
+                            game.flightResults.items.push(deliveryItem);
 
-                                    if (bonus.category === 'COIN') {
-                                        game.pendingCoins += bonus.score || 0;
-                                    } else {
-                                        game._addItemToInventory(bonus);
-                                    }
+                            // ボーナスアイテムの付与 (一致貨物 1 個につき 6.1 の定義数分)
+                            const bonusItemCount = hitGoal.bonusItems || 0;
+                            for (let k = 0; k < bonusItemCount; k++) {
+                                const bonus = game.getWeightedRandomItem({ thresholdBonus: 5, excludeCargo: true });
+                                if (!bonus) continue;
+                                deliveryItem.bonusItems.push({ ...bonus });
+
+                                if (bonus.category === 'COIN') {
+                                    game.pendingCoins += bonus.score || 0;
+                                } else {
+                                    game._addItemToInventory(bonus);
                                 }
-                                game.totalDeliveries++;
-                            } else {
-                                game.pendingCoins += 10;
-                                game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false });
-                                game.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: 10 });
                             }
+                            game.totalDeliveries++;
                         } else {
-                            if (itemData.id === 'cargo_lucky') {
-                                luckCount++;
-                            }
-                            game.flightResults.items.push({ ...itemData });
+                            // 不一致配送: 一律 +10 コインのみ
+                            game.pendingCoins += 10;
+                            game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false });
+                            game.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: 10 });
                         }
-                        return;
+                    } else if (hitGoal) {
+                        if (itemData.id === 'cargo_lucky') luckCount++;
+                        game.flightResults.items.push({ ...itemData });
                     } else {
+                        // 母星帰還
                         if (!game.homeStar.items) game.homeStar.items = [];
                         game.homeStar.items.push(itemData);
                         game.homeStar.isCollected = false;
-                        return;
                     }
+                    return;
                 }
 
                 if (category === 'COIN') {
@@ -219,6 +214,7 @@ export class MissionSystem {
 
                 game._addItemToInventory(itemData);
             });
+
             game.pendingItems = [];
             game.currentCoinDiscount = Math.min(0.5, luckCount * 0.1);
 

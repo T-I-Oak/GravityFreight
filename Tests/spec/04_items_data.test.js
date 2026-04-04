@@ -63,8 +63,8 @@ describe('Spec: Items & Data (Chapter 4)', () => {
 
         describe('Launcher Names (New Model Numbers)', () => {
             it('should have correct LN1200 and PR1000 model names', () => {
-                checkItem('pad_standard_d2', { name: '標準発射台 [LN1200-2]' });
-                checkItem('pad_precision_d2', { name: '精密発射台 [PR1000-2]' });
+                checkItem('pad_standard_d2', { name: '標準発射台 [LN-1200/2]' });
+                checkItem('pad_precision_d2', { name: '精密発射台 [PR-1000/2]' });
             });
         });
 

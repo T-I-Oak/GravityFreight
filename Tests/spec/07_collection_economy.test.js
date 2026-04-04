@@ -113,6 +113,7 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
             // Insurance x2 = 240
             
             game.pendingItems = [{ itemData: { id: 'junk' } }]; // Trigger for resolveItems failure
+            game.pendingCoins = 0;
             game.resolveItems('lost');
             
             expect(game.pendingCoins).toBe(240);
@@ -155,15 +156,11 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
             game.pendingScore = 0;
             game.pendingCoins = 0;
 
-            // 1. PhysicsOrchestrator によるゴール通過基礎報酬の加算（実際の挙動を模擬）
-            game.pendingScore += dangerGoal.score;
-            game.pendingCoins += (dangerGoal.coins || 0);
-            
-            // 2. MissionSystem による配送ボーナスの加算
+            // MissionSystem による報酬の加算 (v0.11 アーキテクチャ: ここですべて完結する)
             game.missionSystem.resolveItems('success', dangerGoal);
             
-            // 合計: 基礎(5000) + 配送ボーナス(1500) = 6500pt
-            // コイン: 基礎(50) + 配送ボーナス(100) = 150c
+            // 合計: 1 x (基礎(5000) + 配送ボーナス(1500)) = 6500pt
+            // コイン: 1 x (基礎(50) + 配送ボーナス(100)) = 150c
             expect(game.pendingScore, "Total score should be Base(5000) + DeliveryBonus(1500)").toBe(6500);
             expect(game.pendingCoins, "Total coins should be Base(50) + DeliveryBonus(100)").toBe(150);
         });
