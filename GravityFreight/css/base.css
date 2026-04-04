@@ -15,7 +15,7 @@ html {
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: hidden; /* Ensure full screen is hidden */
     background-color: var(--bg-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-color);
@@ -25,22 +25,24 @@ html {
 }
 
 
-/* アプリケーション共通のカスタムスクロールバー */
+/* アプリケーション共通のカスタムスクロールバー (Stylish Cyan Neon) */
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 4px; /* Thin / Minimalist */
+    height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 212, 255, 0.2);
-    border-radius: 3px;
+    background: rgba(0, 255, 204, 0.2);
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 212, 255, 0.4);
+    background: rgba(0, 255, 204, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
 }
 
 .hidden {
@@ -56,4 +58,3 @@ html {
     z-index: 1;
     touch-action: none;
 }
-

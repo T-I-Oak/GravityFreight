@@ -1,0 +1,124 @@
+/* --- Title Screen --- */
+#title-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0, 20, 40, 0.7) 0%, rgba(0, 5, 10, 0.95) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+    backdrop-filter: blur(8px);
+    transition: opacity 1s ease, visibility 1s;
+}
+
+#title-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#title-screen canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#title-bg-canvas { z-index: 1; }
+#title-screen .title-container { z-index: 2; position: relative; }
+#title-fg-canvas { z-index: 3; }
+
+#title-screen .title-container {
+    text-align: center;
+    animation: titleFloat 6s ease-in-out infinite;
+}
+
+#title-screen .game-logo {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 10vw, 4.5rem);
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 
+        0 0 15px rgba(0, 212, 255, 0.6),
+        0 0 30px rgba(0, 212, 255, 0.3);
+    margin-bottom: 3rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    white-space: normal;
+    word-break: keep-all;
+    max-width: 90vw;
+    padding: 0 20px;
+}
+
+
+#title-screen .game-logo .subtitle {
+    font-size: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    color: rgba(0, 255, 204, 0.8);
+    letter-spacing: 12px;
+    margin-top: 15px;
+    display: block;
+    text-transform: uppercase;
+}
+
+#title-screen .menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    width: 90%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+#title-screen .menu-buttons .btn-neon {
+    width: 100%;
+    min-width: 280px;
+    border-radius: 50px;
+    padding: 16px 32px;
+}
+
+
+
+/* Coming Soon Badge (formerly inline) */
+#title-screen .ranking-coming-soon {
+    font-size: 0.7em;
+    opacity: 0.6;
+}
+
+#title-screen .title-footer {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 40px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+}
+
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+/* Responsive adjustments for Title Screen */
+@media (max-width: 600px) {
+    #title-screen .game-logo {
+        font-size: 3rem;
+    }
+    #title-screen .game-logo .subtitle {
+        font-size: 1rem;
+        letter-spacing: 6px;
+    }
+}
+

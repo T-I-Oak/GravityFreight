@@ -1,208 +1,5 @@
-/* --- Event Screen --- */
+/* --- Event Screen (#event-screen) --- */
 
-@keyframes eventSlideIn {
-    0% {
-        transform: translateY(50px) scale(0.95);
-        opacity: 0;
-    }
-
-    100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-    }
-}
-
-.event-title-group h2 {
-    margin: 0;
-    font-size: 32px;
-    letter-spacing: 4px;
-    font-weight: 900;
-    text-transform: uppercase;
-    font-family: 'Orbitron', sans-serif;
-}
-
-#event-description {
-    margin: 5px 0 0 0;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.5);
-    letter-spacing: 1px;
-}
-
-/* 拠点別テーマカラー */
-.theme-trading #event-location {
-    color: #44ffbb;
-    text-shadow: 0 0 20px rgba(68, 255, 187, 0.4);
-}
-
-.theme-trading #event-icon {
-    border-color: #44ffbb;
-    color: #44ffbb;
-    box-shadow: inset 0 0 20px rgba(68, 255, 187, 0.1);
-}
-
-.theme-repair #event-location {
-    color: #4488ff;
-    text-shadow: 0 0 20px rgba(68, 136, 255, 0.4);
-}
-
-.theme-repair #event-icon {
-    border-color: #4488ff;
-    color: #4488ff;
-    box-shadow: inset 0 0 20px rgba(68, 136, 255, 0.1);
-}
-
-.theme-blackmarket #event-location {
-    color: #ff4455;
-    text-shadow: 0 0 20px rgba(255, 68, 85, 0.4);
-}
-
-.theme-blackmarket #event-icon {
-    border-color: #ff4455;
-    color: #ff4455;
-    box-shadow: inset 0 0 20px rgba(255, 68, 85, 0.1);
-}
-
-.event-content {
-    flex: 1;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding-right: 10px;
-}
-
-.event-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 25px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.player-credits {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-}
-
-.player-credits .label {
-    font-size: 12px;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.4);
-    letter-spacing: 2px;
-}
-
-.player-credits .value {
-    font-size: 32px;
-    font-weight: 900;
-    color: #ffd700;
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-}
-
-.player-credits .currency {
-    font-size: 14px;
-    color: #ffd700;
-    opacity: 0.7;
-}
-
-.premium-button {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 15px 35px;
-    border-radius: 50px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    font-size: 14px;
-}
-
-.premium-button:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-/* イベントアイテムカード (Shop/Repair等で使用) */
-
-
-.event-card .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-.event-card h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-}
-
-.event-card .price-tag {
-    background: rgba(255, 215, 0, 0.1);
-    color: #ffd700;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 900;
-    border: 1px solid rgba(255, 215, 0, 0.2);
-}
-
-.event-card .card-desc {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
-    line-height: 1.5;
-}
-
-.event-card button {
-    margin-top: 5px;
-    padding: 10px;
-    background: var(--accent-color);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: 800;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.event-card button:hover:not(:disabled) {
-    filter: brightness(1.2);
-    transform: translateY(-1px);
-}
-
-.event-card button:disabled {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.2);
-    cursor: not-allowed;
-}
-
-/* レアリティ別ボーダー */
-.rarity-0 {
-    border-left: 4px solid #888;
-}
-
-.rarity-1 {
-    border-left: 4px solid #44ffbb;
-}
-
-.rarity-2 {
-    border-left: 4px solid #4488ff;
-}
-
-.rarity-3 {
-    border-left: 4px solid #cc44ff;
-}
-
-.rarity-4 {
-    border-left: 4px solid #ffd700;
-}
-
-/* --- Event Screen Enhancements --- */
 #event-screen {
     pointer-events: auto;
     position: fixed;
@@ -225,7 +22,7 @@
     visibility: hidden;
 }
 
-.event-backdrop {
+#event-screen .event-backdrop {
     -webkit-backdrop-filter: blur(10px);
     position: absolute;
     top: 0;
@@ -236,7 +33,7 @@
     backdrop-filter: blur(15px);
 }
 
-.event-modal {
+#event-screen .event-modal {
     gap: 30px;
     position: relative;
     width: 1000px;
@@ -262,296 +59,14 @@
         transform: translateY(30px);
         opacity: 0;
     }
-
     to {
         transform: translateY(0);
         opacity: 1;
     }
 }
 
-#event-content {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 30px;
-    overflow: hidden;
-    min-height: 0;
-}
-
-.event-section,
-.event-shop-section,
-.event-sell-section,
-.repair-section,
-.dismantle-section,
-.dismantle-results-section {
-    /* セクション間の垂直余白 */
-    /* 装飾を削除し、余白をカード側に任せる */
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    margin-bottom: 30px;
-    /* セクション間の垂直余白 */
-    padding: 0;
-    /* 装飾を削除し、余白をカード側に任せる */
-    background: none;
-    border: none;
-    box-shadow: none;
-}
-
-.event-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 4px;
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-}
-
-
-.event-card {
-    gap: 4px;
-    background: none;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    transition: all 0.2s ease;
-    overflow: visible;
-}
-
-.event-card:hover {
-    filter: brightness(1.1);
-}
-
-.card-item-column {
-    flex: 1;
-    min-width: 0;
-}
-
-.event-section h3,
-.event-shop-section h3,
-.event-sell-section h3,
-.repair-section h3,
-.dismantle-section h3,
-.market-results-area h3 {
-    margin: 0 0 8px 0;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    opacity: 0.9;
-}
-
-.card-action-column {
-    width: 160px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 2px;
-    padding: 0 0 0 16px;
-    background: none;
-    border: none;
-}
-
-.price-val {
-    font-size: 22px;
-    font-weight: 900;
-    color: #ffd700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-    font-family: 'Inter', sans-serif;
-}
-
-.currency {
-    font-size: 14px;
-    color: #ffd700;
-    opacity: 0.8;
-    font-weight: 800;
-}
-
-.discount-tag {
-    /* 価格の数値に対して中央に見えるように微調整しつつ傾ける */
-    display: inline-flex;
-    align-items: baseline;
-    gap: 1px;
-    background: #444;
-    color: #fff;
-    font-size: 8px;
-    font-weight: 900;
-    padding: 2px 6px;
-    border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    white-space: nowrap;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    margin-left: 8px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    text-transform: uppercase;
-    /* 価格の数値に対して中央に見えるように微調整しつつ傾ける */
-    align-self: center;
-    transform: rotate(10deg);
-}
-
-.discount-tag .pct-num {
-    font-size: 13px;
-    letter-spacing: -0.5px;
-    line-height: 1;
-}
-
-.discount-tag .pct-sym {
-    font-size: 8px;
-    margin-right: 2px;
-}
-
-/* 割引レベル別の色分け (Visibility & Urgency) */
-.discount-tag[data-level="low"] {
-    /* Bronze/Brown (10-20%) */
-    background: linear-gradient(135deg, #a1887f, #8d6e63);
-    /* Bronze/Brown (10-20%) */
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-.discount-tag[data-level="mid"] {
-    /* Deep Orange/Red (30-40%) */
-    background: linear-gradient(135deg, #ff5722, #f44336);
-    /* Deep Orange/Red (30-40%) */
-    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4);
-}
-
-.discount-tag[data-level="high"] {
-    /* Pink/Purple (50%+) */
-    background: linear-gradient(135deg, #e91e63, #9c27b0);
-    /* Pink/Purple (50%+) */
-    box-shadow: 0 0 15px rgba(233, 30, 99, 0.5);
-    animation: discountPulse 1.5s infinite ease-in-out;
-}
-
-@keyframes discountPulse {
-    0% {
-        transform: rotate(10deg) scale(1);
-        filter: brightness(1);
-    }
-
-    50% {
-        transform: rotate(10deg) scale(1.05);
-        filter: brightness(1.2);
-    }
-
-    100% {
-        transform: rotate(10deg) scale(1);
-        filter: brightness(1);
-    }
-}
-
-
-/* --- Repair Dock Styles --- */
-.event-action-column,
-.event-results-column {
-    flex: 1;
-    min-width: 440px;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 8px;
-}
-
-
-
-.card-price {
-    width: 100%;
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 8px;
-    padding: 4px 0;
-    margin: 0;
-    background: none;
-    border: none;
-    position: relative;
-}
-
-.repair-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 12px;
-}
-
-.section-desc {
-    /* タイトルとの間隔を詰める */
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.6);
-    line-height: 1.5;
-    margin: -4px 0 12px 0;
-    /* タイトルとの間隔を詰める */
-}
-
-.dismantle-result-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    grid-auto-rows: min-content;
-    gap: 6px;
-    align-content: start;
-    padding-top: 4px;
-}
-
-.price-box.pulse {
-    display: flex;
-    justify-content: center;
-    animation: priceHighlight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes priceHighlight {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.4);
-        color: #ffab40;
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-/* �u���b�N�}�[�P�b�g�Ǝ��̉��o */
-
-.used-item {
-    opacity: 0.5;
-    filter: grayscale(0.8);
-    pointer-events: none;
-}
-
-.entrance-anim {
-    animation: slideInFade 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
-}
-
-@keyframes slideInFade {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.used-item .price-val {
-    text-decoration: none;
-}
-
-.premium-item {
-    border: none;
-    background: transparent;
-}
-
-
-.event-header {
+/* Header Section */
+#event-screen .event-header {
     padding-bottom: 25px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -559,8 +74,7 @@
     gap: 20px;
 }
 
-
-#event-icon {
+#event-screen #event-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -578,4 +92,347 @@
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     transform: none;
+}
+
+#event-screen .event-title-group h2 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: 4px;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-family: 'Orbitron', sans-serif;
+}
+
+#event-screen #event-description {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 1px;
+}
+
+/* Location Themes */
+#event-screen .theme-trading #event-location {
+    color: #44ffbb;
+    text-shadow: 0 0 20px rgba(68, 255, 187, 0.4);
+}
+#event-screen .theme-trading #event-icon {
+    border-color: #44ffbb;
+    color: #44ffbb;
+    box-shadow: inset 0 0 20px rgba(68, 255, 187, 0.1);
+}
+#event-screen .theme-repair #event-location {
+    color: #4488ff;
+    text-shadow: 0 0 20px rgba(68, 136, 255, 0.4);
+}
+#event-screen .theme-repair #event-icon {
+    border-color: #4488ff;
+    color: #4488ff;
+    box-shadow: inset 0 0 20px rgba(68, 136, 255, 0.1);
+}
+#event-screen .theme-blackmarket #event-location {
+    color: #ff4455;
+    text-shadow: 0 0 20px rgba(255, 68, 85, 0.4);
+}
+#event-screen .theme-blackmarket #event-icon {
+    border-color: #ff4455;
+    color: #ff4455;
+    box-shadow: inset 0 0 20px rgba(255, 68, 85, 0.1);
+}
+
+/* Content Area */
+#event-screen #event-content {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 30px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+#event-screen .event-action-column,
+#event-screen .event-results-column {
+    flex: 1;
+    min-width: 440px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+#event-screen .event-section,
+
+#event-screen .event-shop-section,
+#event-screen .event-sell-section,
+#event-screen .repair-section,
+#event-screen .dismantle-section,
+#event-screen .dismantle-results-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 30px;
+    padding: 0;
+    background: none;
+    border: none;
+}
+
+#event-screen .event-section h3,
+#event-screen .event-shop-section h3,
+#event-screen .event-sell-section h3,
+#event-screen .repair-section h3,
+#event-screen .dismantle-section h3,
+#event-screen .market-results-area h3 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+#event-screen .section-desc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    margin: -4px 0 12px 0;
+}
+
+/* Grid and Cards */
+#event-screen .event-grid,
+#event-screen .repair-grid,
+#event-screen .dismantle-result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+#event-screen .repair-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+#event-screen .dismantle-result-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-auto-rows: min-content;
+}
+
+#event-screen .event-card {
+    gap: 4px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    transition: all 0.2s ease;
+    overflow: visible;
+}
+
+#event-screen .event-card:hover {
+    filter: none;
+}
+
+/* 施設画面でのアイテムカードの反応を無効化 */
+#event-screen .item-card {
+    cursor: default;
+}
+
+/* 施設アイコン：発光を一切排除した重厚なマットデザイン */
+#event-screen #event-icon {
+    width: 60px;
+    height: 60px;
+    margin-right: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: brightness(0.7); /* シンプルに輝度を落とすスタイルに戻す */
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+
+
+#event-screen .card-item-column {
+    flex: 1;
+    min-width: 0;
+}
+
+#event-screen .card-action-column {
+    width: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 0 0 0 16px;
+    background: none;
+    border: none;
+}
+
+/* Pricing and Currency */
+#event-screen .card-price,
+#event-screen .price-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px; /* 必要十分な高さに調整 */
+    gap: 4px;
+}
+
+
+#event-screen .price-val {
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-family: 'Inter', sans-serif;
+    line-height: 1;
+}
+
+
+#event-screen .currency {
+    font-size: 14px;
+    color: #ffd700;
+    opacity: 0.8;
+    font-weight: 800;
+}
+
+#event-screen .discount-tag {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    background: #444;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-left: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    align-self: center;
+    transform: rotate(10deg);
+}
+
+
+#event-screen .discount-tag .pct-num { font-size: 13px; letter-spacing: -0.5px; line-height: 1; }
+#event-screen .discount-tag .pct-sym { font-size: 8px; margin-right: 2px; }
+
+#event-screen .discount-tag[data-level="low"] { background: linear-gradient(135deg, #a1887f, #8d6e63); }
+#event-screen .discount-tag[data-level="mid"] { background: linear-gradient(135deg, #ff5722, #f44336); box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4); }
+#event-screen .discount-tag[data-level="high"] { background: linear-gradient(135deg, #e91e63, #9c27b0); box-shadow: 0 0 15px rgba(233, 30, 99, 0.5); animation: discountPulse 1.5s infinite ease-in-out; }
+
+@keyframes discountPulse {
+    0%, 100% { transform: rotate(10deg) scale(1); filter: brightness(1); }
+    50% { transform: rotate(10deg) scale(1.05); filter: brightness(1.2); }
+}
+
+/* Footer Section */
+#event-screen .event-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#event-screen .player-credits {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+#event-screen .player-credits .label {
+    font-size: 12px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 2px;
+}
+
+#event-screen .player-credits .value {
+    font-size: 32px;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+#event-screen .premium-button {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 15px 35px;
+    border-radius: 50px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+#event-screen .premium-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Animations and Utils */
+#event-screen .price-box.pulse {
+    animation: priceHighlight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes priceHighlight {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.4); color: #ffab40; }
+}
+
+#event-screen .used-item {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+    pointer-events: none;
+}
+
+#event-screen .entrance-anim {
+    animation: slideInFade 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+}
+
+@keyframes slideInFade {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Rarity Borders */
+#event-screen .rarity-1 { border-left: 4px solid #44ffbb; }
+#event-screen .rarity-2 { border-left: 4px solid #4488ff; }
+#event-screen .rarity-3 { border-left: 4px solid #cc44ff; }
+#event-screen .rarity-4 { border-left: 4px solid #ffd700; }
+
+/* --- Responsive Adjustments for Event Screen --- */
+@media (max-width: 950px) {
+    #event-screen #event-content {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 15px;
+    }
+    
+    #event-screen .event-action-column,
+    #event-screen .event-results-column {
+        height: auto;
+        min-width: 0;
+        overflow-y: visible;
+        flex: none;
+        padding-right: 0;
+        margin-bottom: 20px;
+    }
 }

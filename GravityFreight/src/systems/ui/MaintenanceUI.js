@@ -56,8 +56,9 @@ export class MaintenanceUI {
                 card.className = 'event-row event-card';
                 card.innerHTML = `
                     <div class="card-item-column">
-                        ${UIComponents.generateCardHTML(item, { showInventory: true })}
+                        ${UIComponents.generateCardHTML(item, { showInventory: true, clickable: false })}
                     </div>
+
                     <div class="card-action-column">
                         <div class="card-price">
                             <span class="price-val">${cost}</span><span class="currency">c</span>
@@ -117,8 +118,9 @@ export class MaintenanceUI {
                 row.className = 'event-row event-card';
                 row.innerHTML = `
                     <div class="card-item-column">
-                        ${UIComponents.generateCardHTML(rocket, { badge: rocket.label })}
+                        ${UIComponents.generateCardHTML(rocket, { badge: rocket.label, clickable: false })}
                     </div>
+
                     <div class="card-action-column">
                         <div class="card-price price-box ${game.shouldPulseDismantle ? 'pulse' : ''}">
                             <span class="price-val">${cost}</span><span class="currency">c</span>
@@ -203,8 +205,9 @@ export class MaintenanceUI {
             game.tempDismantleResults.slice(0, 30).forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'event-row event-card mini-item';
-                card.innerHTML = `<div class="card-item-column">${UIComponents.generateCardHTML(item)}</div>`;
+                card.innerHTML = `<div class="card-item-column">${UIComponents.generateCardHTML(item, { clickable: false })}</div>`;
                 resultsList.appendChild(card);
+
             });
             resultsSection.appendChild(resultsList);
         }

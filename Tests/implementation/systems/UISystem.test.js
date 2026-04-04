@@ -53,7 +53,7 @@ describe('Implementation: UISystem Rendering & Internal Logic', () => {
             
             const html = uiSystem.generateCardHTML(item, { showInventory: true });
             expect(html).toContain('enhanced-frame');
-            expect(html).toContain('#ffd700'); // Gold color for enhanced
+            expect(html).toContain('enhanced-border'); // Componentized gold style
         });
     });
 

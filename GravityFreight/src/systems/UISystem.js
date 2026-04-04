@@ -40,6 +40,14 @@ export class UISystem {
         const starTitle = document.getElementById('star-info-title');
         if (!starPanel || !starList) return;
 
+        // 特定のステート以外では強制非表示
+        const allowedStates = ['building', 'aiming', 'flying'];
+        if (!allowedStates.includes(game.state)) {
+            this.currentHoveredStar = null;
+            starPanel.classList.add('hidden');
+            return;
+        }
+
         const isHoverableStar = game.hoveredStar && (
             (!game.hoveredStar.isHome && !game.hoveredStar.isCollected) ||
             (game.hoveredStar.isHome && game.hoveredStar.items && game.hoveredStar.items.length > 0)
@@ -270,9 +278,9 @@ export class UISystem {
         rList.innerHTML = '';
         if (game.inventory.rockets.length === 0) {
             rList.innerHTML = `
-                <div class="slot-placeholder" id="no-rocket-placeholder" style="cursor: pointer;">
-                    <div class="part-header"><span class="part-name" style="opacity: 0.5;">待機中のロケットなし</span></div>
-                    <span class="part-info guide-pulse">ここをクリックしてロケットを建造してください</span>
+                <div class="slot-placeholder guide" id="no-rocket-placeholder">
+                    <div class="part-header"><span class="part-name">待機中のロケットなし</span></div>
+                    <span class="part-info">ここをクリックしてロケットを建造してください</span>
                 </div>
             `;
             const noRocket = document.getElementById('no-rocket-placeholder');
@@ -419,13 +427,30 @@ export class UISystem {
         const closeBtn = document.getElementById('result-close-btn');
         if (closeBtn) {
             let label = 'CONTINUE';
+            closeBtn.classList.remove('btn-grad-green', 'btn-grad-blue', 'btn-grad-red', 'btn-grad-orange');
+            
             if (resultType === 'success' || resultType === 'cleared') {
-                const names = { 'SAFE': 'TRADING POST', 'NORMAL': 'REPAIR DOCK', 'DANGER': 'BLACK MARKET' };
-                label = `TO ${names[game.lastHitGoal?.id] || 'NEXT SECTOR'}`;
-            } else if (resultType === 'gameover') label = 'RESTART ADVENTURE';
-            else if (game.isGameOver()) label = 'ABANDON MISSION';
-            else if (resultType === 'returned') label = 'BACK TO BASE';
-            else label = 'RETRY MISSION';
+                const goalType = game.lastHitGoal?.id;
+                const colorClasses = {
+                    'TRADING_POST': 'btn-grad-green',
+                    'REPAIR_DOCK': 'btn-grad-blue',
+                    'BLACK_MARKET': 'btn-grad-red'
+                };
+                label = `TO ${GOAL_NAMES[goalType] || 'NEXT SECTOR'}`;
+                closeBtn.classList.add(colorClasses[goalType] || 'btn-grad-green');
+            } else if (resultType === 'returned') {
+                label = 'BACK TO BASE';
+                closeBtn.classList.add('btn-grad-green');
+            } else if (resultType === 'gameover') {
+                label = 'RESTART ADVENTURE';
+                closeBtn.classList.add('btn-grad-orange');
+            } else if (game.isGameOver()) {
+                label = 'ABANDON MISSION';
+                closeBtn.classList.add('btn-grad-orange');
+            } else {
+                label = 'RETRY MISSION';
+                closeBtn.classList.add('btn-grad-orange');
+            }
             closeBtn.textContent = label;
         }
 
@@ -528,7 +553,7 @@ export class UISystem {
                 card.className = 'reward-item-card stagger-in';
                 card.style.animationDelay = `${this._resultDelay}s`;
                 this._resultDelay += 0.07;
-                card.innerHTML = this.generateCardHTML(item, { showInventory: true });
+                card.innerHTML = this.generateCardHTML(item, { showInventory: true, clickable: false });
                 itemsList.appendChild(card);
                 
                 if (item.bonusItems && item.bonusItems.length > 0) {
@@ -545,7 +570,7 @@ export class UISystem {
                         bonusCard.className = 'reward-item-card stagger-in';
                         bonusCard.style.animationDelay = `${this._resultDelay}s`;
                         this._resultDelay += 0.07;
-                        bonusCard.innerHTML = this.generateCardHTML(bonus, { indent: 16, showInventory: true });
+                        bonusCard.innerHTML = this.generateCardHTML(bonus, { indent: 16, showInventory: true, clickable: false });
                         itemsList.appendChild(bonusCard);
                     });
                 }

@@ -8,6 +8,12 @@ export class PhysicsOrchestrator {
 
     updateHover() {
         const game = this.game;
+        // ホバーを許可するステートのホワイトリスト
+        const allowedStates = ['building', 'aiming', 'flying'];
+        if (!allowedStates.includes(game.state)) {
+            game.hoveredStar = null;
+            return;
+        }
         // マウスホバー判定
         const worldMouse = game.getWorldPos(game.mousePos);
         game.hoveredStar = null;

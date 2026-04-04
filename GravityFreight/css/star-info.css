@@ -1,0 +1,42 @@
+/* --- Star Info Panel (Mouse-tracking World Inventory Tooltip) --- */
+#star-info-panel {
+    position: absolute;
+    z-index: 9000; /* Above all menu UI as it follows mouse */
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 1;
+    max-height: 60vh;
+    overflow-y: auto;
+    width: 320px;
+    scrollbar-width: thin;
+}
+
+#star-info-panel.hidden {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+/* Compact layout for high item counts in star storage */
+.compact-list .part-item-container {
+    padding: 4px 10px;
+}
+
+.compact-list .part-info {
+    display: none; /* Hide descriptions to save vertical space */
+}
+
+.compact-list .part-name {
+    font-size: 11px;
+}
+
+/* Hover-linked panel h2 styling override */
+#star-info-panel h2 {
+    margin: 0 0 15px 0;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #ffd700;
+    text-transform: uppercase;
+}

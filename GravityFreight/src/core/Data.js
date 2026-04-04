@@ -28,15 +28,15 @@ export const CATEGORY_COLORS = {
 };
 
 export const GOAL_COLORS = {
-    SAFE: '#00e676',   // TRADING POST
-    NORMAL: '#2979ff', // REPAIR DOCK
-    DANGER: '#ff1744'  // BLACK MARKET
+    TRADING_POST: '#00e676',
+    REPAIR_DOCK: '#2979ff',
+    BLACK_MARKET: '#ff1744'
 };
 
 export const GOAL_NAMES = {
-    SAFE: 'TRADING POST',
-    NORMAL: 'REPAIR DOCK',
-    DANGER: 'BLACK MARKET'
+    TRADING_POST: 'TRADING POST',
+    REPAIR_DOCK: 'REPAIR DOCK',
+    BLACK_MARKET: 'BLACK MARKET'
 };
 
 export const PARTS = {
@@ -87,9 +87,9 @@ export const PARTS = {
         { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', mass: 1, deliveryGoalId: 'SAFE', rarity: RARITY.UNCOMMON, description: '交易所への配送用物資。' },
-        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', mass: 1, deliveryGoalId: 'NORMAL', rarity: RARITY.UNCOMMON, description: '整備ドックへの配送用パーツ。' },
-        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', mass: 1, deliveryGoalId: 'DANGER', rarity: RARITY.UNCOMMON, description: '闇市場への配送用データ。' },
+        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', mass: 1, deliveryGoalId: 'TRADING_POST', rarity: RARITY.UNCOMMON, description: '交易所への配送用物資。' },
+        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', mass: 1, deliveryGoalId: 'REPAIR_DOCK', rarity: RARITY.UNCOMMON, description: '整備ドックへの配送用パーツ。' },
+        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', mass: 1, deliveryGoalId: 'BLACK_MARKET', rarity: RARITY.UNCOMMON, description: '闇市場への配送用データ。' },
         { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: '施設での消費コインが軽減される。重複可。' }
     ]
 };

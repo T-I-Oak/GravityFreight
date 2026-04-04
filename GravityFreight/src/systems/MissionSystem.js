@@ -44,9 +44,9 @@ export class MissionSystem {
         const centerY = game.canvas.height / 2;
 
         const goalTypes = [
-            { id: 'SAFE', color: GOAL_COLORS.SAFE, angleWidth: 60, score: 2000, coins: 20, bonusItems: 1, label: GOAL_NAMES.SAFE },
-            { id: 'NORMAL', color: GOAL_COLORS.NORMAL, angleWidth: 40, score: 3000, coins: 30, bonusItems: 2, label: GOAL_NAMES.NORMAL },
-            { id: 'DANGER', color: GOAL_COLORS.DANGER, angleWidth: 20, score: 5000, coins: 50, bonusItems: 3, label: GOAL_NAMES.DANGER }
+            { id: 'TRADING_POST', color: GOAL_COLORS.TRADING_POST, angleWidth: 60, score: 2000, coins: 20, bonusItems: 1, label: GOAL_NAMES.TRADING_POST },
+            { id: 'REPAIR_DOCK', color: GOAL_COLORS.REPAIR_DOCK, angleWidth: 40, score: 3000, coins: 30, bonusItems: 2, label: GOAL_NAMES.REPAIR_DOCK },
+            { id: 'BLACK_MARKET', color: GOAL_COLORS.BLACK_MARKET, angleWidth: 20, score: 5000, coins: 50, bonusItems: 3, label: GOAL_NAMES.BLACK_MARKET }
         ];
 
         game.goals = [];

@@ -194,6 +194,20 @@ export class EventSystem {
             };
         }
 
+        // Map buttons
+        const viewMapBtn = document.getElementById('result-view-map-btn');
+        if (viewMapBtn) {
+            viewMapBtn.onclick = () => game.uiSystem.enterMapViewMode();
+        }
+
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        if (backToResultBtn) {
+            backToResultBtn.onclick = () => {
+                console.log("[Navigation] Transitioning back to result screen...");
+                game.uiSystem.exitMapViewMode();
+            };
+        }
+
         // ターミナルパネルの開閉
         const collapseBtn = document.getElementById('terminal-collapse-btn');
         if (collapseBtn) {
@@ -204,25 +218,6 @@ export class EventSystem {
                 if (icon) {
                     icon.textContent = terminalPanel.classList.contains('collapsed') ? '∨' : '∧';
                 }
-            };
-        }
-
-        // マップ確認ボタン (リザルト・レシート画面用)
-        const checkMapBtn = document.getElementById('result-view-map-btn');
-        if (checkMapBtn) {
-            checkMapBtn.onclick = () => {
-                // 【仕様 2.6】classList を直接操作せず UISystem の専用メソッドを呼ぶ
-                game.uiSystem.enterMapViewMode();
-                game.updateUI();
-            };
-        }
-
-        const backToResultBtn = document.getElementById('back-to-result-btn');
-        if (backToResultBtn) {
-            backToResultBtn.onclick = () => {
-                // 【仕様 2.2】classList の直接操作は UISystem のメソッドに閉じる
-                // exitMapViewMode() は内部で updateUI() を呼ぶ
-                game.uiSystem.exitMapViewMode();
             };
         }
 
@@ -480,30 +475,24 @@ export class EventSystem {
         const icon = document.getElementById('event-icon');
         const color = GOAL_COLORS[goal.id] || '#888';
         if (icon) {
-            // ショップごとのダークカラー（V7: 重厚さを追求した暗いトーン）
-            const darkColors = { 
-                'SAFE': '#008b45',    // 深みのある緑
-                'NORMAL': '#1565c0',  // 深みのある青
-                'DANGER': '#b71c1c'   // 深みのある赤
-            };
-            const deepColor = darkColors[goal.id] || color;
+            // 施設のイメージカラーを直接使用
+            const deepColor = color; 
 
-            // CSS変数を使用して色と質感を適応
             icon.style.setProperty('--shop-color', deepColor);
             icon.style.setProperty('--shop-bg', hexToRgba(deepColor, 0.2));
             
-            // イニシャルの設定 (UnifrakturMaguntia)
-            const initials = { 'SAFE': 'T', 'NORMAL': 'R', 'DANGER': 'B' };
+            const initials = { 'TRADING_POST': 'T', 'REPAIR_DOCK': 'R', 'BLACK_MARKET': 'B' };
             icon.textContent = initials[goal.id] || '';
         }
 
-        if (goal.id === 'SAFE') {
+
+        if (goal.id === 'TRADING_POST') {
             desc.textContent = '貨物取引やパーツの売買ができる中継基地。';
             game.uiSystem.initTradingPost(content);
-        } else if (goal.id === 'NORMAL') {
+        } else if (goal.id === 'REPAIR_DOCK') {
             desc.textContent = '機体の整備やパーツの解体・強化を行える高度な設備。';
             game.uiSystem.initRepairDock(content);
-        } else if (goal.id === 'DANGER') {
+        } else if (goal.id === 'BLACK_MARKET') {
             game.currentStarCount++;
             desc.textContent = '通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。';
             game.uiSystem.initBlackMarket(content);

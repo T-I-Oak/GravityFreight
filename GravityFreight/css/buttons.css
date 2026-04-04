@@ -1,0 +1,129 @@
+/* --- Shared Button Components (.btn-neon, .btn-action) --- */
+
+:root {
+    --btn-cyan: #00ffcc;
+    --btn-orange: #ff6600;
+    --btn-green: #00e676;
+    --btn-blue: #2979ff;
+    --btn-red: #ff1744;
+    --btn-matte-cyan: #00acc1;
+    --btn-matte-hover: #00ced1;
+}
+
+/* --- 1. Main Interactive Buttons (Loud/Neon - Title/Results) --- */
+.btn-neon {
+    /* Base Scope Variables - All derivatives will sync with --theme-color */
+    --theme-color: var(--btn-cyan);
+    --glow-opacity: 0.4;
+    --text-glow-opacity: 0.8;
+    
+    position: relative;
+    padding: 12px 24px;
+    background: color-mix(in srgb, var(--theme-color), transparent 85%);
+    border: 2px solid var(--theme-color);
+    color: var(--theme-color);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--theme-color), transparent calc(100% - var(--glow-opacity) * 100%));
+    text-shadow: 0 0 10px color-mix(in srgb, var(--theme-color), transparent calc(100% - var(--text-glow-opacity) * 100%));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-neon:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--theme-color), transparent 65%);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px color-mix(in srgb, var(--theme-color), transparent 10%);
+    border-color: color-mix(in srgb, var(--theme-color), white 30%);
+}
+
+.btn-neon:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+/* --- Color Variant Assignments (Single source of truth) --- */
+.btn-neon.btn-grad-cyan   { --theme-color: var(--btn-cyan); }
+.btn-neon.btn-grad-orange { --theme-color: var(--btn-orange); }
+.btn-neon.btn-grad-green  { --theme-color: var(--btn-green); }
+.btn-neon.btn-grad-blue   { --theme-color: var(--btn-blue); }
+.btn-neon.btn-grad-red    { --theme-color: var(--btn-red); }
+
+/* --- Label and Subtext (Consistent Inherit Design) --- */
+.btn-label {
+    letter-spacing: 1.5px;
+}
+.btn-subtext {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.8;
+    text-transform: none;
+    margin-top: 4px;
+    line-height: 1.2;
+    letter-spacing: normal;
+    white-space: nowrap;
+}
+
+/* --- 2. Facility Action Buttons (Matte Style - Unified) --- */
+.btn-action {
+    width: 100%;
+    margin: 0;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--btn-matte-cyan);
+    color: #ffffff;
+    box-shadow: none;
+    text-shadow: none;
+}
+.btn-action:hover:not(:disabled) {
+    background: var(--btn-matte-hover);
+    transform: translateY(-1px);
+}
+.btn-action:disabled {
+    opacity: 0.3;
+    filter: grayscale(1);
+    background: #1a1a1a;
+    cursor: not-allowed;
+}
+.btn-action-primary, .btn-action-outline {
+    background: var(--btn-matte-cyan);
+    color: #ffffff;
+}
+
+/* --- 3. UI Utility --- */
+.btn-neon-lg { padding: 16px 32px; font-size: 18px; min-width: 200px; }
+.btn-neon-sm { padding: 8px 16px; font-size: 12px; min-width: 180px; }
+
+@keyframes slowPulse {
+    0% { opacity: 0.5; text-shadow: 0 0 5px color-mix(in srgb, var(--btn-cyan), transparent 60%); }
+    50% { opacity: 1; text-shadow: 0 0 15px var(--btn-cyan); }
+    100% { opacity: 0.5; text-shadow: 0 0 5px color-mix(in srgb, var(--btn-cyan), transparent 60%); }
+}
+.btn-neon:disabled .btn-subtext {
+    color: color-mix(in srgb, var(--theme-color), white 20%);
+    animation: slowPulse 2.5s infinite ease-in-out;
+}
+.btn-neon:disabled {
+    cursor: not-allowed;
+    box-shadow: none;
+    filter: saturate(0.5);
+    background: rgba(40, 45, 60, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+}

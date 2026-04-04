@@ -6,6 +6,8 @@ import { CATEGORY_COLORS, hexToRgba } from '../../core/Data.js';
 export class UIComponents {
     /**
      * アイテムカードの HTML を生成
+     * @param {Object} itemData
+     * @param {Object} options { isSelected, clickable, showInventory, badge, indent, selectionCount }
      */
     static generateCardHTML(itemData, options = {}) {
         if (!itemData) return '';
@@ -15,6 +17,7 @@ export class UIComponents {
         const selectionCount = options.selectionCount || 0;
         const showInventory = options.showInventory || false;
         const isSelected = options.isSelected || false;
+        const clickable = options.clickable !== false; // Default to clickable
         const enhancements = itemData.enhancements || {};
         const isRocket = category === 'ROCKETS';
 
@@ -28,7 +31,7 @@ export class UIComponents {
             invInfo = `<span class="inventory-badge">[x ${itemData.count}]</span>`;
         }
 
-        const selTag = (selectionCount > 0) ? ` <span class="selection-badge" style="color: #ffcc00; font-weight: bold;">[${selectionCount}]</span>` : '';
+        const selTag = (selectionCount > 0) ? ` <span class="selection-badge">[${selectionCount}]</span>` : '';
         
         let extraBadge = options.badge || '';
         if (!extraBadge && item.isDelivery) {
@@ -38,21 +41,7 @@ export class UIComponents {
         }
         const indent = options.indent || 0;
 
-        const containerStyle = `
-            position: relative;
-            border-left: 5px solid ${categoryColor};
-            padding: 6px 12px;
-            background: ${isSelected ? hexToRgba(categoryColor, 0.25) : 'rgba(255,255,255,0.03)'};
-            border-radius: 4px;
-            margin-bottom: 2px;
-            min-width: 160px;
-            margin-left: ${indent}px;
-            transition: all 0.2s ease;
-            ${isSelected ? `box-shadow: inset 0 0 15px ${hexToRgba(categoryColor, 0.2)}, 0 0 10px ${hexToRgba(categoryColor, 0.2)};` : ''}
-            border-top: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
-            border-right: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
-            border-bottom: 1px solid ${isSelected ? hexToRgba(categoryColor, 0.4) : 'rgba(255,255,255,0.05)'};
-        `;
+        const containerStyle = `--item-color: ${categoryColor}; margin-left: ${indent}px;`;
 
         const stats = [];
         if (item.slots !== undefined && item.slots > 0) {
@@ -71,7 +60,7 @@ export class UIComponents {
         const statsHtml = stats.map(s => `
             <div class="stat-tag ${s.enhanced ? 'enhanced-border' : ''}">
                 <span class="stat-label">${s.label}</span>
-                <span class="stat-val">${s.val}${s.enhanced ? '<span style="color:#00d4ff; font-size:8px; margin-left:2px;">✦</span>' : ''}</span>
+                <span class="stat-val">${s.val}${s.enhanced ? '<span class="star">✦</span>' : ''}</span>
             </div>
         `).join('');
 
@@ -101,22 +90,22 @@ export class UIComponents {
             merged.forEach(m => {
                 const mGauge = m.maxCharges ? UIComponents.generateHPGauge(m.charges, m.maxCharges, false, true) : '';
                 rows.push(`
-                    <div class="rocket-module-row" style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 2px;">
-                        <span class="rocket-module-name" style="font-size:10px; color:rgba(255,255,255,0.8);">${m.name}</span>
+                    <div class="rocket-module-row">
+                        <span class="rocket-module-name">${m.name}</span>
                         <div style="display:flex; align-items:center;">
-                            <span class="inventory-badge" style="font-size:9px; color:rgba(255,255,255,0.5);">[x ${m.count}]</span>
+                            <span class="inventory-badge">[x ${m.count}]</span>
                             <div style="margin-left:8px;">${mGauge}</div>
                         </div>
                     </div>
                 `);
             });
-            rocketDetailsHtml = `<div class="rocket-details" style="margin-top:4px;">${rows.join('')}</div>`;
+            rocketDetailsHtml = `<div class="rocket-details">${rows.join('')}</div>`;
         }
 
         const desc = isRocket ? '' : (item.description || '');
 
         return `
-            <div class="part-item-container" style="${containerStyle}">
+            <div class="item-card ${isSelected ? 'selected' : ''} ${clickable ? 'clickable' : ''}" style="${containerStyle}">
                 <div class="part-header">
                     <span class="part-name">${item.name || 'Unknown'}${selTag}</span>
                     <div class="part-header-right">
@@ -124,8 +113,8 @@ export class UIComponents {
                         ${invInfo}
                     </div>
                 </div>
-                ${desc ? `<div class="part-info" style="font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 6px;">${desc}</div>` : ''}
-                <div class="part-stats" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                ${desc ? `<div class="part-info">${desc}</div>` : ''}
+                <div class="part-stats">
                     ${statsHtml}
                 </div>
                 ${rocketDetailsHtml}
@@ -140,9 +129,9 @@ export class UIComponents {
         let segments = '';
         for (let i = 0; i < max; i++) {
             const isActive = i < current;
-            const enhancedStyle = (isActive && isEnhanced) ? 'background:#ffd700; border-color:#ffd700; box-shadow: 0 0 5px #ffd700;' : '';
-            segments += `<div class="hp-segment ${isActive ? 'active' : ''} ${mini ? 'mini' : ''}" style="${enhancedStyle}"></div>`;
+            const enhancedClass = (isActive && isEnhanced) ? 'enhanced-border' : '';
+            segments += `<div class="hp-segment ${isActive ? 'active' : ''} ${mini ? 'mini' : ''} ${enhancedClass}"></div>`;
         }
-        return `<div class="hp-gauge ${isEnhanced ? 'enhanced-frame' : ''} ${mini ? 'mini' : ''}" style="display: flex; gap: 2px; padding: 2px;">${segments}</div>`;
+        return `<div class="hp-gauge ${isEnhanced ? 'enhanced-frame' : ''} ${mini ? 'mini' : ''}">${segments}</div>`;
     }
 }

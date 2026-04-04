@@ -8,14 +8,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="GravityFreight/css/base.css?v=0.10.4">
-    <link rel="stylesheet" href="GravityFreight/css/layout.css?v=0.10.4">
-    <link rel="stylesheet" href="GravityFreight/css/ui.css?v=0.10.4">
-    <link rel="stylesheet" href="GravityFreight/css/build-panel.css?v=0.10.4">
-    <link rel="stylesheet" href="GravityFreight/css/result-screen.css?v=0.10.4">
-    <link rel="stylesheet" href="GravityFreight/css/event-screen.css?v=0.10.4">
-    <link rel="stylesheet" href="GravityFreight/css/animations.css?v=0.10.4">
-    <link rel="stylesheet" href="GravityFreight/css/responsive.css?v=0.10.4">
+    <link rel="stylesheet" href="GravityFreight/css/base.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/layout.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/buttons.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/ui.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/title-screen.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/item-card.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/mission-hud.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/build-panel.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/result-screen.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/receipt-screen.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/event-screen.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/how-to-play.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/star-info.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/animations.css?v=0.10.20">
+    <link rel="stylesheet" href="GravityFreight/css/responsive.css?v=0.10.20">
+
+
+
+
+
+
+
+
+
+
+
     <style>
         /* 強化バッヂ */
         .enhancement-badge {
@@ -52,6 +70,7 @@
             margin-bottom: 20px;
             line-height: 1.5;
         }
+
         .cost-val {
             color: #ffcc00;
             font-weight: bold;
@@ -63,19 +82,16 @@
             display: block;
             margin: 20px auto 0;
             padding: 8px 24px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.2s;
-            font-size: 12px;
-            letter-spacing: 1px;
         }
+
         .event-back-btn:hover {
             background: rgba(255,255,255,0.2);
             transform: translateY(-1px);
         }
+
 
         /* アイテムカード修正 */
         .item-card-inner {
@@ -100,12 +116,11 @@
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0.9;
         }
-        /* 親の .collapsed 時に rotate(180deg) されるため、
-           子側でも回転を上書きまたはオフセットして、結果として正しく反転するように調整 */
         .collapsed .icon-chevron {
-            transform: translateY(2px) rotate(225deg); /* 親が 180度回るので、子はベースの角度を維持 */
+            transform: translateY(2px) rotate(225deg);
         }
     </style>
+
 </head>
 <body>
     <!-- タイトル画面 -->
@@ -116,12 +131,22 @@
             <div class="menu-buttons">
                 <button id="start-game-btn" class="btn-neon">BEGIN CONTRACT</button>
                 <button id="how-to-play-btn" class="btn-neon outline">HOW TO PLAY</button>
-                <button id="ranking-btn" class="btn-neon outline" disabled>RANKING <span style="font-size: 0.7em; opacity: 0.6;">(COMING SOON)</span></button>
+                <button id="ranking-btn" class="btn-neon outline" disabled>RANKING <span class="ranking-coming-soon">(COMING SOON)</span></button>
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
         <div class="title-footer">
-            <span class="version">v0.10.4</span>
+            <span class="version">v0.10.20</span>
+
+
+
+
+
+
+
+
+
+
             <span class="copyright">© T.I.OAK 2026</span>
         </div>
     </div>
@@ -181,8 +206,6 @@
         </div>
     </div>
 
-    
-    <!-- リザルト画面オーバーレイ -->
     <div id="result-overlay" class="hidden">
         <div id="result-panel">
             <div id="result-header">
@@ -191,7 +214,6 @@
             </div>
             <div id="result-content">
                 <div class="result-columns">
-                    <!-- 左カラム: 内訳と合計 -->
                     <div class="res-col-left">
                         <div class="result-section">
                             <h3>FLIGHT DATA</h3>
@@ -208,8 +230,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- 右カラム: 獲得アイテム -->
                     <div class="res-col-right">
                         <div class="result-section">
                             <h3>COLLECTED ITEMS</h3>
@@ -219,15 +239,14 @@
                 </div>
             </div>
             <div id="result-footer">
-                <div class="result-actions">
-                    <button id="result-view-map-btn" class="btn-cyber-outline">VIEW MAP</button>
-                    <button id="result-close-btn" class="btn-cyber-outline btn-cyber-outline-success">CONTINUE</button>
+                <div class="result-actions" id="result-actions">
+                    <button id="result-view-map-btn" class="btn-neon btn-neon-lg btn-grad-cyan outline">VIEW MAP</button>
+                    <button id="result-close-btn" class="btn-neon btn-neon-lg btn-grad-orange">RETRY MISSION</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ビルドシステム UI -->
     <div id="build-overlay" class="hidden">
         <div class="panel" id="terminal-panel">
             <div class="panel-header">
@@ -241,15 +260,12 @@
                     </button>
                 </div>
             </div>
-            
             <div id="panel-scroll-area">
-                <!-- FLIGHT タブ内容 -->
                 <div id="flight-tab" class="tab-content">
                     <div class="category">
                         <h3>ROCKET</h3>
                         <div id="rocket-list"></div>
                     </div>
-
                     <div class="category">
                         <h3>LAUNCHER</h3>
                         <div id="launcher-list"></div>
@@ -261,8 +277,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- ASSEMBLY タブ内容 (初期非表示) -->
                 <div id="factory-tab" class="tab-content hidden">
                     <div class="category">
                         <h3>CHASSIS</h3>
@@ -272,14 +286,12 @@
                         <h3>LOGIC</h3>
                         <div id="logic-list"></div>
                     </div>
-
                     <div class="category">
                         <h3>MODULE</h3>
                         <div id="logic-option-list" class="option-list">
                             <div class="slot-placeholder">Slot Empty (Requires Research)</div>
                         </div>
                     </div>
-
                     <button id="build-btn" class="btn-neon btn-neon-sm btn-grad-green" disabled>
                         <span class="btn-label">ASSEMBLE ROCKET</span>
                         <span class="btn-subtext">シャーシとロジックを選択すると建造できます</span>
@@ -289,26 +301,19 @@
         </div>
     </div>
 
-    <!-- 独立した起動ボタンパネル -->
     <div id="launch-control" class="hidden">
         <button id="launch-btn" class="btn-neon btn-neon-lg btn-grad-orange hidden bounce" disabled>
             <span class="btn-label">LAUNCH ENGINE</span>
             <span class="btn-subtext">ロケットと発射台を選択すると発射できます</span>
         </button>
-        <button id="back-to-result-btn" class="btn-neon btn-neon-lg btn-grad-green hidden bounce">BACK TO RESULT</button>
     </div>
+    <button id="back-to-result-btn" class="btn-neon btn-neon-lg btn-grad-green hidden bounce">BACK TO RESULT</button>
 
-
-
-    <!-- 星のアイテム情報パネル (ホバー時表示) -->
     <div id="star-info-panel" class="panel hidden">
         <h2 id="star-info-title">STAR CORE</h2>
-        <div id="star-info-list" class="category">
-            <!-- JSで動的に追加 -->
-        </div>
+        <div id="star-info-list" class="category"></div>
     </div>
 
-    <!-- Event Screen (Overlay) -->
     <div id="event-screen" class="hidden">
         <div class="event-backdrop"></div>
         <div class="event-modal">
@@ -319,11 +324,7 @@
                     <p id="event-description">Orbital supply station for cargo trading.</p>
                 </div>
             </div>
-            
-            <div class="event-content" id="event-content">
-                <!-- Shop items or repair options will be injected here -->
-            </div>
-            
+            <div class="event-content" id="event-content"></div>
             <div class="event-footer">
                 <div class="player-credits">
                     <span class="label">CREDITS:</span>
@@ -335,18 +336,22 @@
         </div>
     </div>
 
-    <!-- セクター開始通知用オーバーレイ -->
     <div id="sector-notification" class="sector-notif hidden"></div>
-
     <div id="ui-layer"></div>
-    <!-- 支払明細（レシート）用オーバーレイ -->
     <div id="receipt-overlay" class="receipt-view hidden">
-        <div class="receipt-paper" id="receipt-content-area">
-            <!-- JSで動的に生成 -->
-        </div>
+        <div class="receipt-paper" id="receipt-content-area"></div>
     </div>
     <canvas id="gameCanvas"></canvas>
-    <script type="module" src="GravityFreight/src/main.js?v=0.10.4"></script>
+    <script type="module" src="GravityFreight/src/main.js?v=0.10.20"></script>
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
-

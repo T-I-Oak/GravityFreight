@@ -58,8 +58,9 @@ export class ShopUI {
             card.className = `event-row event-card`;
             card.innerHTML = `
                 <div class="card-item-column">
-                    ${UIComponents.generateCardHTML(itemData, { isSelected: false })}
+                    ${UIComponents.generateCardHTML(itemData, { isSelected: false, clickable: false })}
                 </div>
+
                 <div class="card-action-column">
                     <div class="card-price" ${isSold ? 'style="opacity: 0.5;"' : ''}>
                         <span class="price-val">${buyPrice}</span><span class="currency">c</span>
@@ -127,8 +128,9 @@ export class ShopUI {
                 card.className = 'event-row event-card';
                 card.innerHTML = `
                     <div class="card-item-column">
-                        ${UIComponents.generateCardHTML(item, { showInventory: true })}
+                        ${UIComponents.generateCardHTML(item, { showInventory: true, clickable: false })}
                     </div>
+
                     <div class="card-action-column">
                         <div class="card-price">
                             <span class="price-val">${sellPrice}</span><span class="currency">c</span>
@@ -219,8 +221,9 @@ export class ShopUI {
                         category: opt.category,
                         rarity: opt.rarity,
                         description: opt.desc
-                    })}
+                    }, { clickable: false })}
                 </div>
+
                 <div class="card-action-column">
                     <div class="card-price" ${game.blackMarketUsed ? 'style="opacity: 0.5;"' : ''}>
                         <span class="price-val">${opt.cost}</span><span class="currency">c</span>
@@ -319,8 +322,9 @@ export class ShopUI {
                 
                 card.innerHTML = `
                     <div class="card-item-column">
-                        ${UIComponents.generateCardHTML(group, { badge: group.count > 1 ? `x ${group.count}` : null })}
+                        ${UIComponents.generateCardHTML(group, { badge: group.count > 1 ? `x ${group.count}` : null, clickable: false })}
                     </div>
+
                 `;
                 list.appendChild(card);
                 
