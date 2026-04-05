@@ -50,7 +50,7 @@
 .item-card .part-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 4px;
 }
 
@@ -65,7 +65,7 @@
 
 .item-card .part-header-right {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
 }
 

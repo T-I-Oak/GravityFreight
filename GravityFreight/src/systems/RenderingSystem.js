@@ -328,7 +328,7 @@ export class Renderer {
                         iconAlpha = 0.5 + 0.5 * Math.sin(Date.now() / 500); 
                     }
 
-                    const iconRadius = boundaryRadius + 95; // ラベル(45)のさらに外側
+                    const iconRadius = boundaryRadius + 85; // 拡大したサイズに合わせて微調整（75 -> 85）
                     const iconAngle = goal.angle;
                     const iconX = centerX + Math.cos(iconAngle) * iconRadius;
                     const iconY = centerY + Math.sin(iconAngle) * iconRadius;
@@ -349,17 +349,45 @@ export class Renderer {
                     this.ctx.shadowBlur = 10;
                     this.ctx.shadowColor = goal.color;
                     
-                    // 封筒アイコンの描画
-                    const w = 14;
-                    const h = 10;
+                    // --- 究極の 3D カーゴアイコン（非対象 3/4 ビュー ＆ 長辺方向ガムテープ） ---
+                    const WL = -15, HL = -9; // 左奥へのベクトル
+                    const WR = 30,  HR = -4.5; // 右奥へのベクトル（長辺・浅い角度）
+                    const V = 18;            // 垂直方向の高さ
+
+                    this.ctx.translate(-2, 2); // 視覚的な重心バランス調整
+
+                    // 1. 外郭シルエット
                     this.ctx.beginPath();
-                    this.ctx.rect(-w, -h, w * 2, h * 2);
+                    this.ctx.moveTo(WL + WR, HL + HR); // 最奥頂点
+                    this.ctx.lineTo(WL, HL);           // 左奥
+                    this.ctx.lineTo(WL, HL + V);       // 左下
+                    this.ctx.lineTo(0, V);             // 手前下
+                    this.ctx.lineTo(WR, HR + V);       // 右下
+                    this.ctx.lineTo(WR, HR);           // 右奥
+                    this.ctx.closePath();
                     this.ctx.stroke();
-                    
+
+                    // 2. 内部の稜線（手前の頂点からの Y 字） 
+                    // ※ P4(0,0) を基準点
                     this.ctx.beginPath();
-                    this.ctx.moveTo(-w, -h);
-                    this.ctx.lineTo(0, 0);
-                    this.ctx.lineTo(w, -h);
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(WL, HL);           // 左稜線
+                    this.ctx.stroke();
+
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(WR, HR);           // 右稜線（長辺）
+                    this.ctx.stroke();
+
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(0, V);             // 垂直稜線
+                    this.ctx.stroke();
+
+                    // 3. 上面のガムテープ（長辺方向：左短辺の中点から、奥の短辺の中点へ）
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(WL / 2, HL / 2);                       // 手前・左辺の中点
+                    this.ctx.lineTo(WL / 2 + WR, HL / 2 + HR);             // 奥・短辺の中点
                     this.ctx.stroke();
 
                     this.ctx.restore();

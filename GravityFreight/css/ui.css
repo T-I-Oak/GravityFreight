@@ -212,15 +212,15 @@ body #back-to-result-btn.hidden {
 /* --- Story System UI (v0.15) --- */
 .mail-icons-group {
     display: flex;
-    gap: 12px;
-    margin-left: 10px;
+    gap: 6px;
+    align-items: flex-start;
 }
 
 .mail-icon-btn {
     background: transparent;
     border: none;
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;

@@ -356,6 +356,10 @@
     font-size: 0.95rem;
 }
 
+#result-overlay .story-reward-card .mail-icon-btn {
+    color: var(--item-color);
+}
+
 
 
 

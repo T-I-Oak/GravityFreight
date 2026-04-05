@@ -45,17 +45,17 @@ describe('Spec: Items & Data (Chapter 4)', () => {
             it('validation of cargo names and descriptions', () => {
                 checkItem('cargo_safe', { 
                     name: '通商物資', 
-                    description: '交易所への配送用物資。',
+                    description: 'Trading Post への配送用物資。',
                     rarity: RARITY.UNCOMMON 
                 });
                 checkItem('cargo_normal', { 
                     name: '整備用パーツ', 
-                    description: '整備ドックへの配送用パーツ。',
+                    description: 'Repair Dock への配送用パーツ。',
                     rarity: RARITY.UNCOMMON 
                 });
                 checkItem('cargo_danger', { 
                     name: '暗号化データ', 
-                    description: '闇市場への配送用データ。',
+                    description: 'Black Market への配送用データ。',
                     rarity: RARITY.UNCOMMON 
                 });
             });

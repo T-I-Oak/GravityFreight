@@ -31,7 +31,7 @@
 - [x] **リザルト画面の改善**: 回収アイテムなし時の文言固定とプレースホルダースタイルの統一。
 
 ### パフォーマンスと品質 (Performance & Quality)
-- [x] **UI レンダリングの最適化**: `UISystem.renderList` に `DocumentFragment` 導入し、DOM 操作回数を削減。
+- [x] **UI レンダリングの最適化**: `UISystem.renderList` に `DocumentFragment` を導入し、DOM 操作回数を削減。
 - [x] **バージョン管理とキャッシュ対策**: 全スクリプトタグへのバージョンクエリパラメータ付与。
 - [x] **バグ修正**: リザルト画面のゴールボーナス累積バグの修正 (`Game.reset()` 初期化漏れ)。
 
