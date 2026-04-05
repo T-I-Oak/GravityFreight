@@ -4,6 +4,10 @@ import { TitleAnimation } from '../utils/TitleAnimation.js';
 import { UIComponents } from './ui/UIComponents.js';
 import { ShopUI } from './ui/ShopUI.js';
 import { MaintenanceUI } from './ui/MaintenanceUI.js';
+import { ResultScreen } from './ui/ResultScreen.js';
+import { TerminalReport } from './ui/TerminalReport.js';
+import { StarInfoPanel } from './ui/StarInfoPanel.js';
+import { UIAnimations } from './ui/UIAnimations.js';
 
 export class UISystem {
     constructor(game) {
@@ -11,6 +15,10 @@ export class UISystem {
         // サブシステムの初期化
         this.shopUI = new ShopUI(game, this);
         this.maintenanceUI = new MaintenanceUI(game, this);
+        this.resultScreen = new ResultScreen(game, this);
+        this.terminalReport = new TerminalReport(game, this);
+        this.starInfoPanel = new StarInfoPanel(game);
+
         this.titleAnimation = null;
         this.notificationTimer = null;
         this.setupStoryListeners();
@@ -31,84 +39,9 @@ export class UISystem {
             this.updateUI();
         }
 
-        this.updateStarInfoPanel();
+        this.starInfoPanel.update();
     }
 
-    updateStarInfoPanel() {
-        const game = this.game;
-        const starPanel = document.getElementById('star-info-panel');
-        const starList = document.getElementById('star-info-list');
-        const starTitle = document.getElementById('star-info-title');
-        if (!starPanel || !starList) return;
-
-        // 特定のステート以外では強制非表示
-        const allowedStates = ['building', 'aiming', 'flying'];
-        if (!allowedStates.includes(game.state)) {
-            this.currentHoveredStar = null;
-            starPanel.classList.add('hidden');
-            return;
-        }
-
-        const isHoverableStar = game.hoveredStar && (
-            (!game.hoveredStar.isHome && !game.hoveredStar.isCollected) ||
-            (game.hoveredStar.isHome && game.hoveredStar.items && game.hoveredStar.items.length > 0)
-        ) && game.hoveredStar.items && game.hoveredStar.items.length > 0;
-
-        if (isHoverableStar) {
-            const star = game.hoveredStar;
-            const currentItemCount = star.items.length;
-
-            if (this.currentHoveredStar !== star || starPanel.dataset.itemCount != currentItemCount) {
-                this.currentHoveredStar = star;
-                starPanel.dataset.itemCount = currentItemCount;
-
-                starTitle.textContent = star.isHome ? "STAR CORE (STORAGE)" : "STAR ITEMS";
-                starList.innerHTML = '';
-
-                const mergedItems = ItemUtils.groupItems(star.items);
-                const isCompact = mergedItems.length > 3;
-                starList.className = `category ${isCompact ? 'compact-list' : ''}`;
-
-                mergedItems.forEach(item => {
-                    const cardWrapper = document.createElement('div');
-                    cardWrapper.className = 'tooltip-card-wrapper';
-                    cardWrapper.style.marginBottom = '4px';
-                    cardWrapper.innerHTML = UIComponents.generateCardHTML(item, { showInventory: true });
-                    starList.appendChild(cardWrapper);
-                });
-            }
-
-            starPanel.classList.remove('hidden');
-            
-            const offset = 20;
-            const mouseX = game.mousePos.x || 0;
-            const mouseY = game.mousePos.y || 0;
-            
-            let px = mouseX + offset;
-            let py = mouseY + offset;
-
-            const panelWidth = starPanel.offsetWidth || 280;
-            const panelHeight = starPanel.offsetHeight || 0;
-
-            if (px + panelWidth > game.canvas.width - 20) {
-                px = mouseX - panelWidth - offset;
-            }
-            if (py + panelHeight > game.canvas.height - 20) {
-                py = mouseY - panelHeight - offset;
-            }
-            
-            px = Math.max(10, px);
-            py = Math.max(10, py);
-
-            starPanel.style.left = px + 'px';
-            starPanel.style.top = py + 'px';
-        } else {
-            if (this.currentHoveredStar !== null) {
-                this.currentHoveredStar = null;
-                starPanel.classList.add('hidden');
-            }
-        }
-    }
 
     // 主要なゲームプレイUI要素の取得 (ルール5.1に基づき、存在を前提とする)
     _getGameplayElements() {
@@ -389,241 +322,7 @@ export class UISystem {
     }
 
     showResult(resultType) {
-        const game = this.game;
-        const overlay = document.getElementById('result-overlay');
-        if (!overlay) return;
-
-        // 【仕様 2.4】新しいリザルト表示開始時に必ず初期化する
-        this.resetResultOverlay();
-        this._resultDelay = 0.1;
-        const ANIMATION_DURATION = 1.0;
-
-        const titleEl = document.getElementById('result-title');
-        const subtitleEl = document.getElementById('result-subtitle');
-        const statsList = document.getElementById('result-stats-list');
-        const itemsList = document.getElementById('result-items-list');
-        const scoreTotalEl = document.getElementById('result-total-score');
-        const coinTotalEl = document.getElementById('result-total-coin');
-        if (scoreTotalEl) scoreTotalEl.textContent = (game.launchScore || 0).toLocaleString();
-        if (coinTotalEl) coinTotalEl.textContent = (game.launchCoins || 0).toLocaleString();
-
-        // 【最重要】表示前にすべてのコンテンツ（タイトル等含む）をクリア/更新し、残像を完全に防ぐ
-        if (statsList) statsList.innerHTML = '';
-        if (itemsList) itemsList.innerHTML = '';
-        
-        const statusText = { 
-            'success': `SECTOR ${game.sector - 1} COMPLETED`, 
-            'cleared': `SECTOR ${game.sector - 1} COMPLETED`, 
-            'returned': 'ROCKET RECOVERED', 
-            'crashed': 'SHIP CRASHED', 
-            'lost': 'LOST IN SPACE',
-            'gameover': 'TERMINAL REPORT'
-        };
-        if (titleEl) titleEl.textContent = statusText[resultType] || 'MISSION END';
-        if (subtitleEl) {
-            subtitleEl.textContent = '';
-            subtitleEl.style.display = 'none';
-        }
-
-        const closeBtn = document.getElementById('result-close-btn');
-        if (closeBtn) {
-            let label = 'CONTINUE';
-            closeBtn.classList.remove('btn-grad-green', 'btn-grad-blue', 'btn-grad-red', 'btn-grad-orange');
-            
-            if (resultType === 'success' || resultType === 'cleared') {
-                const goalType = game.lastHitGoal?.id;
-                const colorClasses = {
-                    'TRADING_POST': 'btn-grad-green',
-                    'REPAIR_DOCK': 'btn-grad-blue',
-                    'BLACK_MARKET': 'btn-grad-red'
-                };
-                label = `TO ${GOAL_NAMES[goalType] || 'NEXT SECTOR'}`;
-                closeBtn.classList.add(colorClasses[goalType] || 'btn-grad-green');
-            } else if (resultType === 'returned') {
-                label = 'BACK TO BASE';
-                closeBtn.classList.add('btn-grad-green');
-            } else if (resultType === 'gameover') {
-                label = 'RESTART ADVENTURE';
-                closeBtn.classList.add('btn-grad-orange');
-            } else if (game.isGameOver()) {
-                label = 'ABANDON MISSION';
-                closeBtn.classList.add('btn-grad-orange');
-            } else {
-                label = 'RETRY MISSION';
-                closeBtn.classList.add('btn-grad-orange');
-            }
-            closeBtn.textContent = label;
-        }
-
-        if (game.flightResults) game.flightResults.status = resultType;
-        overlay.classList.remove('success-theme', 'failure-theme');
-        if (resultType === 'gameover') {
-            overlay.classList.add('failure-theme');
-        } else {
-            overlay.classList.add((resultType === 'success' || resultType === 'cleared' || resultType === 'returned') ? 'success-theme' : 'failure-theme');
-        }
-
-        const pendingS = (game.pendingGoalBonus || 0) + (game.pendingScore || 0);
-        const pendingC = (game.pendingCoins || 0);
-        const pureFlightScore = Math.max(0, game.score - game.launchScore);
-        const pureFlightCoins = Math.max(0, game.coins - game.launchCoins);
-
-        // ステートを暫定的に更新して updateUI による非表示化を防ぐ
-        // 【重要】すべてのデータ計算とDOM初期化が完了したこのタイミングでステートを切り替える
-        if (game.state !== 'result' && game.state !== 'gameover') {
-            game.setState('result');
-        }
-
-        game.score += pendingS;
-        game.coins += pendingC;
-
-        game.pendingGoalBonus = 0;
-        game.pendingScore = 0;
-        game.pendingCoins = 0;
-
-        if (resultType === 'gameover') {
-            const sectors = (game.sector || 1) - 1;
-            const collected = game.totalCollectedItems || 0;
-            const score = Math.floor(game.score || 0);
-
-            // 各項目のグレード情報を事前に取得
-            const sInfo = this._getGradeInfo(sectors, 10);
-            const cInfo = this._getGradeInfo(collected, 30);
-            const pInfo = this._getGradeInfo(score, 50000);
-
-            // ランキング順位を取得（保存自体は showTerminalReport で行うのでここでは checkRank）
-            const sRank = game.rankingSystem.checkRank('sector', sectors);
-            const cRank = game.rankingSystem.checkRank('collected', collected);
-            const pRank = game.rankingSystem.checkRank('score', score);
-
-            this.addRow(statsList, 'SECTORS COMPLETED', sectors, 'score', 'SCS', { grade: sInfo.grade, rank: sRank });
-            this.addRow(statsList, 'TOTAL COLLECTED', collected, 'coin', 'PCS', { grade: cInfo.grade, rank: cRank });
-            this.addRow(statsList, 'FINAL SCORE', score, 'score', 'PTS', { grade: pInfo.grade, rank: pRank });
-        } else {
-            this.addRow(statsList, 'Flight Duration Score', pureFlightScore, 'score');
-
-            // ボーナス項目の集計
-            const groupedBonuses = new Map();
-            if (game.flightResults && game.flightResults.bonuses) {
-                game.flightResults.bonuses.forEach(b => {
-                    const entry = groupedBonuses.get(b.name) || { value: 0, coins: 0, count: 0 };
-                    entry.value += (b.value || 0);
-                    entry.coins += (b.coins || 0);
-                    entry.count++;
-                    groupedBonuses.set(b.name, entry);
-                });
-            }
-
-            groupedBonuses.forEach((data, name) => {
-                const label = data.count > 1 ? `${name} [x ${data.count}]` : name;
-                if (data.value > 0) this.addRow(statsList, label, data.value, 'score');
-                if (data.coins > 0) {
-                    const coinLabel = data.value > 0 ? `${label} Coin` : label;
-                    this.addRow(statsList, coinLabel, data.coins, 'coin');
-                }
-            });
-
-            let itemCoinTotal = 0;
-            if (game.flightResults && game.flightResults.items) {
-                game.flightResults.items.forEach(item => {
-                    if (item.category === 'COIN') itemCoinTotal += (item.score || 0);
-                    if (item.bonusItems) {
-                        item.bonusItems.forEach(b => {
-                            if (b.category === 'COIN') itemCoinTotal += (b.score || 0);
-                        });
-                    }
-                });
-            }
-
-            if (itemCoinTotal > 0) this.addRow(statsList, 'Collected Coins', itemCoinTotal, 'coin');
-        }
-
-        const groupedItems = [];
-        if (resultType !== 'crashed' && resultType !== 'lost' && game.flightResults && game.flightResults.items) {
-            game.flightResults.items.forEach(item => {
-                if (!item || !item.id) return;
-                const enhStr = JSON.stringify(item.enhancements || {});
-                const key = `${item.category}_${item.id}_${enhStr}_${item.charges || -1}_${item.isDelivery || false}_${item.isMatch || false}`;
-                
-                let group = groupedItems.find(g => g.key === key);
-                if (group) {
-                    group.count++;
-                    if (item.bonusItems) group.bonusItems = [...(group.bonusItems || []), ...item.bonusItems];
-                } else {
-                    groupedItems.push({ ...item, count: 1, key, bonusItems: item.bonusItems ? [...item.bonusItems] : [] });
-                }
-            });
-        }
-
-        if (groupedItems.length === 0) {
-            if (itemsList) itemsList.innerHTML = `
-                <div class="slot-placeholder">
-                    <div class="part-header"><span class="part-name" style="opacity: 0.5;">NO ITEMS COLLECTED</span></div>
-                    <span class="part-info">回収アイテムなし</span>
-                </div>
-            `;
-        } else {
-            // [v0.15] 新規ストーリー解放があれば、そのカードを先頭に追加
-            if (game.storySystem.hasUnlockedThisFlight) {
-                const latestId = game.storySystem.sessionUnlocked[game.storySystem.sessionUnlocked.length - 1];
-                const storyData = STORY_DATA[latestId];
-                if (storyData) {
-                    const storyCard = document.createElement('div');
-                    storyCard.className = 'stagger-in';
-                    storyCard.style.animationDelay = `${this._resultDelay}s`;
-                    this._resultDelay += 0.07;
-                    storyCard.innerHTML = UIComponents.generateStoryCardHTML({ ...storyData, id: latestId }, game.storySystem.isRead(latestId));
-                    itemsList.appendChild(storyCard);
-                }
-            }
-
-            groupedItems.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'reward-item-card stagger-in';
-                card.style.animationDelay = `${this._resultDelay}s`;
-                this._resultDelay += 0.07;
-                card.innerHTML = this.generateCardHTML(item, { showInventory: true, clickable: false });
-                itemsList.appendChild(card);
-                
-                if (item.bonusItems && item.bonusItems.length > 0) {
-                    const groupedBonuses = [];
-                    item.bonusItems.forEach(b => {
-                        const bKey = `${b.id}_${JSON.stringify(b.enhancements || {})}_${b.charges || -1}`;
-                        let bg = groupedBonuses.find(g => g.key === bKey);
-                        if (bg) bg.count++;
-                        else groupedBonuses.push({ ...b, count: 1, key: bKey });
-                    });
-
-                    groupedBonuses.forEach(bonus => {
-                        const bonusCard = document.createElement('div');
-                        bonusCard.className = 'reward-item-card stagger-in';
-                        bonusCard.style.animationDelay = `${this._resultDelay}s`;
-                        this._resultDelay += 0.07;
-                        bonusCard.innerHTML = this.generateCardHTML(bonus, { indent: 16, showInventory: true, clickable: false });
-                        itemsList.appendChild(bonusCard);
-                    });
-                }
-            });
-        }
-
-        setTimeout(() => {
-            if (scoreTotalEl) this.animateValue(scoreTotalEl, game.launchScore, game.score, ANIMATION_DURATION);
-            if (coinTotalEl) this.animateValue(coinTotalEl, game.launchCoins, game.coins, ANIMATION_DURATION);
-        }, this._resultDelay * 1000);
-
-        // 【仕様 2.6/2.7】すべての準備（DOM生成）が完了した後に可視化。
-        // updateUI() による自動介入を排除しているため、ここが唯一の表示タイミングとなる。
-        if (resultType !== 'gameover') {
-            requestAnimationFrame(() => {
-                overlay.classList.remove('hidden');
-                this._updateHUD();
-            });
-        } else {
-            // 【憲法 2.6】hidden 操作は showResult/showTerminalReport の責任
-            overlay.classList.remove('hidden');
-            this._updateHUD();
-            this.showTerminalReport();
-        }
+        this.resultScreen.show(resultType);
     }
 
     /**
@@ -652,29 +351,10 @@ export class UISystem {
     }
 
     animateValue(el, start, end, duration) {
-        const game = this.game;
-        if (start === end) {
-            el.textContent = end.toLocaleString();
-            return;
-        }
-        if (el.id === 'coin-display' || el.id === 'event-player-credits') game.isAnimatingCoins = true;
-        if (el.id === 'score-display' || el.id === 'score-total') game.isAnimatingScore = true;
-
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            const value = Math.floor(progress * (end - start) + start);
-            el.textContent = value.toLocaleString();
-            if (el.id === 'coin-display' || el.id === 'event-player-credits') game.displayCoins = value;
-            else if (el.id === 'score-display' || el.id === 'score-total') game.displayScore = value;
-            if (progress < 1) window.requestAnimationFrame(step);
-            else {
-                if (el.id === 'coin-display' || el.id === 'event-player-credits') game.isAnimatingCoins = false;
-                if (el.id === 'score-display' || el.id === 'score-total') game.isAnimatingScore = false;
-            }
-        };
-        window.requestAnimationFrame(step);
+        UIAnimations.animateValue(el, start, end, duration, (val) => {
+            if (el.id === 'coin-display' || el.id === 'event-player-credits') this.game.displayCoins = val;
+            else if (el.id === 'score-display' || el.id === 'score-total') this.game.displayScore = val;
+        });
     }
 
     animateCoinChange(amount) {
@@ -716,118 +396,7 @@ export class UISystem {
     }
 
     showTerminalReport() {
-        const game = this.game;
-        const overlay = document.getElementById('receipt-overlay');
-        const content = document.getElementById('receipt-content-area');
-        if (!overlay || !content) return;
-
-        const sectors = game.sector - 1;
-        const collected = game.totalCollectedItems || 0;
-        const score = Math.floor(game.score);
-
-        // ランキングの保存
-        const sectorRank = game.rankingSystem.addEntry('sector', sectors);
-        const collectedRank = game.rankingSystem.addEntry('collected', collected);
-        const scoreRank = game.rankingSystem.addEntry('score', score);
-
-        // 各項目の評価計算 (目標値 15, 50, 100000)
-        const sectorInfo = this._getGradeInfo(sectors, 15);
-        const collectedInfo = this._getGradeInfo(collected, 50);
-        const scoreInfo = this._getGradeInfo(score, 100000);
-
-        const totalScoreVal = sectorInfo.score + collectedInfo.score + scoreInfo.score;
-        const totalInfo = this._getGradeInfo(totalScoreVal, 1, 'total');
-
-        const now = new Date();
-        const timestamp = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-
-        const getRankText = (rankInfo, label) => {
-            if (!rankInfo || !rankInfo.rank) return `${label} OUT OF TOP 20`;
-            const isTop = rankInfo.rank <= 3;
-            const suffix = ['st', 'nd', 'rd'][(rankInfo.rank - 1) % 10] || 'th';
-            const realSuffix = (rankInfo.rank >= 11 && rankInfo.rank <= 13) ? 'th' : suffix;
-            const topClass = isTop ? 'top-rank' : '';
-            return `<span class="${topClass}">${label} RANKING <span class="rank-value">${rankInfo.rank}${realSuffix}</span></span>`;
-        };
-
-        const stampRotation = -10 - (Math.random() * 15); // -10 to -25 deg
-        const stampOffsetX = (Math.random() - 0.5) * 20; // -10 to +10 px
-        const stampOffsetY = (Math.random() - 0.5) * 15; // -7.5 to +7.5 px
-        
-        // Grade size variant (huge / normal / mini)
-        let sizeVariant = 'normal';
-        if (totalInfo.grade === 'SS') sizeVariant = 'huge';
-        if (totalInfo.grade === 'E') sizeVariant = 'mini';
-
-        content.innerHTML = `
-            <div class="receipt-header">
-                <h1 class="receipt-title">TERMINAL REPORT</h1>
-                <div class="receipt-subtitle">GRAVITY FREIGHT CO. - FINAL EVALUATION</div>
-            </div>
-            <div class="receipt-divider-dotted"></div>
-            
-            <div class="receipt-item-group">
-                <div class="receipt-row"><span>SECTORS COMPLETED</span><span>${sectors} SCS</span></div>
-                <div class="receipt-detail">${getRankText(sectorRank, 'SECTOR')} / GRADE <span class="grade-value receipt-grade-${sectorInfo.grade.toLowerCase()}">${sectorInfo.grade}</span></div>
-            </div>
-
-            <div class="receipt-item-group">
-                <div class="receipt-row"><span>TOTAL COLLECTED</span><span>${collected} PCS</span></div>
-                <div class="receipt-detail">${getRankText(collectedRank, 'COLLECTION')} / GRADE <span class="grade-value receipt-grade-${collectedInfo.grade.toLowerCase()}">${collectedInfo.grade}</span></div>
-            </div>
-
-            <div class="receipt-divider-solid"></div>
-            <div class="receipt-row total"><span>FINAL SCORE</span><span>${score.toLocaleString()} PTS</span></div>
-            <div class="receipt-detail">${getRankText(scoreRank, 'SCORE')} / GRADE <span class="grade-value receipt-grade-${scoreInfo.grade.toLowerCase()}">${scoreInfo.grade}</span></div>
-
-            <div class="receipt-stamp-zone">
-                <div class="receipt-official-seal stamp-${totalInfo.grade.toLowerCase()} ${sizeVariant}" 
-                     id="report-stamp"
-                     style="--stamp-rot: ${stampRotation}deg; --stamp-x: ${stampOffsetX}px; --stamp-y: ${stampOffsetY}px;">
-                    <div class="receipt-stamp-left-half">
-                        <div class="receipt-stamp-text-line small">OPERATOR AUTH.</div>
-                        <div class="receipt-stamp-text-line medium">CONTRACT VERIFIED</div>
-                        <div class="receipt-stamp-text-line large">GRADE</div>
-                    </div>
-                    <div class="receipt-stamp-right-half">
-                        ${totalInfo.grade}
-                    </div>
-                </div>
-            </div>
-
-            <div class="barcode-container"></div>
-            <div class="receipt-footer">
-                <div class="auth-status">OFFICIAL PERFORMANCE LOG GRANTED</div>
-                <div class="timestamp">${timestamp}</div>
-            </div>
-            <button class="receipt-btn" id="receipt-exit-btn">END CONTRACT</button>
-        `;
-
-        overlay.classList.remove('hidden');
-        
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                overlay.classList.add('active');
-                setTimeout(() => {
-                    const stamp = document.getElementById('report-stamp');
-                    if (stamp) stamp.classList.add('active');
-                }, 800);
-            });
-        });
-
-        const exitBtn = document.getElementById('receipt-exit-btn');
-        if (exitBtn) {
-            exitBtn.onclick = () => {
-                overlay.classList.remove('active');
-                const resultOverlay = document.getElementById('result-overlay');
-                if (resultOverlay) resultOverlay.classList.add('hidden');
-
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                    this.game.fullReset();
-                }, 800);
-            };
-        }
+        this.terminalReport.show();
     }
 
     _updateTitleUI() {
@@ -898,32 +467,7 @@ export class UISystem {
      * 呼び出し元: showResult() のみ
      */
     resetResultOverlay() {
-        const resultOverlay = document.getElementById('result-overlay');
-        const receiptOverlay = document.getElementById('receipt-overlay');
-        const backToResultBtn = document.getElementById('back-to-result-btn');
-        
-        // 【重要】クラスだけでなく内容も即座にクリアして残像を防ぐ
-        const titleEl = document.getElementById('result-title');
-        const subtitleEl = document.getElementById('result-subtitle');
-        const statsList = document.getElementById('result-stats-list');
-        const itemsList = document.getElementById('result-items-list');
-
-        if (titleEl) titleEl.textContent = '';
-        if (subtitleEl) subtitleEl.textContent = '';
-        if (statsList) statsList.innerHTML = '';
-        if (itemsList) itemsList.innerHTML = '';
-
-        if (resultOverlay) {
-            resultOverlay.classList.remove('minimized');
-            resultOverlay.classList.add('hidden'); // 一旦隠すことを保証
-            
-            // 【最重要】強制リフロー (Forced Reflow)
-            // ブラウザに「今、この瞬間に隠れた状態である」ことを認識させ、
-            // CSS アニメーションやレンダリング状態を確実にリセットする。
-            void resultOverlay.offsetWidth;
-        }
-        if (receiptOverlay) receiptOverlay.classList.remove('minimized');
-        if (backToResultBtn) backToResultBtn.classList.add('hidden');
+        this.resultScreen.reset();
     }
 
     _updateHUD() {
@@ -1030,55 +574,8 @@ export class UISystem {
         }
     }
 
-    addRow(parent, label, value, colorClass, unit = '', extra = null) {
-        if (!parent) return;
-        const row = document.createElement('div');
-        row.className = 'result-row stagger-in';
-        if (extra) row.classList.add('terminal-report-row');
-
-        row.style.animationDelay = `${this._resultDelay}s`;
-        const displayValue = typeof value === 'number' ? 
-            (value >= 0 ? '+' : '') + value.toLocaleString() : 
-            value;
-        const unitText = unit ? ` ${unit}` : '';
-        
-        let html = `
-            <div class="main-content">
-                <span class="label">${label}</span>
-                <span class="value ${colorClass}">${displayValue}${unitText}</span>
-            </div>
-        `;
-
-        if (extra) {
-            const rankText = extra.rank ? `${extra.rank}${(extra.rank === 1 ? 'st' : (extra.rank === 2 ? 'nd' : (extra.rank === 3 ? 'rd' : 'th')))}` : 'OUT OF RANK';
-            const rankClass = extra.rank <= 3 ? 'top-rank' : '';
-            html += `
-                <div class="extra-info">
-                    <span class="rank-label ${rankClass}">${rankText} IN RANKINGS</span>
-                    <span class="grade-tag grade-${extra.grade.toLowerCase()}">${extra.grade}</span>
-                </div>
-            `;
-        }
-
-        row.innerHTML = html;
-        parent.appendChild(row);
-        this._resultDelay += 0.1;
-    }
-
-    animateValue(element, start, end, duration) {
-        if (!element) return;
-        const startTime = performance.now();
-        const update = (now) => {
-            const elapsed = (now - startTime) / (duration * 1000);
-            if (elapsed < 1) {
-                const current = Math.floor(start + (end - start) * elapsed);
-                element.textContent = current.toLocaleString();
-                requestAnimationFrame(update);
-            } else {
-                element.textContent = end.toLocaleString();
-            }
-        };
-        requestAnimationFrame(update);
+    showStatus(message, type = 'info') {
+        // 現在はログ出力を抑制。将来的に UI でのメッセージ表示に使用可能。
     }
 
     showStatus(message, type = 'info') {
