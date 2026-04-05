@@ -29,7 +29,7 @@
     border-radius: 20px;
     width: 620px;
     max-width: 95vw;
-    max-height: 85vh;
+    height: 85vh;
     padding: 30px;
     display: flex;
     flex-direction: column;
@@ -89,11 +89,22 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    gap: 20px; /* サマリーとカラム間のマージン */
+}
+
+/* 独立スクロールを実現する各セクション */
+.result-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 8px; /* スクロールバー用のマージン */
 }
 
 .result-columns {
     display: flex;
-    gap: 30px;
+    gap: 24px;
     align-items: stretch;
     flex: 1;
     min-height: 0;
@@ -101,38 +112,12 @@
 
 .res-col-left {
     flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-height: 0;
-}
-
-.res-col-left .result-section {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 8px;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-#result-stats-list {
-    flex: 1;
-}
-
-.res-col-left .result-summary {
-    flex-shrink: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.05); /* 区切り線 */
+    padding-right: 12px;
 }
 
 .res-col-right {
-    flex: 1;
-    min-width: 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.05);
-    padding-left: 20px;
-    overflow-y: auto;
-    padding-right: 5px;
-    min-height: 0;
+    flex: 1.1; /* アイテムの方を若干広く */
 }
 
 .result-section h3 {
@@ -160,14 +145,16 @@
 
 .result-row .label {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.85); /* 視認性向上のため少し白く */
+    letter-spacing: 1px;
 }
 
 .result-row .value {
-    font-size: 15px;
+    font-size: 16px; /* 15pxから若干拡大 */
     font-weight: 700;
     font-family: 'Inter', sans-serif;
     color: #fff;
+    text-align: right; /* 右寄せを担保 */
 }
 
 .result-row .value.score {
@@ -233,7 +220,7 @@
 .reward-item-card {
     margin-bottom: 8px;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: auto; /* ホバーなどで無反応にならないよう auto に設定 */
 }
 
 #result-footer {
@@ -245,30 +232,52 @@
 }
 
 
-.result-summary {
-    background: rgba(255, 255, 255, 0.03);
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+/* --- Prominent Summary at the Top --- */
+.result-summary.prominent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+    margin: 0;
+    flex-shrink: 0;
 }
 
 .total-score-box,
-.total-coin-box {
+.total-coin-card {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 10px;
-}
-
-.total-coin-box {
-    margin-bottom: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
 }
 
 .total-score-box .label,
-.total-coin-box .label {
-    font-size: 10px;
+.total-coin-card .label {
+    font-size: 11px;
     letter-spacing: 2px;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+#result-total-score, 
+#result-total-coin {
+    font-size: 36px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+#result-total-score {
+    color: #00ffcc;
+    text-shadow: 0 0 25px rgba(0, 255, 204, 0.4);
+}
+
+#result-total-coin {
+    color: #ffd700;
+    text-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
 }
 
 #result-total-score {
@@ -358,6 +367,68 @@
 
 #result-overlay .story-reward-card .mail-icon-btn {
     color: var(--item-color);
+}
+
+/* --- Responsive Responsive Scrolling & Layout --- */
+@media (max-width: 640px) {
+    #result-panel {
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        border-radius: 0;
+        padding: 20px 15px;
+    }
+
+    .result-summary.prominent {
+        flex-direction: row; /* 横並びを維持 */
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .total-score-box,
+    .total-coin-card {
+        align-items: flex-start;
+        flex: 1;
+    }
+
+    #result-total-score, 
+    #result-total-coin {
+        font-size: 24px; /* 小さい画面用に縮小 */
+    }
+
+    .total-score-box .label,
+    .total-coin-card .label {
+        font-size: 10px; /* ラベルも少し小さく */
+    }
+
+    /* モバイル時は全体で1つのスクロールエリアにする */
+    #result-content {
+        overflow-y: auto; /* 個別のスクロールではなく全体でスクロール */
+        padding-right: 5px;
+        -webkit-overflow-scrolling: touch; /* iOSなどでのスムーズなスクロール用 */
+    }
+
+    .result-columns {
+        flex-direction: column;
+        overflow-y: visible; /* 各カラムのスクロールを解除 */
+        gap: 40px;
+        height: auto;
+    }
+
+    .res-col-left {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-right: 0;
+        padding-bottom: 30px;
+    }
+
+    .result-section {
+        overflow-y: visible; /* 各パートの独立スクロールを解除 */
+        height: auto;
+        flex: none;
+    }
 }
 
 

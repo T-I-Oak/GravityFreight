@@ -162,7 +162,6 @@
 }
 
 #event-screen .event-section,
-
 #event-screen .event-shop-section,
 #event-screen .event-sell-section,
 #event-screen .repair-section,
@@ -170,7 +169,9 @@
 #event-screen .dismantle-results-section {
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    flex: none; /* 親の高さに合わせて伸び縮みさせない */
+    height: auto;
+    min-height: auto;
     margin-bottom: 30px;
     padding: 0;
     background: none;
@@ -205,9 +206,10 @@
     flex-direction: column;
     gap: 12px;
     padding: 4px;
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
+    /* 独立したスクロールを解除し、親のカラムに委ねる */
+    overflow-y: visible;
+    flex: none;
+    min-height: auto;
 }
 
 #event-screen .repair-grid {

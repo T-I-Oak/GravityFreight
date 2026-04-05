@@ -461,7 +461,6 @@ export class EventSystem {
         game.selection.launcher = null;
         game.selection.booster = null;
         game.reset();
-        game.missionSystem.checkGameOver();
     }
 
     handleEvent(goal) {

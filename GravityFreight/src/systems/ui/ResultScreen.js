@@ -84,6 +84,8 @@ export class ResultScreen {
         // データの同期とステート更新 (オリジナルのタイミングを維持)
         const pendingS = (game.pendingGoalBonus || 0) + (game.pendingScore || 0);
         const pendingC = (game.pendingCoins || 0);
+        
+        // 【重要】ボーナス加算前の値でフライトスコアを計算する
         const pureFlightScore = Math.max(0, game.score - game.launchScore);
 
         if (game.state !== 'result' && game.state !== 'gameover') {
@@ -310,18 +312,18 @@ export class ResultScreen {
         const unitText = unit ? ` ${unit}` : '';
         
         let html = `
-            <div class="main-content">
-                <span class="label">${label}</span>
-                <span class="value ${colorClass}">${displayValue}${unitText}</span>
-            </div>
+            <span class="label">${label}</span>
+            <span class="value ${colorClass}">${displayValue}${unitText}</span>
         `;
 
         if (extra) {
-            const rankText = extra.rank ? `${extra.rank}${(extra.rank === 1 ? 'st' : (extra.rank === 2 ? 'nd' : (extra.rank === 3 ? 'rd' : 'th')))}` : 'OUT OF RANK';
-            const rankClass = extra.rank <= 3 ? 'top-rank' : '';
-            html += `
+            html = `
+                <div class="main-content">
+                    <span class="label">${label}</span>
+                    <span class="value ${colorClass}">${displayValue}${unitText}</span>
+                </div>
                 <div class="extra-info">
-                    <span class="rank-label ${rankClass}">${rankText} IN RANKINGS</span>
+                    <span class="rank-label ${extra.rank <= 3 ? 'top-rank' : ''}">${extra.rank ? `${extra.rank}${(extra.rank === 1 ? 'st' : (extra.rank === 2 ? 'nd' : (extra.rank === 3 ? 'rd' : 'th')))}` : 'OUT OF RANK'} IN RANKINGS</span>
                     <span class="grade-tag grade-${extra.grade.toLowerCase()}">${extra.grade}</span>
                 </div>
             `;

@@ -24,6 +24,8 @@
 #receipt-overlay .receipt-paper {
     width: 460px;
     max-width: 95vw;
+    max-height: 90vh; /* 画面からはみ出さないように制限 */
+    overflow-y: auto;  /* はみ出す場合はこのパネル全体でスクロール */
     background: #dcdcdc;
     color: #1a1a1a;
     padding: 50px 40px;

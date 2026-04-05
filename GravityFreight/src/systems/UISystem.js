@@ -322,6 +322,7 @@ export class UISystem {
     }
 
     showResult(resultType) {
+        if (this.game.state === 'result') return;
         this.resultScreen.show(resultType);
     }
 
