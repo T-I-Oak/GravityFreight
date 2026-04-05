@@ -16,7 +16,7 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.15.1";
+        this.version = "0.16.0";
 
 
 
