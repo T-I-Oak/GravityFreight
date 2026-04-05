@@ -16,6 +16,9 @@ export class TerminalReport {
         const content = document.getElementById('receipt-content-area');
         if (!overlay || !content) return;
 
+        overlay.classList.remove('hidden', 'minimized');
+        overlay.classList.add('active');
+
         const sectors = game.sector - 1;
         const collected = game.totalCollectedItems || 0;
         const score = Math.floor(game.score);

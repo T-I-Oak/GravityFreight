@@ -322,7 +322,8 @@ export class UISystem {
     }
 
     showResult(resultType) {
-        if (this.game.state === 'result') return;
+        // [仕様 2.4] 新しいリザルト表示開始時にクリーンアップを行う
+        this.resetResultOverlay();
         this.resultScreen.show(resultType);
     }
 
@@ -573,10 +574,6 @@ export class UISystem {
             this.game.storySystem.markAsRead(storyId);
             this.updateMailIcon(); 
         }
-    }
-
-    showStatus(message, type = 'info') {
-        // 現在はログ出力を抑制。将来的に UI でのメッセージ表示に使用可能。
     }
 
     showStatus(message, type = 'info') {

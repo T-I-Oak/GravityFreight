@@ -43,7 +43,17 @@ export class ResultScreen {
         const overlay = document.getElementById('result-overlay');
         if (!overlay) return;
 
-        this.reset();
+        const currentShowingType = overlay.getAttribute('data-result-type');
+        
+        // 【重要】既に同じ結果を表示中、あるいはアニメーション中であれば重複呼び出しを無視する
+        // これにより、ストーリー解放時に走る「早出し」とタイマーによる「正規表示」の競合を防ぐ
+        if (!overlay.classList.contains('hidden') && currentShowingType === resultType) return;
+        
+        // ターミナルレポート（gameover）への移行は常に許可する
+        if (resultType !== 'gameover' && currentShowingType === 'gameover') return;
+
+        // reset() は UISystem.showResult() 内で resetResultOverlay() を通じて既に実行済み
+        overlay.setAttribute('data-result-type', resultType);
         this._resultDelay = 0.1;
 
         const titleEl = document.getElementById('result-title');
@@ -312,8 +322,10 @@ export class ResultScreen {
         const unitText = unit ? ` ${unit}` : '';
         
         let html = `
-            <span class="label">${label}</span>
-            <span class="value ${colorClass}">${displayValue}${unitText}</span>
+            <div class="main-content">
+                <span class="label">${label}</span>
+                <span class="value ${colorClass}">${displayValue}${unitText}</span>
+            </div>
         `;
 
         if (extra) {

@@ -453,9 +453,17 @@ export class EventSystem {
             return;
         }
 
+        // 成功・クリア時は施設遷移を優先（ショップでの機体購入チャンスを確保）
         if (status === 'success' || status === 'cleared') {
             if (game.lastHitGoal) { game.handleEvent(game.lastHitGoal); return; }
+        } else {
+            // 墜落・喪失時はリザルトを閉じた瞬間にゲームオーバー判定を行う
+            if (game.missionSystem.isGameOver()) {
+                game.uiSystem.showResult('gameover');
+                return;
+            }
         }
+
         game.setState('building');
         if (status !== 'returned') game.selection.rocket = null;
         game.selection.launcher = null;
