@@ -1,4 +1,4 @@
-import { CATEGORY_COLORS } from '../core/Data.js';
+import { CATEGORY_COLORS, STORY_DATA } from '../core/Data.js';
 
 export class Renderer {
     constructor(canvas, game) {
@@ -311,6 +311,59 @@ export class Renderer {
                     }
                 }
                 this.ctx.restore();
+
+                // --- Cargo Presence Indicator (Backlog 46/47) ---
+                const hasCargo = this.game.bodies.some(b => 
+                    !b.isCollected && b.items && b.items.some(it => it.deliveryGoalId === goal.id)
+                );
+
+                if (hasCargo) {
+                    const branchChar = goal.id[0]; // 'T', 'R', or 'B'
+                    const nextId = this.game.storySystem.currentPath + branchChar;
+                    const isNextUnread = STORY_DATA[nextId] && !this.game.storySystem.isRead(nextId);
+                    
+                    // 明滅ロジック：次に解放されるストーリーが「初見（未読）」の場合に明滅。周期をゆっくりに調整。
+                    let iconAlpha = 1.0;
+                    if (isNextUnread) {
+                        iconAlpha = 0.5 + 0.5 * Math.sin(Date.now() / 500); 
+                    }
+
+                    const iconRadius = boundaryRadius + 95; // ラベル(45)のさらに外側
+                    const iconAngle = goal.angle;
+                    const iconX = centerX + Math.cos(iconAngle) * iconRadius;
+                    const iconY = centerY + Math.sin(iconAngle) * iconRadius;
+
+                    this.ctx.save();
+                    this.ctx.globalAlpha = iconAlpha;
+                    this.ctx.translate(iconX, iconY);
+                    
+                    // ラベルの反転ロジック (isBottom) に同期させる
+                    if (isBottom) {
+                        this.ctx.rotate(iconAngle - Math.PI / 2);
+                    } else {
+                        this.ctx.rotate(iconAngle + Math.PI / 2);
+                    }
+                    
+                    this.ctx.strokeStyle = goal.color;
+                    this.ctx.lineWidth = 2.5;
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = goal.color;
+                    
+                    // 封筒アイコンの描画
+                    const w = 14;
+                    const h = 10;
+                    this.ctx.beginPath();
+                    this.ctx.rect(-w, -h, w * 2, h * 2);
+                    this.ctx.stroke();
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(-w, -h);
+                    this.ctx.lineTo(0, 0);
+                    this.ctx.lineTo(w, -h);
+                    this.ctx.stroke();
+
+                    this.ctx.restore();
+                }
             }
             this.ctx.restore();
         });

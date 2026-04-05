@@ -156,7 +156,7 @@ body #back-to-result-btn {
     bottom: 20px;
     right: 20px;
     width: 320px;
-    z-index: 10000; /* Ensure it stays above everything during Map View */
+    z-index: 10000;
     white-space: nowrap;
     pointer-events: auto;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -208,3 +208,68 @@ body #back-to-result-btn.hidden {
 .grade-c  { background: #999999 !important; }
 .grade-d  { background: #666666 !important; }
 .grade-e  { background: #333333 !important; }
+
+/* --- Story System UI (v0.15) --- */
+.mail-icons-group {
+    display: flex;
+    gap: 12px;
+    margin-left: 10px;
+}
+
+.mail-icon-btn {
+    background: transparent;
+    border: none;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.2s;
+    padding: 0;
+    color: var(--story-color, #00d4ff);
+}
+
+.mail-icon-btn:not(.gray):hover {
+    transform: scale(1.2);
+}
+
+.mail-icon-btn.gray {
+    opacity: 0.4;
+    filter: grayscale(1);
+    cursor: default;
+}
+
+/* 幾何学的な封筒アイコン (実線と擬似要素で構成) */
+.mail-envelope {
+    width: 18px;
+    height: 12px;
+    border: 1.5px solid currentColor;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.mail-envelope::after {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 2px;
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    box-sizing: border-box;
+}
+
+.mail-icon-btn.unread {
+    animation: blink-slow 3s infinite ease-in-out;
+}
+
+.mr-8 { margin-right: 8px; }
+
+@keyframes blink-slow {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50% { opacity: 0.4; filter: brightness(1.8); }
+}

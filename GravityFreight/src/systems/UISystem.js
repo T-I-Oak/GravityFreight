@@ -1,4 +1,4 @@
-import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba, PARTS, RARITY } from '../core/Data.js';
+import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba, PARTS, RARITY, STORY_DATA, GOAL_COLORS } from '../core/Data.js';
 import { ItemUtils } from '../utils/ItemUtils.js';
 import { TitleAnimation } from '../utils/TitleAnimation.js';
 import { UIComponents } from './ui/UIComponents.js';
@@ -13,6 +13,7 @@ export class UISystem {
         this.maintenanceUI = new MaintenanceUI(game, this);
         this.titleAnimation = null;
         this.notificationTimer = null;
+        this.setupStoryListeners();
     }
 
     update(dt) {
@@ -562,6 +563,20 @@ export class UISystem {
                 </div>
             `;
         } else {
+            // [v0.15] 新規ストーリー解放があれば、そのカードを先頭に追加
+            if (game.storySystem.hasUnlockedThisFlight) {
+                const latestId = game.storySystem.sessionUnlocked[game.storySystem.sessionUnlocked.length - 1];
+                const storyData = STORY_DATA[latestId];
+                if (storyData) {
+                    const storyCard = document.createElement('div');
+                    storyCard.className = 'stagger-in';
+                    storyCard.style.animationDelay = `${this._resultDelay}s`;
+                    this._resultDelay += 0.07;
+                    storyCard.innerHTML = UIComponents.generateStoryCardHTML({ ...storyData, id: latestId }, game.storySystem.isRead(latestId));
+                    itemsList.appendChild(storyCard);
+                }
+            }
+
             groupedItems.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'reward-item-card stagger-in';
@@ -922,6 +937,97 @@ export class UISystem {
         if (coinDisplay) coinDisplay.textContent = Math.floor(game.displayCoins || 0).toLocaleString();
         if (eventCoinDisplay) eventCoinDisplay.textContent = Math.floor(game.displayCoins || 0).toLocaleString();
         if (sectorDisplay) sectorDisplay.textContent = game.sector;
+        this.updateMailIcon();
+    }
+
+    setupStoryListeners() {
+        for (let i = 0; i < 3; i++) {
+            const btn = document.getElementById(`mail-btn-${i}`);
+            if (btn) {
+                btn.onclick = () => {
+                    const id = this.game.storySystem.sessionUnlocked[i];
+                    if (id) this.showStoryModal(id);
+                };
+            }
+        }
+
+        const closeBtn = document.getElementById('close-story-btn');
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                document.getElementById('story-overlay').classList.add('hidden');
+            };
+        }
+    }
+
+    updateMailIcon() {
+        const game = this.game;
+        const group = document.getElementById('mail-status-group');
+        if (!group) return;
+
+        const sessionStories = game.storySystem.sessionUnlocked;
+        
+        for (let i = 0; i < 3; i++) {
+            const btn = document.getElementById(`mail-btn-${i}`);
+            if (!btn) continue;
+            const id = sessionStories[i];
+
+            // 既存のテーマクラスを一旦リセット
+            btn.classList.remove('unread', 'gray');
+            btn.style.color = '';
+            btn.style.borderColor = '';
+            btn.style.boxShadow = '';
+
+            if (id) {
+                btn.disabled = false;
+                // インデックス i 文字目のブランチ名からテーマ色を決定 (例: id="TR", i=1 -> "R")
+                const branch = id.charAt(i).toUpperCase();
+                const goalKey = branch === 'T' ? 'TRADING_POST' : (branch === 'R' ? 'REPAIR_DOCK' : 'BLACK_MARKET');
+                const color = GOAL_COLORS[goalKey];
+                
+                btn.style.color = color;
+                btn.style.borderColor = color;
+                btn.style.boxShadow = `0 0 15px ${hexToRgba(color, 0.2)}`;
+                btn.classList.toggle('unread', !game.storySystem.isRead(id));
+            } else {
+                btn.disabled = true;
+                btn.classList.add('gray');
+            }
+        }
+    }
+
+    showStoryModal(storyId) {
+        const story = STORY_DATA[storyId];
+        if (!story) return;
+
+        const overlay = document.getElementById('story-overlay');
+        const title = document.getElementById('story-title');
+        const discovery = document.getElementById('story-discovery');
+        const content = document.getElementById('story-content');
+        const branchIcon = document.getElementById('story-branch-icon');
+
+        if (overlay && branchIcon) {
+            const branch = story.branch; // 'T', 'R', or 'B'
+            const goalKey = branch === 'T' ? 'TRADING_POST' : (branch === 'R' ? 'REPAIR_DOCK' : 'BLACK_MARKET');
+            const color = GOAL_COLORS[goalKey];
+
+            // モーダル全体のカラーテーマを CSS 変数で上書き
+            const r = parseInt(color.slice(1, 3), 16);
+            const g = parseInt(color.slice(3, 5), 16);
+            const b = parseInt(color.slice(5, 7), 16);
+            
+            overlay.style.setProperty('--story-color', color);
+            overlay.style.setProperty('--story-color-alpha', hexToRgba(color, 0.4));
+            overlay.style.setProperty('--story-color-rgb', `${r}, ${g}, ${b}`);
+            
+            branchIcon.textContent = branch;
+            title.textContent = story.title;
+            discovery.textContent = story.discovery;
+            content.innerHTML = story.content.replace(/\n/g, '<br>');
+
+            overlay.classList.remove('hidden');
+            this.game.storySystem.markAsRead(storyId);
+            this.updateMailIcon(); 
+        }
     }
 
     addRow(parent, label, value, colorClass, unit = '', extra = null) {

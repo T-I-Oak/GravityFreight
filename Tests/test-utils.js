@@ -51,9 +51,19 @@ export function setupStandardDOM() {
         <div id="receipt-overlay" class="hidden">
             <div id="receipt-content-area"></div>
         </div>
+        <div id="story-overlay" class="hidden">
+            <div class="story-modal">
+                <div id="story-branch-icon"></div>
+                <h2 id="story-title"></h2>
+                <div id="story-discovery"></div>
+                <div id="story-content"></div>
+                <button id="close-story-btn"></button>
+            </div>
+        </div>
         <div id="score-display">0</div>
         <div id="coin-display">0</div>
         <div id="sector-display">1</div>
+        <button id="mail-btn" class="hidden"><span class="unread-badge"></span></button>
         <div id="flight-tab" class="tab-btn" data-tab="flight"></div>
         <div id="factory-tab" class="tab-btn" data-tab="factory"></div>
     `;

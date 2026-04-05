@@ -1,0 +1,86 @@
+#story-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 5, 15, 0.85);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6000;
+}
+
+#story-overlay .story-modal {
+    background: rgba(15, 20, 30, 0.9);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-top: 4px solid var(--story-color, #00d4ff);
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.8), 0 0 30px var(--story-color-alpha, rgba(0, 212, 255, 0.1));
+    position: relative;
+}
+
+#story-overlay .story-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+#story-overlay .story-branch-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(var(--story-color-rgb), 0.1); /* fallback is difficult with bg, using default or manual override if needed */
+    border: 1px solid var(--story-color-alpha, rgba(0, 212, 255, 0.4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--story-color, #00d4ff);
+    border-radius: 4px;
+}
+
+#story-overlay .story-modal h2 {
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.6rem;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+#story-overlay .story-discovery-msg {
+    font-size: 0.9rem;
+    color: var(--story-color, #00d4ff);
+    background: rgba(var(--story-color-rgb), 0.05);
+    padding: 10px 15px;
+    border-left: 2px solid var(--story-color, #00d4ff);
+    margin-bottom: 25px;
+    font-style: italic;
+    filter: brightness(1.2);
+}
+
+#story-overlay .story-content-body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.05rem;
+    margin-bottom: 35px;
+    letter-spacing: 0.02em;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+#story-overlay .story-footer {
+    display: flex;
+    justify-content: center;
+}
+
+#story-overlay #close-story-btn {
+    min-width: 220px;
+}

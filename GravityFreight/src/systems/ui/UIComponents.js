@@ -133,7 +133,31 @@ export class UIComponents {
     }
 
     /**
-     * 耐久力ゲージの HTML を生成
+     * ストーリー解放通知用カードの HTML を生成
+     */
+    static generateStoryCardHTML(storyData, isRead = false) {
+        if (!storyData) return '';
+        const branchColors = { 'T': '#00ffcc', 'R': '#00aaff', 'B': '#ff3366' };
+        const categoryColor = branchColors[storyData.branch] || '#fff';
+        
+        return `
+            <div class="item-card story-reward-card" style="--item-color: ${categoryColor};">
+                <div class="part-header">
+                    <span class="part-name">${storyData.title || 'NEW MESSAGE'}</span>
+                    <div class="part-header-right">
+                        ${!isRead ? '<span class="status-badge status-new">NEW STORY</span>' : ''}
+                        <div class="mail-icon-btn ${!isRead ? 'unread' : ''}" onclick="window.game.uiSystem.showStoryModal('${storyData.id}')">
+                            <div class="mail-envelope"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="part-info discovery-msg">${storyData.discovery}</div>
+            </div>
+        `;
+    }
+
+    /**
+     * 耐久値ゲージの HTML を生成
      */
     static generateHPGauge(current, max, isEnhanced = false, mini = false) {
         let segments = '';

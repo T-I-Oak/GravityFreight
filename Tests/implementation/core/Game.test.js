@@ -23,6 +23,18 @@ describe('Implementation: Game Core Controllers', () => {
     let mockCanvas, mockUI, game;
 
     beforeEach(() => {
+        // Mock localStorage
+        const store = {};
+        Object.defineProperty(window, 'localStorage', {
+            value: {
+                getItem: vi.fn(key => store[key] || null),
+                setItem: vi.fn((key, value) => { store[key] = value.toString(); }),
+                clear: vi.fn(() => { for (let key in store) delete store[key]; }),
+                removeItem: vi.fn(key => delete store[key])
+            },
+            writable: true
+        });
+
         // Create all necessary DOM elements for Game initialization
         document.body.innerHTML = `
             <canvas id="gameCanvas"></canvas>
@@ -32,6 +44,7 @@ describe('Implementation: Game Core Controllers', () => {
                 <div id="score-display">0</div>
                 <div id="coin-display">0</div>
                 <div id="sector-display">1</div>
+                <button id="mail-btn" class="hidden"><span class="unread-badge"></span></button>
             </div>
             <div id="terminal-panel" class="hidden">
                 <div class="collapse-btn" id="terminal-collapse-btn"><span class="icon">∧</span></div>
@@ -49,7 +62,7 @@ describe('Implementation: Game Core Controllers', () => {
             <div id="launch-control" class="hidden"></div>
             <div id="launch-btn" class="hidden"></div>
             <div id="result-overlay" class="hidden">
-                <div id="result-title"></div>
+                <h2 id="result-title"></h2>
                 <div id="result-subtitle"></div>
                 <div id="result-stats-list"></div>
                 <div id="result-items-list"></div>
@@ -61,14 +74,31 @@ describe('Implementation: Game Core Controllers', () => {
             <div id="receipt-overlay" class="hidden">
                 <div id="receipt-content-area"></div>
             </div>
+            <div id="story-overlay" class="hidden">
+                <div id="story-branch-icon"></div>
+                <h2 id="story-title"></h2>
+                <div id="story-discovery"></div>
+                <div id="story-content"></div>
+                <button id="close-story-btn"></button>
+            </div>
             <button id="back-to-result-btn" class="hidden">BACK TO RESULT</button>
-            <div id="event-screen" class="hidden"></div>
-            <div id="how-to-play-overlay" class="hidden"></div>
+            <div id="event-screen" class="hidden">
+                <div id="event-location"></div>
+                <div id="event-description"></div>
+                <div id="event-content"></div>
+                <div id="event-icon"></div>
+                <div id="event-player-credits"></div>
+                <button id="event-continue-btn"></button>
+            </div>
+            <div id="how-to-play-overlay" class="hidden">
+                <button id="close-help-btn"></button>
+            </div>
             <div id="star-info-panel" class="hidden"></div>
             <div id="star-info-list"></div>
             <div id="star-info-title"></div>
             <canvas id="title-bg-canvas"></canvas>
             <canvas id="title-fg-canvas"></canvas>
+            <div id="sector-notification" class="hidden"></div>
         `;
         mockCanvas = document.getElementById('gameCanvas');
         mockCanvas.width = 800;

@@ -35,7 +35,8 @@ describe('Spec: Game Cycle & Mission Flow (Chapter 5)', () => {
             selection: { chassis: null, logic: null, modules: {}, boosters: null },
             inventory: { chassis: [], logic: [], modules: [], boosters: [], rockets: [], launchers: [] },
             flightResults: { status: '', bonuses: [], items: [] },
-            rankingSystem: { checkRank: vi.fn(), addEntry: vi.fn() }
+            rankingSystem: { checkRank: vi.fn(), addEntry: vi.fn() },
+            storySystem: { unlockedIds: [], hasUnread: vi.fn(() => false), markAsRead: vi.fn() }
         };
         uiSystem = new UISystem(game);
     });

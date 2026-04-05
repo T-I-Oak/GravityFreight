@@ -53,6 +53,10 @@
         transform: scale(1);
     }
 }
-
-
+/* Mail Icon Pulse Animation */
+@keyframes pulse-mail {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+    100% { transform: scale(1); }
+}
 

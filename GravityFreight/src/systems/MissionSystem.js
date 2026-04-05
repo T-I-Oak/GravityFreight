@@ -140,6 +140,8 @@ export class MissionSystem {
 
     resolveItems(result, hitGoal = null) {
         const game = this.game;
+        if (game.storySystem) game.storySystem.resetFlightFlag();
+
         if (result === 'success') {
             let luckCount = 0;
 
@@ -189,6 +191,13 @@ export class MissionSystem {
                                 }
                             }
                             game.totalDeliveries++;
+
+                            // ストーリー解放のトリガー (v0.15 新機能)
+                            const branchMap = { 'TRADING_POST': 'T', 'REPAIR_DOCK': 'R', 'BLACK_MARKET': 'B' };
+                            const branch = branchMap[hitGoal.id];
+                            if (branch) {
+                                game.storySystem.unlockNext(branch);
+                            }
                         } else {
                             // 不一致配送: 一律 +10 コインのみ
                             game.pendingCoins += 10;

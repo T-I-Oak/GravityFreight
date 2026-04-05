@@ -334,4 +334,28 @@
     }
 }
 
+/* Story reward card */
+#result-overlay .story-reward-card {
+    border-style: solid;
+    border-left: 8px double var(--item-color); /* 二重線で特別感を演出 */
+    background: color-mix(in srgb, var(--item-color) 15%, rgba(10, 15, 30, 0.4)); /* 塗りつぶしに近い背景 */
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px color-mix(in srgb, var(--item-color) 10%, transparent);
+}
+
+#result-overlay .story-reward-card .part-header-right {
+    gap: 12px;
+}
+
+#result-overlay .discovery-msg {
+    font-style: italic;
+    color: #fff;
+    opacity: 0.8;
+    margin: 12px 0;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+
+
 

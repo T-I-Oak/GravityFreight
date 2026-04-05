@@ -219,7 +219,8 @@
     text-transform: uppercase;
 }
 
-.item-card .status-delivered {
+.item-card .status-delivered,
+.item-card .status-new {
     color: #44ffbb;
     text-shadow: 0 0 5px rgba(68, 255, 187, 0.3);
 }

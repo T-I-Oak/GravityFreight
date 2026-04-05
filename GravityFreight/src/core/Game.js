@@ -9,14 +9,14 @@ import { UISystem } from '../systems/UISystem.js';
 import { EventSystem } from '../systems/EventSystem.js';
 import { Renderer } from '../systems/RenderingSystem.js';
 import { RankingSystem } from '../systems/RankingSystem.js';
+import { StorySystem } from '../systems/StorySystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        console.log("DEBUG: Game instance creating (v0.13.0+)");
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.13.0";
+        this.version = "0.15.1";
 
 
 
@@ -30,6 +30,7 @@ export class Game {
         this.uiSystem = new UISystem(this);
         this.eventSystem = new EventSystem(this);
         this.rankingSystem = new RankingSystem(this);
+        this.storySystem = new StorySystem(this);
 
         this.renderer = new Renderer(canvas, this);
         this.bodies = [];
@@ -249,6 +250,7 @@ export class Game {
         this.isFactoryOpen = false;
         this.selection = { chassis: null, logic: null, launcher: null, rocket: null, modules: {}, booster: null };
         this.lastHitGoal = null;
+        this.storySystem.resetSession();
         this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
         this.pendingItems = [];
         this.ship = null;
