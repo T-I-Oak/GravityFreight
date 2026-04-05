@@ -20,14 +20,14 @@
     pointer-events: none;
 }
 
-.how-to-grid {
+#how-to-play-overlay .how-to-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
     margin-top: 10px;
 }
 
-.how-to-item {
+#how-to-play-overlay .how-to-item {
     display: flex;
     gap: 12px;
     align-items: flex-start;
@@ -37,7 +37,7 @@
     border-radius: 8px;
 }
 
-.how-to-icon {
+#how-to-play-overlay .how-to-icon {
     font-size: 1.8rem;
     background: rgba(0, 255, 204, 0.1);
     width: 44px;
@@ -50,7 +50,7 @@
     border: 1px solid rgba(0, 255, 204, 0.2);
 }
 
-.how-to-text strong {
+#how-to-play-overlay .how-to-text strong {
     display: block;
     color: #00ffcc;
     font-size: 0.85rem;
@@ -58,7 +58,7 @@
     letter-spacing: 1px;
 }
 
-.how-to-text p {
+#how-to-play-overlay .how-to-text p {
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.7);
     line-height: 1.4;

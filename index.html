@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="GravityFreight/css/star-info.css?v=0.16.0">
     <link rel="stylesheet" href="GravityFreight/css/story-overlay.css?v=0.16.0">
     <link rel="stylesheet" href="GravityFreight/css/animations.css?v=0.16.0">
+    <link rel="stylesheet" href="GravityFreight/css/sector-notification.css?v=0.16.0">
     <link rel="stylesheet" href="GravityFreight/css/responsive.css?v=0.16.0">
 
 
@@ -35,92 +36,6 @@
 
 
 
-    <style>
-        /* 強化バッヂ */
-        .enhancement-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: rgba(255, 215, 0, 0.2);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 215, 0, 0.5);
-            border-radius: 10px;
-            padding: 2px 6px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            z-index: 10;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
-        }
-        .enhancement-badge .stars {
-            color: #ffd700;
-            font-size: 10px;
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-        }
-        .enhancement-badge .extra-count {
-            color: #fff;
-            font-size: 9px;
-            font-weight: bold;
-        }
-
-        /* イベント補助テキスト */
-        .event-subtext {
-            text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-
-        .cost-val {
-            color: #ffcc00;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        /* 戻るボタン */
-        .event-back-btn {
-            display: block;
-            margin: 20px auto 0;
-            padding: 8px 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.2s;
-        }
-
-        .event-back-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-1px);
-        }
-
-
-        /* アイテムカード修正 */
-        .item-card-inner {
-            position: relative;
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        /* スタイリッシュな開閉アイコン (原則に基づき直角デザイン) */
-        .icon-chevron {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-bottom: 3.5px solid currentColor;
-            border-right: 3.5px solid currentColor;
-            transform: translateY(-2px) rotate(225deg); /* 基本姿勢 (Open/Up) */
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.9;
-        }
-        .collapsed .icon-chevron {
-            transform: translateY(2px) rotate(225deg);
-        }
-    </style>
 
 </head>
 <body>

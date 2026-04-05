@@ -116,3 +116,16 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 }
+
+/* --- Story System UI (v0.15) --- */
+#mission-hud .mail-icons-group {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+#mission-hud .mail-icon-btn.gray {
+    opacity: 0.4;
+    filter: grayscale(1);
+    cursor: default;
+}

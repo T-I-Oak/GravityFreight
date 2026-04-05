@@ -254,8 +254,38 @@
     background-repeat: no-repeat;
     background-position: center;
     filter: brightness(0.7); /* シンプルに輝度を落とすスタイルに戻す */
-    box-shadow: none !important;
-    text-shadow: none !important;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* イベント補助テキスト (Moved from index.html) */
+.event-subtext {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.cost-val {
+    color: #ffcc00;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* 戻るボタン (Moved from index.html) */
+.event-back-btn {
+    display: block;
+    margin: 20px auto 0;
+    padding: 8px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.event-back-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
 }
 
 

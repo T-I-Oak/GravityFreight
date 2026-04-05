@@ -185,6 +185,16 @@ JavaScript による `element.style.property = value` の直接操作は、**原
 - **推奨**: `#launch-control .btn-neon.btn-grad-orange:hover`
 - **非推奨**: `.btn-neon:hover { color: orange !important; }`
 
+### 4.3 CSS ファイル構造とモジュール化 (Modular Architecture)
+
+保守性の向上のため、CSS は `GravityFreight/css/` ディレクトリ内に機能単位で分割管理する。
+各画面のスタイルは、必ず対応する「ルート ID」を親セレクタに持ち、画面間の干渉を物理的に排除する。
+
+- **`base.css`**: リセット、共通変数、タイポグラフィ、スクロールバー等。
+- **`ui.css`**: 全画面共通のユーティリティ（`.hidden`）、パネル（`.panel`）、グレード（`.grade-tag`）、共有アイコン（`.mail-icon-btn`）等。
+- **`animations.css`**: 再利用可能な `@keyframes`（フェードイン、パルス等）。
+- **`[screen-name].css`**: 各画面（`mission-hud`, `result-screen`, `build-panel` 等）専用のスタイル。
+
 ## 5. UI 画面定義とクラス設計 (UI Screen Definitions)
 
 主要な UI コンポーネントはすべて `<body>` 直下の独立したコンテナ（兄弟要素）として定義されており、**互いに包含関係を持たない**。各画面のデザインをカプセル化し、スタイルの干渉を防ぐため、以下のルート ID を基点に CSS のカスケードを記述する。
@@ -213,12 +223,17 @@ JavaScript による `element.style.property = value` の直接操作は、**原
 
 ### 8.1 アイテムカード (`.item-card`)
 - **色管理**: `--item-color` 変数を使用。CSS の `color-mix` でホバー演出を自動計算。
-- **状態管理**: 
-    - `.clickable`: ホバー演出（カラーフェード + 拡大）を有効化し、ポインタを `pointer` に変更する。
-    - `.selected`: 選択中の強調表示（内側発光と枠線強化）。
+- **状態管理 (Interaction States)**: 
+    - **非選択ホバー (`:hover:not(.selected)`)**: `translateX(3px)` で右側にわずかに「浮き上がる」フィードバックを与える。
+    - **選択済み (`.selected`)**: インベントリ内での視覚的安定を優先し、`transform: none` で固定する。強めの `box-shadow` と `background` 透過度の向上で強調。
+    - **選択済み＋強ホバー**: さらなる輝度（`brightness(1.1)`）と外側光彩の加算により、クリック可能であることを示す。
 - **原則**: リザルト画面等の操作不能な場所では `.clickable` を付与してはならない。
 
-### 8.2 アイテムプレースホルダー (`.slot-placeholder`)
+### 8.2 リザルト情報行 (`.result-row`)
+- **構造**: ラベルと値を左右に配置するため、常に単一の子要素 `.main-content` を持ち、これを `display: flex` かつ `justify-content: space-between` で制御する。
+- **拡張**: ゲームオーバー等の詳細表示（`.terminal-report-row`）では、`.main-content` の下に `.extra-info`（ランクやグレード）を垂直方向に積み重ねる構造をとる。
+
+### 8.3 アイテムプレースホルダー (`.slot-placeholder`)
 - **基本モード**: グレーの破線枠（静的な空スロット）。
 - **誘導モード (`.guide`)**: 
     - ロケット建造等の必須操作用。

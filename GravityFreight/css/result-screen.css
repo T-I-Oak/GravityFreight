@@ -167,18 +167,18 @@
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
+.result-row .main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
 /* --- Terminal Report Specific Row Styles --- */
 .terminal-report-row {
     flex-direction: column;
     align-items: stretch;
     padding: 12px 0;
-}
-
-.terminal-report-row .main-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
 }
 
 .terminal-report-row .extra-info {

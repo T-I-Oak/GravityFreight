@@ -18,7 +18,7 @@
 
 /* Event State visual feedback for items inside build overlay */
 #build-overlay.event-active .item-card {
-    cursor: default !important;
+    cursor: default;
 }
 
 /* Panel Base inside Build Overlay */

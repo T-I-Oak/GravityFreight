@@ -18,15 +18,15 @@
 }
 
 /* Compact layout for high item counts in star storage */
-.compact-list .part-item-container {
+#star-info-panel .compact-list .part-item-container {
     padding: 4px 10px;
 }
 
-.compact-list .part-info {
+#star-info-panel .compact-list .part-info {
     display: none; /* Hide descriptions to save vertical space */
 }
 
-.compact-list .part-name {
+#star-info-panel .compact-list .part-name {
     font-size: 11px;
 }
 
