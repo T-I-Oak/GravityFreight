@@ -382,10 +382,10 @@ export class UISystem {
         });
 
         // 【新：責任分離後のクリーンアップ】リストに含まれないリザルト系を個別に隠蔽
-        const res = document.getElementById('result-overlay');
+        this.resetResultOverlay();
         const rec = document.getElementById('receipt-overlay');
         const back = document.getElementById('back-to-result-btn');
-        [res, rec, back].forEach(el => {
+        [rec, back].forEach(el => {
             if (el) {
                 el.classList.add('hidden');
                 el.classList.remove('active', 'minimized'); // ステートのリセット
