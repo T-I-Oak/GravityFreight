@@ -41,6 +41,49 @@ export const GOAL_NAMES = {
 
 export const REPAIR_BASE_COST = 10;
 
+// ゲームバランス調整用定数
+export const GAME_BALANCE = {
+    DEFAULT_SHIP_MASS: 10,
+    DELIVERY_REWARD: { SCORE: 1500, COINS: 100 },
+    UNMATCHED_DELIVERY_REWARD: { SCORE: 0, COINS: 10 },
+    MAX_COIN_DISCOUNT: 0.5,
+    LUCKY_CARGO_DISCOUNT: 0.1,
+    SHIP_START_OFFSET: 12,
+    GRADE_STEPS: { SINGLE: 20, TOTAL: 50 },
+    SECTOR_NOTIFICATION_DURATION: 3600,
+    SCORE_PER_STEP: 1,
+    TRAIL_MAX_LENGTH: 40,
+    MAGNET_PULSE_GROWTH: 20,
+    SAFE_DISTANCE_FROM_HOME: 30,
+    COLLISION_MARGIN: 1,
+    CUSHION_BOUNCE: 0.5,
+    EMERGENCY_THRUST_MULT: 0.8
+};
+
+// マップ生成用定数
+export const MAP_CONSTANTS = {
+    BOUNDARY_RADIUS: 900,
+    MIN_STAR_DISTANCE: 180,
+    HOME_STAR_RADIUS: 25,
+    HOME_STAR_MASS: 4000,
+    STAR_DEFAULT_RADIUS: 20,
+    STAR_HIT_MARGIN: 15
+};
+
+// UI・エフェクト用カラー定義
+export const UI_COLORS = {
+    BG: '#050510',
+    HOME_STAR: '#ff6600',
+    HOME_STAR_GLOW: '#ff3300',
+    NORMAL_STAR: '#ffcc00',
+    NORMAL_STAR_GLOW: 'rgba(255,204,0,0.5)',
+    BOUNDARY: 'rgba(255, 255, 255, 0.1)',
+    SCANNER: 'rgba(0, 255, 204, 1.0)',
+    SCANNER_FILL: 'rgba(0, 255, 204, 0.15)',
+    TRAIL: 'rgba(255, 255, 255, 1.0)',
+    PREDICTION: 'rgba(255, 255, 255, 0.6)'
+};
+
 export const PARTS = {
     CHASSIS: [
         { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 1, precision: 200, rarity: RARITY.COMMON, description: '予測精度を抑えることで軽量化された機体。' },

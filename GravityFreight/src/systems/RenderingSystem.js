@@ -1,4 +1,4 @@
-import { CATEGORY_COLORS, STORY_DATA } from '../core/Data.js';
+import { CATEGORY_COLORS, STORY_DATA, UI_COLORS, MAP_CONSTANTS } from '../core/Data.js';
 
 export class Renderer {
     constructor(canvas, game) {
@@ -33,7 +33,7 @@ export class Renderer {
 
 
     clear() {
-        this.ctx.fillStyle = '#050510';
+        this.ctx.fillStyle = UI_COLORS.BG;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
@@ -108,9 +108,9 @@ export class Renderer {
         const { x, y } = body.position;
         const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
         
-        // 母星は赤橙系 (#ff6600) で表示
-        const finalColor = body.isHome ? '#ff6600' : color;
-        const finalGlow = body.isHome ? '#ff3300' : (glowColor || color);
+        // 母星は赤橙系 (UI_COLORS.HOME_STAR) で表示
+        const finalColor = body.isHome ? UI_COLORS.HOME_STAR : color;
+        const finalGlow = body.isHome ? UI_COLORS.HOME_STAR_GLOW : (glowColor || color);
 
         this.ctx.save();
         this.ctx.shadowBlur = 20;
@@ -201,8 +201,9 @@ export class Renderer {
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.arc(ship.position.x, ship.position.y, rippleRadius, 0, Math.PI * 2);
-            this.ctx.fillStyle = `rgba(0, 255, 204, ${alpha * 0.15})`; // わずかに塗りつぶしを追加
-            this.ctx.strokeStyle = `rgba(0, 255, 204, ${alpha})`;
+            this.ctx.globalAlpha = alpha;
+            this.ctx.fillStyle = UI_COLORS.SCANNER_FILL;
+            this.ctx.strokeStyle = UI_COLORS.SCANNER;
             this.ctx.lineWidth = 2.5;
             this.ctx.fill();
             this.ctx.stroke();
@@ -217,7 +218,7 @@ export class Renderer {
         const centerY = this.canvas.height / 2;
 
         // 境界線全体を暗いグレーで描画
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        this.ctx.strokeStyle = UI_COLORS.BOUNDARY;
         this.ctx.lineWidth = 1;
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, boundaryRadius, 0, Math.PI * 2);
@@ -325,7 +326,7 @@ export class Renderer {
                     // 明滅ロジック：次に解放されるストーリーが「初見（未読）」の場合に明滅。周期をゆっくりに調整。
                     let iconAlpha = 1.0;
                     if (isNextUnread) {
-                        iconAlpha = 0.5 + 0.5 * Math.sin(Date.now() / 500); 
+                        iconAlpha = 0.5 + 0.5 * Math.sin(Date.now() / 333); 
                     }
 
                     const iconRadius = boundaryRadius + 85; // 拡大したサイズに合わせて微調整（75 -> 85）

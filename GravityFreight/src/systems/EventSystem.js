@@ -1,4 +1,4 @@
-import { GOAL_COLORS, GOAL_NAMES, hexToRgba } from '../core/Data.js';
+import { GOAL_COLORS, GOAL_NAMES, hexToRgba, GAME_BALANCE, MAP_CONSTANTS } from '../core/Data.js';
 import { Vector2 } from '../utils/Physics.js';
 
 export class EventSystem {
@@ -203,7 +203,6 @@ export class EventSystem {
         const backToResultBtn = document.getElementById('back-to-result-btn');
         if (backToResultBtn) {
             backToResultBtn.onclick = () => {
-                console.log("[Navigation] Transitioning back to result screen...");
                 game.uiSystem.exitMapViewMode();
             };
         }
@@ -315,17 +314,15 @@ export class EventSystem {
         if (game.selection.rocket && game.selection.launcher) {
             game.setState('aiming');
             
-            // 5.1 コーディング原則に基づき、既存 ship オブジェクトがあっても
-            // 新しいエイミング開始時にランタイムプロパティを確実に再初期化する。
-            if (!game.ship) {
-                const centerX = game.canvas.width / 2;
-                const centerY = game.canvas.height / 2;
-                game.ship = {
-                    position: new Vector2(centerX, centerY - 25 - 12),
-                    velocity: new Vector2(),
-                    rotation: -Math.PI / 2
-                };
-            }
+            const centerX = game.canvas.width / 2;
+            const centerY = game.canvas.height / 2;
+            const prevRotation = game.ship ? game.ship.rotation : -Math.PI / 2;
+            
+            game.ship = {
+                position: new Vector2(centerX, centerY - MAP_CONSTANTS.HOME_STAR_RADIUS - GAME_BALANCE.SHIP_START_OFFSET),
+                velocity: new Vector2(),
+                rotation: prevRotation
+            };
             
             // 既存または新規の ship オブジェクトに対してプロパティを保証（初期化漏れを防止）
             game.ship.trail = [];
@@ -338,7 +335,7 @@ export class EventSystem {
 
             // 位置を母星表面の適切な発射位置に強制リセット (不具合修正)
             const homePos = game.homeStar.position;
-            const resetOffset = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation)).scale(game.homeStar.radius + 12);
+            const resetOffset = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation)).scale(game.homeStar.radius + GAME_BALANCE.SHIP_START_OFFSET);
             game.ship.position = homePos.add(resetOffset);
 
             // 性能計算 (モジュール・ブースターの影響を統合)

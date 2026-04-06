@@ -1,5 +1,5 @@
 import { Vector2, calculateAcceleration, getDistanceSqToSegment } from '../utils/Physics.js';
-import { ANIMATION_DURATION } from '../core/Data.js';
+import { ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS, UI_COLORS } from '../core/Data.js';
 
 export class PhysicsOrchestrator {
     constructor(game) {
@@ -21,7 +21,7 @@ export class PhysicsOrchestrator {
             const distWorld = worldMouse.sub(body.position).length();
             const distScreen = distWorld * game.zoom;
             // 判定半径 (master 準拠のロジック)
-            const hitRadius = (body.radius || 20) * game.zoom + 15;
+            const hitRadius = (body.radius || MAP_CONSTANTS.STAR_DEFAULT_RADIUS) * game.zoom + MAP_CONSTANTS.STAR_HIT_MARGIN;
 
             if (distScreen < hitRadius) {
                 game.hoveredStar = body;
@@ -54,7 +54,7 @@ export class PhysicsOrchestrator {
             const booster = game.selection.rocket.booster;
             if (booster && booster.id === 'boost_magnet') {
                 const elapsed = game.simulatedTime - game.launchTime;
-                ship.pickupRange = (game.selection.rocket.totalPickupRange || 0) + elapsed * 20;
+                ship.pickupRange = (game.selection.rocket.totalPickupRange || 0) + elapsed * GAME_BALANCE.MAGNET_PULSE_GROWTH;
             }
 
             game.bodies.forEach(body => {
@@ -65,7 +65,7 @@ export class PhysicsOrchestrator {
                 // 母星のアイテムは「発射直後の母星表面」でも確実に回収できるようにする。
                 // 通常の星は pickupRadius に依存するが、母星はカーゴの再回収導線として扱う。
                 const isHomeStar = (body === game.homeStar);
-                const isOnLaunchPadSurface = isHomeStar && surfaceDist <= 12;
+                const isOnLaunchPadSurface = isHomeStar && surfaceDist <= GAME_BALANCE.SHIP_START_OFFSET;
                 const canPickup = (surfaceDist <= pickupRadius) || isOnLaunchPadSurface;
 
                 if (canPickup && !body.isCollected) {
@@ -77,7 +77,7 @@ export class PhysicsOrchestrator {
 
         if (ship && !ship.isSafeToReturn) {
             const dist = ship.position.sub(game.homeStar.position).length();
-            if (dist > game.homeStar.radius + 30) {
+            if (dist > game.homeStar.radius + GAME_BALANCE.SAFE_DISTANCE_FROM_HOME) {
                 ship.isSafeToReturn = true;
             }
         }
@@ -89,7 +89,7 @@ export class PhysicsOrchestrator {
         ship.position = ship.position.add(ship.velocity.scale(dt));
 
         // simulatedTime の更新は Game.js 側で行われるが、score はステップごとに加算 (事実ベース)
-        game.score += 1;
+        game.score += GAME_BALANCE.SCORE_PER_STEP;
 
         // 衝突判定をサブステップごとに行う (事実ベースの復元)
         if (this.checkCollisions(prevPos)) return;
@@ -101,7 +101,7 @@ export class PhysicsOrchestrator {
                 throw new Error("Critical: ship.trail is undefined during flight. Check initialization in EventSystem.");
             }
             ship.trail.push(new Vector2(ship.position.x, ship.position.y));
-            if (ship.trail.length > 40) ship.trail.shift();
+            if (ship.trail.length > GAME_BALANCE.TRAIL_MAX_LENGTH) ship.trail.shift();
         }
     }
 
@@ -206,7 +206,7 @@ export class PhysicsOrchestrator {
             cushion.charges--;
             const normal = ship.position.sub(body.position).normalize();
             const dot = ship.velocity.dot(normal);
-            ship.velocity = ship.velocity.sub(normal.scale(2 * dot)).scale(0.5);
+            ship.velocity = ship.velocity.sub(normal.scale(2 * dot)).scale(GAME_BALANCE.CUSHION_BOUNCE);
             return true;
         }
         return false;
@@ -220,7 +220,7 @@ export class PhysicsOrchestrator {
             emergency.charges--;
             const center = new Vector2(game.canvas.width / 2, game.canvas.height / 2);
             const toCenter = center.sub(shipPos).normalize();
-            ship.velocity = toCenter.scale(ship.velocity.length() * 0.8);
+            ship.velocity = toCenter.scale(ship.velocity.length() * GAME_BALANCE.EMERGENCY_THRUST_MULT);
             return true;
         }
         return false;
@@ -234,7 +234,7 @@ export class PhysicsOrchestrator {
 
             const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
             const shipRadius = game.ship ? (game.ship.radius || 2) : 2;
-            const collisionDist = radius + shipRadius + 1;
+            const collisionDist = radius + shipRadius + GAME_BALANCE.COLLISION_MARGIN;
             const distSq = getDistanceSqToSegment(body.position, prevPos, pos);
 
             if (distSq < collisionDist * collisionDist) {
@@ -261,12 +261,12 @@ export class PhysicsOrchestrator {
             if (game.selection.booster && game.selection.booster.powerMultiplier) {
                 power *= game.selection.booster.powerMultiplier;
             }
-            const mass = rocket.mass || 10;
-            const massFactor = Math.sqrt(10 / mass);
+            const mass = rocket.mass || GAME_BALANCE.DEFAULT_SHIP_MASS;
+            const massFactor = Math.sqrt(GAME_BALANCE.DEFAULT_SHIP_MASS / mass);
             let tempVel = dir.scale(power * massFactor);
             
             // EventSystem.js の初期化位置 (centerY - 25 - 12) と完全に一致させる
-            let tempPos = game.homeStar.position.add(dir.scale(game.homeStar.radius + 12));
+            let tempPos = game.homeStar.position.add(dir.scale(game.homeStar.radius + GAME_BALANCE.SHIP_START_OFFSET));
 
             const simDt = game.fixedDt;
             const accBonus = launcher ? (launcher.precisionMultiplier || 1.0) : 1.0;
@@ -305,7 +305,7 @@ export class PhysicsOrchestrator {
 
                 if (!tempIsSafeToReturn) {
                     const dist = tempPos.sub(game.homeStar.position).length();
-                    if (dist > game.homeStar.radius + 30) tempIsSafeToReturn = true;
+                    if (dist > game.homeStar.radius + GAME_BALANCE.SAFE_DISTANCE_FROM_HOME) tempIsSafeToReturn = true;
                 }
 
                 const hitBody = this.findBodyCollision(tempPos, prevTempPos, tempIsSafeToReturn, tempBodies);
@@ -328,7 +328,7 @@ export class PhysicsOrchestrator {
                     if (hasGhostEmergency) {
                         const center = new Vector2(game.canvas.width / 2, game.canvas.height / 2);
                         const toCenter = center.sub(tempPos).normalize();
-                        tempVel = toCenter.scale(tempVel.length() * 0.8);
+                        tempVel = toCenter.scale(tempVel.length() * GAME_BALANCE.EMERGENCY_THRUST_MULT);
                         continue;
                     }
                     points.push(new Vector2(tempPos.x, tempPos.y));
@@ -358,8 +358,8 @@ export class PhysicsOrchestrator {
 
         game.bodies.forEach(body => {
             const glow = (game.hoveredStar === body);
-            // 通常の星は明るい黄色 (#ffcc00) で表示
-            renderer.drawBody(body, body.color || '#ffcc00', glow ? '#ffcc00' : (body.color || 'rgba(255,204,0,0.5)'));
+            // 通常の星は明るい黄色 (UI_COLORS.NORMAL_STAR) で表示
+            renderer.drawBody(body, body.color || UI_COLORS.NORMAL_STAR, glow ? UI_COLORS.NORMAL_STAR : (body.color || UI_COLORS.NORMAL_STAR_GLOW));
         });
 
         if (game.ship && (['aiming', 'flying', 'crashed', 'returned'].includes(game.state))) {

@@ -1,4 +1,4 @@
-import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, RARITY, ANIMATION_DURATION } from '../core/Data.js';
+import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, RARITY, ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS } from '../core/Data.js';
 import { Body, Vector2 } from '../utils/Physics.js';
 
 export class MissionSystem {
@@ -12,12 +12,12 @@ export class MissionSystem {
         const centerX = game.canvas.width / 2;
         const centerY = game.canvas.height / 2;
 
-        game.homeStar = new Body(new Vector2(centerX, centerY), 4000, true);
-        game.homeStar.radius = 25;
+        game.homeStar = new Body(new Vector2(centerX, centerY), MAP_CONSTANTS.HOME_STAR_MASS, true);
+        game.homeStar.radius = MAP_CONSTANTS.HOME_STAR_RADIUS;
         game.homeStar.isHome = true;
 
         game.bodies = [game.homeStar];
-        game.boundaryRadius = 900;
+        game.boundaryRadius = MAP_CONSTANTS.BOUNDARY_RADIUS;
         game.goals = [];
 
         this.initGoals();
@@ -28,7 +28,7 @@ export class MissionSystem {
         game.blackMarketUsed = false;
 
         // 自機の初期設定
-        game.ship = new Body(new Vector2(centerX, centerY - game.homeStar.radius - 12), 10);
+        game.ship = new Body(new Vector2(centerX, centerY - game.homeStar.radius - GAME_BALANCE.SHIP_START_OFFSET), GAME_BALANCE.DEFAULT_SHIP_MASS);
         game.ship.collectedItems = [];
         game.ship.lastCollectedStar = null;
         game.ship.pickupRange = 0;
@@ -68,7 +68,7 @@ export class MissionSystem {
         const game = this.game;
         const centerX = game.canvas.width / 2;
         const centerY = game.canvas.height / 2;
-        const minDistance = 180; // master ブランチの事実に基づく制限
+        const minDistance = MAP_CONSTANTS.MIN_STAR_DISTANCE;
 
         for (let i = 0; i < starCount; i++) {
             let attempts = 0;
@@ -79,7 +79,7 @@ export class MissionSystem {
                 tooClose = false;
                 const angle = Math.random() * Math.PI * 2;
                 // 境界(900)から確実に内側に収まるように配置
-                const dist = 180 + Math.random() * (game.boundaryRadius - 380);
+                const dist = MAP_CONSTANTS.MIN_STAR_DISTANCE + Math.random() * (game.boundaryRadius - 380);
                 pos = new Vector2(centerX + Math.cos(angle) * dist, centerY + Math.sin(angle) * dist);
                 for (const body of game.bodies) {
                     if (pos.sub(body.position).length() < minDistance) {
@@ -166,12 +166,12 @@ export class MissionSystem {
                         const isMatch = hitGoal.id === itemData.deliveryGoalId;
                         if (isMatch) {
                             // 【Spec 6.2】配送ボーナスは一致する貨物の数 (N) に応じて個別に加算（N倍）
-                            game.pendingScore += 1500;
-                            game.pendingCoins += 100;
+                            game.pendingScore += GAME_BALANCE.DELIVERY_REWARD.SCORE;
+                            game.pendingCoins += GAME_BALANCE.DELIVERY_REWARD.COINS;
                             game.flightResults.bonuses.push({ 
                                 name: 'Delivery Bonus', 
-                                value: 1500, 
-                                coins: 100 
+                                value: GAME_BALANCE.DELIVERY_REWARD.SCORE, 
+                                coins: GAME_BALANCE.DELIVERY_REWARD.COINS 
                             });
 
                             const deliveryItem = { ...itemData, isDelivery: true, isMatch: true, bonusItems: [] };
@@ -200,9 +200,9 @@ export class MissionSystem {
                             }
                         } else {
                             // 不一致配送: 一律 +10 コインのみ
-                            game.pendingCoins += 10;
+                            game.pendingCoins += GAME_BALANCE.UNMATCHED_DELIVERY_REWARD.COINS;
                             game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false });
-                            game.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: 10 });
+                            game.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: GAME_BALANCE.UNMATCHED_DELIVERY_REWARD.COINS });
                         }
                     } else if (hitGoal) {
                         if (itemData.id === 'cargo_lucky') luckCount++;
@@ -227,7 +227,7 @@ export class MissionSystem {
             });
 
             game.pendingItems = [];
-            game.currentCoinDiscount = Math.min(0.5, luckCount * 0.1);
+            game.currentCoinDiscount = Math.min(GAME_BALANCE.MAX_COIN_DISCOUNT, luckCount * GAME_BALANCE.LUCKY_CARGO_DISCOUNT);
 
         } else if (result === 'crashed' || result === 'lost') {
             game.flightResults.items = [];

@@ -1,4 +1,4 @@
-import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba, PARTS, RARITY, STORY_DATA, GOAL_COLORS } from '../core/Data.js';
+import { CATEGORY_COLORS, ITEM_REGISTRY, GOAL_NAMES, ANIMATION_DURATION, hexToRgba, PARTS, RARITY, STORY_DATA, GOAL_COLORS, GAME_BALANCE } from '../core/Data.js';
 import { ItemUtils } from '../utils/ItemUtils.js';
 import { TitleAnimation } from '../utils/TitleAnimation.js';
 import { UIComponents } from './ui/UIComponents.js';
@@ -58,7 +58,7 @@ export class UISystem {
         // 定義済みプレイ系ステート以外の不正ステートは例外を投げる (ルール5.1)
         const validStates = ['building', 'aiming', 'flying', 'cleared', 'crashed', 'lost', 'returned', 'event', 'result', 'gameover'];
         if (!validStates.includes(game.state)) {
-            throw new Error(`[v0.6.6] Critical: Invalid game state detected in updateUI: ${game.state}`);
+            throw new Error(`Critical: Invalid game state detected in updateUI: ${game.state}`);
         }
 
         // 2. 主要要素の取得 (一本化)
@@ -243,7 +243,7 @@ export class UISystem {
                 currentEl.classList.remove('animate');
             }
             this.notificationTimer = null;
-        }, 3600); // アニメーション時間(3.5s)より少し長く。
+        }, GAME_BALANCE.SECTOR_NOTIFICATION_DURATION); // アニメーション時間(3.5s)より少し長く。
     }
 
     renderList(id, items, type, selected) {
@@ -357,7 +357,7 @@ export class UISystem {
     _getGradeInfo(value, target, type = 'single') {
         const score = type === 'single' ? Math.sqrt(value / target) * 100 : value;
         const grades = ['E', 'D', 'C', 'B', 'A', 'S', 'SS'];
-        const step = type === 'single' ? 20 : 50;
+        const step = type === 'single' ? GAME_BALANCE.GRADE_STEPS.SINGLE : GAME_BALANCE.GRADE_STEPS.TOTAL;
         const index = Math.min(grades.length - 1, Math.floor(score / step));
         return {
             grade: grades[index],

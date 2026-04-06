@@ -164,7 +164,7 @@
 }
 
 .mail-icon-btn.unread {
-    animation: blink-slow 3s infinite ease-in-out;
+    animation: blink-slow 2s infinite ease-in-out;
 }
 
 .mr-8 { margin-right: 8px; }
