@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/png" href="favicon.png">
-    <title>Gravity Freight v0.18.0</title>
+    <title>Gravity Freight: ORBITAL ECHOES</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="GravityFreight/css/base.css?v=0.18.0">
     <link rel="stylesheet" href="GravityFreight/css/layout.css?v=0.18.0">
     <link rel="stylesheet" href="GravityFreight/css/buttons.css?v=0.18.0">
@@ -38,6 +41,7 @@
 
 
 </head>
+
 <body>
     <!-- タイトル画面 -->
     <div id="title-screen">
@@ -47,7 +51,8 @@
             <div class="menu-buttons">
                 <button id="start-game-btn" class="btn-neon">BEGIN CONTRACT</button>
                 <button id="how-to-play-btn" class="btn-neon outline">HOW TO PLAY</button>
-                <button id="ranking-btn" class="btn-neon outline" disabled>RANKING <span class="ranking-coming-soon">(COMING SOON)</span></button>
+                <button id="ranking-btn" class="btn-neon outline" disabled>RANKING <span
+                        class="ranking-coming-soon">(COMING SOON)</span></button>
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
@@ -61,7 +66,8 @@
 
     <!-- 操作説明パネル -->
     <div id="how-to-play-overlay" class="hidden">
-        <div class="panel" style="max-width: 600px; width: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+        <div class="panel"
+            style="max-width: 600px; width: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
             <div class="panel-header">
                 <h2>HOW TO PLAY</h2>
             </div>
@@ -98,7 +104,8 @@
                 </div>
             </div>
             <div class="panel-footer" style="text-align: center; margin-top: 10px; padding: 0 20px 20px;">
-                <button id="close-help-btn" class="btn-neon" style="min-width: 180px; padding: 10px 20px; font-size: 1.1rem;">UNDERSTOOD</button>
+                <button id="close-help-btn" class="btn-neon"
+                    style="min-width: 180px; padding: 10px 20px; font-size: 1.1rem;">UNDERSTOOD</button>
             </div>
         </div>
     </div>
@@ -155,7 +162,8 @@
             </div>
             <div id="result-footer">
                 <div class="result-actions" id="result-actions">
-                    <button id="result-view-map-btn" class="btn-neon btn-neon-lg btn-grad-cyan outline">VIEW MAP</button>
+                    <button id="result-view-map-btn" class="btn-neon btn-neon-lg btn-grad-cyan outline">VIEW
+                        MAP</button>
                     <button id="result-close-btn" class="btn-neon btn-neon-lg btn-grad-orange">RETRY MISSION</button>
                 </div>
             </div>
@@ -284,4 +292,5 @@
 
 
 </body>
+
 </html>
