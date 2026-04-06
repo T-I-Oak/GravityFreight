@@ -15,7 +15,7 @@ vi.mock('../../../GravityFreight/src/utils/TitleAnimation.js', () => ({
     }
 }));
 
-describe('Implementation: Fuel Launch Protection', () => {
+describe('Implementation: systems/EventSystem.js', () => {
     let game;
     let eventSystem;
     const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };

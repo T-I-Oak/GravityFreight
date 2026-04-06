@@ -1,9 +1,9 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { UISystem } from '../../../GravityFreight/src/systems/UISystem.js';
-import { setupStandardDOM } from '../../test-utils.js';
+import { UISystem } from '../../../../GravityFreight/src/systems/UISystem.js';
+import { setupStandardDOM } from '../../../test-utils.js';
 
-describe('UISystem - Star Info Panel Core Logic (Preservation Test)', () => {
+describe('Implementation: systems/ui/StarInfoPanel.js', () => {
     let game;
     let ui;
 

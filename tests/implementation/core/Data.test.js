@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { ITEM_REGISTRY } from '../../../GravityFreight/src/core/Data.js';
 
-describe('Implementation: ItemData Fuel Updates', () => {
+describe('Implementation: core/Data.js', () => {
     it('opt_fuel (High Reactant Fuel) should have 1 maxCharges', () => {
         const item = ITEM_REGISTRY['opt_fuel'];
         expect(item).not.toBeUndefined();

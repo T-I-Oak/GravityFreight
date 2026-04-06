@@ -7,7 +7,7 @@ import { InventorySystem } from '../../../GravityFreight/src/systems/InventorySy
 import { UISystem } from '../../../GravityFreight/src/systems/UISystem.js';
 import { ITEM_REGISTRY } from '../../../GravityFreight/src/core/Data.js';
 
-describe('InventorySystem.takeItem: instanceId identity', () => {
+describe('Implementation: systems/InventorySystem.js', () => {
     it('should not double-select when taking from a stacked item', () => {
         setupStandardDOM();
 

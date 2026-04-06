@@ -2,12 +2,12 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Game } from '../../../GravityFreight/src/core/Game.js';
-import { MaintenanceUI } from '../../../GravityFreight/src/systems/ui/MaintenanceUI.js';
-import { setupStandardDOM } from '../../test-utils.js';
+import { Game } from '../../../../GravityFreight/src/core/Game.js';
+import { MaintenanceUI } from '../../../../GravityFreight/src/systems/ui/MaintenanceUI.js';
+import { setupStandardDOM } from '../../../test-utils.js';
 
 // TitleAnimation のモック化
-vi.mock('../../../GravityFreight/src/utils/TitleAnimation.js', () => ({
+vi.mock('../../../../GravityFreight/src/utils/TitleAnimation.js', () => ({
     TitleAnimation: class {
         constructor() {}
         start() {}
@@ -15,7 +15,7 @@ vi.mock('../../../GravityFreight/src/utils/TitleAnimation.js', () => ({
     }
 }));
 
-describe('Implementation: MaintenanceUI Repair Cost', () => {
+describe('Implementation: systems/ui/MaintenanceUI.js', () => {
     let game;
     let maintenanceUI;
     const mockCanvas = { width: 800, height: 600, addEventListener: vi.fn(), getContext: vi.fn(() => ({})) };
