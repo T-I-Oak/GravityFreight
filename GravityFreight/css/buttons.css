@@ -97,9 +97,11 @@
     transform: translateY(-1px);
 }
 .btn-action:disabled {
-    opacity: 0.3;
+    opacity: 1;
     filter: grayscale(1);
-    background: #1a1a1a;
+    background: #121212;
+    color: #444;
+    border: 1px solid #333;
     cursor: not-allowed;
 }
 .btn-action-primary, .btn-action-outline {
@@ -124,6 +126,7 @@
     cursor: not-allowed;
     box-shadow: none;
     filter: saturate(0.5);
-    background: rgba(40, 45, 60, 0.4);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: #1a1a20;
+    border-color: #333;
+    color: #555;
 }

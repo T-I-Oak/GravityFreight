@@ -1,4 +1,4 @@
-import { hexToRgba } from '../../core/Data.js';
+import { hexToRgba, REPAIR_BASE_COST } from '../../core/Data.js';
 import { UIComponents } from './UIComponents.js';
 
 export class MaintenanceUI {
@@ -48,7 +48,7 @@ export class MaintenanceUI {
         } else {
             repairables.forEach(item => {
                 const totalDiscount = Math.min(0.5, game.currentCoinDiscount || 0);
-                const cost = Math.floor(20 * (1 - totalDiscount));
+                const cost = Math.floor(REPAIR_BASE_COST * (1 - totalDiscount));
                 const displayDiscountPct = Math.round(totalDiscount * 100);
                 const discountLevel = displayDiscountPct >= 50 ? 'high' : (displayDiscountPct >= 30 ? 'mid' : 'low');
 

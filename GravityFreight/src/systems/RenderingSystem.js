@@ -422,9 +422,9 @@ export class Renderer {
         if (!ship.collectedItems || ship.collectedItems.length === 0) return;
         if (!ship.trail || ship.trail.length < 5) return;
 
-        // 連なる感じで描画 (10フレームずつの間隔)
+        // 連なる感じで描画 (4フレームずつの間隔)
         ship.collectedItems.forEach((item, i) => {
-            const gap = 8; // ドット間の間隔（トレイルのインデックス数）
+            const gap = 4; // ドット間の間隔（トレイルのインデックス数）
             const trailIdx = Math.max(0, ship.trail.length - 1 - (i + 1) * gap);
             if (trailIdx >= 0) {
                 const pos = ship.trail[trailIdx];

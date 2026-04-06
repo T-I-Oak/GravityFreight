@@ -14,8 +14,8 @@ export class TitleAnimation {
         
         this.orbitA = 380; // 長半径
         this.orbitB = 120; // 短半径
-        this.inclination = -30 * Math.PI / 180; // 逆方向に30度傾斜
-        this.cargoGap = 10; // 荷物との間隔（将来的な調整用）
+        this.inclination = -60 * Math.PI / 180; // 逆方向に60度傾斜
+        this.cargoGap = 4; // 荷物との間隔（RenderingSystemと同期）
         
         this.isRunning = false;
         this.requestId = null;
@@ -82,7 +82,7 @@ export class TitleAnimation {
 
         const currentPos = {
             x: x + window.innerWidth / 2,
-            y: y + window.innerHeight * 0.45, // タイトル位置に合わせる
+            y: y + window.innerHeight * 0.5, // 画面中央に合わせる
             isFront,
             angle
         };

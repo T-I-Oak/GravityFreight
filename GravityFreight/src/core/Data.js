@@ -39,6 +39,8 @@ export const GOAL_NAMES = {
     BLACK_MARKET: 'BLACK MARKET'
 };
 
+export const REPAIR_BASE_COST = 10;
+
 export const PARTS = {
     CHASSIS: [
         { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 1, precision: 200, rarity: RARITY.COMMON, description: '予測精度を抑えることで軽量化された機体。' },
@@ -75,8 +77,8 @@ export const PARTS = {
         { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '境界復帰時の予測軌道を表示。' }
     ],
     BOOSTERS: [
-        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, rarity: RARITY.COMMON, description: '20%強化された燃料を供給するブースター。' },
-        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '2回分の高反応燃料を供給するブースター。' },
+        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '発射台の燃料の代わりに使用できる1回分の強化燃料。' },
+        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '発射台の燃料の代わりに使用できる2回分の強化燃料。' },
         { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', mass: 0, slots: 0, gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間重力を無視して直進する。' },
         { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', mass: 0, slots: 0, powerMultiplier: 1.3, rarity: RARITY.COMMON, description: '発射パワーを30%強化する。' },
         { id: 'boost_magnet', category: 'BOOSTERS', name: 'マグネティック・パルス', mass: 0, slots: 0, rarity: RARITY.RARE, description: '航行時間とともにアイテム回収範囲が拡大する。' },

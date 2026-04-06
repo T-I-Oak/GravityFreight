@@ -414,29 +414,38 @@ export class EventSystem {
         const massFactor = Math.sqrt(10 / game.ship.mass);
         game.ship.velocity = new Vector2(Math.cos(angle) * (power * massFactor), Math.sin(angle) * (power * massFactor));
 
-        // スタック対応：1個だけ取り出して使用、残れば再マージする
-        const taken = game.inventorySystem.takeItem('launchers', l.instanceId, 1);
-        if (taken) {
-            taken.charges--;
-            if (taken.charges > 0) {
-                game.inventorySystem.addItem(taken, { isNew: false });
-            } else {
-                game.showStatus('ランチャーの耐久度が尽きました。', 'info');
+        // 耐久度消費の判定 (v0.17: 高反応燃料などがランチャーの身代わりになるロジック)
+        const protectsLauncher = b && b.preventsLauncherWear;
+
+        // 1. ブースターの消費
+        if (b) {
+            const takenB = game.inventorySystem.takeItem('boosters', b.instanceId, 1);
+            if (takenB) {
+                const currentCharges = (takenB.charges !== undefined ? takenB.charges : (takenB.maxCharges || 1));
+                takenB.charges = currentCharges - 1;
+                
+                if (takenB.charges > 0) {
+                    game.inventorySystem.addItem(takenB, { isNew: false });
+                } else if (protectsLauncher) {
+                    game.showStatus('燃料が空になりました。', 'info');
+                }
             }
-        }
-
-        // 使用後は選択を解除（インベントリ内の状態が変わるため）
-        game.selection.launcher = null;
-
-        if (b && !b.preventsLauncherWear) {
-            // ブースター自体の回数消費が必要な場合はここで行う
-        }
-
-        // インベントリから使用したブースターを削除 (Spec 5.3.242)
-        if (game.selection.booster) {
-            game.inventorySystem.takeItem('boosters', game.selection.booster.instanceId);
             game.selection.booster = null;
         }
+
+        // 2. ランチャーの消費 (保護されていない場合)
+        if (!protectsLauncher) {
+            const takenL = game.inventorySystem.takeItem('launchers', l.instanceId, 1);
+            if (takenL) {
+                takenL.charges--;
+                if (takenL.charges > 0) {
+                    game.inventorySystem.addItem(takenL, { isNew: false });
+                } else {
+                    game.showStatus('ランチャーの耐久度が尽きました。', 'info');
+                }
+            }
+        }
+        game.selection.launcher = null;
 
         game.launchScore = game.score;
         game.launchCoins = game.coins;
