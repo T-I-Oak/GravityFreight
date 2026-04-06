@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { UISystem } from '../../../GravityFreight/src/systems/UISystem.js';
-import { setupStandardDOM } from '../../test-utils.js';
+import { UISystem } from '../../../../GravityFreight/src/systems/UISystem.js';
+import { setupStandardDOM } from '../../../test-utils.js';
 
 describe('UISystem - Result Screen Core Logic (Preservation Test)', () => {
     let game;
@@ -30,6 +30,7 @@ describe('UISystem - Result Screen Core Logic (Preservation Test)', () => {
             inventory: { chassis: [], logic: [], modules: [], boosters: [], launchers: [], rockets: [] },
             selection: { modules: {} },
             storySystem: { sessionUnlocked: [], isRead: () => true, hasUnlockedThisFlight: false },
+            rankingSystem: { checkRank: vi.fn(() => 1), addEntry: vi.fn(() => 1) },
             updateUI: vi.fn()
         };
         ui = new UISystem(game);
@@ -89,5 +90,28 @@ describe('UISystem - Result Screen Core Logic (Preservation Test)', () => {
         ui.showResult('success');
         
         expect(statsList.innerHTML).not.toContain('Old Content');
+    });
+
+    describe('v0.18.0 Bug Reproduction', () => {
+        it('should show success result screen even if the previous session was gameover', () => {
+            const resultOverlay = document.getElementById('result-overlay');
+            
+            // 1. ゲームオーバー発生
+            ui.showResult('gameover');
+            expect(resultOverlay.classList.contains('hidden')).toBe(false);
+            expect(resultOverlay.getAttribute('data-result-type')).toBe('gameover');
+
+            // 2. [バグの核心] UI状態のリセット（fullResetやタイトル戻りを想定）
+            // 現状、手動で hidden だけ付与されるケースや、reset() が属性を消さないケースをシミュレート
+            ui.resetResultOverlay(); 
+            expect(resultOverlay.classList.contains('hidden')).toBe(true);
+            
+            // 3. 次のプレイで成功
+            ui.showResult('success');
+            
+            // 【検証】表示されているべき
+            expect(resultOverlay.classList.contains('hidden')).toBe(false);
+            expect(resultOverlay.getAttribute('data-result-type')).toBe('success');
+        });
     });
 });

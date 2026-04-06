@@ -30,6 +30,7 @@ export class ResultScreen {
         if (resultOverlay) {
             resultOverlay.classList.remove('minimized');
             resultOverlay.classList.add('hidden');
+            resultOverlay.removeAttribute('data-result-type');
             void resultOverlay.offsetWidth; // 強制リフロー
         }
         if (backToResultBtn) backToResultBtn.classList.add('hidden');
