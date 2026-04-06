@@ -16,7 +16,7 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.19.0";
+        this.version = "0.20.1";
 
 
 
@@ -215,6 +215,10 @@ export class Game {
             this.ship.trail = [];
             this.ship.collectedItems = [];
             this.ship.activeBoosterEffect = null;
+            // 拡大倍率や重力補正などの一時的なステートをリセット
+            this.ship.arcMultiplier = 1.0;
+            this.ship.gravityMultiplier = 1.0;
+            this.ship.pickupMultiplier = 1.0;
         }
         this.pendingItems = [];
         this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };

@@ -84,5 +84,34 @@ describe('Spec: Items & Data (Chapter 4)', () => {
                 checkItem('hull_heavy', { rarity: RARITY.COMMON });
              });
         });
+
+        describe('Evasion and Ghost Modules', () => {
+            it('should have correct names and descriptions for primary and ghost modules', () => {
+                checkItem('mod_star_breaker', {
+                    name: 'スター・ブレイカー',
+                    description: '星に激突する直前に星を破壊して回避。'
+                });
+                checkItem('mod_cushion', {
+                    name: 'インパクト・クッション',
+                    description: '星に激突したときにバウンドして回避。'
+                });
+                checkItem('mod_emergency', {
+                    name: '緊急スラスター',
+                    description: '境界線で自動方向転換してロストを回避。'
+                });
+                checkItem('mod_gst_breaker', {
+                    name: 'ブレイカー・ゴースト',
+                    description: 'スター・ブレイカーで星を破壊するときの予測線を表示。'
+                });
+                checkItem('mod_gst_cushion', {
+                    name: 'クッション・ゴースト',
+                    description: 'インパクト・クッションで星を回避したときの予測線を表示。'
+                });
+                checkItem('mod_gst_emergency', {
+                    name: 'スラスター・ゴースト',
+                    description: '緊急スラスターで境界線を回避したときの予測線を表示。'
+                });
+            });
+        });
     });
 });

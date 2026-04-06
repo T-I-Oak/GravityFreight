@@ -12,10 +12,16 @@ export class InventorySystem {
         this.inventory = {};
         for (const [cat, items] of Object.entries(INITIAL_INVENTORY)) {
             const list = Array.isArray(items) ? items : Object.values(items);
-            this.inventory[cat] = list.map(item => ({
-                ...ITEM_REGISTRY[item.id],
-                ...item
-            }));
+            this.inventory[cat] = list.map(item => {
+                const combined = {
+                    ...ITEM_REGISTRY[item.id],
+                    ...item
+                };
+                if (combined.maxCharges !== undefined && combined.charges === undefined) {
+                    combined.charges = combined.maxCharges;
+                }
+                return combined;
+            });
         }
         if (!this.inventory.rockets) this.inventory.rockets = [];
         this._initInstanceIds();

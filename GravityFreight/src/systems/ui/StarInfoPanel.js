@@ -52,7 +52,7 @@ export class StarInfoPanel {
                     const cardWrapper = document.createElement('div');
                     cardWrapper.className = 'tooltip-card-wrapper';
                     cardWrapper.style.marginBottom = '4px';
-                    cardWrapper.innerHTML = UIComponents.generateCardHTML(item, { showInventory: true });
+                    cardWrapper.innerHTML = UIComponents.generateCardHTML(item);
                     this.starList.appendChild(cardWrapper);
                 });
             }

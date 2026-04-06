@@ -15,30 +15,28 @@ export class UIComponents {
         const category = itemData.category || 'CHASSIS';
         const categoryColor = CATEGORY_COLORS[category] || '#fff';
         const selectionCount = options.selectionCount || 0;
-        const showInventory = options.showInventory || false;
         const isSelected = options.isSelected || false;
         const clickable = options.clickable !== false; // Default to clickable
         const enhancements = itemData.enhancements || {};
         const isRocket = category === 'ROCKETS';
 
-        let invInfo = "";
+        let stack = "";
+        let gauges = "";
         const hasCharges = itemData.charges !== undefined || itemData.maxCharges !== undefined;
-        if (showInventory) {
-            let gauges = "";
-            let stack = "";
-            
-            if (hasCharges) {
-                const max = itemData.maxCharges || 2;
-                const current = itemData.charges !== undefined ? itemData.charges : max;
-                gauges = UIComponents.generateHPGauge(current, max, enhancements.charges > 0);
-            }
-            
-            if (itemData.count > 1) {
-                stack = `<div class="stack-badge"><span class="stack-count">${itemData.count}</span></div>`;
-            }
-            
-            invInfo = `${stack}${gauges}`;
+        
+        // 耐久度ゲージ（対象アイテムのみ）
+        if (hasCharges && options.hideCharges !== true) {
+            const max = itemData.maxCharges; // 厳密にデータモデルのみを信頼する
+            const current = itemData.charges !== undefined ? itemData.charges : max;
+            gauges = UIComponents.generateHPGauge(current, max, enhancements.charges > 0);
         }
+
+        // スタック数バッジ（複数所持／複数セットのみ）
+        if (itemData.count > 1) {
+            stack = `<div class="stack-badge"><span class="stack-count">${itemData.count}</span></div>`;
+        }
+        
+        const invInfo = `${stack}${gauges}`;
 
         const selTag = (selectionCount > 0) ? ` <span class="selection-badge">[${selectionCount}]</span>` : '';
         

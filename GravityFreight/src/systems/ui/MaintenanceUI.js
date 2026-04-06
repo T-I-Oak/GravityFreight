@@ -56,7 +56,7 @@ export class MaintenanceUI {
                 card.className = 'event-row event-card';
                 card.innerHTML = `
                     <div class="card-item-column">
-                        ${UIComponents.generateCardHTML(item, { showInventory: true, clickable: false })}
+                        ${UIComponents.generateCardHTML(item, { clickable: false })}
                     </div>
 
                     <div class="card-action-column">
@@ -135,6 +135,9 @@ export class MaintenanceUI {
                 }
 
                 row.querySelector('.dismantle-btn').onclick = () => {
+                    const idx = game.inventory.rockets.findIndex(r => r.instanceId === rocket.instanceId);
+                    if (idx === -1) return;
+
                     const currentCost = Math.floor((game.dismantleCount + 1) * 50 * (1 - totalDiscount));
                     if (game.coins < currentCost) return;
                     
@@ -159,7 +162,6 @@ export class MaintenanceUI {
                     });
 
                     if (game.selection.rocket?.instanceId === rocket.instanceId) game.selection.rocket = null;
-                    const idx = game.inventory.rockets.findIndex(r => r.instanceId === rocket.instanceId);
                     if (idx !== -1) game.inventory.rockets.splice(idx, 1);
                     
                     this.initRepairDock(container);
@@ -207,7 +209,6 @@ export class MaintenanceUI {
                 card.className = 'event-row event-card mini-item';
                 card.innerHTML = `<div class="card-item-column">${UIComponents.generateCardHTML(item, { clickable: false })}</div>`;
                 resultsList.appendChild(card);
-
             });
             resultsSection.appendChild(resultsList);
         }

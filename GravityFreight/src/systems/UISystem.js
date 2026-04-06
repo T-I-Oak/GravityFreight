@@ -289,7 +289,6 @@ export class UISystem {
             div.className = `part-item ${isAnySelected ? 'selected' : ''}`;
             div.innerHTML = this.generateCardHTML(group, {
                 isSelected: isAnySelected,
-                showInventory: true,
                 selectionCount: selectionCount
             });
 

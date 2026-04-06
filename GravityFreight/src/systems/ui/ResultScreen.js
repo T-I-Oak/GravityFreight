@@ -287,7 +287,7 @@ export class ResultScreen {
         card.className = 'reward-item-card stagger-in';
         card.style.animationDelay = `${this._resultDelay}s`;
         this._resultDelay += 0.07;
-        card.innerHTML = UIComponents.generateCardHTML(item, { showInventory: true, clickable: false });
+        card.innerHTML = UIComponents.generateCardHTML(item, { clickable: false });
         itemsList.appendChild(card);
     }
 
@@ -305,7 +305,7 @@ export class ResultScreen {
             bonusCard.className = 'reward-item-card stagger-in';
             bonusCard.style.animationDelay = `${this._resultDelay}s`;
             this._resultDelay += 0.07;
-            bonusCard.innerHTML = UIComponents.generateCardHTML(bonus, { indent: 16, showInventory: true, clickable: false });
+            bonusCard.innerHTML = UIComponents.generateCardHTML(bonus, { indent: 16, clickable: false });
             itemsList.appendChild(bonusCard);
         });
     }

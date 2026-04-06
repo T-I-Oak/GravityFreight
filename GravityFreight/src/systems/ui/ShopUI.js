@@ -122,13 +122,12 @@ export class ShopUI {
             `;
         } else {
             allHoldings.forEach(item => {
-                if ((item.count || 0) <= 0 && item.charges === undefined) return;
                 const sellPrice = game.economySystem.calculateValue(item);
                 const card = document.createElement('div');
                 card.className = 'event-row event-card';
                 card.innerHTML = `
                     <div class="card-item-column">
-                        ${UIComponents.generateCardHTML(item, { showInventory: true, clickable: false })}
+                        ${UIComponents.generateCardHTML(item, { clickable: false })}
                     </div>
 
                     <div class="card-action-column">
@@ -322,7 +321,7 @@ export class ShopUI {
                 
                 card.innerHTML = `
                     <div class="card-item-column">
-                        ${UIComponents.generateCardHTML(group, { badge: group.count > 1 ? `x ${group.count}` : null, clickable: false })}
+                        ${UIComponents.generateCardHTML(group, { clickable: false })}
                     </div>
 
                 `;

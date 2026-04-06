@@ -56,7 +56,7 @@ export const GAME_BALANCE = {
     MAGNET_PULSE_GROWTH: 20,
     SAFE_DISTANCE_FROM_HOME: 30,
     COLLISION_MARGIN: 1,
-    CUSHION_BOUNCE: 0.5,
+    CUSHION_BOUNCE: 1.0,
     EMERGENCY_THRUST_MULT: 0.8
 };
 
@@ -109,15 +109,15 @@ export const PARTS = {
     ],
     MODULES: [
         { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: '拡張スロットを追加するモジュール。' },
-        { id: 'mod_star_breaker', category: 'MODULES', name: 'スター・ブレイカー', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '衝突時に星を破壊して回避する。' },
-        { id: 'mod_cushion', category: 'MODULES', name: 'インパクト・クッション', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '衝突時にバウンドして回避。' },
-        { id: 'mod_emergency', category: 'MODULES', name: '緊急スラスター', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '境界線で自動方向転換。' },
+        { id: 'mod_star_breaker', category: 'MODULES', name: 'スター・ブレイカー', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '星に激突する直前に星を破壊して回避。' },
+        { id: 'mod_cushion', category: 'MODULES', name: 'インパクト・クッション', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '星に激突したときにバウンドして回避。' },
+        { id: 'mod_emergency', category: 'MODULES', name: '緊急スラスター', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '境界線で自動方向転換してロストを回避。' },
         { id: 'mod_stabilizer', category: 'MODULES', name: '軌道安定化装置', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.RARE, description: '自機にかかる重力を20%軽減するモジュール。' },
         { id: 'mod_analyzer', category: 'MODULES', name: 'オービット・アナリスト', mass: 1, precisionMultiplier: 1.5, rarity: RARITY.UNCOMMON, description: '予測精度を50%強化するモジュール。' },
         { id: 'mod_insurance', category: 'MODULES', name: 'ロスト保険', mass: 1, onLostBonus: 1, rarity: RARITY.UNCOMMON, description: '機体を失った時に保険金が受給される。重複可。' },
-        { id: 'mod_gst_breaker', category: 'MODULES', name: 'スター・ゴースト', mass: 1, ghostType: 'breaker', rarity: RARITY.RARE, description: '破壊回避時の予測軌道を表示。' },
-        { id: 'mod_gst_cushion', category: 'MODULES', name: 'クッション・ゴースト', mass: 1, ghostType: 'cushion', rarity: RARITY.RARE, description: '跳ね返り時の予測軌道を表示。' },
-        { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '境界復帰時の予測軌道を表示。' }
+        { id: 'mod_gst_breaker', category: 'MODULES', name: 'ブレイカー・ゴースト', mass: 1, ghostType: 'breaker', rarity: RARITY.RARE, description: 'スター・ブレイカーで星を破壊するときの予測線を表示。' },
+        { id: 'mod_gst_cushion', category: 'MODULES', name: 'クッション・ゴースト', mass: 1, ghostType: 'cushion', rarity: RARITY.RARE, description: 'インパクト・クッションで星を回避したときの予測線を表示。' },
+        { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '緊急スラスターで境界線を回避したときの予測線を表示。' }
     ],
     BOOSTERS: [
         { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '発射台の燃料の代わりに使用できる1回分の強化燃料。' },
@@ -139,7 +139,6 @@ export const PARTS = {
     ]
 };
 
-// 初期所持アイテムの定義 (数量管理)
 export const INITIAL_INVENTORY = {
     chassis: [
         { id: 'hull_light', count: 1 },

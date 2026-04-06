@@ -51,10 +51,10 @@ export class PhysicsOrchestrator {
 
         if (ship) {
             // Magnetic Pulse 効果: 時間経過で範囲拡大
-            const booster = game.selection.rocket.booster;
+            const booster = game.activeBoosterAtLaunch;
             if (booster && booster.id === 'boost_magnet') {
-                const elapsed = game.simulatedTime - game.launchTime;
-                ship.pickupRange = (game.selection.rocket.totalPickupRange || 0) + elapsed * GAME_BALANCE.MAGNET_PULSE_GROWTH;
+                const elapsed = game.simulatedTime - (game.launchTime || 0);
+                ship.pickupRange = (ship.basePickupRange || 100) + elapsed * GAME_BALANCE.MAGNET_PULSE_GROWTH;
             }
 
             game.bodies.forEach(body => {
@@ -108,11 +108,25 @@ export class PhysicsOrchestrator {
     calculateGravity(pos, bodies, mass) {
         const game = this.game;
         const ship = game.ship;
-        const acc = calculateAcceleration(pos, bodies, mass);
+
+        // 直近で回避・バウンドした星からの重力を一時的に無視 (母星と同様の挙動)
+        const activeBodies = bodies.filter(body => {
+            if (body === ship.lastEvasionBody) {
+                const dist = pos.sub(body.position).length();
+                if (dist < body.radius + GAME_BALANCE.SAFE_DISTANCE_FROM_HOME) {
+                    return false;
+                }
+                // 十分に離れたらフラグをリセット
+                ship.lastEvasionBody = null;
+            }
+            return true;
+        });
+
+        const acc = calculateAcceleration(pos, activeBodies, mass);
         let mult = ship.gravityMultiplier || 1.0;
 
-        if (ship.activeBoosterEffect && ship.activeBoosterEffect.type === 'gravityMultiplier') {
-            mult *= ship.activeBoosterEffect.value;
+        if (ship.activeBoosterEffect && ship.activeBoosterEffect.gravityMultiplier !== undefined) {
+            mult *= ship.activeBoosterEffect.gravityMultiplier;
             if (ship.activeBoosterEffect.duration !== undefined) {
                 ship.activeBoosterEffect.duration--;
                 if (ship.activeBoosterEffect.duration <= 0) {
@@ -123,30 +137,30 @@ export class PhysicsOrchestrator {
         return acc.scale(mult);
     }
 
-    checkCollisions(prevPos = null) {
+    checkCollisions(startPos) {
         const game = this.game;
         const ship = game.ship;
         if (!ship) return false;
 
         const shipPos = ship.position;
-        const startPos = prevPos || shipPos;
 
-        const hitBody = this.findBodyCollision(shipPos, startPos, ship.isSafeToReturn);
+        // 回避・バウンド直後の星を除外して衝突判定（粘着防止）
+        const filteredBodies = game.bodies.filter(b => b !== ship.lastEvasionBody);
+        const hitBody = this.findBodyCollision(shipPos, startPos, ship.isSafeToReturn, filteredBodies);
 
         if (hitBody) {
-            const body = hitBody;
-            if (body === game.homeStar) {
+            // 回避モジュールの処理
+            if (this.handleCollisionEvasion(hitBody)) return false;
+
+            if (hitBody === game.homeStar) {
                 game.state = 'returned';
                 game.stateTimer = ANIMATION_DURATION / 1000;
                 game.resolveItems('returned');
             } else {
-                // アドオンによる衝突回避判定
-                if (this.handleCollisionEvasion(body)) return false;
-
                 game.state = 'crashed';
                 game.stateTimer = ANIMATION_DURATION / 1000;
                 game.consumeRocketOnFailure();
-                game.resolveItems('crashed', body);
+                game.resolveItems('crashed', hitBody);
             }
             return true;
         }
@@ -192,22 +206,37 @@ export class PhysicsOrchestrator {
         const game = this.game;
         const ship = game.ship;
 
+        // 回避ロジックの修正: 
+        // 1. ゴースト版単体では回避能力を持たず、ベースのモジュール（耐久度あり）が必要。
+        // 2. ゴースト版はエイミング時にその回避結果を表示する役割を担う（データ仕様に準拠）。
+
         // 1. Star Breaker
         const breaker = ship.equippedModules.find(m => m.id === 'mod_star_breaker' && m.charges > 0);
         if (breaker) {
             breaker.charges--;
             game.bodies = game.bodies.filter(b => b !== body);
+            ship.lastEvasionBody = null; // ブレイカーは星を消すので回避フラグ不要
             return true;
         }
 
         // 2. Impact Cushion
         const cushion = ship.equippedModules.find(m => m.id === 'mod_cushion' && m.charges > 0);
         if (cushion) {
-            cushion.charges--;
             const normal = ship.position.sub(body.position).normalize();
             const dot = ship.velocity.dot(normal);
-            ship.velocity = ship.velocity.sub(normal.scale(2 * dot)).scale(GAME_BALANCE.CUSHION_BOUNCE);
-            return true;
+            
+            // 接近中（dot < 0）の場合のみ跳ね返す
+            if (dot < 0) {
+                cushion.charges--;
+                ship.velocity = ship.velocity.sub(normal.scale(2 * dot)).scale(GAME_BALANCE.CUSHION_BOUNCE);
+                
+                // 表面に押し出し、その星からの重力を一時的に無効化
+                const surfaceRadius = body.radius + (ship.radius || 2) + GAME_BALANCE.COLLISION_MARGIN + 0.1;
+                ship.position = body.position.add(normal.scale(surfaceRadius));
+                ship.lastEvasionBody = body;
+                
+                return true;
+            }
         }
         return false;
     }
@@ -217,23 +246,30 @@ export class PhysicsOrchestrator {
         const ship = game.ship;
         const emergency = ship.equippedModules.find(m => m.id === 'mod_emergency' && m.charges > 0);
         if (emergency) {
-            emergency.charges--;
             const center = new Vector2(game.canvas.width / 2, game.canvas.height / 2);
             const toCenter = center.sub(shipPos).normalize();
-            ship.velocity = toCenter.scale(ship.velocity.length() * GAME_BALANCE.EMERGENCY_THRUST_MULT);
-            return true;
+            const dot = ship.velocity.dot(toCenter);
+            
+            if (dot < 0) {
+                emergency.charges--;
+                ship.velocity = toCenter.scale(ship.velocity.length() * GAME_BALANCE.EMERGENCY_THRUST_MULT);
+                ship.lastEvasionBody = null; // 境界線回避なので体当たりフラグは不要
+                return true;
+            }
         }
         return false;
     }
 
     findBodyCollision(pos, prevPos, isSafeToReturn, bodies = null) {
         const game = this.game;
+        const ship = game.ship;
         const targetBodies = bodies || game.bodies;
         for (const body of targetBodies) {
+            // 母星は安全帰還フラグが立つまで衝突を回避
             if (body === game.homeStar && !isSafeToReturn) continue;
 
+            const shipRadius = ship ? (ship.radius || 2) : 2;
             const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
-            const shipRadius = game.ship ? (game.ship.radius || 2) : 2;
             const collisionDist = radius + shipRadius + GAME_BALANCE.COLLISION_MARGIN;
             const distSq = getDistanceSqToSegment(body.position, prevPos, pos);
 
@@ -281,17 +317,30 @@ export class PhysicsOrchestrator {
             }
 
             let tempIsSafeToReturn = false;
+            let tempLastEvasionBody = null; 
             let tempBodies = [...game.bodies];
             
-            const hasGhostBreaker = rocket.modules && Object.values(rocket.modules).some(m => m.ghostType === 'breaker');
-            const hasGhostCushion = rocket.modules && Object.values(rocket.modules).some(m => m.ghostType === 'cushion');
-            const hasGhostEmergency = rocket.modules && Object.values(rocket.modules).some(m => m.ghostType === 'emergency');
+            const modules = rocket.modules ? Object.values(rocket.modules) : [];
+            const hasGhostBreaker = modules.some(m => m.ghostType === 'breaker');
+            const hasGhostCushion = modules.some(m => m.ghostType === 'cushion');
+            const hasGhostEmergency = modules.some(m => m.ghostType === 'emergency');
 
             for (let i = 0; i < precision; i++) {
+                // 周期的にポイントを保存 (最初の点も含む)
                 if (i % 5 === 0) points.push(new Vector2(tempPos.x, tempPos.y));
 
                 const prevTempPos = new Vector2(tempPos.x, tempPos.y);
-                const grav = calculateAcceleration(tempPos, tempBodies, mass);
+                
+                // 重力計算（回避直後の星を除外）
+                const activeTempBodies = tempBodies.filter(b => {
+                    if (b === tempLastEvasionBody) {
+                        const dist = tempPos.sub(b.position).length();
+                        if (dist < b.radius + GAME_BALANCE.SAFE_DISTANCE_FROM_HOME) return false;
+                        tempLastEvasionBody = null; // 十分に離れたらリセット
+                    }
+                    return true;
+                });
+                const grav = calculateAcceleration(tempPos, activeTempBodies, mass);
                 
                 let currentGMult = gravityMultiplier;
                 if (boosterDuration > 0) {
@@ -303,22 +352,33 @@ export class PhysicsOrchestrator {
                 tempVel = tempVel.add(gravityAcc.scale(simDt));
                 tempPos = tempPos.add(tempVel.scale(simDt));
 
+                // 母星から十分離れたかチェック
                 if (!tempIsSafeToReturn) {
                     const dist = tempPos.sub(game.homeStar.position).length();
                     if (dist > game.homeStar.radius + GAME_BALANCE.SAFE_DISTANCE_FROM_HOME) tempIsSafeToReturn = true;
                 }
 
-                const hitBody = this.findBodyCollision(tempPos, prevTempPos, tempIsSafeToReturn, tempBodies);
+                // 衝突判定（回避直後の星を除外）
+                const filteredCollBodies = tempBodies.filter(b => b !== tempLastEvasionBody);
+                const hitBody = this.findBodyCollision(tempPos, prevTempPos, tempIsSafeToReturn, filteredCollBodies);
+                
                 if (hitBody) {
                     if (hitBody === game.homeStar) return points;
+                    
                     if (hasGhostBreaker) {
                         tempBodies = tempBodies.filter(b => b !== hitBody);
+                        tempLastEvasionBody = null;
                         continue;
                     } else if (hasGhostCushion) {
                         const normal = tempPos.sub(hitBody.position).normalize();
                         const dot = tempVel.dot(normal);
-                        tempVel = tempVel.sub(normal.scale(2 * dot)).scale(0.5);
-                        continue;
+                        if (dot < 0) {
+                            tempVel = tempVel.sub(normal.scale(2 * dot)).scale(GAME_BALANCE.CUSHION_BOUNCE);
+                            const surfaceRadius = hitBody.radius + 2 + GAME_BALANCE.COLLISION_MARGIN + 0.1;
+                            tempPos = hitBody.position.add(normal.scale(surfaceRadius));
+                            tempLastEvasionBody = hitBody;
+                            continue;
+                        }
                     }
                     return points;
                 }
@@ -329,6 +389,7 @@ export class PhysicsOrchestrator {
                         const center = new Vector2(game.canvas.width / 2, game.canvas.height / 2);
                         const toCenter = center.sub(tempPos).normalize();
                         tempVel = toCenter.scale(tempVel.length() * GAME_BALANCE.EMERGENCY_THRUST_MULT);
+                        tempLastEvasionBody = null;
                         continue;
                     }
                     points.push(new Vector2(tempPos.x, tempPos.y));

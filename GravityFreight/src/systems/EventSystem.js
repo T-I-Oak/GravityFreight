@@ -297,10 +297,26 @@ export class EventSystem {
     selectOption(type, instanceId) {
         const game = this.game;
         if (type === 'modules') {
-            const current = game.selection.modules[instanceId] || 0;
+            const sel = game.selection;
+            const current = sel.modules[instanceId] || 0;
             const item = game.inventory.modules.find(o => o.instanceId === instanceId);
             if (!item) return;
-            game.inventorySystem.selectOption(instanceId, (current < item.count) ? current + 1 : 0);
+
+            // 次のクリックでの予測状況を確認
+            // すでに上限ならサイクルリセット（0）
+            const nextCount = current + 1;
+            const projected = game.assemblySystem.getModuleSlotStatus(instanceId, 1);
+            
+            // バリデーション: スタック上限内かつ、全体のスロット上限内か
+            const isCountValid = nextCount <= item.count;
+            const isSlotValid = !projected.overflow || projected.overflow <= 0;
+
+            if (nextCount > 0 && isCountValid && isSlotValid) {
+                game.inventorySystem.selectOption(instanceId, nextCount);
+            } else {
+                game.inventorySystem.selectOption(instanceId, 0);
+            }
+            
             game.checkReadyToAim();
         } else if (type === 'booster') {
             const opt = game.inventory.boosters.find(o => o.instanceId === instanceId);
@@ -358,15 +374,19 @@ export class EventSystem {
             // 装備中モジュールの効果
             game.ship.equippedModules = [];
             if (r.modules) {
-                for (const [mid, count] of Object.entries(r.modules)) {
-                    const m = game.inventory.modules.find(item => item.id === mid);
-                    if (m) {
+                // r.modules は { [instanceId]: moduleItem } の形式
+                for (const moduleItem of Object.values(r.modules)) {
+                    if (moduleItem) {
+                        const count = moduleItem.count || 1;
                         for (let i = 0; i < count; i++) {
-                            game.ship.equippedModules.push({ ...m });
-                            if (m.precisionMultiplier) pMult *= m.precisionMultiplier;
-                            if (m.pickupMultiplier) pickMult *= m.pickupMultiplier;
-                            if (m.gravityMultiplier) gMult *= m.gravityMultiplier;
-                            if (m.arcMultiplier) aMult *= m.arcMultiplier;
+                            // 各スロット分のクローンを格納（耐久度を独立して管理するため）
+                            const moduleInstance = { ...moduleItem, charges: moduleItem.maxCharges || 0 };
+                            game.ship.equippedModules.push(moduleInstance);
+                            
+                            if (moduleItem.precisionMultiplier) pMult *= moduleItem.precisionMultiplier;
+                            if (moduleItem.pickupMultiplier) pickMult *= moduleItem.pickupMultiplier;
+                            if (moduleItem.gravityMultiplier) gMult *= moduleItem.gravityMultiplier;
+                            if (moduleItem.arcMultiplier) aMult *= moduleItem.arcMultiplier;
                         }
                     }
                 }
@@ -403,6 +423,16 @@ export class EventSystem {
 
         game.setState('flying');
         game.activeBoosterAtLaunch = b ? { ...b } : null;
+        game.launchTime = game.simulatedTime;
+
+        if (b) {
+            // ブースター独自の航行中効果（閃光推進剤など）
+            if (b.gravityMultiplier !== undefined) {
+                game.ship.activeBoosterEffect = { ...b };
+            }
+            // マグネティック・パルス用の基準値を保存
+            game.ship.basePickupRange = game.ship.pickupRange || 100;
+        }
 
         let power = l.power * (r.powerMultiplier || 1);
         if (b && b.powerMultiplier) power *= b.powerMultiplier;
