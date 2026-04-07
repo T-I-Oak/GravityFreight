@@ -32,9 +32,9 @@
 }
 
 #story-overlay .story-branch-icon {
-    width: 60px;
-    height: 60px;
-    background: rgba(0, 0, 0, 0.5);
+    width: 64px; /* 施設アイコンと同一の 64px に同期 */
+    height: 64px;
+    background: var(--story-color-alpha, rgba(0, 0, 0, 0.5)); 
     border: 4px solid var(--story-color, #00d4ff);
     display: flex;
     align-items: center;
@@ -47,7 +47,13 @@
     flex-shrink: 0;
     line-height: 1;
     box-sizing: border-box;
-    filter: brightness(0.7); /* 施設アイコン共通の重厚なマットデザイン */
+    filter: brightness(0.7);
+    /* 施設アイコンと同一のプレミアムな発光表現を同期 */
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+
+    /* 枠内での垂直方向の重心バランス調整（施設側と共通の補正） */
+    padding-top: 5px; 
 }
 
 #story-overlay .story-modal h2 {

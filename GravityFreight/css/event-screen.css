@@ -74,11 +74,12 @@
     gap: 20px;
 }
 
+/* 施設アイコンの基本デザイン設定 */
 #event-screen #event-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 64px;
+    width: 64px; /* 指定のサイズ 64px に統合 */
     height: 64px;
     background: var(--shop-bg, rgba(0, 0, 0, 0.5));
     border: 4px solid var(--shop-color, #fff);
@@ -89,9 +90,13 @@
     line-height: 1;
     margin-right: 20px;
     flex-shrink: 0;
+    filter: brightness(0.7);
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    transform: none;
+    box-sizing: border-box;
+
+    /* 枠内での垂直方向の重心バランス調整（文字を下げるための補正） */
+    padding-top: 5px; 
 }
 
 #event-screen .event-title-group h2 {
@@ -245,18 +250,6 @@
     cursor: default;
 }
 
-/* 施設アイコン：発光を一切排除した重厚なマットデザイン */
-#event-screen #event-icon {
-    width: 60px;
-    height: 60px;
-    margin-right: 20px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: brightness(0.7); /* シンプルに輝度を落とすスタイルに戻す */
-    box-shadow: none;
-    text-shadow: none;
-}
 
 /* イベント補助テキスト (Moved from index.html) */
 .event-subtext {

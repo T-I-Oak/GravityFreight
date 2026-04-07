@@ -121,14 +121,17 @@ export class HUDManager {
         if (overlay && branchIcon) {
             const branch = story.branch; // 'T', 'R', or 'B'
             const goalKey = branch === 'T' ? 'TRADING_POST' : (branch === 'R' ? 'REPAIR_DOCK' : 'BLACK_MARKET');
-            const color = GOAL_COLORS[goalKey];
+            
+            // Data.js の定義（施設と同一）に完全に同期させる
+            const color = GOAL_COLORS[goalKey]; 
 
             const r = parseInt(color.slice(1, 3), 16);
             const g = parseInt(color.slice(3, 5), 16);
             const b = parseInt(color.slice(5, 7), 16);
             
             overlay.style.setProperty('--story-color', color);
-            overlay.style.setProperty('--story-color-alpha', hexToRgba(color, 0.4));
+            // 施設側の背景透過度 0.2 に完全に同期
+            overlay.style.setProperty('--story-color-alpha', hexToRgba(color, 0.2));
             overlay.style.setProperty('--story-color-rgb', `${r}, ${g}, ${b}`);
             
             branchIcon.textContent = branch;
