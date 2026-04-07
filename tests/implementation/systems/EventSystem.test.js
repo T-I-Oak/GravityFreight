@@ -84,4 +84,27 @@ describe('Implementation: systems/EventSystem.js', () => {
         expect(finalFuel).not.toBeUndefined();
         expect(finalFuel.charges).toBe(1);
     });
+
+    it('should reset returnBonus in closeEvent (sector completed)', () => {
+        game.returnBonus = 0.4;
+        eventSystem.closeEvent();
+        expect(game.returnBonus).toBe(0);
+    });
+
+    it('should apply returnBonus to launch velocity', () => {
+        game.state = 'aiming';
+        game.returnBonus = 0.2; // +20%
+        game.selection.rocket = { mass: 10, gravityMultiplier: 1.0 };
+        game.selection.launcher = { power: 1000 };
+        game.selection.booster = null;
+        
+        // Mock current ship rotation (default is -PI/2) and mass
+        game.ship = { rotation: -Math.PI / 2, mass: 10 };
+        
+        // Calculate expected velocity: power(1000) * massFactor(1.0) * (1 + bonus(0.2)) = 1200
+        // Direction is up (0, -1)
+        eventSystem.launch();
+        
+        expect(game.ship.velocity.y).toBeCloseTo(-1200);
+    });
 });

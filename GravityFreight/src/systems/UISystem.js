@@ -96,6 +96,16 @@ export class UISystem {
                 if (launchBtn) {
                     launchBtn.classList.remove('hidden');
                     launchBtn.disabled = true;
+                    // 【Spec 9.3】アイテムカードのプロパティ表示と同じ形式（小文字x・強化枠・次の行）
+                    const label = launchBtn.querySelector('.btn-label');
+                    const bonusText = game.returnBonus > 0 ? `
+                        <div class="part-stats">
+                            <span class="stat-tag enhanced-border">
+                                <span class="stat-label">POWER</span>
+                                <span class="stat-val">x${(1 + game.returnBonus).toFixed(1)}</span>
+                            </span>
+                        </div>` : '';
+                    if (label) label.innerHTML = `LAUNCH ENGINE${bonusText}`;
                 }
                 if (lc) lc.classList.remove('hidden');
 
@@ -111,6 +121,16 @@ export class UISystem {
                 if (lb) {
                     lb.classList.remove('hidden');
                     lb.disabled = false;
+                    // 【Spec 9.3】アイテムカードのプロパティ表示と同じ形式（小文字x・強化枠・次の行）
+                    const label = lb.querySelector('.btn-label');
+                    const bonusText = game.returnBonus > 0 ? `
+                        <div class="part-stats">
+                            <span class="stat-tag enhanced-border">
+                                <span class="stat-label">POWER</span>
+                                <span class="stat-val">x${(1 + game.returnBonus).toFixed(1)}</span>
+                            </span>
+                        </div>` : '';
+                    if (label) label.innerHTML = `LAUNCH ENGINE${bonusText}`;
                 }
                 if (lc) lc.classList.remove('hidden');
                 

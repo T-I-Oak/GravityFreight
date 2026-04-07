@@ -13,10 +13,10 @@ import { StorySystem } from '../systems/StorySystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
+        this.version = "0.21.0";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-        this.version = "0.20.1";
 
 
 
@@ -58,6 +58,7 @@ export class Game {
         this.coins = INITIAL_COINS;
         this.score = 0;
         this.displayScore = 0;
+        this.returnBonus = 0;
         this.displayCoins = 0;
         this.sector = 1;
         this.stageLevel = 1;
@@ -237,6 +238,7 @@ export class Game {
         this.displayCoins = INITIAL_COINS;
         this.score = 0;
         this.displayScore = 0;
+        this.returnBonus = 0;
         
         this.sector = 1;
         this.stageLevel = 1;

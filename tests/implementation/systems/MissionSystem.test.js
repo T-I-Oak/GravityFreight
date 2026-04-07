@@ -64,4 +64,10 @@ describe('Implementation: MissionSystem Logic', () => {
         
         expect(game.missionSystem.isGameOver()).toBe(false);
     });
+
+    it('should increment game.returnBonus by 0.1 on returned status', () => {
+        game.returnBonus = 0.1;
+        game.missionSystem.resolveItems('returned');
+        expect(game.returnBonus).toBeCloseTo(0.2);
+    });
 });

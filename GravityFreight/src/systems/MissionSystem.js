@@ -289,6 +289,7 @@ export class MissionSystem {
             }
 
         } else if (result === 'returned') {
+            game.returnBonus += GAME_BALANCE.RETURN_BONUS_INCREMENT;
             if (game.pendingItems && game.pendingItems.length > 0) {
                 game.missionSystem.resolveItems('success');
             }

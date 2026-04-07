@@ -89,13 +89,19 @@
     margin-bottom: 6px;
 }
 
-.item-card .part-stats {
+.item-card .part-stats,
+#launch-btn .part-stats {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
 }
 
-.item-card .stat-tag {
+#launch-btn .part-stats {
+    justify-content: center;
+}
+
+.item-card .stat-tag,
+#launch-btn .stat-tag {
     display: inline-flex;
     align-items: center;
     background: rgba(0, 0, 0, 0.2);
@@ -106,17 +112,29 @@
     margin-bottom: 4px;
 }
 
-.item-card .stat-label {
+.item-card .stat-label,
+#launch-btn .stat-label {
     font-size: 8px;
     font-weight: 800;
     color: rgba(255, 255, 255, 0.4);
     text-transform: uppercase;
 }
 
-.item-card .stat-val {
+.item-card .stat-val,
+#launch-btn .stat-val {
     font-size: 10px;
     font-weight: 900;
     color: #fff;
+}
+
+/* ボタン無効時のバッジ抑制 */
+#launch-btn:disabled .stat-tag {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+#launch-btn:disabled .stat-label,
+#launch-btn:disabled .stat-val {
+    color: #444;
 }
 
 /* Rocket Details Row */
@@ -243,9 +261,15 @@
 }
 
 /* Enhancement Effects */
-.item-card .enhanced-border {
+.item-card .enhanced-border,
+#launch-btn .enhanced-border {
     border-color: #00d4ff;
     box-shadow: 0 0 8px rgba(0, 212, 255, 0.4), inset 0 0 4px rgba(0, 212, 255, 0.2);
+}
+
+#launch-btn:disabled .enhanced-border {
+    border-color: #333;
+    box-shadow: none;
 }
 
 .item-card .enhanced-frame {

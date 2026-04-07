@@ -436,6 +436,7 @@ export class EventSystem {
 
         let power = l.power * (r.powerMultiplier || 1);
         if (b && b.powerMultiplier) power *= b.powerMultiplier;
+        power *= (1 + game.returnBonus);
 
         const angle = game.ship.rotation;
         const massFactor = Math.sqrt(10 / game.ship.mass);
@@ -559,6 +560,7 @@ export class EventSystem {
         
         game.currentShopStock = null;
         game.tempDismantleResults = null;
+        game.returnBonus = 0; // セクター移動時にボーナスをリセット
         if (game.missionSystem.isGameOver()) { game.uiSystem.showResult('gameover'); return; }
         game.stageLevel++;
         game.sector = game.stageLevel;

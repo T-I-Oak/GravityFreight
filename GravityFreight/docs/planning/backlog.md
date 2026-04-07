@@ -36,6 +36,8 @@
     - [ ] アイテム取得音
     - [ ] ロケットの到着位置に応じた音 (crash / goal / lost / return)
     - [ ] UIの操作音
+
+
 ### バグ修正・調整中 (Fixes & Adjustments)
 - [ ] エイミング状態でないとき、shift (or ctrl) + ドラッグをしても領域の外側ではパンできない
 

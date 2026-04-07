@@ -511,4 +511,14 @@ describe('Implementation: Game Core Controllers', () => {
         expect(receiptOverlay.classList.contains('hidden')).toBe(true, 'Receipt overlay should be hidden');
         expect(titleScreen.classList.contains('hidden')).toBe(false, 'Title screen should be visible');
     });
+
+    it('should initialize with returnBonus of 0', () => {
+        expect(game.returnBonus).toBe(0);
+    });
+
+    it('should reset returnBonus back to 0 on fullReset', () => {
+        game.returnBonus = 0.5;
+        game.fullReset();
+        expect(game.returnBonus).toBe(0);
+    });
 });

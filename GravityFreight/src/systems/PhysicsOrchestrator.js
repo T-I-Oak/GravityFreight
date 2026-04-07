@@ -297,6 +297,7 @@ export class PhysicsOrchestrator {
             if (game.selection.booster && game.selection.booster.powerMultiplier) {
                 power *= game.selection.booster.powerMultiplier;
             }
+            power *= (1 + game.returnBonus);
             const mass = rocket.mass || GAME_BALANCE.DEFAULT_SHIP_MASS;
             const massFactor = Math.sqrt(GAME_BALANCE.DEFAULT_SHIP_MASS / mass);
             let tempVel = dir.scale(power * massFactor);
