@@ -24,6 +24,7 @@ describe('UISystem - Result Screen Core Logic (Preservation Test)', () => {
             pendingGoalBonus: 0,
             pendingScore: 0,
             pendingCoins: 0,
+            totalSectorsCompleted: 1,
             flightResults: { bonuses: [], items: [] },
             setState: vi.fn((s) => { game.state = s; }),
             isGameOver: () => false,

@@ -69,8 +69,8 @@ export class ResultScreen {
         if (coinTotalEl) coinTotalEl.textContent = (game.launchCoins || 0).toLocaleString();
 
         const statusText = { 
-            'success': `SECTOR ${game.sector - 1} COMPLETED`, 
-            'cleared': `SECTOR ${game.sector - 1} COMPLETED`, 
+            'success': `SECTOR ${game.totalSectorsCompleted} COMPLETED`, 
+            'cleared': `SECTOR ${game.totalSectorsCompleted} COMPLETED`, 
             'returned': 'ROCKET RECOVERED', 
             'crashed': 'SHIP CRASHED', 
             'lost': 'LOST IN SPACE',
@@ -172,7 +172,7 @@ export class ResultScreen {
 
     _renderGameOverStats(statsList) {
         const game = this.game;
-        const sectors = (game.sector || 1) - 1;
+        const sectors = game.totalSectorsCompleted || 0;
         const collected = game.totalCollectedItems || 0;
         const score = Math.floor(game.score || 0);
 

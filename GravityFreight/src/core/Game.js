@@ -13,7 +13,7 @@ import { StorySystem } from '../systems/StorySystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.24.0";
+        this.version = "0.25.0";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
@@ -60,8 +60,9 @@ export class Game {
         this.displayScore = 0;
         this.returnBonus = 0;
         this.displayCoins = 0;
-        this.sector = 1;
-        this.stageLevel = 1;
+        this.sector = 0;
+        this.stageLevel = 0;
+        this.totalSectorsCompleted = 0;
         this.launchScore = 0;
         this.launchCoins = 0;
         this.totalDeliveries = 0;
@@ -99,12 +100,26 @@ export class Game {
     setState(newState) {
         if (this.state === newState) return;
         
-        // 【仕様】ビデオパネルの自動展開 (ビルド開始時)
+        // 1. まずステートを確定
+        this.state = newState;
+
+        // 2. 副作用の実行
         if (newState === 'building') {
             this.uiSystem.expandPanel();
         }
 
-        this.state = newState;
+        if (newState === 'preparing') {
+            if (this.missionSystem && this.missionSystem.isGameOver()) {
+                this.showResult('gameover');
+                this.state = 'gameover';
+                this.updateUI();
+                return;
+            }
+            this.stateTimer = 3.5;
+            this.isWarpInitialized = false; // 演出中のマップ更新フラグ
+            this.reset();
+        }
+
         this.updateUI();
     }
 
@@ -224,8 +239,6 @@ export class Game {
         this.pendingItems = [];
         this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
         this.accumulator = 0;
-        this.eventSystem.checkReadyToAim();
-        this.updateUI();
     }
 
     fullReset() {
@@ -240,8 +253,9 @@ export class Game {
         this.displayScore = 0;
         this.returnBonus = 0;
         
-        this.sector = 1;
-        this.stageLevel = 1;
+        this.sector = 0;
+        this.stageLevel = 0;
+        this.totalSectorsCompleted = 0;
         this.currentStarCount = 5;
         this.totalDeliveries = 0;
         this.launchScore = 0;
@@ -344,9 +358,48 @@ export class Game {
     }
 
     update(dt) {
+        if (this.state === 'title') return;
+
         // 表示系の更新（補間など）およびホバー判定
         this.physicsOrchestrator.updateHover();
         this.uiSystem.update(dt); 
+
+        // 演出バッファ中のワープ処理 (Zoom演出)
+        if (this.state === 'preparing') {
+            const DURATION = 3.5;
+            const progress = (DURATION - this.stateTimer) / DURATION; // 0.0 to 1.0
+            
+            if (progress < 0.4) {
+                // Phase 1: 加速離脱 (Cubic Ease-In)
+                const p = progress / 0.4; // 0.0 -> 1.0
+                const ease = p * p * p;
+                const warpScale = 1.0 + ease * 99.0; // 1.0 -> 100.0
+                this.visualZoom = this.zoom * warpScale;
+                this.warpEffectSpeed = warpScale;
+            } else if (progress < 0.6) {
+                // Phase 2: 最高速維持 & 中間地点初期化
+                if (!this.isWarpInitialized) {
+                    this.sector++;
+                    this.stageLevel = this.sector;
+                    this.initStage(this.currentStarCount);
+                    this.uiSystem.showSectorNotification(`SECTOR ${this.sector} READY`);
+                    this.isWarpInitialized = true;
+                }
+                this.visualZoom = this.zoom * 100.0;
+                this.warpEffectSpeed = 100.0;
+            } else {
+                // Phase 3: 減速飛来 (Cubic Ease-Out)
+                const p = (progress - 0.6) / 0.4; // 0.0 -> 1.0
+                const ease = 1 - Math.pow(1 - p, 3); // Cubic decelerating
+                const warpScale = 0.01 + ease * 0.99;
+                this.visualZoom = this.zoom * warpScale;
+                // 星の速度も 100.0 -> 1.0 への減速カーブ
+                this.warpEffectSpeed = 100.0 * (1.0 - ease) + 1.0;
+            }
+        } else {
+            this.visualZoom = this.zoom;
+            this.warpEffectSpeed = 1.0;
+        }
 
         this.accumulator += dt;
         const maxSteps = 10;
@@ -360,12 +413,12 @@ export class Game {
             steps++;
         }
 
-        if (['cleared', 'crashed', 'lost', 'returned'].includes(this.state)) {
+        if (['cleared', 'crashed', 'lost', 'returned', 'preparing'].includes(this.state)) {
             this.physicsOrchestrator.updateStateTimer(dt);
         }
     }
 
-    draw() {
-        this.physicsOrchestrator.draw(this.ctx);
+    draw(dt) {
+        this.physicsOrchestrator.draw(this.ctx, dt);
     }
 }

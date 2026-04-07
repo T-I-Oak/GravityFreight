@@ -39,9 +39,12 @@ export class PhysicsOrchestrator {
         const game = this.game;
         game.stateTimer -= dt;
         if (game.stateTimer <= 0) {
-            game.showResult(game.state);
-            game.state = 'result';
-            game.updateUI();
+            if (game.state === 'preparing') {
+                game.setState('building');
+            } else {
+                game.showResult(game.state);
+                game.setState('result');
+            }
         }
     }
 
@@ -188,8 +191,8 @@ export class PhysicsOrchestrator {
             if (hitGoal) {
                 game.state = 'cleared';
                 game.stateTimer = ANIMATION_DURATION / 1000;
+                game.totalSectorsCompleted++;
                 game.lastHitGoal = hitGoal;
-                game.sector++;
                 game.resolveItems('success', hitGoal);
             } else {
                 game.state = 'lost';
@@ -403,34 +406,39 @@ export class PhysicsOrchestrator {
         }
     }
 
-    draw(ctx) {
+    draw(ctx, dt = 0.016) {
         const game = this.game;
         const renderer = game.renderer;
         if (!renderer) return;
 
         renderer.clear();
-        renderer.drawStars(game.cameraOffset, game.simulatedTime * 1000);
+        renderer.drawStars(game.cameraOffset, game.simulatedTime * 1000, dt);
 
-        renderer.applyCamera(game.zoom, game.cameraOffset);
+        // 最初のワープ（セクター0以前）の初期段階では、マップ要素を描画しない
+        const isInitialWarpPhase = game.state === 'preparing' && !game.isWarpInitialized && game.totalSectorsCompleted === 0;
 
-        if (game.state === 'aiming') {
-            const points = this.getPredictionPoints();
-            renderer.drawPrediction(points, game.zoom);
+        const zoom = game.visualZoom || game.zoom;
+        renderer.applyCamera(zoom, game.cameraOffset);
+
+        if (!isInitialWarpPhase) {
+            if (game.state === 'aiming') {
+                const points = this.getPredictionPoints();
+                renderer.drawPrediction(points, zoom);
+            }
+
+            game.bodies.forEach(body => {
+                const glow = (game.hoveredStar === body);
+                renderer.drawBody(body, body.color || UI_COLORS.NORMAL_STAR, glow ? UI_COLORS.NORMAL_STAR : (body.color || UI_COLORS.NORMAL_STAR_GLOW));
+            });
+
+            const arcBonus = game.ship ? (game.ship.arcMultiplier || 1.0) : 1.0;
+            renderer.drawGoals(game.goals, game.boundaryRadius, arcBonus);
         }
-
-        game.bodies.forEach(body => {
-            const glow = (game.hoveredStar === body);
-            // 通常の星は明るい黄色 (UI_COLORS.NORMAL_STAR) で表示
-            renderer.drawBody(body, body.color || UI_COLORS.NORMAL_STAR, glow ? UI_COLORS.NORMAL_STAR : (body.color || UI_COLORS.NORMAL_STAR_GLOW));
-        });
 
         if (game.ship && (['aiming', 'flying', 'crashed', 'returned'].includes(game.state))) {
             renderer.drawTrail(game.ship.trail);
             renderer.drawShip(game.ship);
         }
-
-        const arcBonus = game.ship ? (game.ship.arcMultiplier || 1.0) : 1.0;
-        renderer.drawGoals(game.goals, game.boundaryRadius, arcBonus);
 
         renderer.restoreCamera();
         renderer.drawVersion(game.version);

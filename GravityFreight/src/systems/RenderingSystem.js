@@ -55,12 +55,13 @@ export class Renderer {
     }
 
 
-    drawStars(offset = { x: 0, y: 0 }, timestamp = 0) {
+    drawStars(offset = { x: 0, y: 0 }, timestamp = 0, dt = 0.016) {
         if (!this.bgStars || !this.game) return;
         
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
-        const speed = 0.05;
+        const warpFactor = this.game.warpEffectSpeed || 1.0;
+        const speed = 0.1 * warpFactor * (dt * 60); 
         const maxZ = 2000;
         const rotation = this.game.mapRotation;
 
@@ -70,34 +71,49 @@ export class Renderer {
         const sin = Math.sin(rotation);
 
         for (const star of this.bgStars) {
+            const oldZ = star.z;
+            let wrapped = false;
             star.z -= speed;
             if (star.z <= 0) {
-                star.z = maxZ;
+                star.z = maxZ - Math.random() * 800;
                 star.x = (Math.random() - 0.5) * 2000;
                 star.y = (Math.random() - 0.5) * 2000;
+                wrapped = true;
             }
 
             const scale = 200 / (star.z || 1);
-            
-            // 1. 世界座標系での回転（母星中心）
             const rx = star.x * cos - star.y * sin;
             const ry = star.x * sin + star.y * cos;
-
-            // 2. 投影と画面上でのオフセット（パララックス）を適用
-            // offsetは画面基準なので、rx*scaleの後にそのまま足す
             const px = centerX + rx * scale + offset.x * 0.2;
             const py = centerY + ry * scale + offset.y * 0.2;
 
             if (px < 0 || px > this.canvas.width || py < 0 || py > this.canvas.height) continue;
 
             const twinkle = 0.8 + 0.2 * Math.sin((timestamp / 1000) * star.pulseRate + star.pulseOffset);
-            const brightness = (1 - star.z / maxZ) * star.alpha * twinkle;
-            const size = Math.min(4, star.size * scale * 1.2);
+            let brightness = (0.15 + 0.85 * (1 - star.z / maxZ)) * star.alpha * twinkle;
+            const size = Math.max(0.8, Math.min(4, star.size * scale * 1.2));
 
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
-            this.ctx.beginPath();
-            this.ctx.arc(px, py, Math.max(0.2, size), 0, Math.PI * 2);
-            this.ctx.fill();
+            const isWarping = !wrapped && warpFactor > 1.1;
+            const drawAlpha = isWarping ? Math.min(1.0, brightness * 1.6) : brightness;
+
+            this.ctx.strokeStyle = `rgba(255, 255, 255, ${drawAlpha})`;
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${drawAlpha})`;
+            
+            if (isWarping) {
+                const oldScale = 200 / oldZ;
+                const opx = centerX + rx * oldScale + offset.x * 0.2;
+                const opy = centerY + ry * oldScale + offset.y * 0.2;
+                
+                this.ctx.lineWidth = Math.max(0.8, size * 0.4);
+                this.ctx.beginPath();
+                this.ctx.moveTo(opx, opy);
+                this.ctx.lineTo(px, py);
+                this.ctx.stroke();
+            } else {
+                this.ctx.beginPath();
+                this.ctx.arc(px, py, size * 0.45, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
         }
         
         this.ctx.restore();
@@ -108,11 +124,18 @@ export class Renderer {
         const { x, y } = body.position;
         const radius = body.radius || (Math.sqrt(body.mass) / 5 + 2);
         
-        // 母星は赤橙系 (UI_COLORS.HOME_STAR) で表示
         const finalColor = body.isHome ? UI_COLORS.HOME_STAR : color;
         const finalGlow = body.isHome ? UI_COLORS.HOME_STAR_GLOW : (glowColor || color);
 
+        // ズーム倍率に応じたフェードアウト (2.0 -> 10.0 の間で透明度を 1.0 -> 0.0 へ)
+        const visualZoom = this.game.visualZoom || 1.0;
+        let alpha = 1.0;
+        if (visualZoom > 2.0) {
+            alpha = Math.max(0, 1.0 - (visualZoom - 2.0) / 8.0);
+        }
+
         this.ctx.save();
+        this.ctx.globalAlpha = alpha;
         this.ctx.shadowBlur = 20;
         this.ctx.shadowColor = finalGlow;
         this.ctx.fillStyle = finalColor;
@@ -121,7 +144,7 @@ export class Renderer {
         this.ctx.fill();
 
         // アイテム保持時の縁取り (未取得の場合のみ)
-        if (!body.isCollected && body.items && body.items.length > 0) {
+        if (alpha > 0.1 && !body.isCollected && body.items && body.items.length > 0) {
             const itemCount = body.items.length;
             const angleStep = (Math.PI * 2) / itemCount;
 
@@ -130,7 +153,6 @@ export class Renderer {
                 if (!itemData || !CATEGORY_COLORS[itemData.category]) continue;
 
                 const startAngle = i * angleStep;
-                // 複数アイテム時は少し隙間を空ける
                 const gap = itemCount > 1 ? 0.1 : 0;
                 const endAngle = startAngle + angleStep - gap;
 
@@ -147,7 +169,6 @@ export class Renderer {
                 this.ctx.restore();
             }
         }
-
         this.ctx.restore();
     }
 
@@ -212,7 +233,15 @@ export class Renderer {
     }
 
     drawGoals(goals, boundaryRadius, arcMultiplier = 1.0) {
+        const visualZoom = this.game.visualZoom || 1.0;
+        let alpha = 1.0;
+        if (visualZoom > 2.0) {
+            alpha = Math.max(0, 1.0 - (visualZoom - 2.0) / 8.0);
+        }
+        if (alpha <= 0) return;
+
         this.ctx.save();
+        this.ctx.globalAlpha *= alpha;
         
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;

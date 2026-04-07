@@ -268,8 +268,7 @@ export class EventSystem {
                 if (titleScreen) {
                     titleScreen.classList.add('hidden'); // CSS transition (1s) が発動
                 }
-                game.setState('building');
-                game.uiSystem.showSectorNotification(`SECTOR ${game.sector} READY`);
+                game.setState('preparing');
             };
         }
 
@@ -500,11 +499,12 @@ export class EventSystem {
             }
         }
 
-        game.setState('building');
         if (status !== 'returned') game.selection.rocket = null;
         game.selection.launcher = null;
         game.selection.booster = null;
+        // 同一セクターでのリトライ・帰還時は演出（preparing）をスキップして直接ビルド画面へ
         game.reset();
+        game.setState('building');
     }
 
     handleEvent(goal) {
@@ -560,16 +560,10 @@ export class EventSystem {
         game.currentShopStock = null;
         game.tempDismantleResults = null;
         game.returnBonus = 0; // セクター移動時にボーナスをリセット
-        if (game.missionSystem.isGameOver()) { game.uiSystem.showResult('gameover'); return; }
-        game.stageLevel++;
-        game.sector = game.stageLevel;
-        game.initStage(game.currentStarCount);
-        game.setState('building');
-        game.uiSystem.showSectorNotification(`SECTOR ${game.sector} READY`);
         game.selection.rocket = null;
         game.selection.launcher = null;
         game.selection.booster = null;
-        game.reset();
+        game.setState('preparing');
     }
 
     clearPendingTimers() {

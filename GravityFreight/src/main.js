@@ -19,7 +19,7 @@ function main() {
         game.update(dt);
 
         // 描画 (Game.js 側のオーケストレーターに一任)
-        game.draw();
+        game.draw(dt);
 
         requestAnimationFrame(loop);
     }

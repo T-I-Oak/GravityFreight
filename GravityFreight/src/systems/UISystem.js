@@ -31,7 +31,6 @@ export class UISystem {
         this.starInfoPanel.update();
     }
 
-
     // 主要なゲームプレイUI要素の取得 (ルール5.1に基づき、存在を前提とする)
     _getGameplayElements() {
         return [
@@ -56,7 +55,7 @@ export class UISystem {
         }
 
         // 定義済みプレイ系ステート以外の不正ステートは例外を投げる (ルール5.1)
-        const validStates = ['building', 'aiming', 'flying', 'cleared', 'crashed', 'lost', 'returned', 'event', 'result', 'gameover'];
+        const validStates = ['preparing', 'building', 'aiming', 'flying', 'cleared', 'crashed', 'lost', 'returned', 'event', 'result', 'gameover'];
         if (!validStates.includes(game.state)) {
             throw new Error(`Critical: Invalid game state detected in updateUI: ${game.state}`);
         }
@@ -71,6 +70,10 @@ export class UISystem {
         // 3. 表示ステータスのサニタイズ (以前のステートの残存スタイルを徹底排除)
         if (titleScreen) {
             titleScreen.classList.add('hidden');
+            // スタイルを確実に初期化
+            titleScreen.style.transform = '';
+            titleScreen.style.opacity = '';
+            titleScreen.style.pointerEvents = '';
         }
         this.titleAnimation?.stop();
 
@@ -81,7 +84,7 @@ export class UISystem {
         });
 
         // 4. ステートに関わらずミッション中に表示すべき基本HUD (常時表示ガード)
-        const isMission = ['building', 'aiming', 'flying', 'event', 'result', 'gameover'].includes(game.state);
+        const isMission = ['preparing', 'building', 'aiming', 'flying', 'event', 'result', 'gameover'].includes(game.state);
         document.getElementById('terminal-panel').classList.toggle('hidden', !isMission);
         document.getElementById('mission-hud').classList.toggle('hidden', !isMission);
 
@@ -182,6 +185,10 @@ export class UISystem {
             case 'lost':
             case 'returned': {
                 // 【憲法 2.6】hidden 操作は showResult() の単独責任。
+                break;
+            }
+            case 'preparing': {
+                // セクター準備中: 全てのオーバーレイを非表示のままにする
                 break;
             }
             default:
