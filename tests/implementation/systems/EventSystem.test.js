@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Game } from '../../../GravityFreight/src/core/Game.js';
 import { EventSystem } from '../../../GravityFreight/src/systems/EventSystem.js';
 import { setupStandardDOM } from '../../test-utils.js';
+import { Vector2 } from '../../../GravityFreight/src/utils/Physics.js';
 
 // TitleAnimation のモック化
 vi.mock('../../../GravityFreight/src/utils/TitleAnimation.js', () => ({
@@ -106,5 +107,61 @@ describe('Implementation: systems/EventSystem.js', () => {
         eventSystem.launch();
         
         expect(game.ship.velocity.y).toBeCloseTo(-1200);
+    });
+
+    describe('checkReadyToAim: Pickup Range (Sync with Parts & Modules)', () => {
+        beforeEach(() => {
+            // checkReadyToAim uses these during ship initialization
+            game.canvas = { width: 800, height: 600 };
+            game.homeStar = { position: new Vector2(400, 300), radius: 25 };
+            game.selection = {
+                rocket: null,
+                launcher: { power: 1000, charges: 5, precision: 100, precisionMultiplier: 1.0 },
+                booster: null
+            };
+            game.inventory = { chassis: [], logic: [], launchers: [], rockets: [], modules: [], boosters: [] };
+            game.returnBonus = 0;
+        });
+
+        it('should calculate correct radius (range * mult) for various logic parts', () => {
+            const cases = [
+                { id: 'sensor_short', r: 40, m: 1.5, expected: 60 },
+                { id: 'sensor_normal', r: 40, m: 1.0, expected: 40 },
+                { id: 'sensor_long', r: 40, m: 0.5, expected: 20 }
+            ];
+
+            cases.forEach(c => {
+                game.selection.rocket = {
+                    id: 'assembled_rocket',
+                    pickupRange: c.r,
+                    pickupMultiplier: c.m,
+                    totalPrecision: 400,
+                    precisionMultiplier: 1.0,
+                    modules: {}
+                };
+                
+                eventSystem.checkReadyToAim();
+                expect(game.ship.pickupRange * game.ship.pickupMultiplier).toBe(c.expected);
+            });
+        });
+
+        it('should combine multipliers from rocket and booster correctly', () => {
+            game.selection.rocket = {
+                id: 'assembled_rocket',
+                pickupRange: 40,
+                pickupMultiplier: 3.0, // e.g. 1.5 logic * 2.0 module
+                totalPrecision: 400,
+                precisionMultiplier: 1.0,
+                modules: {
+                    'mod_sensor': { id: 'mod_sensor', pickupMultiplier: 2.0, count: 1, maxCharges: 5 }
+                }
+            };
+            game.selection.booster = { id: 'boost_magnet', pickupMultiplier: 1.2 };
+            
+            eventSystem.checkReadyToAim();
+            
+            // Expected: 40 * (3.0 * 1.2) = 144
+            expect(game.ship.pickupRange * game.ship.pickupMultiplier).toBeCloseTo(144);
+        });
     });
 });

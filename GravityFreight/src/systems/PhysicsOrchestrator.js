@@ -54,7 +54,7 @@ export class PhysicsOrchestrator {
             const booster = game.activeBoosterAtLaunch;
             if (booster && booster.id === 'boost_magnet') {
                 const elapsed = game.simulatedTime - (game.launchTime || 0);
-                ship.pickupRange = (ship.basePickupRange || 100) + elapsed * GAME_BALANCE.MAGNET_PULSE_GROWTH;
+                ship.pickupRange = ship.basePickupRange + elapsed * GAME_BALANCE.MAGNET_PULSE_GROWTH;
             }
 
             game.bodies.forEach(body => {

@@ -13,7 +13,7 @@ import { StorySystem } from '../systems/StorySystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.23.0";
+        this.version = "0.24.0";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;

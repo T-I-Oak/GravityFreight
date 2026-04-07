@@ -354,15 +354,16 @@ export class EventSystem {
             const resetOffset = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation)).scale(game.homeStar.radius + GAME_BALANCE.SHIP_START_OFFSET);
             game.ship.position = homePos.add(resetOffset);
 
-            // 性能計算 (モジュール・ブースターの影響を統合)
+            // 性能計算 (ロケットベース性能 + ランチャー・ブースターの補正)
             const r = game.selection.rocket;
             const l = game.selection.launcher;
             const b = game.selection.booster;
 
-            let pMult = l.precisionMultiplier || 1.0;
-            let pickMult = 1.0;
-            let gMult = 1.0;
-            let aMult = 1.0;
+            // 各倍率の初期化 (ロケットとランチャーの基本値を合成)
+            let pMult = (l.precisionMultiplier || 1.0) * (r.precisionMultiplier || 1.0);
+            let pickMult = (r.pickupMultiplier || 1.0);
+            let gMult = (r.gravityMultiplier || 1.0);
+            let aMult = (r.arcMultiplier || 1.0);
 
             if (b) {
                 if (b.precisionMultiplier) pMult *= b.precisionMultiplier;
@@ -383,21 +384,17 @@ export class EventSystem {
                             const moduleInstance = { ...moduleItem, charges: moduleItem.maxCharges || 0 };
                             game.ship.equippedModules.push(moduleInstance);
                             
-                            if (moduleItem.precisionMultiplier) pMult *= moduleItem.precisionMultiplier;
-                            if (moduleItem.pickupMultiplier) pickMult *= moduleItem.pickupMultiplier;
-                            if (moduleItem.gravityMultiplier) gMult *= moduleItem.gravityMultiplier;
-                            if (moduleItem.arcMultiplier) aMult *= moduleItem.arcMultiplier;
+                            // ※ モジュール自体の倍率補正は AssemblySystem.js で既に rocket.pickupMultiplier 等に
+                            // 合算・乗算されているため、ここでは二重計算を避けるために加算しない。
                         }
                     }
                 }
             }
 
-            // ロケットの総重量を ship.mass に同期させる
-            if (typeof r.mass === 'number') {
-                game.ship.mass = r.mass;
-            }
-
-            game.ship.pickupRange = 100 * pickMult;
+            // ロケットの基本設定を同期
+            game.ship.mass = r.mass || 10;
+            game.ship.pickupRange = r.pickupRange || 0;
+            game.ship.pickupMultiplier = pickMult;
             game.ship.gravityMultiplier = gMult;
             game.ship.arcMultiplier = aMult;
             game.ship.precision = r.totalPrecision * pMult;
@@ -433,7 +430,7 @@ export class EventSystem {
                 game.ship.activeBoosterEffect = { ...b };
             }
             // マグネティック・パルス用の基準値を保存
-            game.ship.basePickupRange = game.ship.pickupRange || 100;
+            game.ship.basePickupRange = game.ship.pickupRange;
         }
 
         let power = l.power * (r.powerMultiplier || 1);
