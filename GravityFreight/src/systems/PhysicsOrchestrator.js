@@ -9,7 +9,7 @@ export class PhysicsOrchestrator {
     updateHover() {
         const game = this.game;
         // ホバーを許可するステートのホワイトリスト
-        const allowedStates = ['building', 'aiming', 'flying'];
+        const allowedStates = ['building', 'aiming', 'flying', 'result', 'gameover'];
         if (!allowedStates.includes(game.state)) {
             game.hoveredStar = null;
             return;

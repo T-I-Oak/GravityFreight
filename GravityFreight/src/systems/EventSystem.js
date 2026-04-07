@@ -405,6 +405,8 @@ export class EventSystem {
             game.updateUI();
         } else {
             game.setState('building');
+            // ステートが既に building の場合 setState は何もしないため、明示的に UI を更新する
+            game.updateUI();
         }
     }
 

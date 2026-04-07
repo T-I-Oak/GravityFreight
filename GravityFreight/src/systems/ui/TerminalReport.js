@@ -17,7 +17,6 @@ export class TerminalReport {
         if (!overlay || !content) return;
 
         overlay.classList.remove('hidden', 'minimized');
-        overlay.classList.add('active');
 
         const sectors = game.sector - 1;
         const collected = game.totalCollectedItems || 0;
@@ -91,15 +90,17 @@ export class TerminalReport {
             <button class="receipt-btn" id="receipt-exit-btn">END CONTRACT</button>
         `;
 
-        overlay.classList.remove('hidden');
-        
+        // 初期位置をリセット (トランジション前のベース)
+        const paper = overlay.querySelector('.receipt-paper');
+        if (paper) paper.style.transform = ''; // CSS の translateY(110%) に従わせる
+
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 overlay.classList.add('active');
                 setTimeout(() => {
                     const stamp = document.getElementById('report-stamp');
                     if (stamp) stamp.classList.add('active');
-                }, 800);
+                }, 1600);
             });
         });
 
