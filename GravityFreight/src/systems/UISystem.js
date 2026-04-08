@@ -234,7 +234,11 @@ export class UISystem {
                 </div>
             `;
             const noRocket = document.getElementById('no-rocket-placeholder');
-            noRocket.onclick = () => { game.isFactoryOpen = true; this.updateUI(); };
+            noRocket.onclick = () => {
+                game.audioSystem.playTick();
+                game.isFactoryOpen = true; 
+                this.updateUI(); 
+            };
         } else {
             game.inventory.rockets.forEach(rocket => {
                 const div = document.createElement('div');

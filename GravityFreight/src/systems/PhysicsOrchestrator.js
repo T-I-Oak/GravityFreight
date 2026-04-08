@@ -37,6 +37,29 @@ export class PhysicsOrchestrator {
         }
     }
 
+    /**
+     * ステートに関わらず自機が存在すれば実行する共通処理（ソナー音など）
+     */
+    updateCommon(dt) {
+        const game = this.game;
+        const ship = game.ship;
+        if (!ship) return;
+
+        // 波紋が表示される条件（スキャナー範囲が有効、かつ表示対象ステート）をチェック
+        const radius = (ship.pickupRange || 0) * (ship.pickupMultiplier || 1);
+        // ソナー波紋が表示されるステート（エイミング、飛行中）。
+        // finishing ステートでは新しいパルスを撃ち止める（v0.26 仕様準拠）。
+        const visibleStates = ['aiming', 'flying'];
+        if (radius <= 0 || !visibleStates.includes(game.state)) return;
+
+        // ソナー音のトリガー (1.0秒間隔)
+        // エイミング中でもレンダラーの波紋と等しく同期させる
+        const prevTime = game.simulatedTime - dt;
+        if (Math.floor(game.simulatedTime) !== Math.floor(prevTime)) {
+             game.audioSystem.playSonar();
+        }
+    }
+
     updateStateTimer(dt) {
         const game = this.game;
         game.stateTimer -= dt;
@@ -65,7 +88,10 @@ export class PhysicsOrchestrator {
         const ship = game.ship;
 
         if (ship) {
-            // Magnetic Pulse 効果: 時間経過で範囲拡大
+            // ロケットの速度に応じた航行音の更新 (飛行中のみ)
+            this.game.audioSystem.updateFlightSound(ship.velocity.length());
+
+            // Magnetic Pulse 効果: 時間経過で範囲拡大 (飛行中のみ)
             const booster = game.activeBoosterAtLaunch;
             if (booster && booster.id === 'boost_magnet') {
                 const elapsed = game.simulatedTime - (game.launchTime || 0);
@@ -177,9 +203,11 @@ export class PhysicsOrchestrator {
             if (this.handleCollisionEvasion(hitBody)) return false;
 
             if (hitBody === game.homeStar) {
+                game.audioSystem.playReturn(); // 帰還専用のチャイム音
                 game.finishResult = 'returned';
                 game.resolveItems('returned');
             } else {
+                game.audioSystem.playCrash();
                 game.finishResult = 'crashed';
                 game.consumeRocketOnFailure();
                 game.resolveItems('crashed', hitBody);
@@ -210,11 +238,13 @@ export class PhysicsOrchestrator {
             }
 
             if (hitGoal) {
+                game.audioSystem.playGoal();
                 game.finishResult = 'cleared';
                 game.totalSectorsCompleted++;
                 game.lastHitGoal = hitGoal;
                 game.resolveItems('success', hitGoal);
             } else {
+                game.audioSystem.playLost();
                 game.finishResult = 'lost';
                 game.consumeRocketOnFailure();
                 game.resolveItems('lost');

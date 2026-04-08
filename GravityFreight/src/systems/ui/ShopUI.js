@@ -71,6 +71,7 @@ export class ShopUI {
             `;
             card.querySelector('.buy-btn').onclick = () => {
                 if (game.coins >= buyPrice && !isSold) {
+                    game.audioSystem.playTick();
                     this.uiSystem.animateCoinChange(-buyPrice);
                     game.coins -= buyPrice;
                     game.inventorySystem.addItem(itemData);
@@ -140,6 +141,7 @@ export class ShopUI {
                 card.querySelector('.sell-btn').onclick = () => {
                     const success = game.inventorySystem.takeItem(item.cat, item.instanceId);
                     if (success) {
+                        game.audioSystem.playTick();
                         this.uiSystem.animateCoinChange(sellPrice);
                         game.coins += sellPrice;
                         this.initTradingPost(container);
@@ -276,6 +278,7 @@ export class ShopUI {
         const game = this.game;
         if (game.coins < cost || game.blackMarketUsed) return;
         
+        game.audioSystem.playTick();
         game.blackMarketUsed = true;
         this.uiSystem.animateCoinChange(-cost);
         game.coins -= cost;

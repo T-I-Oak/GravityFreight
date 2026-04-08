@@ -10,10 +10,11 @@ import { EventSystem } from '../systems/EventSystem.js';
 import { Renderer } from '../systems/RenderingSystem.js';
 import { RankingSystem } from '../systems/RankingSystem.js';
 import { StorySystem } from '../systems/StorySystem.js';
+import { AudioSystem } from '../systems/AudioSystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.26.0";
+        this.version = "0.27.0";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
@@ -31,6 +32,7 @@ export class Game {
         this.eventSystem = new EventSystem(this);
         this.rankingSystem = new RankingSystem(this);
         this.storySystem = new StorySystem(this);
+        this.audioSystem = new AudioSystem(this);
 
         this.renderer = new Renderer(canvas, this);
         this.bodies = [];
@@ -106,6 +108,7 @@ export class Game {
 
         // 2. 副作用の実行
         if (newState === 'building') {
+            this.audioSystem.stopFlightSound();
             this.uiSystem.expandPanel();
         }
 
@@ -117,6 +120,7 @@ export class Game {
                 return;
             }
             this.stateTimer = 3.5;
+            this.audioSystem.playWarp(3.5);
             this.isWarpInitialized = false; // 演出中のマップ更新フラグ
             this.reset();
         }
@@ -141,7 +145,7 @@ export class Game {
     launch() { this.eventSystem.launch(); }
 
     // --- Delegation to Inventory/EconomySystem ---
-    selectPart(type, id) { this.inventorySystem.selectPart(type, id); }
+    selectPart(type, id) { this.eventSystem.selectPart(type, id); }
     calculateValue(item) { return this.economySystem.calculateValue(item); }
     enhanceItem(item) { return this.economySystem.enhanceItem(item); }
 
@@ -226,6 +230,8 @@ export class Game {
         );
     }
 
+
+
     reset() {
         if (this.ship) {
             this.ship.velocity = new Vector2(0, 0);
@@ -285,6 +291,10 @@ export class Game {
     }
 
     onMouseDown(e) {
+        this.audioSystem.resume();
+        if (this.hoveredStar) {
+            this.audioSystem.playTick();
+        }
         this.isPointerDown = true;
         this.mousePos = new Vector2(e.clientX, e.clientY);
         
@@ -411,6 +421,10 @@ export class Game {
                 this.physicsOrchestrator.step(this.fixedDt);
             }
             this.simulatedTime += this.fixedDt;
+            
+            // 時間更新の「直後」に共通処理（ソナー音判定等）を行うことで、計算ラグを排除
+            this.physicsOrchestrator.updateCommon(this.fixedDt);
+            
             this.accumulator -= this.fixedDt;
             steps++;
         }

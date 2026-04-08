@@ -112,6 +112,7 @@ export class MissionSystem {
 
     collectItems(body) {
         if (!body.items || body.items.length === 0) return;
+        this.game.audioSystem.playPickup();
 
         body.items.forEach(itemData => {
             const category = itemData.category;

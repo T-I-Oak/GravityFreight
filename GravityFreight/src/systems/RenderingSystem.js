@@ -204,7 +204,7 @@ export class Renderer {
         const radius = (ship.pickupRange || 0) * (ship.pickupMultiplier || 1);
         if (radius <= 0) return;
 
-        const now = Date.now();
+        const now = this.game.simulatedTime * 1000;
         const duration = 2000;
 
         [0, 0.5].forEach(offset => {

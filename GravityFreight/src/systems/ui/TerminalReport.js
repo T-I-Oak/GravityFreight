@@ -99,14 +99,18 @@ export class TerminalReport {
                 overlay.classList.add('active');
                 setTimeout(() => {
                     const stamp = document.getElementById('report-stamp');
-                    if (stamp) stamp.classList.add('active');
-                }, 1600);
+                    if (stamp) {
+                        this.game.audioSystem.playStamp();
+                        stamp.classList.add('active');
+                    }
+                }, 1650);
             });
         });
 
         const exitBtn = document.getElementById('receipt-exit-btn');
         if (exitBtn) {
             exitBtn.onclick = () => {
+                this.game.audioSystem.playTick();
                 overlay.classList.remove('active');
                 const resultOverlay = document.getElementById('result-overlay');
                 if (resultOverlay) resultOverlay.classList.add('hidden');

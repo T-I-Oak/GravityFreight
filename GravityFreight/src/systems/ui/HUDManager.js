@@ -91,6 +91,7 @@ export class HUDManager {
             const btn = document.getElementById(`mail-btn-${i}`);
             if (btn) {
                 btn.onclick = () => {
+                    this.game.audioSystem.playTick();
                     const id = this.game.storySystem.sessionUnlocked[i];
                     if (id) this.showStoryModal(id);
                 };
@@ -100,6 +101,7 @@ export class HUDManager {
         const closeBtn = document.getElementById('close-story-btn');
         if (closeBtn) {
             closeBtn.onclick = () => {
+                this.game.audioSystem.playTick();
                 document.getElementById('story-overlay').classList.add('hidden');
             };
         }

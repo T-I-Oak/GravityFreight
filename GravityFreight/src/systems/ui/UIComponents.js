@@ -144,7 +144,7 @@ export class UIComponents {
                     <span class="part-name">${storyData.title || 'NEW MESSAGE'}</span>
                     <div class="part-header-right">
                         ${!isRead ? '<span class="status-badge status-new">NEW STORY</span>' : ''}
-                        <div class="mail-icon-btn ${!isRead ? 'unread' : ''}" onclick="window.game.uiSystem.showStoryModal('${storyData.id}')">
+                        <div class="mail-icon-btn ${!isRead ? 'unread' : ''}" onclick="window.game.audioSystem.playTick(); window.game.uiSystem.showStoryModal('${storyData.id}')">
                             <div class="mail-envelope"></div>
                         </div>
                     </div>

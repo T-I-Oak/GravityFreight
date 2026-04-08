@@ -69,6 +69,7 @@ export class MaintenanceUI {
                 `;
                 card.querySelector('.repair-btn').onclick = () => {
                     if (game.coins >= cost) {
+                        game.audioSystem.playTick();
                         this.uiSystem.animateCoinChange(-cost);
                         game.coins -= cost;
                         item.charges = Math.min(item.charges + 1, item.maxCharges || 2);
@@ -141,6 +142,7 @@ export class MaintenanceUI {
                     const currentCost = Math.floor((game.dismantleCount + 1) * 50 * (1 - totalDiscount));
                     if (game.coins < currentCost) return;
                     
+                    game.audioSystem.playTick();
                     this.uiSystem.animateCoinChange(-currentCost);
                     game.coins -= currentCost;
                     game.dismantleCount++;

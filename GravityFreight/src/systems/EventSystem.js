@@ -165,6 +165,7 @@ export class EventSystem {
         const tabBtns = document.querySelectorAll('.tab-btn');
         tabBtns.forEach(btn => {
             btn.onclick = () => {
+                game.audioSystem.playTick();
                 game.isFactoryOpen = (btn.getAttribute('data-tab') === 'factory');
                 game.updateUI();
             };
@@ -174,6 +175,7 @@ export class EventSystem {
         const buildBtn = document.getElementById('build-btn');
         if (buildBtn) {
             buildBtn.onclick = () => {
+                game.audioSystem.playTick();
                 game.assemblySystem.assembleRocket();
             };
         }
@@ -182,6 +184,7 @@ export class EventSystem {
         const launchBtn = document.getElementById('launch-btn');
         if (launchBtn) {
             launchBtn.onclick = () => {
+                game.audioSystem.playTick();
                 this.launch();
             };
         }
@@ -197,12 +200,16 @@ export class EventSystem {
         // Map buttons
         const viewMapBtn = document.getElementById('result-view-map-btn');
         if (viewMapBtn) {
-            viewMapBtn.onclick = () => game.uiSystem.enterMapViewMode();
+            viewMapBtn.onclick = () => {
+                game.audioSystem.playTick();
+                game.uiSystem.enterMapViewMode();
+            };
         }
 
         const backToResultBtn = document.getElementById('back-to-result-btn');
         if (backToResultBtn) {
             backToResultBtn.onclick = () => {
+                game.audioSystem.playTick();
                 game.uiSystem.exitMapViewMode();
             };
         }
@@ -211,6 +218,7 @@ export class EventSystem {
         const collapseBtn = document.getElementById('terminal-collapse-btn');
         if (collapseBtn) {
             collapseBtn.onclick = () => {
+                game.audioSystem.playTick();
                 const terminalPanel = document.getElementById('terminal-panel');
                 terminalPanel.classList.toggle('collapsed');
                 const icon = collapseBtn.querySelector('.icon');
@@ -224,6 +232,7 @@ export class EventSystem {
         const sectionTabs = document.querySelectorAll('.section-tab');
         sectionTabs.forEach(tab => {
             tab.onclick = () => {
+                game.audioSystem.playTick();
                 const target = tab.getAttribute('data-section');
                 const lists = document.querySelectorAll('.inventory-list');
                 lists.forEach(l => l.classList.add('hidden'));
@@ -264,17 +273,23 @@ export class EventSystem {
         const startBtn = document.getElementById('start-game-btn');
         if (startBtn) {
             startBtn.onclick = () => {
-                const titleScreen = document.getElementById('title-screen');
-                if (titleScreen) {
-                    titleScreen.classList.add('hidden'); // CSS transition (1s) が発動
-                }
-                game.setState('preparing');
+                game.audioSystem.playTick();
+                
+                // 【重要】音が鳴り終わる（50ms）まで待機してから重い処理を開始し、音割れを防止する
+                setTimeout(() => {
+                    const titleScreen = document.getElementById('title-screen');
+                    if (titleScreen) {
+                        titleScreen.classList.add('hidden'); // CSS transition (1s) が発動
+                    }
+                    game.setState('preparing');
+                }, 50);
             };
         }
 
         const htpBtn = document.getElementById('how-to-play-btn');
         if (htpBtn) {
             htpBtn.onclick = () => {
+                game.audioSystem.playTick();
                 const overlay = document.getElementById('how-to-play-overlay');
                 if (overlay) overlay.classList.remove('hidden');
             };
@@ -283,6 +298,7 @@ export class EventSystem {
         const closeHtpBtn = document.getElementById('close-help-btn');
         if (closeHtpBtn) {
             closeHtpBtn.onclick = () => {
+                game.audioSystem.playTick();
                 const overlay = document.getElementById('how-to-play-overlay');
                 if (overlay) overlay.classList.add('hidden');
             };
@@ -290,6 +306,7 @@ export class EventSystem {
     }
 
     selectPart(type, instanceId) {
+        this.game.audioSystem.playConfirm();
         this.game.inventorySystem.selectPart(type, instanceId);
     }
 
@@ -311,14 +328,17 @@ export class EventSystem {
             const isSlotValid = !projected.overflow || projected.overflow <= 0;
 
             if (nextCount > 0 && isCountValid && isSlotValid) {
+                game.audioSystem.playConfirm();
                 game.inventorySystem.selectOption(instanceId, nextCount);
             } else {
+                game.audioSystem.playTick(); // 無効な場合は軽い音
                 game.inventorySystem.selectOption(instanceId, 0);
             }
             
             game.checkReadyToAim();
         } else if (type === 'booster') {
             const opt = game.inventory.boosters.find(o => o.instanceId === instanceId);
+            game.audioSystem.playConfirm();
             game.selection.booster = (game.selection.booster === opt) ? null : opt;
             game.checkReadyToAim();
         }
@@ -409,6 +429,7 @@ export class EventSystem {
     launch() {
         const game = this.game;
         if (game.state !== 'aiming') return;
+        game.audioSystem.playLaunch();
 
         const l = game.selection.launcher;
         const r = game.selection.rocket;
@@ -480,6 +501,7 @@ export class EventSystem {
 
     closeResult() {
         const game = this.game;
+        game.audioSystem.playTick();
         document.getElementById('result-overlay')?.classList.add('hidden');
         const status = game.flightResults.status;
 
@@ -547,7 +569,10 @@ export class EventSystem {
             desc.textContent = '通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。';
             game.uiSystem.initBlackMarket(content);
         }
-        document.getElementById('event-continue-btn').onclick = () => this.closeEvent();
+        document.getElementById('event-continue-btn').onclick = () => {
+            game.audioSystem.playTick();
+            this.closeEvent();
+        };
         screen.classList.remove('hidden');
         game.updateUI();
     }
