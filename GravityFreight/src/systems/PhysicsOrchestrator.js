@@ -478,8 +478,10 @@ export class PhysicsOrchestrator {
             }
 
             game.bodies.forEach(body => {
-                const glow = (game.hoveredStar === body);
-                renderer.drawBody(body, body.color || UI_COLORS.NORMAL_STAR, glow ? UI_COLORS.NORMAL_STAR : (body.color || UI_COLORS.NORMAL_STAR_GLOW));
+                const isHovered = (game.hoveredStar === body);
+                const baseColor = body.color || UI_COLORS.NORMAL_STAR;
+                const glowColor = isHovered ? baseColor : (body.color || UI_COLORS.NORMAL_STAR_GLOW);
+                renderer.drawBody(body, baseColor, glowColor);
             });
 
             const arcBonus = game.ship ? (game.ship.arcMultiplier || 1.0) : 1.0;

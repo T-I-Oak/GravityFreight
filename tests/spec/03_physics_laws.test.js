@@ -14,7 +14,7 @@ describe('Spec: Physics Laws (Chapter 3)', () => {
     describe('3.2 Gravity Calculation', () => {
         it('should follow inverse-square law with mass factor compensation', () => {
             const pos = new Vector2(0, 0);
-            const star = { position: new Vector2(100, 0), mass: 100 };
+            const star = { position: new Vector2(100, 0), mass: 100, gravityMultiplier: 1.0 };
             const bodies = [star];
             const rocketMass = 10; // Reference mass
             
@@ -26,9 +26,25 @@ describe('Spec: Physics Laws (Chapter 3)', () => {
             expect(acc.y).toBe(0);
         });
 
+        it('should support Repulsive Star physics when gravityMultiplier is negative', () => {
+            const pos = new Vector2(0, 0);
+            const repulsiveStar = { 
+                position: new Vector2(100, 0), 
+                mass: 100,
+                gravityMultiplier: -1.0 // Formal spec for Repulsive Star
+            };
+            const bodies = [repulsiveStar];
+            const rocketMass = 10;
+            
+            // Expected acceleration should be negative (pushing away)
+            const acc = calculateAcceleration(pos, bodies, rocketMass);
+            expect(acc.x).toBeLessThan(0);
+            expect(acc.length()).toBeCloseTo(40);
+        });
+
         it('should scale gravity inversely with rocket mass (Heavier rocket = Weaker gravity influence)', () => {
             const pos = new Vector2(0, 0);
-            const star = { position: new Vector2(100, 0), mass: 100 };
+            const star = { position: new Vector2(100, 0), mass: 100, gravityMultiplier: 1.0 };
             const bodies = [star];
             
             const lightRocketMass = 5;
@@ -45,7 +61,7 @@ describe('Spec: Physics Laws (Chapter 3)', () => {
 
         it('3.2 Singularity Avoidance: should skip gravity calculation if r < 10px', () => {
             const pos = new Vector2(0, 0);
-            const star = { position: new Vector2(5, 0), mass: 100 }; // r = 5 < 10
+            const star = { position: new Vector2(5, 0), mass: 100, gravityMultiplier: 1.0 }; // r = 5 < 10
             const bodies = [star];
             
             const acc = calculateAcceleration(pos, bodies, 10);
@@ -69,7 +85,7 @@ describe('Spec: Physics Laws (Chapter 3)', () => {
             const dt = 0.01;
             let pos = new Vector2(100, 100);
             let vel = new Vector2(10, 0);
-            const bodies = [{ position: new Vector2(0, 0), mass: 5000 }];
+            const bodies = [{ position: new Vector2(0, 0), mass: 5000, gravityMultiplier: 1.0 }];
             const mass = 10;
 
             // Simulate 10 iterations of Semi-Implicit Euler

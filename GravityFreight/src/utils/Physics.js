@@ -85,7 +85,7 @@ export function calculateAcceleration(pos, bodies, targetMass = 10, excludeBody 
 
         // 加速度 a = G * M / r^2
         // さらにこのゲーム固有の仕様として、船体質量による補正 (massFactor) を掛ける
-        const accMagnitude = ((G * other.mass) / distSq) * massFactor;
+        const accMagnitude = ((G * other.mass) / distSq) * massFactor * other.gravityMultiplier;
         totalAcc = totalAcc.add(diff.normalize().scale(accMagnitude));
     }
     return totalAcc;
@@ -100,6 +100,7 @@ export class Body {
         this.isStatic = isStatic;
         this.radius = Math.sqrt(mass) / 5 + 2;
         this.items = [];
+        this.gravityMultiplier = 1.0; // 重力倍率 (1.0 = 通常, 負の値 = 斥力)
         this.isCollected = false;
     }
 }

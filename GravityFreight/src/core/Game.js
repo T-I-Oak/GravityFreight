@@ -14,7 +14,7 @@ import { AudioSystem } from '../systems/AudioSystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.28.0";
+        this.version = "0.29.0";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
@@ -394,7 +394,9 @@ export class Game {
                     this.sector++;
                     this.stageLevel = this.sector;
                     this.initStage(this.currentStarCount);
-                    this.uiSystem.showSectorNotification(`SECTOR ${this.sector} READY`);
+                    const isReverse = (this.sector % 5 === 0);
+                    const text = isReverse ? `ANOMALY SECTOR ${this.sector} READY` : `SECTOR ${this.sector} READY`;
+                    this.uiSystem.showSectorNotification(text, isReverse);
                     this.isWarpInitialized = true;
                 }
                 this.visualZoom = this.zoom * 100.0;

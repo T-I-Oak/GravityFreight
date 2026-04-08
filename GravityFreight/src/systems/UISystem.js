@@ -257,12 +257,13 @@ export class UISystem {
     /**
      * セクター開始通知を表示。
      */
-    showSectorNotification(text) {
+    showSectorNotification(text, isReverse = false) {
         const el = document.getElementById('sector-notification');
         if (!el) return;
         
         el.textContent = text;
-        el.classList.remove('hidden', 'animate');
+        el.classList.remove('hidden', 'animate', 'reverse');
+        if (isReverse) el.classList.add('reverse');
         void el.offsetWidth; // 強制リフロー
         el.classList.add('animate');
         

@@ -35,9 +35,20 @@ describe('Spec: Items & Data (Chapter 4)', () => {
         };
 
         describe('Module Rarity (Critical Balance)', () => {
-            it('essential support modules should be RARE', () => {
-                checkItem('mod_cushion', { rarity: RARITY.RARE });
-                checkItem('mod_emergency', { rarity: RARITY.RARE });
+            it('high-performance survival modules should be ANOMALY', () => {
+                checkItem('mod_star_breaker', { rarity: RARITY.ANOMALY });
+                checkItem('mod_cushion', { rarity: RARITY.ANOMALY });
+                checkItem('mod_emergency', { rarity: RARITY.ANOMALY });
+                checkItem('mod_stabilizer', { rarity: RARITY.ANOMALY });
+            });
+        });
+
+        describe('Core Equipment Specs', () => {
+            it('sensor_gravity should be RARE with 0.9 gravity scale', () => {
+                checkItem('sensor_gravity', { 
+                    rarity: RARITY.RARE,
+                    gravityMultiplier: 0.9 
+                });
             });
         });
 

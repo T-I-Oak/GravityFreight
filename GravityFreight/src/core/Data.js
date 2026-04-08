@@ -9,7 +9,8 @@ export const hexToRgba = (hex, alpha) => {
 export const RARITY = {
     COMMON: 5,
     UNCOMMON: 10,
-    RARE: 15
+    RARE: 15,
+    ANOMALY: 20
 };
 
 export const ANIMATION_DURATION = 1200; // ミリ秒単位
@@ -82,7 +83,9 @@ export const UI_COLORS = {
     SCANNER: 'rgba(0, 255, 204, 1.0)',
     SCANNER_FILL: 'rgba(0, 255, 204, 0.15)',
     TRAIL: 'rgba(255, 255, 255, 1.0)',
-    PREDICTION: 'rgba(255, 255, 255, 0.6)'
+    PREDICTION: 'rgba(255, 255, 255, 0.6)',
+    REPULSIVE_STAR: '#e100ff', // マゼンタ: 斥力星用
+    REPULSIVE_STAR_GLOW: 'rgba(225, 0, 255, 0.5)'
 };
 
 export const PARTS = {
@@ -98,7 +101,7 @@ export const PARTS = {
         { id: 'sensor_short', category: 'LOGIC', name: '広域回収ロジック', mass: 1, pickupRange: 40, pickupMultiplier: 1.5, rarity: RARITY.COMMON, description: '物資回収に特化した広域収集型。' },
         { id: 'sensor_normal', category: 'LOGIC', name: '標準航法ロジック', mass: 1, precisionMultiplier: 1.5, pickupRange: 40, rarity: RARITY.COMMON, description: '汎用的な標準精度。' },
         { id: 'sensor_long', category: 'LOGIC', name: '精密予測ロジック', mass: 1, precisionMultiplier: 2.0, pickupRange: 40, pickupMultiplier: 0.5, rarity: RARITY.COMMON, description: '長距離予測に特化。取得範囲は狭い。' },
-        { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
+        { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.9, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
     ],
     LAUNCHERS: [
         { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LN-1200/2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的な性能の発射台。' },
@@ -110,10 +113,10 @@ export const PARTS = {
     ],
     MODULES: [
         { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: '拡張スロットを追加するモジュール。' },
-        { id: 'mod_star_breaker', category: 'MODULES', name: 'スター・ブレイカー', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '星に激突する直前に星を破壊して回避。' },
-        { id: 'mod_cushion', category: 'MODULES', name: 'インパクト・クッション', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '星に激突したときにバウンドして回避。' },
-        { id: 'mod_emergency', category: 'MODULES', name: '緊急スラスター', mass: 1, maxCharges: 2, rarity: RARITY.RARE, description: '境界線で自動方向転換してロストを回避。' },
-        { id: 'mod_stabilizer', category: 'MODULES', name: '軌道安定化装置', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.RARE, description: '自機にかかる重力を20%軽減するモジュール。' },
+        { id: 'mod_star_breaker', category: 'MODULES', name: 'スター・ブレイカー', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '星に激突する直前に星を破壊して回避。' },
+        { id: 'mod_cushion', category: 'MODULES', name: 'インパクト・クッション', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '星に激突したときにバウンドして回避。' },
+        { id: 'mod_emergency', category: 'MODULES', name: '緊急スラスター', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '境界線で自動方向転換してロストを回避。' },
+        { id: 'mod_stabilizer', category: 'MODULES', name: '軌道安定化装置', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.ANOMALY, description: '自機にかかる重力を20%軽減するモジュール。' },
         { id: 'mod_analyzer', category: 'MODULES', name: 'オービット・アナリスト', mass: 1, precisionMultiplier: 1.5, rarity: RARITY.UNCOMMON, description: '予測精度を50%強化するモジュール。' },
         { id: 'mod_insurance', category: 'MODULES', name: 'ロスト保険', mass: 1, onLostBonus: 1, rarity: RARITY.UNCOMMON, description: '機体を失った時に保険金が受給される。重複可。' },
         { id: 'mod_gst_breaker', category: 'MODULES', name: 'ブレイカー・ゴースト', mass: 1, ghostType: 'breaker', rarity: RARITY.RARE, description: 'スター・ブレイカーで星を破壊するときの予測線を表示。' },

@@ -1,4 +1,4 @@
-import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, RARITY, ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS } from '../core/Data.js';
+import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, UI_COLORS, RARITY, ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS } from '../core/Data.js';
 import { Body, Vector2 } from '../utils/Physics.js';
 
 export class MissionSystem {
@@ -94,15 +94,32 @@ export class MissionSystem {
                 const mass = 5000 + Math.random() * 15000;
                 const body = new Body(pos, mass);
                 body.radius = Math.sqrt(mass) / 5 + 2;
-                
+
                 // 各天体(星)の周囲に 1～2 個のアイテムを配置 (仕様 4.1.3, 7.2 に準拠)
                 body.items = [];
                 const itemCount = 1 + Math.floor(Math.random() * 2);
+                let hasAnomaly = false;
                 for (let j = 0; j < itemCount; j++) {
                     const item = this.getWeightedRandomItem();
                     if (item) {
                         body.items.push(item);
+                        // ANOMALY ランクのアイテムが含まれているかチェック
+                        if (item.rarity >= RARITY.ANOMALY) {
+                            hasAnomaly = true;
+                        }
                     }
+                }
+
+                // 斥力判定のロジック (5の倍数セクターなら逆転)
+                // 通常：ANOMALYを含む星が斥力星
+                // 5の倍数：ANOMALYを含まない（平凡な）星が斥力星
+                const isReverseSector = (this.game.stageLevel % 5 === 0);
+                const isRepulsive = isReverseSector ? !hasAnomaly : hasAnomaly;
+
+                if (isRepulsive) {
+                    body.gravityMultiplier = -1.0;
+                    body.color = UI_COLORS.REPULSIVE_STAR;
+                    body.glowColor = UI_COLORS.REPULSIVE_STAR_GLOW;
                 }
 
                 game.bodies.push(body);
@@ -150,10 +167,10 @@ export class MissionSystem {
             if (hitGoal) {
                 game.pendingScore += (hitGoal.score || 0);
                 game.pendingCoins += (hitGoal.coins || 0);
-                game.flightResults.bonuses.push({ 
-                    name: `${hitGoal.label} Reward`, 
-                    value: hitGoal.score || 0, 
-                    coins: hitGoal.coins || 0 
+                game.flightResults.bonuses.push({
+                    name: `${hitGoal.label} Reward`,
+                    value: hitGoal.score || 0,
+                    coins: hitGoal.coins || 0
                 });
             }
 
@@ -169,10 +186,10 @@ export class MissionSystem {
                             // 【Spec 6.2】配送ボーナスは一致する貨物の数 (N) に応じて個別に加算（N倍）
                             game.pendingScore += GAME_BALANCE.DELIVERY_REWARD.SCORE;
                             game.pendingCoins += GAME_BALANCE.DELIVERY_REWARD.COINS;
-                            game.flightResults.bonuses.push({ 
-                                name: 'Delivery Bonus', 
-                                value: GAME_BALANCE.DELIVERY_REWARD.SCORE, 
-                                coins: GAME_BALANCE.DELIVERY_REWARD.COINS 
+                            game.flightResults.bonuses.push({
+                                name: 'Delivery Bonus',
+                                value: GAME_BALANCE.DELIVERY_REWARD.SCORE,
+                                coins: GAME_BALANCE.DELIVERY_REWARD.COINS
                             });
 
                             const deliveryItem = { ...itemData, isDelivery: true, isMatch: true, bonusItems: [] };
