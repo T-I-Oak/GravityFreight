@@ -13,7 +13,7 @@ import { StorySystem } from '../systems/StorySystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.25.0";
+        this.version = "0.26.0";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
@@ -82,6 +82,7 @@ export class Game {
         this.pendingScore = 0;
         this.pendingCoins = 0;
         this.pendingItems = [];
+        this.finishResult = null; // 終了演出の種類 (cleared/crashed/etc.)
 
         this.isFactoryOpen = false;
         this.dismantleCount = 0;
@@ -238,6 +239,7 @@ export class Game {
         }
         this.pendingItems = [];
         this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
+        this.finishResult = null;
         this.accumulator = 0;
     }
 
@@ -405,7 +407,7 @@ export class Game {
         const maxSteps = 10;
         let steps = 0;
         while (this.accumulator >= this.fixedDt && steps < maxSteps) {
-            if (this.state === 'flying') {
+            if (this.state === 'flying' || this.state === 'finishing') {
                 this.physicsOrchestrator.step(this.fixedDt);
             }
             this.simulatedTime += this.fixedDt;
@@ -413,7 +415,7 @@ export class Game {
             steps++;
         }
 
-        if (['cleared', 'crashed', 'lost', 'returned', 'preparing'].includes(this.state)) {
+        if (['finishing', 'cleared', 'crashed', 'lost', 'returned', 'preparing'].includes(this.state)) {
             this.physicsOrchestrator.updateStateTimer(dt);
         }
     }

@@ -32,6 +32,8 @@ export class PhysicsOrchestrator {
     step(dt) {
         if (this.game.state === 'flying') {
             this.handleFlight(dt);
+        } else if (this.game.state === 'finishing') {
+            this.handleFinishing(dt);
         }
     }
 
@@ -41,7 +43,17 @@ export class PhysicsOrchestrator {
         if (game.stateTimer <= 0) {
             if (game.state === 'preparing') {
                 game.setState('building');
-            } else {
+            } else if (game.state === 'finishing') {
+                // 演出終了、実際の結果ステートへ
+                const result = game.finishResult;
+                if (result === 'cleared' || result === 'returned') {
+                    game.setState(result);
+                } else {
+                    // crashed / lost は即座に結果を表示して result ステートへ
+                    game.showResult(result);
+                    game.setState('result');
+                }
+            } else if (['cleared', 'returned'].includes(game.state)) {
                 game.showResult(game.state);
                 game.setState('result');
             }
@@ -94,18 +106,27 @@ export class PhysicsOrchestrator {
         // simulatedTime の更新は Game.js 側で行われるが、score はステップごとに加算 (事実ベース)
         game.score += GAME_BALANCE.SCORE_PER_STEP;
 
-        // 衝突判定をサブステップごとに行う (事実ベースの復元)
-        if (this.checkCollisions(prevPos)) return;
-
         // トレイルの更新 (0.01s ごと)
         if (game.simulatedTime % 0.01 < dt) {
-            // 5.1 規約に基づき、ガードではなくアサーティブに振る舞う
-            if (!ship.trail) {
-                throw new Error("Critical: ship.trail is undefined during flight. Check initialization in EventSystem.");
-            }
             ship.trail.push(new Vector2(ship.position.x, ship.position.y));
             if (ship.trail.length > GAME_BALANCE.TRAIL_MAX_LENGTH) ship.trail.shift();
         }
+
+        // 衝突判定をサブステップごとに行う (事実ベースの復元)
+        if (this.checkCollisions(prevPos)) return;
+    }
+
+    /**
+     * 回収フェーズ中の更新処理。ロケットは動かさず、軌跡とアイテムだけを吸い込ませる。
+     */
+    handleFinishing(dt) {
+        const game = this.game;
+        const ship = game.ship;
+        if (!ship) return;
+
+        // トレイルの更新 (毎ステップ) - 停止位置に点を蓄積させる
+        ship.trail.push(new Vector2(ship.position.x, ship.position.y));
+        if (ship.trail.length > GAME_BALANCE.TRAIL_MAX_LENGTH) ship.trail.shift();
     }
 
     calculateGravity(pos, bodies, mass) {
@@ -156,15 +177,15 @@ export class PhysicsOrchestrator {
             if (this.handleCollisionEvasion(hitBody)) return false;
 
             if (hitBody === game.homeStar) {
-                game.state = 'returned';
-                game.stateTimer = ANIMATION_DURATION / 1000;
+                game.finishResult = 'returned';
                 game.resolveItems('returned');
             } else {
-                game.state = 'crashed';
-                game.stateTimer = ANIMATION_DURATION / 1000;
+                game.finishResult = 'crashed';
                 game.consumeRocketOnFailure();
                 game.resolveItems('crashed', hitBody);
             }
+            game.state = 'finishing';
+            game.stateTimer = ANIMATION_DURATION / 1000;
             return true;
         }
 
@@ -189,17 +210,17 @@ export class PhysicsOrchestrator {
             }
 
             if (hitGoal) {
-                game.state = 'cleared';
-                game.stateTimer = ANIMATION_DURATION / 1000;
+                game.finishResult = 'cleared';
                 game.totalSectorsCompleted++;
                 game.lastHitGoal = hitGoal;
                 game.resolveItems('success', hitGoal);
             } else {
-                game.state = 'lost';
-                game.stateTimer = ANIMATION_DURATION / 1000;
+                game.finishResult = 'lost';
                 game.consumeRocketOnFailure();
                 game.resolveItems('lost');
             }
+            game.state = 'finishing';
+            game.stateTimer = ANIMATION_DURATION / 1000;
             return true;
         }
         return false;
@@ -435,9 +456,19 @@ export class PhysicsOrchestrator {
             renderer.drawGoals(game.goals, game.boundaryRadius, arcBonus);
         }
 
-        if (game.ship && (['aiming', 'flying', 'crashed', 'returned'].includes(game.state))) {
-            renderer.drawTrail(game.ship.trail);
-            renderer.drawShip(game.ship);
+        if (game.ship) {
+            const showShipStates = ['aiming', 'flying'];
+            const showTrailStates = ['aiming', 'flying', 'finishing'];
+            const showOthersStates = ['aiming', 'flying', 'finishing']; // Scanner ripple, trail, items
+            
+            if (showOthersStates.includes(game.state)) {
+                renderer.drawTrail(game.ship.trail);
+                renderer.drawCollectedItems(game.ship);
+                renderer.drawScannerRipple(game.ship);
+            }
+            if (showShipStates.includes(game.state)) {
+                renderer.drawShip(game.ship);
+            }
         }
 
         renderer.restoreCamera();

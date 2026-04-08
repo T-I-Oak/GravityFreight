@@ -69,15 +69,13 @@ export function setupStandardDOM() {
     `;
 
     // Canvas mock for JSDOM
-    if (!HTMLCanvasElement.prototype.getContext) {
-        HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
-            clearRect: vi.fn(), fillRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(),
-            stroke: vi.fn(), fill: vi.fn(), arc: vi.fn(), save: vi.fn(), restore: vi.fn(),
-            translate: vi.fn(), rotate: vi.fn(), scale: vi.fn(), setTransform: vi.fn(),
-            createLinearGradient: vi.fn().mockReturnValue({ addColorStop: vi.fn() }),
-            drawImage: vi.fn()
-        });
-    }
+    HTMLCanvasElement.prototype.getContext = vi.fn().mockReturnValue({
+        clearRect: vi.fn(), fillRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(),
+        stroke: vi.fn(), fill: vi.fn(), arc: vi.fn(), save: vi.fn(), restore: vi.fn(),
+        translate: vi.fn(), rotate: vi.fn(), scale: vi.fn(), setTransform: vi.fn(),
+        createLinearGradient: vi.fn().mockReturnValue({ addColorStop: vi.fn() }),
+        drawImage: vi.fn()
+    });
 
     // Mock localStorage
     const mockStorage = {

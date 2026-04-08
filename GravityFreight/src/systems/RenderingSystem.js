@@ -198,12 +198,6 @@ export class Renderer {
         this.ctx.fill();
 
         this.ctx.restore();
-
-        // ソナー波紋（アイテム回収範囲）の描画
-        this.drawScannerRipple(ship);
-
-        // アイテム追従エフェクトの描画
-        this.drawCollectedItems(ship);
     }
 
     drawScannerRipple(ship) {
@@ -211,10 +205,21 @@ export class Renderer {
         if (radius <= 0) return;
 
         const now = Date.now();
-        const duration = 2000; // 2秒で1周
+        const duration = 2000;
 
         [0, 0.5].forEach(offset => {
-            const t = ((now + offset * duration) % duration) / duration;
+            const timeAtCurrent = now + offset * duration;
+            const t = (timeAtCurrent % duration) / duration;
+
+            if (this.game.state === 'finishing') {
+                // インパクトの瞬間（1.2秒前）の時刻を推定
+                const elapsed = (1.2 - this.game.stateTimer) * 1000;
+                const timeAtImpact = (now - elapsed) + offset * duration;
+                const tAtImpact = (timeAtImpact % duration) / duration;
+                
+                // 今のtがインパクト時より小さい = 周期が一周して「新しく発生した」パルスなので描画しない
+                if (t < tAtImpact) return;
+            }
             const rippleRadius = radius * t;
             // 不透明度と線幅を上げて視認性を高める
             const alpha = (1 - t) * 0.9;
@@ -452,9 +457,9 @@ export class Renderer {
         if (!ship.collectedItems || ship.collectedItems.length === 0) return;
         if (!ship.trail || ship.trail.length < 5) return;
 
-        // 連なる感じで描画 (4フレームずつの間隔)
+        // 連なる感じで描画 (gapフレームずつの間隔)
         ship.collectedItems.forEach((item, i) => {
-            const gap = 4; // ドット間の間隔（トレイルのインデックス数）
+            const gap = 8; // ドット間の間隔（トレイルのインデックス数）
             const trailIdx = Math.max(0, ship.trail.length - 1 - (i + 1) * gap);
             if (trailIdx >= 0) {
                 const pos = ship.trail[trailIdx];

@@ -12,7 +12,7 @@ export const RARITY = {
     RARE: 15
 };
 
-export const ANIMATION_DURATION = 800; // ミリ秒単位
+export const ANIMATION_DURATION = 1200; // ミリ秒単位
 
 // カテゴリ別のイメージカラー定義（spec.mdと同期）
 export const CATEGORY_COLORS = {
@@ -52,7 +52,7 @@ export const GAME_BALANCE = {
     GRADE_STEPS: { SINGLE: 20, TOTAL: 50 },
     SECTOR_NOTIFICATION_DURATION: 3600,
     SCORE_PER_STEP: 1,
-    TRAIL_MAX_LENGTH: 40,
+    TRAIL_MAX_LENGTH: 80,
     MAGNET_PULSE_GROWTH: 20,
     RETURN_BONUS_INCREMENT: 0.1, // 母星帰還1回あたりのパワーボーナス加算値 (+10%)
     SAFE_DISTANCE_FROM_HOME: 30,
