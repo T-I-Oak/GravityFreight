@@ -14,7 +14,7 @@ import { AudioSystem } from '../systems/AudioSystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.27.0";
+        this.version = "0.28.0";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;

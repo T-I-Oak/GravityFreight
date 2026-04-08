@@ -133,9 +133,9 @@ export const PARTS = {
         { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', mass: 1, deliveryGoalId: 'TRADING_POST', rarity: RARITY.UNCOMMON, description: 'Trading Post への配送用物資。' },
-        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', mass: 1, deliveryGoalId: 'REPAIR_DOCK', rarity: RARITY.UNCOMMON, description: 'Repair Dock への配送用パーツ。' },
-        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', mass: 1, deliveryGoalId: 'BLACK_MARKET', rarity: RARITY.UNCOMMON, description: 'Black Market への配送用データ。' },
+        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', mass: 1, deliveryGoalId: 'TRADING_POST', rarity: RARITY.RARE, description: 'Trading Post への配送用物資。' },
+        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', mass: 1, deliveryGoalId: 'REPAIR_DOCK', rarity: RARITY.RARE, description: 'Repair Dock への配送用パーツ。' },
+        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', mass: 1, deliveryGoalId: 'BLACK_MARKET', rarity: RARITY.RARE, description: 'Black Market への配送用データ。' },
         { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: '施設での消費コインが軽減される。重複可。' }
     ]
 };

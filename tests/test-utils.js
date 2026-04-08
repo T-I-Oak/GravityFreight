@@ -78,29 +78,18 @@ export function setupStandardDOM() {
     });
 
     // Mock localStorage
+    let store = {};
     const mockStorage = {
-        getItem: vi.fn(),
-        setItem: vi.fn(),
-        removeItem: vi.fn(),
-        clear: vi.fn()
+        getItem: vi.fn(key => store[key] === undefined ? null : store[key]),
+        setItem: vi.fn((key, value) => { store[key] = String(value); }),
+        removeItem: vi.fn(key => { delete store[key]; }),
+        clear: vi.fn(() => { store = {}; })
     };
 
-    if (typeof localStorage !== 'undefined') {
-        try {
-            Object.defineProperty(window, 'localStorage', {
-                value: mockStorage,
-                writable: true,
-                configurable: true
-            });
-        } catch (e) {
-            // Fallback for strict environments
-            ['getItem', 'setItem', 'removeItem', 'clear'].forEach(method => {
-                try {
-                    Object.defineProperty(localStorage, method, { value: vi.fn(), configurable: true });
-                } catch (e2) {}
-            });
-        }
-    } else {
-        global.localStorage = mockStorage;
-    }
+    Object.defineProperty(window, 'localStorage', {
+        value: mockStorage,
+        writable: true,
+        configurable: true
+    });
 }
+

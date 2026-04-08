@@ -15,33 +15,32 @@ vi.mock('../../../GravityFreight/src/utils/TitleAnimation.js', () => ({
 }));
 
 // Web Audio API のモック
-const mockOscillator = {
-    connect: vi.fn(),
-    start: vi.fn(),
-    stop: vi.fn(),
-    frequency: { 
-        setValueAtTime: vi.fn(), 
-        exponentialRampToValueAtTime: vi.fn() 
-    },
-    onended: null
-};
-
-const mockGain = {
+const createMockGain = () => ({
     connect: vi.fn(),
     gain: { 
         value: 0.5,
         setValueAtTime: vi.fn(),
         exponentialRampToValueAtTime: vi.fn(),
-        linearRampToValueAtTime: vi.fn()
+        linearRampToValueAtTime: vi.fn(),
+        setTargetAtTime: vi.fn()
     }
-};
+});
 
-const mockAudioContext = {
+const createMockAudioContext = () => ({
     state: 'suspended',
     currentTime: 0,
     resume: vi.fn().mockResolvedValue(),
-    createGain: vi.fn(() => mockGain),
-    createOscillator: vi.fn(() => mockOscillator),
+    createGain: vi.fn(() => createMockGain()),
+    createOscillator: vi.fn(() => ({
+        connect: vi.fn(),
+        start: vi.fn(),
+        stop: vi.fn(),
+        frequency: { 
+            setValueAtTime: vi.fn(), 
+            exponentialRampToValueAtTime: vi.fn() 
+        },
+        onended: null
+    })),
     createBiquadFilter: vi.fn(() => ({
         connect: vi.fn(),
         type: 'lowpass',
@@ -49,11 +48,12 @@ const mockAudioContext = {
         Q: { setValueAtTime: vi.fn() }
     })),
     destination: {}
-};
+});
 
 global.window.AudioContext = vi.fn().mockImplementation(function() {
-    return mockAudioContext;
+    return createMockAudioContext();
 });
+
 
 describe('Implementation: AudioSystem', () => {
     let game;
@@ -76,13 +76,14 @@ describe('Implementation: AudioSystem', () => {
         game.audioSystem.init();
         expect(global.window.AudioContext).toHaveBeenCalled();
         expect(game.audioSystem.active).toBe(true);
-        expect(mockAudioContext.createGain).toHaveBeenCalled();
+        expect(game.audioSystem.ctx.createGain).toHaveBeenCalled();
     });
 
     it('resume should call ctx.resume if suspended', async () => {
         game.audioSystem.init();
+        const resumeSpy = game.audioSystem.ctx.resume;
         await game.audioSystem.resume();
-        expect(mockAudioContext.resume).toHaveBeenCalled();
+        expect(resumeSpy).toHaveBeenCalled();
     });
 
     it('should have methods for required SE types', () => {
@@ -92,4 +93,45 @@ describe('Implementation: AudioSystem', () => {
         expect(typeof game.audioSystem.playCrash).toBe('function');
         expect(typeof game.audioSystem.playGoal).toBe('function');
     });
+
+    describe('Volume Management', () => {
+        beforeEach(() => {
+            localStorage.clear();
+        });
+
+        it('setVolume should update gain and save to localStorage', () => {
+            // init() はコンストラクタで呼ばれているので再呼出し不要
+            const targetGain = game.audioSystem.masterGain.gain;
+            
+            game.audioSystem.setVolume(0.8);
+            
+            // setTargetAtTime の呼び出し検証
+            expect(targetGain.setTargetAtTime).toHaveBeenCalledWith(
+                0.4, 
+                expect.any(Number), 
+                0.05
+            );
+            // localStorage の検証
+            expect(localStorage.getItem('gf_se_volume')).toBe('0.8');
+        });
+
+        it('init should load volume from localStorage', () => {
+            localStorage.clear();
+            localStorage.setItem('gf_se_volume', '0.2');
+            
+            const mockCanvas = { 
+                width: 800, 
+                height: 600, 
+                addEventListener: vi.fn(), 
+                getContext: vi.fn(() => ({})) 
+            };
+            const localGame = new Game(mockCanvas, {});
+            
+            expect(localGame.audioSystem.masterGain.gain.value).toBeCloseTo(0.1);
+        });
+    });
 });
+
+
+
+

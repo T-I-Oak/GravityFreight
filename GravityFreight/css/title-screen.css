@@ -122,3 +122,127 @@
     }
 }
 
+/* --- Settings & UI Additions --- */
+.settings-btn {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 5002;
+    padding: 10px;
+    line-height: 1;
+    user-select: none;
+}
+
+.settings-btn:hover {
+    color: #00d4ff;
+    transform: rotate(45deg);
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+}
+
+#settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    transition: opacity 0.3s ease;
+}
+
+.settings-modal {
+    width: 90% !important;
+    max-width: 440px !important;
+    background: rgba(15, 20, 35, 0.8) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+}
+
+.settings-modal h2 {
+    font-size: 1.2rem !important;
+    margin: 0 !important;
+}
+
+.settings-section {
+    padding: 20px 0;
+}
+
+.setting-item {
+    margin-bottom: 20px;
+}
+
+.setting-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.setting-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.setting-value {
+    color: #00d4ff;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* Premium Slider styling */
+.premium-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    margin: 10px 0;
+}
+
+.premium-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #00d4ff;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    border: 2px solid #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.premium-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.8);
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #ff4d4d;
+}
+
+.panel-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}

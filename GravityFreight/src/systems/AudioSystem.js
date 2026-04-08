@@ -19,7 +19,9 @@ export class AudioSystem {
             this.ctx = new AudioContext();
             
             this.masterGain = this.ctx.createGain();
-            this.masterGain.gain.value = 0.5;
+            const savedVol = localStorage.getItem('gf_se_volume');
+            const initialVol = (savedVol !== null && savedVol !== undefined) ? parseFloat(savedVol) : 0.5;
+            this.masterGain.gain.value = initialVol * 0.5; // マスターゲインは0.5倍を基準とする
             
             this.lowPass = this.ctx.createBiquadFilter();
             this.lowPass.type = 'lowpass';
@@ -62,6 +64,10 @@ export class AudioSystem {
     setVolume(value) {
         if (!this.masterGain) return;
         const vol = Math.max(0, Math.min(1, value));
+        
+        // 設定を保存
+        localStorage.setItem('gf_se_volume', vol.toString());
+
         // 急激な変更によるノイズを避けるため、滑らかに（50ms）遷移させる
         const t = this.ctx.currentTime;
         this.masterGain.gain.setTargetAtTime(vol * 0.5, t, 0.05);

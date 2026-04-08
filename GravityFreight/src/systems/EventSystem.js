@@ -303,7 +303,63 @@ export class EventSystem {
                 if (overlay) overlay.classList.add('hidden');
             };
         }
+
+        // --- 設定パネルの制御 ---
+        const settingsBtn = document.getElementById('title-settings-btn');
+        const settingsOverlay = document.getElementById('settings-overlay');
+        const closeSettingsBtn = document.getElementById('close-settings-btn');
+        const settingsDoneBtn = document.getElementById('settings-done-btn');
+        const seVolumeSlider = document.getElementById('se-volume-slider');
+        const volumeDisplay = document.getElementById('volume-value-display');
+        let originalVolume = 0.5;
+
+        if (settingsBtn && settingsOverlay) {
+            settingsBtn.onclick = (e) => {
+                e.stopPropagation();
+                game.audioSystem.playTick();
+                
+                // 現在の音量を保持（キャンセル用）
+                const savedVol = localStorage.getItem('gf_se_volume');
+                originalVolume = savedVol !== null ? parseFloat(savedVol) : 0.5;
+                if (seVolumeSlider) seVolumeSlider.value = originalVolume * 100;
+                if (volumeDisplay) volumeDisplay.textContent = `${Math.round(originalVolume * 100)}%`;
+                
+                settingsOverlay.classList.remove('hidden');
+            };
+        }
+
+        const cancelSettings = () => {
+            // 元の音量に戻して閉じる
+            game.audioSystem.setVolume(originalVolume);
+            settingsOverlay?.classList.add('hidden');
+        };
+
+        const confirmSettings = () => {
+            game.audioSystem.playTick();
+            settingsOverlay?.classList.add('hidden');
+        };
+
+        if (closeSettingsBtn) closeSettingsBtn.onclick = cancelSettings;
+        if (settingsDoneBtn) settingsDoneBtn.onclick = confirmSettings;
+        if (settingsOverlay) {
+            settingsOverlay.onclick = (e) => {
+                if (e.target === settingsOverlay) cancelSettings();
+            };
+        }
+
+        if (seVolumeSlider) {
+            seVolumeSlider.oninput = () => {
+                const val = parseInt(seVolumeSlider.value);
+                if (volumeDisplay) volumeDisplay.textContent = `${val}%`;
+                game.audioSystem.setVolume(val / 100);
+            };
+            // 離したときに現在の音量で音を鳴らす
+            seVolumeSlider.onchange = () => {
+                game.audioSystem.playTick();
+            };
+        }
     }
+
 
     selectPart(type, instanceId) {
         this.game.audioSystem.playConfirm();
