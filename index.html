@@ -11,23 +11,24 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="GravityFreight/css/base.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/layout.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/buttons.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/ui.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/title-screen.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/item-card.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/mission-hud.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/build-panel.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/result-screen.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/receipt-screen.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/event-screen.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/how-to-play.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/star-info.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/story-overlay.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/animations.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/sector-notification.css?v=0.29.0">
-    <link rel="stylesheet" href="GravityFreight/css/responsive.css?v=0.29.0">
+    <link rel="stylesheet" href="GravityFreight/css/base.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/layout.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/buttons.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/ui.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/title-screen.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/item-card.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/mission-hud.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/build-panel.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/result-screen.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/receipt-screen.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/event-screen.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/how-to-play.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/ranking-screen.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/star-info.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/story-overlay.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/animations.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/sector-notification.css?v=0.30.0">
+    <link rel="stylesheet" href="GravityFreight/css/responsive.css?v=0.30.0">
 
 
 
@@ -51,19 +52,40 @@
             <div class="menu-buttons">
                 <button id="start-game-btn" class="btn-neon">BEGIN CONTRACT</button>
                 <button id="how-to-play-btn" class="btn-neon outline">HOW TO PLAY</button>
-                <button id="ranking-btn" class="btn-neon outline" disabled>RANKING <span
-                        class="ranking-coming-soon">(COMING SOON)</span></button>
+                <button id="ranking-btn" class="btn-neon outline">RANKING</button>
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
         <div id="title-settings-btn" class="settings-btn" title="SETTINGS">⚙</div>
         <div class="title-footer">
-
-
-            <div id="version">v0.29.0</div>
+            <div id="version">v0.30.0</div>
             <span class="copyright">© T.I.OAK 2026</span>
         </div>
     </div>
+
+
+    <!-- ランキング画面 (v0.30.0) -->
+    <div id="ranking-overlay" class="hidden">
+        <div class="ranking-modal">
+            <div class="ranking-header">
+                <h2>RANKINGS</h2>
+            </div>
+            <div class="ranking-tabs">
+                <button class="ranking-tab-btn active" data-category="score">SCORE</button>
+                <button class="ranking-tab-btn" data-category="sector">SECTOR</button>
+                <button class="ranking-tab-btn" data-category="collected">COLLECTED</button>
+            </div>
+            <div class="ranking-content">
+                <div id="ranking-list-container" class="ranking-list">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+            <div class="ranking-footer">
+                <button id="close-ranking-btn" class="btn-neon close-ranking-btn">RETURN TO MISSION</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- 操作説明パネル -->
     <div id="how-to-play-overlay" class="hidden">
@@ -304,7 +326,7 @@
         </div>
     </div>
     <canvas id="gameCanvas"></canvas>
-    <script type="module" src="GravityFreight/src/main.js?v=0.29.0"></script>
+    <script type="module" src="GravityFreight/src/main.js?v=0.30.0"></script>
 
 
 

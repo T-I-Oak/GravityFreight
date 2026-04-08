@@ -23,9 +23,15 @@ export class TerminalReport {
         const score = Math.floor(game.score);
 
         // ランキングの保存
-        const sectorRank = game.rankingSystem.addEntry('sector', sectors);
-        const collectedRank = game.rankingSystem.addEntry('collected', collected);
-        const scoreRank = game.rankingSystem.addEntry('score', score);
+        const ranks = game.rankingSystem.addEntry({
+            sector: sectors,
+            collected: collected,
+            score: score
+        });
+        const sectorRank = { rank: ranks.sectorRank };
+        const collectedRank = { rank: ranks.collectedRank };
+        const scoreRank = { rank: ranks.scoreRank };
+        const isBest = ranks.scoreRank === 1 || ranks.sectorRank === 1 || ranks.collectedRank === 1;
 
         // 各項目の評価計算
         const sectorInfo = this.uiSystem._getGradeInfo(sectors, 15);

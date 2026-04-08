@@ -9,6 +9,7 @@ import { TerminalReport } from './ui/TerminalReport.js';
 import { StarInfoPanel } from './ui/StarInfoPanel.js';
 import { UIAnimations } from './ui/UIAnimations.js';
 import { HUDManager } from './ui/HUDManager.js';
+import { RankingUI } from './ui/RankingUI.js';
 
 export class UISystem {
     constructor(game) {
@@ -20,6 +21,7 @@ export class UISystem {
         this.terminalReport = new TerminalReport(game, this);
         this.starInfoPanel = new StarInfoPanel(game);
         this.hudManager = new HUDManager(game, this);
+        this.rankingUI = new RankingUI(game, this);
 
         this.titleAnimation = null;
         this.notificationTimer = null;
@@ -486,6 +488,10 @@ export class UISystem {
 
     showStoryModal(storyId) {
         this.hudManager.showStoryModal(storyId);
+    }
+
+    showRankingScreen() {
+        this.rankingUI.show();
     }
 
     showStatus(message, type = 'info') {

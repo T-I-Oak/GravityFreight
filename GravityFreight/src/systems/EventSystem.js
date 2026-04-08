@@ -295,6 +295,14 @@ export class EventSystem {
             };
         }
 
+        const rankingBtn = document.getElementById('ranking-btn');
+        if (rankingBtn) {
+            rankingBtn.onclick = () => {
+                game.audioSystem.playTick();
+                game.uiSystem.showRankingScreen();
+            };
+        }
+
         const closeHtpBtn = document.getElementById('close-help-btn');
         if (closeHtpBtn) {
             closeHtpBtn.onclick = () => {

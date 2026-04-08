@@ -114,19 +114,38 @@
     color: #ffffff;
 }
 
-/* --- 3. UI Utility --- */
+/* --- 3. UI Utility/Variants --- */
 .btn-neon-lg { padding: 16px 32px; font-size: 18px; min-width: 200px; }
 .btn-neon-sm { padding: 8px 16px; font-size: 12px; min-width: 180px; }
+
+/* --- Secondary Outline Style --- */
+.btn-neon.outline {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: blur(8px);
+}
+
+.btn-neon.outline:hover {
+    background: rgba(0, 255, 204, 0.08);
+    border-color: rgba(0, 255, 204, 0.6);
+    color: #00ffcc;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2) !important;
+}
 
 @keyframes slowPulse {
     0% { opacity: 0.5; text-shadow: 0 0 5px color-mix(in srgb, var(--btn-cyan), transparent 60%); }
     50% { opacity: 1; text-shadow: 0 0 15px var(--btn-cyan); }
     100% { opacity: 0.5; text-shadow: 0 0 5px color-mix(in srgb, var(--btn-cyan), transparent 60%); }
 }
+
 .btn-neon:disabled .btn-subtext {
     color: color-mix(in srgb, var(--theme-color), white 20%);
     animation: slowPulse 2.5s infinite ease-in-out;
 }
+
 .btn-neon:disabled {
     cursor: not-allowed;
     box-shadow: none;
