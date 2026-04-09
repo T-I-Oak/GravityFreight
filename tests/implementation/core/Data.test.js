@@ -1,28 +1,67 @@
 import { describe, it, expect } from 'vitest';
-import { ITEM_REGISTRY } from '../../../GravityFreight/src/core/Data.js';
+import { PARTS } from '../../../GravityFreight/src/core/Data.js';
 
-describe('Implementation: core/Data.js', () => {
-    it('opt_fuel (High Reactant Fuel) should have 1 maxCharges', () => {
-        const item = ITEM_REGISTRY['opt_fuel'];
-        expect(item).not.toBeUndefined();
-        
-        // This is expected to FAIL because current charges isn't defined
-        expect(item.maxCharges).toBe(1);
+describe('Item Data Integrity', () => {
+    it('Chassis should have mass, slots, and precision', () => {
+        PARTS.CHASSIS.forEach(item => {
+            expect(item.mass, `Chassis ${item.id} should have mass`).toBeDefined();
+            expect(item.mass).toBeGreaterThan(0);
+            expect(item.slots, `Chassis ${item.id} should have slots`).toBeDefined();
+            expect(item.precision, `Chassis ${item.id} should have precision`).toBeDefined();
+        });
     });
 
-    it('opt_fuel (High Reactant Fuel) should have the correct description', () => {
-        const item = ITEM_REGISTRY['opt_fuel'];
-        const targetDesc = '発射台の燃料の代わりに使用できる1回分の強化燃料。';
-        
-        // This is expected to FAIL because current description is different
-        expect(item.description).toBe(targetDesc);
+    it('Logic should have mass and pickupRange, but NOT slots', () => {
+        PARTS.LOGIC.forEach(item => {
+            expect(item.mass, `Logic ${item.id} should have mass`).toBeDefined();
+            expect(item.mass).toBeGreaterThan(0);
+            expect(item.pickupRange, `Logic ${item.id} is missing pickupRange`).toBeDefined();
+            expect(item.slots, `Logic ${item.id} should NOT have slots`).toBeUndefined();
+        });
     });
 
-    it('opt_fuel_pack should have the correct description', () => {
-        const item = ITEM_REGISTRY['opt_fuel_pack'];
-        const targetDesc = '発射台の燃料の代わりに使用できる2回分の強化燃料。';
-        
-        // This is expected to FAIL because current description is different
-        expect(item.description).toBe(targetDesc);
+    it('Module should have mass', () => {
+        PARTS.MODULES.forEach(item => {
+            expect(item.mass, `Module ${item.id} should have mass`).toBeDefined();
+            expect(item.mass).toBeGreaterThan(0);
+        });
+    });
+
+    it('Launcher should NOT have mass or slots', () => {
+        PARTS.LAUNCHERS.forEach(item => {
+            expect(item.mass, `Launcher ${item.id} should NOT have mass`).toBeUndefined();
+            expect(item.slots, `Launcher ${item.id} should NOT have slots`).toBeUndefined();
+        });
+    });
+
+    it('Booster should NOT have mass or slots', () => {
+        PARTS.BOOSTERS.forEach(item => {
+            expect(item.mass, `Booster ${item.id} should NOT have mass`).toBeUndefined();
+            expect(item.slots, `Booster ${item.id} should NOT have slots`).toBeUndefined();
+        });
+    });
+
+    it('Coin should NOT have mass', () => {
+        PARTS.COIN.forEach(item => {
+            expect(item.mass, `Coin ${item.id} should NOT have mass`).toBeUndefined();
+        });
+    });
+
+    it('Cargo should NOT have mass', () => {
+        PARTS.CARGO.forEach(item => {
+            expect(item.mass, `Cargo ${item.id} should NOT have mass`).toBeUndefined();
+        });
+    });
+
+    it('Chassis should have precision', () => {
+        PARTS.CHASSIS.forEach(item => {
+            expect(item.precision, `Chassis ${item.id} should have precision`).toBeDefined();
+        });
+    });
+
+    it('Launcher should have power', () => {
+        PARTS.LAUNCHERS.forEach(item => {
+            expect(item.power, `Launcher ${item.id} should have power`).toBeDefined();
+        });
     });
 });

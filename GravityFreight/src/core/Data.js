@@ -108,7 +108,7 @@ export const PARTS = {
         { id: 'sensor_short', category: 'LOGIC', name: '広域回収ロジック', mass: 1, pickupRange: 40, pickupMultiplier: 1.5, rarity: RARITY.COMMON, description: '物資回収に特化した広域収集型。' },
         { id: 'sensor_normal', category: 'LOGIC', name: '標準航法ロジック', mass: 1, precisionMultiplier: 1.5, pickupRange: 40, rarity: RARITY.COMMON, description: '汎用的な標準精度。' },
         { id: 'sensor_long', category: 'LOGIC', name: '精密予測ロジック', mass: 1, precisionMultiplier: 2.0, pickupRange: 40, pickupMultiplier: 0.5, rarity: RARITY.COMMON, description: '長距離予測に特化。取得範囲は狭い。' },
-        { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.9, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
+        { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.9, pickupRange: 40, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
     ],
     LAUNCHERS: [
         { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LN-1200/2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的な性能の発射台。' },
@@ -131,22 +131,22 @@ export const PARTS = {
         { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '緊急スラスターで境界線を回避したときの予測線を表示。' }
     ],
     BOOSTERS: [
-        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '発射台の燃料の代わりに使用できる1回分の強化燃料。' },
-        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', mass: 0, slots: 0, powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '発射台の燃料の代わりに使用できる2回分の強化燃料。' },
-        { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', mass: 0, slots: 0, gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間重力を無視して直進する。' },
-        { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', mass: 0, slots: 0, powerMultiplier: 1.3, rarity: RARITY.COMMON, description: '発射パワーを30%強化する。' },
-        { id: 'boost_magnet', category: 'BOOSTERS', name: 'マグネティック・パルス', mass: 0, slots: 0, rarity: RARITY.RARE, description: '航行時間とともにアイテム回収範囲が拡大する。' },
-        { id: 'boost_expander', category: 'BOOSTERS', name: 'アーク・エクスパンダー', mass: 0, slots: 0, arcMultiplier: 2.0, rarity: RARITY.RARE, description: '出口サイズを2.0倍に拡大する。' }
+        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '発射台の燃料の代わりに使用できる1回分の強化燃料。' },
+        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '発射台の燃料の代わりに使用できる2回分の強化燃料。' },
+        { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間重力を無視して直進する。' },
+        { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', powerMultiplier: 1.3, rarity: RARITY.COMMON, description: '発射パワーを30%強化する。' },
+        { id: 'boost_magnet', category: 'BOOSTERS', name: 'マグネティック・パルス', rarity: RARITY.RARE, description: '航行時間とともにアイテム回収範囲が拡大する。' },
+        { id: 'boost_expander', category: 'BOOSTERS', name: 'アーク・エクスパンダー', arcMultiplier: 2.0, rarity: RARITY.RARE, description: '出口サイズを2.0倍に拡大する。' }
     ],
     COIN: [
         { id: 'coin_100', category: 'COIN', name: '100コイン', score: 100, rarity: RARITY.UNCOMMON, description: '通貨。獲得時に100コイン加算される。' },
         { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', mass: 1, deliveryGoalId: 'TRADING_POST', rarity: RARITY.RARE, description: 'Trading Post への配送用物資。' },
-        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', mass: 1, deliveryGoalId: 'REPAIR_DOCK', rarity: RARITY.RARE, description: 'Repair Dock への配送用パーツ。' },
-        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', mass: 1, deliveryGoalId: 'BLACK_MARKET', rarity: RARITY.RARE, description: 'Black Market への配送用データ。' },
-        { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', mass: 1, coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: '施設での消費コインが軽減される。重複可。' }
+        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', deliveryGoalId: 'TRADING_POST', rarity: RARITY.RARE, description: 'Trading Post への配送用物資。' },
+        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', deliveryGoalId: 'REPAIR_DOCK', rarity: RARITY.RARE, description: 'Repair Dock への配送用パーツ。' },
+        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', deliveryGoalId: 'BLACK_MARKET', rarity: RARITY.RARE, description: 'Black Market への配送用データ。' },
+        { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: '施設での消費コインが軽減される。重複可。' }
     ]
 };
 

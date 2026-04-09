@@ -21,6 +21,7 @@ export class AudioSystem {
             this.masterGain = this.ctx.createGain();
             const savedVol = localStorage.getItem('gf_se_volume');
             const initialVol = (savedVol !== null && savedVol !== undefined) ? parseFloat(savedVol) : 0.5;
+            this.currentVolume = initialVol;
             this.masterGain.gain.value = initialVol * 0.5; // マスターゲインは0.5倍を基準とする
             
             this.lowPass = this.ctx.createBiquadFilter();
@@ -52,6 +53,7 @@ export class AudioSystem {
      */
     _prepare() {
         if (!this.ctx) return false;
+        if (this.currentVolume <= 0) return false; // 消音設定なら音を鳴らさない
         if (this.ctx.state === 'suspended') {
             this.resume();
         }
@@ -64,6 +66,7 @@ export class AudioSystem {
     setVolume(value) {
         if (!this.masterGain) return;
         const vol = Math.max(0, Math.min(1, value));
+        this.currentVolume = vol; // 現在の音量を保持
         
         // 設定を保存
         localStorage.setItem('gf_se_volume', vol.toString());

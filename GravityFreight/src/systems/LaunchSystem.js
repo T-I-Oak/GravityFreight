@@ -49,7 +49,8 @@ export class LaunchSystem {
             if (b) {
                 if (b.precisionMultiplier) pMult *= b.precisionMultiplier;
                 if (b.pickupMultiplier) pickMult *= b.pickupMultiplier;
-                if (b.gravityMultiplier) gMult *= b.gravityMultiplier;
+                // gravityMultiplier は duration がある場合は飛行中の効果として扱うため、ベース値の計算には含めない
+                if (b.gravityMultiplier && b.duration === undefined) gMult *= b.gravityMultiplier;
                 if (b.arcMultiplier) aMult *= b.arcMultiplier;
             }
 
