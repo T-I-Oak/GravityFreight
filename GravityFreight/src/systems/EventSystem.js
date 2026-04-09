@@ -29,8 +29,8 @@ export class EventSystem {
                     game.onMouseDown({
                         clientX: e.clientX,
                         clientY: e.clientY,
-                        shiftKey: false,
-                        ctrlKey: false
+                        shiftKey: e.shiftKey,
+                        ctrlKey: e.ctrlKey
                     });
                     return;
                 }
