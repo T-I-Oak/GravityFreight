@@ -94,10 +94,13 @@ export class RankingUI {
         const isSector = this.currentCategory === 'sector';
         const isCollected = this.currentCategory === 'collected';
 
+        const latestDate = this.game.rankingSystem.latestEntryDate;
+
         rankings.forEach((entry, index) => {
             const rank = index + 1;
+            const isLatest = entry.date === latestDate;
             const div = document.createElement('div');
-            div.className = `ranking-entry rank-${rank <= 3 ? rank : 'normal'} stagger-in`;
+            div.className = `ranking-entry rank-${rank <= 3 ? rank : 'normal'} stagger-in ${isLatest ? 'is-latest' : ''}`;
             div.style.animationDelay = `${index * 0.04}s`;
 
             div.innerHTML = `

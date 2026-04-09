@@ -1,8 +1,7 @@
 {
   "name": "gravityfreight",
-  "version": "0.30.1",
-
-  "description": "2D物理演算ベースの宇宙航行ローグライク",
+  "version": "0.31.1",
+  "description": "Gravity Freight: ORBITAL ECHOES - A 2D space simulation roguelike game",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -87,7 +87,16 @@ export class InventorySystem {
         return Boolean(this.takeItem(category, instanceId));
     }
 
-    takeItem(category, instanceId, takeCount = 1) {
+    /**
+     * 指定したアイテムを指定数取り出します。
+     * 
+     * ID管理の設計意図(options.keepSourceId):
+     * - false(デフォルト): 取り出した個体が元のIDを「継承」し、残りのスタックに新IDを振る。
+     *   ユーザーが特定のパーツを選択して装備・売却する際など、Identityの連続性が操作側に必要な場合に適している。
+     * - true: スタック側のIDを「維持」し、取り出した個体に新IDを振る。
+     *   同一スタックから連続して1つずつ個体を切り出すバッチ処理など、取り出し元を固定したい場合に適している。
+     */
+    takeItem(category, instanceId, takeCount = 1, options = {}) {
         const cat = this._getCategory(category);
         const list = this.inventory[cat];
         if (!list) return null;
@@ -100,14 +109,22 @@ export class InventorySystem {
         const actualTake = Math.min(currentCount, takeCount);
         if (actualTake <= 0) return null;
 
-        // 取り出した側は「元の instanceId を保持」する
-        const taken = { ...current, count: actualTake };
-
+        let taken;
         const remainingCount = currentCount - actualTake;
+
         if (remainingCount > 0) {
+            // 分割処理
+            taken = { ...current, count: actualTake };
             current.count = remainingCount;
-            this._reassignInstanceId(current);
+
+            if (options.keepSourceId) {
+                this._reassignInstanceId(taken);
+            } else {
+                this._reassignInstanceId(current);
+            }
         } else {
+            // 全数取り出す場合、Identityはそのまま移動
+            taken = current;
             list.splice(idx, 1);
         }
 

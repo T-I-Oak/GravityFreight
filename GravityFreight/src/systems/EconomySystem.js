@@ -1,4 +1,4 @@
-import { ITEM_REGISTRY } from '../core/Data.js';
+import { ITEM_REGISTRY, RARITY_PRICES } from '../core/Data.js';
 
 export class EconomySystem {
     static MARKET_VALUE_MULTIPLIER = 2; // ブラックマーケット等での査定額倍率
@@ -15,9 +15,7 @@ export class EconomySystem {
         const cur = item.charges !== undefined ? item.charges : max;
 
         // ベース価格 (Spec 7.3.318)
-        let base = 20;
-        if (rarity === 10) base = 40; // RARITY.UNCOMMON
-        if (rarity === 15) base = 60; // RARITY.RARE
+        const base = RARITY_PRICES[rarity];
 
         // コンディション補正 (Spec 7.3.319)
         const condition = (max > 0) ? (cur + 1) / (max + 1) : 1.0;

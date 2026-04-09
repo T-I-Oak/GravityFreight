@@ -53,23 +53,16 @@ export class LaunchSystem {
                 if (b.arcMultiplier) aMult *= b.arcMultiplier;
             }
 
-            // 装備中モジュールの効果
+            // モジュールリスト（既に個別に展開済み）を同期
             game.ship.equippedModules = [];
-            if (r.modules) {
-                // r.modules は { [instanceId]: moduleItem } の形式
-                for (const moduleItem of Object.values(r.modules)) {
-                    if (moduleItem) {
-                        const count = moduleItem.count || 1;
-                        for (let i = 0; i < count; i++) {
-                            // 各スロット分のクローンを格納（耐久度を独立して管理するため）
-                            const moduleInstance = { ...moduleItem, charges: moduleItem.maxCharges || 0 };
-                            game.ship.equippedModules.push(moduleInstance);
-                            
-                            // ※ モジュール自体の倍率補正は AssemblySystem.js で既に rocket.pickupMultiplier 等に
-                            // 合算・乗算されているため、ここでは二重計算を避けるために加算しない。
-                        }
+            if (Array.isArray(r.modules)) {
+                game.ship.equippedModules = r.modules.map(m => {
+                    const inst = { ...m };
+                    if (inst.charges === undefined && inst.maxCharges !== undefined) {
+                        inst.charges = inst.maxCharges;
                     }
-                }
+                    return inst;
+                });
             }
 
             // ロケットの基本設定を同期

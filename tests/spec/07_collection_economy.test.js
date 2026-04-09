@@ -80,14 +80,16 @@ describe('Spec: Collection & Economy (Chapter 7)', () => {
     });
 
     describe('7.3 Economy & Insurance', () => {
-        it('Item Value: should calculate base price by rarity (20/40/60)', () => {
+        it('Item Value: should calculate base price by rarity (20/40/60/100)', () => {
             const common = { id: 'c', rarity: RARITY.COMMON };
             const uncommon = { id: 'u', rarity: RARITY.UNCOMMON };
             const rare = { id: 'r', rarity: RARITY.RARE };
+            const anomaly = { id: 'a', rarity: RARITY.ANOMALY };
             
             expect(game.economySystem.calculateValue(common)).toBe(20);
             expect(game.economySystem.calculateValue(uncommon)).toBe(40);
             expect(game.economySystem.calculateValue(rare)).toBe(60);
+            expect(game.economySystem.calculateValue(anomaly)).toBe(100);
         });
 
         it('Item Value: should apply enhancement bonus (+10% per level)', () => {

@@ -26,8 +26,8 @@ export class UIComponents {
         
         // 耐久度ゲージ（対象アイテムのみ）
         if (hasCharges && options.hideCharges !== true) {
-            const max = itemData.maxCharges; // 厳密にデータモデルのみを信頼する
-            const current = itemData.charges !== undefined ? itemData.charges : max;
+            const max = itemData.maxCharges || 0;
+            const current = (itemData.charges !== undefined ? itemData.charges : (itemData.maxCharges || 0));
             gauges = UIComponents.generateHPGauge(current, max, enhancements.charges > 0);
         }
 
@@ -36,7 +36,7 @@ export class UIComponents {
             stack = `<div class="stack-badge"><span class="stack-count">${itemData.count}</span></div>`;
         }
         
-        const invInfo = `${stack}${gauges}`;
+        const invInfo = `${gauges}${stack}`;
 
         const selTag = (selectionCount > 0) ? ` <span class="selection-badge">[${selectionCount}]</span>` : '';
         
@@ -71,25 +71,27 @@ export class UIComponents {
             </div>
         `).join('');
 
+        // モジュールを表示用に ID で集約
         let rocketDetailsHtml = '';
-        if (isRocket && item.modules) {
+        if (isRocket && Array.isArray(item.modules)) {
             const merged = new Map();
-            for (const [id, data] of Object.entries(item.modules)) {
+            for (const data of item.modules) {
                 if (!data) continue;
-                const mid = data.id;
+                const mid = data.id; // ベースIDで集約
                 if (merged.has(mid)) {
                     const e = merged.get(mid);
-                    e.count += data.count || 1;
+                    e.count += 1;
                     if (data.maxCharges) {
-                        e.maxCharges = (e.maxCharges || 0) + (data.maxCharges * (data.count || 1));
-                        e.charges = (e.charges || 0) + ((data.charges !== undefined ? data.charges : data.maxCharges) * (data.count || 1));
+                        e.maxCharges += data.maxCharges;
+                        e.charges += (data.charges !== undefined ? data.charges : data.maxCharges);
                     }
                 } else {
+                    const chargesValue = data.maxCharges ? (data.charges !== undefined ? data.charges : data.maxCharges) : undefined;
                     merged.set(mid, {
                         name: data.name,
-                        count: data.count || 1,
-                        maxCharges: data.maxCharges ? (data.maxCharges * (data.count || 1)) : undefined,
-                        charges: data.maxCharges ? ((data.charges !== undefined ? data.charges : data.maxCharges) * (data.count || 1)) : undefined
+                        count: 1,
+                        maxCharges: data.maxCharges,
+                        charges: chargesValue
                     });
                 }
             }
@@ -99,11 +101,11 @@ export class UIComponents {
                 const mStack = m.count > 1 ? `<div class="stack-badge mini"><span class="stack-count">${m.count}</span></div>` : '';
                 rows.push(`
                     <div class="rocket-module-row">
-                        <span class="rocket-module-name">${m.name}</span>
-                        <div style="display:flex; align-items:center; gap: 8px;">
+                        <div style="display:flex; align-items:center; gap: 6px;">
+                            <span class="rocket-module-name">${m.name}</span>
                             ${mStack}
-                            ${mGauge}
                         </div>
+                        ${mGauge}
                     </div>
                 `);
             });
@@ -113,7 +115,7 @@ export class UIComponents {
         const desc = isRocket ? '' : (item.description || '');
 
         return `
-            <div class="item-card ${isSelected ? 'selected' : ''} ${clickable ? 'clickable' : ''}" style="${containerStyle}">
+            <div class="item-card ${isSelected ? 'selected' : ''} ${clickable ? 'clickable' : ''} ${options.mini ? 'mini-card' : ''}" style="${containerStyle}">
                 <div class="part-header">
                     <span class="part-name">${item.name || 'Unknown'}${selTag}</span>
                     <div class="part-header-right">

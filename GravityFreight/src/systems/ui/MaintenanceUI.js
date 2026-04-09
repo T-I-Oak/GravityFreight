@@ -151,8 +151,8 @@ export class MaintenanceUI {
                     const partsToReturn = [];
                     if (rocket.chassis) partsToReturn.push({ ...rocket.chassis, category: 'CHASSIS', count: 1 });
                     if (rocket.logic) partsToReturn.push({ ...rocket.logic, category: 'LOGIC', count: 1 });
-                    if (rocket.modules) {
-                        Object.values(rocket.modules).forEach(m => {
+                    if (Array.isArray(rocket.modules)) {
+                        rocket.modules.forEach(m => {
                             if (m) partsToReturn.push({ ...m, category: 'MODULES' });
                         });
                     }

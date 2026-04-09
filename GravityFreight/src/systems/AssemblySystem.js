@@ -25,47 +25,25 @@ export class AssemblySystem {
         let totalGravityMultiplier = (chassisTaken.gravityMultiplier || 1) * (logicTaken.gravityMultiplier || 1);
         let arcMultiplier = 1.0;
 
-        // モジュールデータの取得と合算
-        const equippedModules = {};
-        for (const [mInstId, count] of Object.entries(sel.modules)) {
-            const taken = this.game.inventorySystem.takeItem('modules', mInstId, count);
-            if (!taken) continue;
-
-            // 耐久力があるアイテムのみ charges を設定（UI/計算のため）
-            if (taken.maxCharges !== undefined) {
-                const baseMax = taken.maxCharges;
-                const totalMax = baseMax * count;
-                // Since individual items now have their charges initialized properly, we sum them.
-                // Assuming all items in the stack have equivalent charges (per ItemUtils rules),
-                // total charges = individual charges * count
-                if (taken.charges !== undefined) {
-                    taken.charges = taken.charges * count;
-                } else {
-                    taken.charges = totalMax;
+            // モジュールを個別の個体（count: 1）として展開して登録
+            const equippedModules = [];
+            for (const [mInstId, count] of Object.entries(sel.modules)) {
+                for (let i = 0; i < count; i++) {
+                    const taken = this.game.inventorySystem.takeItem('modules', mInstId, 1, { keepSourceId: true });
+                    if (taken) equippedModules.push(taken);
                 }
-                // スタック全体の合計耐久度として扱う
-                taken.maxCharges = totalMax;
             }
 
-            equippedModules[mInstId] = taken;
-
-            // モジュールによるステータス加算
-            totalMass += (taken.mass || 0) * count;
-            totalSlots += (taken.slots || 0) * count;
-            totalPrecision += (taken.precision || 0) * count;
-            totalPickupRange += (taken.pickupRange || 0) * count;
-
-            // 倍率補正
-            if (taken.precisionMultiplier) {
-                for (let i = 0; i < count; i++) totalPrecisionMultiplier *= taken.precisionMultiplier;
-            }
-            if (taken.pickupMultiplier) {
-                for (let i = 0; i < count; i++) totalPickupMultiplier *= taken.pickupMultiplier;
-            }
-            if (taken.gravityMultiplier) {
-                for (let i = 0; i < count; i++) totalGravityMultiplier *= taken.gravityMultiplier;
-            }
-        }
+            // 合算計算（展開後の配列を元に算出）
+            equippedModules.forEach(m => {
+                totalMass += (m.mass || 0);
+                totalSlots += (m.slots || 0);
+                totalPrecision += (m.precision || 0);
+                totalPickupRange += (m.pickupRange || 0);
+                if (m.precisionMultiplier) totalPrecisionMultiplier *= m.precisionMultiplier;
+                if (m.pickupMultiplier) totalPickupMultiplier *= m.pickupMultiplier;
+                if (m.gravityMultiplier) totalGravityMultiplier *= m.gravityMultiplier;
+            });
 
         const rocket = {
             id: 'assembled_rocket',

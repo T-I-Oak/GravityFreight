@@ -13,6 +13,13 @@ export const RARITY = {
     ANOMALY: 20
 };
 
+export const RARITY_PRICES = {
+    [RARITY.COMMON]: 20,
+    [RARITY.UNCOMMON]: 40,
+    [RARITY.RARE]: 60,
+    [RARITY.ANOMALY]: 100
+};
+
 export const ANIMATION_DURATION = 1200; // ミリ秒単位
 
 // カテゴリ別のイメージカラー定義（spec.mdと同期）

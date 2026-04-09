@@ -161,6 +161,13 @@ export class MissionSystem {
         if (game.storySystem) game.storySystem.resetFlightFlag();
 
         if (result === 'success') {
+            // 航行中に変化したモジュールの耐久度を機体データへ同期 (永続化)
+            const rocket = game.selection.rocket;
+            if (rocket && game.ship?.equippedModules) {
+                // 配列形式で個別の状態を保持するように更新
+                rocket.modules = game.ship.equippedModules.map(m => ({ ...m }));
+            }
+
             let luckCount = 0;
 
             // 【Spec 6.1】ゴールの基本報酬（スコア・コイン）は貨物に関係なく常に 1 回だけ付与する
