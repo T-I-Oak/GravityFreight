@@ -11,10 +11,12 @@ import { Renderer } from '../systems/RenderingSystem.js';
 import { RankingSystem } from '../systems/RankingSystem.js';
 import { StorySystem } from '../systems/StorySystem.js';
 import { AudioSystem } from '../systems/AudioSystem.js';
+import { LaunchSystem } from '../systems/LaunchSystem.js';
+import { FacilityEventSystem } from '../systems/FacilityEventSystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.30.0";
+        this.version = "0.30.1";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
@@ -30,6 +32,8 @@ export class Game {
         this.physicsOrchestrator = new PhysicsOrchestrator(this);
         this.uiSystem = new UISystem(this);
         this.eventSystem = new EventSystem(this);
+        this.launchSystem = new LaunchSystem(this);
+        this.facilityEventSystem = new FacilityEventSystem(this);
         this.rankingSystem = new RankingSystem(this);
         this.storySystem = new StorySystem(this);
         this.audioSystem = new AudioSystem(this);
@@ -139,10 +143,14 @@ export class Game {
 
     // --- Delegation to EventSystem ---
     closeResult() { this.eventSystem.closeResult(); }
-    handleEvent(goal) { this.eventSystem.handleEvent(goal); }
-    checkReadyToAim() { this.eventSystem.checkReadyToAim(); }
     selectOption(type, id) { this.eventSystem.selectOption(type, id); }
-    launch() { this.eventSystem.launch(); }
+
+    // --- Delegation to LaunchSystem ---
+    checkReadyToAim() { this.launchSystem.checkReadyToAim(); }
+    launch() { this.launchSystem.launch(); }
+
+    // --- Delegation to FacilityEventSystem ---
+    handleEvent(goal) { this.facilityEventSystem.handleEvent(goal); }
 
     // --- Delegation to Inventory/EconomySystem ---
     selectPart(type, id) { this.eventSystem.selectPart(type, id); }

@@ -59,7 +59,7 @@ describe('Spec 09: Return Bonus', () => {
         
         // ミッション成功 (次セクターへ進出)
         // closeEvent はセクターの切り替えを想定
-        game.eventSystem.closeEvent();
+        game.facilityEventSystem.closeEvent();
         
         expect(game.returnBonus).toBe(0);
     });

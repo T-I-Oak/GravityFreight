@@ -178,27 +178,9 @@
 | | 暗号化データ | `cargo_danger` | RARE | 1 | - | - | - | - | - | - | - | Black Market への配送用データ。 |
 | | 幸運の導き | `cargo_lucky` | UNCOMMON | 1 | - | - | - | - | - | - | - | 施設での消費コインが軽減される。重複可。 |
 
-### 4.4 ビジュアル・初期設定データ
+### 4.4 初期設定データ
 
-#### アイテムカラー (Item Category Colors)
-各カテゴリーのイメージカラー定義。UIの縁取りやパーティクル、軌道予測線の描画に使用されます。
-
-- Chassis: `#ffab40` (オレンジ)
-- Logic: `#00bcd4` (シアン)
-- Launcher: `#4caf50` (グリーン)
-- Module: `#9c27b0` (パープル)
-- Booster: `#795548` (ブラウン)
-- Rocket: `#c0c0c0` (シルバー)
-- Resource (Coin): `#ffd700` (ゴールド)
-- Resource (Cargo): `#00e5ff` (アクア)
-- Repulsive Star: `#e100ff` (マゼンタ)
-
-#### 出口カラー (Goal Colors)
-- TRADING POST: `#00e676` (グリーン)
-- REPAIR DOCK: `#2979ff` (ブルー)
-- BLACK MARKET: `#ff1744` (レッド)
-
-#### 初期設定データ (Initial Setup Data)
+#### 初期所持品 (Initial Setup Data)
 ゲーム開始時に、プレイヤーのインベントリ（および財布）に自動的に支給される構成。
 
 | カテゴリ | アイテム名 | 数量 | 備考 |

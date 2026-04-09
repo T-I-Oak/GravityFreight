@@ -447,7 +447,7 @@ describe('Implementation: Game Core Controllers', () => {
         vi.spyOn(game, 'showStatus').mockImplementation(() => {});
 
         // Test if launch() handles zero charges properly
-        expect(() => game.eventSystem.launch()).not.toThrow();
+        expect(() => game.launchSystem.launch()).not.toThrow();
         expect(game.state).toBe('aiming'); // State should not transition
         expect(game.showStatus).toHaveBeenCalledWith(expect.any(String), 'error');
     });
@@ -467,7 +467,7 @@ describe('Implementation: Game Core Controllers', () => {
         vi.spyOn(game, 'updateUI').mockImplementation(() => {});
 
         // Execute launch (calls EventSystem.launch)
-        game.eventSystem.launch();
+        game.launchSystem.launch();
 
         // Must be removed from inventory and selection cleared
         expect(game.inventory.boosters.length).toBe(0);
@@ -486,7 +486,7 @@ describe('Implementation: Game Core Controllers', () => {
         vi.spyOn(game, 'showStatus').mockImplementation(() => {});
 
         // Execute launch
-        game.eventSystem.launch();
+        game.launchSystem.launch();
 
         // Must be removed from inventory when charges reach 0
         expect(game.inventory.launchers).not.toContain(launcher);

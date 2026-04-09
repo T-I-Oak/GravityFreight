@@ -50,7 +50,7 @@ describe('Implementation: systems/EventSystem.js', () => {
         game.selection.booster = fuel;
         game.state = 'aiming';
 
-        eventSystem.launch();
+        game.launchSystem.launch();
 
         // Launcher charges should NOT have decreased
         const finalLauncher = game.inventory.launchers.find(l => l.instanceId === 'l1');
@@ -74,7 +74,7 @@ describe('Implementation: systems/EventSystem.js', () => {
         game.selection.booster = fuelPack;
         game.state = 'aiming';
 
-        eventSystem.launch();
+        game.launchSystem.launch();
 
         // Launcher charges should NOT have decreased
         const finalLauncher = game.inventory.launchers.find(l => l.instanceId === 'l1');
@@ -88,7 +88,7 @@ describe('Implementation: systems/EventSystem.js', () => {
 
     it('should reset returnBonus in closeEvent (sector completed)', () => {
         game.returnBonus = 0.4;
-        eventSystem.closeEvent();
+        game.facilityEventSystem.closeEvent();
         expect(game.returnBonus).toBe(0);
     });
 
@@ -104,7 +104,7 @@ describe('Implementation: systems/EventSystem.js', () => {
         
         // Calculate expected velocity: power(1000) * massFactor(1.0) * (1 + bonus(0.2)) = 1200
         // Direction is up (0, -1)
-        eventSystem.launch();
+        game.launchSystem.launch();
         
         expect(game.ship.velocity.y).toBeCloseTo(-1200);
     });
@@ -140,7 +140,7 @@ describe('Implementation: systems/EventSystem.js', () => {
                     modules: {}
                 };
                 
-                eventSystem.checkReadyToAim();
+                game.launchSystem.checkReadyToAim();
                 expect(game.ship.pickupRange * game.ship.pickupMultiplier).toBe(c.expected);
             });
         });
@@ -158,7 +158,7 @@ describe('Implementation: systems/EventSystem.js', () => {
             };
             game.selection.booster = { id: 'boost_magnet', pickupMultiplier: 1.2 };
             
-            eventSystem.checkReadyToAim();
+            game.launchSystem.checkReadyToAim();
             
             // Expected: 40 * (3.0 * 1.2) = 144
             expect(game.ship.pickupRange * game.ship.pickupMultiplier).toBeCloseTo(144);
