@@ -1,3 +1,5 @@
+import { StorageUtils } from '../utils/StorageUtils.js';
+
 export class AudioSystem {
     constructor(game) {
         this.game = game;
@@ -19,8 +21,7 @@ export class AudioSystem {
             this.ctx = new AudioContext();
             
             this.masterGain = this.ctx.createGain();
-            const savedVol = localStorage.getItem('gf_se_volume');
-            const initialVol = (savedVol !== null && savedVol !== undefined) ? parseFloat(savedVol) : 0.5;
+            const initialVol = StorageUtils.get('gf_se_volume', 0.5);
             this.currentVolume = initialVol;
             this.masterGain.gain.value = initialVol * 0.5; // マスターゲインは0.5倍を基準とする
             
@@ -69,7 +70,7 @@ export class AudioSystem {
         this.currentVolume = vol; // 現在の音量を保持
         
         // 設定を保存
-        localStorage.setItem('gf_se_volume', vol.toString());
+        StorageUtils.set('gf_se_volume', vol);
 
         // 急激な変更によるノイズを避けるため、滑らかに（50ms）遷移させる
         const t = this.ctx.currentTime;
@@ -160,7 +161,7 @@ export class AudioSystem {
      */
     playSonar() {
         if (!this._prepare()) return;
-        // 波紋が機体からはみ出すタイミング（約0.25秒）に合わせて遅延再生
+        // 波紋がロケットからはみ出すタイミング（約0.25秒）に合わせて遅延再生
         const t = this.ctx.currentTime + 0.25; 
         
         const osc = this.ctx.createOscillator();

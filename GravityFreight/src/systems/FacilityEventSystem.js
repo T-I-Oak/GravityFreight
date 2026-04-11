@@ -1,4 +1,4 @@
-import { GOAL_COLORS, GOAL_NAMES, hexToRgba } from '../core/Data.js';
+import { FACILITY_INFO, hexToRgba } from '../core/Data.js';
 
 export class FacilityEventSystem {
     constructor(game) {
@@ -19,25 +19,24 @@ export class FacilityEventSystem {
         const title = document.getElementById('event-location');
         const desc = document.getElementById('event-description');
         const content = document.getElementById('event-content');
-        title.textContent = GOAL_NAMES[goal.id];
+        const facility = FACILITY_INFO[goal.id];
+        title.textContent = facility ? facility.name : goal.id;
         const icon = document.getElementById('event-icon');
-        const color = GOAL_COLORS[goal.id] || '#888';
+        const color = facility ? facility.color : '#888';
         if (icon) {
             // 施設のイメージカラーを直接使用
             const deepColor = color; 
 
-            icon.style.setProperty('--shop-color', deepColor);
-            icon.style.setProperty('--shop-bg', hexToRgba(deepColor, 0.2));
-            
-            const initials = { 'TRADING_POST': 'T', 'REPAIR_DOCK': 'R', 'BLACK_MARKET': 'B' };
-            icon.textContent = initials[goal.id] || '';
+            icon.style.setProperty('--shop-color', color);
+            icon.style.setProperty('--shop-bg', hexToRgba(color, 0.2));
+            icon.textContent = facility ? facility.icon : '';
         }
 
         if (goal.id === 'TRADING_POST') {
             desc.textContent = '貨物取引やパーツの売買ができる中継基地。';
             game.uiSystem.initTradingPost(content);
         } else if (goal.id === 'REPAIR_DOCK') {
-            desc.textContent = '機体の整備やパーツの解体・強化を行える高度な設備。';
+            desc.textContent = '発射台の整備やロケットの分解・強化を行える高度な設備。';
             game.uiSystem.initRepairDock(content);
         } else if (goal.id === 'BLACK_MARKET') {
             game.currentStarCount++;
@@ -79,7 +78,7 @@ export class FacilityEventSystem {
             return;
         }
 
-        // 成功・クリア時は施設遷移を優先（ショップでの機体購入チャンスを確保）
+        // 成功・クリア時は施設遷移を優先（ショップでのロケット購入チャンスを確保）
         if (status === 'success' || status === 'cleared') {
             if (game.lastHitGoal) { this.handleEvent(game.lastHitGoal); return; }
         } else {

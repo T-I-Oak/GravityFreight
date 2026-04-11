@@ -1,4 +1,5 @@
 import { Vector2 } from '../utils/Physics.js';
+import { StorageUtils } from '../utils/StorageUtils.js';
 
 export class EventSystem {
     constructor(game) {
@@ -324,8 +325,7 @@ export class EventSystem {
                 game.audioSystem.playTick();
                 
                 // 現在の音量を保持（キャンセル用）
-                const savedVol = localStorage.getItem('gf_se_volume');
-                originalVolume = savedVol !== null ? parseFloat(savedVol) : 0.5;
+                originalVolume = StorageUtils.get('gf_se_volume', 0.5);
                 if (seVolumeSlider) seVolumeSlider.value = originalVolume * 100;
                 if (volumeDisplay) volumeDisplay.textContent = `${Math.round(originalVolume * 100)}%`;
                 

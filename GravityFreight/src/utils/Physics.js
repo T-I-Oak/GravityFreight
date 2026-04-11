@@ -71,7 +71,7 @@ export function getDistanceSqToSegment(p, a, b) {
 export function calculateAcceleration(pos, bodies, targetMass = 10, excludeBody = null) {
     let totalAcc = new Vector2();
     const referenceMass = 10; // 基準質量 (Core Hull)
-    // 重力の影響は質量に反比例させる（軽量機体ほど強くなる）
+    // 重力の影響は質量に反比例させる（軽量ロケットほど強くなる）
     const massFactor = referenceMass / targetMass;
 
 

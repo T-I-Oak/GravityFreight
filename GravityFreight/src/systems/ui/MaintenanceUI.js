@@ -88,9 +88,9 @@ export class MaintenanceUI {
         dismantleSection.className = 'event-section dismantle-section';
         dismantleSection.innerHTML = `
             <div class="section-header">
-                <h3>機体の解体・調整</h3>
+                <h3>ロケットの分解・強化</h3>
             </div>
-            <p class="section-desc">機体を解体して構成パーツを再調整し、インベントリに戻します。解体コストは実行ごとに増加します。</p>
+            <p class="section-desc">ロケットを分解して構成パーツを再調整し、インベントリに戻します。分解コストは実行ごとに増加します。</p>
         `;
 
         const dismantleGrid = document.createElement('div');
@@ -104,7 +104,7 @@ export class MaintenanceUI {
                         <div class="part-header">
                             <span class="part-name" style="opacity: 0.5;">NO ASSEMBLED ROCKETS</span>
                         </div>
-                        <span class="part-info">解体可能な機体が組み立てられていません。</span>
+                        <span class="part-info">分解可能なロケットがありません。</span>
                     </div>
                 </div>
             `;
@@ -185,9 +185,9 @@ export class MaintenanceUI {
         resultsSection.className = 'event-section dismantle-results-section';
         resultsSection.innerHTML = `
             <div class="section-header">
-                <h3>調整済みパーツ（受取り）</h3>
+                <h3>強化済みパーツ（受取り）</h3>
             </div>
-            <p class="section-desc">解体・調整によって回収された構成パーツの一覧です。</p>
+            <p class="section-desc">分解・強化によって回収された構成パーツの一覧です。</p>
         `;
 
         if (game.tempDismantleResults.length === 0) {
@@ -198,7 +198,7 @@ export class MaintenanceUI {
                     <div class="part-header">
                         <span class="part-name" style="opacity: 0.5;">NO RECENT ADJUSTMENTS</span>
                     </div>
-                    <span class="part-info">このセッションでの解体・調整履歴はありません。</span>
+                    <span class="part-info">このセッションでの分解・強化履歴はありません。</span>
                 </div>
             `;
             resultsSection.appendChild(emptyRow);

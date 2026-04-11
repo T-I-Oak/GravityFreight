@@ -1,3 +1,5 @@
+import { StorageUtils } from '../utils/StorageUtils.js';
+
 /**
  * StorySystem
  * 貨物の配送成功をトリガーとして、ストーリー（メール）の解放および状態を管理するシステム。
@@ -65,18 +67,13 @@ export class StorySystem {
         const data = {
             readIds: Array.from(this.readIds)
         };
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+        StorageUtils.set(this.STORAGE_KEY, data);
     }
 
     load() {
-        try {
-            const saved = localStorage.getItem(this.STORAGE_KEY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                if (data.readIds) this.readIds = new Set(data.readIds);
-            }
-        } catch (e) {
-            console.error("Failed to load story progress", e);
+        const data = StorageUtils.get(this.STORAGE_KEY);
+        if (data && data.readIds) {
+            this.readIds = new Set(data.readIds);
         }
     }
 

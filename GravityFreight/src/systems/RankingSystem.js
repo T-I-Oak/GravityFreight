@@ -1,3 +1,5 @@
+import { StorageUtils } from '../utils/StorageUtils.js';
+
 export class RankingSystem {
     constructor(game) {
         this.game = game;
@@ -9,19 +11,9 @@ export class RankingSystem {
     }
 
     _loadRankings() {
-        try {
-            if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
-                const data = localStorage.getItem(this.STORAGE_KEY);
-                if (data) {
-                    const parsed = JSON.parse(data);
-                    // バージョンチェック
-                    if (parsed && parsed.version === this.DATA_VERSION && Array.isArray(parsed.entries)) {
-                        return parsed;
-                    }
-                }
-            }
-        } catch (e) {
-            console.error('Failed to load rankings:', e);
+        const data = StorageUtils.get(this.STORAGE_KEY);
+        if (data && data.version === this.DATA_VERSION && Array.isArray(data.entries)) {
+            return data;
         }
 
         return {
@@ -31,13 +23,7 @@ export class RankingSystem {
     }
 
     _saveRankings() {
-        try {
-            if (typeof localStorage !== 'undefined' && typeof localStorage.setItem === 'function') {
-                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
-            }
-        } catch (e) {
-            console.error('Failed to save rankings:', e);
-        }
+        StorageUtils.set(this.STORAGE_KEY, this.data);
     }
 
     _getFormattedDate() {

@@ -27,7 +27,7 @@ export class MissionSystem {
         game.dismantleCount = 0;
         game.blackMarketUsed = false;
 
-        // 自機の初期設定
+        // ロケットの初期設定
         game.ship = new Body(new Vector2(centerX, centerY - game.homeStar.radius - GAME_BALANCE.SHIP_START_OFFSET), GAME_BALANCE.DEFAULT_SHIP_MASS);
         game.ship.collectedItems = [];
         game.ship.lastCollectedStar = null;
@@ -161,7 +161,7 @@ export class MissionSystem {
         if (game.storySystem) game.storySystem.resetFlightFlag();
 
         if (result === 'success') {
-            // 航行中に変化したモジュールの耐久度を機体データへ同期 (永続化)
+            // 航行中に変化したモジュールの耐久度をロケットデータへ同期 (永続化)
             const rocket = game.selection.rocket;
             if (rocket && game.ship?.equippedModules) {
                 // 配列形式で個別の状態を保持するように更新
