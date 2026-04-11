@@ -1,4 +1,4 @@
-import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, UI_COLORS, RARITY, ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS } from '../core/Data.js';
+import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, UI_COLORS, RARITY, ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS, FACILITY_INFO } from '../core/Data.js';
 import { Body, Vector2 } from '../utils/Physics.js';
 
 export class MissionSystem {
@@ -218,8 +218,7 @@ export class MissionSystem {
                             game.totalDeliveries++;
 
                             // ストーリー解放のトリガー (v0.15 新機能)
-                            const branchMap = { 'TRADING_POST': 'T', 'REPAIR_DOCK': 'R', 'BLACK_MARKET': 'B' };
-                            const branch = branchMap[hitGoal.id];
+                            const branch = FACILITY_INFO[hitGoal.id]?.id;
                             if (branch) {
                                 game.storySystem.unlockNext(branch);
                             }
