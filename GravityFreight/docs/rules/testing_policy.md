@@ -7,8 +7,14 @@
 テストは役割に応じて `tests/` フォルダ下に階層化し、整理すること。
 
 - **`tests/spec/` (仕様・受入テスト)**:
-    - **命名規則**: `spec.md` 内の章構成（例: `01_xxx.test.js`, `02_yyy.test.js`）と**完全に対応させた名称**を付けること。
-    - **内容**: 仕様書で定義された挙動を満たしているかを確認する受入テスト。
+    - **命名規則**: `docs/specs/requirements/` 内のドキュメント名および章構成と **厳密に対応させた名称** を付けること。
+    - **形式**: `[prefix]_[chapter_number]_[test_name].test.js`
+    - **対応接頭辞 (Prefix)**:
+        - `core_mechanics.md` → **`core`**
+        - `item_catalog.md` → **`item`**
+        - `world_config.md` → **`world`**
+    - **例**: `core_03_physics_laws.test.js`, `item_03_catalog_table.test.js`, `world_02_exit_arcs.test.js`
+    - **内容**: 要求仕様書で定義された挙動を満たしているかを確認する受入テスト。
 - **`tests/implementation/` (ユニット・実装テスト)**:
     - **命名規則**: `src/` フォルダ内のディレクトリ構成およびファイル名と **1 対 1 で対応させた名称**を付けること。
     - **例**: `src/core/Game.js` のテストは `tests/implementation/core/Game.test.js` に配置。

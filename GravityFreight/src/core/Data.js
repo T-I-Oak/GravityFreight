@@ -22,7 +22,7 @@ export const RARITY_PRICES = {
 
 export const ANIMATION_DURATION = 1200; // ミリ秒単位
 
-// カテゴリ別のイメージカラー定義（spec.mdと同期）
+// カテゴリ別のイメージカラー定義（要求仕様書と同期）
 export const CATEGORY_COLORS = {
     CHASSIS: '#ffab40',
     LOGIC: '#00bcd4',
