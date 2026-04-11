@@ -13,6 +13,7 @@ import { StorySystem } from '../systems/StorySystem.js';
 import { AudioSystem } from '../systems/AudioSystem.js';
 import { LaunchSystem } from '../systems/LaunchSystem.js';
 import { FacilityEventSystem } from '../systems/FacilityEventSystem.js';
+import { StorageUtils } from '../utils/StorageUtils.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
@@ -56,7 +57,7 @@ export class Game {
         this.isAimingInteraction = false;
         this.activePointers = new Map();
         this.lastPinchDist = 0;
-        this.zoom = 0.5;
+        this.zoom = StorageUtils.get('game_zoom', 0.5);
         this.cameraOffset = new Vector2(0, 0);
         this.mapRotation = 0; // マップの回転角（ラジアン）
 
@@ -375,6 +376,8 @@ export class Game {
         const newScreenMouse = this.getScreenPos(worldMouse);
         this.cameraOffset.x += this.mousePos.x - newScreenMouse.x;
         this.cameraOffset.y += this.mousePos.y - newScreenMouse.y;
+        
+        StorageUtils.set('game_zoom', this.zoom);
     }
 
     update(dt) {

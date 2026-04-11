@@ -260,9 +260,8 @@ export class PhysicsOrchestrator {
         const game = this.game;
         const ship = game.ship;
 
-        // 回避ロジックの修正: 
-        // 1. ゴースト版単体では回避能力を持たず、ベースのモジュール（耐久度あり）が必要。
-        // 2. ゴースト版はエイミング時にその回避結果を表示する役割を担う（データ仕様に準拠）。
+        // 母星への帰還時は回避ロジックを適用せず、帰還成功判定を優先させる
+        if (body === game.homeStar) return false;
 
         // 1. Star Breaker
         const breaker = ship.equippedModules.find(m => m.id === 'mod_star_breaker' && m.charges > 0);
