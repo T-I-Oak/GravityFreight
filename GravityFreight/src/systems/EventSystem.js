@@ -244,6 +244,12 @@ export class EventSystem {
 
         // キーボードショートカット
         window.onkeydown = (e) => {
+            // チュートリアルなどのオーバーレイが表示されている場合は、背後のゲーム操作を無効化
+            const tutorialOverlay = document.getElementById('how-to-play-overlay');
+            if (tutorialOverlay && !tutorialOverlay.classList.contains('hidden')) {
+                return;
+            }
+
             if (e.key === 'r' || e.key === 'R') {
                 // Rキーで結果画面を閉じる（ショートカット）
                 if (game.state === 'result') game.facilityEventSystem.closeResult();
@@ -289,8 +295,7 @@ export class EventSystem {
         if (htpBtn) {
             htpBtn.onclick = () => {
                 game.audioSystem.playTick();
-                const overlay = document.getElementById('how-to-play-overlay');
-                if (overlay) overlay.classList.remove('hidden');
+                game.uiSystem.showTutorial();
             };
         }
 
@@ -302,14 +307,7 @@ export class EventSystem {
             };
         }
 
-        const closeHtpBtn = document.getElementById('close-help-btn');
-        if (closeHtpBtn) {
-            closeHtpBtn.onclick = () => {
-                game.audioSystem.playTick();
-                const overlay = document.getElementById('how-to-play-overlay');
-                if (overlay) overlay.classList.add('hidden');
-            };
-        }
+        // Note: Tutorial navigation button listeners are handled in TutorialUI.js
 
         // --- 設定パネルの制御 ---
         const settingsBtn = document.getElementById('title-settings-btn');

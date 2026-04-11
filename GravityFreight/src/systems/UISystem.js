@@ -10,6 +10,7 @@ import { StarInfoPanel } from './ui/StarInfoPanel.js';
 import { UIAnimations } from './ui/UIAnimations.js';
 import { HUDManager } from './ui/HUDManager.js';
 import { RankingUI } from './ui/RankingUI.js';
+import { TutorialUI } from './ui/TutorialUI.js';
 
 export class UISystem {
     constructor(game) {
@@ -22,6 +23,7 @@ export class UISystem {
         this.starInfoPanel = new StarInfoPanel(game);
         this.hudManager = new HUDManager(game, this);
         this.rankingUI = new RankingUI(game, this);
+        this.tutorialUI = new TutorialUI(game, this);
 
         this.titleAnimation = null;
         this.notificationTimer = null;
@@ -496,5 +498,41 @@ export class UISystem {
 
     showStatus(message, type = 'info') {
         // 現在はログ出力を抑制。将来的に UI でのメッセージ表示に使用可能。
+    }
+
+    /**
+     * チュートリアルを表示
+     */
+    showTutorial() {
+        if (this.tutorialUI) {
+            this.tutorialUI.show();
+        }
+    }
+
+    /**
+     * チュートリアルを閉じる
+     */
+    hideTutorial() {
+        if (this.tutorialUI) {
+            this.tutorialUI.hide();
+        }
+    }
+
+    /**
+     * 次のスライド
+     */
+    nextTutorialSlide() {
+        if (this.tutorialUI) {
+            this.tutorialUI.nextSlide();
+        }
+    }
+
+    /**
+     * 前のスライド
+     */
+    prevTutorialSlide() {
+        if (this.tutorialUI) {
+            this.tutorialUI.prevSlide();
+        }
     }
 }

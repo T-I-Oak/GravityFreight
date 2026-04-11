@@ -11,24 +11,24 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="GravityFreight/css/base.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/layout.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/buttons.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/ui.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/title-screen.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/item-card.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/mission-hud.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/build-panel.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/result-screen.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/receipt-screen.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/event-screen.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/how-to-play.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/ranking-screen.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/star-info.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/story-overlay.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/animations.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/sector-notification.css?v=0.32.2">
-    <link rel="stylesheet" href="GravityFreight/css/responsive.css?v=0.32.2">
+    <link rel="stylesheet" href="GravityFreight/css/base.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/layout.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/buttons.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/ui.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/title-screen.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/item-card.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/mission-hud.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/build-panel.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/result-screen.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/receipt-screen.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/event-screen.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/how-to-play.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/ranking-screen.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/star-info.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/story-overlay.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/animations.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/sector-notification.css?v=0.33.13">
+    <link rel="stylesheet" href="GravityFreight/css/responsive.css?v=0.33.13">
 
 
 
@@ -58,7 +58,7 @@
         <canvas id="title-fg-canvas"></canvas>
         <div id="title-settings-btn" class="settings-btn" title="SETTINGS">⚙</div>
         <div class="title-footer">
-            <div id="version">v0.32.0</div>
+            <div id="version">v0.33.13</div>
             <span class="copyright">© T.I.OAK 2026</span>
         </div>
     </div>
@@ -88,47 +88,23 @@
 
 
     <!-- 操作説明パネル -->
-    <div id="how-to-play-overlay" class="hidden">
-        <div class="panel"
-            style="max-width: 600px; width: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
-            <div class="panel-header">
+    <div id="how-to-play-overlay" class="overlay hidden">
+        <div class="modal tutorial-modal">
+            <div class="modal-header">
                 <h2>HOW TO PLAY</h2>
             </div>
-            <div class="panel-content" style="max-height: 70vh; overflow-y: auto; padding: 20px;">
-                <div class="how-to-grid">
-                    <div class="how-to-item">
-                        <div class="how-to-icon">🖱️</div>
-                        <div class="how-to-text">
-                            <strong>DRAG TO AIM</strong>
-                            <p>画面をドラッグして、発射角度とパワーを調整します。</p>
-                        </div>
-                    </div>
-                    <div class="how-to-item">
-                        <div class="how-to-icon">🚀</div>
-                        <div class="how-to-text">
-                            <strong>LAUNCH</strong>
-                            <p>LAUNCHボタンで機体を発射！中継地点の星を目指しましょう。</p>
-                        </div>
-                    </div>
-                    <div class="how-to-item">
-                        <div class="how-to-icon">📦</div>
-                        <div class="how-to-text">
-                            <strong>COLLECT & DELIVER</strong>
-                            <p>星の近くを通るとアイテムを回収できます。指定の星へ荷物を届けましょう。</p>
-                        </div>
-                    </div>
-                    <div class="how-to-item">
-                        <div class="how-to-icon">🛠️</div>
-                        <div class="how-to-text">
-                            <strong>BUILD & UPGRADE</strong>
-                            <p>回収したパーツで機体を強化。より遠くのセクターを目指しましょう。</p>
-                        </div>
-                    </div>
+            <div class="tutorial-slider">
+                <div class="tutorial-slides" id="tutorial-slides">
+                    <!-- Dynamic content rendered by TutorialUI.js -->
                 </div>
             </div>
-            <div class="panel-footer" style="text-align: center; margin-top: 10px; padding: 0 20px 20px;">
-                <button id="close-help-btn" class="btn-neon"
-                    style="min-width: 180px; padding: 10px 20px; font-size: 1.1rem;">UNDERSTOOD</button>
+            <div class="tutorial-nav">
+                <div class="nav-controls">
+                    <button class="nav-btn prev" id="prev-tutorial-btn">&lt; BACK</button>
+                    <div class="tutorial-dots" id="tutorial-dots"></div>
+                    <button class="nav-btn next" id="next-tutorial-btn">NEXT &gt;</button>
+                </div>
+                <button class="nav-btn close-action highlight" id="tutorial-close-btn-bottom">CLOSE</button>
             </div>
         </div>
     </div>
@@ -326,7 +302,7 @@
         </div>
     </div>
     <canvas id="gameCanvas"></canvas>
-    <script type="module" src="GravityFreight/src/main.js?v=0.32.2"></script>
+    <script type="module" src="GravityFreight/src/main.js?v=0.33.13"></script>
 
 
 

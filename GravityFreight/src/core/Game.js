@@ -16,7 +16,7 @@ import { FacilityEventSystem } from '../systems/FacilityEventSystem.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.32.2";
+        this.version = "0.33.13";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
