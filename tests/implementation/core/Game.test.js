@@ -521,4 +521,22 @@ describe('Implementation: Game Core Controllers', () => {
         game.fullReset();
         expect(game.returnBonus).toBe(0);
     });
+
+    describe('Zoom Persistence', () => {
+        it('should load zoom level from StorageUtils on initialization', () => {
+            // localStorage をモック（beforeEach で設定済み）
+            window.localStorage.setItem('game_zoom', '1.25');
+            const newGame = new Game(mockCanvas, mockUI);
+            expect(newGame.zoom).toBe(1.25);
+        });
+
+        it('should save zoom level to StorageUtils on wheel event', () => {
+            game.zoom = 0.5;
+            // wheelイベントをシミュレート
+            game.onWheel({ deltaY: -100, preventDefault: vi.fn() }); // zoomイン
+            const newZoom = game.zoom;
+            expect(newZoom).toBeGreaterThan(0.5);
+            expect(window.localStorage.setItem).toHaveBeenCalledWith('game_zoom', newZoom.toString());
+        });
+    });
 });

@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Game } from '../../../GravityFreight/src/core/Game.js';
 import { Vector2 } from '../../../GravityFreight/src/utils/Physics.js';
+import { FACILITY_INFO } from '../../../GravityFreight/src/core/Data.js';
 import { setupStandardDOM } from '../../test-utils.js';
 
 // TitleAnimation のモック化
@@ -69,5 +70,26 @@ describe('Implementation: MissionSystem Logic', () => {
         game.returnBonus = 0.1;
         game.missionSystem.resolveItems('returned');
         expect(game.returnBonus).toBeCloseTo(0.2);
+    });
+
+    it('Facility branches should use mapping from FACILITY_INFO', () => {
+        game.storySystem.unlockNext = vi.fn();
+
+        const testGoals = [
+            { id: 'TRADING_POST', type: 'TRADING_POST' },
+            { id: 'REPAIR_DOCK', type: 'REPAIR_DOCK' },
+            { id: 'BLACK_MARKET', type: 'BLACK_MARKET' }
+        ];
+
+        testGoals.forEach(goal => {
+            game.lastHitGoal = goal;
+            game.pendingItems = [{ itemData: { category: 'CARGO', deliveryGoalId: goal.id, id: 'test_cargo' } }];
+            
+            // 配送処理実行
+            game.missionSystem.resolveItems('success', goal);
+            
+            const expectedInitial = FACILITY_INFO[goal.id].id; // 'T', 'R', or 'B'
+            expect(game.storySystem.unlockNext).toHaveBeenCalledWith(expectedInitial);
+        });
     });
 });
