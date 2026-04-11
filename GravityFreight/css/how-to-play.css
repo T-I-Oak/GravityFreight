@@ -199,7 +199,7 @@
     flex-direction: column;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     will-change: opacity, transform, backdrop-filter;
-    transform: translateY(20px);
+    transform: translateY(-10px);
     opacity: 0;
 }
 
@@ -264,12 +264,6 @@
     font-weight: 700;
     flex-shrink: 0; /* タイトルは固定 */
     border-bottom: 1px solid rgba(0, 255, 204, 0.2); /* タイトル下の区切り線を復元 */
-    text-shadow: 
-        -1px -1px 0 #000,  
-         1px -1px 0 #000,
-        -1px  1px 0 #000,
-         1px  1px 0 #000,
-         2px  2px 4px rgba(0,0,0,0.8); /* 視認性向上のための黒い縁取りと影 */
 
     /* 登場アニメーション用初期状態 */
     opacity: 0;
@@ -294,11 +288,41 @@
     padding: 0;
 }
 
-#how-to-play-overlay .slide-content {
+#how-to-play-overlay .slide-content,
+#how-to-play-overlay .block-body {
     flex: 1;
-    overflow-y: auto; /* 通常（1カラム）時はここでスクロール */
+    overflow-y: auto;
     padding-top: 20px;
-    padding-right: 5px; /* スクロールバーとの重なり防止 */
+    padding-right: 15px;
+}
+
+#how-to-play-overlay.is-animating .slide-content,
+#how-to-play-overlay.is-animating .block-body,
+#how-to-play-overlay.is-animating .text-side,
+#how-to-play-overlay.is-animating .diagram-side {
+    overflow-y: hidden !important;
+}
+
+#how-to-play-overlay.is-animating .slide-content::-webkit-scrollbar,
+#how-to-play-overlay.is-animating .block-body::-webkit-scrollbar,
+#how-to-play-overlay.is-animating .text-side::-webkit-scrollbar,
+#how-to-play-overlay.is-animating .diagram-side::-webkit-scrollbar {
+    display: none !important;
+}
+/* 共通スクロールバースタイル */
+#how-to-play-overlay .slide-content::-webkit-scrollbar,
+#how-to-play-overlay .block-body::-webkit-scrollbar,
+#how-to-play-overlay .text-side::-webkit-scrollbar,
+#how-to-play-overlay .diagram-side::-webkit-scrollbar {
+    width: 4px;
+}
+
+#how-to-play-overlay .slide-content::-webkit-scrollbar-thumb,
+#how-to-play-overlay .block-body::-webkit-scrollbar-thumb,
+#how-to-play-overlay .text-side::-webkit-scrollbar-thumb,
+#how-to-play-overlay .diagram-side::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 204, 0.3);
+    border-radius: 10px;
 }
 
 /* Infoブロック以外の直接の子要素（pタグやリスト等）もアニメーションさせる */
@@ -306,7 +330,7 @@
 #how-to-play-overlay .slide-content > ul,
 #how-to-play-overlay .slide-content > ol {
     opacity: 0;
-    transform: translateY(15px);
+    transform: translateY(-10px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
@@ -318,19 +342,7 @@
     transition-delay: 0.35s;
 }
 
-/* モジュラーなスクロールバースタイル（base.css準拠だが、念のためここでも定義を確実に） */
-#how-to-play-overlay .slide-content::-webkit-scrollbar,
-#how-to-play-overlay .text-side::-webkit-scrollbar,
-#how-to-play-overlay .diagram-side::-webkit-scrollbar {
-    width: 4px;
-}
 
-#how-to-play-overlay .slide-content::-webkit-scrollbar-thumb,
-#how-to-play-overlay .text-side::-webkit-scrollbar-thumb,
-#how-to-play-overlay .diagram-side::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 204, 0.3);
-    border-radius: 10px;
-}
 
 /* 2列レイアウト時 */
 #how-to-play-overlay .slide-content.wide {
@@ -354,11 +366,15 @@
     height: 100%;
 }
 
-/* 非対話型の図解領域 */
+/* 非対話型の図解領域（縮まないように制御） */
 #how-to-play-overlay .diagram-side {
     display: flex;
     flex-direction: column;
-    pointer-events: none;
+    pointer-events: auto; /* スクロール可能にする */
+}
+
+#how-to-play-overlay .diagram-side > * {
+    flex-shrink: 0;
 }
 
 /* レスポンシブ：縦並び切り替え */
@@ -482,6 +498,22 @@
     font-weight: 700;
     font-size: 1.0rem;
     margin-bottom: 2px;
+}
+
+/* 施設カラー（Data.js一元化への追従） */
+/* 共通テキスト縁取り（発光させずに輪郭を強調） */
+#how-to-play-overlay .text-outline,
+#how-to-play-overlay h3,
+#how-to-play-overlay .status-trading-post,
+#how-to-play-overlay .status-repair-dock,
+#how-to-play-overlay .status-black-market,
+#how-to-play-overlay .block-header,
+#how-to-play-overlay .tip-box p,
+#how-to-play-overlay .list-desc,
+#how-to-play-overlay .flavor,
+#how-to-play-overlay .info-block p,
+#how-to-play-overlay ol li::before {
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
 }
 
 /* 施設カラー（Data.js一元化への追従） */
@@ -620,7 +652,7 @@
     gap: 15px;
     align-items: flex-start;
     will-change: opacity, transform, backdrop-filter;
-    transform: translateY(20px);
+    transform: translateY(-10px);
     opacity: 0;
 }
 
