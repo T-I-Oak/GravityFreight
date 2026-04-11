@@ -185,8 +185,12 @@
 
 #how-to-play-overlay .info-block {
     background: none;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition: 
+        opacity 0.6s ease-out, 
+        transform 0.6s ease-out, 
+        backdrop-filter 0.6s ease-out;
     border: 1px solid rgba(0, 255, 204, 0.25);
     border-radius: 12px;
     margin-bottom: 15px;
@@ -194,6 +198,17 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    will-change: opacity, transform, backdrop-filter;
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+#how-to-play-overlay .tutorial-slide.is-active .info-block {
+    opacity: 1;
+    transform: translateY(0);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition-delay: 0.3s; /* タイトルより少し遅れて登場 */
 }
 
 #how-to-play-overlay .block-header {
@@ -248,13 +263,24 @@
     font-size: 1.6rem;
     font-weight: 700;
     flex-shrink: 0; /* タイトルは固定 */
-    border-bottom: 1px solid rgba(0, 255, 204, 0.2); /* プロジェクト標準のシアンラインに修正 */
+    border-bottom: 1px solid rgba(0, 255, 204, 0.2); /* タイトル下の区切り線を復元 */
     text-shadow: 
         -1px -1px 0 #000,  
          1px -1px 0 #000,
         -1px  1px 0 #000,
          1px  1px 0 #000,
          2px  2px 4px rgba(0,0,0,0.8); /* 視認性向上のための黒い縁取りと影 */
+
+    /* 登場アニメーション用初期状態 */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+#how-to-play-overlay .tutorial-slide.is-active h3 {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.1s; /* 背景が見えてから少し遅れて表示 */
 }
 
 /* コンテンツ本体エリア */
@@ -273,6 +299,23 @@
     overflow-y: auto; /* 通常（1カラム）時はここでスクロール */
     padding-top: 20px;
     padding-right: 5px; /* スクロールバーとの重なり防止 */
+}
+
+/* Infoブロック以外の直接の子要素（pタグやリスト等）もアニメーションさせる */
+#how-to-play-overlay .slide-content > p,
+#how-to-play-overlay .slide-content > ul,
+#how-to-play-overlay .slide-content > ol {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+#how-to-play-overlay .tutorial-slide.is-active .slide-content > p,
+#how-to-play-overlay .tutorial-slide.is-active .slide-content > ul,
+#how-to-play-overlay .tutorial-slide.is-active .slide-content > ol {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.35s;
 }
 
 /* モジュラーなスクロールバースタイル（base.css準拠だが、念のためここでも定義を確実に） */
@@ -563,17 +606,30 @@
 #how-to-play-overlay .tip-box {
     margin-top: 10px;
     padding: 15px 18px;
-    background: rgba(0, 255, 204, 0.08);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(0, 255, 204, 0.05); 
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition: 
+        opacity 0.6s ease-out, 
+        transform 0.6s ease-out, 
+        backdrop-filter 0.6s ease-out;
     border: 1px solid rgba(0, 255, 204, 0.15);
     border-left: 4px solid var(--tutorial-accent);
     border-radius: 12px;
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.85);
-    line-height: 1.6;
     display: flex;
+    gap: 15px;
     align-items: flex-start;
+    will-change: opacity, transform, backdrop-filter;
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+#how-to-play-overlay .tutorial-slide.is-active .tip-box {
+    opacity: 1;
+    transform: translateY(0);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition-delay: 0.4s; /* Infoブロックよりさらに少し遅れて登場 */
 }
 
 #how-to-play-overlay .tip-box::before {

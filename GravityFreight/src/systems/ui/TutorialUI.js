@@ -8,6 +8,8 @@ export class TutorialUI {
         this.uiSystem = uiSystem;
         this.currentTutorialSlide = 0;
         this.totalTutorialSlides = 0;
+        this.lastSlideIndex = null;
+        this.isTransitioning = false;
         this._isInitialized = false;
         this.overlay = document.getElementById('how-to-play-overlay');
 
@@ -184,7 +186,7 @@ export class TutorialUI {
                         },
                         {
                             type: 'tip',
-                            text: '出口（アーク）に到達できず、境界線の外に出るか星へ激突すると、機体は失われます。激突した場合、回収していた荷物はすべてその場に遺された状態となります。また、ロケットのパーツも一部が残存することがあり、これらは次回の航行で再び回収することが可能です。'
+                            text: '激突した場合、回収していた荷物はすべてその場に残され、ロケットのパーツも一部が残ることがあります。これらは再び回収することができます。'
                         }
                     ],
                     right: [
@@ -519,11 +521,15 @@ export class TutorialUI {
         }
     }
 
-    show() {
-        this._ensureInitialized();
+    async show() {
+        if (!this._isInitialized) {
+            this._ensureInitialized();
+        }
+
         if (this.overlay) {
             this.overlay.classList.remove('hidden');
-            this.initSlider();
+            // スライダーの初期化
+            await this.initSlider();
         }
     }
 
@@ -534,23 +540,25 @@ export class TutorialUI {
         }
     }
 
-    initSlider() {
+    async initSlider() {
         this._ensureInitialized();
         if (this.dotsContainer) {
             this.dotsContainer.innerHTML = '';
             for (let i = 0; i < this.totalTutorialSlides; i++) {
                 const dot = document.createElement('div');
                 dot.className = `dot ${i === 0 ? 'active' : ''}`;
-                dot.onclick = (e) => {
+                dot.onclick = async (e) => {
                     e.stopPropagation();
-                    this.updateSlide(i);
+                    await this.updateSlide(i);
                 };
                 this.dotsContainer.appendChild(dot);
             }
         }
-        this.updateSlide(0);
-        // 全スライド共通の図解描画を呼び出し
-        this._drawDiagrams();
+        
+        // 最初のスライドを表示
+        this.currentTutorialSlide = 0;
+        this.lastSlideIndex = null;
+        await this.updateSlide(0);
     }
 
     /**
@@ -570,25 +578,48 @@ export class TutorialUI {
         }
     }
 
-    nextSlide() {
+    async nextSlide() {
+        if (this.isTransitioning) return;
         if (this.currentTutorialSlide < this.totalTutorialSlides - 1) {
-            this.updateSlide(this.currentTutorialSlide + 1);
+            await this.updateSlide(this.currentTutorialSlide + 1);
         }
     }
 
-    prevSlide() {
+    async prevSlide() {
+        if (this.isTransitioning) return;
         if (this.currentTutorialSlide > 0) {
-            this.updateSlide(this.currentTutorialSlide - 1);
+            await this.updateSlide(this.currentTutorialSlide - 1);
         }
     }
 
-    updateSlide(index) {
-        if (index < 0 || index >= this.totalTutorialSlides) return;
+    async updateSlide(index) {
+        if (index < 0 || index >= this.totalTutorialSlides || this.isTransitioning) return;
+
+        this.isTransitioning = true;
+        const slides = this.overlay.querySelectorAll('.tutorial-slide');
+
+        // 1. 現在のコンテンツをフェードアウト
+        if (this.lastSlideIndex !== null && slides[this.lastSlideIndex]) {
+            slides[this.lastSlideIndex].classList.remove('is-active');
+            // フェードアウトの完了を待つ
+            await new Promise(resolve => setTimeout(resolve, 400));
+        }
 
         this._stopAnimations();
         this.currentTutorialSlide = index;
+
+        // 2. 背景（トラック）を左右にスライド
         if (this.slidesContainer) {
             this.slidesContainer.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        // スライド移動の完了を待つ (CSS transition: 0.6s)
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        // 3. 次のコンテンツをフェードイン
+        const currentSlide = slides[this.currentTutorialSlide];
+        if (currentSlide) {
+            currentSlide.classList.add('is-active');
         }
 
         const dots = this.dotsContainer ? this.dotsContainer.querySelectorAll('.dot') : [];
@@ -596,13 +627,27 @@ export class TutorialUI {
             dot.classList.toggle('active', i === index);
         });
 
-        // 描画を更新
+        // 図解の描画更新
+        this._updateSlideDiagrams(index);
+
+        if (this.prevBtn) {
+            this.prevBtn.disabled = index === 0;
+        }
+        if (this.nextBtn) {
+            this.nextBtn.disabled = index === this.totalTutorialSlides - 1;
+        }
+
+        this.lastSlideIndex = index;
+        this.isTransitioning = false;
+    }
+
+    _updateSlideDiagrams(index) {
         if (index === 2) {
             const assembleBase = document.querySelector('#tutorial-assemble-diagram');
-            if (!assembleBase) throw new Error('#tutorial-assemble-diagram not found');
-            const diagramContainer = assembleBase.querySelector('.block-body');
-            if (!diagramContainer) throw new Error('.block-body not found in assemble diagram');
-            this._startAssembleAnimation(diagramContainer);
+            if (assembleBase) {
+                const diagramContainer = assembleBase.querySelector('.block-body');
+                if (diagramContainer) this._startAssembleAnimation(diagramContainer);
+            }
         } else if (index === 3) {
             const launchBase = document.querySelector('#tutorial-launch-diagram');
             if (launchBase) {
@@ -611,13 +656,6 @@ export class TutorialUI {
             }
         } else if (index === 4) {
             this._startNavigationAnimation();
-        }
-
-        if (this.prevBtn) {
-            this.prevBtn.disabled = index === 0;
-        }
-        if (this.nextBtn) {
-            this.nextBtn.disabled = index === this.totalTutorialSlides - 1;
         }
     }
 
