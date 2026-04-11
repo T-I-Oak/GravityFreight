@@ -118,4 +118,31 @@ describe('PhysicsOrchestrator', () => {
         expect(game.state).not.toBe('finishing');
         expect(mockCushion.charges).toBe(0); // バウンドして消費された
     });
+
+    it('Impact Cushion should NOT work and ship should crash when charges are 0', () => {
+        // 通常の星のセットアップ
+        const regularStar = { position: new Vector2(200, 200), radius: 30, isHome: false };
+        game.bodies = [regularStar];
+        
+        // 耐久値 0 のクッション
+        const mockCushion = { id: 'mod_cushion', charges: 0, maxCharges: 3 };
+        game.ship = {
+            position: new Vector2(200, 231), // 衝突圏内
+            velocity: new Vector2(0, -50),
+            mass: 10,
+            isSafeToReturn: true,
+            equippedModules: [mockCushion],
+            trail: []
+        };
+        
+        // 衝突判定を実行
+        game.physicsOrchestrator.checkCollisions(game.ship.position);
+        
+        // 結果を確認: 
+        // 1. 回避が発動せず、ゲーム状態が finishing になっている（衝突）
+        // 2. 耐久値は 0 のまま
+        expect(game.state).toBe('finishing');
+        expect(game.finishResult).toBe('crashed');
+        expect(mockCushion.charges).toBe(0);
+    });
 });
