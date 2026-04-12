@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/GravityFreight/assets/favicon-CdrwZTe2.png">
+    <title>Gravity Freight: ORBITAL ECHOES</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
+        rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+
+
+  <script type="module" crossorigin src="/GravityFreight/assets/main-yoW0mShb.js"></script>
+  <link rel="stylesheet" crossorigin href="/GravityFreight/assets/main-UQvGb0Id.css">
+</head>
+
+<body>
+    <!-- タイトル画面 -->
+    <div id="title-screen">
+        <canvas id="title-bg-canvas"></canvas>
+        <div class="title-container">
+            <h1 class="game-logo">GRAVITY FREIGHT<br><span class="subtitle">ORBITAL ECHOES</span></h1>
+            <div class="menu-buttons">
+                <button id="start-game-btn" class="btn-neon">BEGIN CONTRACT</button>
+                <button id="how-to-play-btn" class="btn-neon outline">HOW TO PLAY</button>
+                <button id="ranking-btn" class="btn-neon outline">RANKING</button>
+            </div>
+        </div>
+        <canvas id="title-fg-canvas"></canvas>
+        <div id="title-settings-btn" class="settings-btn" title="SETTINGS">⚙</div>
+        <div class="title-footer">
+            <div id="version">v-.--.-</div>
+            <span class="copyright">© T.I.OAK 2026</span>
+        </div>
+    </div>
+
+
+    <!-- ランキング画面 (v0.31.0) -->
+    <div id="ranking-overlay" class="hidden">
+        <div class="ranking-modal">
+            <div class="ranking-header">
+                <h2>RANKINGS</h2>
+            </div>
+            <div class="ranking-tabs">
+                <button class="ranking-tab-btn active" data-category="score">SCORE</button>
+                <button class="ranking-tab-btn" data-category="sector">SECTOR</button>
+                <button class="ranking-tab-btn" data-category="collected">COLLECTED</button>
+            </div>
+            <div class="ranking-content">
+                <div id="ranking-list-container" class="ranking-list">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+            <div class="ranking-footer">
+                <button id="close-ranking-btn" class="btn-neon close-ranking-btn">RETURN TO MISSION</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 操作説明パネル -->
+    <div id="how-to-play-overlay" class="overlay hidden">
+        <div class="modal tutorial-modal">
+            <div class="modal-header">
+                <h2>HOW TO PLAY</h2>
+            </div>
+            <div class="tutorial-slider">
+                <div class="tutorial-slides" id="tutorial-slides">
+                    <!-- Dynamic content rendered by TutorialUI.js -->
+                </div>
+            </div>
+            <div class="tutorial-nav">
+                <div class="nav-controls">
+                    <button class="nav-btn prev" id="prev-tutorial-btn">&lt; BACK</button>
+                    <div class="tutorial-dots" id="tutorial-dots"></div>
+                    <button class="nav-btn next" id="next-tutorial-btn">NEXT &gt;</button>
+                </div>
+                <button class="nav-btn close-action highlight" id="tutorial-close-btn-bottom">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mission-hud" class="panel static hidden">
+        <div class="panel-header">
+            <h1 id="title">GRAVITY FREIGHT<span class="subtitle">ORBITAL ECHOES</span></h1>
+            <div id="mail-status-group" class="mail-icons-group">
+                <button id="mail-btn-0" class="mail-icon-btn gray" disabled>
+                    <div class="mail-envelope"></div>
+                </button>
+                <button id="mail-btn-1" class="mail-icon-btn gray" disabled>
+                    <div class="mail-envelope"></div>
+                </button>
+                <button id="mail-btn-2" class="mail-icon-btn gray" disabled>
+                    <div class="mail-envelope"></div>
+                </button>
+            </div>
+        </div>
+        <div id="hud-metrics">
+            <div class="metric"><span class="label">SECTOR</span><span id="sector-display">1</span></div>
+            <div class="metric"><span class="label">SCORE</span><span id="score-display">0</span></div>
+            <div class="metric"><span class="label">COIN</span><span id="coin-display">0</span></div>
+        </div>
+    </div>
+
+    <div id="result-overlay" class="hidden">
+        <div id="result-panel">
+            <div id="result-header">
+                <h2 id="result-title">MISSION STATUS</h2>
+                <div id="result-subtitle">SECTOR COMPLETED</div>
+            </div>
+            <div id="result-content">
+                <div class="result-summary prominent">
+                    <div class="total-score-box">
+                        <span class="label">FINAL MISSION SCORE</span>
+                        <span id="result-total-score">0</span>
+                    </div>
+                    <div class="total-coin-card">
+                        <span class="label">TOTAL CREDITS EARNED</span>
+                        <span id="result-total-coin">0</span>
+                    </div>
+                </div>
+                <div class="result-columns">
+                    <div class="res-col-left result-section">
+                        <h3>FLIGHT PERFORMANCE DATA</h3>
+                        <div id="result-stats-list"></div>
+                    </div>
+                    <div class="res-col-right result-section">
+                        <h3>COLLECTED SPACE ASSETS</h3>
+                        <div id="result-items-list"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="result-footer">
+                <div class="result-actions" id="result-actions">
+                    <button id="result-view-map-btn" class="btn-neon btn-neon-lg btn-grad-cyan outline">VIEW
+                        MAP</button>
+                    <button id="result-close-btn" class="btn-neon btn-neon-lg btn-grad-orange">RETRY MISSION</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="build-overlay" class="hidden">
+        <div class="panel" id="terminal-panel">
+            <div class="panel-header">
+                <div class="tab-header">
+                    <button class="tab-btn active" data-tab="flight">FLIGHT</button>
+                    <button class="tab-btn" data-tab="factory">ASSEMBLY</button>
+                </div>
+                <div id="panel-controls">
+                    <button class="collapse-btn" id="terminal-collapse-btn">
+                        <span class="icon-chevron"></span>
+                    </button>
+                </div>
+            </div>
+            <div id="panel-scroll-area">
+                <div id="flight-tab" class="tab-content">
+                    <div class="category rockets">
+                        <h3>ROCKET</h3>
+                        <div id="rocket-list"></div>
+                    </div>
+                    <div class="category launchers">
+                        <h3>LAUNCHER</h3>
+                        <div id="launcher-list"></div>
+                    </div>
+                    <div class="category boosters">
+                        <h3>BOOSTER</h3>
+                        <div id="acc-option-list" class="option-list">
+                            <div class="slot-placeholder">No Booster Equipped</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="factory-tab" class="tab-content hidden">
+                    <div class="category chassis">
+                        <h3>CHASSIS</h3>
+                        <div id="chassis-list"></div>
+                    </div>
+                    <div class="category logic">
+                        <h3>LOGIC</h3>
+                        <div id="logic-list"></div>
+                    </div>
+                    <div class="category modules">
+                        <h3>MODULE</h3>
+                        <div id="logic-option-list" class="option-list">
+                            <div class="slot-placeholder">Slot Empty (Requires Research)</div>
+                        </div>
+                    </div>
+                    <button id="build-btn" class="btn-neon btn-neon-sm btn-grad-green" disabled>
+                        <span class="btn-label">ASSEMBLE ROCKET</span>
+                        <span class="btn-subtext">シャーシとロジックを選択すると建造できます</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="launch-control" class="hidden">
+        <button id="launch-btn" class="btn-neon btn-neon-lg btn-grad-orange hidden bounce" disabled>
+            <span class="btn-label">LAUNCH ENGINE</span>
+            <span class="btn-subtext">ロケットと発射台を選択すると発射できます</span>
+        </button>
+    </div>
+    <button id="back-to-result-btn" class="btn-neon btn-neon-lg btn-grad-green hidden bounce">BACK TO RESULT</button>
+
+    <div id="star-info-panel" class="panel hidden">
+        <h2 id="star-info-title">STAR CORE</h2>
+        <div id="star-info-list" class="category"></div>
+    </div>
+
+    <div id="event-screen" class="hidden">
+        <div class="event-backdrop"></div>
+        <div class="event-modal">
+            <div class="event-header">
+                <div class="event-icon" id="event-icon"></div>
+                <div class="event-title-group">
+                    <h2 id="event-location">TRADING POST</h2>
+                    <p id="event-description">Orbital supply station for cargo trading.</p>
+                </div>
+            </div>
+            <div class="event-content" id="event-content"></div>
+            <div class="event-footer">
+                <div class="player-credits">
+                    <span class="label">CREDITS:</span>
+                    <span class="value" id="event-player-credits">0</span>
+                    <span class="currency">c</span>
+                </div>
+                <button id="event-continue-btn" class="premium-button">DEPART FROM STATION</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sector-notification" class="sector-notif hidden"></div>
+    <div id="ui-layer"></div>
+    <div id="receipt-overlay" class="receipt-view hidden">
+        <div class="receipt-paper" id="receipt-content-area"></div>
+    </div>
+
+    <!-- ストーリー表示モーダル (v0.15) -->
+    <div id="story-overlay" class="hidden">
+        <div class="story-modal">
+            <div class="story-header">
+                <div class="story-branch-icon" id="story-branch-icon">T</div>
+                <h2 id="story-title">STORY TITLE</h2>
+            </div>
+            <div id="story-discovery" class="story-discovery-msg">DISCOVERY MESSAGE</div>
+            <div id="story-content" class="story-content-body">STORY CONTENT</div>
+            <div class="story-footer">
+                <button id="close-story-btn" class="btn-neon btn-grad-cyan">CLOSE COMMUNICATION</button>
+            </div>
+        </div>
+    </div>
+    <!-- 設定パネル -->
+    <div id="settings-overlay" class="hidden">
+        <div class="panel settings-modal">
+            <div class="panel-header">
+                <h2>SETTINGS</h2>
+                <button id="close-settings-btn" class="close-btn">×</button>
+            </div>
+            <div class="panel-content">
+                <div class="settings-section">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-name">SOUND VOLUME</span>
+                            <span id="volume-value-display" class="setting-value">50%</span>
+                        </div>
+                        <input type="range" id="se-volume-slider" min="0" max="100" value="50" class="premium-slider">
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button id="settings-done-btn" class="btn-neon">DONE</button>
+            </div>
+        </div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
