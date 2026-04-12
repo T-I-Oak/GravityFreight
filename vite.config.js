@@ -19,6 +19,7 @@ export default defineConfig({
     // 最新のブラウザをターゲットに設定し、新しい CSS プロパティが削られるのを防ぐ
     target: 'esnext',
     cssTarget: 'chrome100',
+    cssMinify: false, // CSS の圧縮を無効化してプロパティが削られるのを防ぐ（デバッグ用）
     // 資産のハッシュ化（Vite のデフォルト）
     assetsInlineLimit: 0, // 小さな画像も別ファイルとして出力してキャッシュ管理を容易にする
     rollupOptions: {
