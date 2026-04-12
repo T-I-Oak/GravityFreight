@@ -1,4 +1,4 @@
-import { ITEM_REGISTRY, UI_COLORS, GOAL_COLORS, GOAL_NAMES, MAP_CONSTANTS, GAME_BALANCE } from '../../core/Data.js';
+import { ITEM_REGISTRY, UI_COLORS, GOAL_COLORS, CATEGORY_COLORS, GOAL_NAMES, MAP_CONSTANTS, GAME_BALANCE } from '../../core/Data.js';
 import { TUTORIAL_SLIDES } from './TutorialSlidesData.js';
 import { TutorialDiagrams } from './TutorialDiagrams.js';
 
@@ -265,6 +265,12 @@ export class TutorialUI {
             '--repair-dock-color': GOAL_COLORS.REPAIR_DOCK,
             '--black-market-color': GOAL_COLORS.BLACK_MARKET
         };
+
+        // Data.js のカテゴリーカラーも同期 (チュートリアル内の用語強調用)
+        Object.entries(CATEGORY_COLORS).forEach(([key, val]) => {
+            styles[`--color-${key.toLowerCase()}`] = val;
+        });
+
         if (this.overlay) Object.entries(styles).forEach(([p, v]) => this.overlay.style.setProperty(p, v));
     }
 

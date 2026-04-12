@@ -521,6 +521,14 @@
 #how-to-play-overlay .status-repair-dock  { color: var(--repair-dock-color); font-weight: 800; filter: brightness(0.85); }
 #how-to-play-overlay .status-black-market { color: var(--black-market-color); font-weight: 800; filter: brightness(0.85); }
 
+/* カテゴリー個別カラー */
+#how-to-play-overlay .status-rockets    { color: var(--color-rockets); font-weight: 800; }
+#how-to-play-overlay .status-chassis    { color: var(--color-chassis); font-weight: 800; }
+#how-to-play-overlay .status-logic      { color: var(--color-logic); font-weight: 800; }
+#how-to-play-overlay .status-launchers  { color: var(--color-launchers); font-weight: 800; }
+#how-to-play-overlay .status-modules    { color: var(--color-modules); font-weight: 800; }
+#how-to-play-overlay .status-boosters    { color: var(--color-boosters); font-weight: 800; }
+
 #how-to-play-overlay .step-item-desc {
     margin-left: 20px;
     font-size: 0.95rem;

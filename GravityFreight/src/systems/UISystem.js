@@ -28,6 +28,23 @@ export class UISystem {
         this.titleAnimation = null;
         this.notificationTimer = null;
         this.hudManager.setupStoryListeners();
+        this._applyThemeVariables();
+    }
+
+    /**
+     * Data.js の定義色を CSS 変数としてセットする。
+     * これにより CSS 側で var(--color-chassis) のように参照可能になる。
+     */
+    _applyThemeVariables() {
+        const root = document.documentElement;
+        Object.entries(CATEGORY_COLORS).forEach(([key, color]) => {
+            const varName = `--color-${key.toLowerCase()}`;
+            root.style.setProperty(varName, color);
+            
+            // 透過色も必要になることが多いため生成しておく (RGBA)
+            const rgba = hexToRgba(color, 0.2);
+            root.style.setProperty(`${varName}-alpha`, rgba);
+        });
     }
 
     update(dt) {

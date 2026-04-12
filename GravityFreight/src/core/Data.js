@@ -24,12 +24,12 @@ export const ANIMATION_DURATION = 1200; // ミリ秒単位
 
 // カテゴリ別のイメージカラー定義（要求仕様書と同期）
 export const CATEGORY_COLORS = {
-    CHASSIS: '#ffab40',
-    LOGIC: '#00bcd4',
+    CHASSIS: '#90a4ae',
+    LOGIC: '#4488ff',
     LAUNCHERS: '#4caf50',
     MODULES: '#9c27b0',
-    BOOSTERS: '#795548',
-    ROCKETS: '#c0c0c0',
+    BOOSTERS: '#8d6e63',
+    ROCKETS: '#81ecec',
     COIN: '#ffd700',
     CARGO: '#00e5ff',
     MARKET: '#ff4d4d'

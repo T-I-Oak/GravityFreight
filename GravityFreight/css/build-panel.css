@@ -161,13 +161,32 @@
     display: none;
 }
 
+#build-overlay .category {
+    margin-top: 8px;
+}
+
+#build-overlay .category:first-of-type {
+    margin-top: 0;
+}
+
 #build-overlay .category h3 {
-    margin: 0 0 10px 0;
-    font-size: 10px;
+    margin: 0 0 4px 0;
+    font-size: 11px;
+    font-weight: 900;
     letter-spacing: 2px;
     color: rgba(255, 255, 255, 0.4);
     text-transform: uppercase;
+    
+    /* カテゴリーごとの色を適用するためのカスタムプロパティ */
+    transition: color 0.3s;
 }
+
+#build-overlay .category.rockets h3 { --cat-color: var(--color-rockets); color: var(--color-rockets); }
+#build-overlay .category.launchers h3 { --cat-color: var(--color-launchers); color: var(--color-launchers); }
+#build-overlay .category.boosters h3 { --cat-color: var(--color-boosters); color: var(--color-boosters); }
+#build-overlay .category.chassis h3 { --cat-color: var(--color-chassis); color: var(--color-chassis); }
+#build-overlay .category.logic h3 { --cat-color: var(--color-logic); color: var(--color-logic); }
+#build-overlay .category.modules h3 { --cat-color: var(--color-modules); color: var(--color-modules); }
 
 #build-overlay .option-list {
     display: flex;

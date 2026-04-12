@@ -36,8 +36,8 @@ export const TUTORIAL_SLIDES = [
                     list: {
                         type: 'ol',
                         items: [
-                            { title: 'ASSEMBLE', text: '収集したパーツを組み合わせてロケットを建造します。' },
-                            { title: 'LAUNCH', text: '建造したロケットとブースターを選択し、宇宙へ発射します。' },
+                            { title: 'ASSEMBLE', text: '収集したパーツを組み合わせて<span class="status-rockets">ロケット</span>を建造します。' },
+                            { title: 'LAUNCH', text: '建造した<span class="status-rockets">ロケット</span>と<span class="status-boosters">ブースター</span>を選択し、宇宙へ発射します。' },
                             { title: 'NAVIGATION', text: '星々の重力を利用して自動航行し、荷物を回収しながら出口（アーク）を目指します。' },
                             { title: 'DELIVERY / RETURN', text: '到達した出口（アーク）に応じた施設での取引、あるいは母星への帰還によって次なる航走に備えます。' }
                         ]
@@ -65,8 +65,8 @@ export const TUTORIAL_SLIDES = [
                         className: 'number-list',
                         items: [
                             { text: '<strong>ASSEMBLY</strong> タブを選択します。' },
-                            { text: '<strong>シャーシ</strong>、<strong>ロジック</strong>を選択します。また、シャーシなどが持つスロットの数だけ<strong>モジュール</strong>を搭載することができます。' },
-                            { text: '<strong>ASSEMBLE ROCKET</strong> ボタンを押してロケットを建造します。' }
+                            { text: '<strong><span class="status-chassis">シャーシ</span></strong>、<strong><span class="status-logic">ロジック</span></strong>を選択します。また、シャーシなどが持つスロットの数だけ<strong><span class="status-modules">モジュール</span></strong>を搭載することができます。' },
+                            { text: '<strong>ASSEMBLE ROCKET</strong> ボタンを押して<span class="status-rockets">ロケット</span>を建造します。' }
                         ]
                     }
                 },
@@ -108,15 +108,15 @@ export const TUTORIAL_SLIDES = [
                         type: 'ol',
                         className: 'number-list',
                         items: [
-                            { text: '<strong>FLIGHT</strong> タブから、建造済みの <strong>ロケット</strong> と <strong>発射台</strong> を選択します。このとき航行をサポートする <strong>ブースター</strong> を1つ選択することができます。' },
-                            { text: 'ロケットと発射台を選択すると母星にロケットが表示されます。タップして <strong>発射方向</strong> を決定します。' },
-                            { text: '<strong>LAUNCH ENGINE</strong> ボタンをタップしてロケットを発射します（使用したブースターは消費されます）。' }
+                            { text: '<strong>FLIGHT</strong> タブから、建造済みの <strong><span class="status-rockets">ロケット</span></strong> と <strong><span class="status-launchers">発射台</span></strong> を選択します。このとき航行をサポートする <strong><span class="status-boosters">ブースター</span></strong> を1つ選択することができます。' },
+                            { text: '<span class="status-rockets">ロケット</span>と<span class="status-launchers">発射台</span>を選択すると母星にロケットが表示されます。タップして <strong>発射方向</strong> を決定します。' },
+                            { text: '<strong>LAUNCH ENGINE</strong> ボタンをタップして<span class="status-rockets">ロケット</span>を発射します（使用した<span class="status-boosters">ブースター</span>は消費されます）。' }
                         ]
                     }
                 },
                 {
                     type: 'tip',
-                    text: '発射台は使用回数制限に達すると消失します。発射台がすべてなくなるか、発射するロケットが準備できない場合は任務終了（ゲームオーバー）となります。'
+                    text: '<span class="status-launchers">発射台</span>は使用回数制限に達すると消失します。<span class="status-launchers">発射台</span>がすべてなくなるか、発射する<span class="status-rockets">ロケット</span>が準備できない場合は任務終了（ゲームオーバー）となります。'
                 }
             ],
             right: [
@@ -175,7 +175,7 @@ export const TUTORIAL_SLIDES = [
                 },
                 {
                     type: 'tip',
-                    text: '出口（アーク）に到達できず、境界線の外に出るか星へ激突すると、ロケットは失われます。激突した場合、回収していた荷物はすべてその場に残され、ロケットのパーツも一部が残ることがあります。これらは再び回収することができます。'
+                    text: '出口（アーク）に到達できず、境界線の外に出るか星へ激突すると、<span class="status-rockets">ロケット</span>は失われます。激突した場合、回収していた荷物はすべてその場に残され、<span class="status-rockets">ロケット</span>のパーツも一部が残ることがあります。これらは再び回収することができます。'
                 }
             ],
             right: [
