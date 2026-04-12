@@ -29,6 +29,17 @@ export class UISystem {
         this.notificationTimer = null;
         this.hudManager.setupStoryListeners();
         this._applyThemeVariables();
+        this._initVersionDisplay();
+    }
+
+    /**
+     * バージョン表記を実データで初期化する
+     */
+    _initVersionDisplay() {
+        const versionEl = document.getElementById('version');
+        if (versionEl) {
+            versionEl.textContent = `v${this.game.version}`;
+        }
     }
 
     /**
