@@ -1,4 +1,4 @@
-import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, UI_COLORS, RARITY, ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS, FACILITY_INFO } from '../core/Data.js';
+import { PARTS, CATEGORY_COLORS, GOAL_COLORS, GOAL_NAMES, UI_COLORS, RARITY, GAME_BALANCE, MAP_CONSTANTS, FACILITY_INFO } from '../core/Data.js';
 import { Body, Vector2 } from '../utils/Physics.js';
 
 export class MissionSystem {

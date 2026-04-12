@@ -41,6 +41,9 @@ describe('Spec: Items & Data (Chapter 4)', () => {
                 checkItem('mod_emergency', { rarity: RARITY.ANOMALY });
                 checkItem('mod_stabilizer', { rarity: RARITY.ANOMALY });
             });
+            it('insurance should be COMMON', () => {
+                checkItem('mod_insurance', { rarity: RARITY.COMMON });
+            });
         });
 
         describe('Core Equipment Specs', () => {
@@ -56,17 +59,17 @@ describe('Spec: Items & Data (Chapter 4)', () => {
             it('validation of cargo names and descriptions', () => {
                 checkItem('cargo_safe', { 
                     name: '通商物資', 
-                    description: 'Trading Post への配送用物資。',
+                    description: 'Trading Post への配送を目的とした荷物。',
                     rarity: RARITY.RARE 
                 });
                 checkItem('cargo_normal', { 
                     name: '整備用パーツ', 
-                    description: 'Repair Dock への配送用パーツ。',
+                    description: 'Repair Dock への配送を目的とした整備用パーツ。',
                     rarity: RARITY.RARE 
                 });
                 checkItem('cargo_danger', { 
                     name: '暗号化データ', 
-                    description: 'Black Market への配送用データ。',
+                    description: 'Black Market への配送を目的とした暗号化データ。',
                     rarity: RARITY.RARE 
                 });
             });
@@ -100,27 +103,27 @@ describe('Spec: Items & Data (Chapter 4)', () => {
             it('should have correct names and descriptions for primary and ghost modules', () => {
                 checkItem('mod_star_breaker', {
                     name: 'スター・ブレイカー',
-                    description: '星に激突する直前に星を破壊して回避。'
+                    description: '星に激突する直前、高出力パルスで対象を破壊する衝突回避装置。'
                 });
                 checkItem('mod_cushion', {
                     name: 'インパクト・クッション',
-                    description: '星に激突したときにバウンドして回避。'
+                    description: '星に激突した際、反発場を展開してバウンドする衝突緩衝モジュール。'
                 });
                 checkItem('mod_emergency', {
                     name: '緊急スラスター',
-                    description: '境界線で自動方向転換してロストを回避。'
+                    description: '境界線でのロストを回避するための、自動方向転換用スラスター。'
                 });
                 checkItem('mod_gst_breaker', {
                     name: 'ブレイカー・ゴースト',
-                    description: 'スター・ブレイカーで星を破壊するときの予測線を表示。'
+                    description: 'スター・ブレイカー作動時の想定軌道を演算し、航法システムへ表示する補助機能。'
                 });
                 checkItem('mod_gst_cushion', {
                     name: 'クッション・ゴースト',
-                    description: 'インパクト・クッションで星を回避したときの予測線を表示。'
+                    description: 'インパクト・クッション作動時の想定軌道を演算し、航法システムへ表示する補助機能。'
                 });
                 checkItem('mod_gst_emergency', {
                     name: 'スラスター・ゴースト',
-                    description: '緊急スラスターで境界線を回避したときの予測線を表示。'
+                    description: '緊急スラスター作動時の想定軌道を演算し、航法システムへ表示する補助機能。'
                 });
             });
         });

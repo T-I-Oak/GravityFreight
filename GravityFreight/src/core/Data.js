@@ -108,56 +108,56 @@ export const getFacilityByType = (type) => FACILITY_INFO[type];
 
 export const PARTS = {
     CHASSIS: [
-        { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 1, precision: 100, rarity: RARITY.COMMON, description: '予測精度を抑えることで軽量化されたシャーシ。' },
-        { id: 'hull_medium', category: 'CHASSIS', name: '標準シャーシ', mass: 8, slots: 2, precision: 150, rarity: RARITY.COMMON, description: '汎用性の高い標準的なシャーシ。' },
-        { id: 'hull_heavy', category: 'CHASSIS', name: '堅牢シャーシ', mass: 18, slots: 3, precision: 200, rarity: RARITY.COMMON, description: '多くのモジュールを搭載できるが、初速は遅い。' },
-        { id: 'hull_light_plus', category: 'CHASSIS', name: '軽量シャーシ＋', mass: 3, slots: 1, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型軽量シャーシ。予測と取得が20%強化されている。' },
-        { id: 'hull_medium_plus', category: 'CHASSIS', name: '標準シャーシ＋', mass: 8, slots: 2, precision: 150, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型標準シャーシ。予測と取得が20%強化されている。' },
-        { id: 'hull_heavy_plus', category: 'CHASSIS', name: '堅牢シャーシ＋', mass: 18, slots: 3, precision: 200, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '改良型堅牢シャーシ。予測と取得が20%強化されている。' }
+        { id: 'hull_light', category: 'CHASSIS', name: '軽量シャーシ', mass: 3, slots: 1, precision: 100, rarity: RARITY.COMMON, description: 'スロットを減らした軽量化設計で機動性能を向上させたシャーシ。' },
+        { id: 'hull_medium', category: 'CHASSIS', name: '標準シャーシ', mass: 8, slots: 2, precision: 150, rarity: RARITY.COMMON, description: '汎用性と拡張性のバランスに優れた標準規格のシャーシ。' },
+        { id: 'hull_heavy', category: 'CHASSIS', name: '堅牢シャーシ', mass: 18, slots: 3, precision: 200, rarity: RARITY.COMMON, description: '初速制限と引き換えに多数の拡張枠を確保した重装甲シャーシ。' },
+        { id: 'hull_light_plus', category: 'CHASSIS', name: '軽量シャーシ＋', mass: 3, slots: 1, precision: 100, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '軌道予測とアイテム回収機能が強化された軽量シャーシの改良版。' },
+        { id: 'hull_medium_plus', category: 'CHASSIS', name: '標準シャーシ＋', mass: 8, slots: 2, precision: 150, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '軌道予測とアイテム回収機能が強化された標準シャーシの改良版。' },
+        { id: 'hull_heavy_plus', category: 'CHASSIS', name: '堅牢シャーシ＋', mass: 18, slots: 3, precision: 200, precisionMultiplier: 1.2, pickupMultiplier: 1.2, rarity: RARITY.RARE, description: '軌道予測とアイテム回収機能が強化された堅牢シャーシの改良版。' }
     ],
     LOGIC: [
-        { id: 'sensor_short', category: 'LOGIC', name: '広域回収ロジック', mass: 1, pickupRange: 40, pickupMultiplier: 1.2, rarity: RARITY.COMMON, description: '物資回収に特化した広域収集型。' },
-        { id: 'sensor_normal', category: 'LOGIC', name: '標準航法ロジック', mass: 1, precisionMultiplier: 1.2, pickupRange: 40, rarity: RARITY.COMMON, description: '汎用的な標準精度。' },
-        { id: 'sensor_long', category: 'LOGIC', name: '精密予測ロジック', mass: 1, precisionMultiplier: 1.5, pickupRange: 40, pickupMultiplier: 0.8, rarity: RARITY.COMMON, description: '長距離予測に特化。取得範囲は狭い。' },
-        { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.9, pickupRange: 40, rarity: RARITY.RARE, description: '重力の影響を軽減する特殊回路を搭載。' }
+        { id: 'sensor_short', category: 'LOGIC', name: '広域回収ロジック', mass: 1, pickupRange: 40, pickupMultiplier: 1.2, rarity: RARITY.COMMON, description: '物資回収範囲の拡大に特化した広域収集型のアルゴリズム。' },
+        { id: 'sensor_normal', category: 'LOGIC', name: '標準航法ロジック', mass: 1, precisionMultiplier: 1.2, pickupRange: 40, rarity: RARITY.COMMON, description: '状況を選ばず安定した性能を維持する標準仕様のロジック。' },
+        { id: 'sensor_long', category: 'LOGIC', name: '精密予測ロジック', mass: 1, precisionMultiplier: 1.5, pickupRange: 40, pickupMultiplier: 0.8, rarity: RARITY.COMMON, description: 'アイテム回収範囲を犠牲にし遠方までの軌道予測を優先した精密演算ロジック。' },
+        { id: 'sensor_gravity', category: 'LOGIC', name: '重力偏向ロジック', mass: 1, gravityMultiplier: 0.9, pickupRange: 40, rarity: RARITY.RARE, description: '星からの重力を特殊回路で軽減し軌道を安定させる偏向ロジック。' }
     ],
     LAUNCHERS: [
-        { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LN-1200/2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的な性能の発射台。' },
-        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PR-1000/2]', power: 1000, maxCharges: 2, precisionMultiplier: 1.2, rarity: RARITY.COMMON, description: '予測精度を20%向上させた発射台。発射速度は遅い。' },
-        { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LN-1210/3]', power: 1210, maxCharges: 3, rarity: RARITY.UNCOMMON, description: '標準発射台のスピードと容量を向上した改良版。' },
-        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PR-1010/3]', power: 1010, maxCharges: 3, precisionMultiplier: 1.2, rarity: RARITY.UNCOMMON, description: '精密発射台のスピードと容量を向上した改良版。' },
-        { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LN-1220/4]', power: 1220, maxCharges: 4, rarity: RARITY.RARE, description: '標準発射台のスピードと容量をさらに向上した改良版。' },
-        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PR-1020/4]', power: 1020, maxCharges: 4, precisionMultiplier: 1.2, rarity: RARITY.RARE, description: '精密発射台のスピードと容量をさらに向上した改良版。' }
+        { id: 'pad_standard_d2', category: 'LAUNCHERS', name: '標準発射台 [LN-1200/2]', power: 1200, maxCharges: 2, rarity: RARITY.COMMON, description: '標準的なパワーと容量を備えた、基本設計の発射台。' },
+        { id: 'pad_precision_d2', category: 'LAUNCHERS', name: '精密発射台 [PR-1000/2]', power: 1000, maxCharges: 2, precisionMultiplier: 1.2, rarity: RARITY.COMMON, description: '出力を抑える代わりに、予測精度の向上を図った精密射出装置。' },
+        { id: 'pad_standard_d3', category: 'LAUNCHERS', name: '標準発射台 [LN-1210/3]', power: 1210, maxCharges: 3, rarity: RARITY.UNCOMMON, description: '高い射出パワーと余裕のある耐久力を両立した、標準型の発射台。' },
+        { id: 'pad_precision_d3', category: 'LAUNCHERS', name: '精密発射台 [PR-1010/3]', power: 1010, maxCharges: 3, precisionMultiplier: 1.2, rarity: RARITY.UNCOMMON, description: '予測精度を維持しつつ、耐久性能の向上を図った精密射出装置。' },
+        { id: 'pad_standard_d4', category: 'LAUNCHERS', name: '標準発射台 [LN-1220/4]', power: 1220, maxCharges: 4, rarity: RARITY.RARE, description: '最大級の耐久性能を確保した、標準型発射台の最上位モデル。' },
+        { id: 'pad_precision_d4', category: 'LAUNCHERS', name: '精密発射台 [PR-1020/4]', power: 1020, maxCharges: 4, precisionMultiplier: 1.2, rarity: RARITY.RARE, description: '最大級の耐久性能を確保した、精密射出装置の最上位モデル。' }
     ],
     MODULES: [
-        { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: '拡張スロットを追加するモジュール。' },
-        { id: 'mod_star_breaker', category: 'MODULES', name: 'スター・ブレイカー', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '星に激突する直前に星を破壊して回避。' },
-        { id: 'mod_cushion', category: 'MODULES', name: 'インパクト・クッション', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '星に激突したときにバウンドして回避。' },
-        { id: 'mod_emergency', category: 'MODULES', name: '緊急スラスター', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '境界線で自動方向転換してロストを回避。' },
-        { id: 'mod_stabilizer', category: 'MODULES', name: '軌道安定化装置', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.ANOMALY, description: 'ロケットにかかる重力を20%軽減するモジュール。' },
-        { id: 'mod_analyzer', category: 'MODULES', name: 'オービット・アナリスト', mass: 1, precisionMultiplier: 1.2, rarity: RARITY.UNCOMMON, description: '予測精度を20%強化するモジュール。' },
-        { id: 'mod_insurance', category: 'MODULES', name: 'ロスト保険', mass: 1, onLostBonus: 1, rarity: RARITY.UNCOMMON, description: 'ロケットを失った時に保険金が受給される。重複可。' },
-        { id: 'mod_gst_breaker', category: 'MODULES', name: 'ブレイカー・ゴースト', mass: 1, ghostType: 'breaker', rarity: RARITY.RARE, description: 'スター・ブレイカーで星を破壊するときの予測線を表示。' },
-        { id: 'mod_gst_cushion', category: 'MODULES', name: 'クッション・ゴースト', mass: 1, ghostType: 'cushion', rarity: RARITY.RARE, description: 'インパクト・クッションで星を回避したときの予測線を表示。' },
-        { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '緊急スラスターで境界線を回避したときの予測線を表示。' }
+        { id: 'mod_capacity', category: 'MODULES', name: 'スロット拡張基板', mass: 1, slots: 2, rarity: RARITY.UNCOMMON, description: 'スロット数を増設しロケットの拡張性を高める追加基板。' },
+        { id: 'mod_star_breaker', category: 'MODULES', name: 'スター・ブレイカー', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '星に激突する直前、高出力パルスで対象を破壊する衝突回避装置。' },
+        { id: 'mod_cushion', category: 'MODULES', name: 'インパクト・クッション', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '星に激突した際、反発場を展開してバウンドする衝突緩衝モジュール。' },
+        { id: 'mod_emergency', category: 'MODULES', name: '緊急スラスター', mass: 1, maxCharges: 2, rarity: RARITY.ANOMALY, description: '境界線でのロストを回避するための、自動方向転換用スラスター。' },
+        { id: 'mod_stabilizer', category: 'MODULES', name: '軌道安定化装置', mass: 1, gravityMultiplier: 0.8, rarity: RARITY.ANOMALY, description: '強力な重力軽減で軌道を安定させる、1フライト限りの使い切り装置。' },
+        { id: 'mod_analyzer', category: 'MODULES', name: 'オービット・アナリスト', mass: 1, precisionMultiplier: 1.2, rarity: RARITY.UNCOMMON, description: '演算アルゴリズムを最適化して予測精度を向上させる解析モジュール。' },
+        { id: 'mod_insurance', category: 'MODULES', name: 'ロスト保険', mass: 1, onLostBonus: 1, rarity: RARITY.COMMON, description: 'ロケット消失時に査定価格に応じた保険金が支払われる、重複受給可能な保証プラン。' },
+        { id: 'mod_gst_breaker', category: 'MODULES', name: 'ブレイカー・ゴースト', mass: 1, ghostType: 'breaker', rarity: RARITY.RARE, description: 'スター・ブレイカー作動時の想定軌道を演算し、航法システムへ表示する補助機能。' },
+        { id: 'mod_gst_cushion', category: 'MODULES', name: 'クッション・ゴースト', mass: 1, ghostType: 'cushion', rarity: RARITY.RARE, description: 'インパクト・クッション作動時の想定軌道を演算し、航法システムへ表示する補助機能。' },
+        { id: 'mod_gst_emergency', category: 'MODULES', name: 'スラスター・ゴースト', mass: 1, ghostType: 'emergency', rarity: RARITY.RARE, description: '緊急スラスター作動時の想定軌道を演算し、航法システムへ表示する補助機能。' }
     ],
     BOOSTERS: [
-        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '発射台の燃料の代わりに使用できる1回分の強化燃料。' },
-        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '発射台の燃料の代わりに使用できる2回分の強化燃料。' },
-        { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間重力を無視して直進する。' },
-        { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', powerMultiplier: 1.3, rarity: RARITY.COMMON, description: '発射パワーを30%強化する。' },
-        { id: 'boost_magnet', category: 'BOOSTERS', name: 'マグネティック・パルス', rarity: RARITY.RARE, description: '航行時間とともにアイテム回収範囲が拡大する。' },
-        { id: 'boost_expander', category: 'BOOSTERS', name: 'アーク・エクスパンダー', arcMultiplier: 2.0, rarity: RARITY.RARE, description: '出口サイズを2.0倍に拡大する。' }
+        { id: 'opt_fuel', category: 'BOOSTERS', name: '高反応燃料', powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 1, rarity: RARITY.COMMON, description: '燃料を代用しつつ射出パワーを強化する、1回分の高反応燃料カートリッジ。' },
+        { id: 'opt_fuel_pack', category: 'BOOSTERS', name: '高反応燃料パック', powerMultiplier: 1.2, preventsLauncherWear: true, maxCharges: 2, rarity: RARITY.UNCOMMON, description: '燃料を代用しつつ射出パワーを強化する、大容量の高反応燃料カートリッジ。' },
+        { id: 'boost_flash', category: 'BOOSTERS', name: '閃光推進剤', gravityMultiplier: 0.1, duration: 100, rarity: RARITY.RARE, description: '一定時間、星の重力をほぼ無効化して直進性能を向上させる高反応添加剤。' },
+        { id: 'boost_power', category: 'BOOSTERS', name: '高出力パワーブレード', powerMultiplier: 1.3, rarity: RARITY.COMMON, description: 'エンジンの燃焼効率を一時的に高め、射出パワーを強化する高出力添加剤。' },
+        { id: 'boost_magnet', category: 'BOOSTERS', name: 'マグネティック・パルス', rarity: RARITY.RARE, description: '航行時間とともに回収範囲を拡大し続ける、1回限りの磁気パルス発生装置。' },
+        { id: 'boost_expander', category: 'BOOSTERS', name: 'アーク・エクスパンダー', arcMultiplier: 2.0, rarity: RARITY.RARE, description: '出口（アーク）の有効半径を2倍に拡大させる、1回限りの磁気干渉装置。' }
     ],
     COIN: [
-        { id: 'coin_100', category: 'COIN', name: '100コイン', score: 100, rarity: RARITY.UNCOMMON, description: '通貨。獲得時に100コイン加算される。' },
-        { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '通貨。獲得時に200コイン加算される。' }
+        { id: 'coin_100', category: 'COIN', name: '100コイン', score: 100, rarity: RARITY.UNCOMMON, description: '交易所での支払いや設備の利用に用いられる、標準的な通貨チップ。' },
+        { id: 'coin_200', category: 'COIN', name: '200コイン', score: 200, rarity: RARITY.RARE, description: '大口取引のために高密度のデータが記録された上位の通貨チップ。' }
     ],
     CARGO: [
-        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', deliveryGoalId: 'TRADING_POST', rarity: RARITY.RARE, description: 'Trading Post への配送用物資。' },
-        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', deliveryGoalId: 'REPAIR_DOCK', rarity: RARITY.RARE, description: 'Repair Dock への配送用パーツ。' },
-        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', deliveryGoalId: 'BLACK_MARKET', rarity: RARITY.RARE, description: 'Black Market への配送用データ。' },
-        { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: '施設での消費コインが軽減される。重複可。' }
+        { id: 'cargo_safe', category: 'CARGO', name: '通商物資', deliveryGoalId: 'TRADING_POST', rarity: RARITY.RARE, description: 'Trading Post への配送を目的とした荷物。' },
+        { id: 'cargo_normal', category: 'CARGO', name: '整備用パーツ', deliveryGoalId: 'REPAIR_DOCK', rarity: RARITY.RARE, description: 'Repair Dock への配送を目的とした整備用パーツ。' },
+        { id: 'cargo_danger', category: 'CARGO', name: '暗号化データ', deliveryGoalId: 'BLACK_MARKET', rarity: RARITY.RARE, description: 'Black Market への配送を目的とした暗号化データ。' },
+        { id: 'cargo_lucky', category: 'CARGO', name: '幸運の導き', coinDiscount: 0.1, rarity: RARITY.UNCOMMON, description: '施設への配送完了時に取引コストを軽減する特殊貨物。複数配送による効果の累積が可能。' }
     ]
 };
 
