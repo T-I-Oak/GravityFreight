@@ -16,6 +16,9 @@ export default defineConfig({
   build: {
     // 出力先
     outDir: 'dist',
+    // 最新のブラウザをターゲットに設定し、新しい CSS プロパティが削られるのを防ぐ
+    target: 'esnext',
+    cssTarget: 'chrome100',
     // 資産のハッシュ化（Vite のデフォルト）
     assetsInlineLimit: 0, // 小さな画像も別ファイルとして出力してキャッシュ管理を容易にする
     rollupOptions: {
