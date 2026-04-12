@@ -145,4 +145,43 @@ describe('PhysicsOrchestrator', () => {
         expect(game.finishResult).toBe('crashed');
         expect(mockCushion.charges).toBe(0);
     });
+    describe('Gravity Scaling (v0.35)', () => {
+        it('should calculate gravity constant correctly based on sector', () => {
+            // Sector 1: Baseline (100%)
+            game.sector = 1;
+            expect(system.getCurrentGravityConstant()).toBe(4000);
+
+            // Sector 2: +2% (4080)
+            game.sector = 2;
+            expect(system.getCurrentGravityConstant()).toBe(4080);
+
+            // Sector 6: +10% (4400)
+            game.sector = 6;
+            expect(system.getCurrentGravityConstant()).toBe(4400);
+        });
+
+        it('getPredictionPoints should use scaled gravity by default', () => {
+            game.state = 'aiming';
+            game.selection.rocket = { mass: 10, totalPrecision: 100, gravityMultiplier: 1.0, modules: [] };
+            game.selection.launcher = { power: 1000 };
+            game.homeStar = { position: new Vector2(400, 300), radius: 25 };
+            game.bodies = [{ position: new Vector2(450, 200), mass: 2000, radius: 20, gravityMultiplier: 1.0 }];
+
+            // Sector 1
+            game.sector = 1;
+            const points1 = system.getPredictionPoints();
+
+            // Sector 11 (+20% gravity)
+            game.sector = 11;
+            const points11 = system.getPredictionPoints();
+
+            // 点が存在することを確認
+            expect(points1.length).toBeGreaterThan(5);
+            expect(points11.length).toBeGreaterThan(5);
+
+            // 重力が強いため、x=450の方に引き寄せられ、座標に差異が出るはず
+            expect(points11[5].x).not.toBe(points1[5].x);
+            expect(points11[5].x).toBeGreaterThan(points1[5].x);
+        });
+    });
 });

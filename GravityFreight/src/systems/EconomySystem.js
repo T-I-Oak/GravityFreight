@@ -45,11 +45,11 @@ export class EconomySystem {
                 logMessage = "SLOTS +1";
                 break;
             case 'precision':
-                item.precisionMultiplier = (item.precisionMultiplier || 1.0) + 0.2;
+                item.precisionMultiplier = (item.precisionMultiplier || 1.0) + 0.1;
                 logMessage = `PRECISION x${item.precisionMultiplier.toFixed(1)}`;
                 break;
             case 'pickup':
-                item.pickupMultiplier = (item.pickupMultiplier || 1.0) + 0.2;
+                item.pickupMultiplier = (item.pickupMultiplier || 1.0) + 0.1;
                 logMessage = `PICKUP x${item.pickupMultiplier.toFixed(1)}`;
                 break;
             case 'gravity':

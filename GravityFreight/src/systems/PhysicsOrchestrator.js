@@ -1,9 +1,16 @@
-import { Vector2, calculateAcceleration, getDistanceSqToSegment } from '../utils/Physics.js';
+import { Vector2, calculateAcceleration, getDistanceSqToSegment, G } from '../utils/Physics.js';
 import { ANIMATION_DURATION, GAME_BALANCE, MAP_CONSTANTS, UI_COLORS } from '../core/Data.js';
 
 export class PhysicsOrchestrator {
     constructor(game) {
         this.game = game;
+    }
+
+    /**
+     * 現在のセクターに基づいたスケーリング済みの重力定数を取得する
+     */
+    getCurrentGravityConstant() {
+        return G * (1 + (this.game.sector - 1) * GAME_BALANCE.GRAVITY_SCALING_FACTOR);
     }
 
     updateHover() {
@@ -125,7 +132,8 @@ export class PhysicsOrchestrator {
 
         const prevPos = new Vector2(ship.position.x, ship.position.y);
 
-        const acc = this.calculateGravity(ship.position, game.bodies, ship.mass);
+        const currentG = this.getCurrentGravityConstant();
+        const acc = this.calculateGravity(ship.position, game.bodies, ship.mass, currentG);
         ship.velocity = ship.velocity.add(acc.scale(dt));
         ship.position = ship.position.add(ship.velocity.scale(dt));
 
@@ -155,7 +163,7 @@ export class PhysicsOrchestrator {
         if (ship.trail.length > GAME_BALANCE.TRAIL_MAX_LENGTH) ship.trail.shift();
     }
 
-    calculateGravity(pos, bodies, mass) {
+    calculateGravity(pos, bodies, mass, gravityConstant = G) {
         const game = this.game;
         const ship = game.ship;
 
@@ -172,7 +180,7 @@ export class PhysicsOrchestrator {
             return true;
         });
 
-        const acc = calculateAcceleration(pos, activeBodies, mass);
+        const acc = calculateAcceleration(pos, activeBodies, mass, null, gravityConstant);
         let mult = ship.gravityMultiplier || 1.0;
 
         if (ship.activeBoosterEffect && ship.activeBoosterEffect.gravityMultiplier !== undefined) {
@@ -358,6 +366,7 @@ export class PhysicsOrchestrator {
             // EventSystem.js の初期化位置 (centerY - 25 - 12) と完全に一致させる
             let tempPos = game.homeStar.position.add(dir.scale(game.homeStar.radius + GAME_BALANCE.SHIP_START_OFFSET));
 
+            const currentG = this.getCurrentGravityConstant();
             const simDt = game.fixedDt;
             const accBonus = launcher ? (launcher.precisionMultiplier || 1.0) : 1.0;
             const precision = ((rocket.totalPrecision || 0) + (launcher ? (launcher.precision || 0) : 0)) * ((rocket.precisionMultiplier || 1.0) * accBonus);
@@ -394,7 +403,7 @@ export class PhysicsOrchestrator {
                     }
                     return true;
                 });
-                const grav = calculateAcceleration(tempPos, activeTempBodies, mass);
+                const grav = calculateAcceleration(tempPos, activeTempBodies, mass, null, currentG);
                 
                 let currentGMult = gravityMultiplier;
                 if (boosterDuration > 0) {

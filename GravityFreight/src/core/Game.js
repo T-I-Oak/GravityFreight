@@ -17,7 +17,7 @@ import { StorageUtils } from '../utils/StorageUtils.js';
 
 export class Game {
     constructor(canvas, ui, starCount = 5) {
-        this.version = "0.34.1";
+        this.version = "0.35.8";
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;

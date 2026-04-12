@@ -50,11 +50,11 @@ export function getDistanceSqToSegment(p, a, b) {
     const ap = p.sub(a);
     const lengthSq = ab.lengthSq();
     if (lengthSq === 0) return ap.lengthSq();
-    
+
     // 線分上の投影位置 t を計算 (0.0 - 1.0 にクランプ)
     let t = (ap.x * ab.x + ap.y * ab.y) / lengthSq;
     t = Math.max(0, Math.min(1, t));
-    
+
     const closest = a.add(ab.scale(t));
     return p.sub(closest).lengthSq();
 }
@@ -68,7 +68,7 @@ export function getDistanceSqToSegment(p, a, b) {
  * @param {Body} excludeBody 計算から除外する物体（自身の重力無視用）
  * @returns {Vector2} 加速度ベクトル
  */
-export function calculateAcceleration(pos, bodies, targetMass = 10, excludeBody = null) {
+export function calculateAcceleration(pos, bodies, targetMass = 10, excludeBody = null, gravityConstant = G) {
     let totalAcc = new Vector2();
     const referenceMass = 10; // 基準質量 (Core Hull)
     // 重力の影響は質量に反比例させる（軽量ロケットほど強くなる）
@@ -85,7 +85,7 @@ export function calculateAcceleration(pos, bodies, targetMass = 10, excludeBody 
 
         // 加速度 a = G * M / r^2
         // さらにこのゲーム固有の仕様として、船体質量による補正 (massFactor) を掛ける
-        const accMagnitude = ((G * other.mass) / distSq) * massFactor * other.gravityMultiplier;
+        const accMagnitude = ((gravityConstant * other.mass) / distSq) * massFactor * other.gravityMultiplier;
         totalAcc = totalAcc.add(diff.normalize().scale(accMagnitude));
     }
     return totalAcc;

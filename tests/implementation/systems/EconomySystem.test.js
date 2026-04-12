@@ -46,7 +46,7 @@ describe('Implementation: EconomySystem Enhancement', () => {
         
         game.economySystem.enhanceItem(item);
         
-        expect(item.precisionMultiplier).toBe(1.2);
+        expect(item.precisionMultiplier).toBe(1.1);
     });
 
     it('enhanceItem should repair charges if not at max', () => {

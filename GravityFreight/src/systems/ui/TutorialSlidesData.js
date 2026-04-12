@@ -229,7 +229,7 @@ export const TUTORIAL_SLIDES = [
                         items: [
                             { title: 'HOME STAR (母星への帰還)', text: '航行中に母星（HOME STAR）へ着陸することで、回収したアイテムを安全にインベントリへ移し、確保することができます。' },
                             { title: 'REBOOT (再始動ボーナス)', text: '母星へ帰還するたびに、そのセクターに限り<strong>発射パワーが +10% ずつ加算</strong>されます。重力が強すぎてエリアからの脱出が困難なときは、母星へ戻ってパワーを溜めることで状況を打開できます。' },
-                            { title: 'DENSITY (銀河の密度)', text: `<span class="status-black-market">${GOAL_NAMES.BLACK_MARKET}</span> を利用すると、以降の全セクターで出現する星の数が +1 増加します。一度増えた星は元に戻らず、銀河全体の重力密度が永久に高まっていくため、慎重な選択が必要です。` }
+                            { title: 'DENSITY (銀河の密度)', text: `セクターを進めていくと徐々に重力が高まっていきます。また<span class="status-black-market">${GOAL_NAMES.BLACK_MARKET}</span> を利用すると、以降の全セクターで出現する星の数が +1 増加します。一度増えた星は元に戻らず、銀河全体の重力密度が永久に高まっていくため、慎重な選択が必要です。` }
                         ]
                     }
                 },
