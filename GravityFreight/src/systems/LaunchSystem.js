@@ -86,6 +86,7 @@ export class LaunchSystem {
         const game = this.game;
         if (game.state !== 'aiming') return;
         game.audioSystem.playLaunch();
+        game.achievementSystem.updateStat('stat_launches', 1);
 
         const l = game.selection.launcher;
         const r = game.selection.rocket;

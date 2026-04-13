@@ -215,7 +215,7 @@ export class MissionSystem {
                                     game._addItemToInventory(bonus);
                                 }
                             }
-                            game.totalDeliveries++;
+                            game.incrementDeliveries();
 
                             // ストーリー解放のトリガー (v0.15 新機能)
                             const branch = FACILITY_INFO[hitGoal.id]?.id;

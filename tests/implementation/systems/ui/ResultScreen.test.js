@@ -32,6 +32,9 @@ describe('UISystem - Result Screen Core Logic (Preservation Test)', () => {
             selection: { modules: {} },
             storySystem: { sessionUnlocked: [], isRead: () => true, hasUnlockedThisFlight: false },
             rankingSystem: { checkRank: vi.fn(() => 1), addEntry: vi.fn(() => 1) },
+            achievementSystem: { updateStat: vi.fn() },
+            addScore: vi.fn(),
+            addCoins: vi.fn(),
             updateUI: vi.fn()
         };
         ui = new UISystem(game);

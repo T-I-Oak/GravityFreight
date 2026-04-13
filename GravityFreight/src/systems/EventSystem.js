@@ -300,11 +300,11 @@ export class EventSystem {
             };
         }
 
-        const rankingBtn = document.getElementById('ranking-btn');
-        if (rankingBtn) {
-            rankingBtn.onclick = () => {
+        const archiveBtn = document.getElementById('archive-btn');
+        if (archiveBtn) {
+            archiveBtn.onclick = () => {
                 game.audioSystem.playTick();
-                game.uiSystem.showRankingScreen();
+                game.uiSystem.showArchive();
             };
         }
 

@@ -9,7 +9,7 @@ import { TerminalReport } from './ui/TerminalReport.js';
 import { StarInfoPanel } from './ui/StarInfoPanel.js';
 import { UIAnimations } from './ui/UIAnimations.js';
 import { HUDManager } from './ui/HUDManager.js';
-import { RankingUI } from './ui/RankingUI.js';
+import { ArchiveUI } from './ui/ArchiveUI.js';
 import { TutorialUI } from './ui/TutorialUI.js';
 
 export class UISystem {
@@ -22,7 +22,7 @@ export class UISystem {
         this.terminalReport = new TerminalReport(game, this);
         this.starInfoPanel = new StarInfoPanel(game);
         this.hudManager = new HUDManager(game, this);
-        this.rankingUI = new RankingUI(game, this);
+        this.archiveUI = new ArchiveUI(game, this);
         this.tutorialUI = new TutorialUI(game, this);
 
         this.titleAnimation = null;
@@ -434,29 +434,34 @@ export class UISystem {
     }
 
     _updateTitleUI() {
+        this.showTitle();
+    }
+
+    /**
+     * タイトル画面を表示し、アニメーションを開始する
+     */
+    showTitle() {
         const titleScreen = document.getElementById('title-screen');
         const gameplayElements = this._getGameplayElements();
 
-        // ルール5.1に基づき、存在を前提とした警告なしのリセット
-        // 全てのゲームプレイ UI をインラインスタイルで強制非表示
+        // 全てのゲームプレイ UI を非表示
         gameplayElements.forEach(el => {
-            if (!el) return;
-            el.classList.add('hidden');
+            if (el) el.classList.add('hidden');
         });
 
-        // 【新：責任分離後のクリーンアップ】リストに含まれないリザルト系を個別に隠蔽
         this.resetResultOverlay();
         const rec = document.getElementById('receipt-overlay');
         const back = document.getElementById('back-to-result-btn');
         [rec, back].forEach(el => {
             if (el) {
                 el.classList.add('hidden');
-                el.classList.remove('active', 'minimized'); // ステートのリセット
+                el.classList.remove('active', 'minimized');
             }
         });
 
-        // タイトル画面を最前面で表示
-        titleScreen.classList.remove('hidden');
+        if (titleScreen) {
+            titleScreen.classList.remove('hidden');
+        }
 
         if (!this.titleAnimation) {
             const bg = document.getElementById('title-bg-canvas');
@@ -464,6 +469,19 @@ export class UISystem {
             this.titleAnimation = new TitleAnimation(bg, fg);
         }
         this.titleAnimation.start();
+    }
+
+    /**
+     * タイトル画面を隠し、アニメーションを停止する
+     */
+    hideTitle() {
+        const titleScreen = document.getElementById('title-screen');
+        if (titleScreen) {
+            titleScreen.classList.add('hidden');
+        }
+        if (this.titleAnimation) {
+            this.titleAnimation.stop();
+        }
     }
 
     /**
@@ -520,8 +538,21 @@ export class UISystem {
         this.hudManager.showStoryModal(storyId);
     }
 
-    showRankingScreen() {
-        this.rankingUI.show();
+    showArchive(tab = 'ranking') {
+        if (this.archiveUI) {
+            this.hideTitle();
+            this.archiveUI.show(tab);
+        }
+    }
+
+    /**
+     * アーカイブを閉じる (Titleを再表示)
+     */
+    hideArchive() {
+        if (this.archiveUI) {
+            this.archiveUI.hide();
+            this.showTitle();
+        }
     }
 
     showStatus(message, type = 'info') {
@@ -563,4 +594,34 @@ export class UISystem {
             this.tutorialUI.prevSlide();
         }
     }
+
+    /**
+     * 実績通知の表示
+     */
+    showAchievementToast(data, callback) {
+        const container = document.getElementById('achievement-toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'achievement-toast';
+        toast.innerHTML = `
+            <div class="achievement-icon-box">✦</div>
+            <div class="achievement-info">
+                <span class="description">実績解除: ${data.label}</span>
+                <span class="title">${data.title}</span>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // 一定時間後に消衰
+        setTimeout(() => {
+            toast.classList.add('exit');
+            toast.addEventListener('animationend', () => {
+                toast.remove();
+                if (callback) callback();
+            });
+        }, 3000); 
+    }
+
 }

@@ -103,8 +103,18 @@ export class ResultScreen {
             game.setState('result');
         }
 
-        game.score += pendingS;
-        game.coins += pendingC;
+        // 実績・統計の更新
+        const flightTicks = Math.max(0, pureFlightScore);
+
+        // 1. 航行距離 (ticks) と航行分のスコア累積を報告
+        game.achievementSystem.updateStat('stat_max_dist', flightTicks);
+        game.achievementSystem.updateStat('stat_distance', flightTicks);
+        game.achievementSystem.updateStat('stat_total_score', flightTicks);
+        
+        // 2. 残りのボーナススコアとコインをメソッド経由で加算（実績も自動更新）
+        game.addScore(pendingS);
+        game.addCoins(pendingC);
+
         game.pendingGoalBonus = 0;
         game.pendingScore = 0;
         game.pendingCoins = 0;
@@ -129,11 +139,11 @@ export class ResultScreen {
         if (resultType !== 'gameover') {
             requestAnimationFrame(() => {
                 overlay.classList.remove('hidden');
-                this.uiSystem._updateHUD();
+                game.updateUI();
             });
         } else {
             overlay.classList.remove('hidden');
-            this.uiSystem._updateHUD();
+            game.updateUI();
             this.uiSystem.showTerminalReport();
         }
     }

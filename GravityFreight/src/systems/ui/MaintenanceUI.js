@@ -70,8 +70,7 @@ export class MaintenanceUI {
                 card.querySelector('.repair-btn').onclick = () => {
                     if (game.coins >= cost) {
                         game.audioSystem.playTick();
-                        this.uiSystem.animateCoinChange(-cost);
-                        game.coins -= cost;
+                        game.addCoins(-cost);
                         item.charges = Math.min(item.charges + 1, item.maxCharges || 2);
                         this.initRepairDock(container);
                         game.updateUI();
@@ -143,8 +142,7 @@ export class MaintenanceUI {
                     if (game.coins < currentCost) return;
                     
                     game.audioSystem.playTick();
-                    this.uiSystem.animateCoinChange(-currentCost);
-                    game.coins -= currentCost;
+                    game.addCoins(-currentCost);
                     game.dismantleCount++;
                     game.shouldPulseDismantle = true;
 

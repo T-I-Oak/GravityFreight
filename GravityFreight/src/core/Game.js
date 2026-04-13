@@ -12,6 +12,7 @@ import { RankingSystem } from '../systems/RankingSystem.js';
 import { StorySystem } from '../systems/StorySystem.js';
 import { AudioSystem } from '../systems/AudioSystem.js';
 import { LaunchSystem } from '../systems/LaunchSystem.js';
+import { AchievementSystem } from '../systems/AchievementSystem.js';
 import { FacilityEventSystem } from '../systems/FacilityEventSystem.js';
 import { StorageUtils } from '../utils/StorageUtils.js';
 
@@ -37,6 +38,7 @@ export class Game {
         this.facilityEventSystem = new FacilityEventSystem(this);
         this.rankingSystem = new RankingSystem(this);
         this.storySystem = new StorySystem(this);
+        this.achievementSystem = new AchievementSystem(this);
         this.audioSystem = new AudioSystem(this);
 
         this.renderer = new Renderer(canvas, this);
@@ -72,8 +74,9 @@ export class Game {
         this.totalSectorsCompleted = 0;
         this.launchScore = 0;
         this.launchCoins = 0;
-        this.totalDeliveries = 0;
         this.totalCollectedItems = 0;
+        this.currentFlightTicks = 0;
+        this.sessionCoinsEarned = 0;
 
         this.selection = {
             chassis: null,
@@ -127,6 +130,12 @@ export class Game {
             this.stateTimer = 3.5;
             this.audioSystem.playWarp(3.5);
             this.isWarpInitialized = false; // 演出中のマップ更新フラグ
+            
+            // 新規契約開始（セクター0からの開始）時にカウント
+            if (this.totalSectorsCompleted === 0) {
+                this.achievementSystem.updateStat('stat_runs', 1);
+                this.sessionCoinsEarned = 0;
+            }
             this.reset();
         }
 
@@ -177,6 +186,52 @@ export class Game {
 
     incrementCollectedItems(count = 1) {
         this.totalCollectedItems += count;
+        // 収集物実績がある場合はここに追加
+    }
+
+    /**
+     * スコアを加算し、実績をチェックする
+     */
+    addScore(amount) {
+        if (amount <= 0) return;
+        this.score += amount;
+        this.achievementSystem.updateStat('stat_total_score', amount);
+        this.achievementSystem.updateStat('stat_max_score', this.score);
+        this.updateUI();
+    }
+
+    /**
+     * コインを加算（または負の値で減算）し、実績をチェックする
+     */
+    addCoins(amount) {
+        if (amount === 0) return;
+        
+        this.animateCoinChange(amount);
+        this.coins += amount;
+
+        if (amount > 0) {
+            // 獲得
+            this.sessionCoinsEarned += amount;
+            this.achievementSystem.updateStat('stat_total_coins', amount);
+            this.achievementSystem.updateStat('stat_max_coins_earned', this.sessionCoinsEarned); 
+        } else {
+            // 消費
+            this.achievementSystem.updateStat('stat_spend_coins', Math.abs(amount));
+        }
+
+        // 常に最高所持額をチェック
+        this.achievementSystem.updateStat('stat_max_coins', this.coins);
+        this.updateUI();
+    }
+
+    /**
+     * 配達成功数をインクリメントし、実績をチェックする
+     */
+    incrementDeliveries() {
+        this.totalDeliveries++;
+        this.achievementSystem.updateStat('stat_deliveries', 1);
+        this.achievementSystem.updateStat('stat_max_deliveries', this.totalDeliveries);
+        this.updateUI();
     }
 
     handleResize(w, h) {
@@ -404,6 +459,8 @@ export class Game {
                 if (!this.isWarpInitialized) {
                     this.sector++;
                     this.stageLevel = this.sector;
+                    this.achievementSystem.updateStat('stat_sectors', this.sector);
+                    this.achievementSystem.updateStat('stat_total_sectors', 1);
                     this.initStage(this.currentStarCount);
                     const isReverse = (this.sector % 5 === 0);
                     const text = isReverse ? `ANOMALY SECTOR ${this.sector} READY` : `SECTOR ${this.sector} READY`;

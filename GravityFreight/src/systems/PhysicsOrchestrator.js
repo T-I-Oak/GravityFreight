@@ -135,7 +135,8 @@ export class PhysicsOrchestrator {
         const currentG = this.getCurrentGravityConstant();
         const acc = this.calculateGravity(ship.position, game.bodies, ship.mass, currentG);
         ship.velocity = ship.velocity.add(acc.scale(dt));
-        ship.position = ship.position.add(ship.velocity.scale(dt));
+        const moveVec = ship.velocity.scale(dt);
+        ship.position = ship.position.add(moveVec);
 
         // simulatedTime の更新は Game.js 側で行われるが、score はステップごとに加算 (事実ベース)
         game.score += GAME_BALANCE.SCORE_PER_STEP;

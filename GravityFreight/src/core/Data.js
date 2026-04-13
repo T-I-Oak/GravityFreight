@@ -96,6 +96,9 @@ export const UI_COLORS = {
     REPULSIVE_STAR_GLOW: 'rgba(225, 0, 255, 0.5)'
 };
 
+// 実績UI用カラー（段階ごとのレアリティ）
+export const ACHIEVEMENT_TIER_COLORS = ['#10b981', '#3b82f6', '#d4af37'];
+
 // 施設情報の定義と共通ユーティリティ (v0.34.0)
 export const FACILITY_INFO = {
     TRADING_POST: { id: 'T', type: 'TRADING_POST', name: 'TRADING POST', color: '#00e676', icon: 'T' },

@@ -46,6 +46,9 @@ export class StorySystem {
     markAsRead(storyId) {
         this.readIds.add(storyId);
         this.save();
+        if (this.game.achievementSystem) {
+            this.game.achievementSystem.checkAll();
+        }
     }
 
     isRead(storyId) {

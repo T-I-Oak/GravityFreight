@@ -37,7 +37,11 @@ describe('Spec: Game Cycle & Mission Flow (Chapter 5)', () => {
             flightResults: { status: '', bonuses: [], items: [] },
             rankingSystem: { checkRank: vi.fn(), addEntry: vi.fn(() => ({ sectorRank: 1, collectedRank: 1, scoreRank: 1 })) },
             storySystem: { unlockedIds: [], hasUnread: vi.fn(() => false), markAsRead: vi.fn() },
-            audioSystem: { playTick: vi.fn(), playStamp: vi.fn() }
+            audioSystem: { playTick: vi.fn(), playStamp: vi.fn() },
+            addScore: vi.fn(),
+            addCoins: vi.fn(),
+            achievementSystem: { updateStat: vi.fn() },
+            updateUI: vi.fn()
         };
         uiSystem = new UISystem(game);
     });

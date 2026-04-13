@@ -440,5 +440,32 @@ export class AudioSystem {
         noise.start(t);
         noise.stop(t + 0.2);
     }
+
+    /**
+     * 実績解除音: 清涼感のある上昇チャイム。
+     */
+    playAchievement() {
+        if (!this._prepare()) return;
+        const t = this.ctx.currentTime;
+        // ミ・ソ・ド の和音をアルペジオで再生
+        [659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const startTime = t + i * 0.1;
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, startTime);
+            osc.frequency.exponentialRampToValueAtTime(freq * 1.05, startTime + 0.5);
+            
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8);
+            
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+            osc.start(startTime);
+            osc.stop(startTime + 0.8);
+        });
+    }
 }
 

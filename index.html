@@ -23,11 +23,11 @@
     <link rel="stylesheet" href="GravityFreight/css/receipt-screen.css">
     <link rel="stylesheet" href="GravityFreight/css/event-screen.css">
     <link rel="stylesheet" href="GravityFreight/css/how-to-play.css">
-    <link rel="stylesheet" href="GravityFreight/css/ranking-screen.css">
     <link rel="stylesheet" href="GravityFreight/css/star-info.css">
     <link rel="stylesheet" href="GravityFreight/css/story-overlay.css">
     <link rel="stylesheet" href="GravityFreight/css/animations.css">
     <link rel="stylesheet" href="GravityFreight/css/sector-notification.css">
+    <link rel="stylesheet" href="GravityFreight/css/achievements.css">
     <link rel="stylesheet" href="GravityFreight/css/responsive.css">
 
 
@@ -52,7 +52,7 @@
             <div class="menu-buttons">
                 <button id="start-game-btn" class="btn-neon">BEGIN CONTRACT</button>
                 <button id="how-to-play-btn" class="btn-neon outline">HOW TO PLAY</button>
-                <button id="ranking-btn" class="btn-neon outline">RANKING</button>
+                <button id="archive-btn" class="btn-neon outline">RECORDS</button>
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
@@ -63,25 +63,31 @@
         </div>
     </div>
 
+    <!-- 実績通知コンテナ -->
+    <div id="achievement-toast-container"></div>
 
-    <!-- ランキング画面 (v0.31.0) -->
-    <div id="ranking-overlay" class="hidden">
-        <div class="ranking-modal">
-            <div class="ranking-header">
-                <h2>RANKINGS</h2>
-            </div>
-            <div class="ranking-tabs">
-                <button class="ranking-tab-btn active" data-category="score">SCORE</button>
-                <button class="ranking-tab-btn" data-category="sector">SECTOR</button>
-                <button class="ranking-tab-btn" data-category="collected">COLLECTED</button>
-            </div>
-            <div class="ranking-content">
-                <div id="ranking-list-container" class="ranking-list">
-                    <!-- Dynamic content -->
+    <!-- Archive Overlay (Ranking & Achievements) (v1.1) -->
+    <div id="archive-overlay" class="overlay-container hidden">
+        <div class="event-backdrop"></div>
+        <div class="event-modal theme-archive">
+            <div class="event-header">
+                <div id="archive-icon" class="archive-symbol">✦</div>
+                <div class="event-title-group">
+                    <h2 id="archive-main-title">CENTRAL ARCHIVE</h2>
+                    <div class="archive-tabs-nav">
+                        <button class="archive-tab-btn active" data-tab="ranking">RANKING</button>
+                        <button class="archive-tab-btn" data-tab="achievements">ACHIEVEMENTS</button>
+                    </div>
                 </div>
             </div>
-            <div class="ranking-footer">
-                <button id="close-ranking-btn" class="btn-neon close-ranking-btn">RETURN TO MISSION</button>
+            <div class="archive-body" id="archive-content-root">
+                <div id="archive-list-container">
+                    <!-- Content will be rendered here -->
+                </div>
+            </div>
+            <div class="event-footer">
+                <div class="status-left"></div>
+                <button id="close-archive-btn" class="premium-button">CLOSE ARCHIVE</button>
             </div>
         </div>
     </div>
@@ -236,7 +242,7 @@
         <div id="star-info-list" class="category"></div>
     </div>
 
-    <div id="event-screen" class="hidden">
+    <div id="event-screen" class="overlay-container hidden">
         <div class="event-backdrop"></div>
         <div class="event-modal">
             <div class="event-header">
