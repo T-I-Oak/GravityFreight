@@ -1890,6 +1890,103 @@ body #back-to-result-btn.hidden {
     }
 }
 
+/* --- Recording and Replay Indicators --- */
+.recording-controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.recording-controls.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.rec-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 900;
+    color: #ff3366;
+    letter-spacing: 2px;
+    background: rgba(255, 51, 102, 0.15);
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    height: 28px;
+    padding: 0 16px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.2);
+    animation: pulseRec 1.5s infinite alternate;
+    box-sizing: border-box;
+}
+
+.rec-badge::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    background: #ff3366;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff3366;
+}
+
+@keyframes pulseRec {
+    0% { opacity: 0.7; box-shadow: 0 0 5px rgba(255, 51, 102, 0.2); }
+    100% { opacity: 1; box-shadow: 0 0 15px rgba(255, 51, 102, 0.6); }
+}
+
+.favorite-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    height: 28px;
+    width: 175px;
+    padding-left: 18px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.favorite-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.favorite-toggle-btn.active {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(255, 215, 0, 0.5);
+    color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.favorite-toggle-btn .icon {
+    font-size: 14px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.favorite-toggle-btn.active .icon {
+    transform: scale(1.2);
+}
+
+/* --- Replay Overlay --- */
+
+
 
 
 
@@ -3934,6 +4031,56 @@ body #back-to-result-btn.hidden {
     border-radius: 2px; 
 }
 
+/* --- Replays --- */
+/* --- Replay Table Column Adjustments --- */
+#archive-overlay .col-config {
+    flex: 1.5;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: 20px;
+}
+
+#archive-overlay .col-actions {
+    width: 140px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+#archive-overlay .replay-fav-btn {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.1);
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.3s;
+}
+
+#archive-overlay .replay-fav-btn:hover {
+    color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.2);
+}
+
+#archive-overlay .replay-fav-btn.active {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#archive-overlay .no-data-msg {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.2);
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+    padding: 30px;
+}
+
+
+
 /* Toast styles (Global) */
 #achievement-toast-container {
     position: fixed;
@@ -3960,6 +4107,196 @@ body #back-to-result-btn.hidden {
 .achievement-toast.exit { animation: toastSlideOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 @keyframes toastSlideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toastSlideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+
+
+
+
+
+
+
+
+/* --- Replay Panel (Unified Design) --- */
+/* 規約1.2: IDセレクタによる詳細度確保で !important を排除 */
+#replay-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+    background: none;
+    transform: none;
+}
+
+#replay-overlay .panel.replay-panel {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    left: auto;
+    width: 280px;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    transform: none;
+    background: rgba(10, 15, 25, 0.45);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+#replay-overlay .panel-header h2 {
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #00d4ff;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+#replay-overlay .replay-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+    padding: 2px 8px;
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    border-radius: 4px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+}
+
+#replay-overlay .panel-content {
+    padding: 4px 0 10px 0; /* padding-topを縮小してビルドパネルと同期 */
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+#replay-overlay .category {
+    margin-top: 8px; /* build-panel.css(165行目)と同期 */
+}
+
+#replay-overlay .category:first-of-type {
+    margin-top: 0; /* build-panel.css(169行目)と同期 */
+}
+
+#replay-overlay .category h3 {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    padding-left: 10px;
+}
+
+#replay-overlay .part-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    margin: 0 10px;
+    overflow: hidden;
+}
+
+#replay-overlay .panel-footer {
+    margin-top: 10px;
+    padding: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+}
+
+#exit-replay-btn {
+    width: 100%;
+    box-shadow: 0 0 15px rgba(255, 100, 0, 0.2);
+}
+
+.col-actions .replay-play-btn {
+    height: 24px;
+    padding: 0 16px;
+    font-size: 0.72rem;
+    min-width: 80px;
+}
+
+.col-rank {
+    width: 50px;
+    padding-left: 15px;
+}
+
+.nai {
+    opacity: 0.2;
+    font-size: 0.8rem;
+}
+
+/* Favorite Replacement Modal */
+.fav-replace-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 6000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fav-replace-modal {
+    background: rgba(20, 30, 50, 0.95);
+    border: 1px solid rgba(68, 136, 255, 0.3);
+    border-radius: 12px;
+    padding: 30px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.fav-replace-modal h3 {
+    margin: 0 0 10px 0;
+    color: #4488ff;
+    font-size: 1.2rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.fav-replace-modal p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+}
+
+.fav-list-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.fav-item-mini {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 15px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.fav-item-mini:hover {
+    background: rgba(255, 68, 68, 0.2);
+    border-color: rgba(255, 68, 68, 0.5);
+}
+
+.fav-item-mini .score { color: #ffd700; font-weight: 800; font-family: 'Orbitron', sans-serif; }
+.fav-item-mini .date { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
+
+.fav-replace-cancel {
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    display: block;
+    margin: 0 auto;
+}
+
 /* Responsive Adjustments for Tablet/Mobile */
 
 
