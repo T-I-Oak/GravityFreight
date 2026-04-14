@@ -37,7 +37,7 @@ export class PhysicsOrchestrator {
     }
 
     step(dt) {
-        if (this.game.state === 'flying') {
+        if (this.game.state === 'flying' || this.game.state === 'replaying') {
             this.handleFlight(dt);
         } else if (this.game.state === 'finishing') {
             this.handleFinishing(dt);
@@ -78,6 +78,10 @@ export class PhysicsOrchestrator {
                 const result = game.finishResult;
                 if (result === 'cleared' || result === 'returned') {
                     game.setState(result);
+                } else if (result === 'replayed') {
+                    // リプレイ終了時はリザルトを出さず、そのままHUDを表示し続ける（EXIT待ち）
+                    // stateTimerが0になっても勝手に遷移させない
+                    game.stateTimer = 0;
                 } else {
                     // crashed / lost は即座に結果を表示して result ステートへ
                     game.showResult(result);
@@ -138,8 +142,10 @@ export class PhysicsOrchestrator {
         const moveVec = ship.velocity.scale(dt);
         ship.position = ship.position.add(moveVec);
 
-        // simulatedTime の更新は Game.js 側で行われるが、score はステップごとに加算 (事実ベース)
-        game.score += GAME_BALANCE.SCORE_PER_STEP;
+        // リプレイ中ではない場合のみスコアを加算 (航行時間分としてタイプ指定)
+        if (this.game.state !== 'replaying') {
+            game.addScore(GAME_BALANCE.SCORE_PER_STEP, 'duration');
+        }
 
         // トレイルの更新 (0.01s ごと)
         if (game.simulatedTime % 0.01 < dt) {
@@ -211,15 +217,21 @@ export class PhysicsOrchestrator {
             // 回避モジュールの処理
             if (this.handleCollisionEvasion(hitBody)) return false;
 
-            if (hitBody === game.homeStar) {
-                game.audioSystem.playReturn(); // 帰還専用のチャイム音
-                game.finishResult = 'returned';
-                game.resolveItems('returned');
+            if (this.game.state !== 'replaying') {
+                if (hitBody === game.homeStar) {
+                    game.audioSystem.playReturn(); // 帰還専用のチャイム音
+                    game.finishResult = 'returned';
+                    game.resolveItems('returned');
+                } else {
+                    game.audioSystem.playCrash();
+                    game.finishResult = 'crashed';
+                    game.consumeRocketOnFailure();
+                    game.resolveItems('crashed', hitBody);
+                }
             } else {
+                // リプレイ中の衝突
                 game.audioSystem.playCrash();
-                game.finishResult = 'crashed';
-                game.consumeRocketOnFailure();
-                game.resolveItems('crashed', hitBody);
+                game.finishResult = 'replayed'; // リプレイ中であることを明示
             }
             game.state = 'finishing';
             game.stateTimer = ANIMATION_DURATION / 1000;
@@ -246,17 +258,23 @@ export class PhysicsOrchestrator {
                 }
             }
 
-            if (hitGoal) {
-                game.audioSystem.playGoal();
-                game.finishResult = 'cleared';
-                game.totalSectorsCompleted++;
-                game.lastHitGoal = hitGoal;
-                game.resolveItems('success', hitGoal);
+            if (this.game.state !== 'replaying') {
+                if (hitGoal) {
+                    game.audioSystem.playGoal();
+                    game.finishResult = 'cleared';
+                    game.totalSectorsCompleted++;
+                    game.lastHitGoal = hitGoal;
+                    game.resolveItems('success', hitGoal);
+                } else {
+                    game.audioSystem.playLost();
+                    game.finishResult = 'lost';
+                    game.consumeRocketOnFailure();
+                    game.resolveItems('lost');
+                }
             } else {
+                // リプレイ中の圏外
                 game.audioSystem.playLost();
-                game.finishResult = 'lost';
-                game.consumeRocketOnFailure();
-                game.resolveItems('lost');
+                game.finishResult = 'replayed';
             }
             game.state = 'finishing';
             game.stateTimer = ANIMATION_DURATION / 1000;
@@ -486,21 +504,24 @@ export class PhysicsOrchestrator {
                 renderer.drawPrediction(points, zoom);
             }
 
-            game.bodies.forEach(body => {
-                const isHovered = (game.hoveredStar === body);
-                const baseColor = body.color || UI_COLORS.NORMAL_STAR;
-                const glowColor = isHovered ? baseColor : (body.color || UI_COLORS.NORMAL_STAR_GLOW);
-                renderer.drawBody(body, baseColor, glowColor);
-            });
+            // 規約2.1: リバランスやステート遷移時の null 参照例外を防止するためのガード
+            if (game.bodies) {
+                game.bodies.forEach(body => {
+                    const isHovered = (game.hoveredStar === body);
+                    const baseColor = body.color || UI_COLORS.NORMAL_STAR;
+                    const glowColor = isHovered ? baseColor : (body.color || UI_COLORS.NORMAL_STAR_GLOW);
+                    renderer.drawBody(body, baseColor, glowColor);
+                });
+            }
 
             const arcBonus = game.ship ? (game.ship.arcMultiplier || 1.0) : 1.0;
             renderer.drawGoals(game.goals, game.boundaryRadius, arcBonus);
         }
 
         if (game.ship) {
-            const showShipStates = ['aiming', 'flying'];
-            const showTrailStates = ['aiming', 'flying', 'finishing'];
-            const showOthersStates = ['aiming', 'flying', 'finishing']; // Scanner ripple, trail, items
+            const showShipStates = ['aiming', 'flying', 'replaying'];
+            const showTrailStates = ['aiming', 'flying', 'finishing', 'replaying'];
+            const showOthersStates = ['aiming', 'flying', 'finishing', 'replaying']; // Scanner ripple, trail, items
             
             if (showOthersStates.includes(game.state)) {
                 renderer.drawTrail(game.ship.trail);

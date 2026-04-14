@@ -1,4 +1,4 @@
-import { CATEGORY_COLORS, ACHIEVEMENT_TIER_COLORS, hexToRgba } from '../../core/Data.js';
+import { CATEGORY_COLORS, ACHIEVEMENT_TIER_COLORS, hexToRgba, ITEM_REGISTRY } from '../../core/Data.js';
 
 /**
  * ArchiveUI
@@ -70,8 +70,10 @@ export class ArchiveUI {
 
         if (this.currentTab === 'ranking') {
             this.renderRanking();
-        } else {
+        } else if (this.currentTab === 'achievements') {
             this.renderAchievements();
+        } else if (this.currentTab === 'replays') {
+            this.renderReplays();
         }
     }
 
@@ -116,9 +118,9 @@ export class ArchiveUI {
             const body = document.createElement('div');
             body.className = 'ranking-body';
             
-            const latestDate = this.game.rankingSystem.latestEntryDate;
+            const latestTimestamp = this.game.rankingSystem.latestEntryTimestamp;
             rankings.forEach((entry, i) => {
-                const isLatest = entry.date === latestDate;
+                const isLatest = entry.timestamp === latestTimestamp && latestTimestamp !== undefined;
                 const row = document.createElement('div');
                 row.className = `ranking-row ${i < 3 ? 'top-3' : ''} ${isLatest ? 'is-latest' : ''}`;
 
@@ -133,7 +135,7 @@ export class ArchiveUI {
                     <div class="col col-score ${isScoreActive}">${entry.score.toLocaleString()}</div>
                     <div class="col col-sector ${isSectorActive}">${entry.sector}</div>
                     <div class="col col-items ${isItemsActive}">${entry.collected}</div>
-                    <div class="col col-date">${entry.date}</div>
+                    <div class="col col-date">${this.game.rankingSystem.formatDate(entry.timestamp)}</div>
                 `;
                 body.appendChild(row);
             });
@@ -237,5 +239,101 @@ export class ArchiveUI {
             list.appendChild(el);
         });
         this.container.appendChild(list);
+    }
+
+    renderReplays() {
+        if (!this.container) return;
+        // 現在のスクロール位置を保存
+        const savedScrollTop = this.container.scrollTop;
+        this.container.innerHTML = '';
+        
+        const records = this.game.replaySystem.getRecords();
+        
+        const table = document.createElement('div');
+        table.className = 'ranking-table';
+
+        // ヘッダー行の作成（ランキングと統一）
+        table.innerHTML = `
+            <div class="ranking-row header">
+                <div class="col col-rank"></div>
+                <div class="col col-score active">SCORE</div>
+                <div class="col col-date">DATE / TIME</div>
+                <div class="col col-actions">ACTION</div>
+            </div>
+        `;
+
+        if (records.length === 0) {
+            table.innerHTML += '<div class="no-data-msg">NO FLIGHT RECORDS FOUND</div>';
+            this.container.appendChild(table);
+            return;
+        }
+
+        const body = document.createElement('div');
+        body.className = 'ranking-body';
+
+        records.forEach(record => {
+            const hasData = !!record.recordData;
+            const row = document.createElement('div');
+            row.className = `ranking-row ${record.isFavorite ? 'is-latest' : ''}`;
+            
+            const d = new Date(record.timestamp);
+            const dateStr = `${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+
+            row.innerHTML = `
+                <div class="col col-rank">
+                    <button class="replay-fav-btn ${record.isFavorite ? 'active' : ''}" title="Keep Record">${record.isFavorite ? '★' : '☆'}</button>
+                </div>
+                <div class="col col-score active">${record.score.toLocaleString()}</div>
+                <div class="col col-date">${dateStr}</div>
+                <div class="col col-actions">
+                    ${hasData ? `<button class="replay-play-btn btn-neon btn-neon-sm btn-grad-cyan">PLAY</button>` : `<span class="nai">N/A</span>`}
+                </div>
+            `;
+
+            // イベント定義
+            const favBtn = row.querySelector('.replay-fav-btn');
+            const playBtn = row.querySelector('.replay-play-btn');
+
+            favBtn.onclick = (e) => {
+                e.stopPropagation();
+                const success = this.game.replaySystem.toggleFavorite(record.id);
+                if (success) {
+                    this.game.audioSystem.playTick();
+                    
+                    // 部分更新: 全体を描画し直さず、この行の状態だけを即座に反映
+                    const isFav = record.isFavorite;
+                    favBtn.textContent = isFav ? '★' : '☆';
+                    favBtn.classList.toggle('active', isFav);
+                    row.classList.toggle('is-latest', isFav);
+                } else {
+                    // 上限到達時は、これまで通りダイアログを表示
+                    this.game.uiSystem.showFavoriteReplacementDialog(record.id, () => {
+                        this.renderReplays();
+                    }, () => {
+                        this.renderReplays();
+                    });
+                }
+            };
+
+            if (playBtn && hasData) {
+                playBtn.onclick = () => {
+                    this.game.audioSystem.playWarp(1.0);
+                    // UISystem.hideArchive() は showTitle() を呼んでしまうため
+                    // ここではオーバーレイを隠すだけに留め、startReplayMode で遷移させる。
+                    this.hide();
+                    this.game.startReplayMode(record);
+                };
+            }
+
+            body.appendChild(row);
+        });
+
+        table.appendChild(body);
+        this.container.appendChild(table);
+
+        // スクロール位置を復元
+        if (savedScrollTop) {
+            this.container.scrollTop = savedScrollTop;
+        }
     }
 }

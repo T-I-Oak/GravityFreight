@@ -287,6 +287,7 @@ export class EventSystem {
                     if (titleScreen) {
                         titleScreen.classList.add('hidden'); // CSS transition (1s) が発動
                     }
+                    game.fullReset(); // 全ての進行状態を初期化
                     game.setState('preparing');
                 }, 50);
             };

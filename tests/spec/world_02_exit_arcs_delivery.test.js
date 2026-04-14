@@ -36,8 +36,8 @@ describe('Spec: Exit Arcs & Cargo Delivery (Chapter 6)', () => {
             
             // Spec 6.1 says "Rewards: 2000 Score / 20 Coins".
             // v0.11 correctly adds them in resolveItems even with no matching cargo.
-            expect(game.pendingScore).toBe(2000); 
-            expect(game.pendingCoins).toBe(20);
+            expect(game.score - game.launchScore).toBe(2000); 
+            expect(game.coins - game.launchCoins).toBe(20);
         });
 
         it('BLACK MARKET: should reward 5000 score and 50 coins', () => {
@@ -45,8 +45,8 @@ describe('Spec: Exit Arcs & Cargo Delivery (Chapter 6)', () => {
             game.pendingItems = [{ itemData: { category: 'COIN', score: 0 } }];
             
             game.missionSystem.resolveItems('success', hitGoal);
-            expect(game.pendingScore).toBe(5000);
-            expect(game.pendingCoins).toBe(50);
+            expect(game.score - game.launchScore).toBe(5000);
+            expect(game.coins - game.launchCoins).toBe(50);
         });
     });
 
@@ -59,9 +59,9 @@ describe('Spec: Exit Arcs & Cargo Delivery (Chapter 6)', () => {
             game.missionSystem.resolveItems('success', hitGoal);
             
             // Result: 1x (Base 2000 + Bonus 1500) = 3500
-            expect(game.pendingScore).toBe(3500);
+            expect(game.score - game.launchScore).toBe(3500);
             // Result: 1x (Base 20 + Bonus 100) = 120
-            expect(game.pendingCoins).toBe(120);
+            expect(game.coins - game.launchCoins).toBe(120);
         });
 
         it('UNMATCHED: should reward base and +10 coins', () => {
@@ -72,9 +72,9 @@ describe('Spec: Exit Arcs & Cargo Delivery (Chapter 6)', () => {
             game.missionSystem.resolveItems('success', hitGoal);
             
             // Should have base score but NO match bonus score
-            expect(game.pendingScore).toBe(2000);
+            expect(game.score - game.launchScore).toBe(2000);
             // Should have base coins + 10 extra coins
-            expect(game.pendingCoins).toBe(20 + 10);
+            expect(game.coins - game.launchCoins).toBe(20 + 10);
         });
 
         it('6.2.C Lucky Cargo: should provide -10% discount per item (up to 50%)', () => {
@@ -102,9 +102,9 @@ describe('Spec: Exit Arcs & Cargo Delivery (Chapter 6)', () => {
             game.missionSystem.resolveItems('success', goal);
 
             // Calculation: (Base 2000) + (1500 * 2) = 5000
-            expect(game.pendingScore).toBe(5000);
+            expect(game.score - game.launchScore).toBe(5000);
             // Calculation: (Base 20) + (100 * 2) = 220
-            expect(game.pendingCoins).toBe(220);
+            expect(game.coins - game.launchCoins).toBe(220);
 
             // Item calculation: 1 (base items) * 2 (matches) = 2 Gacha items delivered
             const matchItems = game.flightResults.items.filter(i => i.isDelivery && i.isMatch);

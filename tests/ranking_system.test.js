@@ -29,7 +29,7 @@ describe('RankingSystem', () => {
         expect(rankings[0].score).toBe(1000);
         expect(rankings[0].sector).toBe(5);
         expect(rankings[0].collected).toBe(10);
-        expect(rankings[0].date).toMatch(/^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/);
+        expect(typeof rankings[0].timestamp).toBe('number');
     });
 
     test('should sort entries descending by specific category', () => {
@@ -50,24 +50,29 @@ describe('RankingSystem', () => {
         expect(bySector[2].sector).toBe(2);
     });
 
-    test('should reset data if version is old', () => {
-        // 旧形式（versionが違う）をシミュレート
+    test('should migrate old formatted data properly instead of resetting', () => {
+        // 旧形式（versionが古く、dateプロパティ）をシミュレート
         const oldData = {
-            version: "0.29.0",
+            version: "0.29.0", // または 0.30.0 等
             entries: [{ score: 100, sector: 1, collected: 1, date: "2026/04/08 10:00" }]
         };
         localStorage.setItem('gravity_freight_rankings', JSON.stringify(oldData));
 
-        // 再初期化
+        // 再初期化：古いバージョンでもマイグレーションされるはず
         const newSystem = new RankingSystem(mockGame);
         const rankings = newSystem.getRankings('score');
-        expect(rankings.length).toBe(0); // リセットされているはず
+        
+        expect(rankings.length).toBe(1);
+        expect(rankings[0].score).toBe(100);
+        expect(rankings[0].timestamp).toBe(new Date("2026/04/08 10:00").getTime()); // ミリ秒変換されていること
+        expect(rankings[0].date).toBeUndefined(); // 古いdateキーは消えていること
+        expect(newSystem.data.version).toBe('1.2.0'); // バージョンが更新されていること
     });
 
-    test('should preserve data if version is correct', () => {
+    test('should load valid latest version data directly', () => {
         const newData = {
-            version: "0.30.0",
-            entries: [{ score: 500, sector: 3, collected: 5, date: "2026/04/08 12:00" }]
+            version: "1.2.0", // 最新のDATA_VERSION
+            entries: [{ score: 500, sector: 3, collected: 5, timestamp: new Date("2026/04/08 12:00").getTime() }]
         };
         localStorage.setItem('gravity_freight_rankings', JSON.stringify(newData));
 
@@ -75,6 +80,8 @@ describe('RankingSystem', () => {
         const rankings = newSystem.getRankings('score');
         expect(rankings.length).toBe(1);
         expect(rankings[0].score).toBe(500);
+        expect(rankings[0].timestamp).toBe(new Date("2026/04/08 12:00").getTime());
+        expect(newSystem.data.version).toBe("1.2.0");
     });
 
     test('should prune entries that are out of top in all categories', () => {
@@ -109,13 +116,16 @@ describe('RankingSystem', () => {
     });
 
     test('should rank newest entry higher when values are identical', () => {
-        rankingSystem.addEntry({ score: 1000, date: "2026/04/01 10:00" });
-        const result = rankingSystem.addEntry({ score: 1000, date: "2026/04/08 10:00" });
+        const time1 = new Date("2026/04/01 10:00").getTime();
+        const time2 = new Date("2026/04/08 10:00").getTime();
+        rankingSystem.addEntry({ score: 1000, timestamp: time1 });
+        const result = rankingSystem.addEntry({ score: 1000, timestamp: time2 });
         
         // 新しい方が1位、古い方が2位
         expect(result.scoreRank).toBe(1);
         const rankings = rankingSystem.getRankings('score');
         expect(rankings[0].score).toBe(1000);
+        expect(rankings[0].timestamp).toBe(time2);
     });
 
     test('should return null if value is exactly at 21st place', () => {

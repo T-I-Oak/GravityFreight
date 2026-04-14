@@ -93,57 +93,43 @@ export class ResultScreen {
         }
 
         // データの同期とステート更新 (オリジナルのタイミングを維持)
-        const pendingS = (game.pendingGoalBonus || 0) + (game.pendingScore || 0);
-        const pendingC = (game.pendingCoins || 0);
-        
-        // 【重要】ボーナス加算前の値でフライトスコアを計算する
-        const pureFlightScore = Math.max(0, game.score - game.launchScore);
-
         if (game.state !== 'result' && game.state !== 'gameover') {
             game.setState('result');
         }
 
+        // フライト成果の取得（内訳管理APIを使用）
+        const durationScore = game.flightResults.durationScore || 0;
+
         // 実績・統計の更新
-        const flightTicks = Math.max(0, pureFlightScore);
-
-        // 1. 航行距離 (ticks) と航行分のスコア累積を報告
-        game.achievementSystem.updateStat('stat_max_dist', flightTicks);
-        game.achievementSystem.updateStat('stat_distance', flightTicks);
-        game.achievementSystem.updateStat('stat_total_score', flightTicks);
+        // ※ステップスコア相当分を統計に計上
+        game.achievementSystem.updateStat('stat_max_dist', durationScore);
+        game.achievementSystem.updateStat('stat_distance', durationScore);
         
-        // 2. 残りのボーナススコアとコインをメソッド経由で加算（実績も自動更新）
-        game.addScore(pendingS);
-        game.addCoins(pendingC);
-
-        game.pendingGoalBonus = 0;
-        game.pendingScore = 0;
-        game.pendingCoins = 0;
-
         // 統計リストの生成
         if (resultType === 'gameover') {
             this._renderGameOverStats(statsList);
         } else {
-            this._renderFlightStats(statsList, pureFlightScore);
+            this._renderFlightStats(statsList, durationScore);
         }
 
         // アイテムリストの生成
         this._renderItems(itemsList, resultType);
 
-        // 数値アニメーションの実行
-        setTimeout(() => {
-            if (scoreTotalEl) UIAnimations.animateValue(scoreTotalEl, game.launchScore, game.score, this.ANIMATION_DURATION, (v) => game.displayScore = v);
-            if (coinTotalEl) UIAnimations.animateValue(coinTotalEl, game.launchCoins, game.coins, this.ANIMATION_DURATION, (v) => game.displayCoins = v);
-        }, this._resultDelay * 1000);
+        // 数値アニメーションの基準点をセット（ここからHUDManagerが自動で追いかける）
+        game.displayScore = game.launchScore;
+        game.displayCoins = game.launchCoins;
 
         // 表示の実行
         if (resultType !== 'gameover') {
             requestAnimationFrame(() => {
                 overlay.classList.remove('hidden');
                 game.updateUI();
+                this._setupRecordingControls();
             });
         } else {
             overlay.classList.remove('hidden');
             game.updateUI();
+            this._setupRecordingControls();
             this.uiSystem.showTerminalReport();
         }
     }
@@ -178,6 +164,116 @@ export class ResultScreen {
             closeBtn.classList.add('btn-grad-orange');
         }
         closeBtn.textContent = label;
+    }
+
+    _setupRecordingControls() {
+        const header = document.getElementById('result-header');
+        if (!header) return;
+
+        // 既存のコントロールがあれば削除
+        const existing = document.getElementById('recording-controls-container');
+        if (existing) existing.remove();
+
+        const game = this.game;
+        if (!game.flightResults) return;
+
+        const container = document.createElement('div');
+        container.id = 'recording-controls-container';
+        container.className = 'recording-controls active stagger-in';
+        container.style.animationDelay = `${this._resultDelay}s`;
+        this._resultDelay += 0.1;
+
+        const recBadge = document.createElement('div');
+        recBadge.className = 'rec-badge';
+        recBadge.textContent = 'RECORDED';
+        
+        const favBtn = document.createElement('button');
+        favBtn.className = 'favorite-toggle-btn';
+
+        const updateUI = () => {
+            const isSaved = game.flightResults.savedAsBestShot;
+            const recordId = game.flightResults.savedRecordId;
+            
+            // バッジの表示制御
+            recBadge.style.display = isSaved ? 'inline-flex' : 'none';
+
+            if (!isSaved) {
+                // 未保存状態（ランキング圏外かつ未保存）
+                favBtn.classList.remove('active');
+                favBtn.innerHTML = `<span class="icon">☆</span> SAVE REPLAY`;
+            } else {
+                // 保存済み状態（録画が存在する）
+                const record = game.replaySystem.getRecords().find(r => r.id === recordId);
+                if (record && record.isFavorite) {
+                    favBtn.classList.add('active');
+                    favBtn.innerHTML = `<span class="icon">★</span> PROTECTED`;
+                } else {
+                    favBtn.classList.remove('active');
+                    favBtn.innerHTML = `<span class="icon">☆</span> PROTECT RECORD`;
+                    
+                    // ランキング圏外で、かつお気に入りも外された場合は「未保存」に戻す
+                    // ※ ReplaySystem.toggleFavorite ですでにレコード自体が消えている可能性がある
+                    if (!record) {
+                        game.flightResults.savedAsBestShot = false;
+                        game.flightResults.savedRecordId = null;
+                        // pendingRecordDataは元のデータを復元しておく必要があるが、
+                        // 面倒なので再描画して初期状態に戻す
+                        updateUI();
+                    }
+                }
+            }
+        };
+
+        favBtn.addEventListener('click', () => {
+            if (!game.flightResults.savedAsBestShot) {
+                // 【新規保存】
+                const score = game.flightResults.pendingScore;
+                const data = game.flightResults.pendingRecordData;
+                const newId = game.replaySystem.saveAsFavorite(score, data);
+                
+                if (newId) {
+                    game.flightResults.savedAsBestShot = true;
+                    game.flightResults.savedRecordId = newId;
+                    game.audioSystem.playBuy();
+                    updateUI();
+                } else {
+                    // お気に入り保存を明示的に行おうとしたが上限に達している場合
+                    const score = game.flightResults.pendingScore;
+                    const data = game.flightResults.pendingRecordData;
+                    
+                    this.uiSystem.showFavoriteReplacementDialog({ score, recordData: data }, (newId) => {
+                        game.flightResults.savedAsBestShot = true;
+                        game.flightResults.savedRecordId = newId;
+                        updateUI();
+                    }, () => {
+                        updateUI();
+                    });
+                }
+            } else {
+                // 【お気に入りトグル】
+                const recordId = game.flightResults.savedRecordId;
+                const success = game.replaySystem.toggleFavorite(recordId);
+                if (success) {
+                    game.audioSystem.playTick();
+                    updateUI();
+                } else {
+                    const candidateId = game.flightResults.savedRecordId;
+                    this.uiSystem.showFavoriteReplacementDialog(candidateId, () => {
+                        updateUI();
+                    }, () => {
+                        updateUI();
+                    });
+                }
+            }
+        });
+
+        // 初回表示の必要性チェック
+        if (!game.flightResults.savedAsBestShot && !game.flightResults.pendingRecordData) return;
+
+        updateUI();
+        container.appendChild(recBadge);
+        container.appendChild(favBtn);
+        header.appendChild(container);
     }
 
     _renderGameOverStats(statsList) {

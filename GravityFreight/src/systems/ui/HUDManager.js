@@ -12,13 +12,17 @@ export class HUDManager {
      */
     update(dt) {
         const game = this.game;
+        // 定数に基づき、毎フレーム差分の約10%を埋める（指数的収束）
+        // 1秒間でほぼ完全に収束する速度
+        const catchupFactor = 1 - Math.pow(0.001, dt); 
+        
         const scoreDiff = game.score - game.displayScore;
         const coinDiff = game.coins - game.displayCoins;
 
         let needsUpdate = false;
         if (Math.abs(scoreDiff) > 0.1 || Math.abs(coinDiff) > 0.1) {
-            if (!game.isAnimatingScore) game.displayScore += scoreDiff * 0.1;
-            if (!game.isAnimatingCoins) game.displayCoins += coinDiff * 0.1;
+            game.displayScore += scoreDiff * catchupFactor;
+            game.displayCoins += coinDiff * catchupFactor;
             needsUpdate = true;
         } else if (game.displayScore !== game.score || game.displayCoins !== game.coins) {
             game.displayScore = game.score;
@@ -41,9 +45,18 @@ export class HUDManager {
         const sectorDisplay = document.getElementById('sector-display');
         const eventCoinDisplay = document.getElementById('event-player-credits');
         
-        if (scoreDisplay) scoreDisplay.textContent = Math.floor(game.displayScore || 0).toLocaleString();
-        if (coinDisplay) coinDisplay.textContent = Math.floor(game.displayCoins || 0).toLocaleString();
-        if (eventCoinDisplay) eventCoinDisplay.textContent = Math.floor(game.displayCoins || 0).toLocaleString();
+        // リザルト画面の要素ももし存在すれば同期対象に含める（手術の肝）
+        const resultScoreDisplay = document.getElementById('result-total-score');
+        const resultCoinDisplay = document.getElementById('result-total-coin');
+        
+        const currentS = Math.floor(game.displayScore || 0).toLocaleString();
+        const currentC = Math.floor(game.displayCoins || 0).toLocaleString();
+
+        if (scoreDisplay) scoreDisplay.textContent = currentS;
+        if (coinDisplay) coinDisplay.textContent = currentC;
+        if (eventCoinDisplay) eventCoinDisplay.textContent = currentC;
+        if (resultScoreDisplay) resultScoreDisplay.textContent = currentS;
+        if (resultCoinDisplay) resultCoinDisplay.textContent = currentC;
         if (sectorDisplay) sectorDisplay.textContent = game.sector;
         
         this.updateMailIcons();

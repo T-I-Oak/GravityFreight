@@ -21,7 +21,7 @@ export class LaunchSystem {
                 rotation: prevRotation
             };
             
-            // 既存または新規の ship オブジェクトに対してプロパティを保証（初期化漏れを防止）
+            // 既存または新規の ship オブジェクトに対してプロパティを保証
             game.ship.trail = [];
             game.ship.collectedItems = [];
             game.ship.equippedModules = [];
@@ -30,7 +30,7 @@ export class LaunchSystem {
 
             if (game.ship.rotation === undefined) game.ship.rotation = -Math.PI / 2;
 
-            // 位置を母星表面の適切な発射位置に強制リセット (不具合修正)
+            // 位置を母星表面の適切な発射位置にリセット
             const homePos = game.homeStar.position;
             const resetOffset = new Vector2(Math.cos(game.ship.rotation), Math.sin(game.ship.rotation)).scale(game.homeStar.radius + GAME_BALANCE.SHIP_START_OFFSET);
             game.ship.position = homePos.add(resetOffset);
@@ -40,7 +40,7 @@ export class LaunchSystem {
             const l = game.selection.launcher;
             const b = game.selection.booster;
 
-            // 各倍率の初期化 (ロケットとランチャーの基本値を合成)
+            // 各倍率の初期化
             let pMult = (l.precisionMultiplier || 1.0) * (r.precisionMultiplier || 1.0);
             let pickMult = (r.pickupMultiplier || 1.0);
             let gMult = (r.gravityMultiplier || 1.0);
@@ -49,12 +49,11 @@ export class LaunchSystem {
             if (b) {
                 if (b.precisionMultiplier) pMult *= b.precisionMultiplier;
                 if (b.pickupMultiplier) pickMult *= b.pickupMultiplier;
-                // gravityMultiplier は duration がある場合は飛行中の効果として扱うため、ベース値の計算には含めない
                 if (b.gravityMultiplier && b.duration === undefined) gMult *= b.gravityMultiplier;
                 if (b.arcMultiplier) aMult *= b.arcMultiplier;
             }
 
-            // モジュールリスト（既に個別に展開済み）を同期
+            // モジュールリストを同期
             game.ship.equippedModules = [];
             if (Array.isArray(r.modules)) {
                 game.ship.equippedModules = r.modules.map(m => {
@@ -66,7 +65,6 @@ export class LaunchSystem {
                 });
             }
 
-            // ロケットの基本設定を同期
             game.ship.mass = r.mass || 10;
             game.ship.pickupRange = r.pickupRange || 0;
             game.ship.pickupMultiplier = pickMult;
@@ -77,7 +75,6 @@ export class LaunchSystem {
             game.updateUI();
         } else {
             game.setState('building');
-            // ステートが既に building の場合 setState は何もしないため、明示的に UI を更新する
             game.updateUI();
         }
     }
@@ -93,20 +90,20 @@ export class LaunchSystem {
         const b = game.selection.booster;
 
         if (l.charges <= 0) {
-            game.showStatus('発射台の残り回数がありません。', 'error');
+            game.showStatus('発射台の使用可能回数がありません。', 'error');
             return;
         }
 
         game.setState('flying');
         game.activeBoosterAtLaunch = b ? { ...b } : null;
         game.launchTime = game.simulatedTime;
+        game.launchScore = game.score;
+        game.launchCoins = game.coins;
 
         if (b) {
-            // ブースター独自の航行中効果（閃光推進剤など）
             if (b.gravityMultiplier !== undefined) {
                 game.ship.activeBoosterEffect = { ...b };
             }
-            // マグネティック・パルス用の基準値を保存
             game.ship.basePickupRange = game.ship.pickupRange;
         }
 
@@ -118,7 +115,36 @@ export class LaunchSystem {
         const massFactor = Math.sqrt(10 / game.ship.mass);
         game.ship.velocity = new Vector2(Math.cos(angle) * (power * massFactor), Math.sin(angle) * (power * massFactor));
 
-        // 耐久度消費の判定 (v0.17: 高反応燃料などがランチャーの身代わりになるロジック)
+        // --- 録画機能 (Best Shot Replay) 用のスナップショット作成 ---
+        // 規約2.1: 耐久消費や天体破壊が発生する前の「初期状態」を保存。
+        // 速度計算直後に取得することで、リプレイ再生時に初速が正しく再現されるようにする。
+        game.lastFlightRecordData = {
+            sector: game.sector,
+            returnBonus: game.returnBonus,
+            bodies: JSON.parse(JSON.stringify(game.bodies)),
+            goals: JSON.parse(JSON.stringify(game.goals)),
+            selection: {
+                rocket: r ? JSON.parse(JSON.stringify(r)) : null,
+                launcher: l ? JSON.parse(JSON.stringify(l)) : null,
+                booster: b ? JSON.parse(JSON.stringify(b)) : null
+            },
+            ship: {
+                position: { x: game.ship.position.x, y: game.ship.position.y },
+                velocity: { x: game.ship.velocity.x, y: game.ship.velocity.y },
+                rotation: game.ship.rotation,
+                mass: game.ship.mass,
+                pickupRange: game.ship.pickupRange,
+                basePickupRange: game.ship.basePickupRange,
+                pickupMultiplier: game.ship.pickupMultiplier,
+                gravityMultiplier: game.ship.gravityMultiplier,
+                arcMultiplier: game.ship.arcMultiplier,
+                precision: game.ship.precision,
+                equippedModules: JSON.parse(JSON.stringify(game.ship.equippedModules || [])),
+                activeBoosterEffect: game.ship.activeBoosterEffect ? JSON.parse(JSON.stringify(game.ship.activeBoosterEffect)) : null
+            }
+        };
+
+        // 耐久度消費の判定
         const protectsLauncher = b && b.preventsLauncherWear;
 
         // 1. ブースターの消費
@@ -137,7 +163,7 @@ export class LaunchSystem {
             game.selection.booster = null;
         }
 
-        // 2. ランチャーの消費 (保護されていない場合)
+        // 2. ランチャーの消費
         if (!protectsLauncher) {
             const takenL = game.inventorySystem.takeItem('launchers', l.instanceId, 1);
             if (takenL) {
@@ -145,14 +171,12 @@ export class LaunchSystem {
                 if (takenL.charges > 0) {
                     game.inventorySystem.addItem(takenL, { isNew: false });
                 } else {
-                    game.showStatus('ランチャーの耐久度が尽きました。', 'info');
+                    game.showStatus('発射台の耐久度が尽きました。', 'info');
                 }
             }
         }
         game.selection.launcher = null;
 
-        game.launchScore = game.score;
-        game.launchCoins = game.coins;
         game.updateUI();
     }
 }

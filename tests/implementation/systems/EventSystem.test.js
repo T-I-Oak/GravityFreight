@@ -48,6 +48,9 @@ describe('Implementation: systems/EventSystem.js', () => {
         game.selection.launcher = launcher;
         game.selection.rocket = { id: 'r1', mass: 10, totalPrecision: 100 };
         game.selection.booster = fuel;
+        game.ship = { rotation: -Math.PI / 2, mass: 10, position: new Vector2(0, 0), velocity: new Vector2(0, 0) };
+        game.bodies = [];
+        game.goals = [];
         game.state = 'aiming';
 
         game.launchSystem.launch();
@@ -72,6 +75,9 @@ describe('Implementation: systems/EventSystem.js', () => {
         game.selection.launcher = launcher;
         game.selection.rocket = { id: 'r1', mass: 10, totalPrecision: 100 };
         game.selection.booster = fuelPack;
+        game.ship = { rotation: -Math.PI / 2, mass: 10, position: new Vector2(0, 0), velocity: new Vector2(0, 0) };
+        game.bodies = [];
+        game.goals = [];
         game.state = 'aiming';
 
         game.launchSystem.launch();
@@ -99,8 +105,10 @@ describe('Implementation: systems/EventSystem.js', () => {
         game.selection.launcher = { power: 1000 };
         game.selection.booster = null;
         
-        // Mock current ship rotation (default is -PI/2) and mass
-        game.ship = { rotation: -Math.PI / 2, mass: 10 };
+        // Mock current ship basic properties
+        game.ship = { rotation: -Math.PI / 2, mass: 10, position: new Vector2(0, 0), velocity: new Vector2(0, 0) };
+        game.bodies = [];
+        game.goals = [];
         
         // Calculate expected velocity: power(1000) * massFactor(1.0) * (1 + bonus(0.2)) = 1200
         // Direction is up (0, -1)

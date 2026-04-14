@@ -66,6 +66,22 @@
     <!-- 実績通知コンテナ -->
     <div id="achievement-toast-container"></div>
 
+    <!-- Replay HUD -->
+    <div id="replay-overlay" class="hidden">
+        <div class="panel replay-panel">
+            <div class="panel-header">
+                <h2>MISSION DATA</h2>
+                <div class="replay-badge">STATUS: ARCHIVED</div>
+            </div>
+            <div class="panel-content">
+                <div id="replay-config-list" class="replay-config-list"></div>
+            </div>
+            <div class="panel-footer">
+                <button id="exit-replay-btn" class="btn-neon btn-grad-orange">EXIT REPLAY</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Archive Overlay (Ranking & Achievements) (v1.1) -->
     <div id="archive-overlay" class="overlay-container hidden">
         <div class="event-backdrop"></div>
@@ -77,6 +93,7 @@
                     <div class="archive-tabs-nav">
                         <button class="archive-tab-btn active" data-tab="ranking">RANKING</button>
                         <button class="archive-tab-btn" data-tab="achievements">ACHIEVEMENTS</button>
+                        <button class="archive-tab-btn" data-tab="replays">REPLAYS</button>
                     </div>
                 </div>
             </div>

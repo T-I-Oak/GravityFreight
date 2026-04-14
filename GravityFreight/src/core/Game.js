@@ -1,5 +1,5 @@
 import { Vector2 } from '../utils/Physics.js';
-import { INITIAL_COINS, ITEM_REGISTRY, RARITY, ANIMATION_DURATION } from './Data.js';
+import { INITIAL_COINS, ITEM_REGISTRY, RARITY, ANIMATION_DURATION, MAP_CONSTANTS } from './Data.js';
 import { InventorySystem } from '../systems/InventorySystem.js';
 import { EconomySystem } from '../systems/EconomySystem.js';
 import { AssemblySystem } from '../systems/AssemblySystem.js';
@@ -12,6 +12,7 @@ import { RankingSystem } from '../systems/RankingSystem.js';
 import { StorySystem } from '../systems/StorySystem.js';
 import { AudioSystem } from '../systems/AudioSystem.js';
 import { LaunchSystem } from '../systems/LaunchSystem.js';
+import { ReplaySystem } from '../systems/ReplaySystem.js';
 import { AchievementSystem } from '../systems/AchievementSystem.js';
 import { FacilityEventSystem } from '../systems/FacilityEventSystem.js';
 import { StorageUtils } from '../utils/StorageUtils.js';
@@ -22,9 +23,6 @@ export class Game {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.ui = ui;
-
-
-
 
         // システムの初期化
         this.inventorySystem = new InventorySystem(this);
@@ -40,6 +38,7 @@ export class Game {
         this.storySystem = new StorySystem(this);
         this.achievementSystem = new AchievementSystem(this);
         this.audioSystem = new AudioSystem(this);
+        this.replaySystem = new ReplaySystem(this);
 
         this.renderer = new Renderer(canvas, this);
         this.bodies = [];
@@ -61,8 +60,7 @@ export class Game {
         this.lastPinchDist = 0;
         this.zoom = StorageUtils.get('game_zoom', 0.5);
         this.cameraOffset = new Vector2(0, 0);
-        this.mapRotation = 0; // マップの回転角（ラジアン）
-
+        this.mapRotation = 0; // マップの回転角度（ラジアン）
         this.inventory = this.inventorySystem.inventory;
         this.coins = INITIAL_COINS;
         this.score = 0;
@@ -87,12 +85,9 @@ export class Game {
             booster: null
         };
 
-        this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
-        this.pendingGoalBonus = 0;
-        this.pendingScore = 0;
-        this.pendingCoins = 0;
+        this.flightResults = { durationScore: 0, bonusScore: 0, bonuses: [], items: [], status: '', isHome: false };
         this.pendingItems = [];
-        this.finishResult = null; // 終了演出の種類 (cleared/crashed/etc.)
+        this.finishResult = null; // 終了時の種類(cleared/crashed/etc.)
 
         this.isFactoryOpen = false;
         this.dismantleCount = 0;
@@ -129,23 +124,155 @@ export class Game {
             }
             this.stateTimer = 3.5;
             this.audioSystem.playWarp(3.5);
-            this.isWarpInitialized = false; // 演出中のマップ更新フラグ
+            this.isWarpInitialized = false;
             
-            // 新規契約開始（セクター0からの開始）時にカウント
             if (this.totalSectorsCompleted === 0) {
                 this.achievementSystem.updateStat('stat_runs', 1);
                 this.sessionCoinsEarned = 0;
+                this.returnBonus = 0;
             }
+            // preparing遷移時のみリセット（フライト開始の儀式）
             this.reset();
+        }
+
+        if (newState === 'replaying') {
+            // リプレイ開始時の航行音は現在無効化
         }
 
         this.updateUI();
     }
 
+    /**
+     * リプレイ再生モードを開始する
+     * @param {object} record ReplaySystemから取得したレコードオブジェクト
+     */
+    startReplayMode(record) {
+        if (!record || !record.recordData) return;
+        const data = record.recordData;
+
+        // 天体データの復元
+        this.bodies = data.bodies.map(b => {
+            const body = { ...b };
+            body.position = new Vector2(b.position.x, b.position.y);
+            return body;
+        });
+        this.homeStar = this.bodies.find(b => b.isHome);
+
+        // ゴール（出口）データの復元
+        this.goals = JSON.parse(JSON.stringify(data.goals));
+
+        // 自機データの復元
+        const s = data.ship;
+        this.ship = {
+            position: new Vector2(s.position.x, s.position.y),
+            velocity: new Vector2(s.velocity.x, s.velocity.y),
+            rotation: s.rotation,
+            mass: s.mass,
+            pickupRange: s.pickupRange,
+            basePickupRange: s.basePickupRange,
+            pickupMultiplier: s.pickupMultiplier,
+            gravityMultiplier: s.gravityMultiplier,
+            arcMultiplier: s.arcMultiplier,
+            precision: s.precision,
+            equippedModules: JSON.parse(JSON.stringify(s.equippedModules)),
+            activeBoosterEffect: s.activeBoosterEffect ? JSON.parse(JSON.stringify(s.activeBoosterEffect)) : null,
+            trail: [],
+            collectedItems: [],
+            isSafeToReturn: false
+        };
+
+        this.simulatedTime = 0;
+        this.sector = data.sector || 1;
+        this.returnBonus = data.returnBonus || 0;
+        this.cameraOffset = new Vector2(0, 0);
+        this.mousePos = new Vector2(this.canvas.width / 2, this.canvas.height / 2);
+        this.mapRotation = 0;
+        this.currentReplaySelection = data.selection || null;
+        
+        // 【復元】不完全なデータでもUIがクラッシュしないよう、構造を保障する
+        const loadedSelection = data.selection || {};
+        this.selection = {
+            chassis: loadedSelection.chassis || null,
+            logic: loadedSelection.logic || null,
+            launcher: loadedSelection.launcher || null,
+            rocket: loadedSelection.rocket || null,
+            modules: loadedSelection.modules || {},
+            booster: loadedSelection.booster || null
+        };
+
+        // 【復元】発射時のブースター状態を再現（Magnetic Pulse等の時間経過エフェクトのため）
+        this.activeBoosterAtLaunch = this.selection.booster;
+        this.launchTime = 0; // リプレイ開始＝シミュレーション時刻0
+
+        // 【復元】遷移済みステートとして記録し、終了時に戻れるようにする
+        this._replayReturnState = this.state;
+
+        this.setState('replaying');
+        this.showStatus('REPLAYING RECORDED FLIGHT', 'info');
+    }
+
+    /**
+     * リプレイ再生を終了し、元のゲーム状態に戻る
+     */
+    stopReplayMode() {
+        const targetState = this._replayReturnState || 'title';
+        this._replayReturnState = null;
+
+        // 宇宙の完全破棄（データの有効性管理を不要にする）
+        this.clearWorld();
+
+        // 指定のステート（主にアーカイブ）へ遷移
+        this.setState(targetState);
+        this.finishResult = null;
+        this.audioSystem.stopFlightSound();
+    }
+
+    /**
+     * 宇宙（物理オブジェクトや進行状態）を完全に破棄・初期化する
+     */
+    clearWorld() {
+        this.bodies = [];
+        this.goals = [];
+        this.ship = null;
+        this.homeStar = null;
+        this.score = 0;
+        this.coins = 0;
+        this.simulatedTime = 0;
+        this.cameraOffset = new Vector2(0, 0);
+        this.zoom = StorageUtils.get('game_zoom', 0.5);
+        this.mapRotation = 0;
+    }
+
+    get currentScore() {
+        return Math.floor(this.score);
+    }
+    
+    get currentCoins() {
+        return Math.floor(this.coins);
+    }
+
     // --- Delegation to UISystem ---
     updateUI() { this.uiSystem.updateUI(); }
     animateCoinChange(amt) { this.uiSystem.animateCoinChange(amt); }
-    showResult(type) { this.uiSystem.showResult(type); }
+    showResult(type) { 
+        // ミッション成果の解決（スコア加算・ボーナス確定）
+        this.missionSystem.resolveItems(type, this.lastHitGoal);
+
+        if (this.lastFlightRecordData) {
+            const flightScore = this.score - this.launchScore;
+            // リプレイ記録を追加
+            const record = this.replaySystem.addRecord(flightScore, this.lastFlightRecordData);
+            this.flightResults.savedAsBestShot = !!record;
+            if (record) {
+                this.flightResults.savedRecordId = record.id;
+            } else {
+                this.flightResults.pendingRecordData = this.lastFlightRecordData;
+                this.flightResults.pendingScore = flightScore;
+            }
+            this.lastFlightRecordData = null;
+        }
+        this.uiSystem.showResult(type); 
+    }
     generateCardHTML(data, opts) { return this.uiSystem.generateCardHTML(data, opts); }
     initTradingPost(container) { this.uiSystem.initTradingPost(container); }
     initRepairDock(container) { this.uiSystem.initRepairDock(container); }
@@ -186,17 +313,26 @@ export class Game {
 
     incrementCollectedItems(count = 1) {
         this.totalCollectedItems += count;
-        // 収集物実績がある場合はここに追加
     }
 
     /**
-     * スコアを加算し、実績をチェックする
+     * スコアを加算し、実績をチェックすると同時にフライト内訳を記録する
+     * @param {number} amount
+     * @param {string} type 'duration' (航行) or 'bonus' (報酬)
      */
-    addScore(amount) {
+    addScore(amount, type = 'duration') {
         if (amount <= 0) return;
         this.score += amount;
         this.achievementSystem.updateStat('stat_total_score', amount);
         this.achievementSystem.updateStat('stat_max_score', this.score);
+        
+        // 内訳の記録
+        if (type === 'duration') {
+            this.flightResults.durationScore += amount;
+        } else {
+            this.flightResults.bonusScore += amount;
+        }
+
         this.updateUI();
     }
 
@@ -225,7 +361,7 @@ export class Game {
     }
 
     /**
-     * 配達成功数をインクリメントし、実績をチェックする
+     * 配送成功数をインクリメントし、実績をチェックする
      */
     incrementDeliveries() {
         this.totalDeliveries++;
@@ -242,7 +378,7 @@ export class Game {
         this.width = w;
         this.height = h;
 
-        // 中心点の移動に伴う座標補正 (master ブランチの事実に基づく)
+        // 中心点の移動に伴う座標補正
         const dx = (w - oldW) / 2;
         const dy = (h - oldH) / 2;
         [...this.bodies, this.ship].forEach(b => {
@@ -254,7 +390,6 @@ export class Game {
 
         if (this.renderer) this.renderer.resize();
     }
-
 
     // --- Core Utilities ---
     getWorldPos(screenPos) {
@@ -294,31 +429,28 @@ export class Game {
         );
     }
 
-
-
     reset() {
         if (this.ship) {
             this.ship.velocity = new Vector2(0, 0);
             this.ship.trail = [];
             this.ship.collectedItems = [];
             this.ship.activeBoosterEffect = null;
-            // 拡大倍率や重力補正などの一時的なステートをリセット
             this.ship.arcMultiplier = 1.0;
             this.ship.gravityMultiplier = 1.0;
             this.ship.pickupMultiplier = 1.0;
         }
         this.pendingItems = [];
-        this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
+        this.flightResults = { durationScore: 0, bonusScore: 0, bonuses: [], items: [], status: '', isHome: false };
         this.finishResult = null;
         this.accumulator = 0;
     }
 
     fullReset() {
-        // ステート管理: まずタイマーをクリアして割り込みを阻止
+        // ステート管理: まずタイマーをクリアして割り込みを防止
         this.eventSystem.clearPendingTimers();
         this.state = 'title';
 
-        // 資金とスコアの初期化 (displayはアニメーションを防ぐために一致させる)
+        // 資産とスコアの初期化
         this.coins = INITIAL_COINS;
         this.displayCoins = INITIAL_COINS;
         this.score = 0;
@@ -328,6 +460,7 @@ export class Game {
         this.sector = 0;
         this.stageLevel = 0;
         this.totalSectorsCompleted = 0;
+        this.flightResults = { durationScore: 0, bonusScore: 0, bonuses: [], items: [], status: '', isHome: false };
         this.currentStarCount = 5;
         this.totalDeliveries = 0;
         this.launchScore = 0;
@@ -343,7 +476,7 @@ export class Game {
         this.selection = { chassis: null, logic: null, launcher: null, rocket: null, modules: {}, booster: null };
         this.lastHitGoal = null;
         this.storySystem.resetSession();
-        this.flightResults = { baseScore: 0, bonuses: [], items: [], status: '', isHome: false };
+        this.flightResults = { durationScore: 0, bonusScore: 0, bonuses: [], items: [], status: '', isHome: false };
         this.pendingItems = [];
         this.ship = null;
 
@@ -367,17 +500,14 @@ export class Game {
         const centerY = this.canvas.height / 2;
         const distFromCenter = worldPos.sub(new Vector2(centerX, centerY)).length();
 
-        // 操作モードの判定 (Technical Spec 6 準拠)
+        // 操作モードの判定
         if (e.shiftKey || e.ctrlKey) {
             this.interactionMode = 'pan';
         } else if (distFromCenter >= this.boundaryRadius) {
-            // 外周なら常に回転
             this.interactionMode = 'rotate';
         } else if (this.state === 'aiming' && this.ship) {
-            // 内周かつエイミング中ならエイム
             this.interactionMode = 'aim';
         } else {
-            // それ以外（内周かつ非エイミング中、または自機なし）ならパン
             this.interactionMode = 'pan';
         }
     }
@@ -388,19 +518,15 @@ export class Game {
 
         if (this.isPointerDown) {
             if (this.interactionMode === 'aim' && this.ship) {
-                // エイム方向の調整
                 const screenShipPos = this.getScreenPos(this.ship.position);
                 const screenAngle = Math.atan2(newPos.y - screenShipPos.y, newPos.x - screenShipPos.x);
                 this.ship.rotation = screenAngle - this.mapRotation;
                 
-                // ロケットの位置を母星表面に同期 (描画の整合性)
                 const angle = this.ship.rotation;
                 const dist = this.homeStar.radius + 12;
                 this.ship.position.x = this.homeStar.position.x + Math.cos(angle) * dist;
                 this.ship.position.y = this.homeStar.position.y + Math.sin(angle) * dist;
             } else if (this.interactionMode === 'rotate') {
-                // マップの回転
-                // 画面上のマップ中心位置（パニング込み）を回転のピボットにする
                 const pivotX = this.canvas.width / 2 + this.cameraOffset.x;
                 const pivotY = this.canvas.height / 2 + this.cameraOffset.y;
                 
@@ -408,7 +534,6 @@ export class Game {
                 const newAngle = Math.atan2(newPos.y - pivotY, newPos.x - pivotX);
                 this.mapRotation += (newAngle - prevAngle);
             } else {
-                // カメラの移動（パン）
                 this.cameraOffset.x += delta.x;
                 this.cameraOffset.y += delta.y;
             }
@@ -426,7 +551,6 @@ export class Game {
         const oldZoom = this.zoom;
         this.zoom = Math.max(0.1, Math.min(2.0, this.zoom * (1 - e.deltaY * zoomSpeed)));
         
-        // マウス位置を中心にズームするためのオフセット調整
         const worldMouse = this.getWorldPos(this.mousePos);
         const newScreenMouse = this.getScreenPos(worldMouse);
         this.cameraOffset.x += this.mousePos.x - newScreenMouse.x;
@@ -438,24 +562,20 @@ export class Game {
     update(dt) {
         if (this.state === 'title') return;
 
-        // 表示系の更新（補間など）およびホバー判定
         this.physicsOrchestrator.updateHover();
         this.uiSystem.update(dt); 
 
-        // 演出バッファ中のワープ処理 (Zoom演出)
         if (this.state === 'preparing') {
             const DURATION = 3.5;
-            const progress = (DURATION - this.stateTimer) / DURATION; // 0.0 to 1.0
+            const progress = (DURATION - this.stateTimer) / DURATION;
             
             if (progress < 0.4) {
-                // Phase 1: 加速離脱 (Cubic Ease-In)
-                const p = progress / 0.4; // 0.0 -> 1.0
+                const p = progress / 0.4;
                 const ease = p * p * p;
-                const warpScale = 1.0 + ease * 99.0; // 1.0 -> 100.0
+                const warpScale = 1.0 + ease * 99.0;
                 this.visualZoom = this.zoom * warpScale;
                 this.warpEffectSpeed = warpScale;
             } else if (progress < 0.6) {
-                // Phase 2: 最高速維持 & 中間地点初期化
                 if (!this.isWarpInitialized) {
                     this.sector++;
                     this.stageLevel = this.sector;
@@ -470,12 +590,10 @@ export class Game {
                 this.visualZoom = this.zoom * 100.0;
                 this.warpEffectSpeed = 100.0;
             } else {
-                // Phase 3: 減速飛来 (Cubic Ease-Out)
-                const p = (progress - 0.6) / 0.4; // 0.0 -> 1.0
-                const ease = 1 - Math.pow(1 - p, 3); // Cubic decelerating
+                const p = (progress - 0.6) / 0.4;
+                const ease = 1 - Math.pow(1 - p, 3);
                 const warpScale = 0.01 + ease * 0.99;
                 this.visualZoom = this.zoom * warpScale;
-                // 星の速度も 100.0 -> 1.0 への減速カーブ
                 this.warpEffectSpeed = 100.0 * (1.0 - ease) + 1.0;
             }
         } else {
@@ -487,12 +605,10 @@ export class Game {
         const maxSteps = 10;
         let steps = 0;
         while (this.accumulator >= this.fixedDt && steps < maxSteps) {
-            if (this.state === 'flying' || this.state === 'finishing') {
+            if (this.state === 'flying' || this.state === 'finishing' || this.state === 'replaying') {
                 this.physicsOrchestrator.step(this.fixedDt);
             }
             this.simulatedTime += this.fixedDt;
-            
-            // 時間更新の「直後」に共通処理（ソナー音判定等）を行うことで、計算ラグを排除
             this.physicsOrchestrator.updateCommon(this.fixedDt);
             
             this.accumulator -= this.fixedDt;

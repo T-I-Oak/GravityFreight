@@ -44,15 +44,12 @@ export class UISystem {
 
     /**
      * Data.js の定義色を CSS 変数としてセットする。
-     * これにより CSS 側で var(--color-chassis) のように参照可能になる。
      */
     _applyThemeVariables() {
         const root = document.documentElement;
         Object.entries(CATEGORY_COLORS).forEach(([key, color]) => {
             const varName = `--color-${key.toLowerCase()}`;
             root.style.setProperty(varName, color);
-            
-            // 透過色も必要になることが多いため生成しておく (RGBA)
             const rgba = hexToRgba(color, 0.2);
             root.style.setProperty(`${varName}-alpha`, rgba);
         });
@@ -63,7 +60,6 @@ export class UISystem {
         this.starInfoPanel.update();
     }
 
-    // 主要なゲームプレイUI要素の取得 (ルール5.1に基づき、存在を前提とする)
     _getGameplayElements() {
         return [
             document.getElementById('terminal-panel'),
@@ -80,48 +76,64 @@ export class UISystem {
     updateUI() {
         const game = this.game;
 
-        // 1. タイトルステートの早期処理 (以降のプレイ用ロジックとの干渉を遮断)
         if (game.state === 'title') {
+            this.archiveUI.hide();
             this._updateTitleUI();
             return;
         }
 
-        // 定義済みプレイ系ステート以外の不正ステートは例外を投げる (ルール5.1)
-        const validStates = ['preparing', 'building', 'aiming', 'flying', 'cleared', 'crashed', 'lost', 'returned', 'event', 'result', 'gameover'];
+        const validStates = ['preparing', 'building', 'aiming', 'flying', 'cleared', 'crashed', 'lost', 'returned', 'event', 'result', 'gameover', 'replaying', 'archive', 'finishing'];
         if (!validStates.includes(game.state)) {
             throw new Error(`Critical: Invalid game state detected in updateUI: ${game.state}`);
         }
 
-        // 2. 主要要素の取得 (一本化)
         const titleScreen = document.getElementById('title-screen');
         const gameplayElements = this._getGameplayElements();
-        const resultOverlay = document.getElementById('result-overlay');
-        const eventScreen = document.getElementById('event-screen');
-        const receiptOverlay = document.getElementById('receipt-overlay');
+        const replayOverlay = document.getElementById('replay-overlay');
 
-        // 3. 表示ステータスのサニタイズ (以前のステートの残存スタイルを徹底排除)
-        if (titleScreen) {
-            titleScreen.classList.add('hidden');
-            // スタイルを確実に初期化
-            titleScreen.style.transform = '';
-            titleScreen.style.opacity = '';
-            titleScreen.style.pointerEvents = '';
-        }
+        if (titleScreen) titleScreen.classList.add('hidden');
         this.titleAnimation?.stop();
 
         gameplayElements.forEach(el => {
-            if (el) {
-                el.classList.add('hidden');
-            }
+            if (el) el.classList.add('hidden');
         });
 
-        // 4. ステートに関わらずミッション中に表示すべき基本HUD (常時表示ガード)
-        const isMission = ['preparing', 'building', 'aiming', 'flying', 'event', 'result', 'gameover'].includes(game.state);
+        // アーカイブの表示制御
+        if (game.state === 'archive') {
+            this.archiveUI.show(this.archiveUI.currentTab || 'replays');
+        } else {
+            this.archiveUI.hide();
+        }
+
+        // リプレイHUDの表示制御
+        if (replayOverlay) {
+            const isReplaying = game.state === 'replaying';
+            replayOverlay.classList.toggle('hidden', !isReplaying);
+            
+            if (isReplaying) {
+                const exitBtn = document.getElementById('exit-replay-btn');
+                if (exitBtn) {
+                    exitBtn.onclick = (e) => {
+                        e.preventDefault();
+                        game.audioSystem.playTick();
+                        game.stopReplayMode();
+                    };
+                }
+            }
+        }
+
+        const isMission = ['preparing', 'building', 'aiming', 'flying', 'event', 'result', 'gameover', 'finishing'].includes(game.state);
         document.getElementById('terminal-panel').classList.toggle('hidden', !isMission);
         document.getElementById('mission-hud').classList.toggle('hidden', !isMission);
 
-        // 5. ステートに基づいた決定論的な表示制御
         switch (game.state) {
+            case 'replaying': {
+                const replayConfigList = document.getElementById('replay-config-list');
+                if (replayConfigList && game.currentReplaySelection) {
+                    this.renderReplayConfig(replayConfigList, game.currentReplaySelection);
+                }
+                break;
+            }
             case 'building': {
                 const buildOverlay = document.getElementById('build-overlay');
                 const launchBtn = document.getElementById('launch-btn');
@@ -131,7 +143,6 @@ export class UISystem {
                 if (launchBtn) {
                     launchBtn.classList.remove('hidden');
                     launchBtn.disabled = true;
-                    // 【Spec 9.3】アイテムカードのプロパティ表示と同じ形式（小文字x・強化枠・次の行）
                     const label = launchBtn.querySelector('.btn-label');
                     const bonusText = game.returnBonus > 0 ? `
                         <div class="part-stats">
@@ -143,20 +154,16 @@ export class UISystem {
                     if (label) label.innerHTML = `LAUNCH ENGINE${bonusText}`;
                 }
                 if (lc) lc.classList.remove('hidden');
-
-                if (eventScreen) eventScreen.classList.add('hidden');
                 break;
             }
             case 'aiming': {
                 const bo = document.getElementById('build-overlay');
                 const lb = document.getElementById('launch-btn');
                 const lc = document.getElementById('launch-control');
-                
                 if (bo) bo.classList.remove('hidden');
                 if (lb) {
                     lb.classList.remove('hidden');
                     lb.disabled = false;
-                    // 【Spec 9.3】アイテムカードのプロパティ表示と同じ形式（小文字x・強化枠・次の行）
                     const label = lb.querySelector('.btn-label');
                     const bonusText = game.returnBonus > 0 ? `
                         <div class="part-stats">
@@ -168,18 +175,15 @@ export class UISystem {
                     if (label) label.innerHTML = `LAUNCH ENGINE${bonusText}`;
                 }
                 if (lc) lc.classList.remove('hidden');
-                
-                if (eventScreen) eventScreen.classList.add('hidden');
                 break;
             }
-            case 'flying': {
+            case 'flying':
+            case 'finishing':
+            case 'replaying': {
                 const bo = document.getElementById('build-overlay');
                 const lc = document.getElementById('launch-control');
-                
                 if (bo) bo.classList.add('hidden');
                 if (lc) lc.classList.add('hidden');
-                
-                if (eventScreen) eventScreen.classList.add('hidden');
                 break;
             }
             case 'event': {
@@ -187,24 +191,17 @@ export class UISystem {
                 if (be) {
                     be.classList.remove('hidden');
                     be.classList.add('event-active');
-                    // 【憲法 2.7】イベント開始時に一度だけ最小化する。
-                    // その後ユーザーが手動で開いた場合は、updateUI で閉じ直さない。
                     if (!game.wasEventPanelMinimized) {
                         be.querySelector('.panel')?.classList.add('collapsed');
                         game.wasEventPanelMinimized = true;
                     }
                 }
-                if (eventScreen) eventScreen.classList.remove('hidden');
+                const es = document.getElementById('event-screen');
+                if (es) es.classList.remove('hidden');
                 break;
             }
-            case 'gameover': {
-                // 【仕様 2.6】hidden 操作は showTerminalReport() の単独責任。
-                break;
-            }
+            case 'gameover': break;
             case 'result': {
-                // 【憲法 2.6】hidden 操作は showResult() の単独責任。
-                // updateUI は result-overlay への操作も、
-                // result ステートでの build-overlay 等への干渉も行わない。
                 const backToResultBtn = document.getElementById('back-to-result-btn');
                 const lc = document.getElementById('launch-control');
                 if (backToResultBtn && !backToResultBtn.classList.contains('hidden')) {
@@ -215,38 +212,29 @@ export class UISystem {
             case 'cleared':
             case 'crashed':
             case 'lost':
-            case 'returned': {
-                // 【憲法 2.6】hidden 操作は showResult() の単独責任。
-                break;
-            }
-            case 'preparing': {
-                // セクター準備中: 全てのオーバーレイを非表示のままにする
-                break;
-            }
+            case 'returned':
+            case 'preparing':
+            case 'archive': break;
             default:
-                if (eventScreen) eventScreen.classList.add('hidden');
                 throw new Error(`Invalid game state: ${game.state}`);
         }
 
-        // 5. タブ切り替え・リスト描画などの詳細処理
         const tabBtns = document.querySelectorAll('.tab-btn');
         const flightTab = document.getElementById('flight-tab');
         const factoryTab = document.getElementById('factory-tab');
 
         if (game.isFactoryOpen) {
-            flightTab.classList.add('hidden');
-            factoryTab.classList.remove('hidden');
+            if (flightTab) flightTab.classList.add('hidden');
+            if (factoryTab) factoryTab.classList.remove('hidden');
             tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'factory'));
         } else {
-            flightTab.classList.remove('hidden');
-            factoryTab.classList.add('hidden');
+            if (flightTab) flightTab.classList.remove('hidden');
+            if (factoryTab) factoryTab.classList.add('hidden');
             tabBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'flight'));
         }
 
-        // 通貨・スコア表示の即時同期 (Spec 5.1/5.3 準拠)
         this.hudManager.refreshHUD();
 
-        // リストレンダリング実行
         this.renderList('chassis-list', game.inventory.chassis, 'chassis', game.selection.chassis);
         this.renderList('logic-list', game.inventory.logic, 'logic', game.selection.logic);
         this.renderList('logic-option-list', game.inventory.modules, 'modules', game.selection.modules);
@@ -254,51 +242,48 @@ export class UISystem {
         this.renderList('launcher-list', game.inventory.launchers, 'launcher', game.selection.launcher);
 
         const buildBtn = document.getElementById('build-btn');
-        buildBtn.disabled = !(game.selection.chassis && game.selection.logic);
+        if (buildBtn) buildBtn.disabled = !(game.selection.chassis && game.selection.logic);
 
         const rList = document.getElementById('rocket-list');
-        rList.innerHTML = '';
-        if (game.inventory.rockets.length === 0) {
-            rList.innerHTML = `
-                <div class="slot-placeholder guide" id="no-rocket-placeholder">
-                    <div class="part-header"><span class="part-name">待機中のロケットなし</span></div>
-                    <span class="part-info">ここをクリックしてロケットを建造してください</span>
-                </div>
-            `;
-            const noRocket = document.getElementById('no-rocket-placeholder');
-            noRocket.onclick = () => {
-                game.audioSystem.playTick();
-                game.isFactoryOpen = true; 
-                this.updateUI(); 
-            };
-        } else {
-            game.inventory.rockets.forEach(rocket => {
-                const div = document.createElement('div');
-                const isSelected = (game.selection.rocket && game.selection.rocket.instanceId === rocket.instanceId);
-                div.className = `rocket-item ${isSelected ? 'selected' : ''}`;
-                div.innerHTML = this.generateCardHTML(rocket, { isSelected });
-                div.onclick = () => {
-                    if (game.state === 'event') return;
-                    game.selectPart('rocket', rocket.instanceId);
+        if (rList) {
+            rList.innerHTML = '';
+            if (game.inventory.rockets.length === 0) {
+                rList.innerHTML = `
+                    <div class="slot-placeholder guide" id="no-rocket-placeholder">
+                        <div class="part-header"><span class="part-name">待機中のロケットなし</span></div>
+                        <span class="part-info">ここをクリックしてロケットを建造してください</span>
+                    </div>
+                `;
+                const noRocket = document.getElementById('no-rocket-placeholder');
+                if (noRocket) noRocket.onclick = () => {
+                    game.audioSystem.playTick();
+                    game.isFactoryOpen = true; 
+                    this.updateUI(); 
                 };
-                rList.appendChild(div);
-            });
+            } else {
+                game.inventory.rockets.forEach(rocket => {
+                    const div = document.createElement('div');
+                    const isSelected = (game.selection.rocket && game.selection.rocket.instanceId === rocket.instanceId);
+                    div.className = `rocket-item ${isSelected ? 'selected' : ''}`;
+                    div.innerHTML = this.generateCardHTML(rocket, { isSelected });
+                    div.onclick = () => {
+                        if (game.state === 'event') return;
+                        game.selectPart('rocket', rocket.instanceId);
+                    };
+                    rList.appendChild(div);
+                });
+            }
         }
     }
 
-    /**
-     * セクター開始通知を表示。
-     */
     showSectorNotification(text, isReverse = false) {
         const el = document.getElementById('sector-notification');
         if (!el) return;
-        
         el.textContent = text;
         el.classList.remove('hidden', 'animate', 'reverse');
         if (isReverse) el.classList.add('reverse');
-        void el.offsetWidth; // 強制リフロー
+        void el.offsetWidth;
         el.classList.add('animate');
-        
         if (this.notificationTimer) clearTimeout(this.notificationTimer);
         this.notificationTimer = setTimeout(() => {
             const currentEl = document.getElementById('sector-notification');
@@ -307,7 +292,7 @@ export class UISystem {
                 currentEl.classList.remove('animate');
             }
             this.notificationTimer = null;
-        }, GAME_BALANCE.SECTOR_NOTIFICATION_DURATION); // アニメーション時間(3.5s)より少し長く。
+        }, GAME_BALANCE.SECTOR_NOTIFICATION_DURATION);
     }
 
     renderList(id, items, type, selected) {
@@ -320,19 +305,12 @@ export class UISystem {
             placeholder.className = 'slot-placeholder';
             let mainText = 'EMPTY';
             let subText = '在庫なし';
-
             if (type === 'chassis') { mainText = 'シャーシなし'; subText = '購入または回収してください'; }
             else if (type === 'logic') { mainText = 'ロジックなし'; subText = '購入または回収してください'; }
             else if (type === 'launcher') { mainText = '発射台なし'; subText = '購入または回収してください'; }
             else if (type === 'modules') { mainText = 'モジュールなし'; subText = '購入または回収してください'; }
             else if (type === 'booster') { mainText = 'ブースターなし'; subText = '購入または回収してください'; }
-
-            placeholder.innerHTML = `
-                <div class="part-header">
-                    <span class="part-name" style="opacity: 0.5;">${mainText}</span>
-                </div>
-                <span class="part-info">${subText}</span>
-            `;
+            placeholder.innerHTML = `<div class="part-header"><span class="part-name" style="opacity: 0.5;">${mainText}</span></div><span class="part-info">${subText}</span>`;
             el.appendChild(placeholder);
             return;
         }
@@ -344,18 +322,14 @@ export class UISystem {
             let isAnySelected = false;
             let selectionCount = 0;
             if (type === 'modules') {
-                selectionCount = this.game.selection.modules[group.instanceId] || 0;
+                const modules = this.game.selection.modules || {};
+                selectionCount = modules[group.instanceId] || 0;
                 isAnySelected = selectionCount > 0;
             } else {
                 isAnySelected = (selected && selected.instanceId === group.instanceId);
             }
-
             div.className = `part-item ${isAnySelected ? 'selected' : ''}`;
-            div.innerHTML = this.generateCardHTML(group, {
-                isSelected: isAnySelected,
-                selectionCount: selectionCount
-            });
-
+            div.innerHTML = this.generateCardHTML(group, { isSelected: isAnySelected, selectionCount: selectionCount });
             div.onclick = () => {
                 if (this.game.state === 'event') return;
                 if (type === 'modules' || type === 'booster') {
@@ -374,15 +348,10 @@ export class UISystem {
     }
 
     showResult(resultType) {
-        // [仕様 2.4] 新しいリザルト表示開始時にクリーンアップを行う
         this.resetResultOverlay();
         this.resultScreen.show(resultType);
     }
 
-    /**
-     * 【憲法 2.7】ビルドパネルを強制的に展開（開いた状態）にする。
-     * 呼び出し元: EventSystem (セクター開始時)、および初期化時
-     */
     expandPanel() {
         const buildOverlay = document.getElementById('build-overlay');
         const panel = buildOverlay?.querySelector('.panel');
@@ -391,7 +360,6 @@ export class UISystem {
             const icon = panel.querySelector('.collapse-btn .icon');
             if (icon) icon.textContent = '∧';
         }
-        // イベント時の最小化済みフラグもリセットして、次のイベントに備える
         this.game.wasEventPanelMinimized = false;
     }
 
@@ -404,18 +372,105 @@ export class UISystem {
         }
     }
 
-    animateValue(el, start, end, duration) {
-        this.hudManager.animateValue(el, start, end, duration);
-    }
-
-    animateCoinChange(amount) {
-        this.hudManager.animateCoinChange(amount);
-    }
-
-    // サブモジュールへの委譲
+    animateValue(el, start, end, duration) { this.hudManager.animateValue(el, start, end, duration); }
+    animateCoinChange(amount) { this.hudManager.animateCoinChange(amount); }
     initTradingPost(container) { this.shopUI.initTradingPost(container); }
     initRepairDock(container) { this.maintenanceUI.initRepairDock(container); }
     initBlackMarket(container) { this.shopUI.initBlackMarket(container); }
+
+    showTerminalReport() { this.terminalReport.show(); }
+
+    _updateTitleUI() { this.showTitle(); }
+
+    showTitle() {
+        const titleScreen = document.getElementById('title-screen');
+        const gameplayElements = this._getGameplayElements();
+        gameplayElements.forEach(el => { if (el) el.classList.add('hidden'); });
+        this.resetResultOverlay();
+        const rec = document.getElementById('receipt-overlay');
+        const back = document.getElementById('back-to-result-btn');
+        [rec, back].forEach(el => { if (el) { el.classList.add('hidden'); el.classList.remove('active', 'minimized'); } });
+        if (titleScreen) titleScreen.classList.remove('hidden');
+        if (!this.titleAnimation) {
+            const bg = document.getElementById('title-bg-canvas');
+            const fg = document.getElementById('title-fg-canvas');
+            this.titleAnimation = new TitleAnimation(bg, fg);
+        }
+        this.titleAnimation.start();
+    }
+
+    hideTitle() {
+        const titleScreen = document.getElementById('title-screen');
+        if (titleScreen) titleScreen.classList.add('hidden');
+        if (this.titleAnimation) this.titleAnimation.stop();
+    }
+
+    enterMapViewMode() {
+        const resultOverlay = document.getElementById('result-overlay');
+        const receiptOverlay = document.getElementById('receipt-overlay');
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        if (resultOverlay) resultOverlay.classList.add('minimized');
+        if (receiptOverlay) receiptOverlay.classList.add('minimized');
+        if (backToResultBtn) backToResultBtn.classList.remove('hidden');
+    }
+
+    exitMapViewMode() {
+        const resultOverlay = document.getElementById('result-overlay');
+        const receiptOverlay = document.getElementById('receipt-overlay');
+        const backToResultBtn = document.getElementById('back-to-result-btn');
+        if (resultOverlay) resultOverlay.classList.remove('minimized');
+        if (receiptOverlay) receiptOverlay.classList.remove('minimized');
+        if (backToResultBtn) backToResultBtn.classList.add('hidden');
+        this.game.updateUI();
+    }
+
+    resetResultOverlay() { this.resultScreen.reset(); }
+    _updateHUD() { this.hudManager.refreshHUD(); }
+    setupStoryListeners() { this.hudManager.setupStoryListeners(); }
+    updateMailIcon() { this.hudManager.updateMailIcons(); }
+    showStoryModal(storyId) { this.hudManager.showStoryModal(storyId); }
+    showArchive(tab = 'ranking') {
+        if (this.archiveUI) {
+            this.archiveUI.currentTab = tab;
+            this.game.setState('archive');
+        }
+    }
+    hideArchive() {
+        this.game.setState('title');
+    }
+    showStatus(message, type = 'info') {}
+    showTutorial() { if (this.tutorialUI) this.tutorialUI.show(); }
+    hideTutorial() { if (this.tutorialUI) this.tutorialUI.hide(); }
+    nextTutorialSlide() { if (this.tutorialUI) this.tutorialUI.nextSlide(); }
+    prevTutorialSlide() { if (this.tutorialUI) this.tutorialUI.prevSlide(); }
+
+    showAchievementToast(data, callback) {
+        const container = document.getElementById('achievement-toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'achievement-toast';
+        toast.innerHTML = `<div class="achievement-icon-box">✦</div><div class="achievement-info"><span class="description">実績解除: ${data.label}</span><span class="title">${data.title}</span></div>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('exit');
+            toast.addEventListener('animationend', () => { toast.remove(); if (callback) callback(); });
+        }, 3000); 
+    }
+
+    renderReplayConfig(container, selection) {
+        if (!selection) return;
+        container.innerHTML = '';
+        const createSection = (title, item) => {
+            if (!item) return '';
+            return `<div class="category"><h3>${title}</h3>${this.generateCardHTML(item, { isSelected: true, clickable: false })}</div>`;
+        };
+        let html = '';
+        if (selection.rocket) html += createSection('ROCKET', selection.rocket);
+        else if (selection.chassis) html += createSection('CHASSIS', selection.chassis);
+        if (selection.launcher) html += createSection('LAUNCHER', selection.launcher);
+        if (selection.booster) html += createSection('BOOSTER', selection.booster);
+        container.innerHTML = html;
+    }
 
     _getGradeInfo(value, target, type = 'single') {
         const score = type === 'single' ? Math.sqrt(value / target) * 100 : value;
@@ -429,199 +484,76 @@ export class UISystem {
         };
     }
 
-    showTerminalReport() {
-        this.terminalReport.show();
-    }
-
-    _updateTitleUI() {
-        this.showTitle();
-    }
-
     /**
-     * タイトル画面を表示し、アニメーションを開始する
+     * お気に入り上限時に表示する入れ替え選択ダイアログ
+     * @param {string|object} candidate 登録候補のID、または新規レコードデータ {score, recordData}
+     * @param {Function} onComplete 入れ替え完了後に実行するコールバック
+     * @param {Function} onCancel キャンセル時に実行するコールバック
      */
-    showTitle() {
-        const titleScreen = document.getElementById('title-screen');
-        const gameplayElements = this._getGameplayElements();
-
-        // 全てのゲームプレイ UI を非表示
-        gameplayElements.forEach(el => {
-            if (el) el.classList.add('hidden');
-        });
-
-        this.resetResultOverlay();
-        const rec = document.getElementById('receipt-overlay');
-        const back = document.getElementById('back-to-result-btn');
-        [rec, back].forEach(el => {
-            if (el) {
-                el.classList.add('hidden');
-                el.classList.remove('active', 'minimized');
-            }
-        });
-
-        if (titleScreen) {
-            titleScreen.classList.remove('hidden');
-        }
-
-        if (!this.titleAnimation) {
-            const bg = document.getElementById('title-bg-canvas');
-            const fg = document.getElementById('title-fg-canvas');
-            this.titleAnimation = new TitleAnimation(bg, fg);
-        }
-        this.titleAnimation.start();
-    }
-
-    /**
-     * タイトル画面を隠し、アニメーションを停止する
-     */
-    hideTitle() {
-        const titleScreen = document.getElementById('title-screen');
-        if (titleScreen) {
-            titleScreen.classList.add('hidden');
-        }
-        if (this.titleAnimation) {
-            this.titleAnimation.stop();
-        }
-    }
-
-    /**
-     * 【仕様 2.2】VIEW MAP モードへ移行する。
-     * result-overlay / receipt-overlay に .minimized を付与し、BACK TO RESULT ボタンを表示する。
-     * 呼び出し元: EventSystem（VIEW MAP ボタンクリック時）のみ
-     */
-    enterMapViewMode() {
-        const resultOverlay = document.getElementById('result-overlay');
-        const receiptOverlay = document.getElementById('receipt-overlay');
-        const backToResultBtn = document.getElementById('back-to-result-btn');
-        if (resultOverlay) resultOverlay.classList.add('minimized');
-        if (receiptOverlay) receiptOverlay.classList.add('minimized');
-        if (backToResultBtn) backToResultBtn.classList.remove('hidden');
-    }
-
-    /**
-     * 【仕様 2.2】VIEW MAP モードからリザルト画面に戻る。
-     * .minimized を削除し、BACK TO RESULT ボタンを非表示にする。
-     * 呼び出し元: EventSystem（BACK TO RESULT ボタンクリック時）のみ
-     */
-    exitMapViewMode() {
-        const resultOverlay = document.getElementById('result-overlay');
-        const receiptOverlay = document.getElementById('receipt-overlay');
-        const backToResultBtn = document.getElementById('back-to-result-btn');
-        if (resultOverlay) resultOverlay.classList.remove('minimized');
-        if (receiptOverlay) receiptOverlay.classList.remove('minimized');
-        if (backToResultBtn) backToResultBtn.classList.add('hidden');
-        this.game.updateUI();
-    }
-
-    /**
-     * 【仕様 2.4】新しいリザルト表示開始時に呼び出す。
-     * .minimized を削除し、BACK ボタンを初期化する。
-     * 呼び出し元: showResult() のみ
-     */
-    resetResultOverlay() {
-        this.resultScreen.reset();
-    }
-
-    _updateHUD() {
-        this.hudManager.refreshHUD();
-    }
-
-    setupStoryListeners() {
-        this.hudManager.setupStoryListeners();
-    }
-
-    updateMailIcon() {
-        this.hudManager.updateMailIcons();
-    }
-
-    showStoryModal(storyId) {
-        this.hudManager.showStoryModal(storyId);
-    }
-
-    showArchive(tab = 'ranking') {
-        if (this.archiveUI) {
-            this.hideTitle();
-            this.archiveUI.show(tab);
-        }
-    }
-
-    /**
-     * アーカイブを閉じる (Titleを再表示)
-     */
-    hideArchive() {
-        if (this.archiveUI) {
-            this.archiveUI.hide();
-            this.showTitle();
-        }
-    }
-
-    showStatus(message, type = 'info') {
-        // 現在はログ出力を抑制。将来的に UI でのメッセージ表示に使用可能。
-    }
-
-    /**
-     * チュートリアルを表示
-     */
-    showTutorial() {
-        if (this.tutorialUI) {
-            this.tutorialUI.show();
-        }
-    }
-
-    /**
-     * チュートリアルを閉じる
-     */
-    hideTutorial() {
-        if (this.tutorialUI) {
-            this.tutorialUI.hide();
-        }
-    }
-
-    /**
-     * 次のスライド
-     */
-    nextTutorialSlide() {
-        if (this.tutorialUI) {
-            this.tutorialUI.nextSlide();
-        }
-    }
-
-    /**
-     * 前のスライド
-     */
-    prevTutorialSlide() {
-        if (this.tutorialUI) {
-            this.tutorialUI.prevSlide();
-        }
-    }
-
-    /**
-     * 実績通知の表示
-     */
-    showAchievementToast(data, callback) {
-        const container = document.getElementById('achievement-toast-container');
-        if (!container) return;
-
-        const toast = document.createElement('div');
-        toast.className = 'achievement-toast';
-        toast.innerHTML = `
-            <div class="achievement-icon-box">✦</div>
-            <div class="achievement-info">
-                <span class="description">実績解除: ${data.label}</span>
-                <span class="title">${data.title}</span>
-            </div>
+    showFavoriteReplacementDialog(candidate, onComplete, onCancel) {
+        const isNewData = typeof candidate === 'object';
+        const candidateId = isNewData ? null : candidate;
+        
+        // 現在のお気に入り（候補が既存の場合はそれを除く）を取得
+        const favorites = this.game.replaySystem.getRecords().filter(r => r.isFavorite && r.id !== candidateId);
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'fav-replace-overlay';
+        overlay.style.zIndex = '11000';
+        
+        const modal = document.createElement('div');
+        modal.className = 'fav-replace-modal';
+        
+        modal.innerHTML = `
+            <h3>FAVORITE LIMIT REACHED</h3>
+            <p>お気に入りの保存上限(5件)に達しています。<br>入れ替える記録を選択してください。</p>
+            <div class="fav-list-mini"></div>
+            <button class="fav-replace-cancel">CANCEL</button>
         `;
-
-        container.appendChild(toast);
-
-        // 一定時間後に消衰
-        setTimeout(() => {
-            toast.classList.add('exit');
-            toast.addEventListener('animationend', () => {
-                toast.remove();
-                if (callback) callback();
-            });
-        }, 3000); 
+        
+        const list = modal.querySelector('.fav-list-mini');
+        favorites.forEach(fav => {
+            const d = new Date(fav.timestamp);
+            const dateStr = `${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}`;
+            
+            const item = document.createElement('div');
+            item.className = 'fav-item-mini';
+            item.innerHTML = `
+                <div class="info">
+                    <div class="date">${dateStr}</div>
+                    <div class="score">${fav.score.toLocaleString()}</div>
+                </div>
+                <div class="replace-label">REPLACE</div>
+            `;
+            
+            item.onclick = () => {
+                // 1. 選択された古い記録を解除
+                this.game.replaySystem.toggleFavorite(fav.id);
+                
+                // 2. 新しい記録を登録
+                if (isNewData) {
+                    // リザルト画面からの新規データ保存
+                    const newId = this.game.replaySystem.saveAsFavorite(candidate.score, candidate.recordData);
+                    if (onComplete) onComplete(newId);
+                } else {
+                    // アーカイブ画面内の既存レコードのお気に入り化
+                    this.game.replaySystem.toggleFavorite(candidateId);
+                    if (onComplete) onComplete();
+                }
+                
+                this.game.audioSystem.playTick();
+                document.body.removeChild(overlay);
+            };
+            
+            list.appendChild(item);
+        });
+        
+        modal.querySelector('.fav-replace-cancel').onclick = () => {
+            document.body.removeChild(overlay);
+            if (onCancel) onCancel();
+        };
+        
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
     }
-
 }

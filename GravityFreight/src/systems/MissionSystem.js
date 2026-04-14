@@ -172,8 +172,8 @@ export class MissionSystem {
 
             // 【Spec 6.1】ゴールの基本報酬（スコア・コイン）は貨物に関係なく常に 1 回だけ付与する
             if (hitGoal) {
-                game.pendingScore += (hitGoal.score || 0);
-                game.pendingCoins += (hitGoal.coins || 0);
+                game.addScore(hitGoal.score || 0, 'bonus');
+                game.addCoins(hitGoal.coins || 0);
                 game.flightResults.bonuses.push({
                     name: `${hitGoal.label} Reward`,
                     value: hitGoal.score || 0,
@@ -191,8 +191,8 @@ export class MissionSystem {
                         const isMatch = hitGoal.id === itemData.deliveryGoalId;
                         if (isMatch) {
                             // 【Spec 6.2】配送ボーナスは一致する貨物の数 (N) に応じて個別に加算（N倍）
-                            game.pendingScore += GAME_BALANCE.DELIVERY_REWARD.SCORE;
-                            game.pendingCoins += GAME_BALANCE.DELIVERY_REWARD.COINS;
+                            game.addScore(GAME_BALANCE.DELIVERY_REWARD.SCORE, 'bonus');
+                            game.addCoins(GAME_BALANCE.DELIVERY_REWARD.COINS);
                             game.flightResults.bonuses.push({
                                 name: 'Delivery Bonus',
                                 value: GAME_BALANCE.DELIVERY_REWARD.SCORE,
@@ -210,7 +210,7 @@ export class MissionSystem {
                                 deliveryItem.bonusItems.push({ ...bonus });
 
                                 if (bonus.category === 'COIN') {
-                                    game.pendingCoins += bonus.score || 0;
+                                    game.addCoins(bonus.score || 0);
                                 } else {
                                     game._addItemToInventory(bonus);
                                 }
@@ -224,7 +224,7 @@ export class MissionSystem {
                             }
                         } else {
                             // 不一致配送: 一律 +10 コインのみ
-                            game.pendingCoins += GAME_BALANCE.UNMATCHED_DELIVERY_REWARD.COINS;
+                            game.addCoins(GAME_BALANCE.UNMATCHED_DELIVERY_REWARD.COINS);
                             game.flightResults.items.push({ ...itemData, isDelivery: true, isMatch: false });
                             game.flightResults.bonuses.push({ name: 'Cargo (Unmatched)', value: 0, coins: GAME_BALANCE.UNMATCHED_DELIVERY_REWARD.COINS });
                         }
@@ -242,7 +242,7 @@ export class MissionSystem {
 
                 if (category === 'COIN') {
                     game.incrementCollectedItems(itemData.count || 1);
-                    game.pendingCoins += itemData.score || 0;
+                    game.addCoins(itemData.score || 0);
                     game.flightResults.items.push(itemData);
                     return;
                 }
@@ -273,7 +273,7 @@ export class MissionSystem {
 
                 // 保険モジュール1つにつき1倍の査定額が支払われる (Spec 7.3.324)
                 const totalPayout = totalUnitValue * insuranceModules.length;
-                game.pendingCoins += totalPayout;
+                game.addCoins(totalPayout);
                 game.flightResults.bonuses.push({ name: 'Insurance Payout', value: 0, coins: totalPayout });
             }
 
@@ -306,10 +306,12 @@ export class MissionSystem {
                     parts.push({ ...rocket.booster, category: 'BOOSTERS' });
                 }
 
-                parts.forEach(partData => {
-                    hitGoal.items.push(partData);
-                    hitGoal.isCollected = false;
-                });
+                if (hitGoal && hitGoal.items) {
+                    parts.forEach(partData => {
+                        hitGoal.items.push(partData);
+                        hitGoal.isCollected = false;
+                    });
+                }
             }
 
         } else if (result === 'returned') {

@@ -10,8 +10,9 @@ UI の重なり順は `z-index` によって厳密に階層化されています
 | :--- | :--- | :--- |
 | 7000 | 最前面アクションボタン | `launch-control`, `.result-actions`。いかなる演出よりも前面に配置し、常に操作可能にする。 |
 | 6000 | 演出用オーバーレイ | `receipt-overlay`, `#story-overlay`。リザルト画面の上に重なる一時的な演出用。 |
-| 5000 | メインオーバーレイ | `result-overlay`, `event-overlay` など。ゲームプレイを遮断する主要な UI。 |
+| 5000 | メインオーバーレイ | `result-overlay`, `event-overlay`, `archive-overlay`。ゲームプレイを遮断する主要な UI。 |
 | 1000 | UI コントロールコンテナ | HUD よりも前面だが、オーバーレイよりは背面。 |
+| 500 | リプレイ用オーバーレイ | `replay-overlay`。リプレイ操作HUD。 |
 | 50-100 | 恒常 HUD / パネル | `mission-hud`, `build-overlay`。プレイ中常に表示される情報レイヤー。 |
 | 0 | ゲームキャンバス | 物理演算の舞台。 |
 
@@ -33,7 +34,7 @@ UI の重なり順は `z-index` によって厳密に階層化されています
 
 UIコンポーネントへのDOM操作（`.hidden`等の着脱）は、以下の管轄に基づくこと。
 
-- `UISystem.js`: `game.state` に基づく全体の表示制御（Orchestrator）。
+- `UISystem.js`: `game.state` に基づく全体の表示制御（Orchestrator）、およびシステム通知（トースト）の管理。
 - `HUDManager.js`: 恒常パネル（スコア、セクター等）内の動的更新。
 - 各種個別クラス (`ResultScreen`, `TerminalReport` 等): 管轄するオーバーレイ内部の排他的管理。`UISystem` はこれらの内部構造には干渉しない。
 
