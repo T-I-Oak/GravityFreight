@@ -39,4 +39,9 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
+
+  test: {
+    exclude: ['**/GravityFreight_v1/**', '**/node_modules/**'],
+    environment: 'jsdom',
+  },
 });

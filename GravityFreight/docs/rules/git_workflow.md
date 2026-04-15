@@ -37,7 +37,7 @@
 
 ## 4. バックログアーカイブの運用 (Archiving Rule)
 
-完了したタスクのアーカイブ方法、および `backlog_archive.md` の記載フォーマットについては、新たに定義された `docs/rules/document_standards.md` の「2.2 backlog_archive.md (改版履歴 / Changelog)」セクションの準拠ルールに従ってください。
+完了したタスクの反映（ユーザー向け更新履歴への記録）と、`update_history.md` の記載フォーマットについては、`docs/rules/document_standards.md` の「2.2 update_history.md (ユーザー向け更新履歴)」セクションの準拠ルールに従ってください。
 
 ## 7. テスト構成 (Testing Policy)
 

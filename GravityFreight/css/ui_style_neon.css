@@ -1,0 +1,66 @@
+/* =========================================
+   STYLE LAYER: NEON
+   Usage: Add .ui-style--neon to parent (e.g. body)
+   ========================================= */
+
+.ui-style--neon {
+    --ui-color: var(--color-primary);
+    background: radial-gradient(circle at center, rgba(0, 15, 30, 0.8) 0%, rgba(5, 5, 10, 1) 100%);
+}
+
+/* Contextual Components: Title */
+.ui-style--neon .text-display {
+    color: #ffffff;
+    text-shadow: 
+        0 0 15px color-mix(in srgb, var(--ui-color), transparent 0.4),
+        0 0 30px color-mix(in srgb, var(--ui-color), transparent 0.7);
+    letter-spacing: 0.15em;
+}
+
+.ui-style--neon .text-sub-display {
+    color: color-mix(in srgb, var(--ui-color), transparent 0.2);
+    text-shadow: 0 0 10px var(--ui-color);
+    letter-spacing: 12px;
+}
+
+/* Contextual Components: Buttons */
+.ui-style--neon .ui-button {
+    --current-color: var(--ui-color);
+    
+    background: color-mix(in srgb, var(--current-color), transparent 85%);
+    border: 2px solid var(--current-color);
+    color: var(--current-color);
+    border-radius: var(--radius-pill);
+    backdrop-filter: blur(8px);
+    
+    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 60%);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 20%);
+    
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    padding: 16px 32px;
+}
+
+.ui-style--neon .ui-button:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--current-color), transparent 65%);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px color-mix(in srgb, var(--current-color), transparent 10%);
+    border-color: #ffffff;
+}
+
+/* Secondary Variant under Neon context */
+.ui-style--neon .ui-button.is-secondary {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.ui-style--neon .ui-button.is-secondary:hover {
+    border-color: var(--current-color);
+    color: var(--current-color);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--current-color), transparent 70%);
+    background: color-mix(in srgb, var(--current-color), transparent 90%);
+}
