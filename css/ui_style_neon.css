@@ -1,0 +1,135 @@
+/* =========================================
+   STYLE LAYER: NEON
+   Usage: Add .ui-style--neon to parent (e.g. body)
+   ========================================= */
+
+.ui-style--neon {
+    --ui-color: var(--color-primary);
+    background: radial-gradient(circle at center, rgba(0, 15, 30, 0.8) 0%, rgba(5, 5, 10, 1) 100%);
+}
+
+/* Contextual Components: Title Box */
+.ui-title-box .text-display {
+    color: #ffffff;
+    /* 多層ブルーム：2pxの強烈な芯 + 15px/30pxの幻想的な広がり */
+    text-shadow: 
+        0 0 2px rgba(255, 255, 255, 0.8),
+        0 0 10px rgba(0, 255, 204, 0.7),
+        0 0 25px rgba(0, 255, 204, 0.4);
+    letter-spacing: 0.15em;
+}
+
+.ui-title-box .text-sub-display {
+    color: var(--ui-color);
+    /* 数値と同じくクッキリした発光 */
+    --ui-glow-color: var(--ui-color);
+    text-shadow: var(--glow-text-high);
+    letter-spacing: clamp(0.4rem, 2.5vw, 1.2rem);
+    font-weight: 700;
+}
+
+/* Contextual Components: Buttons */
+.ui-style--neon .ui-button {
+    --current-color: var(--ui-color);
+    
+    width: 100%;
+    min-width: 280px;
+    background: color-mix(in srgb, var(--current-color), transparent 85%);
+    border: 2px solid var(--current-color);
+    color: var(--current-color);
+    border-radius: var(--radius-pill);
+    backdrop-filter: blur(var(--blur));
+    
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 60%);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 20%);
+    
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2.0px;
+    padding: 16px 32px;
+}
+
+.ui-style--neon .ui-button:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--current-color), transparent 65%);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px color-mix(in srgb, var(--current-color), transparent 10%);
+    border-color: #ffffff;
+}
+
+.ui-style--neon .ui-button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Secondary Variant under Neon context (V1 logic) */
+.ui-style--neon .ui-button.is-secondary {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(var(--blur));
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.ui-style--neon .ui-button.is-secondary:hover:not(:disabled) {
+    background: rgba(0, 255, 204, 0.08);
+    border-color: rgba(0, 255, 204, 0.6);
+    color: #00ffcc;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Numeric Effects under Neon context */
+.num-score {
+    --ui-glow-color: var(--color-num-score);
+    text-shadow: var(--glow-text-high);
+}
+
+.num-sector {
+    --ui-glow-color: var(--color-num-sector);
+    text-shadow: var(--glow-text-high);
+}
+
+.num-coin {
+    --ui-glow-color: var(--color-num-coin);
+    text-shadow: var(--glow-text-high);
+}
+
+.ui-style--neon .ui-panel {
+    background: rgba(255, 255, 255, 0.05); /* 薄く背景を付ける */
+    backdrop-filter: blur(var(--blur));  /* グラスモーフィズムの効果（ぼかし） */
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Internal Borders & Separators --- */
+.ui-style--neon .hud-stats {
+    border-top: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
+}
+
+.ui-style--neon .panel-tabs {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
+}
+
+/* --- Panel Tabs: Neon specific --- */
+.ui-style--neon .tab-item.is-active {
+    color: var(--color-sub);
+    background: color-mix(in srgb, var(--color-sub), transparent 90%);
+    box-shadow: inset 0 -2px 0 var(--color-sub);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--color-sub), transparent 30%);
+}
+
+
+/* Action button settings have been centralized in play.css */
+
+
+/* Action buttons are now fully unified in play.css */
+
+/* --- Footer Info (System Text) --- */
+.ui-style--neon .play-footer {
+    color: rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
