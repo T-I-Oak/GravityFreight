@@ -1,0 +1,85 @@
+/* =========================================
+   STYLE LAYER: PRINT (PAPER DESIGN)
+   Usage: Add .ui-style--print to parent
+   ========================================= */
+
+.ui-style--print {
+    background: #000000; /* 背景は暗い空間 */
+    --paper-color: #f4f1ea; /* 少し温かみのある紙の色 */
+    --ink-color: #222222;
+    --ink-dim: #666666;
+}
+
+/* Contextual Components: Panel (The Paper) */
+.ui-style--print .ui-panel {
+    background: var(--paper-color);
+    color: var(--ink-color);
+    border: none;
+    border-radius: 0; /* 紙なので角丸は最小限か無し */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+/* Receipt Jagged Edge (Pseudo-element for paper feel) */
+.ui-style--print .ui-panel::before,
+.ui-style--print .ui-panel::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background-image: linear-gradient(135deg, var(--paper-color) 25%, transparent 25%), 
+                      linear-gradient(225deg, var(--paper-color) 25%, transparent 25%);
+    background-size: 12px 12px;
+    z-index: 10;
+}
+
+.ui-style--print .ui-panel::before {
+    top: -8px;
+    transform: rotate(180deg);
+}
+
+.ui-style--print .ui-panel::after {
+    bottom: -8px;
+}
+
+/* Components Style Overrides */
+.ui-style--print .ui-title-box {
+    filter: none;
+    color: var(--ink-color);
+}
+
+.ui-style--print .ui-title-box .text-display {
+    color: var(--ink-color);
+    text-shadow: none; /* 印刷に発光はない */
+}
+
+/* Print Style Buttons (Stamp feel) */
+.ui-style--print .ui-button {
+    background: transparent;
+    border: 2px solid var(--ink-color);
+    color: var(--ink-color);
+    border-radius: 2px;
+    box-shadow: none;
+    font-weight: 900;
+}
+
+.ui-style--print .ui-button:hover:not(:disabled) {
+    background: var(--ink-color);
+    color: var(--paper-color);
+    transform: none;
+}
+
+.ui-style--print .ui-button.is-secondary {
+    border-style: dashed;
+    color: var(--ink-dim);
+    border-color: var(--ink-dim);
+}
+
+/* Numeric text for Print */
+.ui-style--print .num-score, 
+.ui-style--print .num-sector, 
+.ui-style--print .num-coin {
+    color: var(--ink-color);
+    text-shadow: none;
+}

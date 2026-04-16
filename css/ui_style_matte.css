@@ -1,0 +1,114 @@
+/* =========================================
+   STYLE LAYER: MATTE
+   Usage: Add .ui-style--matte to parent (e.g. scene container)
+   ========================================= */
+
+.ui-style--matte {
+    --ui-color: var(--color-primary);
+    background: #10121d; /* 施設内をイメージした不透明な深い色 */
+    color: #eeeeee;
+}
+
+/* Contextual Components: Well (Inset for Matte) */
+.ui-style--matte .ui-well {
+    background: rgba(0, 0, 0, 0.15);
+    box-shadow: 
+        inset 2px 2px 4px rgba(0, 0, 0, 0.4),
+        inset -1px -1px 0 rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Contextual Components: Panel */
+.ui-style--matte .ui-panel {
+    background: #1a1e30;
+    border-radius: var(--radius-m);
+    /* 左上：明、右下：暗の控えめな立体感 (1-2px) */
+    box-shadow: 
+        inset 1px 1px 0 rgba(255, 255, 255, 0.05),
+        2px 2px 4px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Contextual Components: Buttons (Facility inspired Matte) */
+.ui-style--matte .ui-button {
+    --current-color: var(--ui-color);
+    background: var(--current-color);
+    color: #000000;
+    border-radius: 2px; /* 全てのボタンを矩形に統一 */
+    font-weight: 950;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    text-shadow: none;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2); 
+    transition: all 0.1s ease;
+}
+
+.ui-style--matte .ui-button:hover:not(:disabled) {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+.ui-style--matte .ui-button:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+/* Primary Action Button (Facility Color: Repair Dock) */
+.ui-style--matte .ui-button.is-primary {
+    background: var(--btn-theme-color);
+    color: #ffffff;
+    padding: 12px 32px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+}
+
+/* Button Contextual Themes */
+.ui-button.is-repair  { --btn-theme-color: var(--color-facility-repair); }
+.ui-button.is-trade   { --btn-theme-color: var(--color-facility-trade); }
+.ui-button.is-market  { --btn-theme-color: var(--color-facility-market); }
+
+/* Retry / Recovery Theme (Orange) */
+.ui-button.is-retry { 
+    --btn-theme-color: var(--color-status-gameover); 
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+}
+
+/* Secondary Button for Matte (Solid Dark) */
+.ui-style--matte .ui-button.is-secondary {
+    background: #1a1e30;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 32px; /* 隣接するプライマリボタンと高さを合わせる */
+}
+
+/* Stat Box (Numeric) in Matte */
+.ui-style--matte .ui-stat-box .stat-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.ui-style--matte .ui-stat-box .stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+}
+
+/* Contextual Components: Badge (Matte variants) */
+.ui-style--matte .ui-badge.is-danger {
+    background: #ff3366;
+    color: #ffffff;
+}
+
+.ui-style--matte .ui-badge.is-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Interaction for Matte Clickables */
+.ui-style--matte .clickable:hover {
+    background: rgba(255, 255, 255, 0.08); /* わずかな塗りつぶしで「反応」を示す */
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+}
+

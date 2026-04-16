@@ -19,17 +19,33 @@ body, html {
 
 /* Base Component: Button Shape only */
 .ui-button {
+    --btn-theme-color: var(--color-primary); /* Default theme color */
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--font-display);
-    font-weight: 900;
+    font-weight: 950;
     text-transform: uppercase;
     cursor: pointer;
     transition: all var(--motion-normal) var(--ease-standard);
     border: none;
     outline: none;
     user-select: none;
+}
+
+/* Base Component: Interactive state for non-buttons */
+.clickable {
+    cursor: pointer;
+    transition: all var(--motion-fast) var(--ease-standard);
+    user-select: none;
+}
+
+.clickable:hover {
+    filter: brightness(1.2);
+}
+
+.clickable:active {
+    transform: scale(0.98);
 }
 
 /* Base Component: Display Text */
@@ -63,13 +79,12 @@ body, html {
 
 /* --- Component: Stat Box (Label + Value) --- */
 .ui-stat-box {
-    display: flex !important; /* 強制的にflexを適用 */
-    flex-direction: column !important;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     gap: 2px;
-    min-width: 60px; /* 最小幅を確保してガタつきを抑える */
 }
 
 .ui-stat-box .stat-label {
@@ -83,7 +98,28 @@ body, html {
 
 .ui-stat-box .stat-value {
     font-family: var(--font-num-primary);
+    font-weight: 700;
     margin: 0;
+}
+
+/* Size Modifiers */
+.ui-stat-box.is-hero .stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+}
+
+.ui-stat-box.is-hero .stat-label {
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+/* --- Component: Stat Group (Container for multiple stats) --- */
+.ui-stat-group {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    gap: var(--space-m);
 }
 
 /* --- Semantic Numbers --- */
@@ -99,17 +135,38 @@ body, html {
 /* --- Component: Panel (Base) --- */
 .ui-panel {
     border-radius: var(--radius-m);
-    padding: 0; /* 内部パーツで余白を管理するため、枠自体は 0 に設定 */
+    padding: 0;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* 子要素（タブ等）が角丸からはみ出さないように */
+    overflow: hidden;
 }
 
 .text-sub-display {
     font-family: var(--font-text);
     font-weight: 700;
     text-transform: uppercase;
+}
+
+/* --- Component: Badge (Status / Category) --- */
+.ui-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    font-size: 9px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+/* --- Component: Well (Inset Container) --- */
+.ui-well {
+    border-radius: var(--radius-m);
+    padding: var(--space-m);
+    box-sizing: border-box;
 }
 
 /* --- Component: Footer Info --- */
@@ -127,4 +184,81 @@ body, html {
     letter-spacing: 1px;
     pointer-events: none;
     z-index: var(--z-hud);
+}
+
+/* --- Component: Panel Variations (4.15) --- */
+.panel-narrow { width: 400px; }
+.panel-regular { width: 640px; }
+.panel-wide { width: 900px; }
+.panel-max-h { height: 85vh; }
+.panel-regular.panel-max-h { height: 85vh; }
+
+/* --- Component: Section Header (V2 Semantic) --- */
+.ui-section-header {
+    margin-bottom: var(--space-m);
+}
+
+.ui-section-header .section-title {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 950;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 1.5px;
+}
+
+.ui-section-header .section-subtext {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+    display: block;
+}
+
+/* --- Responsive Scroll Layout --- */
+.ui-columns-container {
+    display: flex;
+    gap: var(--space-m);
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.ui-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ui-column.is-scrollable {
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Global custom scrollbar style (V2 Standard) */
+*::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+*::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+*::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 640px) {
+    .ui-columns-container {
+        flex-direction: column;
+        overflow-y: visible;
+        height: auto;
+        flex: none;
+    }
+    .ui-column.is-scrollable {
+        overflow-y: visible;
+        height: auto;
+    }
 }

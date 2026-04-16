@@ -1,0 +1,10 @@
+/* 
+   animations.css: 
+   全画面共通で使用されるキーフレームアニメーションの定義 
+*/
+
+/* ロゴやパネルを上下に緩やかに浮かせる効果 */
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}

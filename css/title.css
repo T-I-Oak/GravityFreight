@@ -1,46 +1,67 @@
-/* =========================================
-   TITLE SCREEN LAYOUT
-   Scoped to #title-screen to avoid collision
-   ========================================= */
-
-#title-scene-container {
-    width: 100%;
-    height: 100vh;
-}
+/* 
+   title.css: 
+   タイトル画面（タイトルロゴ、メインメニューボタン）のレイアウト定義 
+*/
 
 #title-screen {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: hidden;
 }
 
 #title-screen .title-container {
     text-align: center;
-    animation: titleFloat 8s ease-in-out infinite;
+    animation: titleFloat 6s ease-in-out infinite;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
 }
 
-/* .text-sub-display is now handled by .ui-title-box in ui_base.css */
+/* タイトルボックス: ロゴとサブタイトルの配置バランスを制御 */
+#title-screen .ui-title-box {
+    gap: 0;
+}
+
+#title-screen .ui-title-box .text-display {
+    /* 画面幅に応じてロゴの視覚的インパクトを最大化するスケーリング */
+    font-size: clamp(2.5rem, 10vw, 4.5rem); 
+    line-height: 1.1; 
+    letter-spacing: 0.15em; 
+}
+
+#title-screen .ui-title-box .text-sub-display {
+    display: block;
+    font-size: 24px; /* サブタイトルとしての補助的役割を担保するサイズ */
+    letter-spacing: 12px; 
+    line-height: 1.1; 
+    margin-top: 15px; /* 上部メインロゴとの適切な垂直間隔 */
+    margin-bottom: 3rem; /* 下部ボタン群とのバランスを制御する大きな余白 */
+    padding-left: 12px; /* 字間による重心の偏りを視覚的に補正 */
+}
 
 #title-screen .menu-buttons {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 20px; /* 各ボタンの独立性を担保する間隔 */
     align-items: center;
-    width: 90%;
-    max-width: 700px;
-    margin-top: 5rem;
+    width: 90%; 
+    max-width: 700px; /* デスクトップ表示での情報の読みやすさを考慮した最大幅 */
+    margin: 0 auto;
 }
 
-/* Footer is now handled by .ui-footer in ui_base.css */
+#title-screen .ui-button {
+    font-size: 14px; /* ボタン機能の判読性に適した標準サイズ */
+    padding: 16px 32px; /* クリック領域の十分な確保と視覚的な重厚感のためのパディング */
+    width: 100%;
+    min-width: 280px; 
+    letter-spacing: normal; 
+}
 
-@keyframes titleFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
+#title-screen .title-footer {
+    position: absolute;
+    bottom: 30px; /* 画面下端からの十分な視認距離を保つ配置 */
 }

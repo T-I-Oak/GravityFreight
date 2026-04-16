@@ -1,0 +1,106 @@
+/* =========================================
+   UI SCREEN: FLIGHT RESULT (Terminal Report)
+   ========================================= */
+
+/* Scene Container */
+#flight-result-scene-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-m);
+}
+
+/* Screen Specific Layout Logic */
+.flight-report-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.flight-report-header {
+    flex-shrink: 0;
+    padding: var(--space-l) var(--space-l) var(--space-m); /* パネル外周は L (32px) を使用 */
+    text-align: center;
+}
+
+.flight-report-title {
+    color: var(--color-num-score);
+    letter-spacing: 4px;
+    font-size: var(--text-display-size);
+    margin-bottom: var(--space-s);
+}
+
+.flight-report-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m); /* 標準的な並びは M (16px) */
+    padding: 0 var(--space-l);
+    min-height: 0;
+}
+
+/* Record Tags Area */
+.flight-report-status {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-s);
+    margin-top: var(--space-s);
+}
+
+/* Summary / Stat Area */
+.flight-report-summary {
+    flex-shrink: 0;
+}
+
+.flight-report-details {
+    flex: 1;
+    min-height: 0;
+    margin-bottom: var(--space-m);
+}
+
+.flight-report-footer {
+    flex-shrink: 0;
+    padding: var(--space-m) var(--space-l) var(--space-l);
+    display: flex;
+    justify-content: center;
+    gap: var(--space-m);
+}
+
+/* Specific Row Styling */
+.report-data-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-s) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.report-data-label {
+    font-size: var(--text-caption-size);
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.report-data-value {
+    font-family: var(--font-num-primary);
+    font-weight: 700;
+}
+
+/* Responsive Overrides (Using only S/M/L) */
+@media (max-width: 640px) {
+    .flight-report-header {
+        padding: var(--space-m) var(--space-m) var(--space-s);
+    }
+    .flight-report-content {
+        padding: var(--space-m);
+        overflow-y: auto;
+        display: block;
+    }
+    .flight-report-summary {
+        margin-bottom: var(--space-m);
+    }
+    .flight-report-footer {
+        padding: var(--space-m);
+    }
+}

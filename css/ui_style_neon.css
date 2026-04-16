@@ -1,6 +1,6 @@
 /* =========================================
    STYLE LAYER: NEON
-   Usage: Add .ui-style--neon to parent (e.g. body)
+   ネオン発光とグラスモーフィズムによる宇宙空間の質感を定義
    ========================================= */
 
 .ui-style--neon {
@@ -8,47 +8,48 @@
     background: radial-gradient(circle at center, rgba(0, 15, 30, 0.8) 0%, rgba(5, 5, 10, 1) 100%);
 }
 
-/* Contextual Components: Title Box */
-.ui-title-box .text-display {
+/* ロゴ・見出し用テキスト: 強力なブルーム効果によりブランドの存在感と視覚的インパクトを強調 */
+.ui-style--neon .text-display {
     color: #ffffff;
-    /* 多層ブルーム：2pxの強烈な芯 + 15px/30pxの幻想的な広がり */
+    font-family: var(--font-display);
+    font-weight: 900; 
+    /* 多層シャドウにより、芯の強さと周囲への光の広がりを表現。サイズに依存しない質感を提供 */
     text-shadow: 
-        0 0 2px rgba(255, 255, 255, 0.8),
-        0 0 10px rgba(0, 255, 204, 0.7),
-        0 0 25px rgba(0, 255, 204, 0.4);
-    letter-spacing: 0.15em;
+        0 0 10px rgba(0, 212, 255, 0.8),
+        0 0 20px rgba(0, 212, 255, 0.4),
+        0 0 30px rgba(0, 212, 255, 0.2);
 }
 
-.ui-title-box .text-sub-display {
-    color: var(--ui-color);
-    /* 数値と同じくクッキリした発光 */
-    --ui-glow-color: var(--ui-color);
-    text-shadow: var(--glow-text-high);
-    letter-spacing: clamp(0.4rem, 2.5vw, 1.2rem);
-    font-weight: 700;
+/* 補助的な小見出し用テキスト: メインを邪魔しないよう、透過度と控えめな発光により奥行きを表現 */
+.ui-style--neon .text-sub-display {
+    color: color-mix(in srgb, var(--ui-color), transparent 20%); 
+    font-family: var(--font-body); 
+    font-weight: 900; 
+    text-shadow: 
+        0 0 15px rgba(0, 212, 255, 0.6), 
+        0 0 30px rgba(0, 212, 255, 0.3); 
 }
 
-/* Contextual Components: Buttons */
+/* ボタン: 幾何学的な明瞭さと重厚な発光によるインタラクティブ性の確保 */
 .ui-style--neon .ui-button {
     --current-color: var(--ui-color);
     
-    width: 100%;
-    min-width: 280px;
     background: color-mix(in srgb, var(--current-color), transparent 85%);
     border: 2px solid var(--current-color);
     color: var(--current-color);
     border-radius: var(--radius-pill);
     backdrop-filter: blur(var(--blur));
     
+    font-family: var(--font-display); /* 幾何学的な形状がネオンの質感と合致するためOutfitを採用 */
+    font-weight: 900; 
+    letter-spacing: normal; 
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
     box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 60%);
     text-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 20%);
     
-    font-size: 14px;
-    font-weight: 900;
-    letter-spacing: 2.0px;
-    padding: 16px 32px;
+    font-size: var(--text-body-size);
+    padding: 12px 24px;
 }
 
 .ui-style--neon .ui-button:hover:not(:disabled) {
@@ -59,11 +60,15 @@
     border-color: #ffffff;
 }
 
+/* クリック時の確実な手応え（フィードバック）のための沈み込みと発光変化 */
 .ui-style--neon .ui-button:active:not(:disabled) {
     transform: translateY(0) scale(0.98);
+    background: color-mix(in srgb, var(--current-color), transparent 45%);
+    box-shadow: 0 0 15px var(--current-color);
+    transition-duration: 0.05s; /* 瞬時のレスポンスを確保 */
 }
 
-/* Secondary Variant under Neon context (V1 logic) */
+/* セカンダリアクション: メイン導線を邪魔しないための減光・枠線主体の表現 */
 .ui-style--neon .ui-button.is-secondary {
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(255, 255, 255, 0.1);
@@ -81,31 +86,66 @@
     transform: translateY(-2px);
 }
 
-/* Numeric Effects under Neon context */
-.num-score {
-    --ui-glow-color: var(--color-num-score);
-    text-shadow: var(--glow-text-high);
+.ui-style--neon .ui-button.is-secondary:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    background: rgba(0, 255, 204, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+    transition-duration: 0.05s;
 }
 
-.num-sector {
-    --ui-glow-color: var(--color-num-sector);
-    text-shadow: var(--glow-text-high);
-}
-
-.num-coin {
-    --ui-glow-color: var(--color-num-coin);
-    text-shadow: var(--glow-text-high);
-}
-
+/* 各種パネル: 視認性と没入感を両立させるグラス表示 */
 .ui-style--neon .ui-panel {
-    background: rgba(255, 255, 255, 0.05); /* 薄く背景を付ける */
-    backdrop-filter: blur(var(--blur));  /* グラスモーフィズムの効果（ぼかし） */
+    background: rgba(10, 20, 40, 0.4);
+    backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
+    /* セカンダリーカラーによる境界線定義。パネル内のセパレーターと質感を同期 */
     border: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        inset 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* --- Internal Borders & Separators --- */
+/* コンテンツ保持用ウェル: 奥行き感を出すための内側シャドウ */
+.ui-style--neon .ui-well {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* 数値強調効果: カテゴリに応じた発光色により直感的な識別を支援 */
+.ui-style--neon .num-score {
+    --ui-glow-color: var(--color-num-score);
+    text-shadow: 0 0 8px var(--ui-glow-color);
+}
+
+.ui-style--neon .num-sector {
+    --ui-glow-color: var(--color-num-sector);
+    text-shadow: 0 0 8px var(--ui-glow-color);
+}
+
+.ui-style--neon .num-coin {
+    --ui-glow-color: var(--color-num-coin);
+    text-shadow: 0 0 8px var(--ui-glow-color);
+}
+
+/* バッジ・勲章: アイコン自体の色を活かした発光演出 */
+.ui-style--neon .ui-badge {
+    box-shadow: 0 0 10px currentColor;
+    text-shadow: 0 0 5px currentColor;
+}
+
+.ui-style--neon .ui-badge.is-outline {
+    border: 1px solid currentColor;
+    background: transparent;
+}
+
+/* ヒーロースタッツ: 重要な統計情報を際立たせる多層発光 */
+.ui-style--neon .ui-stat-box.is-hero .stat-value {
+    --ui-glow-color: currentColor;
+    text-shadow: 0 0 10px var(--ui-glow-color, #fff), 0 0 20px var(--ui-glow-color, #fff);
+}
+
+/* --- セパレーターおよびボーダー情報 --- */
 .ui-style--neon .hud-stats {
     border-top: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
 }
@@ -114,7 +154,7 @@
     border-bottom: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
 }
 
-/* --- Panel Tabs: Neon specific --- */
+/* タブアイテム: アクティブ時の発光とボトムラインによる強調 */
 .ui-style--neon .tab-item.is-active {
     color: var(--color-sub);
     background: color-mix(in srgb, var(--color-sub), transparent 90%);
@@ -122,13 +162,27 @@
     text-shadow: 0 0 10px color-mix(in srgb, var(--color-sub), transparent 30%);
 }
 
+/* メトリクス表示の最適化: 長時間のプレイでも疲労しないよう発光を抑制 */
+.ui-style--neon .metric .text-display,
+.ui-style--neon .ui-metric-card .value {
+    color: #ffffff;
+    /* 読み取りやすさを優先し、文字の輪郭を鋭く保つ最小限の発光 */
+    text-shadow: 
+        0 0 2px rgba(255, 255, 255, 0.3),
+        0 0 2px var(--ui-color);
+}
 
-/* Action button settings have been centralized in play.css */
+.ui-style--neon #score-display {
+    color: var(--color-primary); 
+    text-shadow: 0 0 2px rgba(0, 255, 204, 0.5);
+}
 
+.ui-style--neon #coin-display {
+    color: #ffd700;
+    text-shadow: 0 0 2px rgba(255, 215, 0, 0.4);
+}
 
-/* Action buttons are now fully unified in play.css */
-
-/* --- Footer Info (System Text) --- */
+/* フッター: 補助情報として目立ちすぎない減光表示 */
 .ui-style--neon .play-footer {
     color: rgba(255, 255, 255, 0.3);
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
