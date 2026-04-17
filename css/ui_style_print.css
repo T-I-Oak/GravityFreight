@@ -1,85 +1,110 @@
 /* =========================================
-   STYLE LAYER: PRINT (PAPER DESIGN)
+   STYLE LAYER: PRINT (PAPER & INK)
    Usage: Add .ui-style--print to parent
    ========================================= */
 
 .ui-style--print {
-    background: #000000; /* 背景は暗い空間 */
-    --paper-color: #f4f1ea; /* 少し温かみのある紙の色 */
-    --ink-color: #222222;
-    --ink-dim: #666666;
+    /* Print Color Palette (V1 Based) */
+    --print-paper: #dcdcdc;
+    --print-ink: #1a1a1a;
+    --print-ink-dim: #444444;
+    --print-ink-red: #b22d2d;
+    
+    background: #000000;
 }
 
-/* Contextual Components: Panel (The Paper) */
+/* --- Container: Overlay in Print Style --- */
+.ui-style--print.ui-overlay {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+/* --- Component: Panel (The Paper) --- */
 .ui-style--print .ui-panel {
-    background: var(--paper-color);
-    color: var(--ink-color);
-    border: none;
-    border-radius: 0; /* 紙なので角丸は最小限か無し */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0,0,0,0.5);
-    position: relative;
+    background: var(--print-paper);
+    color: var(--print-ink);
+    padding: 50px 40px;
+    border-radius: 0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    
+    /* Global Typography reset for Print */
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: none; /* !important を削除。詳細度で対応。 */
 }
 
-/* Receipt Jagged Edge (Pseudo-element for paper feel) */
-.ui-style--print .ui-panel::before,
-.ui-style--print .ui-panel::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background-image: linear-gradient(135deg, var(--paper-color) 25%, transparent 25%), 
-                      linear-gradient(225deg, var(--paper-color) 25%, transparent 25%);
-    background-size: 12px 12px;
-    z-index: 10;
+/* Zigzag Edge (Automatic for any panel in print style) */
+.ui-style--print .ui-panel {
+    clip-path: polygon(
+        0% 0%, 2.5% 2%, 5% 0%, 7.5% 2%, 10% 0%, 12.5% 2%, 15% 0%, 17.5% 2%, 20% 0%, 22.5% 2%, 25% 0%, 27.5% 2%, 30% 0%, 32.5% 2%, 35% 0%, 37.5% 2%, 40% 0%, 42.5% 2%, 45% 0%, 47.5% 2%, 50% 0%, 52.5% 2%, 55% 0%, 57.5% 2%, 60% 0%, 62.5% 2%, 65% 0%, 67.5% 2%, 70% 0%, 72.5% 2%, 75% 0%, 77.5% 2%, 80% 0%, 82.5% 2%, 85% 0%, 87.5% 2%, 90% 0%, 92.5% 2%, 95% 0%, 97.5% 2%, 100% 0%, 
+        100% 100%, 0% 100%
+    );
 }
 
-.ui-style--print .ui-panel::before {
-    top: -8px;
-    transform: rotate(180deg);
-}
-
-.ui-style--print .ui-panel::after {
-    bottom: -8px;
-}
-
-/* Components Style Overrides */
-.ui-style--print .ui-title-box {
+/* --- Component: Typography --- */
+.ui-style--print .text-display,
+.ui-style--print .text-sub-display {
+    color: var(--print-ink);
     filter: none;
-    color: var(--ink-color);
 }
 
-.ui-style--print .ui-title-box .text-display {
-    color: var(--ink-color);
-    text-shadow: none; /* 印刷に発光はない */
+/* --- Component: Divider (Ink Line) --- */
+.ui-style--print .ui-divider {
+    border-top-color: rgba(0, 0, 0, 0.3);
 }
 
-/* Print Style Buttons (Stamp feel) */
+.ui-style--print .ui-divider.receipt-divider-dotted {
+    border-top-style: dashed;
+    border-top-width: 1px;
+}
+
+.ui-style--print .ui-divider.receipt-divider-solid {
+    border-top-style: solid;
+    border-top-width: 2px;
+    border-top-color: #000;
+}
+
+/* --- Component: Row --- */
+.ui-style--print .ui-row {
+    color: var(--print-ink);
+}
+
+/* --- Component: Button (The Stamp/Ink Block) --- */
 .ui-style--print .ui-button {
-    background: transparent;
-    border: 2px solid var(--ink-color);
-    color: var(--ink-color);
-    border-radius: 2px;
+    background: var(--print-ink);
+    color: var(--print-paper);
+    border: none;
+    border-radius: 1px;
     box-shadow: none;
-    font-weight: 900;
+    font-family: inherit;
+    transition: transform var(--motion-fast);
 }
 
 .ui-style--print .ui-button:hover:not(:disabled) {
-    background: var(--ink-color);
-    color: var(--paper-color);
-    transform: none;
+    background: #000;
+    transform: scale(1.02);
 }
 
-.ui-style--print .ui-button.is-secondary {
-    border-style: dashed;
-    color: var(--ink-dim);
-    border-color: var(--ink-dim);
+.ui-style--print .ui-button:active:not(:disabled) {
+    transform: scale(0.98);
 }
 
-/* Numeric text for Print */
-.ui-style--print .num-score, 
-.ui-style--print .num-sector, 
-.ui-style--print .num-coin {
-    color: var(--ink-color);
+/* --- Semantic Numbers (Inherit ink color) --- */
+.ui-style--print .num-score,
+.ui-style--print .num-sector,
+.ui-style--print .num-coin,
+.ui-style--print .num-item-count {
+    color: var(--print-ink);
     text-shadow: none;
+}
+
+/* --- Ranking / Grade Colors --- */
+.ui-style--print .top-rank { color: var(--print-ink-red); }
+.ui-style--print .grade-value.receipt-grade-ss,
+.ui-style--print .grade-value.receipt-grade-s { color: var(--print-ink-red); }
+
+/* --- Scrollbar --- */
+.ui-style--print *::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+.ui-style--print *::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
 }

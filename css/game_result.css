@@ -1,0 +1,235 @@
+/* --- Terminal Receipt (Game Result / Screen Specific) --- */
+
+/* 1. Base Structure & Alignment */
+#game-result-scene-container.ui-overlay {
+    align-items: flex-end; /* レシートは画面下部に配置 */
+    padding-bottom: 5vh;
+    z-index: 6000;
+}
+
+/* 衝撃揺れのアニメーションをコンテナ側に定義（中の紙すべてを揺らす） */
+#game-result-scene-container.impact {
+    animation: paperImpactShake 0.4s ease-out;
+}
+
+@keyframes paperImpactShake {
+    0% { transform: translateY(0); }
+    10% { transform: translateY(8px); } /* 叩きつけられた重み */
+    25% { transform: translateY(-2px); }
+    45% { transform: translateY(1px); }
+    100% { transform: translateY(0); }
+}
+
+#game-result-scene-container .ui-panel.receipt-paper {
+    width: 460px;
+    max-width: 95vw;
+    max-height: var(--panel-max-h, 90vh);
+    scrollbar-gutter: stable;
+    will-change: transform;
+    
+    /* Animation Initial State */
+    transform: translateY(110%);
+}
+
+#game-result-scene-container.active .receipt-paper {
+    /* 排出アニメーションは紙単体で実行 */
+    animation: receiptPrintFeed 1.6s cubic-bezier(0.2, 0.5, 0.1, 1.0) forwards;
+}
+
+@keyframes receiptPrintFeed {
+    /* 最初は小刻みに送る (ガタ、ガタ...) */
+    0%   { transform: translateY(110%) rotate(0.1deg); }
+    15%  { transform: translateY(100%) rotate(-0.1deg); }
+    20%  { transform: translateY(100%) rotate(0deg); } /* 一瞬の溜め */
+    
+    35%  { transform: translateY(85%) rotate(0.1deg); }
+    40%  { transform: translateY(85%) rotate(-0.1deg); } /* 一瞬の溜め */
+    
+    55%  { transform: translateY(70%) rotate(0.1deg); }
+    60%  { transform: translateY(70%) rotate(0deg); } /* 一瞬の溜め */
+    
+    /* 最後は目標地点まで一気にスムーズに送る (...スーッ) */
+    100% { transform: translateY(0) rotate(0); }
+}
+
+/* 2. Content Layout (Screen Specific Tuning) */
+#game-result-scene-container .receipt-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#game-result-scene-container .receipt-title {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+#game-result-scene-container .receipt-subtitle {
+    font-size: 12px;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    margin-top: 6px;
+}
+
+/* Row Spacing */
+#game-result-scene-container .ui-row.receipt-row {
+    font-size: 16px;
+    margin: 10px 0 2px 0;
+    font-weight: 600;
+}
+
+#game-result-scene-container .ui-row.receipt-row.total {
+    font-size: 24px;
+    font-weight: 900;
+    margin-top: 15px;
+}
+
+#game-result-scene-container .receipt-detail {
+    text-align: right;
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 700;
+    margin-top: 5px;
+    padding-right: 15px;
+    letter-spacing: 0.5px;
+}
+
+#game-result-scene-container .rank-value, 
+#game-result-scene-container .grade-value {
+    font-size: 1.3em;
+    font-weight: 900;
+}
+
+#game-result-scene-container .ui-button.receipt-btn {
+    width: 65%;
+    max-width: 280px;
+    margin: 30px auto 0;
+    padding: 16px;
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+#game-result-scene-container .receipt-footer {
+    text-align: center;
+    font-size: 10px;
+    margin-top: 5px; 
+    line-height: 1.6;
+}
+
+/* 3. Specialized Components (Screen Specific) */
+
+/* Stamp Zone */
+#game-result-scene-container .receipt-stamp-zone {
+    height: 146px;
+    margin: 35px 0 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    /* 巨大なスタンプが出現しても外部のレイアウトに影響させない。
+       ただし paint を含めないことで、枠外へのはみ出し表示を許可する。 */
+    contain: size layout; 
+}
+
+#game-result-scene-container .receipt-official-seal {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    font-family: 'Inter', sans-serif;
+    transform: rotate(0deg) scale(0);
+    opacity: 0;
+    user-select: none;
+    pointer-events: none;
+    border-style: solid;
+    border-color: currentColor;
+    width: max-content;
+    align-items: stretch;
+    z-index: 100; /* 他のテキストやバーコードの上に表示 */
+    --stamp-rot: -5deg;
+    --stamp-x: 0px;
+    --stamp-y: 0px;
+}
+
+#game-result-scene-container .receipt-official-seal.huge { border-width: 8px; }
+#game-result-scene-container .receipt-official-seal.normal { border-width: 6px; }
+#game-result-scene-container .receipt-official-seal.mini { border-width: 5px; }
+
+#game-result-scene-container .receipt-official-seal.active {
+    animation: receiptStampImpact 0.4s cubic-bezier(0.1, 0.9, 0.2, 1.2) forwards;
+}
+
+@keyframes receiptStampImpact {
+    0% { transform: rotate(-45deg) scale(3) translate(0, 0); opacity: 0; }
+    100% { transform: rotate(var(--stamp-rot)) scale(1) translate(var(--stamp-x), var(--stamp-y)); opacity: 0.85; }
+}
+
+/* (以下、スタンプのパーツ定義などは変更なし) */
+#game-result-scene-container .receipt-stamp-left-half {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: solid currentColor;
+    text-align: left;
+    width: auto;
+}
+
+#game-result-scene-container .receipt-official-seal.huge .receipt-stamp-left-half { padding: 0 15px; border-right-width: 6px; gap: 6px; height: 140px; }
+#game-result-scene-container .receipt-official-seal.normal .receipt-stamp-left-half { padding: 0 11.5px; border-right-width: 4.6px; gap: 4.6px; height: 108px; }
+#game-result-scene-container .receipt-official-seal.mini .receipt-stamp-left-half { padding: 0 10.5px; border-right-width: 4.2px; gap: 4.2px; height: 98px; }
+
+#game-result-scene-container .receipt-stamp-text-line {
+    font-weight: 950;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+#game-result-scene-container .receipt-official-seal.huge .receipt-stamp-text-line.small { font-size: 11px; letter-spacing: 2.8px; }
+#game-result-scene-container .receipt-official-seal.normal .receipt-stamp-text-line.small { font-size: 8.5px; letter-spacing: 2.1px; }
+#game-result-scene-container .receipt-official-seal.mini .receipt-stamp-text-line.small { font-size: 7.7px; letter-spacing: 1.9px; }
+
+#game-result-scene-container .receipt-official-seal.huge .receipt-stamp-text-line.medium { font-size: 16px; letter-spacing: 0.1px; }
+#game-result-scene-container .receipt-official-seal.normal .receipt-stamp-text-line.medium { font-size: 12.4px; letter-spacing: 0.08px; }
+#game-result-scene-container .receipt-official-seal.mini .receipt-stamp-text-line.medium { font-size: 11.2px; letter-spacing: 0.07px; }
+
+#game-result-scene-container .receipt-official-seal.huge .receipt-stamp-text-line.large { font-size: 32px; letter-spacing: 8px; }
+#game-result-scene-container .receipt-official-seal.normal .receipt-stamp-text-line.large { font-size: 25px; letter-spacing: 6.2px; }
+#game-result-scene-container .receipt-official-seal.mini .receipt-stamp-text-line.large { font-size: 22.4px; letter-spacing: 5.6px; }
+
+#game-result-scene-container .receipt-stamp-right-half {
+    font-weight: 950;
+    line-height: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+}
+
+#game-result-scene-container .receipt-official-seal.huge .receipt-stamp-right-half { font-size: 100px; padding: 0 20px; }
+#game-result-scene-container .receipt-official-seal.normal .receipt-stamp-right-half { font-size: 78px; padding: 0 15.6px; }
+#game-result-scene-container .receipt-official-seal.mini .receipt-stamp-right-half { font-size: 70px; padding: 0 14px; }
+
+/* Colors (Ink Variables) */
+#game-result-scene-container .receipt-official-seal.stamp-ss { color: #b8860b; }
+#game-result-scene-container .receipt-official-seal.stamp-s  { color: #a52a2a; }
+#game-result-scene-container .receipt-official-seal.stamp-a  { color: #2f4f4f; }
+#game-result-scene-container .receipt-official-seal.stamp-b  { color: #556b2f; }
+#game-result-scene-container .receipt-official-seal.stamp-c  { color: #696969; }
+#game-result-scene-container .receipt-official-seal.stamp-d  { color: #2c4a6d; }
+#game-result-scene-container .receipt-official-seal.stamp-e  { color: #1a3b5a; }
+
+/* Barcode */
+#game-result-scene-container .barcode-container {
+    margin: 10px 0 5px;
+    height: 55px;
+    width: 100%;
+    background: 
+        linear-gradient(90deg, #000 1px, transparent 1px) 0 0 / 4px 100%,
+        linear-gradient(90deg, #000 2px, transparent 2px) 7px 0 / 12px 100%,
+        linear-gradient(90deg, #000 3px, transparent 3px) 15px 0 / 8px 100%,
+        linear-gradient(90deg, #000 4px, transparent 4px) 30px 0 / 15px 100%,
+        linear-gradient(90deg, #000 2px, transparent 2px) 42px 0 / 10px 100%;
+    background-repeat: repeat-x;
+    opacity: 0.8;
+}

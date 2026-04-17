@@ -155,6 +155,13 @@ body, html {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
+}
+
+/* Base Component: Scrollable area */
+.ui-scrollable {
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .text-sub-display {
@@ -206,6 +213,42 @@ body, html {
     border-radius: var(--radius-m);
     padding: var(--space-m);
     box-sizing: border-box;
+}
+
+/* --- Logic: Overlay (Screen masking) --- */
+.ui-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--z-dialog, 1000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--motion-normal) var(--ease-standard), visibility var(--motion-normal);
+}
+
+.ui-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- Logic: Data row (Label-Value pair) --- */
+.ui-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+}
+
+/* --- Logic: Divider (Semantic separator) --- */
+.ui-divider {
+    width: 100%;
+    margin: var(--space-m) 0;
+    border: none;
 }
 
 /* --- Component: Footer Info --- */
