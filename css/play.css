@@ -57,8 +57,7 @@
     transition: all var(--motion-fast);
 }
 
-.msg-icon svg {
-    stroke-width: 2.0;
+.msg-icon .ui-icon {
     /* 多層化：1.5pxの芯 + 5pxの光の広がり */
     filter: drop-shadow(0 0 1.5px currentColor) drop-shadow(0 0 5px currentColor);
 }
@@ -175,7 +174,7 @@
     border-radius: var(--radius-m);
 }
 
-#inventory-panel .panel-toggle svg {
+#inventory-panel .panel-toggle .ui-icon {
     transition: transform var(--motion-normal);
 }
 
@@ -186,7 +185,7 @@
     box-shadow: 0 0 12px color-mix(in srgb, var(--color-sub), transparent 30%);
 }
 
-#inventory-panel.is-collapsed .panel-toggle svg {
+#inventory-panel.is-collapsed .panel-toggle .ui-icon {
     transform: rotate(180deg);
 }
 
@@ -254,11 +253,7 @@
     gap: 4px; /* 6pxから4pxに圧縮 */
 }
 
-.item-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
+
 
 
 /* Action Dock */

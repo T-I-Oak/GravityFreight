@@ -12,6 +12,12 @@
     overflow: hidden;
 }
 
+#facility-screen .ui-facility-icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    /* デザインの詳細は ui_base.css を継承 */
+}
+
 /* 施設タイプに応じたトークン割り当て（HTML側はクラス付与のみ） */
 #facility-screen.is-trading-post { --facility-color: var(--color-facility-trade); }
 #facility-screen.is-repair-dock   { --facility-color: var(--color-facility-repair); }

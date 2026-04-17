@@ -65,6 +65,11 @@ body, html {
     text-transform: uppercase;
 }
 
+.text-intro {
+    font-style: italic;
+    opacity: 0.9;
+}
+
 /* --- Component: Title Box (Logo Block) --- */
 .ui-title-box {
     display: flex;
@@ -269,6 +274,17 @@ body, html {
 }
 
 /* Global custom scrollbar style (V2 Standard) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05); /* Firefox Support */
+}
+
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 *::-webkit-scrollbar {
     width: 4px;
     height: 4px;
@@ -295,4 +311,90 @@ body, html {
         overflow-y: visible;
         height: auto;
     }
+}
+
+/* --- UI Components: Facility Icon (Global) --- */
+.ui-facility-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    font-family: 'UnifrakturMaguntia', serif;
+    font-size: 2.8rem;
+    color: var(--current-color, var(--facility-color, #fff));
+    border: 3px solid var(--current-color, var(--facility-color, #fff));
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 0 15px color-mix(in srgb, var(--current-color, var(--facility-color, #fff)), transparent 80%);
+    padding-top: 4px; /* フォントの垂直位置調整 */
+}
+
+/* =========================================
+   UTILITY: ICON SYSTEM (CSS MASK BASED)
+   ========================================= */
+
+.ui-icon {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
+    background-color: currentColor;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    transition: all var(--motion-fast);
+    flex-shrink: 0;
+}
+
+/* Base Icon Shapes */
+.is-icon-mail {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.is-icon-chevron-down {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* States & Variants */
+.ui-icon.is-disabled {
+    opacity: 0.2;
+    background-color: #fff !important;
+}
+
+.ui-icon.is-new {
+    animation: ui-guide-pulse 2.2s infinite ease-in-out;
+}
+
+/* Neon Glow Support (Apply filter when in Neon mode) */
+.ui-style--neon .ui-icon:not(.is-disabled) {
+    filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 5px currentColor);
+}
+
+/* --- Interactive Wrapper for Icons --- */
+.ui-icon-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    transition: all var(--motion-fast);
+    pointer-events: auto;
+    border-radius: 4px;
+}
+
+.ui-icon-action:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.ui-icon-action:hover .ui-icon {
+    filter: brightness(1.8); /* ホバー時に眩しく発光 */
+    transform: scale(1.1);   /* わずかな拡大フィードバック */
+}
+
+.ui-icon-action.is-disabled {
+    cursor: not-allowed;
+    pointer-events: none;
 }

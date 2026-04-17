@@ -1,2 +1,2 @@
-# Update History
+# 改版履歴
 

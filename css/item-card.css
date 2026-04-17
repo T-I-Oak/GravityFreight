@@ -1,5 +1,5 @@
 /* =========================================
-   UI COMPONENT: ITEM CARD
+   UI COMPONENT: ITEM CARD (Standardized V2 - Full Edition)
    ========================================= */
 
 .item-card {
@@ -41,7 +41,8 @@
 }
 
 /* Selected State */
-.item-card.is-selected {
+.item-card.is-selected,
+.item-card.is-story {
     background: color-mix(in srgb, var(--item-color, var(--color-primary)), transparent 85%);
     border-color: var(--item-color, var(--color-primary));
     box-shadow: 
@@ -49,8 +50,25 @@
         0 0 15px color-mix(in srgb, var(--item-color, var(--color-primary)), transparent 90%);
 }
 
+/* Story Item: Double Border Decoration */
+.item-card.is-story {
+    padding-left: calc(var(--space-s) + 16px); /* 4px + 3px + 4px + 余白 */
+}
+
+.item-card.is-story::after {
+    content: "";
+    position: absolute;
+    left: 7px; /* 1本目(4px) + 隙間(3px) */
+    top: 0;
+    bottom: 0;
+    width: 4px; /* 1本目と同じ太さに増強 */
+    background-color: var(--item-color, var(--color-primary));
+    box-shadow: 0 0 10px color-mix(in srgb, var(--item-color, var(--color-primary)), transparent 50%);
+}
+
 /* Selected + Hover (Additional emphasis) */
-.item-card.is-selected.clickable:hover {
+.item-card.is-selected.clickable:hover,
+.item-card.is-story.clickable:hover {
     background: color-mix(in srgb, var(--item-color, var(--color-primary)), transparent 70%);
     box-shadow: 
         inset 0 0 15px color-mix(in srgb, var(--item-color, var(--color-primary)), transparent 70%),
@@ -59,7 +77,7 @@
     transform: translateX(4px);
 }
 
-/* Header: Name / Stack / Dur */
+/* Header: Name / Meta */
 .item-card__header {
     display: flex;
     justify-content: space-between;
@@ -68,7 +86,7 @@
 }
 
 .item-card__name {
-    font-family: var(--font-display); /* Outfit */
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 14px;
     color: #fff;
@@ -82,9 +100,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    color: var(--item-color, rgba(255, 255, 255, 0.4)); /* アイコン等にテーマカラーを波及させる */
 }
 
-/* V1 Style: Stack Badge */
+/* Base Component: Stack Badge */
 .stack-badge {
     font-family: var(--font-display);
     font-size: 11px;
@@ -97,12 +116,17 @@
     line-height: 1.2;
 }
 
-/* V1 Style: HP/Durability Gauge */
+.stack-badge.is-mini {
+    font-size: 9px;
+    padding: 0 4px;
+}
+
+/* Base Component: HP/Durability Gauge */
 .hp-gauge {
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
-    max-width: 60px; /* ある程度の数で折り返す */
+    max-width: 60px;
 }
 
 .hp-segment {
@@ -119,12 +143,22 @@
     box-shadow: 0 0 8px var(--color-primary);
 }
 
-/* Enhanced Durability: 枠のみを追加し、色は変えない */
+/* Advanced State: Enhanced Durability (V1 Legacy Style) */
 .hp-gauge.is-enhanced {
     border: 1px solid #ffd700;
     box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
     padding: 2px;
     border-radius: 2px;
+}
+
+/* Mini variants for nested info */
+.hp-gauge.is-extra-mini .hp-segment {
+    width: 4px;
+    height: 2px;
+}
+
+.hp-gauge.is-extra-mini {
+    gap: 1px;
 }
 
 /* Description */
@@ -134,15 +168,36 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
-/* Properties */
-.item-card__props {
+/* Delivery Status Tags */
+.item-card__status {
+    font-family: var(--font-display);
+    font-size: 9px;
+    font-weight: 950;
+    text-transform: uppercase;
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 8px;
-    margin-top: 2px;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.5px;
+    white-space: nowrap; /* 改行を禁止 */
+    flex-shrink: 0;      /* アイテム名が長くても縮ませない */
 }
 
-/* Properties (V1 Stat Tags) */
+.item-card__status.is-delivered { color: #4ade80; }
+.item-card__status.is-unmatched { color: #fb7185; }
+
+/* Bonus Items (Indented Reward List) */
+.item-card__bonus-items {
+    margin-left: 12px; /* 20pxから12pxに縮小 */
+    padding-left: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    position: relative;
+}
+
+/* Properties / Stat Tags */
 .item-card__props {
     display: flex;
     flex-wrap: wrap;
@@ -164,25 +219,25 @@
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.6); /* 0.4から引き上げ */
+    color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
-    text-shadow: none; /* 発光を完全に排除 */
+    text-shadow: none; /* 小さい文字の可読性を守るため発光を排除 */
 }
 
 .item-prop__value {
     font-family: var(--font-mono);
-    font-size: 10.5px; /* 10pxから微増 */
+    font-size: 10.5px;
     font-weight: 900;
     color: #fff;
     display: flex;
     align-items: center;
     gap: 2px;
-    text-shadow: none; /* 発光を排除 */
+    text-shadow: none; /* 小さい文字の可読性を守るため発光を排除 */
 }
 
-/* Enhanced Property Style */
+/* Enhanced Property Style (Legendary/Special items) */
 .item-prop.is-enhanced {
-    border-color: #00d4ff; /* V1: enhanced-border */
+    border-color: #00d4ff; 
     background: rgba(0, 212, 255, 0.1);
     box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
 }
@@ -192,12 +247,12 @@
 }
 
 .item-prop.is-enhanced .item-prop__value::after {
-    content: "✦"; /* V1 正解記号 */
+    content: "✦"; 
     font-size: 8px;
     margin-left: 2px;
 }
 
-/* --- Rocket Specific: Module Details --- */
+/* Rocket Specific: Module Details */
 .rocket-details {
     margin-top: 4px;
     display: flex;
@@ -221,27 +276,24 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
-/* Mini variants for nested info */
-.hp-gauge.is-extra-mini .hp-segment {
-    width: 4px;
-    height: 2px;
-}
+/* =========================================
+   VARIANT LAYERS: ITEM CATEGORIES & THEMES
+   ========================================= */
 
-.stack-badge.is-mini {
-    font-size: 9px;
-    padding: 0 4px;
-}
+/* Category Variants (Using Standardized Tokens) */
+.item-card.is-chassis   { --item-color: var(--color-category-chassis); }
+.item-card.is-logic     { --item-color: var(--color-category-logic); }
+.item-card.is-module    { --item-color: var(--color-category-module); }
+.item-card.is-rocket    { --item-color: var(--color-category-rocket); }
+.item-card.is-launcher  { --item-color: var(--color-category-launcher); }
+.item-card.is-booster   { --item-color: var(--color-category-booster); }
 
-/* Category Colors (Neon Optimized) */
-.item-card[data-category="CHASSIS"]   { --item-color: #94a3b8; } /* Slate */
-.item-card[data-category="LOGIC"]     { --item-color: #38bdf8; } /* Light Blue */
-.item-card[data-category="MODULES"]   { --item-color: #c084fc; } /* Purple */
-.item-card[data-category="ROCKETS"]   { --item-color: #2dd4bf; } /* Teal */
-.item-card[data-category="LAUNCHERS"] { --item-color: #4ade80; } /* Green */
-.item-card[data-category="BOOSTERS"]  { --item-color: #fb7185; } /* Rose/Pink */
-.item-card[data-category="MARKET"]    { --item-color: var(--color-facility-market); } /* Black Market Red */
+/* Facility Theme Variants */
+.item-card.is-trade     { --item-color: var(--color-facility-trade); }
+.item-card.is-repair    { --item-color: var(--color-facility-repair); }
+.item-card.is-market    { --item-color: var(--color-facility-market); }
 
-/* --- Placeholder Component (.item-placeholder) --- */
+/* Placeholder Component */
 .item-placeholder {
     padding: var(--space-m);
     border: 1px dashed rgba(255, 255, 255, 0.15);
@@ -258,32 +310,20 @@
     cursor: default;
 }
 
+.item-placeholder.clickable {
+    cursor: pointer;
+}
+
 .item-placeholder.clickable:hover {
     border-color: rgba(255, 255, 255, 0.3);
     background: rgba(255, 255, 255, 0.03);
     transform: translateX(4px);
 }
 
-.item-placeholder.clickable {
-    cursor: pointer;
-}
-
 .item-placeholder__text {
     font-family: var(--font-display);
     font-size: 13px;
     font-weight: 700;
-}
-
-/* --- Notable / Guide States (Blinking emphasis) --- */
-@keyframes ui-guide-pulse {
-    0%, 100% { 
-        opacity: 0.2; /* 通常の薄さに戻る */
-        text-shadow: 0 0 0px currentColor; 
-    }
-    50% { 
-        opacity: 1; 
-        text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; 
-    }
 }
 
 .item-placeholder__hint {
@@ -294,11 +334,21 @@
     transition: opacity var(--motion-fast);
 }
 
-/* 注目ガイドの強制共通化 (4.17/418行目準拠) */
-/* 基底コンポーネントの変数を優先し、未定義時のみデフォルト色を適用 */
+/* --- Interaction / Guide Effects --- */
+@keyframes ui-guide-pulse {
+    0%, 100% { 
+        opacity: 0.2; 
+        text-shadow: 0 0 0px currentColor; 
+    }
+    50% { 
+        opacity: 1; 
+        text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; 
+    }
+}
+
 .is-notable .item-placeholder__hint,
 .is-notable .btn-sub-label {
     color: var(--guide-color, var(--color-primary));
     animation: ui-guide-pulse 2.5s infinite ease-in-out;
-    opacity: 1; /* 明滅時はベースの不透明度を固定 */
+    opacity: 1;
 }

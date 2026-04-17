@@ -1,0 +1,85 @@
+/* =========================================
+   SCREEN LAYER: STORY MODAL (Standardized Package)
+   Layout and positioning. Visuals provided by .ui-panel.is-primary
+   ========================================= */
+
+#story-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.4); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: var(--z-modal, 9999);
+}
+
+#story-modal {
+    width: 680px;
+    max-width: 95vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ヘッダー */
+#story-modal .modal-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    padding: var(--space-l);
+    background: transparent;
+}
+
+#story-modal .modal-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 2.4rem;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -1px;
+}
+
+/* コンテンツエリア: フォントサイズをここで一元管理 */
+#story-modal .modal-content {
+    padding: var(--space-l);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    font-size: 16px; /* 本文の標準サイズ */
+}
+
+#story-modal .modal-intro {
+    color: #fff;
+    /* 背景を暗く沈め、文字の発光を強調 */
+    background: rgba(0, 0, 0, 0.45);
+    padding: 14px var(--space-m);
+    border-radius: 2px;
+    line-height: 1.5;
+    /* 1px の全周ボーダーでデータの囲み感を演出 */
+    border: 1px solid color-mix(in srgb, var(--current-color, var(--color-primary)), transparent 60%);
+}
+
+#story-modal .modal-body {
+    line-height: 1.9;
+    color: rgba(255, 255, 255, 1);
+    padding: var(--space-s) 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* フッター */
+#story-modal .modal-footer {
+    padding: var(--space-l);
+    padding-top: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#story-modal .modal-footer .ui-button {
+    min-width: 280px;
+}
+
+/* 施設カラー・マッピング */
+#story-modal.is-trade  { --current-color: var(--color-facility-trade); }
+#story-modal.is-repair { --current-color: var(--color-facility-repair); }
+#story-modal.is-market { --current-color: var(--color-facility-market); }

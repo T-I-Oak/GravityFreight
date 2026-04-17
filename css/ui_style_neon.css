@@ -8,19 +8,27 @@
     background: radial-gradient(circle at center, rgba(0, 15, 30, 0.8) 0%, rgba(5, 5, 10, 1) 100%);
 }
 
-/* ロゴ・見出し用テキスト: 強力なブルーム効果によりブランドの存在感と視覚的インパクトを強調 */
+/* ロゴ・見出し用テキスト */
 .ui-style--neon .text-display {
     color: #ffffff;
     font-family: var(--font-display);
     font-weight: 900; 
-    /* 多層シャドウにより、芯の強さと周囲への光の広がりを表現。サイズに依存しない質感を提供 */
     text-shadow: 
         0 0 10px rgba(0, 212, 255, 0.8),
         0 0 20px rgba(0, 212, 255, 0.4),
         0 0 30px rgba(0, 212, 255, 0.2);
 }
 
-/* 補助的な小見出し用テキスト: メインを邪魔しないよう、透過度と控えめな発光により奥行きを表現 */
+/* 発光テキストユーティリティ: --current-color に連動してネオンのような輝きを与える */
+.ui-style--neon .text-glow {
+    color: var(--current-color, var(--color-primary));
+    text-shadow: 
+        0 0 10px color-mix(in srgb, var(--current-color, var(--color-primary)), transparent 20%),
+        0 0 20px color-mix(in srgb, var(--current-color, var(--color-primary)), transparent 60%);
+    font-weight: 700;
+}
+
+/* 補助的な小見出し用テキスト */
 .ui-style--neon .text-sub-display {
     color: color-mix(in srgb, var(--ui-color), transparent 20%); 
     font-family: var(--font-body); 
@@ -30,45 +38,63 @@
         0 0 30px rgba(0, 212, 255, 0.3); 
 }
 
-/* ボタン: 幾何学的な明瞭さと重厚な発光によるインタラクティブ性の確保 */
+/* ボタン: 循環参照を避け、内部色 --local-color でパッケージ化 */
 .ui-style--neon .ui-button {
-    --current-color: var(--ui-color);
+    /* 親から引き継ぐ --current-color があれば優先し、なければスタイルの基本色を使用 */
+    --local-color: var(--current-color, var(--ui-color));
     
-    background: color-mix(in srgb, var(--current-color), transparent 85%);
-    border: 2px solid var(--current-color);
-    color: var(--current-color);
+    background: color-mix(in srgb, var(--local-color), transparent 85%);
+    border: 2px solid var(--local-color);
+    color: var(--local-color);
     border-radius: var(--radius-pill);
     backdrop-filter: blur(var(--blur));
     
-    font-family: var(--font-display); /* 幾何学的な形状がネオンの質感と合致するためOutfitを採用 */
-    font-weight: 900; 
+    font-family: var(--font-display);
+    font-weight: 950; 
     letter-spacing: normal; 
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
-    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 60%);
-    text-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 20%);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--local-color), transparent 60%);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--local-color), transparent 20%);
     
     font-size: var(--text-body-size);
     padding: 12px 24px;
 }
 
 .ui-style--neon .ui-button:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--current-color), transparent 65%);
+    background: color-mix(in srgb, var(--local-color), transparent 65%);
     color: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 0 35px color-mix(in srgb, var(--current-color), transparent 10%);
+    box-shadow: 0 0 35px color-mix(in srgb, var(--local-color), transparent 10%);
     border-color: #ffffff;
 }
 
-/* クリック時の確実な手応え（フィードバック）のための沈み込みと発光変化 */
-.ui-style--neon .ui-button:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
-    background: color-mix(in srgb, var(--current-color), transparent 45%);
-    box-shadow: 0 0 15px var(--current-color);
-    transition-duration: 0.05s; /* 瞬時のレスポンスを確保 */
+/* プライマリーアクション: 高コントラスト・パッケージ */
+.ui-style--neon .ui-button.is-primary {
+    background: color-mix(in srgb, var(--local-color), transparent 85%);
+    border: 3px solid var(--local-color);
+    color: #fff;
+    box-shadow: 0 0 20px color-mix(in srgb, var(--local-color), transparent 60%);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(var(--blur));
 }
 
-/* セカンダリアクション: メイン導線を邪魔しないための減光・枠線主体の表現 */
+.ui-style--neon .ui-button.is-primary:hover:not(:disabled) {
+    background: var(--local-color);
+    color: #000;
+    box-shadow: 0 0 40px var(--local-color);
+    border-color: #fff;
+}
+
+/* クリック時の手応え */
+.ui-style--neon .ui-button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    background: color-mix(in srgb, var(--local-color), transparent 45%);
+    box-shadow: 0 0 15px var(--local-color);
+    transition-duration: 0.05s;
+}
+
+/* セカンダリアクション */
 .ui-style--neon .ui-button.is-secondary {
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(255, 255, 255, 0.1);
@@ -86,33 +112,35 @@
     transform: translateY(-2px);
 }
 
-.ui-style--neon .ui-button.is-secondary:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
-    background: rgba(0, 255, 204, 0.2);
-    box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
-    transition-duration: 0.05s;
-}
-
-/* 各種パネル: 視認性と没入感を両立させるグラス表示 */
+/* 各種パネル */
 .ui-style--neon .ui-panel {
     background: rgba(10, 20, 40, 0.4);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
-    /* セカンダリーカラーによる境界線定義。パネル内のセパレーターと質感を同期 */
     border: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.5),
         inset 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* コンテンツ保持用ウェル: 奥行き感を出すための内側シャドウ */
+/* プライマリーパネル: 厚枠ババリント。ここでも循環参照を排除 */
+.ui-style--neon .ui-panel.is-primary {
+    --local-panel-color: var(--current-color, var(--color-primary));
+    background: color-mix(in srgb, var(--local-panel-color), rgba(5, 8, 16, 0.5) 85%);
+    border: 3px solid var(--local-panel-color);
+    box-shadow: 
+        0 40px 80px rgba(0, 0, 0, 0.7),
+        0 0 25px color-mix(in srgb, var(--local-panel-color), transparent 80%);
+}
+
+/* コンテンツ保持用ウェル */
 .ui-style--neon .ui-well {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* 数値強調効果: カテゴリに応じた発光色により直感的な識別を支援 */
+/* 数値強調効果 */
 .ui-style--neon .num-score {
     --ui-glow-color: var(--color-num-score);
     text-shadow: 0 0 8px var(--ui-glow-color);
@@ -128,7 +156,7 @@
     text-shadow: 0 0 8px var(--ui-glow-color);
 }
 
-/* バッジ・勲章: アイコン自体の色を活かした発光演出 */
+/* バッジ・勲章 */
 .ui-style--neon .ui-badge {
     box-shadow: 0 0 10px currentColor;
     text-shadow: 0 0 5px currentColor;
@@ -139,13 +167,13 @@
     background: transparent;
 }
 
-/* ヒーロースタッツ: 重要な統計情報を際立たせる多層発光 */
+/* ヒーロースタッツ */
 .ui-style--neon .ui-stat-box.is-hero .stat-value {
     --ui-glow-color: currentColor;
     text-shadow: 0 0 10px var(--ui-glow-color, #fff), 0 0 20px var(--ui-glow-color, #fff);
 }
 
-/* --- セパレーターおよびボーダー情報 --- */
+/* セパレーター */
 .ui-style--neon .hud-stats {
     border-top: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
 }
@@ -154,7 +182,7 @@
     border-bottom: 1px solid color-mix(in srgb, var(--color-sub), transparent 60%);
 }
 
-/* タブアイテム: アクティブ時の発光とボトムラインによる強調 */
+/* タブアイテム */
 .ui-style--neon .tab-item.is-active {
     color: var(--color-sub);
     background: color-mix(in srgb, var(--color-sub), transparent 90%);
@@ -162,11 +190,10 @@
     text-shadow: 0 0 10px color-mix(in srgb, var(--color-sub), transparent 30%);
 }
 
-/* メトリクス表示の最適化: 長時間のプレイでも疲労しないよう発光を抑制 */
+/* メトリクス表示 */
 .ui-style--neon .metric .text-display,
 .ui-style--neon .ui-metric-card .value {
     color: #ffffff;
-    /* 読み取りやすさを優先し、文字の輪郭を鋭く保つ最小限の発光 */
     text-shadow: 
         0 0 2px rgba(255, 255, 255, 0.3),
         0 0 2px var(--ui-color);
@@ -182,8 +209,17 @@
     text-shadow: 0 0 2px rgba(255, 215, 0, 0.4);
 }
 
-/* フッター: 補助情報として目立ちすぎない減光表示 */
+/* フッター */
 .ui-style--neon .play-footer {
     color: rgba(255, 255, 255, 0.3);
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+/* --- Item Card Components: Neon Adjustments --- */
+.ui-style--neon .item-card__status.is-delivered {
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+}
+
+.ui-style--neon .item-card__status.is-unmatched {
+    text-shadow: 0 0 8px rgba(251, 113, 133, 0.4);
 }
