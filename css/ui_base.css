@@ -31,6 +31,14 @@ body, html {
     border: none;
     outline: none;
     user-select: none;
+    border-radius: 4px; /* Default shape */
+}
+
+/* Base Component: Small Variant (Generic Padding) */
+.ui-button.is-small {
+    padding: 2px 10px;
+    min-height: 24px;
+    font-size: 10px;
 }
 
 /* Base Component: Interactive state for non-buttons */
@@ -130,6 +138,8 @@ body, html {
 
 .num-score, .num-sector, .num-coin, .num-item-count { 
     letter-spacing: 0.02em;
+    font-weight: 900; /* 重厚な数値を共通化 */
+    font-family: var(--font-num-primary);
 }
 
 /* --- Component: Panel (Base) --- */
@@ -160,6 +170,30 @@ body, html {
     letter-spacing: 1px;
     border-radius: var(--radius-pill);
     white-space: nowrap;
+}
+
+/* Sticker Variant (V1 fine-tuned shape) */
+.ui-badge.is-sticker {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    padding: 2px 8px;
+    transform: rotate(10deg);
+    border-radius: 4px;
+}
+.ui-badge.is-sticker .sticker-num { font-size: 13px; line-height: 1; font-weight: 900; }
+.ui-badge.is-sticker .sticker-pct { font-size: 8px; font-weight: 900; }
+
+/* Facility Icon Base */
+.ui-facility-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 /* --- Component: Well (Inset Container) --- */

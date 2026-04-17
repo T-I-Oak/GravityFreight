@@ -132,10 +132,6 @@
     font-size: 11px;
     line-height: 1.4;
     color: rgba(255, 255, 255, 0.8);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 /* Properties */
@@ -243,6 +239,7 @@
 .item-card[data-category="ROCKETS"]   { --item-color: #2dd4bf; } /* Teal */
 .item-card[data-category="LAUNCHERS"] { --item-color: #4ade80; } /* Green */
 .item-card[data-category="BOOSTERS"]  { --item-color: #fb7185; } /* Rose/Pink */
+.item-card[data-category="MARKET"]    { --item-color: var(--color-facility-market); } /* Black Market Red */
 
 /* --- Placeholder Component (.item-placeholder) --- */
 .item-placeholder {

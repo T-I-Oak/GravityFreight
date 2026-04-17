@@ -3,7 +3,7 @@
 完了した項目は [update_history.md](./update_history.md) に移行します。
 
 ## Version 2.0.0 に向けたロードマップ
-- [ ] 各画面の詳細仕様を作成する (`docs/specs/ui/`)
+- [ ] 各画面 詳細仕様を作成する (`docs/specs/ui/`)
     - [ ] メニュー画面
     - [ ] プレイ画面 (ASSEMBLY/FLIGHT)
     - [ ] 施設画面 (Repair Dock)
@@ -13,7 +13,7 @@
     - [ ] 記録画面 (Archives)
 - [ ] 各画面のモックアップを作成する
     - [x] プレイ画面 (標準化完了)
-    - [ ] 施設画面
+    - [x] 施設画面 (Trading Post / Repair Dock / Black Market 完了)
     - [x] 航行結果画面
     - [ ] ゲームリザルト画面
     - [ ] チュートリアル画面

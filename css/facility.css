@@ -1,0 +1,181 @@
+/* =========================================
+   SCREEN LAYER: FACILITY (Trading Post, Repair Dock, etc.)
+   Scope: #facility-screen
+   ========================================= */
+
+#facility-screen {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* 施設タイプに応じたトークン割り当て（HTML側はクラス付与のみ） */
+#facility-screen.is-trading-post { --facility-color: var(--color-facility-trade); }
+#facility-screen.is-repair-dock   { --facility-color: var(--color-facility-repair); }
+#facility-screen.is-black-market { --facility-color: var(--color-facility-market); }
+
+/* ヘッダー領域 */
+#facility-screen .facility-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+    padding: var(--space-l);
+    flex-shrink: 0;
+}
+
+#facility-screen .facility-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#facility-screen .facility-name {
+    font-size: 2.5rem;
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: 2px;
+    color: var(--facility-color); /* 施設カラーを適用 */
+}
+
+#facility-screen .facility-description {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 4px 0 0;
+}
+
+/* メインコンテンツエリア：2カラムグリッド（50% / 50%） */
+#facility-screen .facility-main-well {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: var(--space-l);
+    margin: 0 var(--space-l);
+    padding: var(--space-l);
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* カラムとセクション */
+#facility-screen .ui-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+}
+
+#facility-screen .facility-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* 見出しと本文の距離を密にする */
+}
+
+#facility-screen h3 {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 950;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#facility-screen .section-subtitle {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+    line-height: 1.4;
+}
+
+#facility-screen .section-subtitle + * {
+    margin-top: 8px; /* 本文（trade-entry等）との距離のみ確保 */
+}
+
+/* 取引アイテム行（Trading / Repair） */
+#facility-screen .trade-entry {
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-s);
+    margin-bottom: var(--space-s);
+}
+
+#facility-screen .trade-item-area {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 価格・アクション領域（140px固定） */
+#facility-screen .trade-action-area {
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#facility-screen .trade-action-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    padding-left: 4px;
+}
+
+#facility-screen .trade-price {
+    font-size: 1.25rem;
+    text-align: center;
+    line-height: 1;
+}
+
+#facility-screen .ui-button.is-small {
+    width: 100%; /* 施設画面内でのみ全目一杯に広げる */
+    margin-top: 4px;
+}
+
+/* フッター領域 */
+#facility-screen .facility-footer {
+    flex-shrink: 0;
+    padding: var(--space-m) var(--space-l) var(--space-l);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#facility-screen .facility-footer .ui-button.is-primary {
+    min-width: 240px;
+}
+
+/* ステッカー（割引バッジ）の調整 */
+#facility-screen .trade-action-group .ui-badge.is-sticker {
+    margin: 0 0 0 4px;
+    flex-shrink: 0;
+}
+
+/* セクション固有の調整（分解セクション等） */
+#facility-screen .facility-section--dismantle {
+    margin-top: var(--space-m);
+}
+
+/* プレースホルダー（アイテム 0 個の状態） */
+#facility-screen .item-placeholder {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 800px) {
+    #facility-screen {
+        height: auto;
+        padding: var(--space-s);
+    }
+    #facility-screen .facility-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    #facility-screen .facility-main-well {
+        grid-template-columns: 1fr;
+        height: auto;
+        margin: 0;
+    }
+}
