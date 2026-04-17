@@ -7,6 +7,7 @@
     - [x] プレイ画面 (標準化済み)
     - [x] 施設画面 (Trading Post / Repair Dock / Black Market 標準化済み)
     - [x] 航行結果画面 (標準化済み)
+    - [x] ゲームリザルト画面 (標準化済み)
     - [ ] チュートリアル画面
     - [ ] 記録画面 (Archives)
 - [ ] 各画面 詳細仕様を作成する (`docs/specs/ui/`)
