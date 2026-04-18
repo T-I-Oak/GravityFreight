@@ -1,450 +1,196 @@
 /* =========================================
-   UI BASE (Shared Shapes)
+   Gravity Freight V2: Base Capabilities
+   Layer: Base / Capability (A-Axis)
+   Managing Semantic Structures & Contextual Layouts
    ========================================= */
 
-body, html {
+/* --- 1. Immersion Reset --- */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+*:focus {
+    outline: none !important;
+}
+
+html, body {
     margin: 0;
     padding: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--color-bg-deep);
-    color: var(--color-text-white);
-    font-family: var(--font-text);
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
+    font-family: var(--font-main);
+    font-size: var(--text-size-main);
 }
 
-*, *:before, *:after {
-    box-sizing: border-box;
-}
-
-/* Base Component: Button Shape only */
-.ui-button {
-    --btn-theme-color: var(--color-primary); /* Default theme color */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-display);
-    font-weight: 950;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all var(--motion-normal) var(--ease-standard);
-    border: none;
-    outline: none;
-    user-select: none;
-    border-radius: 4px; /* Default shape */
-}
-
-/* Base Component: Small Variant (Generic Padding) */
-.ui-button.is-small {
-    padding: 2px 10px;
-    min-height: 24px;
-    font-size: 10px;
-}
-
-/* Base Component: Interactive state for non-buttons */
-.clickable {
-    cursor: pointer;
-    transition: all var(--motion-fast) var(--ease-standard);
-    user-select: none;
-}
-
-.clickable:hover {
-    filter: brightness(1.2);
-}
-
-.clickable:active {
-    transform: scale(0.98);
-}
-
-/* Base Component: Display Text */
-.text-display {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-size: var(--text-display-size);
-    line-height: 1.1;
-    text-transform: uppercase;
-}
-
-.text-intro {
-    font-style: italic;
-    opacity: 0.9;
-}
-
-/* --- Component: Title Box (Logo Block) --- */
-.ui-title-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: var(--space-s);
-}
-
-.ui-title-box .text-display {
-    margin: 0;
-}
-
-.ui-title-box .text-sub-display {
-    display: block;
-    font-size: clamp(0.9rem, 3.5vw, 1.5rem);
-    white-space: nowrap;
-}
-
-/* --- Component: Stat Box (Label + Value) --- */
-.ui-stat-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 2px;
-}
-
-.ui-stat-box .stat-label {
-    font-size: 10px;
-    color: var(--color-text-dim);
-    text-transform: uppercase;
-    font-family: var(--font-display);
-    letter-spacing: 1.5px;
-    opacity: 0.7;
-}
-
-.ui-stat-box .stat-value {
-    font-family: var(--font-num-primary);
-    font-weight: 700;
-    margin: 0;
-}
-
-/* Size Modifiers */
-.ui-stat-box.is-hero .stat-value {
-    font-size: 2.5rem;
-    font-weight: 900;
-}
-
-.ui-stat-box.is-hero .stat-label {
-    font-size: 11px;
-    margin-bottom: 4px;
-}
-
-/* --- Component: Stat Group (Container for multiple stats) --- */
-.ui-stat-group {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    gap: var(--space-m);
-}
-
-/* --- Semantic Numbers --- */
-.num-score { color: var(--color-num-score); }
-.num-sector { color: var(--color-num-sector); }
-.num-item-count { color: var(--color-num-item-count); }
-.num-coin { color: var(--color-num-coin); }
-.num-contract { color: var(--color-num-contract); }
-
-/* --- Global Capabilities --- */
+/* --- 2. Interactive States (Semantic) --- */
 .ui-button,
 .is-clickable {
     cursor: pointer;
+    user-select: none;
 }
 
-.num-score, .num-sector, .num-coin, .num-item-count, .num-contract { 
-    letter-spacing: 0.02em;
-    font-weight: 900; /* 重厚な数値を共通化 */
-    font-family: var(--font-num-primary);
-}
+/* --- 3. Semantic Components: Shapes & Structures --- */
 
-/* --- Component: Panel (Base) --- */
-.ui-panel {
-    border-radius: var(--radius-m);
-    padding: 0;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-}
-
-/* Base Component: Scrollable area */
-.ui-scrollable {
-    overflow-y: auto;
-    scrollbar-width: thin;
-}
-
-.text-sub-display {
-    font-family: var(--font-text);
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-/* --- Component: Badge (Status / Category) --- */
+/* UI Badge: Generic metadata container */
 .ui-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 2px 10px;
-    font-size: 9px;
-    font-weight: 950;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-radius: var(--radius-pill);
+    font-weight: 900;
+    line-height: 1;
     white-space: nowrap;
+    border-radius: var(--radius-standard);
 }
 
-/* Sticker Variant (V1 fine-tuned shape) */
-.ui-badge.is-sticker {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 1px;
-    padding: 2px 8px;
-    transform: rotate(10deg);
-    border-radius: 4px;
-}
-.ui-badge.is-sticker .sticker-num { font-size: 13px; line-height: 1; font-weight: 900; }
-.ui-badge.is-sticker .sticker-pct { font-size: 8px; font-weight: 900; }
-
-/* Facility Icon Base */
-.ui-facility-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 12px;
+/* Durability Gauge: Resource tracking layout */
+.durability-gauge {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 1px;
+}
+
+.durability-unit {
+    width: 10px; /* Base for 8x3 fill + 1px border */
+    height: 5px;
     flex-shrink: 0;
-    box-sizing: border-box;
+    border-radius: 0; 
+    transform: skewX(-15deg);
 }
 
-/* --- Component: Well (Inset Container) --- */
-.ui-well {
-    border-radius: var(--radius-m);
-    padding: var(--space-m);
-    box-sizing: border-box;
-}
+/* --- 4. Contextual Structures: Item Card Layers --- */
 
-/* --- Logic: Overlay (Screen masking) --- */
-.ui-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: var(--z-dialog, 1000);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--motion-normal) var(--ease-standard), visibility var(--motion-normal);
-}
-
-.ui-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* --- Logic: Data row (Label-Value pair) --- */
-.ui-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    width: 100%;
-}
-
-/* --- Logic: Divider (Semantic separator) --- */
-.ui-divider {
-    width: 100%;
-    margin: var(--space-m) 0;
-    border: none;
-}
-
-/* --- Component: Footer Info --- */
-.ui-footer {
-    position: absolute;
-    bottom: var(--space-m);
-    left: var(--space-m);
+.ui-item-card {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.4);
-    font-family: var(--font-text);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    pointer-events: none;
-    z-index: var(--z-hud);
-}
-
-/* --- Component: Panel Variations (4.15) --- */
-.panel-narrow { width: 400px; }
-.panel-regular { width: 640px; }
-.panel-wide { width: 900px; }
-.panel-max-h { height: 85vh; }
-.panel-regular.panel-max-h { height: 85vh; }
-
-/* --- Component: Section Header (V2 Semantic) --- */
-.ui-section-header {
-    margin-bottom: var(--space-m);
-}
-
-.ui-section-header .section-title {
-    font-family: var(--font-display);
-    font-size: 0.85rem;
-    font-weight: 950;
-    margin: 0;
-    color: rgba(255, 255, 255, 0.9);
-    letter-spacing: 1.5px;
-}
-
-.ui-section-header .section-subtext {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin-top: 4px;
-    display: block;
-}
-
-/* --- Responsive Scroll Layout --- */
-.ui-columns-container {
-    display: flex;
-    gap: var(--space-m);
-    flex: 1;
-    min-height: 0;
+    width: 100%;
+    min-height: 50px;
+    position: relative;
     overflow: hidden;
+    transition: all 0.15s ease-out;
 }
 
-.ui-column {
+/* Individual Layer: Hover feedback restricted to capability */
+.ui-item-card.is-clickable:hover {
+    transform: translate(2px, -2px);
+    z-index: 10;
+}
+
+.ui-item-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.ui-item-card .card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+    flex-shrink: 0;
+}
+
+.ui-item-card .card-title {
+    margin: 0;
+    font-size: 14px;
     flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+}
+
+.ui-item-card .card-body {
+    flex: 1;
+}
+
+.ui-item-card .card-description {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.ui-item-card .card-footer {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    margin-top: 2px;
 }
 
-.ui-column.is-scrollable {
-    overflow-y: auto;
-    padding-right: 4px;
+/* Individual Layer: Sizing badges within standard item-card header */
+.ui-item-card .ui-badge {
+    padding: 2px 8px;
+    font-size: 13px;
+    min-width: 24px;
+    border-radius: 4px; /* Explicitly defined for standard context */
 }
 
-/* Global custom scrollbar style (V2 Standard) */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05); /* Firefox Support */
-}
-
-.item-list {
+/* Card Property Capsules */
+.card-prop-group {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 4px 6px;
 }
 
-*::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+.card-prop {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    font-size: 12px;
+    border-radius: 12px;
 }
-*::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+
+.card-prop-label {
+    opacity: 0.5;
+    text-transform: uppercase;
+    font-weight: 400;
 }
-*::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+
+.card-prop-value {
+    font-weight: 700;
+}
+
+/* Individual Layer: Enhanced Data state structure */
+.card-prop.is-enhanced .card-prop-value::after {
+    content: "✦";
+    font-size: 11px;
+    margin-left: 3px;
+    vertical-align: baseline;
+}
+
+.durability-gauge.is-enhanced {
+    padding: 3px;
     border-radius: 2px;
 }
-*::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
 
-@media (max-width: 640px) {
-    .ui-columns-container {
-        flex-direction: column;
-        overflow-y: visible;
-        height: auto;
-        flex: none;
-    }
-    .ui-column.is-scrollable {
-        overflow-y: visible;
-        height: auto;
-    }
-}
+/* --- 5. Contextual Structures: Rocket Deep-Detail --- */
 
-/* --- UI Components: Facility Icon (Global) --- */
-.ui-facility-icon {
+.rocket-details {
+    margin-top: 4px;
+    padding-top: 4px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rocket-module-row {
+    display: flex;
     align-items: center;
-    flex-shrink: 0;
-    font-family: 'UnifrakturMaguntia', serif;
-    font-size: 2.8rem;
-    color: var(--current-color, var(--facility-color, #fff));
-    border: 3px solid var(--current-color, var(--facility-color, #fff));
-    background: rgba(0, 0, 0, 0.4);
-    box-shadow: inset 0 0 15px color-mix(in srgb, var(--current-color, var(--facility-color, #fff)), transparent 80%);
-    padding-top: 4px; /* フォントの垂直位置調整 */
+    justify-content: space-between;
+    font-size: 10px;
 }
 
-/* =========================================
-   UTILITY: ICON SYSTEM (CSS MASK BASED)
-   ========================================= */
-
-.ui-icon {
-    display: inline-block;
-    width: 1.2em;
-    height: 1.2em;
-    vertical-align: middle;
-    background-color: currentColor;
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-    transition: all var(--motion-fast);
-    flex-shrink: 0;
+/* Individual Layer: Miniaturization for nested module lists */
+.rocket-details .ui-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+    min-width: 18px;
+    border-radius: 2px;
 }
 
-/* Base Icon Shapes */
-.is-icon-mail {
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E");
-}
-
-.is-icon-chevron-down {
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-}
-
-/* States & Variants */
-.ui-icon.is-disabled {
-    opacity: 0.2;
-    background-color: #fff !important;
-}
-
-.ui-icon.is-new {
-    animation: ui-guide-pulse 2.2s infinite ease-in-out;
-}
-
-/* Neon Glow Support (Apply filter when in Neon mode) */
-.ui-style--neon .ui-icon:not(.is-disabled) {
-    filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 5px currentColor);
-}
-
-/* --- Interactive Wrapper for Icons --- */
-.ui-icon-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    padding: 0;
-    transition: all var(--motion-fast);
-    pointer-events: auto;
-    border-radius: 4px;
-}
-
-.ui-icon-action:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.ui-icon-action:hover .ui-icon {
-    filter: brightness(1.8); /* ホバー時に眩しく発光 */
-    transform: scale(1.1);   /* わずかな拡大フィードバック */
-}
-
-.ui-icon-action.is-disabled {
-    cursor: not-allowed;
-    pointer-events: none;
+.rocket-details .durability-unit {
+    width: 7px;
+    height: 4px;
 }

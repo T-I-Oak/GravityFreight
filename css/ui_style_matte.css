@@ -1,168 +1,111 @@
 /* =========================================
-   STYLE LAYER: MATTE
-   Usage: Add .ui-style--matte to parent (e.g. scene container)
+   Gravity Freight V2: Matte Style Layer
+   Layer: Style / Aesthetic (Expressions)
+   Focus: Opaque materials, solid colors, pure contrast
    ========================================= */
 
 .ui-style--matte {
-    --ui-color: var(--color-primary);
-    background: #10121d; /* 施設内をイメージした不透明な深い色 */
-    color: #eeeeee;
-}
-
-/* Contextual Components: Well (Inset for Matte) */
-.ui-style--matte .ui-well {
-    background: rgba(0, 0, 0, 0.45);
-    box-shadow: 
-        inset 0 4px 12px rgba(0, 0, 0, 0.6),
-        inset 0 0 30px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.02);
-}
-
-/* Contextual Components: Panel */
-.ui-style--matte .ui-panel {
-    background: color-mix(in srgb, var(--facility-color, transparent), #1a1e30 92%); /* 8% blend */
-    border-radius: var(--radius-m);
-    box-shadow: 
-        inset 1px 1px 0 rgba(255, 255, 255, 0.05),
-        2px 2px 4px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-.ui-style--matte .ui-panel.panel-wide { 
-    height: 85vh; /* 航行結果画面との共通性質 */
-}
-
-/* =========================================
-   [A] Capability Axis: Is it functional?
-   ========================================= */
-.ui-style--matte .ui-button,
-.ui-style--matte .is-clickable {
-    transition: all 0.15s ease-in-out;
-}
-
-.ui-style--matte .ui-button:hover,
-.ui-style--matte .is-clickable:hover { filter: brightness(1.2); }
-
-.ui-style--matte .ui-button:active,
-.ui-style--matte .is-clickable:active { transform: translateY(1px); }
-
-/* =========================================
-   [B] Emphasis/Priority Axis: How important?
-   ========================================= */
-.ui-style--matte .ui-button {
-    /* Identity defined by --current-color (Default to primary) */
-    --current-color: var(--ui-color);
-    
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 12px 32px; font-size: 13px; font-weight: 950; letter-spacing: 1px;
-    border-radius: 4px; border: 1px solid var(--current-color);
-    text-transform: uppercase; font-family: var(--font-display);
-    background: transparent; color: #ffffff;
-    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2); 
-}
-
-/* Matte Primary: Solid Fill */
-.ui-style--matte .is-primary {
-    background: var(--current-color);
-    border-color: var(--current-color);
-    color: #000000;
-}
-
-/* Matte Secondary: Modest Outline/Dark BG */
-.ui-style--matte .is-secondary {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(0, 0, 0, 0.3);
+    background: #050510;
     color: #ffffff;
 }
 
-/* =========================================
-   [C] State Axis: Current status?
-   ========================================= */
-.ui-style--matte .is-inactive {
-    background: transparent !important;
-    /* Border identity persists from flavor */
+/* --- [A] item-card: Matte Expression --- */
+.ui-style--matte .ui-item-card {
+    background: rgba(22, 24, 37, 0.85); /* Pure matte surface */
+    border: var(--border-width) solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-standard);
+    padding: 4px var(--space-double);
+    --category-color: var(--color-theme-main);
+    position: relative;
 }
 
-.ui-style--matte .ui-button:disabled,
-.ui-style--matte .is-disabled {
-    background: transparent !important;
-    color: rgba(255, 255, 255, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: none;
-    pointer-events: none;
-    transform: none;
-    filter: grayscale(1);
-    opacity: 0.5;
+/* Individual Layer (Style): Hover expression for clickable cards */
+.ui-style--matte .ui-item-card.is-clickable:hover {
+    background: color-mix(in srgb, var(--category-color), transparent 85%);
+    border-color: color-mix(in srgb, var(--category-color), transparent 40%);
 }
 
-/* =========================================
-   [D] Flavor Axis: Category Themes
-   ========================================= */
-.ui-style--matte .is-contract  { --current-color: var(--color-num-contract); }
-.ui-style--matte .is-score     { --current-color: var(--color-num-score); }
-.ui-style--matte .is-sector    { --current-color: var(--color-num-sector); }
-.ui-style--matte .is-collected { --current-color: var(--color-num-item-count); }
-.ui-style--matte .is-special   { --current-color: var(--color-sub); } /* Accent Blue */
+/* Axis-D: Flavor Visualization (Category Colors) */
+.ui-style--matte .ui-item-card.is-logic    { border-left: 4px solid var(--color-category-logic); --category-color: var(--color-category-logic); }
+.ui-style--matte .ui-item-card.is-chassis  { border-left: 4px solid var(--color-category-chassis); --category-color: var(--color-category-chassis); }
+.ui-style--matte .ui-item-card.is-module   { border-left: 4px solid var(--color-category-module); --category-color: var(--color-category-module); }
+.ui-style--matte .ui-item-card.is-rockets  { border-left: 4px solid var(--color-category-rockets); --category-color: var(--color-category-rockets); }
+.ui-style--matte .ui-item-card.is-launchers { border-left: 4px solid var(--color-category-launchers); --category-color: var(--color-category-launchers); }
+.ui-style--matte .ui-item-card.is-boosters  { border-left: 4px solid var(--color-category-boosters); --category-color: var(--color-category-boosters); }
+.ui-style--matte .ui-item-card.is-coin      { border-left: 4px solid var(--color-category-coin); --category-color: var(--color-category-coin); }
+.ui-style--matte .ui-item-card.is-cargo     { border-left: 4px solid var(--color-category-cargo); --category-color: var(--color-category-cargo); }
 
-/* Legacy / Individual Flavor Mappings */
-.ui-button.is-repair  { --current-color: var(--color-facility-repair); }
-.ui-button.is-trade   { --current-color: var(--color-facility-trade); }
-.ui-button.is-market  { --current-color: var(--color-facility-market); }
-.ui-button.is-sell    { --current-color: var(--color-category-logic); }
-.ui-button.is-retry   { --current-color: var(--color-status-gameover); }
+/* Typography */
+.ui-style--matte .card-title {
+    color: #ffffff;
+    font-weight: 800;
+}
 
-/* --- Sub Components (Maintained) --- */
-.ui-style--matte .ui-button.is-small { padding: 4px 16px; font-size: 10px; }
+/* --- Component Style: Badges --- */
 
-/* Stat Box (Numeric) in Matte */
-.ui-style--matte .ui-stat-box .stat-label {
+/* Style Layer: Matte texture for general badges */
+.ui-style--matte .ui-badge {
+    background: rgba(255, 255, 255, 0.1); 
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Style Layer (Specialization): Stack Badge color expression */
+.ui-style--matte .stack-badge {
+    background: var(--category-color);
+    color: #050510;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* --- Components: Durability Gauge --- */
+
+.ui-style--matte .durability-gauge {
+    background: rgba(0, 0, 0, 0.5); 
+    padding: 1px;
+}
+
+/* Individual Layer (Style): Enhanced state visuals (Gold frame) */
+.ui-style--matte .durability-gauge.is-enhanced {
+    border: 1px solid #ffd700;
+    padding: 3px; 
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.ui-style--matte .durability-unit {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ui-style--matte .durability-unit.is-active {
+    background: var(--color-theme-main);
+}
+
+/* Props & Descriptions */
+.ui-style--matte .card-description {
+    color: rgba(255, 255, 255, 0.6); 
+    line-height: 1.25;
+}
+
+.ui-style--matte .card-prop {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Individual Layer (Style): Enhanced Property visuals (Azure) */
+.ui-style--matte .card-prop.is-enhanced {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.ui-style--matte .card-prop.is-enhanced .card-prop-value {
+    color: #00d4ff;
+}
+
+/* Composite Elements: Rocket Detail area divider */
+.ui-style--matte .rocket-details {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ui-style--matte .rocket-module-name {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.ui-style--matte .ui-stat-box .stat-value {
-    font-size: 2rem;
-    font-weight: 900;
-}
-
-/* Contextual Components: Badge (Matte variants) */
-.ui-style--matte .ui-badge.is-danger {
-    background: #ff3366;
-    color: #ffffff;
-}
-
-.ui-style--matte .ui-badge.is-outline {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* Interaction for Matte Clickables */
-.ui-style--matte .clickable:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.6);
-    color: #ffffff;
-}
-
-@keyframes discountPulse {
-    0%, 100% { transform: rotate(10deg) scale(1); filter: brightness(1); }
-    50% { transform: rotate(10deg) scale(1.05); filter: brightness(1.2); }
-}
-
-.ui-style--matte .ui-badge.is-sticker {
-    background: #444; color: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.2);
-}
-.ui-style--matte .ui-badge.is-sticker[data-level="low"] { background: linear-gradient(135deg, #a1887f, #8d6e63); }
-.ui-style--matte .ui-badge.is-sticker[data-level="mid"] { background: linear-gradient(135deg, #ff5722, #f44336); }
-.ui-style--matte .ui-badge.is-sticker[data-level="high"] { 
-    background: linear-gradient(135deg, #e91e63, #9c27b0); 
-    animation: discountPulse 1.5s infinite ease-in-out;
-}
-
-.ui-style--matte .facility-name {
-    text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.5);
 }
