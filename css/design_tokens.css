@@ -55,9 +55,12 @@
     --blur: 12px;
     --z-hud: 100;
 
-    /* Semantic Colors */
-    --color-num-score: var(--color-primary);
-    --color-num-coin: var(--color-coin);
+    /* Semantic Colors (Data Categories) */
+    --color-num-contract:   #e1b2e4; /* Lavender: Achievements/Contracts */
+    --color-num-score:      var(--color-primary); /* Mint-Cyan: Performance */
+    --color-num-sector:     #4488ff; /* Traversal Blue: Distance/Traversal */
+    --color-num-item-count: #fcd384; /* Soft Amber: Resource/Collected */
+    --color-num-coin:       var(--color-coin);
 
     /* Text Glow Levels (Required by Neon Style) */
     --glow-text-high: 0 0 2px var(--ui-glow-color, currentColor), 0 0 8px var(--ui-glow-color, currentColor), 0 0 15px var(--ui-glow-color, currentColor);

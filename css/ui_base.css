@@ -138,10 +138,17 @@ body, html {
 /* --- Semantic Numbers --- */
 .num-score { color: var(--color-num-score); }
 .num-sector { color: var(--color-num-sector); }
-.num-coin { color: var(--color-num-coin); }
 .num-item-count { color: var(--color-num-item-count); }
+.num-coin { color: var(--color-num-coin); }
+.num-contract { color: var(--color-num-contract); }
 
-.num-score, .num-sector, .num-coin, .num-item-count { 
+/* --- Global Capabilities --- */
+.ui-button,
+.is-clickable {
+    cursor: pointer;
+}
+
+.num-score, .num-sector, .num-coin, .num-item-count, .num-contract { 
     letter-spacing: 0.02em;
     font-weight: 900; /* 重厚な数値を共通化 */
     font-family: var(--font-num-primary);
