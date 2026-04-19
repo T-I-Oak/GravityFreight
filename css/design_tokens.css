@@ -4,55 +4,99 @@
    ========================================= */
 
 :root {
-    /* Theme Colors
+   /* Base Surface & Text
+       The fundamental canvas of the application. */
+   --color-bg-base: #050510;
+   /* Deep Space Black */
+   --color-text-base: #ffffff;
+   /* Primary font color (white by default) */
+
+   /* Theme Colors
        The core visual identity of the project. */
-    --color-theme-main:            #00ffcc; /* Mint Cyan: Primary Brand Color */
-    --color-theme-sub:             #4488ff; /* Traversal Blue: Secondary Brand Color */
+   --color-theme-main: #00ffcc;
+   /* Mint Cyan: Primary Brand Color */
+   --color-theme-sub: #4488ff;
+   /* Traversal Blue: Secondary Brand Color */
 
-    /* Facility Colors
+   /* Facility Colors
        Fixed pillars of the station environment. */
-    --color-facility-trading-post: #00a62a; /* Commercial Green */
-    --color-facility-repair-dock:  #2979ff; /* Industrial Blue */
-    --color-facility-black-market: #cf1744; /* Prohibited Red */
+   --color-facility-trading-post: #00a62a;
+   /* Commercial Green */
+   --color-facility-repair-dock: #2979ff;
+   /* Industrial Blue */
+   --color-facility-black-market: #cf1744;
+   /* Prohibited Red */
 
-    /* Category Colors
+   /* Category Colors
        Balanced for visibility and logical identity.
        - Warm: Logic, Launchers (Active energy/spark)
        - Cool: Boosters, Modules (Passive/Electric tech)
        - Neutral: Chassis, Rockets, Cargo (Physical mass) */
-    --color-category-chassis:      #78909c; /* Steel: Structural base */
-    --color-category-logic:        #fdd835; /* Yellow: Intellectual spark */
-    --color-category-module:       #9575cd; /* Muted Purple: Internal hardware */
-    --color-category-rockets:      #b0bec5; /* Slate: Gliding projectile mass */
-    --color-category-launchers:    #ffa726; /* Orange: Launch force and ignition */
-    --color-category-boosters:     #00e5ff; /* Vivid Cyan: Kinetic pulse */
-    --color-category-coin:         #ffd700; /* Gold: Standard currency */
-    --color-category-cargo:        #607d8b; /* Concrete: Industrial freight */
+   --color-category-chassis: #78909c;
+   /* Steel: Structural base */
+   --color-category-logic: #fdd835;
+   /* Yellow: Intellectual spark */
+   --color-category-module: #9575cd;
+   /* Muted Purple: Internal hardware */
+   --color-category-rockets: #b0bec5;
+   /* Slate: Gliding projectile mass */
+   --color-category-launchers: #ffa726;
+   /* Orange: Launch force and ignition */
+   --color-category-boosters: #00e5ff;
+   /* Vivid Cyan: Kinetic pulse */
+   --color-category-coin: #ffd700;
+   /* Gold: Standard currency */
+   --color-category-cargo: #607d8b;
+   /* Concrete: Industrial freight */
 
-    /* Numeric Data Colors
+   /* Numeric Data Colors
        Derived tokens based on the semantic relationship of data types. */
-    --color-num-score:             var(--color-theme-main); 
-    --color-num-sector:            var(--color-theme-sub); 
-    --color-num-item-count:        var(--color-category-cargo); 
-    --color-num-contract:          #e1b2e4; /* Achievement: Independent */
-    --color-num-coin:              var(--color-category-coin);
+   --color-num-score: var(--color-theme-main);
+   --color-num-sector: var(--color-theme-sub);
+   --color-num-item-count: var(--color-category-cargo);
+   --color-num-contract: #e1b2e4;
+   /* Achievement: Independent */
+   --color-num-coin: var(--color-category-coin);
 
-    /* Visual Layout Tokens
+   /* Card Surface Tokens
+       Standard backgrounds and borders for item units. */
+   --color-bg-card: rgba(20, 25, 40, 0.95);
+   --color-border-card: rgba(255, 255, 255, 0.1);
+
+   /* Visual Layout Tokens
        Strictly minimized options to ensure standardization. */
-    --space-unit:                  8px;
-    --space-double:                16px;
+   --space-unit: 8px;
+   --space-double: 16px;
 
-    --radius-standard:             4px;
-    --radius-round:                50%;
+   --radius-standard: 4px;
+   --radius-pill: 100px;
+   /* Capsule shape for primary actions */
+   --radius-round: 50%;
 
-    --border-width:                1px;
+   --border-width: 1px;
 
-    /* Typography Tokens
+   /* Typography Tokens
        Limited to three levels of hierarchy. */
-    --font-main:                   'Inter', sans-serif;
-    --font-num:                    'Outfit', sans-serif;
+   --font-main: 'Inter', sans-serif;
+   --font-num: 'Outfit', sans-serif;
 
-    --text-size-title:             16px;
-    --text-size-main:              12px;
-    --text-size-caption:           10px;
+   --text-size-title: 16px;
+   --text-size-main: 12px;
+   --text-size-caption: 10px;
+
+   /* Z-Index Hierarchy
+       Managing the vertical stack of the UI. */
+   --z-world: 10;
+   --z-hud: 100;
+   --z-panel: 200;
+   --z-modal: 500;
+   --z-system: 900;
+
+   /* --- Effects & Motion --- */
+   --blur: 12px;
+   /* Glassmorphism diffusion strength */
+   --motion-fast: 150ms;
+   /* Snappy interaction feedback */
+   --motion-normal: 300ms;
+   /* Standard transition timing */
 }

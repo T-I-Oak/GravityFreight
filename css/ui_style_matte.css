@@ -9,49 +9,30 @@
     color: #ffffff;
 }
 
-/* --- [A] item-card: Matte Expression --- */
+/* --- [A] ui-item-card: Matte Expression --- */
 .ui-style--matte .ui-item-card {
-    background: rgba(22, 24, 37, 0.85); /* Pure matte surface */
-    border: var(--border-width) solid rgba(255, 255, 255, 0.12);
-    border-radius: var(--radius-standard);
-    padding: 4px var(--space-double);
-    --category-color: var(--color-theme-main);
-    position: relative;
+    --color-bg-card: #14192d;
+    --opacity-card-tint-top: 88%;
+    --opacity-card-tint-bottom: 92%;
+    --opacity-card-active-top: 75%;
+    --opacity-card-active-bottom: 85%;
 }
 
-/* Individual Layer (Style): Hover expression for clickable cards */
-.ui-style--matte .ui-item-card.is-clickable:hover {
-    background: color-mix(in srgb, var(--category-color), transparent 85%);
-    border-color: color-mix(in srgb, var(--category-color), transparent 40%);
-}
-
-/* Axis-D: Flavor Visualization (Category Colors) */
-.ui-style--matte .ui-item-card.is-logic    { border-left: 4px solid var(--color-category-logic); --category-color: var(--color-category-logic); }
-.ui-style--matte .ui-item-card.is-chassis  { border-left: 4px solid var(--color-category-chassis); --category-color: var(--color-category-chassis); }
-.ui-style--matte .ui-item-card.is-module   { border-left: 4px solid var(--color-category-module); --category-color: var(--color-category-module); }
-.ui-style--matte .ui-item-card.is-rockets  { border-left: 4px solid var(--color-category-rockets); --category-color: var(--color-category-rockets); }
-.ui-style--matte .ui-item-card.is-launchers { border-left: 4px solid var(--color-category-launchers); --category-color: var(--color-category-launchers); }
-.ui-style--matte .ui-item-card.is-boosters  { border-left: 4px solid var(--color-category-boosters); --category-color: var(--color-category-boosters); }
-.ui-style--matte .ui-item-card.is-coin      { border-left: 4px solid var(--color-category-coin); --category-color: var(--color-category-coin); }
-.ui-style--matte .ui-item-card.is-cargo     { border-left: 4px solid var(--color-category-cargo); --category-color: var(--color-category-cargo); }
-
-/* Typography */
-.ui-style--matte .card-title {
-    color: #ffffff;
-    font-weight: 800;
-}
+/* Axis-D: Flavor Visualization (Category Color Borders) 
+   Structural identification via solid indicator from base. */
+/* No specific overrides needed for Matte indicator beyond base logic */
 
 /* --- Component Style: Badges --- */
 
 /* Style Layer: Matte texture for general badges */
 .ui-style--matte .ui-badge {
-    background: rgba(255, 255, 255, 0.1); 
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 0.8);
 }
 
 /* Style Layer (Specialization): Stack Badge color expression */
-.ui-style--matte .stack-badge {
+.ui-style--matte .ui-badge.is-stack {
     background: var(--category-color);
     color: #050510;
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -59,47 +40,17 @@
 
 /* --- Components: Durability Gauge --- */
 
-.ui-style--matte .durability-gauge {
-    background: rgba(0, 0, 0, 0.5); 
-    padding: 1px;
-}
-
-/* Individual Layer (Style): Enhanced state visuals (Gold frame) */
-.ui-style--matte .durability-gauge.is-enhanced {
-    border: 1px solid #ffd700;
-    padding: 3px; 
-    background: rgba(255, 215, 0, 0.05);
-}
-
-.ui-style--matte .durability-unit {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.ui-style--matte .durability-unit.is-active {
-    background: var(--color-theme-main);
-}
+/* --- Components: Durability Gauge (Overrides Disabled) --- */
 
 /* Props & Descriptions */
-.ui-style--matte .card-description {
-    color: rgba(255, 255, 255, 0.6); 
+.ui-style--matte .ui-item-card__description {
+    color: rgba(255, 255, 255, 0.6);
     line-height: 1.25;
 }
 
-.ui-style--matte .card-prop {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
+/* Property Overrides (Disabled) */
 
-/* Individual Layer (Style): Enhanced Property visuals (Azure) */
-.ui-style--matte .card-prop.is-enhanced {
-    border-color: #00d4ff;
-    background: rgba(0, 212, 255, 0.1);
-}
-
-.ui-style--matte .card-prop.is-enhanced .card-prop-value {
-    color: #00d4ff;
-}
+/* Enhanced visuals unified in base */
 
 /* Composite Elements: Rocket Detail area divider */
 .ui-style--matte .rocket-details {

@@ -2,13 +2,29 @@
 
 本バックログは、新設された `design_philosophy.md` に基づき、UIシステムと各画面をゼロから再定義・再構築するためのものである。
 
+## Completed (完了)
+- [x] **Phase 1: Foundation (基盤再構築)**: アイテムカードの標準化とレイヤー分離
+    - 3層レイヤー設計（Base/Style/Context）をアイテムカードに厳密適用。
+    - `background-image` と `color-mix` によるテーマ別の動的配色システムの構築。
+    - `is-mini` コンポーネント（ゲージ・バッジ）による高密度表示への対応。
+- [x] **Phase 1-2: Style Layer (Neon)**: `ui_style_neon.css` の再構築完了
+    - 透過背景と発光エフェクトの最適化。
+- [x] **Phase 2: Play Screen (プレイ画面) - テーマ再構築**
+    - **HUD**: ロゴ、統計値、メールアイコン（活性/非活性）の質感と配置の最適化。
+    - **Inventory Panel**: パネル構造（`.ui-panel`）の導入、セクションの整理。
+    - **Item Cards**: 新標準カード（`.ui-item-card`）による全カテゴリーの動的描画化。
+
 ## Phase 1: Foundation (基盤再構築)
-- [/] **Design Tokens の再定義**: `design_tokens.css` を意味論に基づき継続的に清書中
-- [/] **Base Capabilities の確立**: `ui_base.css` に共通の振る舞いを集約中
-- [/] **Matte Style Layer の再構築**: `ui_style_matte.css` を再定義中
+- [x] **Design Tokens の再定義**: `design_tokens.css` を意味論に基づき清書完了。
+- [x] **Base Capabilities の確立**: `ui_base.css` に共通の振る舞いを集約完了。
+- [/] **Style Layer の構築**: 各ビジュアルスタイルを再定義
+    - [x] **Matte Style Layer**: `ui_style_matte.css` (カード背景・質感の定義完了)
+    - [ ] **Printing Style Layer**: `ui_style_printing.css` (新規/再構築)
 
 ## Phase 2: Scene Reconstruction (各画面の再構築)
 各画面を新しい4軸モデルとレイヤー構造で順次再定義する。
+- [ ] **Title Screen (タイトル画面)**: 再定義
+- [ ] **Story Modal (ストーリーモーダル)**: 再定義
 - [ ] **Analytic Archive (記録画面)**: 
     *   モックアップの清書（HTML/CSS構造の最適化）
     *   機能仕様の確定

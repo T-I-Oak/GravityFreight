@@ -1,0 +1,122 @@
+/* =========================================
+   Gravity Freight V2: Play Scene Layout
+   Layer: Context / Individual
+   Focus: Screen-specific positioning and HUD structure
+   ========================================= */
+
+#play-scene-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- 1. HUD Layout --- */
+#play-hud {
+    position: absolute;
+    top: var(--space-double);
+    left: var(--space-double);
+    display: flex;
+    flex-direction: column;
+    z-index: var(--z-hud);
+    min-width: 320px;
+    pointer-events: none; /* Allow clicks to pass through empty space */
+}
+
+#play-hud > * {
+    pointer-events: auto; /* Ensure interactive elements capture input */
+}
+
+/* HUD Header: Horizontal alignment with tight branding integration */
+.hud-logo-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    padding: var(--space-double);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+}
+
+.ui-panel__body {
+    padding: var(--space-double);
+}
+
+/* Logic: Grouped message indicators with defined spatial density */
+.hud-messages {
+    display: flex;
+    gap: 4px;
+}
+
+.hud-stats {
+    display: flex;
+    gap: var(--space-double);
+    padding: var(--space-double);
+}
+
+.ui-stat-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: var(--text-size-caption);
+    font-weight: 800;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+}
+
+.stat-value {
+    font-family: var(--font-num);
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+/* --- 2. Main Game Viewport --- */
+#play-screen {
+    flex: 1;
+    position: relative;
+    z-index: var(--z-world);
+}
+
+.play-viewport {
+    width: 100%;
+    height: 100%;
+}
+
+/* --- 3. Sidebar (Inventory Panel) --- */
+#inventory-panel {
+    position: absolute;
+    top: var(--space-double);
+    right: var(--space-double);
+    bottom: 108px; /* Adjusted to sit above the 76px action button + double spacing */
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    z-index: var(--z-panel);
+}
+
+/* --- 4. Bottom Action Dock --- */
+/* Positioned at bottom-right corner, aligned perfectly with the build panel width. */
+.action-dock {
+    position: absolute;
+    bottom: var(--space-double);
+    right: var(--space-double);
+    width: 340px;
+    display: flex;
+    justify-content: center;
+    z-index: var(--z-panel);
+}
+
+/* --- 5. Global Footer --- */
+.ui-footer {
+    position: absolute;
+    bottom: var(--space-unit);
+    left: var(--space-double);
+    display: flex;
+    gap: var(--space-double);
+    font-size: var(--text-size-caption);
+    opacity: 0.3;
+    z-index: var(--z-hud);
+}

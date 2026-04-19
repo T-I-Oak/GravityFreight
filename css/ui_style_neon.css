@@ -1,5 +1,430 @@
-/* Gravity Freight V2: Neon Style Layer (Skeleton)
-   Design and texture values to be defined. */
+/* =========================================
+   Gravity Freight V2: Neon Style Layer
+   Layer: Style / Aesthetic (Emissive)
+   Focus: Cyber-glow, vibrant colors, scanned textures
+   ========================================= */
+
 .ui-style--neon {
-    /* TODO: Define Neon specific expressions */
+    color: #ffffff;
+}
+
+/* --- [A] Base Panel: Neon Expression --- */
+.ui-style--neon .ui-panel {
+    background: rgba(10, 20, 40, 0.4);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Logic: Panel "De-materialization" for minimal HUD footprint when inactive */
+.ui-style--neon .ui-panel.is-collapsed {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.ui-style--neon .ui-panel.is-collapsed .ui-tab-group {
+    visibility: hidden;
+    /* Removing info-clutter while keeping toggle */
+}
+
+/* --- [B] HUD Specific Style --- */
+
+.ui-style--neon .ui-title-box {
+    text-align: center;
+}
+
+/* Logo Flavor Expression: White core with multi-layered cyan bloom for depth */
+.ui-style--neon .is-logo.text-display {
+    text-shadow:
+        0 0 10px rgba(0, 212, 255, 0.8),
+        0 0 20px rgba(0, 212, 255, 0.4),
+        0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.ui-style--neon .is-logo.text-sub-display {
+    text-shadow:
+        0 0 15px rgba(0, 212, 255, 0.6),
+        0 0 30px rgba(0, 212, 255, 0.3);
+}
+
+.ui-style--neon .stat-label {
+    color: #ffffff;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    opacity: 0.25;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+/* Axis-D: Flavor-based glows to emphasize data identity */
+.ui-style--neon .num-sector {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.ui-style--neon .num-coin {
+    text-shadow: 0 0 8px var(--color-num-coin);
+}
+
+.ui-style--neon .num-score {
+    text-shadow: 0 0 8px var(--color-num-score);
+}
+
+.ui-style--neon .ui-panel__header {
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Logical Reset: Ensuring the entire surface vanishes upon collapse */
+.ui-style--neon .ui-panel.is-collapsed .ui-panel__header {
+    background: transparent;
+    border-bottom: none;
+}
+
+.ui-style--neon .ui-tab {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Hover: Subtle surface activation */
+.ui-style--neon .ui-tab:hover:not(.is-active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Active Highlight: Deep-linked thematic signaling with bloom effect */
+.ui-style--neon .ui-tab.is-active {
+    background: color-mix(in srgb, var(--color-theme-sub), transparent 85%);
+    color: var(--color-theme-sub);
+    box-shadow: inset 0 -2px 0 var(--color-theme-sub);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--color-theme-sub), transparent 40%);
+}
+
+/* --- ui-item-card: Neon Expression --- */
+.ui-style--neon .ui-item-card {
+    --color-bg-card: rgba(20, 25, 40, 0.5);
+    --opacity-card-tint-top: 88%;
+    --opacity-card-tint-bottom: 92%;
+    --opacity-card-active-top: 70%;
+    --opacity-card-active-bottom: 80%;
+}
+
+.ui-style--neon .ui-item-card__title {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.ui-style--neon .ui-item-card__description {
+    margin-bottom: 2px;
+}
+
+/* --- Durability Gauge (Overrides Disabled) --- */
+
+/* Footer & Layout Sync with Base */
+
+.ui-style--neon .ui-item-card__prop-group {
+    display: flex;
+    gap: var(--space-double);
+}
+
+/* Property structure unified in base */
+
+.ui-style--neon .ui-item-card__prop-value {
+    color: #ffffff;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Rocket Module List: Specific nested information for complex assemblies */
+.ui-style--neon .rocket-details {
+    margin-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 6px;
+}
+
+.ui-style--neon .rocket-module-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2px;
+}
+
+/* Section Header Decoration: High-density labeling using category color signals */
+.ui-style--neon .ui-section-header {
+    border-left: none;
+    /* Removed as per user request */
+    margin: 12px 0 6px 0;
+    /* Reduced padding/margin for better density */
+    padding-left: 0;
+}
+
+.ui-style--neon .ui-section-title {
+    color: var(--category-color, var(--color-theme-sub));
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--category-color, var(--color-theme-sub)), transparent 40%);
+}
+
+/* Category Color Contexts for Section Titles - Now Inherited from global .is-xxx */
+
+/* UI Placeholder: High-contrast guidance for empty states */
+.ui-style--neon .ui-item-placeholder {
+    padding: var(--space-double);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.02);
+    text-align: center;
+    border-radius: var(--radius-standard);
+    transition: all 0.2s ease;
+}
+
+.ui-style--neon .ui-item-placeholder.is-clickable:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(4px);
+}
+
+/* Scrollbar: Functional glow to aid vertical navigation */
+.ui-style--neon .ui-scrollable::-webkit-scrollbar {
+    width: 4px;
+}
+
+.ui-style--neon .ui-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ui-style--neon .ui-scrollable::-webkit-scrollbar-thumb {
+    background: var(--color-theme-main);
+    box-shadow: 0 0 10px var(--color-theme-main);
+}
+
+/* --- 6. Interaction Layer: High-Visibility Action Controllers --- */
+
+/* Big Action Buttons: Large-scale tactile feedback for critical mission phases */
+.ui-style--neon .is-launch,
+.ui-style--neon .is-assembly {
+    height: 76px;
+    padding: 10px 8px;
+    border-radius: var(--radius-pill);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+
+    background: color-mix(in srgb, var(--current-color), transparent 90%);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 60%);
+    color: var(--current-color);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 85%);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 30%);
+
+    transition: all var(--motion-fast);
+    cursor: pointer;
+    backdrop-filter: blur(var(--blur));
+    width: 100%;
+    /* Default for panel context */
+}
+
+/* Contextual: Buttons inside a Dock inherit the heavy glass look of panels 
+   for a unified "detached floating console" aesthetic. */
+.ui-style--neon .action-dock .ui-button {
+    background: rgba(10, 20, 40, 0.4);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid color-mix(in srgb, var(--current-color, var(--color-theme-main)), transparent 60%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 10px color-mix(in srgb, var(--current-color, var(--color-theme-main)), transparent 90%);
+}
+
+/* Individual Logic: Phase-distinct signatures (V1-compliant color mapping) */
+.ui-style--neon .is-launch {
+    --current-color: var(--color-category-launchers);
+    /* Ignition Orange */
+    max-width: 400px;
+}
+
+.ui-style--neon .is-assembly {
+    --current-color: var(--color-theme-main);
+    /* Technological Cyan */
+}
+
+.ui-style--neon .is-launch .btn-main-label,
+.ui-style--neon .is-assembly .btn-main-label {
+    font-size: 16px;
+    font-weight: 950;
+    letter-spacing: 0.05em;
+}
+
+.ui-style--neon .is-launch .btn-sub-label,
+.ui-style--neon .is-assembly .btn-sub-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    opacity: 0.8;
+}
+
+/* 4. HOVER: Luminance Amplification (Multi-layered Bloom) 
+   Text and border ignite into pure white (#fff) for high-energy feedback. */
+.ui-style--neon .ui-button:hover:not(.is-disabled),
+.ui-style--neon .is-launch:hover:not(.is-disabled),
+.ui-style--neon .is-assembly:hover:not(.is-disabled) {
+    background: color-mix(in srgb, var(--local-color), transparent 70%);
+    color: #ffffff;
+    border-color: #ffffff;
+    box-shadow:
+        0 0 10px #ffffff,
+        0 0 30px var(--local-color),
+        0 0 50px var(--local-color);
+    text-shadow: 0 0 10px #ffffff;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+/* 5. DISABLED / OFF: Thermal Throttling / Power-Down state */
+.ui-style--neon .is-launch.is-disabled,
+.ui-style--neon .is-assembly.is-disabled {
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 90%);
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.ui-style--neon .is-launch.is-disabled .btn-main-label,
+.ui-style--neon .is-assembly.is-disabled .btn-main-label {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+.ui-style--neon .is-launch.is-disabled .btn-sub-label,
+.ui-style--neon .is-assembly.is-disabled .btn-sub-label {
+    color: rgba(255, 255, 255, 0.1);
+}
+
+/* 6. DISABLED + NOTABLE (Guide Awareness Pulse) */
+.ui-style--neon .is-launch.is-disabled.is-notable .btn-sub-label,
+.ui-style--neon .is-assembly.is-disabled.is-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: ui-guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+@keyframes ui-guide-pulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.98);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Panel Controls: Visual density for utility icons */
+.ui-style--neon .panel-toggle {
+    width: 24px;
+    height: 24px;
+    margin: 4px;
+    /* Providing breathing room within the header */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-standard);
+    color: color-mix(in srgb, var(--color-theme-sub), transparent 40%);
+    transition: all 0.2s ease;
+}
+
+.ui-style--neon .panel-toggle:hover {
+    color: #ffffff;
+    border-color: var(--color-theme-sub);
+    background: color-mix(in srgb, var(--color-theme-sub), transparent 80%);
+    box-shadow: 0 0 15px var(--color-theme-sub);
+}
+
+/* Action Dock: Semantic wrapper for positioning primary gameplay triggers. 
+   Visual styling is omitted to keep the focus on the buttons themselves. */
+.ui-style--neon .action-dock {
+    background: none;
+    padding: 0;
+}
+
+/* Generic Reactive Button: Dynamic coloration based on context/category colors */
+.ui-style--neon .ui-button {
+    --local-color: var(--current-color, var(--color-theme-main));
+    background: color-mix(in srgb, var(--local-color), transparent 90%);
+    border: 1px solid var(--local-color);
+    color: var(--local-color);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--local-color), transparent 40%);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--local-color), transparent 80%);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 800;
+}
+
+.ui-style--neon .ui-button.is-primary {
+    border-width: 3px;
+    font-weight: 900;
+}
+
+/* Message Icons */
+.ui-style--neon .msg-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    /* Controls .ui-icon size via 1.2em */
+    padding: 0;
+    /* Spacing exclusively managed by gap in layout layer */
+    transition: all 0.2s ease;
+}
+
+.ui-style--neon .msg-icon.is-trading-post {
+    color: var(--color-facility-trading-post);
+}
+
+.ui-style--neon .msg-icon.is-repair-dock {
+    color: var(--color-facility-repair-dock);
+}
+
+.ui-style--neon .msg-icon.is-disabled {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+/* Resource Badges: High-feedback markers for data counting with V1 black-core aesthetic */
+.ui-style--neon .ui-badge.is-stack {
+    background: var(--category-color, var(--color-theme-main));
+    color: #050510;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--category-color, var(--color-theme-main)), transparent 40%);
+    text-shadow: none;
+    /* Black text must stay crisp */
+}
+
+/* Apply pulse to the icon itself */
+.ui-style--neon .msg-icon.has-new .ui-icon {
+    animation: neon-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes neon-pulse {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        filter: drop-shadow(0 0 2px currentColor);
+    }
+
+    50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 8px currentColor) brightness(1.5);
+    }
 }
