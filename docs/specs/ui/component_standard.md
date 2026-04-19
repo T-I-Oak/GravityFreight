@@ -25,8 +25,10 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
 ## 2. 主要コンポーネント定義
 
 ### 2.1 Item Card (アイテムカード)
-- **タグ構造**: `<article class="ui-item-card is-clickable is-active is-[category]">`
+- **タグ構造**: `<article class="ui-item-card is-clickable is-active is-[category] is-rarity-[n]" data-id="..." data-uid="...">`
 - **主要な挙動**:
+    - **識別属性**: システム連携のため、アイテムID (`data-id`) とインスタンスID (`data-uid`) を属性として保持することを必須とする。
+    - **レアリティ表現**: レアリティに応じた配色を行う場合、`is-rarity-[0-4]` クラスを付与し、スタイルレイヤーで色を定義する。
     - **ホバー・フィードバック**: `.is-clickable` 時のみ明るさの強調(brightness(1.15))と、枠線の強調を行う。
     - **選択状態 (`.is-active`)**: カテゴリカラーを背景に強く(15〜25%)合成し、枠線を明るく強調する。
     - **背景合成 (Tint)**: `ui_base.css` の `color-mix` とスタイルレイヤーの変数により、透過/不透過を切り替える。
@@ -88,3 +90,12 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
 ### 4.4 複合構造プロパティ (Composition)
 - `modules` (Array<Object>, optional): ロケット等に含まれる内包モジュールのリスト。
     - 各要素は `{ name, maxCharges, charges, count }` を持ち、カード下部の `.rocket-details` エリアに高密度表示される。
+
+### 4.5 標準プロパティラベル (Standard Labels)
+UI上で表示する各種パラメータのラベルは、以下の表記に統一する。
+- `SLOTS`: 拡張スロット数。
+- `PRECISION`: 命中精度/制御精度。
+- `MASS`: 重量（kg等）。
+- `POWER`: 出力/推力。
+- `ENERGY`: 消費電力/燃料。
+- `GRAVITY`: 重力軽減率等の物理パラメータ。
