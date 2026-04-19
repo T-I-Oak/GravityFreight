@@ -74,11 +74,10 @@ export class UIComponents {
         }
 
         // Final Assembly
-        const rarityClass = item.rarity !== undefined ? `is-rarity-${item.rarity}` : 'is-rarity-0';
         const instanceId = item.uid || '';
 
         return `
-            <article class="ui-item-card ${clickableClass} ${categoryClass} ${activeClass} ${rarityClass}" 
+            <article class="ui-item-card ${clickableClass} ${categoryClass} ${activeClass}" 
                      data-id="${item.id}" 
                      data-uid="${instanceId}">
                 ${headerHTML}

@@ -25,10 +25,9 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
 ## 2. 主要コンポーネント定義
 
 ### 2.1 Item Card (アイテムカード)
-- **タグ構造**: `<article class="ui-item-card is-clickable is-active is-[category] is-rarity-[n]" data-id="..." data-uid="...">`
+- **タグ構造**: `<article class="ui-item-card is-clickable is-active is-[category]" data-id="..." data-uid="...">`
 - **主要な挙動**:
     - **識別属性**: システム連携のため、アイテムID (`data-id`) とインスタンスID (`data-uid`) を属性として保持することを必須とする。
-    - **レアリティ表現**: レアリティに応じた配色を行う場合、`is-rarity-[0-4]` クラスを付与し、スタイルレイヤーで色を定義する。
     - **ホバー・フィードバック**: `.is-clickable` 時のみ明るさの強調(brightness(1.15))と、枠線の強調を行う。
     - **選択状態 (`.is-active`)**: カテゴリカラーを背景に強く(15〜25%)合成し、枠線を明るく強調する。
     - **背景合成 (Tint)**: `ui_base.css` の `color-mix` とスタイルレイヤーの変数により、透過/不透過を切り替える。
@@ -76,7 +75,7 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
 - `name` (string): 表示名称。
 - `category` (string): カテゴリー識別子（`chassis`, `logic`, `launcher`, `module`, `booster`, `coin`, `cargo`, `rocket`）。これに基づき CSS 変数 `--category-color` が適用される。
 - `description` (string, optional): 説明文。存在しない場合はレンダリングをスキップする。
-- `rarity` (number, optional): レアリティ定数。ヘッダーの配色等に影響。
+- `rarity` (number, optional): レアリティ定数。
 
 ### 4.2 状態・計測プロパティ (Status & Metrics)
 - `count` (number, optional): スタック数。2以上の場合に右上に `.is-stack` バッジを表示。
