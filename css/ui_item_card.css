@@ -34,6 +34,10 @@
     cursor: pointer;
 }
 
+.ui-item-card.is-clickable:hover {
+    filter: brightness(1.1);
+}
+
 /* Category indicator bar: Shared structure for all themes */
 .ui-item-card::before {
     content: '';
