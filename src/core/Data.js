@@ -22,25 +22,6 @@ export const RARITY_PRICES = {
 
 export const ANIMATION_DURATION = 1200; // ミリ秒単位
 
-// カテゴリ別のイメージカラー定義（Data.js オリジナルのアイデンティティを保持）
-export const CATEGORY_COLORS = {
-    CHASSIS: '#90a4ae',
-    LOGIC: '#4488ff',
-    LAUNCHERS: '#4caf50',
-    MODULES: '#9c27b0',
-    BOOSTERS: '#8d6e63',
-    ROCKETS: '#81ecec',
-    COIN: '#ffd700',
-    CARGO: '#00e5ff',
-    MARKET: '#ff4d4d'
-};
-
-export const GOAL_COLORS = {
-    TRADING_POST: '#00e676',
-    REPAIR_DOCK: '#2979ff',
-    BLACK_MARKET: '#ff1744'
-};
-
 export const GOAL_NAMES = {
     TRADING_POST: 'TRADING POST',
     REPAIR_DOCK: 'REPAIR DOCK',
@@ -80,30 +61,11 @@ export const MAP_CONSTANTS = {
     STAR_HIT_MARGIN: 15
 };
 
-// UI・エフェクト用カラー定義
-export const UI_COLORS = {
-    BG: '#050510',
-    HOME_STAR: '#ff6600',
-    HOME_STAR_GLOW: '#ff3300',
-    NORMAL_STAR: '#ffcc00',
-    NORMAL_STAR_GLOW: 'rgba(255,204,0,0.5)',
-    BOUNDARY: 'rgba(255, 255, 255, 0.1)',
-    SCANNER: 'rgba(0, 255, 204, 1.0)',
-    SCANNER_FILL: 'rgba(0, 255, 204, 0.15)',
-    TRAIL: 'rgba(255, 255, 255, 1.0)',
-    PREDICTION: 'rgba(255, 255, 255, 0.6)',
-    REPULSIVE_STAR: '#e100ff',
-    REPULSIVE_STAR_GLOW: 'rgba(225, 0, 255, 0.5)'
-};
-
-// 実績UI用カラー
-export const ACHIEVEMENT_TIER_COLORS = ['#10b981', '#3b82f6', '#d4af37'];
-
 // 施設情報の定義と共通ユーティリティ (v0.34.0)
 export const FACILITY_INFO = {
-    TRADING_POST: { id: 'T', type: 'TRADING_POST', name: 'TRADING POST', color: '#00e676', icon: 'T' },
-    REPAIR_DOCK: { id: 'R', type: 'REPAIR_DOCK', name: 'REPAIR DOCK', color: '#2979ff', icon: 'R' },
-    BLACK_MARKET: { id: 'B', type: 'BLACK_MARKET', name: 'BLACK MARKET', color: '#ff1744', icon: 'B' }
+    TRADING_POST: { id: 'T', type: 'TRADING_POST', name: 'TRADING POST', icon: 'T' },
+    REPAIR_DOCK: { id: 'R', type: 'REPAIR_DOCK', name: 'REPAIR DOCK', icon: 'R' },
+    BLACK_MARKET: { id: 'B', type: 'BLACK_MARKET', name: 'BLACK MARKET', icon: 'B' }
 };
 
 export const getFacilityById = (id) => Object.values(FACILITY_INFO).find(f => f.id === id);

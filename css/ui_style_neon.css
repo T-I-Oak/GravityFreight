@@ -190,144 +190,60 @@
     transform: translateX(4px);
 }
 
-/* Scrollbar: Functional glow to aid vertical navigation */
-.ui-style--neon .ui-scrollable::-webkit-scrollbar {
-    width: 4px;
-}
 
-.ui-style--neon .ui-scrollable::-webkit-scrollbar-track {
-    background: transparent;
-}
+/* --- 6. Interaction Layer: Button Aesthetics --- */
 
-.ui-style--neon .ui-scrollable::-webkit-scrollbar-thumb {
-    background: var(--color-theme-main);
-    box-shadow: 0 0 10px var(--color-theme-main);
-}
-
-/* --- 6. Interaction Layer: High-Visibility Action Controllers --- */
-
-/* Big Action Buttons: Large-scale tactile feedback for critical mission phases */
-.ui-style--neon .is-launch,
-.ui-style--neon .is-assembly {
-    height: 76px;
-    padding: 10px 8px;
-    border-radius: var(--radius-pill);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 2px;
-
+/* Base Neon Button: Interactive glow and semi-transparent surface */
+.ui-style--neon .ui-button {
     background: color-mix(in srgb, var(--current-color), transparent 90%);
     border: 1px solid color-mix(in srgb, var(--current-color), transparent 60%);
     color: var(--current-color);
-    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 85%);
-    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 30%);
-
-    transition: all var(--motion-fast);
-    cursor: pointer;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 90%);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 40%);
     backdrop-filter: blur(var(--blur));
-    width: 100%;
-    /* Default for panel context */
+    transition: all var(--motion-fast) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Contextual: Buttons inside a Dock inherit the heavy glass look of panels 
-   for a unified "detached floating console" aesthetic. */
-.ui-style--neon .action-dock .ui-button {
-    background: rgba(10, 20, 40, 0.4);
-    backdrop-filter: blur(var(--blur));
-    -webkit-backdrop-filter: blur(var(--blur));
-    border: 1px solid color-mix(in srgb, var(--current-color, var(--color-theme-main)), transparent 60%);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5),
-        inset 0 0 10px color-mix(in srgb, var(--current-color, var(--color-theme-main)), transparent 90%);
+.ui-style--neon .ui-button:hover:not(.is-disabled) {
+    background: color-mix(in srgb, var(--current-color), transparent 80%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 30%);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 70%);
+    transform: translateY(-1px);
 }
 
-/* Individual Logic: Phase-distinct signatures (V1-compliant color mapping) */
-.ui-style--neon .is-launch {
-    --current-color: var(--color-category-launchers);
-    /* Ignition Orange */
-    max-width: 400px;
+.ui-style--neon .ui-button:active:not(.is-disabled) {
+    transform: scale(0.98);
+    filter: brightness(1.2);
 }
 
-.ui-style--neon .is-assembly {
-    --current-color: var(--color-theme-main);
-    /* Technological Cyan */
+/* Primary Button: Enhanced visibility with brighter border and denser background */
+.ui-style--neon .ui-button.is-primary {
+    background: color-mix(in srgb, var(--current-color), transparent 80%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 40%);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--current-color), transparent 80%);
+    font-weight: 900;
 }
 
-.ui-style--neon .is-launch .btn-main-label,
-.ui-style--neon .is-assembly .btn-main-label {
-    font-size: 16px;
-    font-weight: 950;
-    letter-spacing: 0.05em;
+.ui-style--neon .ui-button.is-primary:hover:not(.is-disabled) {
+    background: color-mix(in srgb, var(--current-color), transparent 70%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 70%);
+    box-shadow: 0 0 25px color-mix(in srgb, var(--current-color), transparent 60%);
 }
 
-.ui-style--neon .is-launch .btn-sub-label,
-.ui-style--neon .is-assembly .btn-sub-label {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    opacity: 0.8;
-}
+/* Specific Signatures: Overriding colors based on context (Moved launch/assembly to play.css) */
+.ui-style--neon .is-repair { --current-color: var(--color-facility-repair-dock); }
+.ui-style--neon .is-trade { --current-color: var(--color-facility-trading-post); }
+.ui-style--neon .is-blackmarket { --current-color: var(--color-facility-black-market); }
 
-/* 4. HOVER: Luminance Amplification (Multi-layered Bloom) 
-   Text and border ignite into pure white (#fff) for high-energy feedback. */
-.ui-style--neon .ui-button:hover:not(.is-disabled),
-.ui-style--neon .is-launch:hover:not(.is-disabled),
-.ui-style--neon .is-assembly:hover:not(.is-disabled) {
-    background: color-mix(in srgb, var(--local-color), transparent 70%);
-    color: #ffffff;
-    border-color: #ffffff;
-    box-shadow:
-        0 0 10px #ffffff,
-        0 0 30px var(--local-color),
-        0 0 50px var(--local-color);
-    text-shadow: 0 0 10px #ffffff;
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-}
+/* --- 7. Individual Module Specifics (Removed from here, moved to Context layer) --- */
+
+/* --- 7. Status & State Layer --- */
 
 /* 5. DISABLED / OFF: Thermal Throttling / Power-Down state */
-.ui-style--neon .is-launch.is-disabled,
-.ui-style--neon .is-assembly.is-disabled {
+.ui-style--neon .ui-button.is-disabled {
+    filter: grayscale(0.8);
+    opacity: 0.5;
     cursor: not-allowed;
-    background: color-mix(in srgb, var(--current-color), transparent 96%);
-    border-color: color-mix(in srgb, var(--current-color), transparent 90%);
-    box-shadow: none;
-    text-shadow: none;
-}
-
-.ui-style--neon .is-launch.is-disabled .btn-main-label,
-.ui-style--neon .is-assembly.is-disabled .btn-main-label {
-    color: rgba(255, 255, 255, 0.15);
-}
-
-.ui-style--neon .is-launch.is-disabled .btn-sub-label,
-.ui-style--neon .is-assembly.is-disabled .btn-sub-label {
-    color: rgba(255, 255, 255, 0.1);
-}
-
-/* 6. DISABLED + NOTABLE (Guide Awareness Pulse) */
-.ui-style--neon .is-launch.is-disabled.is-notable .btn-sub-label,
-.ui-style--neon .is-assembly.is-disabled.is-notable .btn-sub-label {
-    color: var(--current-color);
-    text-shadow: 0 0 12px var(--current-color);
-    animation: ui-guide-pulse 2s infinite ease-in-out;
-    opacity: 1;
-}
-
-@keyframes ui-guide-pulse {
-
-    0%,
-    100% {
-        opacity: 0.3;
-        transform: scale(0.98);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1);
-    }
 }
 
 /* Panel Controls: Visual density for utility icons */
@@ -353,29 +269,8 @@
     box-shadow: 0 0 15px var(--color-theme-sub);
 }
 
-/* Action Dock: Semantic wrapper for positioning primary gameplay triggers. 
-   Visual styling is omitted to keep the focus on the buttons themselves. */
-.ui-style--neon .action-dock {
-    background: none;
-    padding: 0;
-}
 
-/* Generic Reactive Button: Dynamic coloration based on context/category colors */
-.ui-style--neon .ui-button {
-    --local-color: var(--current-color, var(--color-theme-main));
-    background: color-mix(in srgb, var(--local-color), transparent 90%);
-    border: 1px solid var(--local-color);
-    color: var(--local-color);
-    text-shadow: 0 0 8px color-mix(in srgb, var(--local-color), transparent 40%);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--local-color), transparent 80%);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 800;
-}
-
-.ui-style--neon .ui-button.is-primary {
-    border-width: 3px;
-    font-weight: 900;
-}
+/* Utilities & Indicators */
 
 /* Message Icons */
 .ui-style--neon .msg-icon {

@@ -29,7 +29,7 @@
 }
 
 /* HUD Header: Horizontal alignment with tight branding integration */
-.hud-logo-header {
+#play-hud .hud-logo-header {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -38,35 +38,35 @@
     border-bottom: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
 }
 
-.ui-panel__body {
+#play-scene-container .ui-panel__body {
     padding: var(--space-double);
 }
 
 /* Logic: Grouped message indicators with defined spatial density */
-.hud-messages {
+#play-hud .hud-messages {
     display: flex;
     gap: 4px;
 }
 
-.hud-stats {
+#play-hud .hud-stats {
     display: flex;
     gap: var(--space-double);
     padding: var(--space-double);
 }
 
-.ui-stat-box {
+#play-hud .ui-stat-box {
     display: flex;
     flex-direction: column;
 }
 
-.stat-label {
+#play-hud .stat-label {
     font-size: var(--text-size-caption);
     font-weight: 800;
     opacity: 0.6;
     letter-spacing: 0.05em;
 }
 
-.stat-value {
+#play-hud .stat-value {
     font-family: var(--font-num);
     font-size: 20px;
     font-weight: 900;
@@ -77,12 +77,13 @@
 #play-screen {
     flex: 1;
     position: relative;
-    z-index: var(--z-world);
+    /* Z-index removed to allow children to participant in global stacking */
 }
 
-.play-viewport {
+#play-screen .play-viewport {
     width: 100%;
     height: 100%;
+    z-index: var(--z-world);
 }
 
 /* --- 3. Sidebar (Inventory Panel) --- */
@@ -90,8 +91,8 @@
     position: absolute;
     top: var(--space-double);
     right: var(--space-double);
-    bottom: 108px; /* Adjusted to sit above the 76px action button + double spacing */
     width: 340px;
+    max-height: calc(100% - var(--space-double) - 108px);
     display: flex;
     flex-direction: column;
     z-index: var(--z-panel);
@@ -99,7 +100,7 @@
 
 /* --- 4. Bottom Action Dock --- */
 /* Positioned at bottom-right corner, aligned perfectly with the build panel width. */
-.action-dock {
+#play-scene-container .action-dock {
     position: absolute;
     bottom: var(--space-double);
     right: var(--space-double);
@@ -109,14 +110,72 @@
     z-index: var(--z-panel);
 }
 
-/* --- 5. Global Footer --- */
-.ui-footer {
-    position: absolute;
-    bottom: var(--space-unit);
-    left: var(--space-double);
+/* Large Action Buttons: Specialized branding for critical mission phases */
+#play-screen .is-launch { --current-color: var(--color-category-launchers); }
+#play-screen .is-assembly { --current-color: var(--color-theme-main); }
+
+#play-screen .is-launch,
+#play-screen .is-assembly {
+    height: 76px;
+    padding: 10px 8px;
+    border-radius: var(--radius-pill);
+    border-width: 3px; /* Stronger structural presence for main actions */
     display: flex;
-    gap: var(--space-double);
-    font-size: var(--text-size-caption);
-    opacity: 0.3;
-    z-index: var(--z-hud);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    transition: all var(--motion-fast);
 }
+
+/* Enhanced Glow for Mission-Critical Actions */
+#play-screen .is-launch:hover:not(.is-disabled),
+#play-screen .is-assembly:hover:not(.is-disabled) {
+    border-color: color-mix(in srgb, var(--current-color), #fff 50%);
+    box-shadow: 0 0 25px var(--current-color);
+}
+
+#play-screen .is-launch .btn-main-label,
+#play-screen .is-assembly .btn-main-label {
+    font-size: 16px;
+    font-weight: 950;
+    letter-spacing: 0.05em;
+}
+
+#play-screen .is-launch .btn-sub-label,
+#play-screen .is-assembly .btn-sub-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    opacity: 0.8;
+}
+
+/* Mission-Specific Disabled Logic */
+#play-screen .is-launch.is-disabled,
+#play-screen .is-assembly.is-disabled {
+    filter: none; /* Override global neon grayscale */
+    opacity: 1;    /* Override global neon opacity to allow bright children */
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* 6. DISABLED + NOTABLE (Guide Awareness Pulse) */
+#play-screen .is-launch.is-disabled.is-notable .btn-sub-label,
+#play-screen .is-assembly.is-disabled.is-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: ui-guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+@keyframes ui-guide-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+
+/* --- 5. Global Footer (Moved to ui_base.css) --- */

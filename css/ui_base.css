@@ -14,6 +14,26 @@
     outline: none !important;
 }
 
+.ui-scrollable {
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.ui-scrollable::-webkit-scrollbar {
+    width: 4px; /* Vertical width */
+    height: 4px; /* Horizontal height */
+}
+
+.ui-scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ui-scrollable::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
 html,
 body {
     margin: 0;
@@ -33,11 +53,20 @@ body {
 .is-clickable {
     cursor: pointer;
     user-select: none;
+    transition: all var(--motion-fast);
 }
 
 .ui-button {
+    --current-color: var(--color-theme-main); /* Default semantic color */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-main);
+    font-weight: 800;
     border-radius: var(--radius-standard);
-    /* Synchronized with global design system */
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    text-decoration: none;
 }
 
 /* Disabled State: Structural prevention of interaction */
@@ -156,6 +185,17 @@ body {
     font-weight: 950;
     letter-spacing: 0.2em;
     opacity: 0.5;
+}
+
+/* --- 3. Layout Utilities (Common) --- */
+
+/* UI Flex Center: Abstract centering logic for various containers */
+.ui-flex-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 /* UI Title Box: Branding container adjusted for optimal vertical density */
@@ -530,4 +570,20 @@ body {
 
 .num-score {
     color: var(--color-num-score);
+}
+
+/* --- 8. Global Components: Shared Elements --- */
+
+/* UI Footer: Standardized branding and versioning anchor.
+   Positioned at the bottom-left corner across all contexts. */
+.ui-footer {
+    position: absolute;
+    bottom: var(--space-unit);
+    left: var(--space-double);
+    display: flex;
+    gap: var(--space-double);
+    font-size: var(--text-size-caption);
+    opacity: 0.3;
+    z-index: var(--z-hud);
+    pointer-events: none; /* Non-intrusive metadata */
 }

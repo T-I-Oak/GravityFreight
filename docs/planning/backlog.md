@@ -23,7 +23,6 @@
 
 ## Phase 2: Scene Reconstruction (各画面の再構築)
 各画面を新しい4軸モデルとレイヤー構造で順次再定義する。
-- [ ] **Title Screen (タイトル画面)**: 再定義
 - [ ] **Story Modal (ストーリーモーダル)**: 再定義
 - [ ] **Analytic Archive (記録画面)**: 
     *   モックアップの清書（HTML/CSS構造の最適化）
@@ -31,8 +30,8 @@
 - [ ] **Flight Result (航行結果画面)**: 再定義
 - [ ] **Terminal Report (ゲームリザルト)**: 再定義
 - [ ] **Trading Post (施設画面)**: 再定義
+- [ ] **Inventory System (アイテム管理)**: 再定義
 
 ## Phase 3: System Integration (システム統合)
-- [ ] Z-index 管理システムの導入
-- [ ] 全画面のレスポンシブ・スクロール点検
-- [ ] 実装フェーズへの移行
+- [ ] **全画面のレスポンシブ・スクロール点検**
+- [ ] **実装フェーズへの移行**
