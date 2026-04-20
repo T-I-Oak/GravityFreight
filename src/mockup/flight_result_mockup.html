@@ -22,36 +22,35 @@
     <link rel="stylesheet" href="../../css/ui_style_neon.css">
     <link rel="stylesheet" href="../../css_old/animations.css">
     
-    <!-- 承認時レイアウトの強制復旧 (Context Layer) -->
+    <!-- Scene Specific Style (Context Layer) -->
     <style>
-        /* 2カラム構造を強制 */
-        #flight-result-screen .ui-panel__body {
-            flex-direction: row !important;
-            gap: var(--space-double);
-            padding: var(--space-double);
+        /* Contextual adjustments for Flight Result Screen */
+        .report-data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
         }
-        
-        /* 削除した ui-well, ui-stat-box, ui-section-header の定義を、承認時と全く同じ内容でここに定義 */
+        .report-data-label { opacity: 0.7; font-size: 14px; }
+        .report-data-value { font-family: 'Courier Prime', monospace; font-weight: 700; }
+
+        /* Status labeling for items captured in flight */
+        .ui-item-card__status {
+            font-size: 9px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+        .ui-item-card__status.is-delivered { color: #00ffcc; background: rgba(0, 255, 204, 0.1); }
+        .ui-item-card__status.is-unmatched { color: #ff4488; background: rgba(255, 68, 136, 0.1); }
+
+        /* Mockup-specific data blocks to avoid global CSS changes */
         .ui-well {
             background: rgba(0, 0, 0, 0.15);
             border-radius: var(--radius-standard);
             padding: var(--space-double);
             border: 1px solid rgba(255, 255, 255, 0.05);
             margin-bottom: var(--space-double);
-        }
-        
-        .ui-section-header {
-            padding: var(--space-unit) 0;
-            margin-bottom: var(--space-unit);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .ui-section-header .section-title {
-            font-size: var(--text-size-caption);
-            font-weight: 900;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            opacity: 0.6;
         }
 
         .ui-stat-group {
@@ -66,12 +65,6 @@
             gap: 4px;
         }
 
-        .ui-stat-box .stat-label {
-            font-size: var(--text-size-caption);
-            opacity: 0.5;
-            text-transform: uppercase;
-        }
-
         .ui-stat-box .stat-value {
             font-size: var(--text-size-title);
             line-height: 1;
@@ -79,61 +72,58 @@
 
         .ui-stat-box.is-hero .stat-value {
             font-size: 24px;
+            font-weight: 900;
         }
 
-        /* 承認時の行データのスタイル */
-        .report-data-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        /* [航行結果] パネルのサイズ固定指定 (画面比率ベース) */
+        #flight-result-screen .ui-panel {
+            width: 70vw;
+            height: 85vh;
+            max-width: 640px; /* 2カラム時の最大幅をスマートに制限 */
+            margin: auto;
         }
-        .report-data-label { opacity: 0.7; font-size: 14px; }
-        .report-data-value { font-family: 'Courier Prime', monospace; font-weight: 700; }
 
-        /* スクロールバーの親要素が正しく縮小するように設定 */
-        #flight-result-screen .ui-column {
-            min-height: 0;
-            flex: 1;
+        @media screen and (max-width: 600px) {
+            #flight-result-screen .ui-panel {
+                width: 95vw;
+                height: 90vh;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- ui-flex-center を削除し、承認時の配置に戻す -->
-    <main id="flight-result-screen" class="ui-style--neon">
-        <!-- Main Panel using V2 semantic layout -->
-        <article class="ui-panel">
+    <main id="flight-result-screen" class="ui-style--matte ui-flex-center">
+        <section class="ui-panel">
 
             <!-- Header Section -->
             <header class="ui-panel__header" style="padding: var(--space-double);">
                 <div class="ui-title-box">
                     <h1 class="text-display" id="report-title">SECTOR 1 COMPLETED</h1>
                 </div>
-                <!-- 承認時のステータスバッジの配置を維持 -->
-                <div class="flight-report-status" style="margin-top: var(--space-unit);">
-                    <div class="ui-badge is-danger">● RECORDED</div>
-                    <div class="ui-badge is-outline clickable">☆ PROTECT RECORD</div>
+                <div class="flight-report-status" style="margin-top: var(--space-unit); display: flex; gap: var(--space-unit);">
+                    <div class="ui-badge is-danger" style="background: var(--color-facility-black-market); color: white; padding: 2px 8px;">● RECORDED</div>
+                    <div class="ui-badge is-outline clickable" style="border: 1px solid rgba(255,255,255,0.3); padding: 2px 8px;">☆ PROTECT RECORD</div>
                 </div>
             </header>
 
             <!-- Content Area -->
-            <div class="ui-panel__body">
+            <div class="ui-panel__body ui-columns" style="padding: var(--space-double); gap: var(--space-double);">
                 <!-- Left Column: Performance data -->
-                <section class="ui-column is-scrollable">
-                    <div class="ui-section-header">
-                        <span class="section-title">FLIGHT PERFORMANCE DATA</span>
-                    </div>
+                <section class="ui-column ui-scrollable">
+                    <header class="ui-section-header">
+                        <h3 class="ui-section-title">FLIGHT PERFORMANCE DATA</h3>
+                    </header>
 
                     <div class="flight-report-summary">
                         <div class="ui-well">
                             <div class="ui-stat-group">
                                 <div class="ui-stat-box is-hero">
-                                    <span class="stat-label">Final Mission Score</span>
+                                    <span class="ui-stat-label">Final Mission Score</span>
                                     <span class="stat-value num-score">3,260</span>
                                 </div>
                                 <div class="ui-stat-box is-hero">
-                                    <span class="stat-label">Total Credits Earned</span>
+                                    <span class="ui-stat-label">Total Credits Earned</span>
                                     <span class="stat-value num-coin">30</span>
                                 </div>
                             </div>
@@ -155,50 +145,53 @@
                 </section>
 
                 <!-- Right Column: Acquired assets -->
-                <section class="ui-column is-scrollable">
-                    <div class="ui-section-header">
-                        <span class="section-title">COLLECTED SPACE ASSETS</span>
-                    </div>
+                <section class="ui-column ui-scrollable">
+                    <header class="ui-section-header">
+                        <h3 class="ui-section-title">COLLECTED SPACE ASSETS</h3>
+                    </header>
 
-                    <div class="item-list">
-                        <div class="item-card is-trading-post is-story">
-                            <div class="item-card__header">
-                                <span class="item-card__name">母からの押し花</span>
-                                <div class="item-card__meta">
-                                    <div class="ui-icon-action">
-                                        <span class="ui-icon is-icon-mail"></span>
-                                    </div>
+                    <div class="ui-item-list">
+                        <!-- Story Item -->
+                        <div class="ui-item-card is-trading-post">
+                            <header class="ui-item-card__header">
+                                <h4 class="ui-item-card__title">母からの押し花</h4>
+                                <div class="ui-item-card__header-right">
+                                    <span class="ui-icon is-icon-mail"></span>
                                 </div>
-                            </div>
-                            <div class="item-card__desc">届けた「通常物資」の梱包材に、古い押し花と手紙が使われていた。</div>
+                            </header>
+                            <p class="ui-item-card__description">届けた「通常物資」の梱包材に、古い押し花と手紙が使われていた。</p>
                         </div>
 
-                        <!-- Cargo Bonus Success Example (Black Market) -->
-                        <div class="item-card-group">
-                            <div class="item-card is-black-market">
-                                <div class="item-card__header">
-                                    <span class="item-card__name">暗号化データ [BLACK MARKET]</span>
-                                    <div class="item-card__status is-delivered">✓ DELIVERED</div>
+                        <!-- Black Market Item -->
+                        <div class="ui-item-card is-black-market">
+                            <header class="ui-item-card__header">
+                                <h4 class="ui-item-card__title">暗号化データ [BLACK MARKET]</h4>
+                                <div class="ui-item-card__header-right">
+                                    <span class="ui-item-card__status is-delivered">✓ DELIVERED</span>
                                 </div>
-                                <div class="item-card__desc">Black Marketへの配送を目的とした機密データ。</div>
-                            </div>
+                            </header>
+                            <p class="ui-item-card__description">Black Marketへの配送を目的とした機密データ。</p>
                         </div>
 
-                        <div class="item-card is-trading-post">
-                            <div class="item-card__header">
-                                <span class="item-card__name">試作型コンデンサ [FACTORY]</span>
-                                <div class="item-card__status is-unmatched">✗ UNMATCHED</div>
-                            </div>
-                            <div class="item-card__desc">Trading Postに届けられたが、本来の宛先はBlack Marketだった。</div>
+                        <!-- Unmatched Item -->
+                        <div class="ui-item-card is-trading-post">
+                            <header class="ui-item-card__header">
+                                <h4 class="ui-item-card__title">試作型コンデンサ [FACTORY]</h4>
+                                <div class="ui-item-card__header-right">
+                                    <span class="ui-item-card__status is-unmatched">✗ UNMATCHED</span>
+                                </div>
+                            </header>
+                            <p class="ui-item-card__description">Trading Postに届けられたが、本来の宛先はBlack Marketだった。</p>
                         </div>
 
-                        <div class="item-card is-chassis">
-                            <div class="item-card__header">
-                                <span class="item-card__name">軽量シャーシ</span>
-                                <div class="item-card__meta">
-                                    <div class="stack-badge">x2</div>
+                        <!-- Generic Resource -->
+                        <div class="ui-item-card is-chassis">
+                            <header class="ui-item-card__header">
+                                <h4 class="ui-item-card__title">軽量シャーシ</h4>
+                                <div class="ui-item-card__header-right">
+                                    <div class="ui-stack-badge">x2</div>
                                 </div>
-                            </div>
+                            </header>
                         </div>
                     </div>
                 </section>
@@ -206,10 +199,10 @@
 
             <!-- Global Actions Section -->
             <footer class="ui-panel__footer" style="padding: var(--space-double); display: flex; gap: var(--space-double);">
-                <div class="ui-button is-secondary">VIEW MAP</div>
-                <div class="ui-button is-primary is-repair-dock" id="main-action-btn">TO REPAIR DOCK</div>
+                <button class="ui-button">VIEW MAP</button>
+                <button class="ui-button is-primary is-repair-dock" id="main-action-btn">TO REPAIR DOCK</button>
             </footer>
-        </article>
+        </section>
     </main>
 
     <!-- Interactive Mockup Controller -->

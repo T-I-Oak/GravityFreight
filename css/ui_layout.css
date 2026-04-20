@@ -83,6 +83,16 @@ main {
     .ui-columns {
         flex-direction: column;
         overflow-y: auto;
+        /* Project Standard Scrollbar */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    }
+    .ui-columns::-webkit-scrollbar {
+        width: 4px;
+    }
+    .ui-columns::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
     }
     .ui-columns > .ui-column {
         flex: none;
@@ -155,28 +165,3 @@ main {
     margin: 0;
 }
 
-/* --- 7. Data Presentation Blocks --- */
-.ui-well {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-standard);
-    padding: var(--space-double);
-    margin-bottom: var(--space-double);
-}
-
-.ui-stat-group {
-    display: flex;
-    gap: var(--space-double);
-    flex-wrap: wrap;
-}
-
-.ui-stat-box {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.ui-stat-box.is-hero .stat-value {
-    font-size: 24px;
-    font-weight: 900;
-}
