@@ -105,22 +105,6 @@
 /* --- ui-item-card: Neon Expression --- */
 .ui-style--neon .ui-item-card {
     --color-bg-card: rgba(20, 25, 40, 0.5);
-    --opacity-card-tint-top: 88%;
-    --opacity-card-tint-bottom: 92%;
-    --opacity-card-active-top: 70%;
-    --opacity-card-active-bottom: 80%;
-
-    background-image: linear-gradient(
-        color-mix(in srgb, var(--category-color), transparent var(--opacity-card-tint-top)),
-        color-mix(in srgb, var(--category-color), transparent var(--opacity-card-tint-bottom))
-    );
-}
-
-.ui-style--neon .ui-item-card.is-active {
-    background-image: linear-gradient(
-        color-mix(in srgb, var(--category-color), transparent var(--opacity-card-active-top)),
-        color-mix(in srgb, var(--category-color), transparent var(--opacity-card-active-bottom))
-    );
 }
 
 .ui-style--neon .ui-item-card__title {
