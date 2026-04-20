@@ -12,9 +12,12 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
 - **0. Tokens (定数層)**: `design_tokens.css`。すべての層で共有される「色、フォント、間隔、z-index」等の定数定義。
 
 ### 3層レイヤーモデル
-1.  **意味の層 (Semantic Layer / Base)**: `ui_base.css`
+1.  **意味の層 (Semantic Layer / Base)**: 
+    - `ui_base.css`: リセット、html/body/main等、アプリケーションの最も基本的な属性。
+    - `ui_layout.css`: パネル、カラム、格子系など、構造を作るレイアウトエンジン。
+    - `ui_primitives.css`: バッジ、アイコン、ゲージなど、原子単位の共通部品。
+    - `ui_item_card.css`: アイテムカードの構造と基本特性。
     - 役割：物体の「形」と「構造」の定義。
-    - 例：角丸の半径、フレックスの配置、基本図形（平行四辺形など）。
 2.  **スタイルの層 (Style Layer / Expression)**: `ui_style_matte.css`, `ui_style_neon.css` 等
     - 役割：物体の「質感」と「色彩」の定義。各ビジュアルスタイルごとに個別のファイルを用意し、切り替えて使用する。
     - 例：透過背景、カテゴリカラーのボーダー、影を排したコントラスト表現。
