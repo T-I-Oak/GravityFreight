@@ -54,11 +54,11 @@
 /* Enhanced visuals unified in base */
 
 /* Composite Elements: Rocket Detail area divider */
-.ui-style--matte .rocket-details {
+.ui-style--matte .ui-rocket-details {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.ui-style--matte .rocket-module-name {
+.ui-style--matte .ui-module-name {
     color: rgba(255, 255, 255, 0.5);
 }
 
