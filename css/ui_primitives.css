@@ -127,7 +127,22 @@
 .num-coin { color: var(--color-num-coin); }
 .num-score { color: var(--color-num-score); }
 
-/* --- 5. Logo Specific Primitives --- */
+/* --- 5. Semantic Labels --- */
+.ui-stat-label {
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* --- 6. Message & Indicator Wrappers --- */
+.ui-msg-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- 7. Logo Specific Primitives --- */
 .is-logo.text-display {
     font-family: 'Outfit', sans-serif;
     font-size: 18px;
