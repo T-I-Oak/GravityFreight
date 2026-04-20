@@ -48,6 +48,14 @@ body {
     line-height: 1.5;
 }
 
+/* --- 2. Screen Structures (Semantic Roots) --- */
+main {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden; /* Prevent unnecessary scroll during screen transitions */
+}
+
 /* --- 2. Interactive States (Semantic) --- */
 .ui-button,
 .is-clickable {
@@ -61,6 +69,7 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    padding: 6px 16px;
     font-family: var(--font-main);
     font-weight: 800;
     border-radius: var(--radius-standard);
@@ -109,39 +118,91 @@ body {
     position: relative;
     border: 1px solid transparent;
     transition: all var(--motion-normal);
-    /* Smooth state transitions */
+    max-width: 100%;
+    max-height: 100%;
 }
 
-/* Logic: Collapsed state where only the toggle remains operational */
+/* UI Panel Sections (BEM) */
+.ui-panel__header {
+    flex-shrink: 0;
+}
+
+.ui-panel__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Ensures content can scroll if necessary */
+}
+
+.ui-panel__footer {
+    flex-shrink: 0;
+}
+
+/* Flexible Layout Systems */
+.ui-columns {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    gap: var(--space-m);
+}
+
+@media screen and (max-width: 600px) {
+    .ui-columns {
+        flex-direction: column;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    }
+    
+    .ui-columns::-webkit-scrollbar {
+        width: 4px;
+    }
+    .ui-columns::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+    
+    .ui-columns > .ui-column {
+        flex: none; /* Allow columns to take their natural height */
+    }
+
+    .ui-columns > .ui-scrollable {
+        overflow-y: visible; /* Disable inner scrolling when stacked */
+    }
+}
+
+.ui-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* UI Split Row: Abstracted two-sided layout container */
+.ui-split-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.is-scrollable {
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
 .ui-panel.is-collapsed {
     height: 32px !important;
-    /* Force minimum header height */
     overflow: visible;
-    /* Prevent clipping of externalized toggles */
 }
 
+.ui-panel.is-collapsed .ui-panel-body,
 .ui-panel.is-collapsed .ui-panel__body {
     display: none;
-    /* Physical removal of content from viewport */
 }
 
 .ui-panel.is-collapsed .toggle-icon {
     transform: rotate(180deg);
-    /* Visual feedback for alternate state */
-}
-
-/* UI Panel Sub-structures: Segregating control areas from content areas */
-.ui-panel__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    height: 32px;
-}
-
-.ui-panel__body {
-    flex: 1;
-    min-height: 0;
 }
 
 /* UI Tab Group: Navigational layer for switching data contexts */
@@ -195,16 +256,12 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
 }
 
 /* UI Title Box: Branding container adjusted for optimal vertical density */
 .ui-title-box {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
     gap: 0;
 }
 
@@ -339,9 +396,10 @@ body {
 }
 
 .ui-item-card .ui-item-card__header {
+    /* Inherits from .ui-split-row when used in HTML, or we can just apply properties */
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
 }
 
 .ui-item-card__title {
@@ -452,6 +510,11 @@ body {
 .is-coin     { --category-color: var(--color-category-coin); }
 .is-cargo    { --category-color: var(--color-category-cargo); }
 
+/* Facility Semantic Mappings: Fixed locations and station functions */
+.is-repair-dock   { --current-color: var(--color-facility-repair-dock); }
+.is-trading-post  { --current-color: var(--color-facility-trading-post); }
+.is-black-market  { --current-color: var(--color-facility-black-market); }
+
 /* --- 7. Individual Layer Logic --- */
 
 /* Stack Badge: Categorized count indicator with maximum font-scale (13px) in a tight frame (17px).
@@ -540,9 +603,6 @@ body {
 }
 
 .ui-module-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     line-height: 1;
 }
 
@@ -571,6 +631,9 @@ body {
 .num-score {
     color: var(--color-num-score);
 }
+
+
+
 
 /* --- 8. Global Components: Shared Elements --- */
 

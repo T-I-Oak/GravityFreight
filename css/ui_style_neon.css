@@ -230,13 +230,6 @@
     box-shadow: 0 0 25px color-mix(in srgb, var(--current-color), transparent 60%);
 }
 
-/* Specific Signatures: Overriding colors based on context (Moved launch/assembly to play.css) */
-.ui-style--neon .is-repair { --current-color: var(--color-facility-repair-dock); }
-.ui-style--neon .is-trade { --current-color: var(--color-facility-trading-post); }
-.ui-style--neon .is-blackmarket { --current-color: var(--color-facility-black-market); }
-
-/* --- 7. Individual Module Specifics (Removed from here, moved to Context layer) --- */
-
 /* --- 7. Status & State Layer --- */
 
 /* 5. DISABLED / OFF: Thermal Throttling / Power-Down state */

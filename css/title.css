@@ -5,10 +5,6 @@
    ========================================= */
 
 #title-screen {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
     display: flex; /* Root uses flex to align the inner container */
     align-items: center;
     justify-content: center;

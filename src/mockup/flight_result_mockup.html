@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Freight: Flight Result Mockup (System & Data Verified)</title>
+    <!-- Google Fonts: Inter/Outfit (System Display) + Courier Prime (Mono stats) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@300;400;700;900&family=Courier+Prime&display=swap"
+        rel="stylesheet">
+
+    <!-- V2 System CSS Layers -->
+    <link rel="stylesheet" href="./css/design_tokens.css">
+    <link rel="stylesheet" href="./css/ui_base.css">
+    <link rel="stylesheet" href="./css/ui_style_matte.css">
+    <link rel="stylesheet" href="./css/ui_style_neon.css">
+    <link rel="stylesheet" href="./css/animations.css">
+    <link rel="stylesheet" href="./css/item-card.css">
+    
+    <!-- 承認時レイアウトの強制復旧 (Context Layer) -->
+    <style>
+        /* 2カラム構造を強制 */
+        #flight-result-screen .ui-panel__body {
+            flex-direction: row !important;
+            gap: var(--space-double);
+            padding: var(--space-double);
+        }
+        
+        /* 削除した ui-well, ui-stat-box, ui-section-header の定義を、承認時と全く同じ内容でここに定義 */
+        .ui-well {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-standard);
+            padding: var(--space-double);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: var(--space-double);
+        }
+        
+        .ui-section-header {
+            padding: var(--space-unit) 0;
+            margin-bottom: var(--space-unit);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .ui-section-header .section-title {
+            font-size: var(--text-size-caption);
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .ui-stat-group {
+            display: flex;
+            gap: var(--space-double);
+            flex-wrap: wrap;
+        }
+
+        .ui-stat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ui-stat-box .stat-label {
+            font-size: var(--text-size-caption);
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+
+        .ui-stat-box .stat-value {
+            font-size: var(--text-size-title);
+            line-height: 1;
+        }
+
+        .ui-stat-box.is-hero .stat-value {
+            font-size: 24px;
+        }
+
+        /* 承認時の行データのスタイル */
+        .report-data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        .report-data-label { opacity: 0.7; font-size: 14px; }
+        .report-data-value { font-family: 'Courier Prime', monospace; font-weight: 700; }
+
+        /* スクロールバーの親要素が正しく縮小するように設定 */
+        #flight-result-screen .ui-column {
+            min-height: 0;
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ui-flex-center を削除し、承認時の配置に戻す -->
+    <main id="flight-result-screen" class="ui-style--neon">
+        <!-- Main Panel using V2 semantic layout -->
+        <article class="ui-panel">
+
+            <!-- Header Section -->
+            <header class="ui-panel__header" style="padding: var(--space-double);">
+                <div class="ui-title-box">
+                    <h1 class="text-display" id="report-title">SECTOR 1 COMPLETED</h1>
+                </div>
+                <!-- 承認時のステータスバッジの配置を維持 -->
+                <div class="flight-report-status" style="margin-top: var(--space-unit);">
+                    <div class="ui-badge is-danger">● RECORDED</div>
+                    <div class="ui-badge is-outline clickable">☆ PROTECT RECORD</div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="ui-panel__body">
+                <!-- Left Column: Performance data -->
+                <section class="ui-column is-scrollable">
+                    <div class="ui-section-header">
+                        <span class="section-title">FLIGHT PERFORMANCE DATA</span>
+                    </div>
+
+                    <div class="flight-report-summary">
+                        <div class="ui-well">
+                            <div class="ui-stat-group">
+                                <div class="ui-stat-box is-hero">
+                                    <span class="stat-label">Final Mission Score</span>
+                                    <span class="stat-value num-score">3,260</span>
+                                </div>
+                                <div class="ui-stat-box is-hero">
+                                    <span class="stat-label">Total Credits Earned</span>
+                                    <span class="stat-value num-coin">30</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-data-row">
+                        <span class="report-data-label">Flight Duration Score</span>
+                        <span class="report-data-value num-score">+260</span>
+                    </div>
+                    <div class="report-data-row">
+                        <span class="report-data-label">REPAIR DOCK Reward</span>
+                        <span class="report-data-value num-score">+3,000</span>
+                    </div>
+                    <div class="report-data-row">
+                        <span class="report-data-label">REPAIR DOCK Reward Coin</span>
+                        <span class="report-data-value num-coin">+30</span>
+                    </div>
+                </section>
+
+                <!-- Right Column: Acquired assets -->
+                <section class="ui-column is-scrollable">
+                    <div class="ui-section-header">
+                        <span class="section-title">COLLECTED SPACE ASSETS</span>
+                    </div>
+
+                    <div class="item-list">
+                        <div class="item-card is-trading-post is-story">
+                            <div class="item-card__header">
+                                <span class="item-card__name">母からの押し花</span>
+                                <div class="item-card__meta">
+                                    <div class="ui-icon-action">
+                                        <span class="ui-icon is-icon-mail"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item-card__desc">届けた「通常物資」の梱包材に、古い押し花と手紙が使われていた。</div>
+                        </div>
+
+                        <!-- Cargo Bonus Success Example (Black Market) -->
+                        <div class="item-card-group">
+                            <div class="item-card is-black-market">
+                                <div class="item-card__header">
+                                    <span class="item-card__name">暗号化データ [BLACK MARKET]</span>
+                                    <div class="item-card__status is-delivered">✓ DELIVERED</div>
+                                </div>
+                                <div class="item-card__desc">Black Marketへの配送を目的とした機密データ。</div>
+                            </div>
+                        </div>
+
+                        <div class="item-card is-trading-post">
+                            <div class="item-card__header">
+                                <span class="item-card__name">試作型コンデンサ [FACTORY]</span>
+                                <div class="item-card__status is-unmatched">✗ UNMATCHED</div>
+                            </div>
+                            <div class="item-card__desc">Trading Postに届けられたが、本来の宛先はBlack Marketだった。</div>
+                        </div>
+
+                        <div class="item-card is-chassis">
+                            <div class="item-card__header">
+                                <span class="item-card__name">軽量シャーシ</span>
+                                <div class="item-card__meta">
+                                    <div class="stack-badge">x2</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Global Actions Section -->
+            <footer class="ui-panel__footer" style="padding: var(--space-double); display: flex; gap: var(--space-double);">
+                <div class="ui-button is-secondary">VIEW MAP</div>
+                <div class="ui-button is-primary is-repair-dock" id="main-action-btn">TO REPAIR DOCK</div>
+            </footer>
+        </article>
+    </main>
+
+    <!-- Interactive Mockup Controller -->
+    <script>
+        const states = [
+            { title: 'SECTOR 1 COMPLETED', btn: 'TO REPAIR DOCK', cls: 'is-repair-dock' },
+            { title: 'SECTOR 1 COMPLETED', btn: 'TO TRADING POST', cls: 'is-trading-post' },
+            { title: 'SECTOR 1 COMPLETED', btn: 'TO BLACK MARKET', cls: 'is-black-market' },
+            { title: 'ROCKET RECOVERED', btn: 'BACK TO BASE', cls: 'is-retry' },
+            { title: 'SHIP CRASHED', btn: 'RETRY MISSION', cls: 'is-retry' },
+            { title: 'LOST IN SPACE', btn: 'RETRY MISSION', cls: 'is-retry' }
+        ];
+
+        let currentState = 0;
+        const btn = document.getElementById('main-action-btn');
+        const title = document.getElementById('report-title');
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentState = (currentState + 1) % states.length;
+            const s = states[currentState];
+
+            // Update Title
+            title.textContent = s.title;
+
+            // Update Button
+            btn.textContent = s.btn;
+
+            // Update Classes
+            btn.classList.remove('is-repair-dock', 'is-trading-post', 'is-black-market', 'is-retry');
+            btn.classList.add(s.cls);
+
+            // Sync Panel for coloring
+            const panel = document.querySelector('.ui-panel');
+            panel.classList.remove('is-repair-dock', 'is-trading-post', 'is-black-market', 'is-retry');
+            panel.classList.add(s.cls);
+
+            console.log('Switched to state:', s.title);
+        });
+    </script>
+</body>
+
+</html>

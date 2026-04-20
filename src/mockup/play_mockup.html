@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Freight: Play Screen Mockup</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=Orbitron:wght@700;900&family=Courier+Prime&display=swap" rel="stylesheet">
+    
+    <!-- Design System Files -->
+    <link rel="stylesheet" href="./css/design_tokens.css">
+    <link rel="stylesheet" href="./css/ui_base.css">
+    <link rel="stylesheet" href="./css/ui_style_neon.css">
+    <!-- Scene Specific Style (Context Layer) -->
+    <link rel="stylesheet" href="./css/play.css">
+</head>
+<body style="background: #050510 url('assets/tutorial/slide1.png') no-repeat center center fixed; background-size: cover;">
+    <main id="play-scene-container" class="ui-style--neon">
+        <header id="play-hud" class="ui-panel">
+            <div class="hud-logo-header">
+                <div class="ui-title-box">
+                    <h1 class="text-display is-logo">GRAVITY FREIGHT</h1>
+                    <span class="text-sub-display is-logo">ORBITAL ECHOES</span>
+                </div>
+                <div class="hud-messages">
+                    <div class="msg-icon is-trading-post has-new is-clickable"><span class="ui-icon is-icon-mail"></span></div>
+                    <div class="msg-icon is-repair-dock is-clickable"><span class="ui-icon is-icon-mail"></span></div>
+                    <div class="msg-icon is-disabled"><span class="ui-icon is-icon-mail"></span></div>
+                </div>
+            </div>
+            
+            <div class="hud-stats">
+                <div class="ui-stat-box">
+                    <span class="stat-label">SECTOR</span>
+                    <span class="stat-value num-sector">12</span>
+                </div>
+                <div class="ui-stat-box">
+                    <span class="stat-label">COIN</span>
+                    <span class="stat-value num-coin">1,234</span>
+                </div>
+                <div class="ui-stat-box">
+                    <span class="stat-label">SCORE</span>
+                    <span class="stat-value num-score">1,234,567</span>
+                </div>
+            </div>
+        </header>
+
+    <main id="play-screen">
+        <!-- Center Viewport (Background Map omitted) -->
+        <div class="play-viewport"></div>
+
+        <!-- Right Panel: Selection / Inventory -->
+        <aside id="inventory-panel" class="ui-panel">
+            <header class="ui-panel__header ui-split-row">
+                <div class="ui-tab-group">
+                    <button class="ui-tab is-clickable is-active" data-tab="flight">FLIGHT</button>
+                    <button class="ui-tab is-clickable" data-tab="assembly">ASSEMBLY</button>
+                </div>
+                <div class="panel-toggle is-clickable" id="btn-toggle-panel">
+                    <span class="ui-icon is-icon-chevron-down toggle-icon"></span>
+                </div>
+            </header>
+
+            <div class="ui-panel__body ui-scrollable" id="panel-content">
+                <!-- Tab: FLIGHT -->
+                <div class="tab-content" id="tab-flight">
+                    <section class="ui-section is-rocket" id="section-rocket">
+                        <header class="ui-section-header">
+                            <h3 class="ui-section-title">ROCKET</h3>
+                        </header>
+                        <div class="item-list" id="list-rocket"></div>
+                    </section>
+
+                    <section class="ui-section is-launcher" id="section-launcher">
+                        <header class="ui-section-header">
+                            <h3 class="ui-section-title">LAUNCHER</h3>
+                        </header>
+                        <div class="item-list" id="list-launcher"></div>
+                    </section>
+
+                    <section class="ui-section is-booster" id="section-booster">
+                        <header class="ui-section-header">
+                            <h3 class="ui-section-title">BOOSTER</h3>
+                        </header>
+                        <div class="item-list" id="list-booster"></div>
+                    </section>
+                </div>
+
+                <!-- Tab: ASSEMBLY -->
+                <div id="tab-assembly" class="tab-content" style="display:none;">
+                    <section class="ui-section is-chassis">
+                        <header class="ui-section-header">
+                            <h3 class="ui-section-title">CHASSIS</h3>
+                        </header>
+                        <div class="item-list" id="list-chassis"></div>
+                    </section>
+                    <section class="ui-section is-logic">
+                        <header class="ui-section-header">
+                            <h3 class="ui-section-title">LOGIC</h3>
+                        </header>
+                        <div class="item-list" id="list-logic"></div>
+                    </section>
+                    <section class="ui-section is-module">
+                        <header class="ui-section-header">
+                            <h3 class="ui-section-title">MODULES</h3>
+                        </header>
+                        <div class="item-list" id="list-module"></div>
+                    </section>
+
+                    <div class="assembly-actions">
+                        <button class="ui-button is-primary is-disabled is-notable is-assembly" id="demo-assemble-btn">
+                            <span class="btn-main-label">ASSEMBLE ROCKET</span>
+                            <span class="btn-sub-label">シャーシとロジックを選択すると建造できます</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Bottom Action -->
+        <div class="action-dock">
+            <button class="ui-button is-primary is-disabled is-notable is-launch" id="demo-launch-btn">
+                <span class="btn-main-label">LAUNCH ENGINE</span>
+                <span class="btn-sub-label">ロケットと発射台を選択すると発射できます</span>
+            </button>
+        </div>
+    </main>
+
+    <footer class="ui-footer">
+        <span>VER 1.6.1</span>
+        <span>© T.I.OAK 2026</span>
+    </footer>
+
+    <script type="module">
+        import { UIComponents } from './src/systems/ui/UIComponents.js';
+        import { PARTS, ITEM_REGISTRY } from './src/core/Data.js';
+
+        // --- 1. Rendering Mock Data ---
+        const MOCK_DATA = {
+            flight: {
+                rocket: [
+                    {
+                        name: '軽量シャーシ + 広域回収ロジック',
+                        category: 'rocket',
+                        slots: 4,
+                        precisionMultiplier: 1.2,
+                        modules: [
+                            { name: 'スロット拡張基盤' },
+                            { name: 'スター・ブレイカー', maxCharges: 2, charges: 1 },
+                            { name: 'ロスト保険', count: 2 }
+                        ]
+                    }
+                ],
+                launcher: [
+                    { ...ITEM_REGISTRY['pad_standard_d2'], isActive: true, charges: 3, maxCharges: 5 },
+                    { ...ITEM_REGISTRY['pad_precision_d2'], isActive: false, charges: 2 }
+                ],
+                booster: [
+                    { ...ITEM_REGISTRY['opt_fuel'], count: 5 },
+                    { ...ITEM_REGISTRY['boost_power'], count: 1 }
+                ]
+            },
+            assembly: {
+                chassis: [
+                    { ...ITEM_REGISTRY['hull_light'], isActive: true }
+                ],
+                logic: [
+                    { ...ITEM_REGISTRY['sensor_short'], isActive: true }
+                ],
+                module: [
+                    { ...ITEM_REGISTRY['mod_capacity'] },
+                    { ...ITEM_REGISTRY['mod_star_breaker'], maxCharges: 2, charges: 2 }
+                ]
+            }
+        };
+
+        function renderMockup() {
+            // Render Flight Tab
+            renderToList('list-rocket', MOCK_DATA.flight.rocket);
+            renderToList('list-launcher', MOCK_DATA.flight.launcher);
+            renderToList('list-booster', MOCK_DATA.flight.booster);
+            
+            // Render Assembly Tab
+            renderToList('list-chassis', MOCK_DATA.assembly.chassis);
+            renderToList('list-logic', MOCK_DATA.assembly.logic);
+            renderToList('list-module', MOCK_DATA.assembly.module);
+        }
+
+        function renderToList(containerId, items) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            items.forEach(item => {
+                const html = UIComponents.generateCardHTML(item, { 
+                    isClickable: true,
+                    isActive: item.isActive 
+                });
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                container.appendChild(div.firstElementChild);
+            });
+
+            // Add placeholder if empty
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="ui-item-placeholder">
+                        <span class="placeholder-text">データなし</span>
+                    </div>`;
+            }
+        }
+
+        renderMockup();
+
+        // --- 2. Interactive Controls ---
+        const panel = document.getElementById('inventory-panel');
+        const toggleBtn = document.getElementById('btn-toggle-panel');
+        
+        if (toggleBtn && panel) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                panel.classList.toggle('is-collapsed');
+            });
+        }
+
+        const tabs = document.querySelectorAll('.ui-tab[data-tab]');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-tab');
+                tabs.forEach(t => t.classList.toggle('is-active', t === tab));
+                contents.forEach(c => {
+                    const isActive = (c.id === `tab-${target}`);
+                    c.style.display = isActive ? 'block' : 'none';
+                });
+            });
+        });
+
+        const demoBtns = [
+            document.getElementById('demo-launch-btn'),
+            document.getElementById('demo-assemble-btn')
+        ];
+        demoBtns.forEach(btn => {
+            if (btn) {
+                btn.classList.add('is-disabled', 'is-notable');
+                btn.addEventListener('click', () => btn.classList.toggle('is-disabled'));
+            }
+        });
+    </script>
+
+    <!-- Mockup Toggle Helper: Allow clicking even when disabled to test feedback -->
+    <style>
+        .is-launch, .is-assembly {
+            pointer-events: auto !important; 
+        }
+    </style>
+    </div> <!-- #play-scene-container END -->
+</body>
+</html>

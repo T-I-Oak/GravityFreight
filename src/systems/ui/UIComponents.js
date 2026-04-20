@@ -32,7 +32,7 @@ export class UIComponents {
         }
 
         const headerHTML = `
-            <header class="ui-item-card__header">
+            <header class="ui-item-card__header ui-split-row">
                 <h3 class="ui-item-card__title">${item.name || 'Unknown Item'}</h3>
                 <div class="ui-item-card__header-right">${headerRight}</div>
             </header>
@@ -120,7 +120,7 @@ export class UIComponents {
             }
 
             rows += `
-                <div class="ui-module-row">
+                <div class="ui-module-row ui-split-row">
                     <span class="ui-module-name">${mod.name}</span>
                     <div class="ui-module-meta">${meta}</div>
                 </div>

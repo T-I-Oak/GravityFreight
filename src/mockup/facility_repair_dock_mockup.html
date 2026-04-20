@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Freight Mockup: Repair Dock (V2 Redesign)</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=Courier+Prime:wght@400;700&family=Orbitron:wght@700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    
+    <!-- Design System CSS Layers -->
+    <link rel="stylesheet" href="css/design_tokens.css">
+    <link rel="stylesheet" href="css/ui_base.css">
+    <link rel="stylesheet" href="css/ui_style_matte.css">
+    <link rel="stylesheet" href="css/facility.css">
+    <link rel="stylesheet" href="css/item-card.css">
+</head>
+<body class="ui-style--matte">
+    
+    <div id="facility-screen" class="is-repair-dock">
+        
+        <article class="ui-panel panel-wide">
+            <header class="facility-header">
+                <div class="ui-facility-icon">R</div>
+                <div class="facility-info">
+                    <h1 class="facility-name text-display">REPAIR DOCK</h1>
+                    <p class="facility-description">発射台の整備やロケットの分解・強化を行える高度な設備。</p>
+                </div>
+            </header>
+
+            <main class="ui-well facility-main-well">
+                
+                <section class="ui-column">
+                    <div class="facility-section">
+                        <h3>発射台のメンテナンス</h3>
+                        <p class="section-subtitle">ランチャーの使用回数を回復します。</p>
+                        
+                        <div class="trade-entry">
+                            <div class="trade-item-area">
+                                <div class="item-card is-launcher">
+                                    <div class="item-card__header">
+                                        <span class="item-card__name">標準発射台 [LN-1200/2]</span>
+                                    </div>
+                                    <div class="item-card__desc">標準的なパワーと容量を備えた、基本設計の発射台。</div>
+                                </div>
+                            </div>
+                            <div class="trade-action-area">
+                                <div class="trade-action-group">
+                                    <div class="trade-price num-coin">10 c</div>
+                                </div>
+                                <button class="ui-button is-trade is-small">REPAIR</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="facility-section facility-section--dismantle">
+                        <h3>ロケットの分解・強化</h3>
+                        <p class="section-subtitle">ロケットを分解して構成パーツを再調整し、インベントリに戻します。</p>
+                        
+                        <div class="trade-entry">
+                            <div class="trade-item-area">
+                                <div class="item-card is-chassis">
+                                    <div class="item-card__header">
+                                        <span class="item-card__name">軽量シャーシ・広域回収ロジック</span>
+                                    </div>
+                                    <div class="item-card__desc">オービット・アナリスト</div>
+                                </div>
+                            </div>
+                            <div class="trade-action-area">
+                                <div class="trade-action-group">
+                                    <div class="trade-price num-coin">50 c</div>
+                                </div>
+                                <button class="ui-button is-trade is-small">DISMANTLE</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ui-column">
+                    <div class="facility-section">
+                        <h3>強化済みパーツ（受取り）</h3>
+                        <p class="section-subtitle">分解・強化によって回収された構成パーツの一覧です。</p>
+                        
+                        <div class="item-placeholder">
+                            <span class="item-placeholder__text">NO RECENT ADJUSTMENTS</span>
+                            <span class="item-placeholder__hint">このセッションでの分解・強化履歴はありません。</span>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+            <footer class="facility-footer">
+                <div class="ui-stat-box">
+                    <span class="stat-label">CREDITS BALANCE</span>
+                    <span class="stat-value num-coin">50 c</span>
+                </div>
+                <button class="ui-button is-primary">DEPART FROM STATION</button>
+            </footer>
+
+        </article>
+
+    </div>
+
+</body>
+</html>

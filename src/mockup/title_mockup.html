@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Freight: ORBITAL ECHOES</title>
+    <!-- Fonts: システム標準 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- 3層モデルに基づき、Base, Expression, Context レイヤーを読み込み -->
+    <link rel="stylesheet" href="./css/design_tokens.css">
+    <link rel="stylesheet" href="./css/ui_base.css">
+    <link rel="stylesheet" href="./css/ui_style_neon.css">
+    <link rel="stylesheet" href="./css/title.css">
+</head>
+<body class="ui-style--neon">
+
+    <!-- 仕様 3. セマンティクス表に基づき画面ルートを main に定義 -->
+    <main id="title-screen">
+
+        <!-- コンテンツを中央に寄せるための見えないコンテナ -->
+        <div class="title-content-wrapper ui-flex-center">
+            <!-- ロゴエリア：特にカード構造ではないため div (ui-title-box) で構成 -->
+            <div class="ui-title-box">
+                <h1 class="text-display is-logo">GRAVITY FREIGHT</h1>
+                <span class="text-sub-display is-logo">ORBITAL ECHOES</span>
+            </div>
+
+            <!-- ボタンメニュー：コンテナとしての div を使用 -->
+            <div class="ui-menu-buttons">
+                <button class="ui-button is-primary is-clickable">BEGIN CONTRACT</button>
+                <button class="ui-button is-clickable">HOW TO PLAY</button>
+                <button class="ui-button is-clickable">RECORDS</button>
+            </div>
+        </div>
+
+        <!-- 設定指示器： div を使用 -->
+        <div class="ui-button is-clickable" id="title-settings-btn">⚙</div>
+
+        <!-- 仕様 3. バージョン等の「属性情報」として末尾に footer を配置 -->
+        <footer class="ui-footer">
+            <span>v2.0.0</span>
+            <span>© T.I.OAK 2026</span>
+        </footer>
+
+    </main>
+
+</body>
+</html>

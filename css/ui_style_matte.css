@@ -60,3 +60,61 @@
 .ui-style--matte .rocket-module-name {
     color: rgba(255, 255, 255, 0.5);
 }
+
+/* --- Panel Expressions: Matte Surface (Physical Plate) --- */
+
+/* Base Panel Style: Neutral Heavy Charcoal Iron Plate */
+.ui-style--matte .ui-panel {
+    background: #1e1e1e; 
+    
+    /* Softened 3D Edging effect (Enhanced visibility) */
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    border-left: 2px solid rgba(255, 255, 255, 0.2);
+    border-right: 2px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Facility Override Layer: When a facility color is mapped, use the muted mix logic */
+.ui-style--matte .ui-panel.is-repair-dock,
+.ui-style--matte .ui-panel.is-trading-post,
+.ui-style--matte .ui-panel.is-black-market {
+    background: color-mix(in srgb, var(--current-color), #101020 90%);
+}
+
+/* --- Button Expressions: Matte Solid State Logic --- */
+
+/* 1. Default State: Outline-style with vivid border and dark fill */
+.ui-style--matte .ui-button {
+    border-color: color-mix(in srgb, var(--current-color), #000 40%);
+    background: color-mix(in srgb, var(--current-color), #000 85%);
+    color: #ffffff;
+}
+
+.ui-style--matte .ui-button:hover:not(.is-disabled) {
+    border-color: color-mix(in srgb, var(--current-color), #000 25%);
+    background: color-mix(in srgb, var(--current-color), #000 75%);
+}
+
+/* 2. Highlight State: Absolute solid fill (Border = Background) */
+.ui-style--matte .ui-button.is-primary,
+.ui-style--matte .ui-button.is-active {
+    border-color: color-mix(in srgb, var(--current-color), #000 40%);
+    background: color-mix(in srgb, var(--current-color), #000 40%);
+    color: #ffffff;
+}
+
+.ui-style--matte .ui-button.is-primary:hover:not(.is-disabled),
+.ui-style--matte .ui-button.is-active:hover:not(.is-disabled) {
+    border-color: color-mix(in srgb, var(--current-color), #000 25%);
+    background: color-mix(in srgb, var(--current-color), #000 25%);
+}
+
+/* 3. Disabled & Static States */
+.ui-style--matte .ui-button.is-disabled {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.2);
+    cursor: not-allowed;
+}

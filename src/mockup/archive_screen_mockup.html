@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive - Analytic Terminal</title>
+    <link rel="stylesheet" href="css/design_tokens.css">
+    <link rel="stylesheet" href="css/ui_base.css">
+    <link rel="stylesheet" href="css/ui_style_matte.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@400;700;900&family=Orbitron:wght@400;700;900&family=Outfit:wght@500;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; outline: none; }
+
+        /* JS-FREE LOGIC */
+        .tab-switch, .rank-selector-switch { display: none; }
+        #tab-analytics:checked ~ .ui-columns-container #analytics { display: flex; }
+        #tab-achievements:checked ~ .ui-columns-container #achievements { display: flex; }
+        #tab-replays:checked ~ .ui-columns-container #replays { display: flex; }
+
+        .ui-panel { background: #161825; border: 1px solid #1b1e2e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .ui-well { background: #111420; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); border: 1px solid #1b1e2e; }
+        .ui-well.is-bignumber { display: flex; align-items: center; justify-content: center; }
+
+        /* [Mockup Specific Interaction] 
+           These rules synchronize the radio buttons with the 4-axis UI system.
+           In production, this would be handled by JS class toggling. */
+        #tab-analytics:checked ~ .modal-header .label-analytics,
+        #tab-achievements:checked ~ .modal-header .label-achievements,
+        #tab-replays:checked ~ .modal-header .label-replays,
+        #rank-score:checked ~ .ui-columns-container .label-score,
+        #rank-sector:checked ~ .ui-columns-container .label-sector,
+        #rank-collected:checked ~ .ui-columns-container .label-collected {
+            background: var(--current-color, #4488ff) !important; 
+            border-color: var(--current-color, #4488ff) !important; 
+            color: #000000 !important; /* Matte Solid active text */
+        }
+
+        /* Tabs remain white text on active blue for better look */
+        #tab-analytics:checked ~ .modal-header .label-analytics,
+        #tab-achievements:checked ~ .modal-header .label-achievements,
+        #tab-replays:checked ~ .modal-header .label-replays {
+            color: #ffffff !important;
+        }
+
+        /* Mockup Formatting Helpers */
+        .ui-style--matte .is-small { padding: 4px 16px; font-size: 10px; }
+        .ui-style--matte .is-large { padding: 16px 48px; font-size: 16px; }
+
+        /* Synchronization: Table Columns */
+        #rank-score:checked ~ .ui-columns-container .num-score { font-size: 16px; font-weight: 950; opacity: 1; }
+        #rank-sector:checked ~ .ui-columns-container .num-sector { font-size: 16px; font-weight: 950; opacity: 1; }
+        #rank-collected:checked ~ .ui-columns-container .num-item-count { font-size: 16px; font-weight: 950; opacity: 1; }
+
+        /* Synchronization: Graph Lines & Averages */
+        .graph-line, .graph-avg { transition: all 0.2s ease; }
+        .graph-avg { stroke-dasharray: 4; }
+        .legend-score, .legend-sector, .legend-item { opacity: 0.7; }
+        
+        #rank-score:checked ~ .ui-columns-container .graph-score { stroke-width: 3.5; opacity: 1; }
+        #rank-score:checked ~ .ui-columns-container .avg-score { opacity: 0.8; stroke-width: 1; }
+        #rank-score:checked ~ .ui-columns-container .legend-score { opacity: 1; font-size: 10px; }
+
+        #rank-sector:checked ~ .ui-columns-container .graph-sector { stroke-width: 3.5; opacity: 1; }
+        #rank-sector:checked ~ .ui-columns-container .avg-sector { opacity: 0.8; stroke-width: 1; }
+        #rank-sector:checked ~ .ui-columns-container .legend-sector { opacity: 1; font-size: 10px; }
+
+        #rank-collected:checked ~ .ui-columns-container .graph-item { stroke-width: 3.5; opacity: 1; }
+        #rank-collected:checked ~ .ui-columns-container .avg-item { opacity: 0.8; stroke-width: 1; }
+        #rank-collected:checked ~ .ui-columns-container .legend-item { opacity: 1; font-size: 10px; }
+
+        /* Layout */
+        #archive-screen .archive-modal { 
+            display: flex; flex-direction: column; width: 1120px; box-sizing: border-box; max-width: 98vw; height: 90vh; 
+            overflow: hidden; padding: 0;
+        }
+        
+        #archive-screen .modal-header { padding: 24px 40px; border-bottom: 1px solid #1b1e2e; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; z-index: 20; }
+        #archive-screen .ui-columns-container { flex: 1; display: flex; min-height: 0; gap: 0; }
+        
+        /* Sidebar */
+        #archive-screen .left-pane { flex: 0 0 200px; } 
+        #archive-screen .kpi-group { display: flex; flex-direction: column; gap: 8px; padding: 32px 0; }
+        #archive-screen .kpi-card { padding: 0 20px; }
+        #archive-screen .stat-label { font-size: 8px; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; margin-bottom: 4px; }
+        #archive-screen .is-bignumber { text-align: center; } 
+
+        /* Main */
+        #archive-screen .right-pane { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 0; }
+        .tab-content { display: none; flex: 1; flex-direction: column; min-height: 0; }
+        .analysis-region { flex: 3 1 auto; display: flex; flex-direction: column; min-height: 0; border-bottom: 1px solid #1b1e2e; }
+        .table-region { flex: 7 1 auto; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+        .region-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px 8px 24px; flex-shrink: 0; }
+        .region-title { font-family: var(--font-display); font-size: 11px; font-weight: 950; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin: 0; }
+        .region-subtext { font-size: 9px; opacity: 0.4; display: block; margin-top: 2px; }
+        
+        .graph-content { flex: 1; margin: 0 24px 16px 24px; padding: 12px; overflow: hidden; }
+        .graph-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+        /* Table */
+        .table-scroll-wrapper.ui-well { flex: 1; margin: 0 24px 20px 24px; overflow-y: auto; width: calc(100% - 48px); padding: 0; }
+        .pure-table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        .pure-table thead th { position: sticky; top: 0; z-index: 10; text-align: left; padding: 12px 12px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; box-shadow: inset 0 -1px 0 #1a1d2e; background: #11131b; white-space: nowrap; }
+        .pure-table td, .pure-table tbody th { padding: 12px 12px; border-bottom: 1px solid #11131b; font-size: 13px; white-space: nowrap; text-align: left; }
+        .pure-table tr.is-latest { background: #322518; }
+        .pure-table th:first-child, .pure-table td:first-child { padding-left: 24px; }
+        .pure-table th:last-child, .pure-table td:last-child { padding-right: 24px; }
+        
+        /* Semantics */
+        .num-contract { color: var(--color-num-contract); font-family: var(--font-num-primary); font-weight: 950; font-size: 2.2rem; line-height: 1; }
+        .num-score { color: var(--color-num-score); font-family: var(--font-num-primary); font-size: 2.2rem; line-height: 1; }
+        .num-sector { color: var(--color-num-sector); font-family: var(--font-num-primary); font-size: 2.2rem; line-height: 1; }
+        .num-item-count { color: var(--color-num-item-count); font-family: var(--font-num-primary); font-size: 2.2rem; line-height: 1; }
+        .text-meta { color: var(--color-text-dim); font-family: var(--font-display); }
+
+        /* Badges */
+        .ui-badge { 
+            background: var(--color-accent);
+            color: #000000;
+            margin-left: 2px;
+            padding: 1px 4px;
+            font-size: 10px;
+            border-radius: 2px;
+            font-weight: 950;
+        }
+
+        .modal-footer { padding: 20px 24px; display: flex; justify-content: flex-end; border-top: 1px solid #15171f; flex-shrink: 0; }
+    </style>
+</head>
+<body class="ui-style--matte">
+    <div id="archive-screen-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); z-index: 1000;">
+        <article id="archive-screen" class="archive-modal ui-panel panel-wide panel-max-h">
+            
+            <input type="radio" name="main-tabs" id="tab-analytics" class="tab-switch" checked>
+            <input type="radio" name="main-tabs" id="tab-achievements" class="tab-switch">
+            <input type="radio" name="main-tabs" id="tab-replays" class="tab-switch">
+            <input type="radio" name="rank-tabs" id="rank-score" class="rank-selector-switch" checked>
+            <input type="radio" name="rank-tabs" id="rank-sector" class="rank-selector-switch">
+            <input type="radio" name="rank-tabs" id="rank-collected" class="rank-selector-switch">
+
+            <header class="modal-header">
+                <div><h1 class="text-display" style="font-size: 1.5rem; letter-spacing: 2px; margin: 0; line-height: 1;">Analytic Archive</h1><span class="text-sub-display" style="font-size: 0.6rem; color: var(--color-primary); opacity: 0.7; letter-spacing: 1px;">Central Pilot Records System</span></div>
+                <div class="header-tabs" style="display: flex; gap: 8px;">
+                    <label for="tab-analytics" class="ui-button is-special is-inactive label-analytics">Analytics</label>
+                    <label for="tab-achievements" class="ui-button is-special is-inactive label-achievements">Achievements</label>
+                    <label for="tab-replays" class="ui-button is-special is-inactive label-replays">Replays</label>
+                </div>
+            </header>
+
+            <div class="ui-columns-container">
+                <aside class="ui-column left-pane">
+                    <section class="kpi-group">
+                        <div class="kpi-card"><div class="stat-label">Lifetime Contracts</div><div class="ui-well is-bignumber"><span class="num-contract">24</span></div></div>
+                        <div class="kpi-card"><div class="stat-label">Cumulative Sectors</div><div class="ui-well is-bignumber"><span class="num-sector">142</span></div></div>
+                        <div class="kpi-card"><div class="stat-label">Total Item Collected</div><div class="ui-well is-bignumber"><span class="num-item-count">589</span></div></div>
+                    </section>
+                </aside>
+
+                <main class="ui-column right-pane">
+                    <!-- TAB: ANALYTICS -->
+                    <section id="analytics" class="tab-content">
+                        <section class="analysis-region">
+                            <header class="region-header">
+                                <div><h3 class="region-title">Performance Trend Analysis</h3><span class="region-subtext">Recent 20 Sessions Historical Metrics Summary</span></div>
+                                <div style="display: flex; gap: 12px; font-size: 8px; opacity: 0.8; letter-spacing: 1px;">
+                                    <span style="display: flex; align-items: center; gap: 4px;"><div style="width: 8px; height: 1px; background: var(--color-num-score);"></div> SCORE</span>
+                                    <span style="display: flex; align-items: center; gap: 4px;"><div style="width: 8px; height: 1px; background: var(--color-num-sector);"></div> SECTORS</span>
+                                    <span style="display: flex; align-items: center; gap: 4px;"><div style="width: 8px; height: 1px; background: var(--color-num-item-count);"></div> ITEMS</span>
+                                </div>
+                            </header>
+                            <div class="graph-content ui-well">
+                                <svg class="graph-svg" viewBox="0 0 800 120" preserveAspectRatio="none">
+                                    <line class="graph-avg avg-item" x1="0" y1="95" x2="800" y2="95" stroke="var(--color-num-item-count)" stroke-width="0.5" stroke-dasharray="4" opacity="0.2" />
+                                    <line class="graph-avg avg-sector" x1="0" y1="75" x2="800" y2="75" stroke="var(--color-num-sector)" stroke-width="0.5" stroke-dasharray="4" opacity="0.2" />
+                                    <line class="graph-avg avg-score" x1="0" y1="55" x2="800" y2="55" stroke="var(--color-num-score)" stroke-width="0.5" stroke-dasharray="8 4" opacity="0.2" />
+                                    <path class="graph-line graph-item" fill="none" stroke="var(--color-num-item-count)" stroke-width="1.2" opacity="0.3" d="M0,115 L40,110 L80,118 L120,95 L160,105 L200,100 L240,115 L280,108 L320,112 L800,90" />
+                                    <path class="graph-line graph-sector" fill="none" stroke="var(--color-num-sector)" stroke-width="1.2" opacity="0.3" d="M0,105 L40,95 L80,102 L120,70 L160,82 L200,75 L240,100 L280,95 L320,98 L800,60" />
+                                    <path class="graph-line graph-score" fill="none" stroke="var(--color-num-score)" stroke-width="2.5" d="M0,100 L40,86 L80,95 L120,59 L160,63 L200,36 L240,75 L280,68 L320,55 L800,10" opacity="0.4" />
+                                </svg>
+                            </div>
+                        </section>
+
+                        <section class="table-region">
+                            <header class="region-header">
+                                <div style="flex: 1;"><h3 class="region-title">Personal Best Ranking</h3><span class="region-subtext">Deep Analytics Historical Processing Hub</span></div>
+                                <div class="rank-selector" style="display: flex; gap: 8px;">
+                                    <label for="rank-score" class="ui-button is-small is-score is-inactive label-score">Score</label>
+                                    <label for="rank-sector" class="ui-button is-small is-sector is-inactive label-sector">Sector</label>
+                                    <label for="rank-collected" class="ui-button is-small is-collected is-inactive label-collected">Collected</label>
+                                </div>
+                            </header>
+                            <div class="table-scroll-wrapper ui-well">
+                                <table class="pure-table">
+                                    <thead>
+                                        <tr>
+                                            <th>RANK</th>
+                                            <th style="color: var(--color-num-score);">FINAL SCORE</th>
+                                            <th style="color: var(--color-num-sector);">SECTORS</th>
+                                            <th style="color: var(--color-num-item-count);">ITEM COLLECTED</th>
+                                            <th>DATE TIME</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="is-latest">
+                                            <th scope="row" class="text-meta">#01</th>
+                                            <td class="num-score" style="font-size: 13px;">12,940</td><td class="num-sector" style="font-size: 13px;">3</td><td class="num-item-count" style="font-size: 13px;">14</td><td class="text-meta">2026.04.18 01:12 <span class="ui-badge" style="vertical-align: middle; margin-top: -2px;">NEW</span></td>
+                                        </tr>
+                                        <tr><th scope="row" class="text-meta">#02</th><td class="num-score" style="font-size: 13px;">10,411</td><td class="num-sector" style="font-size: 13px;">2</td><td class="num-item-count" style="font-size: 13px;">8</td><td class="text-meta">2026.04.17 22:45</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </section>
+
+                    <section id="achievements" class="tab-content">
+                        <div style="padding: 40px; color: var(--color-text-dim); text-align: center;">
+                            <h2 class="text-display" style="opacity: 0.1;">Achievements Data Baseline</h2>
+                        </div>
+                    </section>
+                    <section id="replays" class="tab-content">
+                        <div style="padding: 40px; color: var(--color-text-dim); text-align: center;">
+                            <h2 class="text-display" style="opacity: 0.1;">Replay Module Hub</h2>
+                        </div>
+                    </section>
+                </main>
+            </div>
+            <footer class="modal-footer"><button class="ui-button is-secondary">CLOSE TERMINAL</button></footer>
+        </article>
+    </div>
+</body>
+</html>

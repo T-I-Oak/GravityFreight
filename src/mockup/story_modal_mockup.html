@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Freight Mockup: Story Modal (Full Architecture Standard)</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=Courier+Prime:wght@400;700&family=Orbitron:wght@700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    
+    <!-- Design System CSS Layers -->
+    <link rel="stylesheet" href="css/design_tokens.css">
+    <link rel="stylesheet" href="css/ui_base.css">
+    <link rel="stylesheet" href="css/ui_style_matte.css">
+    <link rel="stylesheet" href="css/ui_style_neon.css">
+    <link rel="stylesheet" href="css/facility.css">
+    <link rel="stylesheet" href="css/item-card.css">
+    <link rel="stylesheet" href="css/story_modal.css">
+
+    <style>
+        body { height: 100vh; margin: 0; overflow: hidden; background: #000; }
+        .verification-background {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('assets/tutorial/slide1.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.65);
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="ui-style--neon">
+    
+    <div class="verification-background"></div>
+
+    <div id="story-modal-overlay">
+        
+        <article id="story-modal" class="ui-panel is-primary is-trade">
+            
+            <header class="modal-header">
+                <div class="ui-facility-icon">T</div>
+                <h2 class="modal-title">母からの押し花</h2>
+            </header>
+
+            <div class="modal-content">
+                <div class="modal-intro text-intro text-glow">
+                    届けた「通常物資」の梱包材に、古い押し花と手紙が使われていた。
+                </div>
+                
+                <div class="modal-body">
+——レオ、届いたかな。ママは、この星の「植物園」にのこることにしたわ。約束していた青い花の種は、この『通常物資』の中に入れておくわ。
+
+あなたがいつか、この種を芽吹かせてくれるのを信じているわ。宇宙は広いけれど、迷わずに出口（アーク）を目指すのよ。約束よ。
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <!-- パッケージ化された .is-primary ボタン共通クラスを利用 -->
+                <button class="ui-button is-primary">CLOSE COMMUNICATION</button>
+            </footer>
+
+        </article>
+
+    </div>
+
+</body>
+</html>

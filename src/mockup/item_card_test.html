@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Gravity Freight V2: Integrated Spec Gallery (System Driven)</title>
+    <link rel="stylesheet" href="css/design_tokens.css">
+    <link rel="stylesheet" href="css/ui_base.css">
+    <link rel="stylesheet" href="css/ui_style_matte.css">
+    <link rel="stylesheet" href="css/ui_style_neon.css">
+    <!-- Inline styles for the comparison gallery layout -->
+    <style>
+        body {
+            background-image: url('assets/tutorial/slide1.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+        .theme-column {
+            height: 100%;
+            overflow: hidden;
+        }
+        .ui-panel {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .ui-panel__body {
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .theme-label {
+            margin: 0;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <main class="comparison-grid">
+        <section class="theme-column ui-style--matte">
+            <article class="ui-panel">
+                <header class="ui-panel__header">
+                    <h1 class="theme-label">Matte Style</h1>
+                </header>
+                <div class="ui-panel__body" id="matte-column">
+                    <!-- Cards are appended here -->
+                </div>
+            </article>
+        </section>
+
+        <section class="theme-column ui-style--neon">
+            <article class="ui-panel">
+                <header class="ui-panel__header">
+                    <h1 class="theme-label">Neon Style</h1>
+                </header>
+                <div class="ui-panel__body" id="neon-column">
+                    <!-- Cards are appended here -->
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script type="module">
+        import { UIComponents } from './src/systems/ui/UIComponents.js';
+        import { PARTS } from './src/core/Data.js';
+
+        // --- 1. Flatten PARTS from Data.js into a single list ---
+        const CATALOG = Object.values(PARTS).flat();
+
+        // --- 2. Render Execution (Using External UIComponents and Real Data) ---
+        function renderGallery() {
+            const matteCol = document.getElementById('matte-column');
+            const neonCol = document.getElementById('neon-column');
+            
+            CATALOG.forEach(item => {
+                // Using the unified production logic with real Data.js objects
+                const html = UIComponents.generateCardHTML(item, { isClickable: true });
+                
+                const matteDiv = document.createElement('div');
+                matteDiv.innerHTML = html;
+                matteCol.appendChild(matteDiv.firstElementChild);
+                
+                const neonDiv = document.createElement('div');
+                neonDiv.innerHTML = html;
+                neonCol.appendChild(neonDiv.firstElementChild);
+            });
+
+            // --- 3. Stack Count Testing (Manual Injection) ---
+            const stackTestItem = { 
+                ...CATALOG[0], 
+                count: 2, 
+                name: CATALOG[0].name + " (Stack & Enhanced Test)",
+                maxCharges: 3,
+                charges: 2,
+                enhancement: { slots: 1, charges: 1 }
+            };
+            const stackHtml = UIComponents.generateCardHTML(stackTestItem, { isClickable: true });
+            
+            [matteCol, neonCol].forEach(col => {
+                const div = document.createElement('div');
+                div.innerHTML = stackHtml;
+                col.appendChild(div.firstElementChild);
+            });
+
+            // --- 4. Rocket (Nested Modules) Testing ---
+            const rocketItem = {
+                id: 'custom-rocket',
+                name: '軽量シャーシ + 広域回収ロジック',
+                category: 'rocket',
+                slots: 4,
+                precisionMultiplier: 1.2,
+                modules: [
+                    { name: 'スロット拡張基盤' },
+                    { name: 'スター・ブレイカー', maxCharges: 2, charges: 1 },
+                    { name: 'ロスト保険', count: 2 }
+                ]
+            };
+            const rocketHtml = UIComponents.generateCardHTML(rocketItem, { isClickable: true });
+            
+            [matteCol, neonCol].forEach(col => {
+                const div = document.createElement('div');
+                div.innerHTML = rocketHtml;
+                col.appendChild(div.firstElementChild);
+            });
+            // --- 5. State Matrix Testing (Clickable x Active) ---
+            const stateSamples = [
+                { id: 'st-1', isClickable: false, isActive: false, name: 'Normal (Non-Clickable)' },
+                { id: 'st-2', isClickable: true, isActive: false, name: 'Clickable (Normal)' },
+                { id: 'st-3', isClickable: false, isActive: true, name: 'Active (Non-Clickable)' },
+                { id: 'st-4', isClickable: true, isActive: true, name: 'Active (Clickable)' }
+            ];
+
+            const baseLogic = CATALOG.find(i => i.id === 'sensor_gravity');
+            
+            [matteCol, neonCol].forEach(col => {
+                const header = document.createElement('h2');
+                header.className = 'section-divider';
+                header.textContent = 'Card State Matrix';
+                col.appendChild(header);
+
+                stateSamples.forEach(state => {
+                    const item = { ...baseLogic, name: state.name };
+                    const html = UIComponents.generateCardHTML(item, { 
+                        isClickable: state.isClickable,
+                        isActive: state.isActive
+                    });
+                    const div = document.createElement('div');
+                    div.style.marginBottom = '12px';
+                    div.innerHTML = html;
+                    col.appendChild(div.firstElementChild);
+                });
+            });
+        }
+
+        renderGallery();
+    </script>
+</body>
+</html>
