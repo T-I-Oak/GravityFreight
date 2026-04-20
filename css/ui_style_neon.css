@@ -197,11 +197,11 @@
 
 /* Base Neon Button: Interactive glow and semi-transparent surface */
 .ui-style--neon .ui-button {
-    background: color-mix(in srgb, var(--current-color), transparent 90%);
-    border: 1px solid color-mix(in srgb, var(--current-color), transparent 60%);
+    background: color-mix(in srgb, var(--current-color), transparent 95%);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 80%);
     color: var(--current-color);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 90%);
-    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 40%);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 95%);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 70%);
     backdrop-filter: blur(var(--blur));
     transition: all var(--motion-fast) cubic-bezier(0.4, 0, 0.2, 1);
 }
