@@ -51,7 +51,7 @@
         0 0 30px rgba(0, 212, 255, 0.3);
 }
 
-.ui-style--neon .stat-label {
+.ui-style--neon .ui-stat-label {
     color: #ffffff;
     font-size: 9px;
     letter-spacing: 0.05em;
@@ -141,13 +141,13 @@
 }
 
 /* Rocket Module List: Specific nested information for complex assemblies */
-.ui-style--neon .rocket-details {
+.ui-style--neon .ui-rocket-details {
     margin-top: 8px;
     border-top: 1px dashed rgba(255, 255, 255, 0.1);
     padding-top: 6px;
 }
 
-.ui-style--neon .rocket-module-row {
+.ui-style--neon .ui-module-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -243,7 +243,7 @@
 }
 
 /* Panel Controls: Visual density for utility icons */
-.ui-style--neon .panel-toggle {
+.ui-style--neon .ui-panel-toggle {
     width: 24px;
     height: 24px;
     margin: 4px;
@@ -258,7 +258,7 @@
     transition: all 0.2s ease;
 }
 
-.ui-style--neon .panel-toggle:hover {
+.ui-style--neon .ui-panel-toggle:hover {
     color: #ffffff;
     border-color: var(--color-theme-sub);
     background: color-mix(in srgb, var(--color-theme-sub), transparent 80%);
@@ -269,7 +269,7 @@
 /* Utilities & Indicators */
 
 /* Message Icons */
-.ui-style--neon .msg-icon {
+.ui-style--neon .ui-msg-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -280,15 +280,15 @@
     transition: all 0.2s ease;
 }
 
-.ui-style--neon .msg-icon.is-trading-post {
+.ui-style--neon .ui-msg-icon.is-trading-post {
     color: var(--color-facility-trading-post);
 }
 
-.ui-style--neon .msg-icon.is-repair-dock {
+.ui-style--neon .ui-msg-icon.is-repair-dock {
     color: var(--color-facility-repair-dock);
 }
 
-.ui-style--neon .msg-icon.is-disabled {
+.ui-style--neon .ui-msg-icon.is-disabled {
     color: rgba(255, 255, 255, 0.15);
 }
 
@@ -302,7 +302,7 @@
 }
 
 /* Apply pulse to the icon itself */
-.ui-style--neon .msg-icon.has-new .ui-icon {
+.ui-style--neon .ui-msg-icon.has-new .ui-icon {
     animation: neon-pulse 1.5s infinite ease-in-out;
 }
 
