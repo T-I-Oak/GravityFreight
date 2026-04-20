@@ -110,6 +110,7 @@
 .ui-style--neon .ui-item-card.is-clickable:hover {
     border-color: color-mix(in srgb, var(--category-color), #fff 60%);
     box-shadow: 0 0 15px color-mix(in srgb, var(--category-color), transparent 50%);
+    transform: translateY(-1px);
 }
 
 .ui-style--neon .ui-item-card__title {
