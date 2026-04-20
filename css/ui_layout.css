@@ -1,0 +1,148 @@
+/* =========================================
+   Gravity Freight V2: Layout & Structure
+   Layer: Base / Capability (A-Axis)
+   Managing Panels, Columns, and Generic Containers
+   ========================================= */
+
+/* --- 1. Screen Structures (Semantic Roots) --- */
+main {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- 2. UI Panel System --- */
+.ui-panel {
+    border-radius: var(--radius-standard);
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid transparent;
+    transition: all var(--motion-normal);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.ui-panel__header {
+    flex-shrink: 0;
+}
+
+.ui-panel__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.ui-panel__footer {
+    flex-shrink: 0;
+}
+
+.ui-panel.is-collapsed {
+    height: 32px !important;
+    overflow: visible;
+}
+
+.ui-panel.is-collapsed .ui-panel__body {
+    display: none;
+}
+
+.ui-panel.is-collapsed .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* --- 3. Column & Grid System --- */
+.ui-columns {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    gap: var(--space-unit);
+}
+
+.ui-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+@media screen and (max-width: 600px) {
+    .ui-columns {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    .ui-columns > .ui-column {
+        flex: none;
+    }
+}
+
+.ui-split-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- 4. Sectioning --- */
+.ui-section {
+    margin-bottom: var(--space-unit);
+}
+
+.ui-section-header {
+    margin-bottom: 4px;
+}
+
+.ui-section-title {
+    margin: 0;
+    font-size: 10px;
+    font-weight: 950;
+    letter-spacing: 0.2em;
+    opacity: 0.5;
+    text-transform: uppercase;
+}
+
+/* --- 5. Navigational Layouts --- */
+.ui-tab-group {
+    display: flex;
+    gap: 0;
+    flex: 1;
+}
+
+.ui-tab {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+/* --- 6. Abstract Utilities --- */
+.ui-flex-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ui-title-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.text-display,
+.text-sub-display {
+    margin: 0;
+}
