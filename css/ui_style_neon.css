@@ -109,7 +109,7 @@
 
 .ui-style--neon .ui-item-card.is-clickable:hover {
     border-color: color-mix(in srgb, var(--category-color), #fff 60%);
-    box-shadow: 0 0 15px color-mix(in srgb, var(--category-color), transparent 50%);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--category-color), transparent 60%);
     transform: translateY(-1px);
 }
 
@@ -200,8 +200,8 @@
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid color-mix(in srgb, var(--current-color), transparent 75%);
     color: var(--current-color);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 90%);
-    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 40%);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--current-color), transparent 90%);
+    text-shadow: 0 0 4px color-mix(in srgb, var(--current-color), transparent 40%);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
     transition: all var(--motion-fast) cubic-bezier(0.4, 0, 0.2, 1);
@@ -223,7 +223,7 @@
 .ui-style--neon .ui-button.is-primary {
     background: color-mix(in srgb, var(--current-color), transparent 85%);
     border-color: color-mix(in srgb, var(--current-color), #fff 60%);
-    box-shadow: 0 0 20px color-mix(in srgb, var(--current-color), transparent 80%);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 80%);
     font-weight: 900;
 }
 
