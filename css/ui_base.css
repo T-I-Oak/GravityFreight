@@ -342,7 +342,9 @@ main {
 /* --- 4. Contextual Structures: Item Card Layers (V2 Modern Architecture) --- */
 
 /* .ui-item-card: The unified data unit for Gravity Freight V2.
-   Designed for high density and theme-agnostic structural integrity. */
+   [設計上の例外処置]: アイテムカードが「カテゴリーの色に染まる」特性は、ネオン/マット両スタイルで
+   共通の視覚体験を維持し、コードの二重定義を防ぐため、敢えて Base レイヤーで定義されています。
+   これにより、全スタイルで「カテゴリーのアイデンティティ」が保証されます。 */
 .ui-item-card {
     display: flex;
     flex-direction: column;
