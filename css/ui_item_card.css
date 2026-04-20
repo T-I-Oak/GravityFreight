@@ -1,0 +1,162 @@
+/* =========================================
+   Gravity Freight V2: Item Card Component
+   Layer: Base / Capability (A-Axis)
+   Managing unified data units for items and modules
+   ========================================= */
+
+/* --- 1. Base Item Card Structure --- */
+
+/* .ui-item-card: The unified data unit for Gravity Freight V2.
+   [設計上の例外処置]: アイテムカードが「カテゴリーの色に染まる」特性は、ネオン/マット両スタイルで
+   共通の視覚体験を維持し、コードの二重定義を防ぐため、敢えて Base レイヤーで定義されています。
+   これにより、全スタイルで「カテゴリーのアイデンティティ」が保証されます。 */
+.ui-item-card {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: color-mix(in srgb, var(--category-color, transparent), var(--color-bg-card) var(--opacity-card-tint, 93%));
+    border: 1px solid var(--color-border-card);
+    border-radius: var(--radius-standard);
+    transition: all var(--motion-normal) ease;
+    overflow: hidden;
+}
+
+/* Active/Selected State: Structural signaling and enhanced tint */
+.ui-item-card.is-active {
+    background-color: color-mix(in srgb, var(--category-color, transparent), var(--color-bg-card) var(--opacity-card-active, 80%));
+    border-color: color-mix(in srgb, var(--category-color), #fff 40%);
+}
+
+.ui-item-card.is-clickable {
+    cursor: pointer;
+}
+
+/* Category indicator bar: Shared structure for all themes */
+.ui-item-card::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    width: 4px;
+    background: var(--category-color, var(--color-theme-sub));
+    border-radius: var(--radius-standard) 0 0 var(--radius-standard);
+    transition: all 0.2s ease;
+}
+
+/* --- 2. Card Internal Layout --- */
+.ui-item-card .ui-item-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ui-item-card__title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.ui-item-card .ui-item-card__header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+    flex-shrink: 0;
+}
+
+.ui-item-card__description {
+    margin: 0 0 2px 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.3;
+}
+
+.ui-item-card__footer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 4px;
+    padding-top: 4px;
+}
+
+/* --- 3. Property Display System --- */
+.ui-item-card__prop-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.ui-item-card__prop {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-pill);
+}
+
+.ui-item-card__prop-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+}
+
+.ui-item-card__prop-value {
+    color: #ffffff;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* Enhanced State: Special visuals for upgraded properties */
+.ui-item-card__prop.is-enhanced {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.ui-item-card__prop.is-enhanced .ui-item-card__prop-value {
+    color: #00d4ff;
+}
+
+/* --- 4. Rocket & Module Specifics --- */
+.ui-rocket-details {
+    margin-top: 6px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ui-module-row {
+    line-height: 1;
+}
+
+.ui-module-name {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+/* --- 5. Semantic Data Mappings --- */
+.is-rocket   { --category-color: var(--color-category-rockets); }
+.is-launcher { --category-color: var(--color-category-launchers); }
+.is-chassis  { --category-color: var(--color-category-chassis); }
+.is-logic    { --category-color: var(--color-category-logic); }
+.is-module   { --category-color: var(--color-category-module); }
+.is-booster  { --category-color: var(--color-category-boosters); }
+.is-coin     { --category-color: var(--color-category-coin); }
+.is-cargo    { --category-color: var(--color-category-cargo); }
+
+.is-repair-dock   { --current-color: var(--color-facility-repair-dock); }
+.is-trading-post  { --current-color: var(--color-facility-trading-post); }
+.is-black-market  { --current-color: var(--color-facility-black-market); }
