@@ -12,10 +12,11 @@
 /* --- [A] ui-item-card: Matte Expression --- */
 .ui-style--matte .ui-item-card {
     --color-bg-card: #14192d;
-    --opacity-card-tint-top: 88%;
-    --opacity-card-tint-bottom: 92%;
-    --opacity-card-active-top: 75%;
-    --opacity-card-active-bottom: 85%;
+}
+
+.ui-style--matte .ui-item-card.is-clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Axis-D: Flavor Visualization (Category Color Borders) 
