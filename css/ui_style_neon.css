@@ -107,6 +107,11 @@
     --color-bg-card: rgba(20, 25, 40, 0.5);
 }
 
+.ui-style--neon .ui-item-card.is-clickable:hover {
+    border-color: color-mix(in srgb, var(--category-color), #fff 60%);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--category-color), transparent 50%);
+}
+
 .ui-style--neon .ui-item-card__title {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
