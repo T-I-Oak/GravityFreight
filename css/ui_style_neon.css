@@ -220,8 +220,8 @@
 
 /* Primary Button: Enhanced visibility with brighter border and denser background */
 .ui-style--neon .ui-button.is-primary {
-    background: color-mix(in srgb, var(--current-color), transparent 80%);
-    border-color: color-mix(in srgb, var(--current-color), #fff 40%);
+    background: color-mix(in srgb, var(--current-color), transparent 60%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 60%);
     box-shadow: 0 0 20px color-mix(in srgb, var(--current-color), transparent 80%);
     font-weight: 900;
 }
