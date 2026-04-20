@@ -93,7 +93,7 @@
    --z-system: 900;
 
    /* --- Effects & Motion --- */
-   --blur: 12px;
+   --blur: 6px;
    /* Glassmorphism diffusion strength */
    --motion-fast: 150ms;
    /* Snappy interaction feedback */
