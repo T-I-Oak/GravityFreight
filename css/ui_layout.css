@@ -154,3 +154,29 @@ main {
 .text-sub-display {
     margin: 0;
 }
+
+/* --- 7. Data Presentation Blocks --- */
+.ui-well {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-standard);
+    padding: var(--space-double);
+    margin-bottom: var(--space-double);
+}
+
+.ui-stat-group {
+    display: flex;
+    gap: var(--space-double);
+    flex-wrap: wrap;
+}
+
+.ui-stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ui-stat-box.is-hero .stat-value {
+    font-size: 24px;
+    font-weight: 900;
+}
