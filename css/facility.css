@@ -96,6 +96,11 @@
     line-height: 1.2;
 }
 
+#facility-screen .trade-item-area {
+    flex: 1;
+    min-width: 0; /* 防止 flex 項目溢出 */
+}
+
 #facility-screen .trade-action-area {
     width: 110px;
     flex-shrink: 0;
