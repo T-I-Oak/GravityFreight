@@ -75,17 +75,8 @@
             font-weight: 900;
         }
 
-        /* [航行結果] ヘッダー限定のステータス/ボタン表現 */
-        .ui_result_status_recorded {
-            background: var(--color-facility-black-market);
-            color: white;
-            padding: 6px 16px;
-            font-size: var(--text-size-main);
-            font-weight: 800;
-            border-radius: var(--radius-standard);
-            border: 1px solid transparent; /* ボタンとの高さを合わせるためのダミーボーダー */
-            user-select: none;
-            /* unclickable: is-clickableを付けず、cursor指定もなし */
+        .ui-button:not(.is-clickable) {
+            cursor: default;
         }
 
         .flight-report-status {
@@ -121,7 +112,7 @@
                     <h1 class="text-display" id="report-title">SECTOR 1 COMPLETED</h1>
                 </div>
                 <div class="flight-report-status">
-                    <div class="ui_result_status_recorded">● RECORDED</div>
+                    <div class="ui-button is-secondary" style="background: var(--color-facility-black-market);">● RECORDED</div>
                     <button class="ui-button is-outline is-inactive is-clickable">☆ PROTECT RECORD</button>
                 </div>
             </header>
