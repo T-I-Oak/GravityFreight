@@ -147,9 +147,9 @@
             { title: 'SECTOR 1 COMPLETED',  btn: 'TO TRADING POST',    cls: 'is-trading-post' },
             { title: 'SECTOR 1 COMPLETED',  btn: 'TO REPAIR DOCK',     cls: 'is-repair-dock'  },
             { title: 'SECTOR 1 COMPLETED',  btn: 'TO BLACK MARKET',    cls: 'is-black-market' },
-            { title: 'ROCKET RECOVERED',    btn: 'BACK TO BASE',       cls: 'is-retry'        },
-            { title: 'SHIP CRASHED',        btn: 'RETRY FLIGHT',       cls: 'is-retry'        },
-            { title: 'LOST IN SPACE',       btn: 'RETRY FLIGHT',       cls: 'is-retry'        }
+            { title: 'ROCKET RECOVERED',    btn: 'BACK TO BASE',       cls: 'is-home'        },
+            { title: 'SHIP CRASHED',        btn: 'RETRY FLIGHT',       cls: 'is-home'        },
+            { title: 'LOST IN SPACE',       btn: 'RETRY FLIGHT',       cls: 'is-home'        }
         ];
 
         let currentState = 0;
@@ -165,7 +165,7 @@
             btn.querySelector('.btn-main-label').textContent = s.btn;
 
             // Update classes for both Title and Button for color propagation
-            const colorClasses = ['is-repair-dock', 'is-trading-post', 'is-black-market', 'is-retry'];
+            const colorClasses = ['is-repair-dock', 'is-trading-post', 'is-black-market', 'is-home'];
             
             title.classList.remove(...colorClasses);
             title.classList.add(s.cls);
