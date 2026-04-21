@@ -28,10 +28,6 @@
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-.ui-style--matte .ui-item-card.is-placeholder.is-notable {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.05);
-}
 
 /* --- Component Style: Badges --- */
 
