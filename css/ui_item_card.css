@@ -210,9 +210,13 @@
     min-height: 56px;
     padding: 8px 12px;
     opacity: 0.6;
-    /* Default category color for placeholders: Muted gray */
-    --category-color: rgba(255, 255, 255, 0.4);
     gap: 1px;
+}
+
+/* Enable interactions only if clickable */
+.ui-item-card.is-placeholder.is-clickable {
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .ui-item-card.is-placeholder::before {
@@ -225,7 +229,6 @@
     letter-spacing: 0.05em;
     text-transform: none;
     text-align: left;
-    /* Main text remains consistently muted regardless of category color */
     color: rgba(255, 255, 255, 0.7);
 }
 
@@ -234,8 +237,8 @@
     font-weight: 800;
     letter-spacing: 0.02em;
     text-align: left;
-    /* Subtext receives the category color (dynamic) */
-    color: var(--category-color);
+    /* Use category color if provided, fallback to muted gray */
+    color: var(--category-color, rgba(255, 255, 255, 0.4));
     opacity: 1;
 }
 
@@ -243,3 +246,6 @@
 .ui-item-card.is-placeholder.is-notable .placeholder-subtext {
     animation: ui-guide-pulse 2s infinite ease-in-out;
 }
+
+.is-home   { --category-color: var(--color-home-star); }
+.is-theme  { --category-color: var(--color-theme-main); }
