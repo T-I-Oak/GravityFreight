@@ -178,6 +178,18 @@
     }
 }
 
+/* ui-guide-pulse: Guidance animation for placeholders and specific CTAs */
+@keyframes ui-guide-pulse {
+    0%, 100% { 
+        opacity: 0.6; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.05);
+    }
+}
+
 /* is-clickable icons: Visual feedback for interactive icons */
 .ui-icon.is-clickable {
     cursor: pointer;

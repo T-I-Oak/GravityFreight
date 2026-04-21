@@ -23,6 +23,16 @@
    Structural identification via solid indicator from base. */
 /* No specific overrides needed for Matte indicator beyond base logic */
 
+/* --- Placeholder: Matte Expression --- */
+.ui-style--matte .ui-item-card.is-placeholder {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.ui-style--matte .ui-item-card.is-placeholder.is-notable {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
 /* --- Component Style: Badges --- */
 
 /* Style Layer: Matte texture for general badges */

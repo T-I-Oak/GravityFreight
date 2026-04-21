@@ -177,19 +177,14 @@
 /* Category Color Contexts for Section Titles - Now Inherited from global .is-xxx */
 
 /* UI Placeholder: High-contrast guidance for empty states */
-.ui-style--neon .ui-item-placeholder {
-    padding: var(--space-double);
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.02);
-    text-align: center;
-    border-radius: var(--radius-standard);
-    transition: all 0.2s ease;
+.ui-style--neon .ui-item-card.is-placeholder {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.02) !important;
 }
 
-.ui-style--neon .ui-item-placeholder.is-clickable:hover {
-    border-color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateX(4px);
+.ui-style--neon .ui-item-card.is-placeholder.is-notable {
+    border-color: var(--color-theme-main);
+    box-shadow: inset 0 0 10px color-mix(in srgb, var(--color-theme-main), transparent 80%);
 }
 
 

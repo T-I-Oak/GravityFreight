@@ -195,3 +195,42 @@
     padding: 2px 6px;
     border-radius: 2px;
 }
+
+/* --- 7. Placeholder State --- */
+/* .is-placeholder: Structural representation of an empty slot.
+   Maintains layout density while signaling missing content. */
+.ui-item-card.is-placeholder {
+    border-style: dashed;
+    background-color: transparent !important;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 48px;
+    opacity: 0.3;
+    /* Reset category signals */
+    --category-color: rgba(255, 255, 255, 0.2);
+}
+
+.ui-item-card.is-placeholder::before {
+    display: none;
+}
+
+.ui-item-card.is-placeholder .placeholder-text {
+    font-size: 10px;
+    font-weight: 950;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* is-notable (Guidance): Visual pulse to attract user attention to the empty slot */
+.ui-item-card.is-placeholder.is-notable {
+    opacity: 1;
+    border-color: var(--color-theme-main);
+}
+
+.ui-item-card.is-placeholder.is-notable .placeholder-text {
+    color: var(--color-theme-main);
+    animation: ui-guide-pulse 2s infinite ease-in-out;
+}
