@@ -115,7 +115,6 @@
 /* 3. Disabled & Inactive States */
 .ui-style--matte .ui-button.is-inactive {
     background: transparent !important;
-    opacity: 0.5;
 }
 
 .ui-style--matte .ui-button.is-disabled {
