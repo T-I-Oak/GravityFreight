@@ -3,6 +3,9 @@
    Layer: Context / View (Specific)
    ========================================= */
 
+/* Local Status Colors (Not yet promoted to global tokens) */
+.is-retry { --current-color: #ff8c00; }
+
 #flight-result-screen .ui-panel {
     width: 70vw;
     height: 85vh;
