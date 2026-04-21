@@ -75,8 +75,13 @@
             font-weight: 900;
         }
 
-        .ui-button:not(.is-clickable) {
-            cursor: default;
+        .ui-badge.is-inactive {
+            background: transparent !important;
+        }
+
+        .ui-badge.is-clickable:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .flight-report-status {
@@ -112,8 +117,8 @@
                     <h1 class="text-display" id="report-title">SECTOR 1 COMPLETED</h1>
                 </div>
                 <div class="flight-report-status">
-                    <div class="ui-button is-secondary" style="background: var(--color-facility-black-market);">● RECORDED</div>
-                    <button class="ui-button is-outline is-inactive is-clickable">☆ PROTECT RECORD</button>
+                    <div class="ui-badge is-danger" style="background: var(--color-facility-black-market); color: white;">● RECORDED</div>
+                    <div class="ui-badge is-outline is-inactive is-clickable">☆ PROTECT RECORD</div>
                 </div>
             </header>
 
