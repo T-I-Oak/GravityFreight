@@ -28,7 +28,7 @@ export class UIComponents {
         // --- 2. Stack Badge ---
         const currentCount = item.count || 0;
         if (currentCount > 1) {
-            headerRight += `<div class="ui-stack-badge">x${currentCount}</div>`;
+            headerRight += `<div class="ui-badge is-stack">x${currentCount}</div>`;
         }
 
         const headerHTML = `
@@ -116,7 +116,7 @@ export class UIComponents {
                 meta = this.generateHPGauge(current, mod.maxCharges, false, 'is-mini');
             } else if (mod.count && mod.count > 1) {
                 // Minimalist badge for stacks (always mini)
-                meta = `<div class="ui-stack-badge is-mini">x${mod.count}</div>`;
+                meta = `<div class="ui-badge is-stack is-mini">x${mod.count}</div>`;
             }
 
             rows += `
