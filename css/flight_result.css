@@ -34,13 +34,12 @@
 }
 
 /* Header Specific Adjustments */
-.ui-report-title {
+#flight-result-screen .ui-panel__title {
     margin: var(--space-unit) 0 0 0;
     font-size: 24px;
+    font-weight: 900;
     letter-spacing: 0.05em;
     color: var(--current-color, var(--color-text-base));
-    text-shadow: 0 0 15px var(--current-color);
-    transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .flight-report-status {
