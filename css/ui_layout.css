@@ -159,6 +159,12 @@ main {
     justify-content: center;
 }
 
+.ui-split-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .ui-title-box {
     display: flex;
     flex-direction: column;
@@ -177,18 +183,12 @@ main {
     flex-wrap: wrap;
 }
 
-.ui-stat-box {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.ui-stat-box .stat-value {
+.ui-split-column .stat-value {
     font-size: var(--text-size-title);
     line-height: 1;
 }
 
-.ui-stat-box.is-hero .stat-value {
+.ui-split-column.is-hero .stat-value {
     font-size: 24px;
     font-weight: 900;
 }
