@@ -169,3 +169,21 @@
     0%, 100% { transform: rotate(20deg) scale(1); filter: brightness(1); }
     50% { transform: rotate(20deg) scale(1.05); filter: brightness(1.2); }
 }
+
+#facility-screen .ui-durability-gauge {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2px 4px;
+}
+
+#facility-screen .ui-durability-segment {
+    width: 12px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    transform: none;
+}
+
+#facility-screen .ui-durability-segment.is-active {
+    background: var(--category-color, var(--color-theme-main));
+    box-shadow: 0 0 4px var(--category-color);
+}
