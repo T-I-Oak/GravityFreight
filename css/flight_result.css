@@ -8,6 +8,10 @@
     height: 85vh;
     max-width: 640px;
     margin: auto;
+    
+    /* 統一されたパディングとセクション間ギャップ */
+    padding: var(--space-double);
+    gap: var(--space-double);
 }
 
 @media screen and (max-width: 600px) {
@@ -17,17 +21,16 @@
     }
 }
 
-/* Panel Layout: Explicit spacing for result screen components */
+/* Panel Layout: Sections now inherit panel-level padding/gap logic */
 #flight-result-screen .ui-panel__header,
 #flight-result-screen .ui-panel__body,
 #flight-result-screen .ui-panel__footer {
-    padding: var(--space-double);
+    padding: 0; /* 個別パディングを廃止 */
 }
 
 #flight-result-screen .ui-panel__footer {
     display: flex;
     justify-content: space-between;
-    gap: var(--space-double);
 }
 
 /* Layout Specific Adjustments */
