@@ -30,6 +30,11 @@
     gap: var(--space-double);
 }
 
+/* Layout Specific Adjustments */
+#flight-result-screen .ui-columns {
+    gap: 32px; /* 広めの余白を確保 */
+}
+
 /* Header Specific Adjustments */
 #flight-result-screen .ui-panel__title {
     margin: var(--space-unit) 0 0 0;
