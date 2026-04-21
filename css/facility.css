@@ -81,6 +81,40 @@
     pointer-events: none;
 }
 
+#facility-screen .is-trading-post {
+    --current-color: var(--color-facility-trading-post);
+}
+
+#facility-screen .is-repair-dock {
+    --current-color: var(--color-facility-repair-dock);
+}
+
+#facility-screen .is-black-market {
+    --current-color: var(--color-facility-black-market);
+}
+
+#facility-screen .facility-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 4px solid var(--current-color);
+    border-radius: 12px;
+    color: var(--current-color);
+    font-family: 'UnifrakturMaguntia', serif;
+    font-size: 48px;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: brightness(0.7);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 
+                inset 0 0 20px color-mix(in srgb, var(--current-color), transparent 90%);
+    box-sizing: border-box;
+    padding-top: 5px; /* 重心調整 */
+}
+
 #facility-screen .ui-panel__title {
     font-size: 24px;
     font-weight: 900;

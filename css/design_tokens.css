@@ -18,6 +18,8 @@
    --color-theme-sub: #4488ff;
    /* Traversal Blue: Secondary Brand Color */
 
+   --current-color: var(--color-theme-main);
+
    /* Facility Colors
        Fixed pillars of the station environment. */
    --color-facility-trading-post: #00a62a;
