@@ -237,6 +237,11 @@
 }
 
 /* is-notable: Pulsing guidance subtext in theme color (V1 legacy) */
+.ui-item-card.is-placeholder.is-notable {
+    /* Set category color to theme-main to allow hover tinting logic to work */
+    --category-color: var(--color-theme-main);
+}
+
 .ui-item-card.is-placeholder.is-notable .placeholder-subtext {
     color: var(--color-theme-main);
     opacity: 1;
