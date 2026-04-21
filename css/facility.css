@@ -82,7 +82,7 @@
     letter-spacing: -1px;
 }
 
-#facility-screen .ui-button.is-small {
+#facility-screen .trade-action-area .ui-button {
     width: 100%;
     padding: 0;
     height: 24px;
