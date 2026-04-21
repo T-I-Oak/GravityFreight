@@ -55,8 +55,12 @@
 }
 
 #facility-screen .trade-action-area {
-    width: 120px;
+    width: 100px;
     flex-shrink: 0;
+}
+
+#facility-screen .ui-split-row {
+    gap: var(--space-unit);
 }
 
 #facility-screen .trade-action-group {
