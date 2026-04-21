@@ -49,6 +49,16 @@
    --color-category-cargo: #607d8b;
    /* Concrete: Industrial freight */
 
+   /* World & Entity Colors (Canvas)
+       Authoritative colors for game world rendering. */
+   --color-world-bg:             var(--color-bg-base);
+   --color-world-home-star:      #ff6600;
+   --color-world-normal-star:    #ffcc00;
+   --color-world-repulsive-star: #e100ff;
+   --color-world-scanner:        var(--color-theme-main);
+   --color-world-boundary:       rgba(255, 255, 255, 0.1);
+   --color-world-prediction:     rgba(255, 255, 255, 0.6);
+
    /* Numeric Data Colors
        Derived tokens based on the semantic relationship of data types. */
    --color-num-score: var(--color-theme-main);
