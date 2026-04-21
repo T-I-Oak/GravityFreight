@@ -81,8 +81,16 @@
     pointer-events: none;
 }
 
+#facility-screen .ui-panel__title {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    margin: 0;
+    line-height: 1.2;
+}
+
 #facility-screen .trade-action-area {
-    width: 100px;
+    width: 110px;
     flex-shrink: 0;
 }
 
