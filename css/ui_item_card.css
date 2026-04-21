@@ -201,15 +201,15 @@
    Maintains layout density while signaling missing content. */
 .ui-item-card.is-placeholder {
     border-style: dashed;
-    background-color: transparent !important;
+    background-color: transparent;
     pointer-events: none;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 48px;
     opacity: 0.3;
-    /* Reset category signals */
-    --category-color: rgba(255, 255, 255, 0.2);
+    /* Reset category signals via variables */
+    --category-color: transparent;
 }
 
 .ui-item-card.is-placeholder::before {
