@@ -209,7 +209,7 @@
     align-items: flex-start; /* V1 matches actual card title alignment */
     min-height: 56px;
     padding: 8px 12px;
-    opacity: 0.4;
+    opacity: 0.6; /* Common opacity for all empty slots */
     /* Reset category signals via variables */
     --category-color: transparent;
     gap: 1px;
@@ -237,10 +237,6 @@
 }
 
 /* is-notable: Pulsing guidance subtext in theme color (V1 legacy) */
-.ui-item-card.is-placeholder.is-notable {
-    opacity: 1; /* Notable slot should be visible */
-}
-
 .ui-item-card.is-placeholder.is-notable .placeholder-subtext {
     color: var(--color-theme-main);
     opacity: 1;
