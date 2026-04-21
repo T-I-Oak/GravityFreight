@@ -34,27 +34,27 @@
     gap: 1px;
     background: #444;
     color: #fff;
-    font-size: 7px;
+    font-size: 8px; /* 8pxに戻す */
     font-weight: 900;
     padding: 1px 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
     white-space: nowrap;
     border: 1px solid rgba(255, 255, 255, 0.2);
     
-    /* オーバーラップ設定: 価格の "c" あたりに重なるように調整 */
-    margin-left: -12px;
-    margin-top: -4px;
+    /* オーバーラップ設定: 価格に少し重なるように */
+    margin-left: -8px;
+    margin-top: -6px;
     position: relative;
     z-index: 2;
-    pointer-events: none; /* 下のボタン操作を邪魔しない */
+    pointer-events: none;
 
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     text-transform: uppercase;
-    transform: rotate(8deg); /* 角度を少し緩やかに */
+    transform: rotate(8deg);
 }
 
 #facility-screen .trade-action-area {
-    width: 110px; /* 三桁価格 + タグ + 余裕を考慮した固定幅 */
+    width: 120px; /* 固定幅を少し広めに確保 */
     flex-shrink: 0;
 }
 
@@ -62,14 +62,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-end; /* 右寄せ */
-    gap: 0; /* 重複させるので gap は 0 */
+    justify-content: center; /* センタリング */
+    gap: 0;
     margin-bottom: 4px;
 }
 
 #facility-screen .trade-price {
     font-family: var(--font-num);
-    font-size: 24px; /* さらに拡大 */
+    font-size: 22px; /* 24pxは少し大きすぎたため、22pxに微調整 */
     font-weight: 900;
     color: var(--color-category-coin);
     text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
@@ -77,25 +77,13 @@
     letter-spacing: -1px;
 }
 
-#facility-screen .trade-price::after {
-    content: " c";
-    font-size: 12px;
-    opacity: 0.6;
-    margin-left: 2px;
-}
-
-/* モックの HTML 内にある "c" を非表示にするか、CSSで価格単位を共通化 */
-#facility-screen .trade-price.num-coin {
-    /* 単位表示を ::after に移譲するため、元々のテキスト内の c を隠す想定 
-       （今回はHTMLをいじらず、既存の "40 c" をそのまま使いつつサイズだけ変えます） */
-}
-
 #facility-screen .ui-button.is-small {
     width: 100%;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    height: 28px; /* 高さを抑える */
+    padding: 0; /* 上下左右パディングを排除 */
+    height: 24px; /* 極限まで短く */
     font-size: 11px;
+    line-height: 24px; /* 高さと合わせる */
+    min-height: auto;
 }
 
 #facility-screen .ui-badge.is-discount .sticker-num { 
