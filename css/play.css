@@ -115,42 +115,11 @@
 #play-screen .is-launch { --current-color: var(--color-category-launchers); }
 #play-screen .is-assembly { --current-color: var(--color-theme-main); }
 
-#play-screen .is-launch,
-#play-screen .is-assembly {
+/* Play scene specific overrides for large action buttons */
+#play-screen .ui-button.is-big {
     height: 76px;
-    padding: 10px 8px;
-    border-radius: var(--radius-pill);
-    border-width: 3px; /* Stronger structural presence for main actions */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 2px;
+    border-width: 3px;
     width: 100%;
-    transition: all var(--motion-fast);
-}
-
-/* Enhanced Glow for Mission-Critical Actions */
-#play-screen .is-launch:hover:not(.is-disabled),
-#play-screen .is-assembly:hover:not(.is-disabled) {
-    border-color: color-mix(in srgb, var(--current-color), #fff 50%);
-    box-shadow: 0 0 25px var(--current-color);
-}
-
-#play-screen .is-launch .btn-main-label,
-#play-screen .is-assembly .btn-main-label {
-    font-size: 16px;
-    font-weight: 950;
-    letter-spacing: 0.05em;
-}
-
-#play-screen .is-launch .btn-sub-label,
-#play-screen .is-assembly .btn-sub-label {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    opacity: 0.8;
 }
 
 /* Mission-Specific Disabled Logic */

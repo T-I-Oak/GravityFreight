@@ -17,6 +17,11 @@
     border-radius: var(--radius-standard);
 }
 
+/* Capability: pill-shaped badge */
+.ui-badge.is-capsule {
+    border-radius: var(--radius-pill);
+}
+
 /* is-stack: derivative for numerical item counts */
 .ui-badge.is-stack {
     font-size: 13px;
@@ -134,7 +139,7 @@
     justify-content: center;
 }
 
-/* --- 7. Logo Specific Primitives --- */
+/* --- 7. Logo Specific Primitives (Cleaned) --- */
 .is-logo.text-display {
     font-family: 'Outfit', sans-serif;
     font-size: 18px;
@@ -153,4 +158,42 @@
     letter-spacing: 0.4em;
     line-height: 1.2;
     text-transform: uppercase;
+}
+
+/* --- 8. Animation & State Primitives --- */
+
+/* is-new: mail icon specific pulse animation (Unified with HUD neon-pulse rhythm) */
+.ui-icon.is-icon-mail.is-new {
+    animation: ui-mail-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes ui-mail-pulse {
+    0%, 100% { 
+        opacity: 0.8; 
+        filter: brightness(1) drop-shadow(0 0 1px currentColor); 
+    }
+    50% { 
+        opacity: 1; 
+        filter: brightness(1.5) drop-shadow(0 0 6px currentColor); 
+    }
+}
+
+/* is-clickable icons: Visual feedback for interactive icons */
+.ui-icon.is-clickable {
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+}
+
+.ui-icon.is-clickable:hover {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+}
+
+/* --- 9. Data Wells --- */
+.ui-well {
+    border-radius: var(--radius-standard);
+    padding: var(--space-double);
+    margin-bottom: var(--space-double);
+    border: 1px solid transparent;
+    transition: all var(--motion-normal);
 }

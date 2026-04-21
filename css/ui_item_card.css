@@ -51,6 +51,24 @@
     transition: all 0.2s ease;
 }
 
+/* Axis-E: Structural Variation (Story Specialization) */
+.ui-item-card.is-story {
+    padding-left: 16px;
+}
+
+.ui-item-card.is-story::before {
+    width: 8px;
+    background: repeating-linear-gradient(
+        to right,
+        var(--category-color),
+        var(--category-color) 3px,
+        transparent 3px,
+        transparent 5px,
+        var(--category-color) 5px,
+        var(--category-color) 8px
+    );
+}
+
 /* --- 2. Card Internal Layout --- */
 .ui-item-card .ui-item-card__header {
     display: flex;
@@ -95,6 +113,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+}
+
+/* Automatic Color Propagation for Icons */
+.ui-item-card .ui-icon {
+    color: var(--category-color, #ffffff);
 }
 
 .ui-item-card__prop {
@@ -161,6 +184,14 @@
 .is-coin     { --category-color: var(--color-category-coin); }
 .is-cargo    { --category-color: var(--color-category-cargo); }
 
-.is-repair-dock   { --current-color: var(--color-facility-repair-dock); }
-.is-trading-post  { --current-color: var(--color-facility-trading-post); }
-.is-black-market  { --current-color: var(--color-facility-black-market); }
+.is-repair-dock   { --current-color: var(--color-facility-repair-dock); --category-color: var(--color-facility-repair-dock); }
+.is-trading-post  { --current-color: var(--color-facility-trading-post); --category-color: var(--color-facility-trading-post); }
+.is-black-market  { --current-color: var(--color-facility-black-market); --category-color: var(--color-facility-black-market); }
+
+/* --- 6. Card Status Indicators --- */
+.ui-item-card__status {
+    font-size: 9px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 2px;
+}

@@ -105,6 +105,11 @@ main {
     align-items: center;
 }
 
+/* is-data-row: Logical role for split-rows that present key-value data */
+.ui-split-row.is-data-row {
+    width: 100%;
+}
+
 /* --- 4. Sectioning --- */
 .ui-section {
     margin-bottom: var(--space-unit);
@@ -163,5 +168,28 @@ main {
 .text-display,
 .text-sub-display {
     margin: 0;
+}
+
+/* --- 7. Data Visualization Layouts --- */
+.ui-stat-group {
+    display: flex;
+    gap: var(--space-double);
+    flex-wrap: wrap;
+}
+
+.ui-stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ui-stat-box .stat-value {
+    font-size: var(--text-size-title);
+    line-height: 1;
+}
+
+.ui-stat-box.is-hero .stat-value {
+    font-size: 24px;
+    font-weight: 900;
 }
 

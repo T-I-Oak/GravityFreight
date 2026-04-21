@@ -44,11 +44,8 @@
 }
 
 #title-screen .ui-menu-buttons .ui-button {
-    height: 48px;
-    padding: 0 48px;
-    border-radius: var(--radius-pill);
-    font-size: 16px;
-    letter-spacing: 0.1em;
+    /* Base styles are now managed by .ui-button and .is-big in ui_base.css */
+    width: 100%;
 }
 
 /* Specific position for the settings gear on the title screen */

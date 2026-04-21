@@ -1,7 +1,9 @@
 /**
- * UIComponents.js (V2 Modernized - Explicit View Filtering Version)
- * Standardized HTML generation logic for Gravity Freight V2.
+ * UIComponents.js
+ * Standardized HTML generation logic for Gravity Freight.
  */
+import { STORY_DATA, FACILITY_INFO, getFacilityById } from '../../core/Data.js';
+
 export class UIComponents {
     /**
      * Generates a complete item card HTML string.
@@ -29,6 +31,14 @@ export class UIComponents {
         const currentCount = item.count || 0;
         if (currentCount > 1) {
             headerRight += `<div class="ui-badge is-stack">x${currentCount}</div>`;
+        }
+
+        // --- 2.5 Delivery Status Badge ---
+        if (options.status) {
+            const status = options.status.toLowerCase();
+            const statusLabel = status.toUpperCase();
+            const statusClass = `is-${status}`;
+            headerRight += `<span class="ui-item-card__status ${statusClass}">${statusLabel}</span>`;
         }
 
         const headerHTML = `
@@ -128,5 +138,27 @@ export class UIComponents {
         });
 
         return `<div class="ui-rocket-details">${rows}</div>`;
+    }
+
+    /**
+     * Generates a story card HTML string.
+     * @param {string} storyId - Key for STORY_DATA (e.g., 'T')
+     * @param {boolean} isNew - Whether to apply a "new" pulse animation
+     */
+    static generateStoryCardHTML(storyId, isNew = false) {
+        const story = STORY_DATA[storyId];
+        const facilityClass = getFacilityById(story.branch).className;
+
+        return `
+            <article class="ui-item-card is-story is-active is-clickable ${facilityClass}">
+                <header class="ui-item-card__header ui-split-row">
+                    <h3 class="ui-item-card__title">${story.title}</h3>
+                    <div class="ui-item-card__header-right">
+                        <span class="ui-icon is-icon-mail ${isNew ? 'is-new' : ''}"></span>
+                    </div>
+                </header>
+                <div class="ui-item-card__description">${story.discovery}</div>
+            </article>
+        `;
     }
 }

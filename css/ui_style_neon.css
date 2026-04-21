@@ -214,7 +214,12 @@
     transform: translateY(-1px);
 }
 
-.ui-style--neon .ui-button:active:not(.is-disabled) {
+.ui-style--neon .ui-button.is-big:hover:not(.is-disabled) {
+    box-shadow: 0 0 30px var(--current-color);
+}
+
+.ui-style--neon .ui-button:active:not(.is-disabled),
+.ui-style--neon .is-clickable:active:not(.is-disabled) {
     transform: scale(0.98);
     filter: brightness(1.2);
 }
@@ -268,27 +273,21 @@
 
 /* Utilities & Indicators */
 
-/* Message Icons */
-.ui-style--neon .ui-msg-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+/* Message Icons (HUD Specific Size & Branding) */
+#play-hud .hud-messages .ui-icon {
     font-size: 16px;
-    /* Controls .ui-icon size via 1.2em */
-    padding: 0;
-    /* Spacing exclusively managed by gap in layout layer */
     transition: all 0.2s ease;
 }
 
-.ui-style--neon .ui-msg-icon.is-trading-post {
+#play-hud .hud-messages .ui-icon.is-trading-post {
     color: var(--color-facility-trading-post);
 }
 
-.ui-style--neon .ui-msg-icon.is-repair-dock {
+#play-hud .hud-messages .ui-icon.is-repair-dock {
     color: var(--color-facility-repair-dock);
 }
 
-.ui-style--neon .ui-msg-icon.is-disabled {
+#play-hud .hud-messages .ui-icon.is-disabled {
     color: rgba(255, 255, 255, 0.15);
 }
 
@@ -299,23 +298,4 @@
     box-shadow: 0 0 12px color-mix(in srgb, var(--category-color, var(--color-theme-main)), transparent 40%);
     text-shadow: none;
     /* Black text must stay crisp */
-}
-
-/* Apply pulse to the icon itself */
-.ui-style--neon .ui-msg-icon.has-new .ui-icon {
-    animation: neon-pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes neon-pulse {
-
-    0%,
-    100% {
-        opacity: 0.8;
-        filter: drop-shadow(0 0 2px currentColor);
-    }
-
-    50% {
-        opacity: 1;
-        filter: drop-shadow(0 0 8px currentColor) brightness(1.5);
-    }
 }

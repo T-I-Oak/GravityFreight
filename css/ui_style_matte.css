@@ -32,6 +32,16 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
+.ui-style--matte .ui-badge.is-inactive {
+    background: transparent !important;
+}
+
+.ui-style--matte .ui-badge.is-clickable:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+
 /* Style Layer (Specialization): Stack Badge color expression */
 .ui-style--matte .ui-badge.is-stack {
     background: var(--category-color);
@@ -39,9 +49,33 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-/* --- Components: Durability Gauge --- */
+/* --- Components: Data Wells (Recessed/Inward Plate) --- */
+.ui-style--matte .ui-well {
+    background: rgba(0, 0, 0, 0.2); 
+    /* Inward Shadow/Border logic (Inverse of Panel) */
+    border-top: 1px solid rgba(0, 0, 0, 0.4);
+    border-left: 1px solid rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
 
-/* --- Components: Durability Gauge (Overrides Disabled) --- */
+/* --- Components: Card Status Colors --- */
+.ui-style--matte .ui-item-card__status.is-delivered {
+    color: var(--color-theme-main);
+    background: color-mix(in srgb, var(--color-theme-main), transparent 90%);
+}
+.ui-style--matte .ui-item-card__status.is-delivered::before {
+    content: '✓ ';
+}
+
+.ui-style--matte .ui-item-card__status.is-unmatched {
+    color: #ff4488;
+    background: rgba(255, 68, 136, 0.1);
+}
+.ui-style--matte .ui-item-card__status.is-unmatched::before {
+    content: '✗ ';
+}
 
 /* Props & Descriptions */
 .ui-style--matte .ui-item-card__description {
@@ -122,4 +156,11 @@
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.2);
     cursor: not-allowed;
+}
+
+/* --- Global Interaction Feedback (Tactile Response) --- */
+.ui-style--matte .ui-button:active:not(.is-disabled),
+.ui-style--matte .is-clickable:active:not(.is-disabled) {
+    transform: perspective(1px) scale(0.97);
+    filter: brightness(0.9);
 }
