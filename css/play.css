@@ -55,7 +55,7 @@
     padding: var(--space-double);
 }
 
-#play-hud .ui-stat-box {
+#play-hud .ui-split-column {
     display: flex;
     flex-direction: column;
 }
