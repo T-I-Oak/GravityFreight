@@ -206,12 +206,12 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start; /* V1 matches actual card title alignment */
+    align-items: flex-start;
     min-height: 56px;
     padding: 8px 12px;
-    opacity: 0.6; /* Common opacity for all empty slots */
-    /* Reset category signals via variables */
-    --category-color: transparent;
+    opacity: 0.6;
+    /* Default category color for placeholders: Muted gray */
+    --category-color: rgba(255, 255, 255, 0.4);
     gap: 1px;
 }
 
@@ -223,28 +223,23 @@
     font-size: 11px;
     font-weight: 900;
     letter-spacing: 0.05em;
-    text-transform: none; /* V1 uses natural case usually */
+    text-transform: none;
     text-align: left;
-    color: rgba(255, 255, 255, 0.9);
+    /* Main text remains consistently muted regardless of category color */
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .ui-item-card.is-placeholder .placeholder-subtext {
     font-size: 9px;
-    font-weight: 700;
-    opacity: 0.5; /* Even more muted in normal state */
+    font-weight: 800;
     letter-spacing: 0.02em;
     text-align: left;
-}
-
-/* is-notable: Pulsing guidance subtext in theme color (V1 legacy) */
-.ui-item-card.is-placeholder.is-notable {
-    /* Set category color to theme-main to allow hover tinting logic to work */
-    --category-color: var(--color-theme-main);
-}
-
-.ui-item-card.is-placeholder.is-notable .placeholder-subtext {
-    color: var(--color-theme-main);
+    /* Subtext receives the category color (dynamic) */
+    color: var(--category-color);
     opacity: 1;
-    font-weight: 800;
+}
+
+/* is-notable (Guidance): Adds pulse animation to the subtext only */
+.ui-item-card.is-placeholder.is-notable .placeholder-subtext {
     animation: ui-guide-pulse 2s infinite ease-in-out;
 }
