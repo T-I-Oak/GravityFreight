@@ -204,12 +204,14 @@
     background-color: transparent;
     pointer-events: none;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 48px;
-    opacity: 0.3;
+    min-height: 56px;
+    opacity: 0.35;
     /* Reset category signals via variables */
     --category-color: transparent;
+    gap: 2px;
 }
 
 .ui-item-card.is-placeholder::before {
@@ -217,20 +219,26 @@
 }
 
 .ui-item-card.is-placeholder .placeholder-text {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 950;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #ffffff;
+}
+
+.ui-item-card.is-placeholder .placeholder-subtext {
+    font-size: 9px;
+    font-weight: 800;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     text-align: center;
 }
 
-/* is-notable (Guidance): Visual pulse to attract user attention to the empty slot */
-.ui-item-card.is-placeholder.is-notable {
-    opacity: 1;
-    border-color: var(--color-theme-main);
-}
-
-.ui-item-card.is-placeholder.is-notable .placeholder-text {
+/* is-notable: Only the subtext pulses to guide the user */
+.ui-item-card.is-placeholder.is-notable .placeholder-subtext {
     color: var(--color-theme-main);
+    opacity: 1;
     animation: ui-guide-pulse 2s infinite ease-in-out;
 }
