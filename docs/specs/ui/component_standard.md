@@ -42,7 +42,23 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
     - `.is-[category]`: カテゴリー（`chassis`, `logic`, `cargo` 等）に応じた色情報の付与。
 - **デザイン基準**: 標準パディング `8px 12px`、高密度設計。
 
-### 2.2 Story Card (ストーリーカード：派生)
+### 2.2 Placeholder Card (プレースホルダー：空のスロット)
+アイテムが存在しない状態を示すためのカード型コンポーネント。
+- **基本構造**: 
+  ```html
+  <article class="ui-item-card is-placeholder">
+      <div class="placeholder-text">MAIN MESSAGE</div>
+      <div class="placeholder-subtext">Guidance subtext</div>
+  </article>
+  ```
+- **共通修飾クラス (Modifier Classes)**:
+    - `.is-notable`: ガイドアニメーション（`ui-guide-pulse`）を有効化。**サブテキストのみ**が点滅し、ユーザーの注意を引く。
+    - `.is-clickable`: ホバー・クリックフィードバックを有効化。
+    - `.is-[category/theme/home]`: サブテキストにカテゴリー色を付与。枠とメインテキストは常に共通のグレーを維持する。
+- **生成メソッド**: `UIComponents.generatePlaceholderHTML(text, subtext, options)`
+- **デザイン基準**: 境界線は `dashed`（点線）、背景は透明、全体的に `opacity: 0.6` の落ち着いた外観。
+
+### 2.3 Story Card (ストーリーカード：派生)
 アイテムカード（`.ui-item-card`）を拡張した物語用コンポーネント。
 - **追加クラス**: `.is-story` (必ず `.ui-item-card` と併用)
 - **追加される特性**:
@@ -50,27 +66,27 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
     - **レイアウト調整**: インジケーター分、`padding-left: 16px` となる。
 - **用途**: 物語の発見（Discovery）やログの表示に使用。
 
-### 2.3 Durability Gauge (耐久度ゲージ)
+### 2.4 Durability Gauge (耐久度ゲージ)
 - **クラス**: `.durability-gauge` / `.durability-unit`
 - **基本形状**: 
     - **常用サイズ**: 幅10px、高さ5px。
     - **ミニ版 (`.is-mini`)**: 10px 行高に収まる極小サイズ。
 - **色彩基準**: 点灯時はカテゴリーカラーを反映。
 
-### 2.4 UI Badge (汎用バッジ系)
+### 2.5 UI Badge (汎用バッジ系)
 - **基本構造**: `<div class="ui-badge">`
 - **修飾クラス (Modifier Classes)**:
     - `.is-stack`: スタック数表示用。右上に配置。
     - `.is-mini`: 10px 行高に最適化された最小サイズ。
 
-### 2.5 Enhanced State (強化状態)
+### 2.6 Enhanced State (強化状態)
 - **用途**: プロパティ値や耐久度に対する視覚的な強調。
 - **修飾クラス**: `.is-enhanced`
 - **表現基準**:
     - **数値**: アズールブルー色と `✦` 記号の付与。
     - **耐久度**: ゴールド（`#ffd700`）の専用外枠を付与。
 
-### 2.6 UI Button (ボタン)
+### 2.7 UI Button (ボタン)
 - **基本構造**: `<button class="ui-button">`
 - **修飾クラス (Modifier Classes)**:
     - `.is-primary`: 画面内の最優先アクション。塗りつぶし背景。
@@ -78,7 +94,7 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
     - `.is-disabled`: 操作無効状態。
 - **視覚効果**: ネオンスタイルでは `.is-big` に対してのみ、強力な外光（Glow）演出が適用される。
 
-### 2.7 Interactive Icon & State (アイコンと通知)
+### 2.8 Interactive Icon & State (アイコンと通知)
 - **基本構造**: `<span class="ui-icon">`
 - **修飾クラス (Modifier Classes)**:
     - `.is-clickable`: アイコン単体へのユーザー操作（scale変化）を許可。
