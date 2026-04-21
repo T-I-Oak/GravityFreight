@@ -128,7 +128,7 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
         - `isClickable` (bool): ユーザー操作（ホバーエフェクト等）を許可。
         - `isActive` (bool): 選択状態（強調）として描画。
         - `isEnhanced` (bool): 強化状態の外枠を表示。
-        - `status` (string): 'deployed', 'missing' などの状態バッジを表示。
+        - `status` (string): 'delivered' (配達済) や 'unmatched' (不適合) などの状態バッジを表示。
 
 ### 4.2 Story Card 生成
 - **メソッド**: `UIComponents.generateStoryCardHTML(storyId, isNew)`
