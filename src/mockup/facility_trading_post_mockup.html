@@ -34,12 +34,18 @@
                 </div>
             </header>
 
-            <main class="ui-well facility-main-well">
+            <!-- Content Area -->
+            <div class="ui-panel__body ui-columns">
 
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>販売中のアイテム</h3>
-                        <p class="section-subtitle">ステーションで販売されている高度なパーツです。</p>
+                <!-- Left Column: Buy Items -->
+                <section class="ui-column ui-scrollable">
+                    <header class="ui-section-header">
+                        <h3 class="ui-section-title">販売中のアイテム</h3>
+                        <p class="ui-section-subtitle">ステーションで販売されている高度なパーツです。</p>
+                    </header>
+
+                    <div class="ui-item-list">
+                        <!-- Trade entries will go here -->
 
                         <div class="trade-entry">
                             <div class="trade-item-area">
@@ -111,21 +117,25 @@
                                 <button class="ui-button is-trade is-small">BUY</button>
                             </div>
                         </div>
-                    </div>
+                    </div> <!-- /.ui-item-list -->
                 </section>
 
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>パーツの売却</h3>
-                        <p class="section-subtitle">不要なパーツを売却して資金を獲得できます。</p>
+                <!-- Right Column: Sell Items -->
+                <section class="ui-column ui-scrollable">
+                    <header class="ui-section-header">
+                        <h3 class="ui-section-title">パーツの売却</h3>
+                        <p class="ui-section-subtitle">不要なパーツを売却して資金を獲得できます。</p>
+                    </header>
 
+                    <div class="ui-item-list">
                         <div class="trade-entry">
                             <div class="trade-item-area">
-                                <div class="item-card is-chassis">
-                                    <div class="item-card__header"><span class="item-card__name">初期シャーシ [MK-1]</span>
-                                    </div>
-                                    <div class="item-card__desc">全ての物語がここから始まった。最も信頼されている基本躯体。</div>
-                                </div>
+                                <article class="ui-item-card is-chassis">
+                                    <header class="ui-item-card__header">
+                                        <span class="ui-item-card__name">初期シャーシ [MK-1]</span>
+                                    </header>
+                                    <div class="ui-item-card__desc">全ての物語がここから始まった。最も信頼されている基本躯体。</div>
+                                </article>
                             </div>
                             <div class="trade-action-area">
                                 <div class="trade-action-group">
@@ -137,20 +147,20 @@
                     </div>
                 </section>
 
-            </main>
+            </div> <!-- /.ui-panel__body -->
 
-            <footer class="facility-footer">
-                <div class="ui-stat-box">
-                    <span class="stat-label">CREDITS BALANCE</span>
+            <!-- Global Actions Section -->
+            <footer class="ui-panel__footer">
+                <div class="ui-stat-box is-hero">
+                    <span class="ui-stat-label">CREDITS BALANCE</span>
                     <span class="stat-value num-coin">420 c</span>
                 </div>
-                <button class="ui-button is-primary">DEPART FROM STATION</button>
+                <button class="ui-button is-primary is-big is-trading-post">
+                    <span class="btn-main-label">DEPART FROM STATION</span>
+                </button>
             </footer>
-
-        </article>
-
-    </div>
-
+        </section>
+    </main>
 </body>
 
 </html>
