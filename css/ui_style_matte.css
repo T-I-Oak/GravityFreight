@@ -112,7 +112,12 @@
     background: color-mix(in srgb, var(--current-color), #000 25%);
 }
 
-/* 3. Disabled & Static States */
+/* 3. Disabled & Inactive States */
+.ui-style--matte .ui-button.is-inactive {
+    background: transparent !important;
+    opacity: 0.5;
+}
+
 .ui-style--matte .ui-button.is-disabled {
     border-color: rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
