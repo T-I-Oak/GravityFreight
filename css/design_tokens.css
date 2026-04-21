@@ -26,7 +26,9 @@
    /* Industrial Blue */
    --color-facility-black-market: #cf1744;
    /* Prohibited Red */
-   --color-facility-retry: #ff8c00;
+ 
+   /* Functional & Status Colors */
+   --color-ui-retry: #ff8c00;
    /* Emergency Orange */
 
    /* Category Colors
