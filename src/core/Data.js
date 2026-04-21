@@ -51,22 +51,6 @@ export const GAME_BALANCE = {
     EMERGENCY_THRUST_MULT: 0.8
 };
 
-// UI・エフェクト用カラー定義
-export const UI_COLORS = {
-    BG: '#050510',
-    HOME_STAR: '#ff6600',
-    HOME_STAR_GLOW: '#ff3300',
-    NORMAL_STAR: '#ffcc00',
-    NORMAL_STAR_GLOW: 'rgba(255,204,0,0.5)',
-    BOUNDARY: 'rgba(255, 255, 255, 0.1)',
-    SCANNER: 'rgba(0, 255, 204, 1.0)',
-    SCANNER_FILL: 'rgba(0, 255, 204, 0.15)',
-    TRAIL: 'rgba(255, 255, 255, 1.0)',
-    PREDICTION: 'rgba(255, 255, 255, 0.6)',
-    REPULSIVE_STAR: '#e100ff', // マゼンタ: 斥力星用
-    REPULSIVE_STAR_GLOW: 'rgba(225, 0, 255, 0.5)'
-};
-
 // マップ生成用定数
 export const MAP_CONSTANTS = {
     BOUNDARY_RADIUS: 900,
