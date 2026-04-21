@@ -179,7 +179,7 @@
 /* UI Placeholder: High-contrast guidance for empty states */
 .ui-style--neon .ui-item-card.is-placeholder {
     border-color: rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.02) !important;
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .ui-style--neon .ui-item-card.is-placeholder.is-notable {
