@@ -91,6 +91,24 @@
             const matteCol = document.getElementById('matte-column');
             const neonCol = document.getElementById('neon-column');
             
+            // --- 0. Placeholder Testing (Notable & Non-Notable) ---
+            const placeholderHTML = `
+                <article class="ui-item-card is-placeholder">
+                    <div class="placeholder-text">Empty Slot</div>
+                </article>
+                <article class="ui-item-card is-placeholder is-notable">
+                    <div class="placeholder-text">Required Slot</div>
+                </article>
+            `;
+            [matteCol, neonCol].forEach(col => {
+                const div = document.createElement('div');
+                div.innerHTML = placeholderHTML;
+                // Append both placeholders to the top
+                while(div.firstChild) {
+                    col.appendChild(div.firstChild);
+                }
+            });
+
             CATALOG.forEach(item => {
                 // Using the unified production logic with real Data.js objects
                 const html = UIComponents.generateCardHTML(item, { isClickable: true });
