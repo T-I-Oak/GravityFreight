@@ -45,126 +45,8 @@
                         <span class="ui-section-subtitle">ステーションで販売されている高度なパーツです。</span>
                     </header>
 
-                    <div class="ui-item-list">
-                        <!-- Trade entries -->
-
-                        <!-- Logic[2]: 精密予測ロジック -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-logic">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">精密予測ロジック</h3>
-                                    </header>
-                                    <div class="ui-item-card__description">遠方までの軌道予測を優先した精密演算ロジック。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">40 c</div>
-                                </div>
-                                <button class="ui-button is-primary">BUY</button>
-                            </div>
-                        </div>
-
-                        <!-- Module[0]: スロット拡張基板 (50% OFF) -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-module">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">スロット拡張基板</h3>
-                                    </header>
-                                    <div class="ui-item-card__description">スロット数を増設しロケットの拡張性を高める追加基板。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">40 c</div>
-                                    <div class="ui-badge is-discount is-high">
-                                        <span class="sticker-num">50</span><span class="sticker-pct">% OFF</span>
-                                    </div>
-                                </div>
-                                <button class="ui-button is-primary">BUY</button>
-                            </div>
-                        </div>
-
-                        <!-- Module[0]: スロット拡張基板 (Disabled) -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-module">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">スロット拡張基板</h3>
-                                    </header>
-                                    <div class="ui-item-card__description">スロット数を増設しロケットの拡張性を高める追加基板。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">80 c</div>
-                                </div>
-                                <button class="ui-button is-primary is-disabled">BUY</button>
-                            </div>
-                        </div>
-
-                        <!-- Launcher[0]: 標準発射台 [LN-1200/2] (30% OFF) -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-launcher">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">標準発射台 [LN-1200/2]</h3>
-                                    </header>
-                                    <div class="ui-item-card__description">標準的なパワーと容量を備えた、基本設計の発射台。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">28 c</div>
-                                    <div class="ui-badge is-discount is-mid">
-                                        <span class="sticker-num">30</span><span class="sticker-pct">% OFF</span>
-                                    </div>
-                                </div>
-                                <button class="ui-button is-primary">BUY</button>
-                            </div>
-                        </div>
-
-                        <!-- Chassis[1]: 標準シャーシ -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-chassis">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">標準シャーシ</h3>
-                                    </header>
-                                    <div class="ui-item-card__description">汎用性と拡張性のバランスに優れた標準規格のシャーシ。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">40 c</div>
-                                </div>
-                                <button class="ui-button is-primary">BUY</button>
-                            </div>
-                        </div>
-
-                        <!-- Chassis[3]: 軽量シャーシ＋ (10% OFF, Disabled) -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-chassis">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">軽量シャーシ＋</h3>
-                                    </header>
-                                    <div class="ui-item-card__description">軌道予測とアイテム回収機能が強化された改良版。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">109 c</div>
-                                    <div class="ui-badge is-discount is-low">
-                                        <span class="sticker-num">10</span><span class="sticker-pct">% OFF</span>
-                                    </div>
-                                </div>
-                                <button class="ui-button is-primary is-disabled">BUY</button>
-                            </div>
-                        </div>
-
+                    <div class="ui-item-list" id="buy-list">
+                        <!-- Items will be injected here via script -->
                     </div> <!-- /.ui-item-list -->
                 </section>
 
@@ -175,48 +57,8 @@
                         <span class="ui-section-subtitle">不要なパーツを売却して資金を獲得できます。</span>
                     </header>
 
-                    <div class="ui-item-list">
-                        <!-- Chassis[2]: 堅牢シャーシ -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-chassis">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">堅牢シャーシ</h3>
-                                    </header>
-                                    <div class="ui-item-card__description">初速制限と引き換えに多数の拡張枠を確保した重装甲。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">20 c</div>
-                                </div>
-                                <button class="ui-button is-secondary">SELL</button>
-                            </div>
-                        </div>
-
-                        <!-- Launcher[0]: 標準発射台 [LN-1200/2] (Durability 1/2) -->
-                        <div class="trade-entry ui-split-row">
-                            <div class="trade-item-area">
-                                <article class="ui-item-card is-launcher">
-                                    <header class="ui-item-card__header ui-split-row">
-                                        <h3 class="ui-item-card__title">標準発射台 [LN-1200/2]</h3>
-                                        <div class="ui-item-card__header-right">
-                                            <div class="ui-durability-gauge">
-                                                <div class="ui-durability-segment is-active"></div>
-                                                <div class="ui-durability-segment"></div>
-                                            </div>
-                                        </div>
-                                    </header>
-                                    <div class="ui-item-card__description">標準的なパワーと容量を備えた、基本設計の発射台。</div>
-                                </article>
-                            </div>
-                            <div class="trade-action-area ui-split-column">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">13 c</div>
-                                </div>
-                                <button class="ui-button is-secondary">SELL</button>
-                            </div>
-                        </div>
+                    <div class="ui-item-list" id="sell-list">
+                        <!-- Items will be injected here via script -->
                     </div>
                 </section>
 
@@ -234,6 +76,86 @@
             </footer>
         </section>
     </main>
+
+    <script type="module">
+        import { UIComponents } from '../systems/ui/UIComponents.js';
+        import { PARTS } from '../core/Data.js';
+
+        // Helper to create a trade entry row
+        function createTradeEntry(item, actionType, options = {}) {
+            const entry = document.createElement('div');
+            entry.className = 'trade-entry ui-split-row';
+
+            const itemArea = document.createElement('div');
+            itemArea.className = 'trade-item-area';
+            
+            // 1. Generate REAL item card HTML
+            const cardOptions = { ...options.card };
+            itemArea.innerHTML = UIComponents.generateCardHTML(item, cardOptions);
+
+            const actionArea = document.createElement('div');
+            actionArea.className = 'trade-action-area ui-split-column';
+            
+            const group = document.createElement('div');
+            group.className = 'trade-action-group';
+            
+            const price = document.createElement('div');
+            price.className = 'trade-price num-coin';
+            price.textContent = `${options.price} c`;
+            group.appendChild(price);
+
+            if (options.discount) {
+                const badge = document.createElement('div');
+                badge.className = `ui-badge is-discount ${options.discount.level}`;
+                badge.innerHTML = `<span class="sticker-num">${options.discount.val}</span><span class="sticker-pct">% OFF</span>`;
+                group.appendChild(badge);
+            }
+
+            const button = document.createElement('button');
+            button.className = `ui-button is-${actionType === 'buy' ? 'primary' : 'secondary'}`;
+            if (options.disabled) button.classList.add('is-disabled');
+            button.textContent = actionType.toUpperCase();
+
+            actionArea.appendChild(group);
+            actionArea.appendChild(button);
+
+            entry.appendChild(itemArea);
+            entry.appendChild(actionArea);
+            return entry;
+        }
+
+        const buyList = document.getElementById('buy-list');
+        const sellList = document.getElementById('sell-list');
+
+        // LEFT COLUMN: BUY (Logic[2], Module[0]x2, Launcher[0], Chassis[1], Chassis[3])
+        const buyItems = [
+            { item: PARTS.logic[2], price: 40 },
+            { item: PARTS.module[0], price: 40, discount: { level: 'is-high', val: 50 } },
+            { item: PARTS.module[0], price: 80, disabled: true },
+            { item: PARTS.launcher[0], price: 28, discount: { level: 'is-mid', val: 30 } },
+            { item: PARTS.chassis[1], price: 40 },
+            { item: PARTS.chassis[3], price: 109, discount: { level: 'is-low', val: 10 }, disabled: true }
+        ];
+
+        buyItems.forEach(cfg => {
+            buyList.appendChild(createTradeEntry(cfg.item, 'buy', cfg));
+        });
+
+        // RIGHT COLUMN: SELL (Chassis[2], Launcher[0] Durability 1/2)
+        const sellItems = [
+            { item: PARTS.chassis[2], price: 20 },
+            { 
+                item: PARTS.launcher[0], 
+                price: 13, 
+                card: { charges: 1 } // Launcher[0] has maxCharges: 2
+            }
+        ];
+
+        sellItems.forEach(cfg => {
+            sellList.appendChild(createTradeEntry(cfg.item, 'sell', cfg));
+        });
+
+    </script>
 </body>
 
 </html>
