@@ -13,6 +13,11 @@
     - **HUD**: ロゴ、統計値、メールアイコン（活性/非活性）の質感と配置の最適化。
     - **Inventory Panel**: パネル構造（`.ui-panel`）の導入、セクションの整理。
     - **Item Cards**: 新標準カード（`.ui-item-card`）による全カテゴリーの動的描画化。
+- [x] **Phase 1-3: UI Components Standard**:
+    - アイテムカード・プレースホルダーの発明と標準化。
+    - `UIComponents.js` への動的生成ジェネレーター実装。
+- [x] **Phase 2-2: Scene Refinement**:
+    - **Flight Result**: 動的な配色（Entity/World Color Mix）とレイアウトの最適化。
 
 ## Phase 1: Foundation (基盤再構築)
 - [x] **Design Tokens の再定義**: `design_tokens.css` を意味論に基づき清書完了。
@@ -27,10 +32,8 @@
 - [ ] **Analytic Archive (記録画面)**: 
     *   モックアップの清書（HTML/CSS構造の最適化）
     *   機能仕様の確定
-- [ ] **Flight Result (航行結果画面)**: 再定義
 - [ ] **Terminal Report (ゲームリザルト)**: 再定義
 - [ ] **Trading Post (施設画面)**: 再定義
-- [ ] **Inventory System (アイテム管理)**: 再定義
 
 ## Phase 3: System Integration (システム統合)
 - [ ] **全画面のレスポンシブ・スクロール点検**
