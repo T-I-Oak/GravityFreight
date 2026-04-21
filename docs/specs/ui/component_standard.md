@@ -116,11 +116,43 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
 | インジケーター | <div> | ゲージやバッジ自体など、意味論的なテキストを持たない要素。 |
 ---
 
-## 4. データ構造定義 (Data Interface)
+## 4. コンポーネント生成メソッド (Generation Methods)
 
-`UIComponents.generateCardHTML(item, options)` の `item` 引数に渡すべきデータ構造を以下に定義する。
+各コンポーネントは `UIComponents.js` を通じて動的に生成することを推奨する。
 
-### 4.1 基本プロパティ (Core)
+### 4.1 Item Card 生成
+- **メソッド**: `UIComponents.generateCardHTML(item, options)`
+- **主要引数**:
+    - `item` (Object): アイテム属性データ。詳細は「5.1 基本プロパティ」を参照。
+    - `options` (Object): 
+        - `isClickable` (bool): ユーザー操作（ホバーエフェクト等）を許可。
+        - `isActive` (bool): 選択状態（強調）として描画。
+        - `isEnhanced` (bool): 強化状態の外枠を表示。
+        - `status` (string): 'deployed', 'missing' などの状態バッジを表示。
+
+### 4.2 Story Card 生成
+- **メソッド**: `UIComponents.generateStoryCardHTML(storyId, isNew)`
+- **主要引数**:
+    - `storyId` (string): 物語データを特定する ID。
+    - `isNew` (bool): 新着通知アニメーションの有無。
+
+### 4.3 Placeholder Card 生成
+- **メソッド**: `UIComponents.generatePlaceholderHTML(text, subtext, options)`
+- **主要引数**:
+    - `text` (string): メインメッセージ。
+    - `subtext` (string): 案内・補足メッセージ。
+    - `options` (Object):
+        - `category` (string): 背景やサブテキストの色を指定（'theme', 'home' 等）。
+        - `isNotable` (bool): ガイダンスアニメーションの有効化。
+        - `isClickable` (bool): ホバー反応の有効化。
+
+---
+
+## 5. データ構造定義 (Data Interface)
+
+`UIComponents.generateCardHTML(item, options)` の `item` 引数に渡すべきデータ構造。
+
+### 5.1 基本プロパティ (Core)
 - `id` (string): アイテムの種類を特定するID。
 - `uid` (string, optional): 個別の個体を識別するためのインスタンスID。所持アイテムの操作等で使用。
 - `name` (string): 表示名称。
@@ -128,20 +160,20 @@ V2では V1 同様、Matte（マット）、Neon（ネオン）、Printing（印
 - `description` (string, optional): 説明文。存在しない場合はレンダリングをスキップする。
 - `rarity` (number, optional): レアリティ定数。
 
-### 4.2 状態・計測プロパティ (Status & Metrics)
+### 5.2 状態・計測プロパティ (Status & Metrics)
 - `count` (number, optional): スタック数。2以上の場合に右上に `.is-stack` バッジを表示。
 - `maxCharges` / `charges` (number, optional): 耐久度。存在する場合に `.durability-gauge` を表示。
 - `slots`, `mass`, `power`, `precisionMultiplier` (number, optional): 各種性能パラメータ。存在する場合に `.ui-item-card__prop` カプセルを表示。
 
-### 4.3 強化・特殊プロパティ (Enhancements)
+### 5.3 強化・特殊プロパティ (Enhancements)
 - `enhancement` (object, optional): 強化データ。
     - `slots` / `charges`: 強化されている場合に `.is-enhanced` クラスと特殊インジケーター（✦印など）が付与される。
 
-### 4.4 複合構造プロパティ (Composition)
+### 5.4 複合構造プロパティ (Composition)
 - `modules` (Array<Object>, optional): ロケット等に含まれる内包モジュールのリスト。
     - 各要素は `{ name, maxCharges, charges, count }` を持ち、カード下部の `.rocket-details` エリアに高密度表示される。
 
-### 4.5 標準プロパティラベル (Standard Labels)
+### 5.5 標準プロパティラベル (Standard Labels)
 UI上で表示する各種パラメータのラベルは、以下の表記に統一する。
 - `SLOTS`: 拡張スロット数。
 - `PRECISION`: 航行予測線の精度倍率（x1.2 など）。
@@ -151,11 +183,11 @@ UI上で表示する各種パラメータのラベルは、以下の表記に統
 
 ---
 
-## 5. 共通レイアウト・ユーティリティ (Layout Utilities)
+## 6. 共通レイアウト・ユーティリティ (Layout Utilities)
 
 画面やコンテナをまたいで使用可能な、汎用的なレイアウト支援クラス。
 
-### 5.1 UI Flex Center (中央寄せ)
+### 6.1 UI Flex Center (中央寄せ)
 - **クラス**: `.ui-flex-center`
 - **役割**: 要素を親コンテナに対して垂直・水平方向の中央に配置し、テキストも中央揃えにする。
 - **適用例**: 
