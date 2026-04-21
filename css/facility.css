@@ -9,13 +9,40 @@
     max-width: 960px;
     margin: auto;
     
-    /* 統一されたパディングとセクション間ギャップ */
+    padding: 0; /* ヘッダー・フッターを端まで通すため */
+    gap: 0; 
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#facility-screen .ui-panel__header {
     padding: var(--space-double);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
     gap: var(--space-double);
+    justify-content: flex-start; /* 左寄せ */
+    margin-bottom: 0;
+}
+
+#facility-screen .ui-panel__body {
+    padding: var(--space-double);
+    flex: 1;
+    overflow: hidden;
+}
+
+#facility-screen .ui-panel__footer {
+    padding: var(--space-double);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 #facility-screen .ui-columns {
     gap: var(--space-double);
+    height: 100%;
 }
 
 @media screen and (max-width: 600px) {
