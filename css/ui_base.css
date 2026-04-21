@@ -52,8 +52,6 @@ body {
 .is-trading-post { --current-color: var(--color-facility-trading-post); }
 .is-repair-dock  { --current-color: var(--color-facility-repair-dock); }
 .is-black-market { --current-color: var(--color-facility-black-market); }
-.is-retry         { --current-color: var(--color-ui-retry); }
-.is-orange        { --current-color: var(--color-ui-retry); }
 
 /* --- 2. Interactive Foundations (Semantic) --- */
 .ui-button,
