@@ -161,4 +161,23 @@ export class UIComponents {
             </article>
         `;
     }
+
+    /**
+     * Generates a placeholder card HTML string for empty slots.
+     * @param {string} text - Main message (e.g., "NO ROCKET EQUIPPED")
+     * @param {string} subtext - Guidance message (e.g., "CLICK TO BUILD")
+     * @param {Object} options - { category, isNotable, isClickable }
+     */
+    static generatePlaceholderHTML(text, subtext, options = {}) {
+        const category = options.category ? `is-${options.category}` : '';
+        const notable = options.isNotable ? 'is-notable' : '';
+        const clickable = options.isClickable ? 'is-clickable' : '';
+
+        return `
+            <article class="ui-item-card is-placeholder ${category} ${notable} ${clickable}">
+                <div class="placeholder-text">${text}</div>
+                <div class="placeholder-subtext">${subtext}</div>
+            </article>
+        `;
+    }
 }
