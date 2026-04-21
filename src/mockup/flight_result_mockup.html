@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravity Freight: Flight Result Mockup (System & Data Verified)</title>
+    <title>Gravity Freight: Flight Result Mockup (V2 Architecture Verified)</title>
     <!-- Google Fonts: Inter/Outfit (System Display) + Courier Prime (Mono stats) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,95 +20,9 @@
     <link rel="stylesheet" href="../../css/ui_item_card.css">
     <link rel="stylesheet" href="../../css/ui_style_matte.css">
     <link rel="stylesheet" href="../../css/ui_style_neon.css">
-    <link rel="stylesheet" href="../../css_old/animations.css">
     
-    <!-- Scene Specific Style (Context Layer) -->
-    <style>
-        /* Contextual adjustments for Flight Result Screen */
-        .report-data-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-        .report-data-label { opacity: 0.7; font-size: 14px; }
-        .report-data-value { font-family: 'Courier Prime', monospace; font-weight: 700; }
-
-        /* Status labeling for items captured in flight */
-        .ui-item-card__status {
-            font-size: 9px;
-            font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 2px;
-        }
-        .ui-item-card__status.is-delivered { color: #00ffcc; background: rgba(0, 255, 204, 0.1); }
-        .ui-item-card__status.is-unmatched { color: #ff4488; background: rgba(255, 68, 136, 0.1); }
-
-        /* Mockup-specific data blocks to avoid global CSS changes */
-        .ui-well {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: var(--radius-standard);
-            padding: var(--space-double);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: var(--space-double);
-        }
-
-        .ui-stat-group {
-            display: flex;
-            gap: var(--space-double);
-            flex-wrap: wrap;
-        }
-
-        .ui-stat-box {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .ui-stat-box .stat-value {
-            font-size: var(--text-size-title);
-            line-height: 1;
-        }
-
-        .ui-stat-box.is-hero .stat-value {
-            font-size: 24px;
-            font-weight: 900;
-        }
-
-        .ui-badge.is-capsule {
-            border-radius: var(--radius-pill);
-        }
-
-        .ui-badge.is-inactive {
-            background: transparent !important;
-        }
-
-        .ui-badge.is-clickable:hover {
-            border-color: rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .flight-report-status {
-            display: flex;
-            gap: var(--space-unit);
-            align-items: center;
-        }
-
-        /* [航行結果] パネルのサイズ固定指定 (画面比率ベース) */
-        #flight-result-screen .ui-panel {
-            width: 70vw;
-            height: 85vh;
-            max-width: 640px; /* 2カラム時の最大幅をスマートに制限 */
-            margin: auto;
-        }
-
-        @media screen and (max-width: 600px) {
-            #flight-result-screen .ui-panel {
-                width: 95vw;
-                height: 90vh;
-            }
-        }
-    </style>
+    <!-- Context Layer (Scene Specific) -->
+    <link rel="stylesheet" href="../../css/flight_result.css">
 </head>
 
 <body>
@@ -116,18 +30,18 @@
         <section class="ui-panel">
 
             <!-- Header Section -->
-            <header class="ui-panel__header ui-split-row" style="padding: var(--space-double);">
+            <header class="ui-panel__header ui-split-row">
                 <div class="ui-title-box">
                     <h1 class="text-display" id="report-title">SECTOR 1 COMPLETED</h1>
                 </div>
                 <div class="flight-report-status">
-                    <div class="ui-badge is-danger is-capsule" style="background: var(--color-facility-black-market); color: white;">● RECORDED</div>
+                    <div class="ui-badge is-recorded is-capsule"><span class="recorded-text">● RECORDED</span></div>
                     <div class="ui-badge is-outline is-inactive is-clickable is-capsule">☆ PROTECT RECORD</div>
                 </div>
             </header>
 
             <!-- Content Area -->
-            <div class="ui-panel__body ui-columns" style="padding: var(--space-double); gap: var(--space-double);">
+            <div class="ui-panel__body ui-columns">
                 <!-- Left Column: Performance data -->
                 <section class="ui-column ui-scrollable">
                     <header class="ui-section-header">
@@ -138,26 +52,26 @@
                         <div class="ui-well">
                             <div class="ui-stat-group">
                                 <div class="ui-stat-box is-hero">
-                                    <span class="ui-stat-label">Final Mission Score</span>
+                                    <span class="ui-stat-label">FLIGHT SCORE</span>
                                     <span class="stat-value num-score">3,260</span>
                                 </div>
                                 <div class="ui-stat-box is-hero">
-                                    <span class="ui-stat-label">Total Credits Earned</span>
+                                    <span class="ui-stat-label">CREDITS EARNED</span>
                                     <span class="stat-value num-coin">30</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="report-data-row">
+                    <div class="ui-split-row is-data-row">
                         <span class="report-data-label">Flight Duration Score</span>
                         <span class="report-data-value num-score">+260</span>
                     </div>
-                    <div class="report-data-row">
+                    <div class="ui-split-row is-data-row">
                         <span class="report-data-label">REPAIR DOCK Reward</span>
                         <span class="report-data-value num-score">+3,000</span>
                     </div>
-                    <div class="report-data-row">
+                    <div class="ui-split-row is-data-row">
                         <span class="report-data-label">REPAIR DOCK Reward Coin</span>
                         <span class="report-data-value num-coin">+30</span>
                     </div>
@@ -170,69 +84,72 @@
                     </header>
 
                     <div class="ui-item-list">
-                        <!-- Story Item -->
-                        <div class="ui-item-card is-trading-post">
-                            <header class="ui-item-card__header">
-                                <h4 class="ui-item-card__title">母からの押し花</h4>
-                                <div class="ui-item-card__header-right">
-                                    <span class="ui-icon is-icon-mail"></span>
-                                </div>
-                            </header>
-                            <p class="ui-item-card__description">届けた「通常物資」の梱包材に、古い押し花と手紙が使われていた。</p>
-                        </div>
+                    <div class="ui-item-list">
+                        <!-- Dynamic Story Section -->
+                        <div id="story-item-container"></div>
 
-                        <!-- Black Market Item -->
-                        <div class="ui-item-card is-black-market">
-                            <header class="ui-item-card__header">
-                                <h4 class="ui-item-card__title">暗号化データ [BLACK MARKET]</h4>
-                                <div class="ui-item-card__header-right">
-                                    <span class="ui-item-card__status is-delivered">✓ DELIVERED</span>
-                                </div>
-                            </header>
-                            <p class="ui-item-card__description">Black Marketへの配送を目的とした機密データ。</p>
-                        </div>
-
-                        <!-- Unmatched Item -->
-                        <div class="ui-item-card is-trading-post">
-                            <header class="ui-item-card__header">
-                                <h4 class="ui-item-card__title">試作型コンデンサ [FACTORY]</h4>
-                                <div class="ui-item-card__header-right">
-                                    <span class="ui-item-card__status is-unmatched">✗ UNMATCHED</span>
-                                </div>
-                            </header>
-                            <p class="ui-item-card__description">Trading Postに届けられたが、本来の宛先はBlack Marketだった。</p>
-                        </div>
-
-                        <!-- Generic Resource -->
-                        <div class="ui-item-card is-chassis">
-                            <header class="ui-item-card__header">
-                                <h4 class="ui-item-card__title">軽量シャーシ</h4>
-                                <div class="ui-item-card__header-right">
-                                    <div class="ui-badge is-stack">x2</div>
-                                </div>
-                            </header>
+                        <!-- Dynamic Items Section -->
+                        <div id="acquired-items-list">
+                            <!-- Items will be injected here -->
                         </div>
                     </div>
                 </section>
             </div>
 
             <!-- Global Actions Section -->
-            <footer class="ui-panel__footer" style="padding: var(--space-double); display: flex; gap: var(--space-double);">
-                <button class="ui-button">VIEW MAP</button>
-                <button class="ui-button is-primary is-repair-dock" id="main-action-btn">TO REPAIR DOCK</button>
+            <footer class="ui-panel__footer">
+                <button class="ui-button is-big" id="btn-view-map">
+                    <span class="btn-main-label">VIEW MAP</span>
+                </button>
+                <button class="ui-button is-primary is-big is-repair-dock" id="main-action-btn">
+                    <span class="btn-main-label">TO REPAIR DOCK</span>
+                </button>
             </footer>
         </section>
     </main>
 
-    <!-- Interactive Mockup Controller -->
-    <script>
+    <!-- Interactive Mockup Controller & Dynamic Generation -->
+    <script type="module">
+        import { PARTS } from '../core/Data.js';
+        import { UIComponents } from '../systems/ui/UIComponents.js';
+
+        // --- 1. Dynamic Item Generation ---
+        const storyContainer = document.getElementById('story-item-container');
+        const itemListContainer = document.getElementById('acquired-items-list');
+
+        // A. Story Item (Dynamically generated from ID, marked as NEW)
+        storyContainer.innerHTML = UIComponents.generateStoryCardHTML('T', true);
+
+        let html = '';
+        
+        // B. Chassis x2
+        const chassisBase = PARTS.chassis[0];
+        if (chassisBase) {
+            html += UIComponents.generateCardHTML({ ...chassisBase, count: 2 });
+        }
+
+        // B. Encrypted Data (Delivered)
+        html += UIComponents.generateCardHTML(PARTS.cargo[2], { status: 'delivered' });
+
+        // Delivery Bonus Items (Sibling list with title)
+        const bonusItems = [PARTS.logic[2], PARTS.module[1], PARTS.booster[2]];
+        html += `<div class="report-bonus-list">`;
+        html += `<h4 class="report-bonus-title">DELIVERY BONUS</h4>`;
+        html += bonusItems.map(item => UIComponents.generateCardHTML(item)).join('');
+        html += `</div>`;
+
+        // C. Prototype Capacitor (Unmatched)
+        html += UIComponents.generateCardHTML(PARTS.cargo[1], { status: 'unmatched' });
+
+        itemListContainer.innerHTML = html;
+
+        // --- 2. View State Controller ---
         const states = [
-            { title: 'SECTOR 1 COMPLETED', btn: 'TO REPAIR DOCK', cls: 'is-repair-dock' },
-            { title: 'SECTOR 1 COMPLETED', btn: 'TO TRADING POST', cls: 'is-trading-post' },
-            { title: 'SECTOR 1 COMPLETED', btn: 'TO BLACK MARKET', cls: 'is-black-market' },
-            { title: 'ROCKET RECOVERED', btn: 'BACK TO BASE', cls: 'is-retry' },
-            { title: 'SHIP CRASHED', btn: 'RETRY MISSION', cls: 'is-retry' },
-            { title: 'LOST IN SPACE', btn: 'RETRY MISSION', cls: 'is-retry' }
+            { title: 'SECTOR 1 COMPLETED',  btn: 'CONTINUE CONTRACT',  cls: 'is-trading-post' },
+            { title: 'ROCKET RECOVERED',    btn: 'TO REPAIR DOCK',     cls: 'is-repair-dock'  },
+            { title: 'CONTRACT TERMINATED', btn: 'BACK TO BASE',       cls: 'is-retry'        },
+            { title: 'SHIP CRASHED',        btn: 'RETRY FLIGHT',       cls: 'is-retry'        },
+            { title: 'LOST IN SPACE',       btn: 'RETRY FLIGHT',       cls: 'is-retry'        }
         ];
 
         let currentState = 0;
@@ -244,22 +161,17 @@
             currentState = (currentState + 1) % states.length;
             const s = states[currentState];
 
-            // Update Title
             title.textContent = s.title;
+            btn.querySelector('.btn-main-label').textContent = s.btn;
 
-            // Update Button
-            btn.textContent = s.btn;
+            // Update classes for both Title and Button for color propagation
+            const colorClasses = ['is-repair-dock', 'is-trading-post', 'is-black-market', 'is-retry'];
+            
+            title.classList.remove(...colorClasses);
+            title.classList.add(s.cls);
 
-            // Update Classes
-            btn.classList.remove('is-repair-dock', 'is-trading-post', 'is-black-market', 'is-retry');
+            btn.classList.remove(...colorClasses);
             btn.classList.add(s.cls);
-
-            // Sync Panel for coloring
-            const panel = document.querySelector('.ui-panel');
-            panel.classList.remove('is-repair-dock', 'is-trading-post', 'is-black-market', 'is-retry');
-            panel.classList.add(s.cls);
-
-            console.log('Switched to state:', s.title);
         });
     </script>
 </body>
