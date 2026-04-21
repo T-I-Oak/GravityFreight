@@ -48,12 +48,6 @@ body {
     line-height: 1.5;
 }
 
-/* Category Color Modifiers for interactive components */
-.is-trading-post { --current-color: var(--color-facility-trading-post); }
-.is-repair-dock  { --current-color: var(--color-facility-repair-dock); }
-.is-black-market { --current-color: var(--color-facility-black-market); }
-.is-home         { --current-color: var(--color-world-home-star); }
-
 /* --- 2. Interactive Foundations (Semantic) --- */
 .ui-button,
 .is-clickable {
@@ -99,6 +93,12 @@ body {
     opacity: 0.6;
     margin-top: -2px;
 }
+
+/* Category Color Modifiers (Overrides base component defaults) */
+.is-trading-post { --current-color: var(--color-facility-trading-post); }
+.is-repair-dock  { --current-color: var(--color-facility-repair-dock); }
+.is-black-market { --current-color: var(--color-facility-black-market); }
+.is-home         { --current-color: var(--color-world-home-star); }
 
 .is-disabled {
     cursor: default;
