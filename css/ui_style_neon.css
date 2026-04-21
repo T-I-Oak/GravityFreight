@@ -182,11 +182,6 @@
     background: rgba(255, 255, 255, 0.02);
 }
 
-.ui-style--neon .ui-item-card.is-placeholder.is-notable {
-    border-color: var(--color-theme-main);
-    box-shadow: inset 0 0 10px color-mix(in srgb, var(--color-theme-main), transparent 80%);
-}
-
 
 /* --- 6. Interaction Layer: Button Aesthetics --- */
 
