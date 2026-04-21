@@ -24,3 +24,60 @@
         height: 90vh;
     }
 }
+
+/* Facility Specific Components */
+
+/* is-discount: Ported from V1 .discount-tag */
+#facility-screen .ui-badge.is-discount {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    background: #444;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-left: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    align-self: center;
+    transform: rotate(10deg);
+}
+
+#facility-screen .ui-badge.is-discount .sticker-num { 
+    font-size: 13px; 
+    letter-spacing: -0.5px; 
+    line-height: 1; 
+}
+
+#facility-screen .ui-badge.is-discount .sticker-pct { 
+    font-size: 8px; 
+    margin-right: 2px; 
+}
+
+/* Pattern: Level Low */
+#facility-screen .ui-badge.is-discount[data-level="low"] { 
+    background: linear-gradient(135deg, #a1887f, #8d6e63); 
+}
+
+/* Pattern: Level Mid */
+#facility-screen .ui-badge.is-discount[data-level="mid"] { 
+    background: linear-gradient(135deg, #ff5722, #f44336); 
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4); 
+}
+
+/* Pattern: Level High */
+#facility-screen .ui-badge.is-discount[data-level="high"] { 
+    background: linear-gradient(135deg, #e91e63, #9c27b0); 
+    box-shadow: 0 0 15px rgba(233, 30, 99, 0.5); 
+    animation: facility-discount-pulse 1.5s infinite ease-in-out; 
+}
+
+@keyframes facility-discount-pulse {
+    0%, 100% { transform: rotate(10deg) scale(1); filter: brightness(1); }
+    50% { transform: rotate(10deg) scale(1.05); filter: brightness(1.2); }
+}
