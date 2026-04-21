@@ -46,7 +46,18 @@ body {
     font-family: var(--font-main);
     font-size: var(--text-size-main);
     line-height: 1.5;
+    --color-trading-post: #00d4ff;
+    --color-repair-dock:  #ffd700;
+    --color-black-market: #e040fb;
+    --color-retry:        #ff8c00;
 }
+
+/* Category Color Modifiers for interactive components */
+.is-trading-post { --current-color: var(--color-trading-post); }
+.is-repair-dock  { --current-color: var(--color-repair-dock); }
+.is-black-market  { --current-color: var(--color-black-market); }
+.is-retry         { --current-color: var(--color-retry); }
+.is-orange        { --current-color: var(--color-retry); }
 
 /* --- 2. Interactive Foundations (Semantic) --- */
 .ui-button,
@@ -68,6 +79,30 @@ body {
     border: 1px solid transparent;
     box-sizing: border-box;
     text-decoration: none;
+    transition: all var(--motion-fast);
+}
+
+/* is-big: Specialized large action button (Capsule shape) */
+.ui-button.is-big {
+    height: 48px;
+    padding: 0 32px;
+    border-radius: var(--radius-pill);
+    border-width: 2px;
+    flex-direction: column;
+}
+
+.ui-button.is-big .btn-main-label {
+    font-size: 16px;
+    font-weight: 950;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.ui-button.is-big .btn-sub-label {
+    font-size: 10px;
+    font-weight: 800;
+    opacity: 0.6;
+    margin-top: -2px;
 }
 
 .is-disabled {
