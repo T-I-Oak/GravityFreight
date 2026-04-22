@@ -35,10 +35,6 @@
     border-bottom: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
 }
 
-#play-scene-container .ui-panel__header {
-    height: 32px;
-}
-
 #play-scene-container .ui-panel__body {
     padding: var(--space-double);
 }
@@ -53,11 +49,6 @@
     display: flex;
     gap: var(--space-double);
     padding: var(--space-double);
-}
-
-#play-hud .ui-split-column {
-    display: flex;
-    flex-direction: column;
 }
 
 #play-hud .stat-label {
@@ -110,6 +101,7 @@
     justify-content: center;
     z-index: var(--z-panel);
 }
+
 
 /* Large Action Buttons: Specialized branding for critical mission phases */
 #play-screen .is-launch { --current-color: var(--color-category-launchers); }

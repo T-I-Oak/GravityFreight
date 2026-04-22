@@ -108,8 +108,8 @@
 }
 
 .ui-style--neon .ui-item-card.is-clickable:hover {
-    border-color: color-mix(in srgb, var(--category-color), #fff 60%);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--category-color), transparent 60%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 60%);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--current-color), transparent 60%);
     transform: translateY(-1px);
 }
 
@@ -166,12 +166,12 @@
 }
 
 .ui-style--neon .ui-section-title {
-    color: var(--category-color, var(--color-theme-sub));
+    color: var(--current-color);
     font-size: 10px;
     font-weight: 900;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    text-shadow: 0 0 10px color-mix(in srgb, var(--category-color, var(--color-theme-sub)), transparent 40%);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 40%);
     opacity: 0.5;
 }
 
@@ -284,9 +284,9 @@
 
 /* Resource Badges: High-feedback markers for data counting with V1 black-core aesthetic */
 .ui-style--neon .ui-badge.is-stack {
-    background: var(--category-color, var(--color-theme-main));
+    background: var(--current-color);
     color: #050510;
-    box-shadow: 0 0 12px color-mix(in srgb, var(--category-color, var(--color-theme-main)), transparent 40%);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--current-color), transparent 40%);
     text-shadow: none;
     /* Black text must stay crisp */
 }

@@ -27,7 +27,7 @@
     font-size: 13px;
     font-weight: 900;
     color: #050a1a;
-    background: color-mix(in srgb, var(--category-color, #44ccff), #fff 25%);
+    background: color-mix(in srgb, var(--current-color), #fff 25%);
     padding: 0 6px;
     border-radius: 4px; /* badge(radius-standard)と共通の4px */
     min-width: 28px;

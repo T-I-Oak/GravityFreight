@@ -11,81 +11,33 @@ export class UIComponents {
      * @param {Object} options - { isClickable, isEnhanced }
      */
     static generateCardHTML(item, options = {}) {
-        const category = (item.category || 'unknown').toLowerCase();
+        // --- 1. Preparation (Contextual Data) ---
+        const category = item.category ? item.category.toLowerCase() : '';
         const clickableClass = (options.isClickable || item.isClickable) ? 'is-clickable' : '';
         const activeClass = options.isActive ? 'is-active' : '';
-        const categoryClass = `is-${category}`;
-        
-        let headerRight = '';
-        
-        // --- 1. Durability/Charges Gauge ---
-        // Explicitly using maxCharges and current charges as per V2 logic
-        if (item.maxCharges !== undefined && item.maxCharges > 0) {
-            const current = item.charges !== undefined ? item.charges : item.maxCharges;
-            // Detect enhancement from data or explicit option
-            const isDurableEnhanced = !!(options.isEnhanced || (item.enhancement && item.enhancement.charges > 0));
-            headerRight += this.generateHPGauge(current, item.maxCharges, isDurableEnhanced);
-        }
-        
-        // --- 2. Stack Badge ---
-        const currentCount = item.count || 0;
-        if (currentCount > 1) {
-            headerRight += `<div class="ui-badge is-stack">x${currentCount}</div>`;
-        }
+        const categoryClass = category ? `is-${category}` : '';
+        const instanceId = item.uid || '';
+        const displayName = item.name || `[MISSING_NAME: ${item.id}]`;
 
-        // --- 2.5 Delivery Status Badge ---
-        if (options.status) {
-            const status = options.status.toLowerCase();
-            const statusLabel = status.toUpperCase();
-            const statusClass = `is-${status}`;
-            headerRight += `<span class="ui-item-card__status ${statusClass}">${statusLabel}</span>`;
-        }
-
+        // --- 2. Parts Generation (Sub-components) ---
+        const headerRight = this.generateHeaderRightHTML(item, options);
         const headerHTML = `
             <header class="ui-item-card__header ui-split-row">
-                <h3 class="ui-item-card__title">${item.name || 'Unknown Item'}</h3>
+                <h3 class="ui-item-card__title">${displayName}</h3>
                 <div class="ui-item-card__header-right">${headerRight}</div>
             </header>
         `;
 
-        const bodyHTML = item.description ? `<div class="ui-item-card__description">${item.description}</div>` : '';
+        const bodyHTML = item.description 
+            ? `<div class="ui-item-card__description">${item.description}</div>` 
+            : '';
 
-        // --- 3. Footer (Explicit Property Filtering & Formatting) ---
-        // Defined list of displayed properties and their formatting rules
-        const displayProps = [
-            { key: 'slots', label: 'SLOTS', prefix: '' },
-            { key: 'precisionMultiplier', label: 'PRECISION', prefix: 'x' },
-            { key: 'pickupMultiplier', label: 'PICKUP', prefix: 'x' },
-            { key: 'gravityMultiplier', label: 'GRAVITY', prefix: 'x' }
-        ];
+        const footerHTML = this.generateFooterHTML(item, options);
+        const detailsHTML = (category === 'rocket' && Array.isArray(item.modules))
+            ? this.generateRocketDetailsHTML(item.modules)
+            : '';
 
-        let propItems = '';
-        displayProps.forEach(config => {
-            const val = item[config.key];
-            if (val !== undefined) {
-                // Check for enhancement (item.enhancement.[key] > 0)
-                const isEnhanced = item.enhancement && item.enhancement[config.key] > 0;
-                const enhancedClass = isEnhanced ? 'is-enhanced' : '';
-                
-                propItems += `
-                    <div class="ui-item-card__prop ${enhancedClass}">
-                        <span class="ui-item-card__prop-label">${config.label}</span>
-                        <span class="ui-item-card__prop-value">${config.prefix}${val}</span>
-                    </div>`;
-            }
-        });
-
-        const footerHTML = propItems ? `<footer class="ui-item-card__footer"><div class="ui-item-card__prop-group">${propItems}</div></footer>` : '';
-        
-        // --- 4. Rocket Details (Nested Modules) ---
-        let detailsHTML = '';
-        if (Array.isArray(item.modules) && item.modules.length > 0) {
-            detailsHTML = this.generateRocketDetailsHTML(item.modules);
-        }
-
-        // Final Assembly
-        const instanceId = item.uid || '';
-
+        // --- 3. Final Assembly (Isomorphic Frame) ---
         return `
             <article class="ui-item-card ${clickableClass} ${categoryClass} ${activeClass}" 
                      data-id="${item.id}" 
@@ -96,6 +48,63 @@ export class UIComponents {
                 ${detailsHTML}
             </article>
         `;
+    }
+
+    /**
+     * Internal: Generates the right-side content of the header (Badge/HP).
+     */
+    static generateHeaderRightHTML(item, options) {
+        let html = '';
+
+        // Durability Gauge (Explicit data only)
+        if (item.maxCharges !== undefined && item.maxCharges > 0) {
+            const isDurableEnhanced = !!(options.isEnhanced || (item.enhancement && item.enhancement.charges > 0));
+            html += this.generateHPGauge(item.charges, item.maxCharges, isDurableEnhanced);
+        }
+        
+        // Stack Badge
+        if (item.count > 1) {
+            html += `<div class="ui-badge is-stack">x${item.count}</div>`;
+        }
+
+        // Status Badge
+        if (options.status) {
+            const status = options.status.toLowerCase();
+            html += `<span class="ui-item-card__status is-${status}">${status.toUpperCase()}</span>`;
+        }
+
+        return html;
+    }
+
+    /**
+     * Internal: Generates the property footer area.
+     */
+    static generateFooterHTML(item, options) {
+        // Defined list of displayed properties and their semantic types
+        const displayProps = [
+            { key: 'slots', label: 'SLOTS', type: 'is-additive' },
+            { key: 'slotsMax', label: 'MAX SLOTS', type: 'is-additive' },
+            { key: 'precisionMultiplier', label: 'PRECISION', type: 'is-multiplier' },
+            { key: 'pickupMultiplier', label: 'PICKUP', type: 'is-multiplier' },
+            { key: 'gravityMultiplier', label: 'GRAVITY', type: 'is-multiplier' }
+        ];
+
+        let propItems = '';
+        displayProps.forEach(config => {
+            const val = item[config.key];
+            if (val !== undefined) {
+                const isEnhanced = item.enhancement && item.enhancement[config.key] > 0;
+                const enhancedClass = isEnhanced ? 'is-enhanced' : '';
+                
+                propItems += `
+                    <div class="ui-item-card__prop ${enhancedClass} ${config.type}">
+                        <span class="ui-item-card__prop-label">${config.label}</span>
+                        <span class="ui-item-card__prop-value">${val}</span>
+                    </div>`;
+            }
+        });
+
+        return propItems ? `<footer class="ui-item-card__footer"><div class="ui-item-card__prop-group">${propItems}</div></footer>` : '';
     }
 
     /**

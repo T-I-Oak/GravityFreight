@@ -103,6 +103,16 @@ body {
 .is-sub-theme    { --current-color: var(--color-theme-sub); }
 .is-home         { --current-color: var(--color-world-home-star); }
 
+/* Category Mappings (Axis-D: Structure) */
+.is-rocket       { --current-color: var(--color-category-rockets); }
+.is-launcher     { --current-color: var(--color-category-launchers); }
+.is-chassis      { --current-color: var(--color-category-chassis); }
+.is-logic        { --current-color: var(--color-category-logic); }
+.is-module       { --current-color: var(--color-category-module); }
+.is-booster      { --current-color: var(--color-category-boosters); }
+.is-coin         { --current-color: var(--color-category-coin); }
+.is-cargo        { --current-color: var(--color-category-cargo); }
+
 .is-disabled {
     cursor: default;
     pointer-events: none;
@@ -112,6 +122,16 @@ body {
 .is-scrollable {
     overflow-y: auto;
     scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.is-scrollable::-webkit-scrollbar {
+    width: 4px;
+}
+
+.is-scrollable::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 /* --- 3. Global Metadata Components --- */

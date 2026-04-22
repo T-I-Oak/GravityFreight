@@ -1,11 +1,3 @@
-export const hexToRgba = (hex, alpha) => {
-    if (!hex) return `rgba(255, 255, 255, ${alpha})`;
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
-
 export const RARITY = {
     COMMON: 5,
     UNCOMMON: 10,
@@ -130,6 +122,9 @@ export const PARTS = {
 export const ITEM_REGISTRY = {};
 Object.values(PARTS).forEach(categoryList => {
     categoryList.forEach(item => {
+        if (ITEM_REGISTRY[item.id]) {
+            throw new Error(`[Data Safety] Duplicate Item ID detected: ${item.id}`);
+        }
         ITEM_REGISTRY[item.id] = item;
     });
 });

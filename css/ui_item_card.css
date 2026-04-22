@@ -17,7 +17,7 @@
     position: relative;
     padding: 8px 12px;
     margin-bottom: 8px;
-    background-color: color-mix(in srgb, var(--category-color, transparent), var(--color-bg-card) var(--opacity-card-tint, 93%));
+    background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-tint, 93%));
     border: 1px solid var(--color-border-card);
     border-radius: var(--radius-standard);
     transition: all var(--motion-normal) ease;
@@ -26,8 +26,8 @@
 
 /* Active/Selected State: Structural signaling and enhanced tint */
 .ui-item-card.is-active {
-    background-color: color-mix(in srgb, var(--category-color, transparent), var(--color-bg-card) var(--opacity-card-active, 80%));
-    border-color: color-mix(in srgb, var(--category-color), #fff 40%);
+    background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-active, 80%));
+    border-color: color-mix(in srgb, var(--current-color), #fff 40%);
 }
 
 .ui-item-card.is-clickable {
@@ -46,7 +46,7 @@
     top: -1px;
     bottom: -1px;
     width: 4px;
-    background: var(--category-color, var(--color-theme-sub));
+    background: var(--current-color);
     border-radius: var(--radius-standard) 0 0 var(--radius-standard);
     transition: all 0.2s ease;
 }
@@ -60,12 +60,12 @@
     width: 8px;
     background: repeating-linear-gradient(
         to right,
-        var(--category-color),
-        var(--category-color) 3px,
+        var(--current-color),
+        var(--current-color) 3px,
         transparent 3px,
         transparent 5px,
-        var(--category-color) 5px,
-        var(--category-color) 8px
+        var(--current-color) 5px,
+        var(--current-color) 8px
     );
 }
 
@@ -117,7 +117,7 @@
 
 /* Automatic Color Propagation for Icons */
 .ui-item-card .ui-icon {
-    color: var(--category-color, #ffffff);
+    color: var(--current-color);
 }
 
 .ui-item-card__prop {
@@ -142,6 +142,14 @@
     font-family: var(--font-num);
     font-size: 11px;
     font-weight: 800;
+}
+
+/* Property Decoration: Handled in CSS to separate logic from presentation */
+.ui-item-card__prop.is-multiplier .ui-item-card__prop-value::before {
+    content: 'x';
+    font-size: 0.9em;
+    margin-right: 1px;
+    opacity: 0.7;
 }
 
 /* Enhanced State: Special visuals for upgraded properties */
@@ -173,20 +181,6 @@
     color: rgba(255, 255, 255, 0.8);
     font-weight: 500;
 }
-
-/* --- 5. Semantic Data Mappings --- */
-.is-rocket   { --category-color: var(--color-category-rockets); }
-.is-launcher { --category-color: var(--color-category-launchers); }
-.is-chassis  { --category-color: var(--color-category-chassis); }
-.is-logic    { --category-color: var(--color-category-logic); }
-.is-module   { --category-color: var(--color-category-module); }
-.is-booster  { --category-color: var(--color-category-boosters); }
-.is-coin     { --category-color: var(--color-category-coin); }
-.is-cargo    { --category-color: var(--color-category-cargo); }
-
-.is-repair-dock   { --current-color: var(--color-facility-repair-dock); --category-color: var(--color-facility-repair-dock); }
-.is-trading-post  { --current-color: var(--color-facility-trading-post); --category-color: var(--color-facility-trading-post); }
-.is-black-market  { --current-color: var(--color-facility-black-market); --category-color: var(--color-facility-black-market); }
 
 /* --- 6. Card Status Indicators --- */
 .ui-item-card__status {
@@ -237,14 +231,12 @@
     font-weight: 800;
     letter-spacing: 0.02em;
     text-align: left;
-    /* Use category color if provided, fallback to muted gray */
-    color: var(--category-color, rgba(255, 255, 255, 0.4));
+    color: rgba(255, 255, 255, 0.4);
     opacity: 1;
 }
 
-/* is-notable (Guidance): Adds pulse animation to the subtext only */
+/* is-notable (Guidance): Adds color and pulse animation to the subtext only */
 .ui-item-card.is-placeholder.is-notable .placeholder-subtext {
+    color: var(--current-color);
     animation: ui-guide-pulse 2s infinite ease-in-out;
 }
-
-
