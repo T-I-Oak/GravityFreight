@@ -205,7 +205,6 @@
 .ui-well {
     border-radius: var(--radius-standard);
     padding: var(--space-double);
-    margin-bottom: var(--space-double);
     border: 1px solid transparent;
     transition: all var(--motion-normal);
 }

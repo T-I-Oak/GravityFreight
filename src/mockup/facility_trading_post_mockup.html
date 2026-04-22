@@ -7,147 +7,155 @@
     <title>Gravity Freight Mockup: Trading Post (V2 Redesign)</title>
     <!-- Google Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=Courier+Prime:wght@400;700&family=Orbitron:wght@700;900&family=UnifrakturMaguntia&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
         rel="stylesheet">
 
-    <!-- Design System CSS Layers -->
-    <link rel="stylesheet" href="css/design_tokens.css">
-    <link rel="stylesheet" href="css/ui_base.css">
-    <link rel="stylesheet" href="css/ui_style_matte.css">
-    <link rel="stylesheet" href="css/facility.css">
-    <link rel="stylesheet" href="css/item-card.css">
+    <!-- V2 System CSS Layers -->
+    <link rel="stylesheet" href="../../css/design_tokens.css">
+    <link rel="stylesheet" href="../../css/ui_base.css">
+    <link rel="stylesheet" href="../../css/ui_layout.css">
+    <link rel="stylesheet" href="../../css/ui_primitives.css">
+    <link rel="stylesheet" href="../../css/ui_item_card.css">
+    <link rel="stylesheet" href="../../css/ui_style_matte.css">
+    <link rel="stylesheet" href="../../css/ui_style_neon.css">
+    
+    <!-- Context Layer (Scene Specific) -->
+    <link rel="stylesheet" href="../../css/facility.css">
 </head>
 
-<body class="ui-style--matte">
-
-    <div id="facility-screen" class="is-trading-post">
-
-        <article class="ui-panel panel-wide">
-            <header class="facility-header">
-                <div class="ui-facility-icon">T</div>
-                <div class="facility-info">
-                    <h1 class="facility-name text-display">TRADING POST</h1>
-                    <p class="facility-description">貨物取引やパーツの売買ができる中継基地。</p>
+<body id="facility-screen">
+    <main class="ui-style--matte ui-flex-center">
+        <section class="ui-panel is-trading-post">
+            <header class="ui-panel__header">
+                <div class="facility-badge">T</div>
+                <div class="facility-title-group">
+                    <h1 class="ui-panel__title">TRADING POST</h1>
+                    <span class="ui-panel__subtitle">貨物取引やパーツの売買ができる中継基地。</span>
                 </div>
             </header>
 
-            <main class="ui-well facility-main-well">
+            <div class="ui-panel__body">
+                <div class="ui-well">
+                    <div class="ui-columns">
+                        <!-- Left Column: Buy Items -->
+                        <section class="ui-column ui-scrollable">
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">販売中のアイテム</h3>
+                                <span class="ui-section-subtitle">ステーションで販売されている高度なパーツです。</span>
+                            </header>
 
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>販売中のアイテム</h3>
-                        <p class="section-subtitle">ステーションで販売されている高度なパーツです。</p>
+                            <div class="ui-item-list" id="buy-list">
+                                <!-- Items will be injected here via script -->
+                            </div> <!-- /.ui-item-list -->
+                        </section>
 
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-logic">
-                                    <div class="item-card__header"><span class="item-card__name">標準航法ロジック</span></div>
-                                    <div class="item-card__desc">バグを排除し安定性を極限まで高めた標準仕様の航法演算回路。</div>
-                                </div>
-                            </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">40 c</div>
-                                </div>
-                                <button class="ui-button is-trade is-small">BUY</button>
-                            </div>
-                        </div>
+                        <!-- Right Column: Sell Items -->
+                        <section class="ui-column ui-scrollable">
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">パーツの売却</h3>
+                                <span class="ui-section-subtitle">不要なパーツを売却して資金を獲得できます。</span>
+                            </header>
 
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-module">
-                                    <div class="item-card__header"><span class="item-card__name">小型冷却器</span></div>
-                                    <div class="item-card__desc">エンジンの熱暴走を抑えるための簡易型補助冷却ユニット。</div>
-                                </div>
+                            <div class="ui-item-list" id="sell-list">
+                                <!-- Items will be injected here via script -->
                             </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">18 c</div>
-                                    <div class="ui-badge is-sticker" data-level="low">
-                                        <span class="sticker-num">10</span><span class="sticker-pct">% OFF</span>
-                                    </div>
-                                </div>
-                                <button class="ui-button is-trade is-small">BUY</button>
-                            </div>
-                        </div>
+                        </section>
+                    </div> <!-- /.ui-columns -->
+                </div> <!-- /.ui-well -->
+            </div> <!-- /.ui-panel__body -->
 
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-rocket">
-                                    <div class="item-card__header"><span class="item-card__name">PR-1010 精密発舎台</span>
-                                    </div>
-                                    <div class="item-card__desc">高精度な射出を実現。中距離ミッションに最適化されたモデル。</div>
-                                </div>
-                            </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">56 c</div>
-                                    <div class="ui-badge is-sticker" data-level="mid">
-                                        <span class="sticker-num">30</span><span class="sticker-pct">% OFF</span>
-                                    </div>
-                                </div>
-                                <button class="ui-button is-trade is-small">BUY</button>
-                            </div>
-                        </div>
-
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-module">
-                                    <div class="item-card__header"><span class="item-card__name">特殊装甲板 [X-Shell]</span>
-                                    </div>
-                                    <div class="item-card__desc">希少金属を使用した超軽量・高耐久の特殊プロテクター。</div>
-                                </div>
-                            </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">120 c</div>
-                                    <div class="ui-badge is-sticker" data-level="high">
-                                        <span class="sticker-num">50</span><span class="sticker-pct">% OFF</span>
-                                    </div>
-                                </div>
-                                <button class="ui-button is-trade is-small">BUY</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>パーツの売却</h3>
-                        <p class="section-subtitle">不要なパーツを売却して資金を獲得できます。</p>
-
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-chassis">
-                                    <div class="item-card__header"><span class="item-card__name">初期シャーシ [MK-1]</span>
-                                    </div>
-                                    <div class="item-card__desc">全ての物語がここから始まった。最も信頼されている基本躯体。</div>
-                                </div>
-                            </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">20 c</div>
-                                </div>
-                                <button class="ui-button is-sell is-small">SELL</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-            </main>
-
-            <footer class="facility-footer">
-                <div class="ui-stat-box">
-                    <span class="stat-label">CREDITS BALANCE</span>
-                    <span class="stat-value num-coin">420 c</span>
+            <!-- Global Actions Section -->
+            <footer class="ui-panel__footer">
+                <div class="player-credits">
+                    <span class="credits-label">CREDITS:</span>
+                    <span class="credits-value num-coin" id="player-credits-value">420 c</span>
                 </div>
-                <button class="ui-button is-primary">DEPART FROM STATION</button>
+                <button class="ui-button is-primary is-big is-trading-post" id="depart-station">
+                    <span class="btn-main-label">TO NEXT SECTOR</span>
+                </button>
             </footer>
+        </section>
+    </main>
 
-        </article>
+    <script type="module">
+        import { UIComponents } from '../systems/ui/UIComponents.js';
+        import { PARTS } from '../core/Data.js';
 
-    </div>
+        // Helper to create a trade entry row
+        function createTradeEntry(item, actionType, options = {}) {
+            const entry = document.createElement('div');
+            entry.className = 'trade-entry ui-split-row';
 
+            const itemArea = document.createElement('div');
+            itemArea.className = 'trade-item-area';
+            
+            // 1. Generate REAL item card HTML
+            const cardOptions = { ...options.card };
+            itemArea.innerHTML = UIComponents.generateCardHTML(item, cardOptions);
+
+            const actionArea = document.createElement('div');
+            actionArea.className = 'trade-action-area ui-split-column';
+            
+            const group = document.createElement('div');
+            group.className = 'trade-action-group';
+            
+            const price = document.createElement('div');
+            price.className = 'trade-price num-coin';
+            price.textContent = `${options.price} c`;
+            group.appendChild(price);
+
+            if (options.discount) {
+                const badge = document.createElement('div');
+                badge.className = `ui-badge is-discount ${options.discount.level}`;
+                badge.innerHTML = `<span class="sticker-num">${options.discount.val}</span><span class="sticker-pct">% OFF</span>`;
+                group.appendChild(badge);
+            }
+
+            const button = document.createElement('button');
+            button.className = `ui-button is-primary${actionType === 'sell' ? ' is-sub-theme' : ''}`;
+            if (options.disabled) button.classList.add('is-disabled');
+            button.textContent = actionType.toUpperCase();
+
+            actionArea.appendChild(group);
+            actionArea.appendChild(button);
+
+            entry.appendChild(itemArea);
+            entry.appendChild(actionArea);
+            return entry;
+        }
+
+        const buyList = document.getElementById('buy-list');
+        const sellList = document.getElementById('sell-list');
+
+        // LEFT COLUMN: BUY (Logic[2], Module[0]x2, Launcher[0], Chassis[1], Chassis[3])
+        const buyItems = [
+            { item: PARTS.logic[2], price: 40 },
+            { item: PARTS.module[0], price: 40, discount: { level: 'is-high', val: 50 } },
+            { item: PARTS.module[0], price: 80, disabled: true },
+            { item: PARTS.launcher[0], price: 28, discount: { level: 'is-mid', val: 30 } },
+            { item: PARTS.chassis[1], price: 40 },
+            { item: PARTS.chassis[3], price: 109, discount: { level: 'is-low', val: 10 }, disabled: true }
+        ];
+
+        buyItems.forEach(cfg => {
+            buyList.appendChild(createTradeEntry(cfg.item, 'buy', cfg));
+        });
+
+        // RIGHT COLUMN: SELL (Chassis[2], Launcher[0] Durability 1/2)
+        const sellItems = [
+            { item: PARTS.chassis[2], price: 20 },
+            { 
+                item: PARTS.launcher[0], 
+                price: 13, 
+                card: { charges: 1 } // Launcher[0] has maxCharges: 2
+            }
+        ];
+
+        sellItems.forEach(cfg => {
+            sellList.appendChild(createTradeEntry(cfg.item, 'sell', cfg));
+        });
+
+    </script>
 </body>
 
 </html>

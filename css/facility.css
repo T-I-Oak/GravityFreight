@@ -1,0 +1,238 @@
+/* =========================================
+   Gravity Freight V2: Facility Screen
+   Layer: Context / View (Specific)
+   ========================================= */
+
+#facility-screen .ui-panel {
+    width: 70vw;
+    height: 85vh;
+    max-width: 960px;
+    margin: auto;
+    
+    padding: 0; /* ヘッダー・フッターを端まで通すため */
+    gap: 0; 
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#facility-screen .ui-panel__header {
+    padding: var(--space-double);
+    display: flex;
+    align-items: center;
+    gap: var(--space-double);
+    justify-content: flex-start; /* 左寄せ */
+    margin-bottom: 0;
+}
+
+#facility-screen .ui-panel__body {
+    padding: 0;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#facility-screen .ui-well {
+    margin: 0 var(--space-double);
+    padding: var(--space-double);
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+#facility-screen .ui-panel__footer {
+    padding: var(--space-double);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#facility-screen .player-credits {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-unit);
+}
+
+#facility-screen .credits-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+}
+
+#facility-screen .credits-value {
+    font-family: var(--font-num);
+    font-size: 40px; /* 重厚感を出すため大型化 */
+    font-weight: 900;
+    color: var(--color-category-coin);
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    line-height: 1;
+}
+
+#facility-screen .ui-columns {
+    gap: var(--space-double);
+    height: 100%;
+}
+
+@media screen and (max-width: 600px) {
+    #facility-screen .ui-panel {
+        width: 95vw;
+        height: 90vh;
+    }
+}
+
+/* Facility Specific Components */
+
+/* is-discount: Simplified Discount Label */
+#facility-screen .ui-badge.is-discount {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    background: #444;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 1px 4px;
+    white-space: nowrap;
+    
+    /* レイアウトと回転 */
+    margin-left: 4px;
+    margin-top: 0;
+    transform: rotate(20deg);
+    
+    /* 装飾の排除 */
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+    
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+}
+
+
+#facility-screen .facility-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 4px solid var(--current-color);
+    border-radius: 12px;
+    color: var(--current-color);
+    font-family: 'UnifrakturMaguntia', serif;
+    font-size: 48px;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: brightness(0.7);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 
+                inset 0 0 20px color-mix(in srgb, var(--current-color), transparent 90%);
+    box-sizing: border-box;
+    padding-top: 5px; /* 重心調整 */
+}
+
+#facility-screen .ui-panel__title {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    margin: 0;
+    line-height: 1.1;
+}
+
+#facility-screen .ui-panel__subtitle {
+    font-size: 11px;
+    opacity: 0.7;
+    margin: 2px 0 0 0;
+    line-height: 1.2;
+}
+
+/* Section Headlines */
+#facility-screen .ui-section-title {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    margin: 0 0 2px 0;
+}
+
+#facility-screen .ui-section-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 16px 0;
+    line-height: 1.4;
+}
+
+#facility-screen .trade-item-area {
+    flex: 1;
+    min-width: 0; /* 防止 flex 項目溢出 */
+}
+
+#facility-screen .trade-action-area {
+    width: 110px;
+    flex-shrink: 0;
+}
+
+#facility-screen .ui-split-row {
+    gap: var(--space-unit);
+}
+
+#facility-screen .trade-action-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 4px;
+}
+
+#facility-screen .trade-price {
+    font-family: var(--font-num);
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--color-category-coin);
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+#facility-screen .trade-action-area .ui-button {
+    width: 100%;
+    padding: 0;
+    height: 24px;
+    font-size: 11px;
+    line-height: 24px;
+    min-height: auto;
+}
+
+#facility-screen .ui-badge.is-discount .sticker-num { 
+    font-size: 11px; 
+    letter-spacing: -0.5px; 
+    line-height: 1; 
+}
+
+#facility-screen .ui-badge.is-discount .sticker-pct { 
+    font-size: 7px; 
+    margin-right: 1px; 
+}
+
+/* Modifier: Low Discount */
+#facility-screen .ui-badge.is-discount.is-low { 
+    background: linear-gradient(135deg, #a1887f, #8d6e63); 
+}
+
+/* Modifier: Mid Discount */
+#facility-screen .ui-badge.is-discount.is-mid { 
+    background: linear-gradient(135deg, #ff5722, #f44336); 
+}
+
+/* Modifier: High Discount */
+#facility-screen .ui-badge.is-discount.is-high { 
+    background: linear-gradient(135deg, #e91e63, #9c27b0); 
+    animation: facility-discount-pulse 1.5s infinite ease-in-out; 
+}
+
+@keyframes facility-discount-pulse {
+    0%, 100% { transform: rotate(20deg) scale(1); filter: brightness(1); }
+    50% { transform: rotate(20deg) scale(1.05); filter: brightness(1.2); }
+}

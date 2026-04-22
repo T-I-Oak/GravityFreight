@@ -172,6 +172,7 @@
     letter-spacing: 0.25em;
     text-transform: uppercase;
     text-shadow: 0 0 10px color-mix(in srgb, var(--category-color, var(--color-theme-sub)), transparent 40%);
+    opacity: 0.5;
 }
 
 /* Category Color Contexts for Section Titles - Now Inherited from global .is-xxx */

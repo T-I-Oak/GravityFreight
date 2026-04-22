@@ -98,6 +98,9 @@ body {
 .is-trading-post { --current-color: var(--color-facility-trading-post); }
 .is-repair-dock  { --current-color: var(--color-facility-repair-dock); }
 .is-black-market { --current-color: var(--color-facility-black-market); }
+
+.is-theme        { --current-color: var(--color-theme-main); }
+.is-sub-theme    { --current-color: var(--color-theme-sub); }
 .is-home         { --current-color: var(--color-world-home-star); }
 
 .is-disabled {
