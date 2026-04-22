@@ -1,0 +1,41 @@
+/* =========================================
+   Gravity Freight V2: Facility Badge
+   Layer: Base / Capability (A-Axis)
+   Managing the distinctive insignia for orbital facilities.
+   ========================================= */
+
+.ui-facility-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 4px solid var(--current-color);
+    border-radius: 12px;
+    color: var(--current-color);
+    font-family: var(--font-special);
+    font-size: 48px;
+    line-height: 1;
+    flex-shrink: 0;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 
+                inset 0 0 20px color-mix(in srgb, var(--current-color), transparent 90%);
+    box-sizing: border-box;
+    padding-top: 5px; /* 重心調整: タイポグラフィの特性に合わせた補正 */
+}
+
+/* Style Layer: Neon - High vibrancy and glow */
+.ui-style--neon .ui-facility-badge {
+    filter: brightness(1.3);
+    background: color-mix(in srgb, var(--current-color), transparent 95%);
+    box-shadow: 0 0 25px color-mix(in srgb, var(--current-color), transparent 40%),
+                inset 0 0 15px color-mix(in srgb, var(--current-color), transparent 70%);
+    /* border-color はベースの --current-color を継承 */
+}
+
+/* Style Layer: Matte - Solid and weathered */
+.ui-style--matte .ui-facility-badge {
+    filter: brightness(0.7);
+    background: rgba(0, 0, 0, 0.7);
+}
