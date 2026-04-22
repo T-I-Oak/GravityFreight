@@ -1,105 +1,170 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gravity Freight Mockup: Repair Dock (V2 Redesign)</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=Courier+Prime:wght@400;700&family=Orbitron:wght@700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
+        rel="stylesheet">
+
+    <!-- V2 System CSS Layers -->
+    <link rel="stylesheet" href="../../css/design_tokens.css">
+    <link rel="stylesheet" href="../../css/ui_base.css">
+    <link rel="stylesheet" href="../../css/ui_layout.css">
+    <link rel="stylesheet" href="../../css/ui_primitives.css">
+    <link rel="stylesheet" href="../../css/ui_item_card.css">
+    <link rel="stylesheet" href="../../css/ui_style_matte.css">
+    <link rel="stylesheet" href="../../css/ui_style_neon.css">
     
-    <!-- Design System CSS Layers -->
-    <link rel="stylesheet" href="css/design_tokens.css">
-    <link rel="stylesheet" href="css/ui_base.css">
-    <link rel="stylesheet" href="css/ui_style_matte.css">
-    <link rel="stylesheet" href="css/facility.css">
-    <link rel="stylesheet" href="css/item-card.css">
+    <!-- Context Layer (Scene Specific) -->
+    <link rel="stylesheet" href="../../css/facility.css">
 </head>
-<body class="ui-style--matte">
-    
-    <div id="facility-screen" class="is-repair-dock">
-        
-        <article class="ui-panel panel-wide">
-            <header class="facility-header">
-                <div class="ui-facility-icon">R</div>
-                <div class="facility-info">
-                    <h1 class="facility-name text-display">REPAIR DOCK</h1>
-                    <p class="facility-description">発射台の整備やロケットの分解・強化を行える高度な設備。</p>
+
+<body id="facility-screen">
+    <main class="ui-style--matte ui-flex-center">
+        <section class="ui-panel is-repair-dock">
+            <header class="ui-panel__header">
+                <div class="facility-badge">R</div>
+                <div class="facility-title-group">
+                    <h1 class="ui-panel__title">REPAIR DOCK</h1>
+                    <span class="ui-panel__subtitle">発射台の整備やロケットの分解・強化を行える高度な設備。</span>
                 </div>
             </header>
 
-            <main class="ui-well facility-main-well">
-                
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>発射台のメンテナンス</h3>
-                        <p class="section-subtitle">ランチャーの使用回数を回復します。</p>
-                        
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-launcher">
-                                    <div class="item-card__header">
-                                        <span class="item-card__name">標準発射台 [LN-1200/2]</span>
-                                    </div>
-                                    <div class="item-card__desc">標準的なパワーと容量を備えた、基本設計の発射台。</div>
-                                </div>
+            <div class="ui-panel__body">
+                <div class="ui-well">
+                    <div class="ui-columns">
+                        <!-- Left Column: Maintenance & Dismantle -->
+                        <section class="ui-column ui-scrollable">
+                            <!-- Section 1: Launcher Maintenance -->
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">発射台のメンテナンス</h3>
+                                <span class="ui-section-subtitle">ランチャーの使用回数を全回復します。</span>
+                            </header>
+                            <div class="ui-item-list" id="repair-list">
+                                <!-- Generated via JS -->
                             </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">10 c</div>
-                                </div>
-                                <button class="ui-button is-trade is-small">REPAIR</button>
+
+                            <!-- Section 2: Rocket Dismantle -->
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">ロケットの分解・強化</h3>
+                                <span class="ui-section-subtitle">機体を解体し、構成パーツをインベントリに回収します。</span>
+                            </header>
+                            <div class="ui-item-list" id="dismantle-list">
+                                <!-- Generated via JS -->
                             </div>
-                        </div>
-                    </div>
+                        </section>
 
-                    <div class="facility-section facility-section--dismantle">
-                        <h3>ロケットの分解・強化</h3>
-                        <p class="section-subtitle">ロケットを分解して構成パーツを再調整し、インベントリに戻します。</p>
-                        
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-chassis">
-                                    <div class="item-card__header">
-                                        <span class="item-card__name">軽量シャーシ・広域回収ロジック</span>
-                                    </div>
-                                    <div class="item-card__desc">オービット・アナリスト</div>
-                                </div>
+                        <!-- Right Column: Result / History -->
+                        <section class="ui-column ui-scrollable">
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">強化済みパーツ（受取り）</h3>
+                                <span class="ui-section-subtitle">分解・強化によって回収されたパーツの一覧。</span>
+                            </header>
+
+                            <div class="ui-item-list" id="received-list">
+                                <!-- Placeholder Example -->
                             </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">50 c</div>
-                                </div>
-                                <button class="ui-button is-trade is-small">DISMANTLE</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                        </section>
+                    </div> <!-- /.ui-columns -->
+                </div> <!-- /.ui-well -->
+            </div> <!-- /.ui-panel__body -->
 
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>強化済みパーツ（受取り）</h3>
-                        <p class="section-subtitle">分解・強化によって回収された構成パーツの一覧です。</p>
-                        
-                        <div class="item-placeholder">
-                            <span class="item-placeholder__text">NO RECENT ADJUSTMENTS</span>
-                            <span class="item-placeholder__hint">このセッションでの分解・強化履歴はありません。</span>
-                        </div>
-                    </div>
-                </section>
-
-            </main>
-
-            <footer class="facility-footer">
-                <div class="ui-stat-box">
-                    <span class="stat-label">CREDITS BALANCE</span>
-                    <span class="stat-value num-coin">50 c</span>
+            <!-- Global Actions Section -->
+            <footer class="ui-panel__footer">
+                <div class="player-credits">
+                    <span class="credits-label">CREDITS:</span>
+                    <span class="credits-value num-coin" id="player-credits-value">50 c</span>
                 </div>
-                <button class="ui-button is-primary">DEPART FROM STATION</button>
+                <button class="ui-button is-primary is-big is-repair-dock" id="depart-station">
+                    <span class="btn-main-label">DEPART FROM STATION</span>
+                </button>
             </footer>
+        </section>
+    </main>
 
-        </article>
+    <script type="module">
+        import { UIComponents } from '../systems/ui/UIComponents.js';
+        import { PARTS } from '../core/Data.js';
 
-    </div>
+        // Helper to create a facility entry row (Reusing logic from Trading Post)
+        function createFacilityEntry(item, actionLabel, options = {}) {
+            const entry = document.createElement('div');
+            entry.className = 'trade-entry ui-split-row';
 
+            const itemArea = document.createElement('div');
+            itemArea.className = 'trade-item-area';
+            
+            // 1. Generate REAL item card HTML
+            const cardOptions = { ...options.card };
+            itemArea.innerHTML = UIComponents.generateCardHTML(item, cardOptions);
+
+            const actionArea = document.createElement('div');
+            actionArea.className = 'trade-action-area ui-split-column';
+            
+            const group = document.createElement('div');
+            group.className = 'trade-action-group';
+            
+            const price = document.createElement('div');
+            price.className = 'trade-price num-coin';
+            price.textContent = `${options.price} c`;
+            group.appendChild(price);
+
+            const button = document.createElement('button');
+            button.className = `ui-button is-primary`;
+            
+            if (options.disabled) button.classList.add('is-disabled');
+            button.textContent = actionLabel.toUpperCase();
+
+            actionArea.appendChild(group);
+            actionArea.appendChild(button);
+
+            entry.appendChild(itemArea);
+            entry.appendChild(actionArea);
+            return entry;
+        }
+
+        const repairList = document.getElementById('repair-list');
+        const dismantleList = document.getElementById('dismantle-list');
+        const receivedList = document.getElementById('received-list');
+
+        // 1. REPAIR SECTION (Paying -> Primary Facility Color)
+        // Using exactly PARTS.launcher[0]
+        const repairItems = [
+            { 
+                item: PARTS.launcher[0], 
+                price: 10,
+                card: { charges: 1 } // Worn state for repair visualization
+            }
+        ];
+        repairItems.forEach(cfg => {
+            repairList.appendChild(createFacilityEntry(cfg.item, 'repair', cfg));
+        });
+
+        // 2. DISMANTLE SECTION (Paying -> Primary Facility Color)
+        // Using exactly PARTS.chassis[0]
+        const dismantleItems = [
+            { 
+                item: PARTS.chassis[0], 
+                price: 50,
+                card: { isEnhanced: true } // Visual demonstration of enhanced parts
+            }
+        ];
+        dismantleItems.forEach(cfg => {
+            dismantleList.appendChild(createFacilityEntry(cfg.item, 'dismantle', cfg));
+        });
+
+        // 3. PLACEHOLDER (Using standardized Placeholder component)
+        receivedList.innerHTML = UIComponents.generatePlaceholderHTML(
+            'NO RECENT ADJUSTMENTS',
+            'このセッションでの分解・強化履歴はありません。',
+            { category: 'repair-dock' }
+        );
+
+    </script>
 </body>
+
 </html>
