@@ -172,6 +172,36 @@ export class UIComponents {
     }
 
     /**
+     * Generates a complete story modal HTML string.
+     * @param {string} storyId - Key for STORY_DATA
+     */
+    static generateStoryModalHTML(storyId) {
+        const story = STORY_DATA[storyId];
+
+        const facility = getFacilityById(story.branch);
+        const facilityClass = facility.className;
+        const icon = facility.icon;
+
+        return `
+            <article class="ui-panel ${facilityClass} is-story">
+                <header class="ui-panel__header">
+                    <div class="ui-facility-badge">${icon}</div>
+                    <h1 class="ui-panel__title">${story.title}</h1>
+                </header>
+
+                <div class="ui-panel__body ui-scrollable">
+                    <div class="is-intro">${story.discovery}</div>
+                    <div class="ui-well">${story.content}</div>
+                </div>
+
+                <footer class="ui-panel__footer">
+                    <button class="ui-button is-big" id="story-modal-close">CLOSE</button>
+                </footer>
+            </article>
+        `;
+    }
+
+    /**
      * Generates a placeholder card HTML string for empty slots.
      * @param {string} text - Main message (e.g., "NO ROCKET EQUIPPED")
      * @param {string} subtext - Guidance message (e.g., "CLICK TO BUILD")
