@@ -1,0 +1,80 @@
+/* =========================================
+   Gravity Freight V2: Story Modal
+   Layer: Context / View (Specific)
+   Focus: Narrative immersion and message delivery
+   ========================================= */
+
+.ui-panel.is-story {
+    width: 90vw;
+    max-width: 480px;
+    height: auto;
+    max-height: 90vh;
+    
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--current-color), transparent 80%), 
+        rgba(5, 10, 30, 0.9)
+    );
+    border: 2px solid color-mix(in srgb, var(--current-color), #ffffff 50%);
+    box-shadow: 
+        0 0 60px color-mix(in srgb, var(--current-color), transparent 85%),
+        inset 0 0 30px color-mix(in srgb, var(--current-color), transparent 90%);
+    border-radius: 16px;
+    
+    /* Center positioning helper when used within ui-flex-center */
+    margin: auto;
+}
+
+.ui-panel.is-story .ui-panel__header {
+    padding: var(--space-double);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-double);
+}
+
+.ui-panel.is-story .ui-panel__title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    margin: 0;
+    line-height: 1.1;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.ui-panel.is-story .ui-panel__body {
+    padding: var(--space-double);
+    line-height: 1.8;
+    font-size: 14px;
+    gap: var(--space-double);
+    display: flex;
+    flex-direction: column;
+}
+
+.ui-panel.is-story .is-intro {
+    font-size: 14px;
+    font-weight: 900;
+    font-style: italic;
+    color: #050a1e;
+    padding: var(--space-double) 24px;
+    background: color-mix(in srgb, var(--current-color), #ffffff 75%);
+    border-radius: var(--radius-standard);
+    margin: 0 var(--space-double);
+    line-height: 1.5;
+    /* 発光感ではなく、ソリッドな強調に変更 */
+    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 50%);
+}
+
+.ui-panel.is-story .ui-well {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: pre-wrap; /* 手紙の改行を維持 */
+}
+
+.ui-panel.is-story .ui-panel__footer {
+    padding: var(--space-double);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
