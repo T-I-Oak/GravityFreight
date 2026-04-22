@@ -18,7 +18,6 @@
 
 #facility-screen .ui-panel__header {
     padding: var(--space-double);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     gap: var(--space-double);
@@ -27,17 +26,48 @@
 }
 
 #facility-screen .ui-panel__body {
+    padding: 0;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#facility-screen .ui-well {
+    margin: 0 var(--space-double);
     padding: var(--space-double);
     flex: 1;
+    display: flex;
     overflow: hidden;
 }
 
 #facility-screen .ui-panel__footer {
     padding: var(--space-double);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+#facility-screen .player-credits {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-unit);
+}
+
+#facility-screen .credits-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+}
+
+#facility-screen .credits-value {
+    font-family: var(--font-num);
+    font-size: 40px; /* 重厚感を出すため大型化 */
+    font-weight: 900;
+    color: var(--color-category-coin);
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    line-height: 1;
 }
 
 #facility-screen .ui-columns {
@@ -81,17 +111,6 @@
     pointer-events: none;
 }
 
-#facility-screen .is-trading-post {
-    --current-color: var(--color-facility-trading-post);
-}
-
-#facility-screen .is-repair-dock {
-    --current-color: var(--color-facility-repair-dock);
-}
-
-#facility-screen .is-black-market {
-    --current-color: var(--color-facility-black-market);
-}
 
 #facility-screen .facility-badge {
     display: flex;
@@ -128,6 +147,20 @@
     opacity: 0.7;
     margin: 2px 0 0 0;
     line-height: 1.2;
+}
+
+/* Section Headlines */
+#facility-screen .ui-section-title {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    margin: 0 0 2px 0;
+}
+
+#facility-screen .ui-section-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 16px 0;
+    line-height: 1.4;
 }
 
 #facility-screen .trade-item-area {

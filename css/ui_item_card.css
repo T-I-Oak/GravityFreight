@@ -247,5 +247,4 @@
     animation: ui-guide-pulse 2s infinite ease-in-out;
 }
 
-.is-home   { --category-color: var(--color-home-star); }
-.is-theme  { --category-color: var(--color-theme-main); }
+

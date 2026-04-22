@@ -7,7 +7,7 @@
     <title>Gravity Freight Mockup: Trading Post (V2 Redesign)</title>
     <!-- Google Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=Courier+Prime:wght@400;700&family=Orbitron:wght@700;900&family=UnifrakturMaguntia&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
         rel="stylesheet">
 
     <!-- V2 System CSS Layers -->
@@ -23,55 +23,55 @@
     <link rel="stylesheet" href="../../css/facility.css">
 </head>
 
-<body>
-    <main id="facility-screen" class="ui-style--matte ui-flex-center">
+<body id="facility-screen">
+    <main class="ui-style--matte ui-flex-center">
         <section class="ui-panel is-trading-post">
             <header class="ui-panel__header">
-                <div class="facility-header-status">
-                    <div class="ui-facility-icon">T</div>
-                </div>
-                <div class="ui-split-column">
-                    <h2 class="ui-panel__title is-trading-post">TRADING POST</h2>
+                <div class="facility-badge">T</div>
+                <div class="facility-title-group">
+                    <h1 class="ui-panel__title">TRADING POST</h1>
                     <span class="ui-panel__subtitle">貨物取引やパーツの売買ができる中継基地。</span>
                 </div>
             </header>
 
-            <div class="ui-panel__body ui-columns">
+            <div class="ui-panel__body">
+                <div class="ui-well">
+                    <div class="ui-columns">
+                        <!-- Left Column: Buy Items -->
+                        <section class="ui-column ui-scrollable">
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">販売中のアイテム</h3>
+                                <span class="ui-section-subtitle">ステーションで販売されている高度なパーツです。</span>
+                            </header>
 
-                <!-- Left Column: Buy Items -->
-                <section class="ui-column ui-scrollable">
-                    <header class="ui-section-header">
-                        <h3 class="ui-section-title">販売中のアイテム</h3>
-                        <span class="ui-section-subtitle">ステーションで販売されている高度なパーツです。</span>
-                    </header>
+                            <div class="ui-item-list" id="buy-list">
+                                <!-- Items will be injected here via script -->
+                            </div> <!-- /.ui-item-list -->
+                        </section>
 
-                    <div class="ui-item-list" id="buy-list">
-                        <!-- Items will be injected here via script -->
-                    </div> <!-- /.ui-item-list -->
-                </section>
+                        <!-- Right Column: Sell Items -->
+                        <section class="ui-column ui-scrollable">
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">パーツの売却</h3>
+                                <span class="ui-section-subtitle">不要なパーツを売却して資金を獲得できます。</span>
+                            </header>
 
-                <!-- Right Column: Sell Items -->
-                <section class="ui-column ui-scrollable">
-                    <header class="ui-section-header">
-                        <h3 class="ui-section-title">パーツの売却</h3>
-                        <span class="ui-section-subtitle">不要なパーツを売却して資金を獲得できます。</span>
-                    </header>
-
-                    <div class="ui-item-list" id="sell-list">
-                        <!-- Items will be injected here via script -->
-                    </div>
-                </section>
-
+                            <div class="ui-item-list" id="sell-list">
+                                <!-- Items will be injected here via script -->
+                            </div>
+                        </section>
+                    </div> <!-- /.ui-columns -->
+                </div> <!-- /.ui-well -->
             </div> <!-- /.ui-panel__body -->
 
             <!-- Global Actions Section -->
             <footer class="ui-panel__footer">
-                <div class="ui-split-column is-hero">
-                    <span class="ui-stat-label">CREDITS BALANCE</span>
-                    <span class="stat-value num-coin">420 c</span>
+                <div class="player-credits">
+                    <span class="credits-label">CREDITS:</span>
+                    <span class="credits-value num-coin" id="player-credits-value">420 c</span>
                 </div>
-                <button class="ui-button is-primary is-big is-trading-post">
-                    <span class="btn-main-label">DEPART FROM STATION</span>
+                <button class="ui-button is-primary is-big is-trading-post" id="depart-station">
+                    <span class="btn-main-label">TO NEXT SECTOR</span>
                 </button>
             </footer>
         </section>
@@ -112,7 +112,7 @@
             }
 
             const button = document.createElement('button');
-            button.className = `ui-button is-${actionType === 'buy' ? 'primary' : 'secondary'}`;
+            button.className = `ui-button is-primary${actionType === 'sell' ? ' is-sub-theme' : ''}`;
             if (options.disabled) button.classList.add('is-disabled');
             button.textContent = actionType.toUpperCase();
 
