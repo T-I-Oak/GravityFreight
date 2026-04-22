@@ -4,9 +4,9 @@
    ========================================= */
 
 #facility-screen .ui-panel {
-    width: 70vw;
+    width: 85vw;
     height: 85vh;
-    max-width: 960px;
+    max-width: 1080px;
     margin: auto;
     
     padding: 0; /* ヘッダー・フッターを端まで通すため */
@@ -75,7 +75,7 @@
     height: 100%;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
     #facility-screen .ui-panel {
         width: 95vw;
         height: 90vh;
@@ -111,27 +111,45 @@
     pointer-events: none;
 }
 
+/* Trading Post Specific Layout Fixes */
+#facility-screen .trade-entry {
+    margin-bottom: var(--space-standard);
+    min-width: 0;
+    gap: var(--space-standard);
+    align-items: stretch;
+}
 
-#facility-screen .facility-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 4px solid var(--current-color);
-    border-radius: 12px;
-    color: var(--current-color);
-    font-family: 'UnifrakturMaguntia', serif;
-    font-size: 48px;
-    line-height: 1;
+#facility-screen .trade-item-area {
+    flex: 1;
+    min-width: 0;
+}
+
+#facility-screen .trade-action-area {
     flex-shrink: 0;
-    filter: brightness(0.7);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 
-                inset 0 0 20px color-mix(in srgb, var(--current-color), transparent 90%);
-    box-sizing: border-box;
-    padding-top: 5px; /* 重心調整 */
+    width: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-unit);
+}
+
+#facility-screen .trade-price {
+    font-family: var(--font-num);
+    font-size: 14px;
+    font-weight: 900;
+    text-align: right;
+}
+
+#facility-screen .trade-action-group {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+}
+
+#facility-screen .facility-badge,
+#facility-screen .ui-facility-badge {
+    /* 共通コンポーネント ui_facility_badge.css へ移行 */
 }
 
 #facility-screen .ui-panel__title {
