@@ -18,6 +18,7 @@
    --color-theme-sub: #4488ff;
    /* Traversal Blue: Secondary Brand Color */
 
+   /* Dynamic Color Handle (Default: Main Theme) */
    --current-color: var(--color-theme-main);
 
    /* Facility Colors
@@ -89,8 +90,9 @@
 
    /* Typography Tokens
        Limited to three levels of hierarchy. */
-   --font-main: 'Inter', sans-serif;
-   --font-num: 'Outfit', sans-serif;
+   --font-main: 'Inter', 'Noto Sans JP', sans-serif;
+   --font-num: 'Outfit', 'Noto Sans JP', sans-serif;
+   --font-special: 'UnifrakturMaguntia', serif;
 
    --text-size-title: 16px;
    --text-size-main: 12px;
