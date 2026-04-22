@@ -7,102 +7,154 @@
     <title>Gravity Freight Mockup: Black Market (V2 Redesign)</title>
     <!-- Google Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=Courier+Prime:wght@400;700&family=Orbitron:wght@700;900&family=UnifrakturMaguntia&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
         rel="stylesheet">
 
-    <!-- Design System CSS Layers -->
-    <link rel="stylesheet" href="css/design_tokens.css">
-    <link rel="stylesheet" href="css/ui_base.css">
-    <link rel="stylesheet" href="css/ui_style_matte.css">
-    <link rel="stylesheet" href="css/facility.css">
-    <link rel="stylesheet" href="css/item-card.css">
+    <!-- V2 System CSS Layers -->
+    <link rel="stylesheet" href="../../css/design_tokens.css">
+    <link rel="stylesheet" href="../../css/ui_base.css">
+    <link rel="stylesheet" href="../../css/ui_layout.css">
+    <link rel="stylesheet" href="../../css/ui_primitives.css">
+    <link rel="stylesheet" href="../../css/ui_item_card.css">
+    <link rel="stylesheet" href="../../css/ui_style_matte.css">
+    <link rel="stylesheet" href="../../css/ui_style_neon.css">
+
+    <!-- Context Layer (Scene Specific) -->
+    <link rel="stylesheet" href="../../css/facility.css">
 </head>
 
-<body class="ui-style--matte">
-
-    <!-- 施設の色の制御は facility.css 内で .is-black-market クラスにより定義 -->
-    <div id="facility-screen" class="is-black-market">
-
-        <article class="ui-panel panel-wide">
-            <header class="facility-header">
-                <div class="ui-facility-icon">B</div>
-                <div class="facility-info">
-                    <h1 class="facility-name text-display">BLACK MARKET</h1>
-                    <p class="facility-description">通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。</p>
+<body id="facility-screen">
+    <main class="ui-style--matte ui-flex-center">
+        <section class="ui-panel is-black-market">
+            <header class="ui-panel__header">
+                <div class="facility-badge">B</div>
+                <div class="facility-title-group">
+                    <h1 class="ui-panel__title">BLACK MARKET</h1>
+                    <span class="ui-panel__subtitle">通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。</span>
                 </div>
             </header>
 
-            <main class="ui-well facility-main-well">
+            <div class="ui-panel__body">
+                <div class="ui-well">
+                    <div class="ui-columns">
+                        <!-- Left Column: Transactions -->
+                        <section class="ui-column ui-scrollable">
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">闇セクターの仕入れ品</h3>
+                                <span class="ui-section-subtitle">ドック滞在につき1回のみ、性能が強化された一点物を入手できます。</span>
+                            </header>
 
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>闇セクターの仕入れ品</h3>
-                        <p class="section-subtitle">ドック滞在につき1回のみ取引可能です。性能が強化された一点物のパーツを入手できます。</p>
-
-                        <!-- 通常取引 (100c: 残高50cのため本来はこれも不可だが、比較のため一旦プレミアムのみdisabledとする) -->
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-market">
-                                    <div class="item-card__header">
-                                        <span class="item-card__name">通常取引</span>
-                                    </div>
-                                    <div class="item-card__desc">資産価値 100c 以上のアイテム。50%の確率でランダムに強化されています。</div>
-                                </div>
+                            <div class="ui-item-list" id="transaction-list">
+                                <!-- Generated via JS -->
                             </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">100 c</div>
-                                </div>
-                                <button class="ui-button is-trade is-small">BUY</button>
+                        </section>
+
+                        <!-- Right Column: Acquired Items -->
+                        <section class="ui-column ui-scrollable">
+                            <header class="ui-section-header">
+                                <h3 class="ui-section-title">獲得アイテム</h3>
+                                <span class="ui-section-subtitle">購入によって獲得したアイテムが表示されます。</span>
+                            </header>
+
+                            <div class="ui-item-list" id="acquired-list">
+                                <!-- Placeholder -->
                             </div>
-                        </div>
+                        </section>
+                    </div> <!-- /.ui-columns -->
+                </div> <!-- /.ui-well -->
+            </div> <!-- /.ui-panel__body -->
 
-                        <!-- プレミアム取引 (500c: 資金不足のため disabled 属性を付与) -->
-                        <div class="trade-entry">
-                            <div class="trade-item-area">
-                                <div class="item-card is-market">
-                                    <div class="item-card__header">
-                                        <span class="item-card__name">プレミアム取引</span>
-                                    </div>
-                                    <div class="item-card__desc">資産価値 500c 以上。80%の確率で強化済み。希少パーツの出現率が大幅に向上します。</div>
-                                </div>
-                            </div>
-                            <div class="trade-action-area">
-                                <div class="trade-action-group">
-                                    <div class="trade-price num-coin">500 c</div>
-                                </div>
-                                <button class="ui-button is-trade is-small" disabled>BUY</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="ui-column">
-                    <div class="facility-section">
-                        <h3>獲得アイテム</h3>
-                        <p class="section-subtitle">購入によって獲得したアイテムが表示されます。</p>
-
-                        <div class="item-placeholder">
-                            <span class="item-placeholder__text">WAITING FOR TRANSACTION</span>
-                            <span class="item-placeholder__hint">取引を開始すると、ここに獲得したアイテムが表示されます。</span>
-                        </div>
-                    </div>
-                </section>
-
-            </main>
-
-            <footer class="facility-footer">
-                <div class="ui-stat-box">
-                    <span class="stat-label">CREDITS BALANCE</span>
-                    <span class="stat-value num-coin">50 c</span>
+            <!-- Global Actions Section -->
+            <footer class="ui-panel__footer">
+                <div class="player-credits">
+                    <span class="credits-label">CREDITS:</span>
+                    <span class="credits-value num-coin" id="player-credits-value">50 c</span>
                 </div>
-                <button class="ui-button is-primary">DEPART FROM STATION</button>
+                <button class="ui-button is-primary is-big is-black-market" id="depart-station">
+                    <span class="btn-main-label">DEPART FROM STATION</span>
+                </button>
             </footer>
+        </section>
+    </main>
 
-        </article>
+    <script type="module">
+        import { UIComponents } from '../systems/ui/UIComponents.js';
+        import { PARTS, RARITY } from '../core/Data.js';
 
-    </div>
+        // Helper to create a facility entry row
+        function createFacilityEntry(item, actionLabel, options = {}) {
+            const entry = document.createElement('div');
+            entry.className = 'trade-entry ui-split-row';
 
+            const itemArea = document.createElement('div');
+            itemArea.className = 'trade-item-area';
+
+            // Generate item card HTML
+            const cardOptions = { ...options.card };
+            itemArea.innerHTML = UIComponents.generateCardHTML(item, cardOptions);
+
+            const actionArea = document.createElement('div');
+            actionArea.className = 'trade-action-area ui-split-column';
+
+            const group = document.createElement('div');
+            group.className = 'trade-action-group';
+
+            const price = document.createElement('div');
+            price.className = 'trade-price num-coin';
+            price.textContent = `${options.price} c`;
+            group.appendChild(price);
+
+            const button = document.createElement('button');
+            button.className = `ui-button is-primary`;
+            if (options.disabled) button.classList.add('is-disabled');
+            button.textContent = actionLabel.toUpperCase();
+
+            actionArea.appendChild(group);
+            actionArea.appendChild(button);
+
+            entry.appendChild(itemArea);
+            entry.appendChild(actionArea);
+            return entry;
+        }
+
+        const transactionList = document.getElementById('transaction-list');
+        const acquiredList = document.getElementById('acquired-list');
+
+        // Black Market Transactions
+        const transactions = [
+            {
+                item: {
+                    id: 'bm_normal',
+                    name: '通常取引',
+                    category: 'black-market', // Use facility theme color for the indicator
+                    description: '資産価値 100c 以上のアイテム。50%の確率でランダムに強化されています。'
+                },
+                price: 100
+            },
+            {
+                item: {
+                    id: 'bm_premium',
+                    name: 'プレミアム取引',
+                    category: 'black-market',
+                    description: '資産価値 500c 以上。80%の確率で強化済み。希少パーツの出現率が大幅に向上します。'
+                },
+                price: 500,
+                disabled: true // Balance is 50c
+            }
+        ];
+
+        transactions.forEach(cfg => {
+            transactionList.appendChild(createFacilityEntry(cfg.item, 'buy', cfg));
+        });
+
+        // Acquired Placeholder
+        acquiredList.innerHTML = UIComponents.generatePlaceholderHTML(
+            'WAITING FOR TRANSACTION',
+            '取引を開始すると、ここに獲得したアイテムが表示されます。',
+            { category: 'black-market' }
+        );
+
+    </script>
 </body>
 
 </html>
