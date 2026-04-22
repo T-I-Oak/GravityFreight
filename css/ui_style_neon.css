@@ -13,7 +13,7 @@
     background: rgba(10, 20, 40, 0.4);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
-    border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 60%);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
