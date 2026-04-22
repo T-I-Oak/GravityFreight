@@ -57,7 +57,6 @@ body {
 }
 
 .ui-button {
-    --current-color: var(--color-theme-main);
     display: inline-flex;
     align-items: center;
     justify-content: center;
