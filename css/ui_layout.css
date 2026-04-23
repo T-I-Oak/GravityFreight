@@ -80,14 +80,23 @@ main {
 }
 
 @media screen and (max-width: 800px) {
+    /* 1カラム化時は全体コンテナでのスクロールを標準とする */
     .ui-columns {
         flex-direction: column;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
+    
     .ui-columns > .ui-column {
         flex: none;
+    }
+
+    /* カラム側の個別スクロールを解除し、親に展開させる */
+    .ui-columns .is-scrollable,
+    .ui-columns .ui-scrollable {
         overflow: visible;
+        height: auto;
+        flex: none;
     }
 }
 

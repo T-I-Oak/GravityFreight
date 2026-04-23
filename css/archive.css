@@ -145,10 +145,8 @@
         min-width: 0;
     }
 
-    #archive-screen .ui-well.ui-scrollable {
+    #archive-screen .ui-well.is-scrollable {
         flex: none;
-        overflow: visible;
-        height: auto;
     }
     
     #archive-screen.ui-panel {

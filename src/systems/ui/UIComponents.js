@@ -189,7 +189,7 @@ export class UIComponents {
                     <h1 class="ui-panel__title">${story.title}</h1>
                 </header>
 
-                <div class="ui-panel__body ui-scrollable">
+                <div class="ui-panel__body is-scrollable">
                     <div class="is-intro">${story.discovery}</div>
                     <div class="ui-well">${story.content}</div>
                 </div>
