@@ -80,7 +80,7 @@
 }
 
 /* 凡例の装飾 (Context レイヤーで追加) */
-#archive-screen .ui-stat-label::before {
+#archive-screen .ui-stat-group .ui-stat-label::before {
     content: '';
     display: inline-block;
     width: 12px;
