@@ -1,0 +1,124 @@
+/* =========================================
+   Gravity Freight V2: Analytic Archive Screen
+   Layer: Context / View (Specific)
+   ========================================= */
+
+#archive-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#archive-screen.ui-panel {
+    width: 90vw;
+    height: 85vh;
+    max-width: 1120px;
+    margin: auto;
+    
+    /* 施設画面の作法に従い、ヘッダー・フッターを端まで通す */
+    padding: 0;
+}
+
+/* Header & Footer Padding Restoration */
+#archive-screen .ui-panel__header,
+#archive-screen .ui-panel__footer {
+    padding: var(--space-double);
+}
+
+#archive-screen .ui-panel__header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#archive-screen .ui-panel__footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 2カラム構成の定義 */
+#archive-screen .ui-columns {
+    gap: 0;
+    height: 100%;
+}
+
+#archive-screen aside.ui-column {
+    flex: 0 0 240px; /* サイドバー固定幅 */
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    padding: var(--space-double);
+}
+
+#archive-screen main.ui-column {
+    flex: 1;
+    padding: var(--space-double);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 統計セクション (KPI) */
+#archive-screen .ui-well.ui-split-column {
+    margin-bottom: var(--space-unit);
+}
+
+#archive-screen .stat-value {
+    font-size: 32px;
+    font-weight: 950;
+    line-height: 1;
+}
+
+/* グラフセクション */
+#archive-screen .graph-svg {
+    width: 100%;
+    height: 160px; /* グラフの高さ確保 */
+    display: block;
+    margin-top: var(--space-unit);
+}
+
+/* 凡例の装飾 (Context レイヤーで追加) */
+#archive-screen .ui-stat-label::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 2px;
+    vertical-align: middle;
+    margin-right: 8px;
+    background: currentColor;
+    opacity: 0.8;
+}
+
+/* テーブルの調整 */
+#archive-screen .ui-well.ui-scrollable {
+    flex: 1;
+    margin-top: var(--space-unit);
+    padding: 0; /* テーブル自体がパディングを持つため */
+}
+
+#archive-screen .ui-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#archive-screen .ui-table th {
+    text-align: left;
+    padding: var(--space-unit) var(--space-double);
+    font-size: 10px;
+    opacity: 0.5;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+}
+
+#archive-screen .ui-table td {
+    padding: var(--space-unit) var(--space-double);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#archive-screen .ui-table tr.is-active {
+    background: rgba(255, 255, 255, 0.03);
+}
