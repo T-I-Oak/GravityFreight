@@ -4,37 +4,32 @@
    Managing Global Resets and Interactive Foundations
    ========================================= */
 
-/* --- 1. Immersion Reset --- */
+/* --- 1. Immersion Reset & Global Definitions --- */
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-}
-
-*:focus {
-    outline: none !important;
-}
-
-.is-scrollable,
-.ui-columns {
+    
+    /* プロジェクト標準のスクロールバースタイル (グローバル定義) */
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.is-scrollable::-webkit-scrollbar,
-.ui-columns::-webkit-scrollbar {
+*::-webkit-scrollbar {
     width: 4px;
     height: 4px;
 }
 
-.is-scrollable::-webkit-scrollbar-track,
-.ui-columns::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.is-scrollable::-webkit-scrollbar-thumb,
-.ui-columns::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
+}
+
+*:focus {
+    outline: none !important;
 }
 
 .is-scrollable {

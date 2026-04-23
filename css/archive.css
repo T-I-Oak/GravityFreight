@@ -33,28 +33,28 @@
 }
 
 #archive-screen .ui-panel__header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 #archive-screen .ui-panel__footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 /* 2カラム構成の定義 */
 #archive-screen .ui-columns {
-    gap: 0;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    gap: var(--space-double); /* ボディのマージンと同じ値に設定 */
 }
 
 #archive-screen aside.ui-column {
-    flex: 0 0 240px; /* サイドバー固定幅 */
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-    padding: var(--space-double);
+    flex: 0 0 350px;
+    display: flex;
+    flex-direction: column;
 }
 
 #archive-screen main.ui-column {
     flex: 1;
-    padding: var(--space-double);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -115,15 +115,17 @@
     padding: var(--space-unit) var(--space-double);
     font-size: 10px;
     opacity: 0.5;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.2);
     position: sticky;
     top: 0;
 }
 
+#archive-screen .ui-panel__body {
+    padding: 0 var(--space-double) var(--space-double) var(--space-double); /* 上はヘッダーのパディングがあるため0 */
+}
+
 #archive-screen .ui-table td {
     padding: var(--space-unit) var(--space-double);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #archive-screen .ui-table tr.is-active {
@@ -135,8 +137,7 @@
     #archive-screen aside.ui-column {
         flex: none;
         width: 100%;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border: none;
     }
 
     #archive-screen main.ui-column {
