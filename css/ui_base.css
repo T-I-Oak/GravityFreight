@@ -14,28 +14,24 @@
     outline: none !important;
 }
 
-.is-scrollable,
-.ui-scrollable {
+.is-scrollable {
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.is-scrollable::-webkit-scrollbar,
-.ui-scrollable::-webkit-scrollbar {
+.is-scrollable::-webkit-scrollbar {
     width: 4px;
     height: 4px;
 }
 
-.is-scrollable::-webkit-scrollbar-track,
-.ui-scrollable::-webkit-scrollbar-track {
+.is-scrollable::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.is-scrollable::-webkit-scrollbar-thumb,
-.ui-scrollable::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+.is-scrollable::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
 }
 

@@ -92,8 +92,7 @@ main {
     }
 
     /* カラム側の個別スクロールを解除し、親に展開させる */
-    .ui-columns .is-scrollable,
-    .ui-columns .ui-scrollable {
+    .ui-columns .is-scrollable {
         overflow: visible;
         height: auto;
         flex: none;
