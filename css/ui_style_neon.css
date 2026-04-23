@@ -62,7 +62,7 @@
 
 /* Axis-D: Flavor-based glows to emphasize data identity */
 .ui-style--neon .num-sector {
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0 8px var(--color-num-sector);
 }
 
 .ui-style--neon .num-coin {
@@ -71,6 +71,14 @@
 
 .ui-style--neon .num-score {
     text-shadow: 0 0 8px var(--color-num-score);
+}
+
+.ui-style--neon .num-contract {
+    text-shadow: 0 0 8px var(--color-num-contract);
+}
+
+.ui-style--neon .num-item-count {
+    text-shadow: 0 0 8px var(--color-num-item-count);
 }
 
 .ui-style--neon .ui-panel__header {
