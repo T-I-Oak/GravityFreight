@@ -82,9 +82,12 @@ main {
 @media screen and (max-width: 800px) {
     .ui-columns {
         flex-direction: column;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     .ui-columns > .ui-column {
         flex: none;
+        overflow: visible;
     }
 }
 
@@ -186,4 +189,3 @@ main {
     font-size: 24px;
     font-weight: 900;
 }
-

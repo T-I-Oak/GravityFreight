@@ -132,11 +132,6 @@
 
 /* モバイル・1カラム時のレスポンシブ対応 */
 @media screen and (max-width: 800px) {
-    #archive-screen .ui-panel__body {
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
     #archive-screen aside.ui-column {
         flex: none;
         width: 100%;
@@ -148,7 +143,6 @@
         flex: none;
         width: 100%;
         min-width: 0;
-        overflow: visible;
     }
 
     #archive-screen .ui-well.ui-scrollable {
