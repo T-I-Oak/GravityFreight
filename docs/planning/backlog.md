@@ -36,7 +36,7 @@
 
 ## Phase 2: Scene Reconstruction (各画面の再構築)
 各画面を新しい4軸モデルとレイヤー構造で順次再定義する。
-- [ ] **Analytic Archive (記録画面)**: 
+- [x] **Analytic Archive (記録画面)**: 
     *   モックアップの清書（HTML/CSS構造の最適化）
     *   機能仕様の確定
 - [ ] **Terminal Report (ゲームリザルト)**: 再定義
