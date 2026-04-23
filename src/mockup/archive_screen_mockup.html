@@ -42,22 +42,35 @@
 
             <div class="ui-panel__body">
                 <div class="ui-columns">
-                    <aside class="ui-column">
-                        <section class="ui-section">
-                            <div class="ui-well ui-split-column">
-                                <div class="ui-stat-label">Lifetime Contracts</div>
-                                <div class="stat-value num-score">24</div>
+                <!-- Left Column: KPI Stats -->
+                <aside class="ui-column">
+                    <header class="ui-section-header">
+                        <h3 class="ui-section-title">LIFETIME STATS</h3>
+                    </header>
+
+                    <div class="kpi-container">
+                        <div class="ui-split-column kpi-group">
+                            <span class="ui-stat-label">MAX SECTOR</span>
+                            <div class="ui-well">
+                                <span class="stat-value num-sector">12</span>
                             </div>
-                            <div class="ui-well ui-split-column">
-                                <div class="ui-stat-label">Cumulative Sectors</div>
-                                <div class="stat-value num-sector">142</div>
+                        </div>
+
+                        <div class="ui-split-column kpi-group">
+                            <span class="ui-stat-label">LIFETIME CONTRACTS</span>
+                            <div class="ui-well">
+                                <span class="stat-value num-contract">45</span>
                             </div>
-                            <div class="ui-well ui-split-column">
-                                <div class="ui-stat-label">Total Item Collected</div>
-                                <div class="stat-value num-coin">589</div>
+                        </div>
+
+                        <div class="ui-split-column kpi-group">
+                            <span class="ui-stat-label">TOTAL ITEMS COLLECTED</span>
+                            <div class="ui-well">
+                                <span class="stat-value num-item-count">324</span>
                             </div>
-                        </section>
-                    </aside>
+                        </div>
+                    </div>
+                </aside>
 
                     <main class="ui-column">
                         <!-- TAB: ANALYTICS -->

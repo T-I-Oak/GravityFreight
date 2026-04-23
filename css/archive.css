@@ -61,15 +61,40 @@
 }
 
 /* 統計セクション (KPI) */
-#archive-screen .ui-well.ui-split-column {
-    margin-bottom: var(--space-unit);
+.kpi-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-double);
+    align-items: center; /* 左右中央寄せ */
+}
+
+.kpi-group {
+    align-items: center;
+    gap: var(--space-unit);
+}
+
+.kpi-group .ui-stat-label {
+    opacity: 0.6;
+    font-size: 10px;
+}
+
+#archive-screen .ui-well {
+    width: 120px; /* 固定幅 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-unit) 0;
 }
 
 #archive-screen .stat-value {
-    font-size: 32px;
+    font-size: 24px; /* 120px幅に合わせて少し調整 */
     font-weight: 950;
     line-height: 1;
 }
+
+/* 固有色トークンの適用 (Baseで定義されていない場合のため) */
+.num-contract { color: var(--color-num-contract); }
+.num-item-count { color: var(--color-num-item-count); }
 
 /* グラフセクション */
 #archive-screen .graph-svg {
@@ -150,6 +175,13 @@
         flex: none;
     }
     
+    #archive-screen .kpi-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
     #archive-screen.ui-panel {
         width: 95vw;
         height: 90vh;
