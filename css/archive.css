@@ -78,8 +78,8 @@
     font-size: 10px;
 }
 
-#archive-screen .ui-well {
-    width: 120px; /* 固定幅 */
+#archive-screen .kpi-container .ui-well {
+    width: 120px; /* 左カラムの統計項目のみ固定幅 */
     display: flex;
     justify-content: center;
     align-items: center;
