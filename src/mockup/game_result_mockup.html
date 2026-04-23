@@ -57,9 +57,9 @@
             const container = document.getElementById('game-result-scene-container');
 
             // レシート要素を新しく生成 (スクロール位置やアニメーション状態を初期化するため)
-            // .ui-panel と .ui-scrollable を継承
+            // .ui-panel と .is-scrollable を併用
             const paper = document.createElement('div');
-            paper.className = 'ui-panel ui-scrollable receipt-paper';
+            paper.className = 'ui-panel is-scrollable receipt-paper';
             paper.id = 'receipt-content-area';
             container.appendChild(paper);
 

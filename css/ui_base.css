@@ -14,25 +14,32 @@
     outline: none !important;
 }
 
-.is-scrollable {
-    overflow-y: auto;
-    overflow-x: hidden;
+.is-scrollable,
+.ui-columns {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.is-scrollable::-webkit-scrollbar {
+.is-scrollable::-webkit-scrollbar,
+.ui-columns::-webkit-scrollbar {
     width: 4px;
     height: 4px;
 }
 
-.is-scrollable::-webkit-scrollbar-track {
+.is-scrollable::-webkit-scrollbar-track,
+.ui-columns::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.is-scrollable::-webkit-scrollbar-thumb {
+.is-scrollable::-webkit-scrollbar-thumb,
+.ui-columns::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
+}
+
+.is-scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 html,

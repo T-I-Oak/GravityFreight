@@ -85,24 +85,6 @@ main {
         flex-direction: column;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        
-        /* プロジェクト標準のスクロールバースタイル */
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-    }
-
-    .ui-columns::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-    }
-
-    .ui-columns::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .ui-columns::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
     }
     
     .ui-columns > .ui-column {

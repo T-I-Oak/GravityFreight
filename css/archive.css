@@ -99,7 +99,7 @@
 }
 
 /* テーブルの調整 */
-#archive-screen .ui-well.ui-scrollable {
+#archive-screen .ui-well.is-scrollable {
     flex: 1;
     margin-top: var(--space-unit);
     padding: 0; /* テーブル自体がパディングを持つため */
