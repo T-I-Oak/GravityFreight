@@ -73,10 +73,17 @@
 
 /* グラフセクション */
 #archive-screen .graph-svg {
-    width: 100%;
-    height: 160px; /* グラフの高さ確保 */
     display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 160px; /* グラフの高さ確保 */
     margin-top: var(--space-unit);
+    overflow: hidden;
+}
+
+#archive-screen .ui-well:has(.graph-svg) {
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* 凡例の装飾 (Context レイヤーで追加) */
@@ -121,4 +128,28 @@
 
 #archive-screen .ui-table tr.is-active {
     background: rgba(255, 255, 255, 0.03);
+}
+
+/* モバイル・1カラム時のレスポンシブ対応 */
+@media screen and (max-width: 800px) {
+    #archive-screen aside.ui-column {
+        flex: none;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #archive-screen main.ui-column {
+        flex: none;
+        width: 100%;
+        min-width: 0;
+    }
+    
+    #archive-screen.ui-panel {
+        width: 100vw;
+        height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+    }
 }
