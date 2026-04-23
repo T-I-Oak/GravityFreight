@@ -30,11 +30,17 @@
 #archive-screen .ui-panel__header,
 #archive-screen .ui-panel__footer {
     padding: var(--space-double);
+    background: transparent; /* 背景色を統一 */
 }
 
-#archive-screen .ui-panel__header,
-#archive-screen .ui-panel__footer {
-    background: transparent; /* 背景色を統一 */
+/* ヘッダー内のレイアウト調整 (右寄せ) */
+#archive-screen .ui-panel__header .ui-split-column,
+#archive-screen .ui-section-header .ui-split-column {
+    flex: 1;
+}
+
+#archive-screen .ui-tab-group {
+    flex: none;
 }
 
 /* 2カラム構成の定義 */
