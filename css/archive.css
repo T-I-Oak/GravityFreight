@@ -89,10 +89,6 @@
     line-height: 1;
 }
 
-/* 固有色トークンの適用 (Baseで定義されていない場合のため) */
-.num-contract { color: var(--color-num-contract); }
-.num-item-count { color: var(--color-num-item-count); }
-
 /* グラフセクション */
 #archive-screen .graph-svg {
     display: block;

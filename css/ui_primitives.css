@@ -115,7 +115,7 @@
 }
 
 /* --- 4. Numerical Branding --- */
-.num-sector, .num-coin, .num-score {
+.num-sector, .num-coin, .num-score, .num-contract, .num-item-count {
     font-family: var(--font-num);
     font-weight: 900;
 }
@@ -123,6 +123,8 @@
 .num-sector { color: var(--color-num-sector); }
 .num-coin { color: var(--color-num-coin); }
 .num-score { color: var(--color-num-score); }
+.num-contract { color: var(--color-num-contract); }
+.num-item-count { color: var(--color-num-item-count); }
 
 /* --- 5. Semantic Labels --- */
 .ui-stat-label {
