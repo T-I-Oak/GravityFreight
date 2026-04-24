@@ -76,16 +76,27 @@
                                     <h3 class="ui-section-title">Performance Trend Analysis</h3>
                                 </div>
                                 <div class="ui-stat-group">
-                                    <span class="ui-stat-label is-legend num-score">SCORE</span>
+                                    <span class="ui-stat-label is-legend num-score is-active">SCORE</span>
                                     <span class="ui-stat-label is-legend num-sector">SECTORS</span>
                                     <span class="ui-stat-label is-legend num-item-count">ITEMS COLLECTED</span>
                                 </div>
                             </header>
                             
                             <div class="ui-well">
-                                <!-- Graph SVG: Standard classes used where possible -->
+                                <!-- Graph SVG: Multi-layered analytical view -->
                                 <svg class="graph-svg" viewBox="0 0 800 120" preserveAspectRatio="none">
-                                    <path class="graph-line" fill="none" stroke="currentColor" stroke-width="2" d="M0,100 L40,86 L80,95 L120,59 L160,63 L200,36 L240,75 L280,68 L320,55 L800,10"></path>
+                                    <!-- Average Lines (Dotted) -->
+                                    <line class="avg-line is-score" x1="0" y1="45" x2="800" y2="45" />
+                                    <line class="avg-line is-sector" x1="0" y1="80" x2="800" y2="80" />
+                                    <line class="avg-line is-item" x1="0" y1="95" x2="800" y2="95" />
+
+                                    <!-- Data Lines (Polylines/Paths) -->
+                                    <!-- Sectors (Sub) -->
+                                    <path class="graph-line is-sector" fill="none" d="M0,90 L40,85 L80,95 L120,70 L160,80 L200,60 L240,85 L280,80 L320,75 L360,90 L400,85 L440,70 L480,80 L520,65 L560,85 L600,75 L640,80 L680,95 L720,85 L800,70" />
+                                    <!-- Items (Sub) -->
+                                    <path class="graph-line is-item" fill="none" d="M0,110 L40,105 L80,108 L120,95 L160,102 L200,85 L240,105 L280,100 L320,98 L360,110 L400,105 L440,95 L480,102 L520,90 L560,108 L600,100 L640,105 L680,115 L720,108 L800,95" />
+                                    <!-- Score (Main/Active) -->
+                                    <path class="graph-line is-score is-active" fill="none" d="M0,60 L40,50 L80,55 L120,30 L160,35 L200,15 L240,45 L280,40 L320,35 L360,55 L400,50 L440,30 L480,38 L520,20 L560,50 L600,42 L640,48 L680,60 L720,55 L800,40" />
                                 </svg>
                             </div>
 

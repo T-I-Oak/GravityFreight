@@ -139,6 +139,45 @@
     overflow: hidden;
 }
 
+/* グラフ凡例の強調 */
+#archive-screen .ui-stat-label.is-legend.is-active {
+    font-size: 11px;
+    font-weight: 900;
+    opacity: 1;
+}
+
+/* グラフ折れ線スタイル */
+#archive-screen .graph-line {
+    transition: all var(--motion-fast);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#archive-screen .graph-line.is-score { stroke: var(--color-num-score); }
+#archive-screen .graph-line.is-sector { stroke: var(--color-num-sector); }
+#archive-screen .graph-line.is-item { stroke: var(--color-num-item-count); }
+
+#archive-screen .graph-line.is-active {
+    stroke-width: 3px;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+}
+
+#archive-screen .graph-line:not(.is-active) {
+    stroke-width: 1px;
+    opacity: 0.4;
+}
+
+/* 平均線（ドット線） */
+#archive-screen .avg-line {
+    stroke-width: 1px;
+    stroke-dasharray: 2, 4;
+    opacity: 0.3;
+}
+
+#archive-screen .avg-line.is-score { stroke: var(--color-num-score); }
+#archive-screen .avg-line.is-sector { stroke: var(--color-num-sector); }
+#archive-screen .avg-line.is-item { stroke: var(--color-num-item-count); }
+
 /* 凡例の装飾 (Context レイヤーで追加) */
 #archive-screen .ui-stat-label.is-legend::before {
     content: '';
