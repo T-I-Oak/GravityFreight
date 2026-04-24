@@ -38,14 +38,15 @@
                             <!-- 手前のリングが通る場所で星を削るためのマスク -->
                             <mask id="mask-planet-front-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
                                 <rect x="-10" y="-10" width="44" height="44" fill="white" />
-                                <!-- マスター軌道を使って星を削る -->
-                                <use href="#saturn-ring-path" stroke="black" stroke-width="4.2" fill="none" />
+                                <!-- マスター軌道を使って星を削る (2.2px ring + 0.7px gap*2 = 3.6px) -->
+                                <use href="#saturn-ring-path" stroke="black" stroke-width="3.6" fill="none" />
                                 <!-- 星の右上半分（奥側）は削らないように保護 -->
                                 <rect x="-10" y="-10" width="44" height="22" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
                             <!-- 奥側のリングを星の輪郭で削るためのマスク -->
                             <mask id="mask-back-ring-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
                                 <rect x="-10" y="-10" width="44" height="44" fill="white" />
+                                <!-- 星本体(r=5.5) + 隙間(0.7) = r=6.2 で削る -->
                                 <circle cx="12" cy="12" r="6.2" fill="black" />
                                 <!-- 右上半分（奥側）だけを表示するために左下半分（手前）を隠す -->
                                 <rect x="-10" y="12" width="44" height="22" fill="black" transform="rotate(-30 12 12)" />
@@ -242,15 +243,16 @@
                                         </table>
                                     </div>
                                 </div>
+                            </section>
                         </section>
-                </section>
+                    </div>
                 </div>
             </div>
 
-            <footer class="ui-panel__footer">
-                <div class="ui-split-row">
-                    <span></span> <!-- Spacer -->
-                    <button class="ui-button is-big is-secondary is-theme">
+            <footer class="ui-panel__footer ui-split-row">
+                <div class="ui-footer-info">SYSTEM STATUS: ANALYTIC ARCHIVE STANDBY</div>
+                <div class="ui-footer-actions">
+                    <button class="ui-button is-primary">
                         <span class="btn-main-label">CLOSE TERMINAL</span>
                     </button>
                 </div>
@@ -272,17 +274,21 @@
                 <use href="#saturn-ring-path" stroke="#32cd32" stroke-width="2.2" fill="none" mask="url(#mask-front-ring-final)" />
 
                 <!-- VISIBLE SHADOWS (OVERLAYS) -->
-                <!-- YELLOW: Planet Shadow Area (Using the SAME template) -->
+                <!-- RED: Planet shadow for back ring (Gap size visualization) -->
+                <circle cx="12" cy="12" r="6.2" stroke="rgba(255, 0, 0, 0.4)" stroke-width="0.1" fill="rgba(255, 0, 0, 0.2)" />
+                
+                <!-- YELLOW: Ring shadow for planet (Gap size visualization) -->
                 <g mask="url(#mask-front-ring-final)">
-                    <use href="#saturn-ring-path" stroke="rgba(255, 255, 0, 0.4)" stroke-width="4.2" fill="none" />
+                    <use href="#saturn-ring-path" stroke="rgba(255, 255, 0, 0.4)" stroke-width="3.6" fill="none" />
                 </g>
 
                 <!-- Debug Legend Text -->
                 <text x="1" y="2" fill="#32cd32" font-size="1" font-weight="bold">LIME: Front Ring (2.2px)</text>
-                <text x="1" y="4" fill="yellow" font-size="1" font-weight="bold">YELLOW: Shadow Area (4.2px)</text>
+                <text x="1" y="4" fill="yellow" font-size="1" font-weight="bold">YELLOW: Ring Shadow (0.7px margin)</text>
+                <text x="1" y="6" fill="red" font-size="1" font-weight="bold">RED: Planet Shadow (0.7px margin)</text>
             </svg>
         </div>
-        <p style="margin-top: 20px;">Using a shared &lt;use&gt; template to guarantee alignment.</p>
+        <p style="margin-top: 20px;">Standardized to 0.7px margin based on planet shadow scale.</p>
     </div>
 </body>
 </html>
