@@ -106,28 +106,11 @@
 
 /* --- Panel Expressions: Matte Surface (Physical Plate) --- */
 
-/* Base Panel Style: Neutral Heavy Charcoal Iron Plate */
+/* Base Panel Style: Dynamic Surface (Themed Matte Plate) */
 .ui-style--matte .ui-panel {
     background: color-mix(in srgb, var(--current-color), #404040 90%); 
-    
-    /* Softened 3D Edging effect (Enhanced visibility) */
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
-    border-left: 2px solid rgba(255, 255, 255, 0.2);
-    border-right: 2px solid rgba(0, 0, 0, 0.05);
-    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-    
+    border: 2px solid color-mix(in srgb, var(--current-color), transparent 80%);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
-}
-
-/* Facility/Theme States: Now handled by the base class using --current-color */
-
-.ui-style--matte .ui-panel.is-repair-dock,
-.ui-style--matte .ui-panel.is-trading-post,
-.ui-style--matte .ui-panel.is-black-market,
-.ui-style--matte .ui-panel.is-archive-theme,
-.ui-style--matte .ui-panel.is-home {
-    /* Background is inherited from base .ui-panel mix logic */
-    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
 }
 
 /* --- Button Expressions: Matte Solid State Logic --- */
