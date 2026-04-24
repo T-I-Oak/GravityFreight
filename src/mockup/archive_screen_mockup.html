@@ -30,12 +30,18 @@
 
             <header class="ui-panel__header ui-split-row">
                 <div class="ui-split-column ui-title-group">
-                    <svg class="ui-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <svg class="ui-title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <mask id="saturn-mask">
+                                <rect width="24" height="24" fill="white" />
+                                <!-- 星の周りを少し大きくくり抜く -->
+                                <circle cx="12" cy="12" r="6.5" fill="black" />
+                            </mask>
+                        </defs>
+                        <!-- Saturn Ring with Mask -->
+                        <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="2.5" transform="rotate(-20 12 12)" mask="url(#saturn-mask)" />
                         <!-- Planet Core -->
-                        <circle cx="12" cy="12" r="5" fill="currentColor"></circle>
-                        <!-- Saturn Ring -->
-                        <path d="M2 16c0 0 4-10 20-8" opacity="0.9"></path>
-                        <path d="M22 8c0 0-4 10-20 8" opacity="0.9"></path>
+                        <circle cx="12" cy="12" r="5" fill="currentColor" />
                     </svg>
                     <div class="ui-title-text">
                         <h2 class="ui-panel__title">ANALYTIC ARCHIVE</h2>
