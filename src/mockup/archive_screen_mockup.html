@@ -38,19 +38,18 @@
                                 <!-- 手前側の軌道に沿って星を削る -->
                                 <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="black" stroke-width="4.2" transform="rotate(-30 12 12)" />
                                 <!-- 星の奥側（上半分）は削らないように保護 -->
-                                <rect x="0" y="0" width="24" height="12" fill="white" transform="rotate(-30 12 12)" />
+                                <rect x="0" y="0" width="24" height="12" fill="white" />
                             </mask>
                             <!-- 奥側のリングを星の輪郭で削るためのマスク -->
                             <mask id="mask-back-ring-final">
                                 <rect width="24" height="24" fill="white" />
                                 <circle cx="12" cy="12" r="6.2" fill="black" />
-                                <!-- 奥側だけを表示するために下半分を隠す -->
-                                <rect x="0" y="12" width="24" height="12" fill="black" transform="rotate(-30 12 12)" />
+                                <!-- 奥側（上半分）だけを表示するために下半分を隠す -->
+                                <rect x="0" y="12" width="24" height="12" fill="black" />
                             </mask>
                             <!-- 手前側のリングだけを表示するためのマスク -->
                             <mask id="mask-front-ring-final">
-                                <rect width="0" height="0" x="0" y="0" fill="black" /> <!-- Default hide -->
-                                <rect x="0" y="12" width="24" height="12" fill="white" transform="rotate(-30 12 12)" />
+                                <rect x="0" y="11.8" width="24" height="12.2" fill="white" /> <!-- わずかに重ねる -->
                             </mask>
                         </defs>
                         
@@ -253,6 +252,35 @@
                 </div>
             </footer>
         </article>
+    </div>
+    <!-- [DEBUG] Saturn Icon Structure Visualization Overlay -->
+    <div id="icon-debug-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: sans-serif; pointer-events: none;">
+        <h1 style="margin-bottom: 20px;">DEBUG: SATURN ICON STRUCTURE</h1>
+        <div style="background: #111; padding: 40px; border: 1px solid #333; position: relative;">
+            <svg width="400" height="400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- 1. 奥側のリング (CYAN) -->
+                <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="cyan" stroke-width="1.5" transform="rotate(-30 12 12)" mask="url(#ring-back-only)" />
+                
+                <!-- 2. 星本体 -->
+                <circle cx="12" cy="12" r="5.5" fill="#bb86fc" opacity="0.8" />
+                
+                <!-- 3. 【可視化された影】星の周りの余白（Back用） -->
+                <circle cx="12" cy="12" r="6.2" fill="rgba(255, 0, 0, 0.2)" stroke="red" stroke-width="0.1" />
+
+                <!-- 4. 【可視化された影】リングの軌道上の余白（Front用） -->
+                <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="rgba(255, 255, 0, 0.3)" stroke-width="4.2" transform="rotate(-30 12 12)" />
+
+                <!-- 5. 手前側のリング (LIME) -->
+                <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="lime" stroke-width="1.5" transform="rotate(-30 12 12)" mask="url(#mask-front-ring-final)" />
+                
+                <!-- Debug Labels -->
+                <text x="1" y="2" fill="cyan" font-size="1" font-weight="bold">CYAN: Back Ring Segment</text>
+                <text x="1" y="4" fill="lime" font-size="1" font-weight="bold">LIME: Front Ring Segment</text>
+                <text x="1" y="6" fill="red" font-size="1" font-weight="bold">RED: Gap (Back-cut)</text>
+                <text x="1" y="8" fill="yellow" font-size="1" font-weight="bold">YELLOW: Gap (Planet-cut)</text>
+            </svg>
+        </div>
+        <p style="margin-top: 20px;">Check if CYAN/LIME transition occurs at the exact tips of the ellipse.</p>
     </div>
 </body>
 </html>
