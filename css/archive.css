@@ -32,6 +32,11 @@
     background: transparent;
 }
 
+/* アーカイブ専用テーマカラーの定義 */
+#archive-screen.is-archive-theme {
+    --current-color: #bb86fc; /* Archive Violet: 過去の記録を象徴する色 */
+}
+
 .ui-title-group {
     display: flex;
     flex-direction: row;
@@ -42,7 +47,7 @@
 .ui-title-icon {
     width: 32px;
     height: 32px;
-    color: var(--color-theme-main);
+    color: var(--current-color); /* テーマカラーに同期 */
     opacity: 0.9;
 }
 
@@ -58,6 +63,7 @@
     letter-spacing: 0.05em;
     margin: 0;
     line-height: 1;
+    color: var(--current-color); /* タイトルもテーマカラーに同期 */
 }
 
 #archive-screen .ui-panel__subtitle {
