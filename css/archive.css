@@ -29,7 +29,27 @@
 /* Header & Footer Padding Restoration */
 #archive-screen .ui-panel__header {
     padding: var(--space-double);
-    background: transparent; /* 背景色を統一 */
+    background: transparent;
+}
+
+.ui-title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+}
+
+.ui-title-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-theme-main); /* ミント色 */
+    opacity: 0.9;
+}
+
+#archive-screen .ui-panel__title {
+    font-size: 16px;
+    font-weight: 950;
+    letter-spacing: 0.05em;
+    margin: 0;
 }
 
 #archive-screen .ui-panel__footer {
