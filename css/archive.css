@@ -55,7 +55,7 @@
     gap: var(--space-double); /* ボディのマージンと同じ値に設定 */
 }
 
-#archive-screen .ui-column:first-child {
+#archive-screen .ui-column.is-aside {
     flex: 0 0 auto; /* 幅を自動調整 */
     display: flex;
     flex-direction: column;
@@ -63,7 +63,7 @@
     min-height: 0;
 }
 
-#archive-screen .ui-column:nth-child(2) {
+#archive-screen .ui-column.is-main {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -189,13 +189,13 @@
 
 /* モバイル・1カラム時のレスポンシブ対応 */
 @media screen and (max-width: 800px) {
-    #archive-screen .ui-column:first-child {
+    #archive-screen .ui-column.is-aside {
         flex: none;
         width: 100%;
         border: none;
     }
 
-    #archive-screen .ui-column:nth-child(2) {
+    #archive-screen .ui-column.is-main {
         flex: none;
         width: 100%;
         min-width: 0;
