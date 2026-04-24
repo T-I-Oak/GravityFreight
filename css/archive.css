@@ -49,10 +49,6 @@
     gap: var(--space-unit);
 }
 
-#archive-screen .ui-tab-group input {
-    display: none;
-}
-
 /* 2カラム構成の定義 */
 #archive-screen .ui-columns {
     flex: 1;
