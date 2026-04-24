@@ -96,103 +96,107 @@
                                         <h3 class="ui-section-title">PERSONAL BEST RANKING</h3>
                                     </div>
                                     <div class="ui-tab-group">
+                                        <input type="radio" name="rank-filter" id="rank-score" checked>
+                                        <input type="radio" name="rank-filter" id="rank-sector">
+                                        <input type="radio" name="rank-filter" id="rank-collected">
                                         <label for="rank-score" class="ui-button is-small is-primary is-sub-theme is-active">Score</label>
                                         <label for="rank-sector" class="ui-button is-small is-primary is-sub-theme is-inactive">Sector</label>
                                         <label for="rank-collected" class="ui-button is-small is-primary is-sub-theme is-inactive">Collected</label>
                                     </div>
                                 </header>
                                 
-                                <!-- Table Header (Fixed on panel surface) -->
-                                <table class="ui-table is-header">
-                                    <thead>
-                                        <tr>
-                                            <th class="col-rank">RANK</th>
-                                            <th class="col-score num-score">FINAL SCORE</th>
-                                            <th class="col-sector num-sector">SECTORS</th>
-                                            <th class="col-count num-item-count">ITEM COLLECTED</th>
-                                            <th class="col-date">DATE TIME</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-
-                                <div class="ui-well is-scrollable">
-                                    <!-- Using generic table structure; ui-table is a semantic candidate -->
-                                    <table class="ui-table is-body">
-                                        <tbody>
+                                <div class="ui-well is-scroll-container">
+                                    <!-- Fixed Header part inside well -->
+                                    <table class="ui-table is-header">
+                                        <thead>
                                             <tr>
-                                                <td>#01</td>
-                                                <td class="num-score">12,940</td>
-                                                <td class="num-sector">3</td>
-                                                <td class="num-item-count">14</td>
-                                                <td>2026.04.18 01:12 <span class="ui-badge is-new">NEW</span></td>
+                                                <th class="col-rank">RANK</th>
+                                                <th class="col-score num-score">FINAL SCORE</th>
+                                                <th class="col-sector num-sector">SECTORS</th>
+                                                <th class="col-count num-item-count">ITEM COLLECTED</th>
+                                                <th class="col-date">DATE TIME</th>
                                             </tr>
-                                            <tr class="is-active">
-                                                <td>#02</td>
-                                                <td class="num-score">10,411</td>
-                                                <td class="num-sector">2</td>
-                                                <td class="num-item-count">8</td>
-                                                <td>2026.04.17 22:45</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#03</td>
-                                                <td class="num-score">9,820</td>
-                                                <td class="num-sector">2</td>
-                                                <td class="num-item-count">12</td>
-                                                <td>2026.04.15 14:30</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#04</td>
-                                                <td class="num-score">8,500</td>
-                                                <td class="num-sector">2</td>
-                                                <td class="num-item-count">6</td>
-                                                <td>2026.04.14 09:15</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#05</td>
-                                                <td class="num-score">7,240</td>
-                                                <td class="num-sector">1</td>
-                                                <td class="num-item-count">20</td>
-                                                <td>2026.04.12 21:05</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#06</td>
-                                                <td class="num-score">6,900</td>
-                                                <td class="num-sector">1</td>
-                                                <td class="num-item-count">4</td>
-                                                <td>2026.04.10 18:20</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#07</td>
-                                                <td class="num-score">5,800</td>
-                                                <td class="num-sector">1</td>
-                                                <td class="num-item-count">10</td>
-                                                <td>2026.04.08 12:40</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#08</td>
-                                                <td class="num-score">4,500</td>
-                                                <td class="num-sector">1</td>
-                                                <td class="num-item-count">2</td>
-                                                <td>2026.04.05 10:15</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#09</td>
-                                                <td class="num-score">3,200</td>
-                                                <td class="num-sector">1</td>
-                                                <td class="num-item-count">1</td>
-                                                <td>2026.04.01 23:50</td>
-                                            </tr>
-                                            <tr>
-                                                <td>#10</td>
-                                                <td class="num-score">2,100</td>
-                                                <td class="num-sector">1</td>
-                                                <td class="num-item-count">0</td>
-                                                <td>2026.03.30 08:20</td>
-                                            </tr>
-                                        </tbody>
+                                        </thead>
                                     </table>
+
+                                    <!-- Scrollable Body part inside well -->
+                                    <div class="ui-table-scroll-area">
+                                        <table class="ui-table is-body">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="col-rank">#01</td>
+                                                    <td class="col-score num-score">12,940</td>
+                                                    <td class="col-sector num-sector">3</td>
+                                                    <td class="col-count num-item-count">14</td>
+                                                    <td class="col-date">2026.04.18 01:12 <span class="ui-badge is-new">NEW</span></td>
+                                                </tr>
+                                                <tr class="is-active">
+                                                    <td class="col-rank">#02</td>
+                                                    <td class="col-score num-score">10,411</td>
+                                                    <td class="col-sector num-sector">2</td>
+                                                    <td class="col-count num-item-count">8</td>
+                                                    <td class="col-date">2026.04.17 22:45</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#03</td>
+                                                    <td class="col-score num-score">9,820</td>
+                                                    <td class="col-sector num-sector">2</td>
+                                                    <td class="col-count num-item-count">12</td>
+                                                    <td class="col-date">2026.04.15 14:30</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#04</td>
+                                                    <td class="col-score num-score">8,500</td>
+                                                    <td class="col-sector num-sector">2</td>
+                                                    <td class="col-count num-item-count">6</td>
+                                                    <td class="col-date">2026.04.14 09:15</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#05</td>
+                                                    <td class="col-score num-score">7,240</td>
+                                                    <td class="col-sector num-sector">1</td>
+                                                    <td class="col-count num-item-count">20</td>
+                                                    <td class="col-date">2026.04.12 21:05</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#06</td>
+                                                    <td class="col-score num-score">6,900</td>
+                                                    <td class="col-sector num-sector">1</td>
+                                                    <td class="col-count num-item-count">4</td>
+                                                    <td class="col-date">2026.04.10 18:20</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#07</td>
+                                                    <td class="col-score num-score">5,800</td>
+                                                    <td class="col-sector num-sector">1</td>
+                                                    <td class="col-count num-item-count">10</td>
+                                                    <td class="col-date">2026.04.08 12:40</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#08</td>
+                                                    <td class="col-score num-score">4,500</td>
+                                                    <td class="col-sector num-sector">1</td>
+                                                    <td class="col-count num-item-count">2</td>
+                                                    <td class="col-date">2026.04.05 10:15</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#09</td>
+                                                    <td class="col-score num-score">3,200</td>
+                                                    <td class="col-sector num-sector">1</td>
+                                                    <td class="col-count num-item-count">1</td>
+                                                    <td class="col-date">2026.04.01 23:50</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="col-rank">#10</td>
+                                                    <td class="col-score num-score">2,100</td>
+                                                    <td class="col-sector num-sector">1</td>
+                                                    <td class="col-count num-item-count">0</td>
+                                                    <td class="col-date">2026.03.30 08:20</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </section>
                         </section>
                 </section>
                 </div>

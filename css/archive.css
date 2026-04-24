@@ -159,15 +159,30 @@
     min-height: 0;
 }
 
-#archive-screen .ui-well.is-scrollable {
+#archive-screen .ui-well.is-scroll-container {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Well自体のスクロールは禁止 */
+    min-height: 0;
+    padding: 0;
+}
+
+#archive-screen .ui-table-scroll-area {
+    flex: 1;
+    overflow-y: auto;
     min-height: 0;
 }
 
 #archive-screen .ui-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* 列幅を固定してヘッダーとボディを一致させる */
+    table-layout: fixed;
+}
+
+#archive-screen .ui-table.is-header {
+    background: rgba(0, 0, 0, 0.15); /* Well内部でのヘッダー背景 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #archive-screen .ui-table th {
@@ -175,7 +190,6 @@
     padding: var(--space-unit) var(--space-double);
     font-size: 10px;
     color: rgba(255, 255, 255, 0.4);
-    background: transparent; /* パネル背景をそのまま使用 */
 }
 
 /* 列幅の定義 */
