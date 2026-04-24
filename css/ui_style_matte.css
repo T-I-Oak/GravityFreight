@@ -108,7 +108,7 @@
 
 /* Base Panel Style: Neutral Heavy Charcoal Iron Plate */
 .ui-style--matte .ui-panel {
-    background: color-mix(in srgb, var(--current-color), #404040 95%); 
+    background: color-mix(in srgb, var(--current-color), #404040 90%); 
     
     /* Softened 3D Edging effect (Enhanced visibility) */
     border-top: 2px solid rgba(255, 255, 255, 0.2);
