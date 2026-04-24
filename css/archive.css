@@ -199,13 +199,16 @@
 
 /* 選択中のカラム（軸）の強調 */
 #archive-screen .ui-table .is-active-column {
-    font-weight: 950; /* 数値用の極太ウェイト */
+    /* ウェイトは num-* 側の定義を尊重するため削除 */
     opacity: 1;
 }
 
 #archive-screen .ui-table th.is-active-column {
     font-size: 11px; /* ヘッダーはわずかに大きく */
-    color: var(--color-num-score); /* アクティブな軸の色をより鮮明に */
+}
+
+#archive-screen .ui-table td.is-active-column {
+    font-size: 14px; /* ボディは明確に大きく */
 }
 
 /* 列幅の定義 */
