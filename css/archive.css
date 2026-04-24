@@ -350,7 +350,6 @@
 #archive-screen .col-count  { width: 23%; }
 #archive-screen .col-date   { width: 30%; }
 
-/* Replay Table specific column widths */
 #archive-screen .col-fav    { width: 40px; }
 #archive-screen .col-no     { width: 40px; }
 #archive-screen #tab-replays .col-sector { width: 15%; }

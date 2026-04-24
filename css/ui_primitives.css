@@ -9,11 +9,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box; /* ボーダーを含めたサイズ計算 */
-    min-height: 18px; /* 高さを 18px に固定 */
+    box-sizing: border-box; 
+    min-height: 18px; 
     line-height: 1;
     white-space: nowrap;
-    padding: 0 8px; /* 上下パディングを 0 にし min-height で制御 */
+    padding: 0 8px; 
     font-size: 10px;
     font-weight: 800;
     border-radius: var(--radius-standard);
