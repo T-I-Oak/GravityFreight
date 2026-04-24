@@ -169,9 +169,10 @@
     padding: var(--space-unit) var(--space-double);
     font-size: 10px;
     opacity: 0.5;
-    background: rgba(0, 0, 0, 0.2);
+    background: #1a1a1a; /* 不透明な色に設定して背後の行を遮蔽 */
     position: sticky;
     top: 0;
+    z-index: 5; /* 行よりも前面に */
 }
 
 #archive-screen .ui-panel__body {
