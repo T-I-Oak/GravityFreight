@@ -192,6 +192,11 @@
     color: rgba(255, 255, 255, 0.4);
 }
 
+/* num-* クラスが直接指定されている場合はその色を優先 */
+#archive-screen .ui-table th.num-score { color: var(--color-num-score); }
+#archive-screen .ui-table th.num-sector { color: var(--color-num-sector); }
+#archive-screen .ui-table th.num-item-count { color: var(--color-num-item-count); }
+
 /* 列幅の定義 */
 .col-rank  { width: 10%; }
 .col-score { width: 22%; }
