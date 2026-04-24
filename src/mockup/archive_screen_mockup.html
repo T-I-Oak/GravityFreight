@@ -46,10 +46,9 @@
                             <!-- 奥側のリングを星の輪郭で削るためのマスク -->
                             <mask id="mask-back-ring-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
                                 <rect x="-10" y="-10" width="44" height="44" fill="white" />
-                                <!-- 星本体(r=6.0) + 隙間(0.7) = r=6.7 で削る -->
                                 <circle cx="12" cy="12" r="6.7" fill="black" />
-                                <!-- 右上半分（奥側）だけを表示するために左下半分（手前）を隠す -->
-                                <rect x="-10" y="12" width="44" height="22" fill="black" transform="rotate(-30 12 12)" />
+                                <!-- 右上半分（奥側）だけを表示するために左下半分（手前）を隠す (0.5px下げてオーバーラップを作る) -->
+                                <rect x="-10" y="12.5" width="44" height="22" fill="black" transform="rotate(-30 12 12)" />
                             </mask>
                             <!-- 手前側のリングだけを表示するためのマスク -->
                             <mask id="mask-front-ring-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
