@@ -117,6 +117,7 @@
 
 /* 1. Default State: Outline-style with vivid border and dark fill */
 .ui-style--matte .ui-button {
+    border-width: 2px;
     border-color: color-mix(in srgb, var(--current-color), #000 40%);
     background: color-mix(in srgb, var(--current-color), #000 85%);
     color: #ffffff;
