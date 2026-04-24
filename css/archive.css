@@ -343,12 +343,12 @@
     font-size: 1em;
 }
 
-/* 列幅の定義 */
-.col-rank  { width: 10%; }
-.col-score { width: 22%; }
-.col-sector { width: 15%; }
-.col-count { width: 23%; }
-.col-date  { width: 30%; }
+/* 列幅の定義: #archive-screen 内に限定してカプセル化 */
+#archive-screen .col-rank   { width: 10%; }
+#archive-screen .col-score  { width: 22%; }
+#archive-screen .col-sector { width: 15%; }
+#archive-screen .col-count  { width: 23%; }
+#archive-screen .col-date   { width: 30%; }
 
 #archive-screen .ui-table td {
     padding: var(--space-unit) var(--space-double);
