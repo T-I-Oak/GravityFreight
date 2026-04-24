@@ -192,7 +192,7 @@
 
 /* テーブルの調整 */
 #archive-screen .ui-panel__body {
-    padding: 0 var(--space-double) var(--space-double) var(--space-double);
+    padding: 0 var(--space-double);
     overflow: hidden;
     display: flex;
     flex-direction: column;
