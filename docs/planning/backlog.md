@@ -9,6 +9,8 @@
     - `is-mini` コンポーネント（ゲージ・バッジ）による高密度表示への対応。
 - [x] **Phase 1-2: Style Layer (Neon)**: `ui_style_neon.css` の再構築完了
     - 透過背景と発光エフェクトの最適化。
+- [x] **Phase 1-3: Printing Style Layer**: `ui_style_printing.css` の再構築完了
+    - ジグザグエッジ、印字アニメーション、インク質感の復元。
 - [x] **Phase 2: Play Screen (プレイ画面) - テーマ再構築**
     - **HUD**: ロゴ、統計値、メールアイコン（活性/非活性）の質感と配置の最適化。
     - **Inventory Panel**: パネル構造（`.ui-panel`）の導入、セクションの整理。
@@ -23,6 +25,8 @@
     - **配色ルールの統一**: 「支払い＝施設色」「受け取り＝金（サブ色）」のルールを全施設に適用。
 - [x] **Phase 2-2: Scene Refinement**:
     - **Flight Result**: 動的な配色（Entity/World Color Mix）とレイアウトの最適化。
+- [x] **Phase 2-3: Terminal Report (ゲームリザルト)**: V2 再定義完了
+    - 4軸モデルに基づくレイヤー構造の適用と、旧資産の印字演出の完全復元。
 - [x] **Design Tokens の再定義**: `design_tokens.css` を意味論に基づき清書完了。
 - [x] **Base Capabilities の確立**: `ui_base.css` に共通の振る舞いを集約完了。
 - [x] **Matte Style Layer**: `ui_style_matte.css` の再定義と質感の共通化完了。
@@ -32,7 +36,7 @@
     - 装飾フォント（`UnifrakturMaguntia`）のトークン化による一元管理。
 
 ## Phase 1: Foundation (基盤再構築)
-- [ ] **Printing Style Layer**: `ui_style_printing.css` (新規/再構築)
+- [ ] **Archive Style Layer**: `ui_style_archive.css` (計画)
 
 ## Phase 2: Scene Reconstruction (各画面の再構築)
 各画面を新しい4軸モデルとレイヤー構造で順次再定義する。
@@ -51,7 +55,6 @@
     - [ ] Achivementタブ
         - [ ] タブ内デザイン、調整
 - [x] スクロールバー仕様の標準化と .is-scrollable への一本化
-- [ ] **Terminal Report (ゲームリザルト)**: 再定義
 
 ## Phase 3: System Integration (システム統合)
 - [ ] **全画面のレスポンシブ・スクロール点検**
