@@ -343,7 +343,6 @@
     font-size: 1em;
 }
 
-/* 列幅の定義: #archive-screen 内に限定してカプセル化 */
 #archive-screen .col-rank   { width: 10%; }
 #archive-screen .col-score  { width: 22%; }
 #archive-screen .col-sector { width: 15%; }
@@ -352,8 +351,6 @@
 
 #archive-screen .col-fav    { width: 40px; }
 #archive-screen .col-no     { width: 40px; }
-#archive-screen #tab-replays .col-sector { width: 15%; }
-#archive-screen #tab-replays .col-score  { width: 20%; }
 
 /* Favorite (Star) Icon Styles */
 #archive-screen .ui-icon-star {
