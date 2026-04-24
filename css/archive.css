@@ -170,6 +170,7 @@
     font-size: 10px;
     color: rgba(255, 255, 255, 0.5); /* テキストのみを透過させる */
     background: #303030; /* Matte Well(0.25) + Panel(#404040) の合成色 */
+    box-shadow: inset 4px 4px 12px rgba(0, 0, 0, 0.8); /* Wellの内影をヘッダーにも同期 */
     position: sticky;
     top: 0;
     z-index: 10; /* HUD(100)より低く、テーブル内では最前面 */
