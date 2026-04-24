@@ -108,7 +108,7 @@
 
 /* Base Panel Style: Neutral Heavy Charcoal Iron Plate */
 .ui-style--matte .ui-panel {
-    background: #404040; 
+    background: color-mix(in srgb, var(--current-color), #101020 95%); 
     
     /* Softened 3D Edging effect (Enhanced visibility) */
     border-top: 2px solid rgba(255, 255, 255, 0.2);
@@ -119,11 +119,13 @@
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
 }
 
-/* Facility Override Layer: When a facility color is mapped, use the muted mix logic */
+/* Facility/Theme States: Now handled by the base class using --current-color */
 .ui-style--matte .ui-panel.is-repair-dock,
 .ui-style--matte .ui-panel.is-trading-post,
-.ui-style--matte .ui-panel.is-black-market {
-    background: color-mix(in srgb, var(--current-color), #101020 90%);
+.ui-style--matte .ui-panel.is-black-market,
+.ui-style--matte .ui-panel.is-archive-theme {
+    /* Background is inherited from base .ui-panel mix logic */
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
 }
 
 /* --- Button Expressions: Matte Solid State Logic --- */
