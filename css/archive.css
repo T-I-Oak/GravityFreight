@@ -179,11 +179,6 @@
     font-size: 0.7em;
 }
 
-.ui-stat-label.is-failed {
-    color: var(--color-facility-black-market);
-    opacity: 0.8;
-}
-
 #archive-screen .kpi-container .ui-well {
     width: 120px; /* 左カラムの統計項目のみ固定幅 */
     display: flex;
@@ -354,13 +349,6 @@
 .col-sector { width: 15%; }
 .col-count { width: 23%; }
 .col-date  { width: 30%; }
-
-/* Replay Table specific column widths */
-#replays .col-date     { width: 25%; }
-#replays .col-sector   { width: 12%; }
-#replays .col-score    { width: 20%; }
-#replays .col-duration { width: 23%; }
-#replays .col-status   { width: 20%; }
 
 #archive-screen .ui-table td {
     padding: var(--space-unit) var(--space-double);
