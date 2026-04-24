@@ -34,7 +34,7 @@
 
 #archive-screen .ui-panel__footer {
     padding: var(--space-double);
-    background: #404040; /* パネルと同じ背景色を設定して溢れを隠す */
+    background: inherit; /* パネルの色を継承して不透明度を維持 */
     position: relative;
     z-index: 10;
 }
@@ -77,18 +77,20 @@
 
 #archive-screen #analytics {
     flex: 1;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr 2fr; /* Header, Graph, Ranking(Section) */
+    gap: var(--space-unit);
     min-height: 0;
-    overflow: hidden; /* 重要: 子要素の溢れを遮断 */
+    height: 100%;
+    overflow: hidden;
 }
 
 #archive-screen #analytics .ui-section {
-    flex: 2; /* 1:2 の "2" */
+    grid-row: 3;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    overflow: hidden; /* 重要: ここで溢れを止めないとテーブルが突き抜ける */
+    overflow: hidden;
     margin-bottom: 0;
 }
 
@@ -134,9 +136,9 @@
 }
 
 #archive-screen .ui-well:has(.graph-svg) {
-    flex: 1; /* 1:2 の "1" */
-    min-height: 120px;
-    margin-top: var(--space-unit);
+    grid-row: 2;
+    min-height: 0;
+    height: 100%;
     overflow: hidden;
 }
 
