@@ -239,7 +239,7 @@
     font-size: 8px;
     vertical-align: middle;
     margin-left: var(--space-unit);
-    animation: ui-guide-pulse 2s infinite;
+    animation: none;
 }
 
 #archive-screen .ui-table.is-header {
