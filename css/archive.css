@@ -348,7 +348,7 @@
 #archive-screen #tab-replays .col-no     { width: 64px; }
 #archive-screen #tab-replays .col-sector { width: 20%; }
 #archive-screen #tab-replays .col-score  { width: 25%; }
-#archive-screen #tab-replays .col-date   { width: 55%; } /* Remaining fluid space */
+#archive-screen #tab-replays .col-date   { width: 55%; }
 
 /* Favorite (Star) Icon Styles */
 #archive-screen .ui-icon-star {
