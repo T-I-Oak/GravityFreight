@@ -164,14 +164,14 @@
 
 #archive-screen .graph-line:not(.is-active) {
     stroke-width: 1px;
-    opacity: 0.4;
+    opacity: 0.7;
 }
 
 /* 平均線（ドット線） */
 #archive-screen .avg-line {
     stroke-width: 1px;
     stroke-dasharray: 2, 4;
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 #archive-screen .avg-line.is-score { stroke: var(--color-num-score); }
