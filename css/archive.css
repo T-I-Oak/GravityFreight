@@ -63,6 +63,10 @@
     flex-direction: column;
 }
 
+#archive-screen .ui-column {
+    min-height: 0; /* 子要素のスクロールを機能させるために必須 */
+}
+
 #archive-screen main.ui-column {
     flex: 1;
     display: flex;
@@ -78,11 +82,11 @@
 }
 
 #archive-screen #analytics .ui-section {
-    flex: 1;
+    flex: 2; /* 1:2 の "2" */
     display: flex;
     flex-direction: column;
     min-height: 0;
-    margin-bottom: 0; /* 下部の余白は親のパディングで担保 */
+    margin-bottom: 0;
 }
 
 /* 統計セクション (KPI) */
@@ -147,10 +151,10 @@
 
 /* テーブルの調整 */
 #archive-screen .ui-well.is-scrollable {
-    flex: 2; /* 1:2 の "2" */
+    flex: 1; /* 親(flex:2)の中で残りの全領域を占有 */
     margin-top: var(--space-unit);
-    padding: 0; /* テーブル自体がパディングを持つため */
-    min-height: 200px;
+    padding: 0;
+    min-height: 0;
 }
 
 #archive-screen .ui-table {
