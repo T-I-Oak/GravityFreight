@@ -4,23 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravity Freight: Terminal Report Mockup (V1 exact sync)</title>
+    <title>Gravity Freight: Terminal Report Mockup (V2 Architecture)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@300;400;700;900&family=Courier+Prime&display=swap" rel="stylesheet">
+
     <!-- V2 System Styles -->
-    <link rel="stylesheet" href="css/design_tokens.css">
-    <link rel="stylesheet" href="css/ui_base.css">
+    <link rel="stylesheet" href="../../css/design_tokens.css">
+    <link rel="stylesheet" href="../../css/ui_base.css">
+    <link rel="stylesheet" href="../../css/ui_layout.css">
+    <link rel="stylesheet" href="../../css/ui_primitives.css">
+    
     <!-- Style Layers -->
-    <link rel="stylesheet" href="css/ui_style_print.css">
-    <!-- Target Component Style -->
-    <link rel="stylesheet" href="css/game_result.css">
+    <link rel="stylesheet" href="../../css/ui_style_printing.css">
+    
+    <!-- Context Layer (Scene Specific - Placeholder for now) -->
+    <!-- <link rel="stylesheet" href="../../css/game_result.css"> -->
+    
     <!-- Mockup Specific Helper -->
-    <link rel="stylesheet" href="css/local_mockup.css">
+    <link rel="stylesheet" href="../../css/local_test_layout.css">
 </head>
 
 <body>
 
-    <div id="mock-controls">
+    <div id="mock-controls" style="position: fixed; top: 10px; left: 10px; z-index: 9999; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; color: white; font-family: sans-serif;">
         <label for="grade-select">SELECT GRADE:</label>
-        <select id="grade-select">
+        <select id="grade-select" style="background: #222; color: white; border: 1px solid #444;">
             <option value="SS">SS (Legendary)</option>
             <option value="S">S (Excellent)</option>
             <option value="A">A (Great)</option>
@@ -29,13 +40,13 @@
             <option value="D" selected>D (Poor)</option>
             <option value="E">E (Failed)</option>
         </select>
-        <button onclick="showReport()">SHOW / RE-ANIMATE</button>
+        <button onclick="showReport()" style="margin-left: 10px; cursor: pointer;">SHOW / RE-ANIMATE</button>
     </div>
 
     <!-- コンテナ: #game-result-scene-container -->
-    <div id="game-result-scene-container" class="ui-overlay ui-style--print">
+    <main id="game-result-scene-container" class="ui-style--printing ui-flex-center">
         <!-- コンテナ内を動的に生成するように変更 -->
-    </div>
+    </main>
 
     <script>
         function showReport() {
@@ -56,10 +67,9 @@
         function renderReport(grade) {
             const container = document.getElementById('game-result-scene-container');
 
-            // レシート要素を新しく生成 (スクロール位置やアニメーション状態を初期化するため)
-            // .ui-panel と .is-scrollable を併用
-            const paper = document.createElement('div');
-            paper.className = 'ui-panel is-scrollable receipt-paper';
+            // レシート要素を新しく生成 (.ui-panel を使用)
+            const paper = document.createElement('section');
+            paper.className = 'ui-panel is-receipt is-scrollable';
             paper.id = 'receipt-content-area';
             container.appendChild(paper);
 
@@ -75,47 +85,78 @@
             if (grade === 'SS') sizeVariant = 'huge';
             if (grade === 'E') sizeVariant = 'mini';
 
+            // Grade specific rank text logic
+            const rankSectors = grade === 'SS' ? '1st' : grade === 'S' ? '2nd' : grade === 'A' ? '3rd' : '15th';
+            const rankCollected = grade === 'SS' ? '1st' : grade === 'S' ? '3rd' : '45th';
+            const rankScore = grade === 'SS' ? '1st' : '120th';
+            const isTopRankSectors = grade === 'SS' || grade === 'S' || grade === 'A';
+            const isTopRankCollected = grade === 'SS' || grade === 'S';
+            const isTopRankScore = grade === 'SS';
+
             paper.innerHTML = `
-                <div class="receipt-header">
-                    <h1 class="receipt-title">TERMINAL REPORT</h1>
-                    <div class="receipt-subtitle">GRAVITY FREIGHT CO. - FINAL EVALUATION</div>
-                </div>
-                <div class="ui-divider receipt-divider-dotted"></div>
+                <header class="ui-panel__header ui-title-box">
+                    <h1 class="text-display ui-text-center">TERMINAL REPORT</h1>
+                    <p class="text-sub-display ui-text-center">GRAVITY FREIGHT CO. - FINAL EVALUATION</p>
+                </header>
                 
-                <div class="receipt-item-group">
-                    <div class="ui-row receipt-row"><span>SECTORS COMPLETED</span><span>${sectors} SCS</span></div>
-                    <div class="receipt-detail">SECTOR RANKING <span class="rank-value ${grade === 'SS' || grade === 'S' || grade === 'A' ? 'top-rank' : ''}">${grade === 'SS' ? '1st' : grade === 'S' ? '2nd' : grade === 'A' ? '3rd' : '15th'}</span> / GRADE <span class="grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span></div>
-                </div>
-
-                <div class="receipt-item-group">
-                    <div class="ui-row receipt-row"><span>TOTAL COLLECTED</span><span>${collected} PCS</span></div>
-                    <div class="receipt-detail">COLLECTION RANKING <span class="rank-value ${grade === 'SS' || grade === 'S' ? 'top-rank' : ''}">${grade === 'SS' ? '1st' : grade === 'S' ? '3rd' : '45th'}</span> / GRADE <span class="grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span></div>
-                </div>
-
-                <div class="ui-divider receipt-divider-solid"></div>
-                <div class="ui-row receipt-row total"><span>FINAL SCORE</span><span>${score.toLocaleString()} PTS</span></div>
-                <div class="receipt-detail">SCORE RANKING <span class="rank-value ${grade === 'SS' ? 'top-rank' : ''}">${grade === 'SS' ? '1st' : '120th'}</span> / GRADE <span class="grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span></div>
-
-                <div class="receipt-stamp-zone">
-                    <div class="receipt-official-seal stamp-${grade.toLowerCase()} ${sizeVariant}" 
-                         id="report-stamp">
-                        <div class="receipt-stamp-left-half">
-                            <div class="receipt-stamp-text-line small">OPERATOR AUTH.</div>
-                            <div class="receipt-stamp-text-line medium">CONTRACT VERIFIED</div>
-                            <div class="receipt-stamp-text-line large">GRADE</div>
+                <div class="ui-divider is-dotted"></div>
+                
+                <div class="ui-panel__body">
+                    <section class="ui-section">
+                        <div class="ui-split-row is-data-row">
+                            <span class="ui-stat-label">SECTORS COMPLETED</span>
+                            <span class="stat-value num-sector">${sectors} SCS</span>
                         </div>
-                        <div class="receipt-stamp-right-half">
-                            ${grade}
+                        <div class="ui-section-subtitle">
+                            SECTOR RANKING <span class="rank-value ${isTopRankSectors ? 'top-rank' : ''}">${rankSectors}</span> / GRADE <span class="ui-badge grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span>
+                        </div>
+                    </section>
+
+                    <section class="ui-section">
+                        <div class="ui-split-row is-data-row">
+                            <span class="ui-stat-label">TOTAL COLLECTED</span>
+                            <span class="stat-value num-item-count">${collected} PCS</span>
+                        </div>
+                        <div class="ui-section-subtitle">
+                            COLLECTION RANKING <span class="rank-value ${isTopRankCollected ? 'top-rank' : ''}">${rankCollected}</span> / GRADE <span class="ui-badge grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span>
+                        </div>
+                    </section>
+
+                    <div class="ui-divider is-solid"></div>
+                    
+                    <section class="ui-section is-hero">
+                        <div class="ui-split-row is-data-row">
+                            <span class="ui-stat-label">FINAL SCORE</span>
+                            <span class="stat-value num-score">${score.toLocaleString()} PTS</span>
+                        </div>
+                        <div class="ui-section-subtitle">
+                            SCORE RANKING <span class="rank-value ${isTopRankScore ? 'top-rank' : ''}">${rankScore}</span> / GRADE <span class="ui-badge grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span>
+                        </div>
+                    </section>
+
+                    <div class="receipt-stamp-zone">
+                        <div class="receipt-official-seal stamp-${grade.toLowerCase()} ${sizeVariant}" id="report-stamp">
+                            <div class="receipt-stamp-left-half">
+                                <div class="receipt-stamp-text-line small">OPERATOR AUTH.</div>
+                                <div class="receipt-stamp-text-line medium">CONTRACT VERIFIED</div>
+                                <div class="receipt-stamp-text-line large">GRADE</div>
+                            </div>
+                            <div class="receipt-stamp-right-half">
+                                ${grade}
+                            </div>
                         </div>
                     </div>
+
+                    <div class="barcode-container"></div>
                 </div>
 
-                <div class="barcode-container"></div>
-                <div class="receipt-footer">
+                <footer class="ui-panel__footer ui-flex-center">
                     <div class="auth-status">OFFICIAL PERFORMANCE LOG GRANTED</div>
                     <div class="timestamp">${timestamp}</div>
-                </div>
-                <button class="ui-button receipt-btn" id="receipt-exit-btn">END CONTRACT</button>
+                    <button class="ui-button is-primary is-big" id="receipt-exit-btn">
+                        <span class="btn-main-label">END CONTRACT</span>
+                    </button>
+                </footer>
             `;
 
             // アニメーション開始
@@ -123,11 +164,10 @@
                 container.classList.add('active');
             });
 
-            // V1同様のディレイでスタンプアニメーション
+            // スタンプアニメーション
             setTimeout(() => {
                 const stamp = document.getElementById('report-stamp');
                 if (stamp) {
-                    // V1同様のランダム化 (範囲を ±30°, ±20px に拡大)
                     const rot = (Math.random() * 60 - 30).toFixed(1);
                     const offX = (Math.random() * 40 - 20).toFixed(1);
                     const offY = (Math.random() * 40 - 20).toFixed(1);
@@ -136,7 +176,6 @@
                     stamp.style.setProperty('--stamp-y', `${offY}px`);
 
                     stamp.classList.add('active');
-                    // 体感的な心地よさに合わせ、着地の瞬間に合わせて 150ms で揺らします
                     setTimeout(() => {
                         container.classList.add('impact');
                     }, 150); 
@@ -153,4 +192,4 @@
     </script>
 </body>
 
-</html>
+</html>
