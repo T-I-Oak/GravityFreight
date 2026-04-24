@@ -144,17 +144,20 @@
 #tab-analytics:checked ~ .ui-panel__header label[for="tab-analytics"],
 #tab-replays:checked ~ .ui-panel__header label[for="tab-replays"],
 #tab-achievements:checked ~ .ui-panel__header label[for="tab-achievements"] {
-    /* is-active 相当のスタイル (from ui_style_matte.css) */
+    /* Active: べた塗り (Solid fill) */
     background: color-mix(in srgb, var(--current-color), #000 40%) !important;
-    border-color: color-mix(in srgb, var(--current-color), #000 40%);
+    border-color: var(--current-color);
     color: #ffffff;
-    opacity: 1;
+    opacity: 1 !important;
 }
 
 #archive-screen .ui-tab-group label.ui-button {
-    /* 非アクティブ時は is-inactive 相当 (背景透明) */
-    background: transparent;
-    opacity: 0.6;
+    /* Inactive: アウトライン (Outline/Transparent)
+       背景を透明にし、枠線と文字はくっきりと表示 */
+    background: transparent !important;
+    border-color: var(--current-color);
+    color: #ffffff;
+    opacity: 1 !important;
 }
 
 #archive-screen #analytics {
