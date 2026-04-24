@@ -164,15 +164,16 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Well自体のスクロールは禁止 */
+    overflow: hidden;
     min-height: 0;
-    padding: 0;
+    /* padding: 0; を削除して標準の var(--space-double) を適用 */
 }
 
 #archive-screen .ui-table-scroll-area {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    margin-top: var(--space-unit); /* ヘッダーとの隙間を標準化 */
 }
 
 #archive-screen .ui-table {
@@ -182,13 +183,13 @@
 }
 
 #archive-screen .ui-table.is-header {
-    background: rgba(0, 0, 0, 0.15); /* Well内部でのヘッダー背景 */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* background 指定を削除して Well の背景色に統一 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #archive-screen .ui-table th {
     text-align: left;
-    padding: var(--space-unit) var(--space-double);
+    padding: var(--space-unit) 0; /* Wellにパディングがあるため左右は0 */
     font-size: 10px;
     color: rgba(255, 255, 255, 0.4);
 }
@@ -206,7 +207,7 @@
 .col-date  { width: 30%; }
 
 #archive-screen .ui-table td {
-    padding: var(--space-unit) var(--space-double);
+    padding: var(--space-unit) 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
