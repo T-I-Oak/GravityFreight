@@ -37,11 +37,6 @@
     --current-color: #bb86fc; /* Archive Violet */
 }
 
-/* Ensure all themed buttons within the archive use the archive-specific violet */
-#archive-screen .is-theme {
-    --current-color: #bb86fc;
-}
-
 .ui-title-group {
     display: flex;
     flex-direction: row;
@@ -103,10 +98,10 @@
 }
 
 #archive-screen .ui-column.is-aside {
-    flex: 1; /* Match main column for 50:50 split */
+    flex: 0 0 auto; /* 幅を自動調整 (承認時の状態に戻す) */
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: auto; /* サイドバーが長すぎる場合に対応 */
     min-height: 0;
 }
 
