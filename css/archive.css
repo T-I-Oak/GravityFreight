@@ -34,6 +34,7 @@
 
 .ui-title-group {
     display: flex;
+    flex-direction: row; /* 強制的に横並び */
     align-items: center;
     gap: var(--space-unit);
 }
