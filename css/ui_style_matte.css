@@ -38,13 +38,21 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
+.ui-style--matte .ui-badge.is-active {
+    background: color-mix(in srgb, var(--current-color), #000 40%);
+    border-color: color-mix(in srgb, var(--current-color), #000 40%);
+    color: #ffffff;
+}
+
 .ui-style--matte .ui-badge.is-inactive {
     background: transparent !important;
+    border-color: color-mix(in srgb, var(--current-color), transparent 60%);
+    color: var(--current-color);
 }
 
 .ui-style--matte .ui-badge.is-clickable:hover {
-    border-color: rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.05);
+    filter: brightness(1.2);
+    border-color: var(--current-color);
 }
 
 
