@@ -34,7 +34,12 @@
 
 /* アーカイブ専用テーマカラーの定義 */
 #archive-screen.is-archive-theme {
-    --current-color: #bb86fc; /* Archive Violet: 過去の記録を象徴する色 */
+    --current-color: #bb86fc; /* Archive Violet */
+}
+
+/* Ensure all themed buttons within the archive use the archive-specific violet */
+#archive-screen .is-theme {
+    --current-color: #bb86fc;
 }
 
 .ui-title-group {
@@ -98,10 +103,10 @@
 }
 
 #archive-screen .ui-column.is-aside {
-    flex: 0 0 auto; /* 幅を自動調整 */
+    flex: 1; /* Match main column for 50:50 split */
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* サイドバーが長すぎる場合に対応 */
+    overflow-y: auto;
     min-height: 0;
 }
 
