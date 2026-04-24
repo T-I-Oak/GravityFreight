@@ -120,10 +120,13 @@
 }
 
 /* Facility/Theme States: Now handled by the base class using --current-color */
+.is-home { --current-color: #e0e0e0; } /* Home/Neutral Base Color */
+
 .ui-style--matte .ui-panel.is-repair-dock,
 .ui-style--matte .ui-panel.is-trading-post,
 .ui-style--matte .ui-panel.is-black-market,
-.ui-style--matte .ui-panel.is-archive-theme {
+.ui-style--matte .ui-panel.is-archive-theme,
+.ui-style--matte .ui-panel.is-home {
     /* Background is inherited from base .ui-panel mix logic */
     border-color: color-mix(in srgb, var(--current-color), transparent 80%);
 }
