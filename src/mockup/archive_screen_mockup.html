@@ -22,8 +22,8 @@
         <article id="archive-screen" class="ui-panel is-theme is-archive-theme">
             
             <input type="radio" name="main-tabs" id="tab-analytics" hidden checked>
-            <input type="radio" name="main-tabs" id="tab-achievements" hidden>
             <input type="radio" name="main-tabs" id="tab-replays" hidden>
+            <input type="radio" name="main-tabs" id="tab-achievements" hidden>
             <input type="radio" name="rank-tabs" id="rank-score" hidden checked>
             <input type="radio" name="rank-tabs" id="rank-sector" hidden>
             <input type="radio" name="rank-tabs" id="rank-collected" hidden>
@@ -37,9 +37,9 @@
                     </div>
                 </div>
                 <div class="ui-tab-group">
-                    <label for="tab-analytics" class="ui-button is-primary is-active">Analytics</label>
-                    <label for="tab-achievements" class="ui-button is-primary is-inactive">Achievements</label>
-                    <label for="tab-replays" class="ui-button is-primary is-inactive">Replays</label>
+                    <label for="tab-analytics" class="ui-button is-primary">Analytics</label>
+                    <label for="tab-replays" class="ui-button is-primary">Replays</label>
+                    <label for="tab-achievements" class="ui-button is-primary">Achievements</label>
                 </div>
             </header>
 
@@ -209,7 +209,92 @@
                                 </div>
                             </section>
                         </section>
-                    </div>
+
+                        <!-- TAB: REPLAYS -->
+                        <section id="replays" class="ui-section">
+                            <header class="ui-section-header ui-split-row">
+                                <div class="ui-split-column">
+                                    <h3 class="ui-section-title">FLIGHT HISTORY LOGS</h3>
+                                </div>
+                            </header>
+                            
+                            <div class="ui-well is-scroll-container">
+                                <!-- Replay Table Header -->
+                                <table class="ui-table is-header">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-date">DATE TIME</th>
+                                            <th class="col-sector num-sector">SECTOR</th>
+                                            <th class="col-score num-score">SCORE</th>
+                                            <th class="col-duration">DURATION</th>
+                                            <th class="col-status">STATUS</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+
+                                <!-- Replay Table Body -->
+                                <div class="ui-table-scroll-area">
+                                    <table class="ui-table is-body">
+                                        <tbody>
+                                            <tr class="is-latest">
+                                                <td class="col-date">2026.04.18 01:12 <span class="ui-badge is-new">NEW</span></td>
+                                                <td class="col-sector num-sector">3</td>
+                                                <td class="col-score num-score">12,940</td>
+                                                <td class="col-duration">00:45:12</td>
+                                                <td class="col-status"><span class="ui-stat-label">COMPLETED</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-date">2026.04.17 22:45</td>
+                                                <td class="col-sector num-sector">2</td>
+                                                <td class="col-score num-score">10,411</td>
+                                                <td class="col-duration">00:32:05</td>
+                                                <td class="col-status"><span class="ui-stat-label is-failed">FAILED</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-date">2026.04.15 14:30</td>
+                                                <td class="col-sector num-sector">2</td>
+                                                <td class="col-score num-score">9,820</td>
+                                                <td class="col-duration">00:28:40</td>
+                                                <td class="col-status"><span class="ui-stat-label">COMPLETED</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-date">2026.04.14 09:15</td>
+                                                <td class="col-sector num-sector">2</td>
+                                                <td class="col-score num-score">8,500</td>
+                                                <td class="col-duration">00:25:10</td>
+                                                <td class="col-status"><span class="ui-stat-label">COMPLETED</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-date">2026.04.12 21:05</td>
+                                                <td class="col-sector num-sector">1</td>
+                                                <td class="col-score num-score">7,240</td>
+                                                <td class="col-duration">00:15:30</td>
+                                                <td class="col-status"><span class="ui-stat-label is-failed">FAILED</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-date">2026.04.10 18:20</td>
+                                                <td class="col-sector num-sector">1</td>
+                                                <td class="col-score num-score">6,900</td>
+                                                <td class="col-duration">00:12:45</td>
+                                                <td class="col-status"><span class="ui-stat-label">COMPLETED</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- TAB: ACHIEVEMENTS -->
+                        <section id="achievements" class="ui-section">
+                            <header class="ui-section-header ui-split-row">
+                                <div class="ui-split-column">
+                                    <h3 class="ui-section-title">PILOT ACHIEVEMENTS</h3>
+                                </div>
+                            </header>
+                            <div class="ui-well">
+                                <p style="opacity: 0.5; font-size: 0.9em; text-align: center; padding: var(--space-double);">CONTENT PENDING RECONSTRUCTION</p>
+                            </div>
+                        </section>
                 </div>
             </div>
 
