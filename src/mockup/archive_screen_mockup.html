@@ -32,31 +32,40 @@
                 <div class="ui-split-column ui-title-group">
                     <svg class="ui-title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <!-- リングの隙間（縁取り）を作るためのマスク -->
-                            <mask id="saturn-gap-mask">
+                            <!-- 奥側のリングを削るためのマスク（星の影にする） -->
+                            <mask id="mask-back-ring">
                                 <rect width="24" height="24" fill="white" />
                                 <circle cx="12" cy="12" r="6.2" fill="black" />
                             </mask>
-                            <!-- 手前のリングだけを見せるためのマスク -->
-                            <mask id="ring-front-only">
+                            <!-- 手前のリングの通り道を作るために星を削るマスク -->
+                            <mask id="mask-planet-front">
                                 <rect width="24" height="24" fill="white" />
-                                <rect x="0" y="0" width="24" height="12" fill="black" transform="rotate(-20 12 12)" />
+                                <!-- リングの軌道に合わせて星を削る（少し太めの楕円） -->
+                                <ellipse cx="12" cy="12" rx="11" ry="5.2" stroke="black" stroke-width="4.5" transform="rotate(-30 12 12)" />
+                                <!-- 裏側まで削らないように上半分を白で保護 -->
+                                <rect x="0" y="0" width="24" height="11" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
-                            <!-- 奥のリングだけを見せるためのマスク -->
-                            <mask id="ring-back-only">
-                                <rect width="24" height="24" fill="white" />
-                                <rect x="0" y="12" width="24" height="12" fill="black" transform="rotate(-20 12 12)" />
-                            </mask>
+                            <!-- 前後を分けるためのクリッピング用 -->
+                            <clipPath id="clip-front">
+                                <rect x="0" y="11" width="24" height="13" transform="rotate(-30 12 12)" />
+                            </clipPath>
+                            <clipPath id="clip-back">
+                                <rect x="0" y="0" width="24" height="11" transform="rotate(-30 12 12)" />
+                            </clipPath>
                         </defs>
                         
-                        <!-- 1. 奥側のリング (Masked to be behind planet) -->
-                        <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="2.2" transform="rotate(-20 12 12)" mask="url(#ring-back-only)" />
+                        <!-- 1. 奥側のリング (Masked by planet edge) -->
+                        <g clip-path="url(#clip-back)">
+                            <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="2.5" transform="rotate(-30 12 12)" mask="url(#mask-back-ring)" />
+                        </g>
                         
-                        <!-- 2. 星本体 (Planet Core) -->
-                        <circle cx="12" cy="12" r="5" fill="currentColor" />
+                        <!-- 2. 星本体 (Planet Core - Masked by front ring path) -->
+                        <circle cx="12" cy="12" r="5" fill="currentColor" mask="url(#mask-planet-front)" />
 
-                        <!-- 3. 手前側のリング (Masked to be in front, with a gap from planet) -->
-                        <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="2.2" transform="rotate(-20 12 12)" mask="url(#saturn-gap-mask)" />
+                        <!-- 3. 手前側のリング (On top, no mask) -->
+                        <g clip-path="url(#clip-front)">
+                            <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="2.5" transform="rotate(-30 12 12)" />
+                        </g>
                     </svg>
                     <div class="ui-title-text">
                         <h2 class="ui-panel__title">ANALYTIC ARCHIVE</h2>
