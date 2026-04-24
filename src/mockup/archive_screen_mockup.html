@@ -259,36 +259,6 @@
             </footer>
         </article>
     </div>
-    <!-- [DEBUG] Saturn Icon Structure Visualization Overlay -->
-    <div id="icon-debug-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: sans-serif; pointer-events: none;">
-        <h1 style="margin-bottom: 20px;">FINAL SCALE PREVIEW (400px)</h1>
-        <div style="background: #111; padding: 40px; border: 1px solid #333; position: relative;">
-            <svg width="400" height="400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- 1. 奥側のリング (Actual) -->
-                <use href="#saturn-ring-path" stroke="#bb86fc" stroke-width="2.2" fill="none" mask="url(#mask-back-ring-final)" />
-                
-                <!-- 2. 星本体 (Actual) -->
-                <circle cx="12" cy="12" r="6.0" fill="#bb86fc" mask="url(#mask-planet-front-final)" />
-
-                <!-- 3. 手前側のリング (LimeGreen) -->
-                <use href="#saturn-ring-path" stroke="#32cd32" stroke-width="2.2" fill="none" mask="url(#mask-front-ring-final)" />
-
-                <!-- VISIBLE SHADOWS (OVERLAYS) -->
-                <!-- RED: Planet shadow for back ring (Gap size visualization) -->
-                <circle cx="12" cy="12" r="6.7" stroke="rgba(255, 0, 0, 0.4)" stroke-width="0.1" fill="rgba(255, 0, 0, 0.2)" />
-                
-                <!-- YELLOW: Ring shadow for planet (Gap size visualization) -->
-                <g mask="url(#mask-front-ring-final)">
-                    <use href="#saturn-ring-path" stroke="rgba(255, 255, 0, 0.4)" stroke-width="3.6" fill="none" />
-                </g>
-
-                <!-- Debug Legend Text -->
-                <text x="1" y="2" fill="#32cd32" font-size="1" font-weight="bold">LIME: Front Ring (2.2px)</text>
-                <text x="1" y="4" fill="yellow" font-size="1" font-weight="bold">YELLOW: Ring Shadow (0.7px margin)</text>
-                <text x="1" y="6" fill="red" font-size="1" font-weight="bold">RED: Planet Shadow (0.7px margin)</text>
-            </svg>
-        </div>
-        <p style="margin-top: 20px;">Standardized to 0.7px margin based on planet shadow scale.</p>
     </div>
 </body>
 </html>
