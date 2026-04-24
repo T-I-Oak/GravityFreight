@@ -34,9 +34,7 @@
 
 #archive-screen .ui-panel__footer {
     padding: var(--space-double);
-    background: inherit; /* パネルの色を継承して不透明度を維持 */
-    position: relative;
-    z-index: 10;
+    background: transparent; /* 背景色を標準に戻す */
 }
 
 /* ヘッダー内のレイアウト調整 (右寄せ) */
@@ -55,7 +53,6 @@
     flex: 1;
     min-height: 0;
     gap: var(--space-double); /* ボディのマージンと同じ値に設定 */
-    overflow: hidden; /* 子要素の溢れを遮断 */
 }
 
 #archive-screen .ui-column:first-child {
@@ -192,13 +189,13 @@
 
 /* モバイル・1カラム時のレスポンシブ対応 */
 @media screen and (max-width: 800px) {
-    #archive-screen aside.ui-column {
+    #archive-screen .ui-column:first-child {
         flex: none;
         width: 100%;
         border: none;
     }
 
-    #archive-screen main.ui-column {
+    #archive-screen .ui-column:nth-child(2) {
         flex: none;
         width: 100%;
         min-width: 0;
