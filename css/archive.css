@@ -123,14 +123,41 @@
     min-height: 0;
 }
 
-#archive-screen #analytics {
+#archive-screen #analytics,
+#archive-screen #replays,
+#archive-screen #achievements {
+    display: none;
     flex: 1;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr) minmax(0, 2fr); /* minmax(0, ...) で中身による拡大を阻止 */
-    gap: var(--space-unit);
     min-height: 0;
     height: 100%;
     overflow: hidden;
+}
+
+/* Tab Switching Logic: Visibility */
+#tab-analytics:checked ~ .ui-panel__body #analytics,
+#tab-replays:checked ~ .ui-panel__body #replays,
+#tab-achievements:checked ~ .ui-panel__body #achievements {
+    display: grid;
+}
+
+/* Tab Switching Logic: Button Active States */
+#tab-analytics:checked ~ .ui-panel__header label[for="tab-analytics"],
+#tab-replays:checked ~ .ui-panel__header label[for="tab-replays"],
+#tab-achievements:checked ~ .ui-panel__header label[for="tab-achievements"] {
+    background: var(--current-color);
+    color: #000;
+    opacity: 1;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 50%);
+}
+
+#archive-screen #analytics {
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--space-unit);
+}
+
+#archive-screen #replays {
+    grid-template-rows: auto 1fr;
+    gap: var(--space-unit);
 }
 
 #archive-screen #analytics .ui-section {
@@ -158,6 +185,11 @@
 .kpi-group .ui-stat-label {
     opacity: 0.6;
     font-size: 0.7em;
+}
+
+.ui-stat-label.is-failed {
+    color: var(--color-facility-black-market);
+    opacity: 0.8;
 }
 
 #archive-screen .kpi-container .ui-well {
@@ -330,6 +362,13 @@
 .col-sector { width: 15%; }
 .col-count { width: 23%; }
 .col-date  { width: 30%; }
+
+/* Replay Table specific column widths */
+#replays .col-date     { width: 25%; }
+#replays .col-sector   { width: 12%; }
+#replays .col-score    { width: 20%; }
+#replays .col-duration { width: 23%; }
+#replays .col-status   { width: 20%; }
 
 #archive-screen .ui-table td {
     padding: var(--space-unit) var(--space-double);
