@@ -33,8 +33,8 @@
             <header class="ui-panel__header ui-split-row">
                 <h2 id="report-title" class="ui-panel__title is-trading-post">SECTOR 1 COMPLETED</h2>
                 <div class="flight-report-status">
-                    <div class="ui-badge is-recorded is-capsule"><span class="recorded-text">● RECORDED</span></div>
-                    <div class="ui-badge is-outline is-inactive is-clickable is-capsule">☆ PROTECT RECORD</div>
+                    <div id="badge-recorded" class="ui-badge is-recorded is-capsule"><span class="recorded-text">● RECORDED</span></div>
+                    <div id="btn-protect" class="ui-badge is-favorite is-outline is-inactive is-clickable is-capsule">☆ PROTECT RECORD</div>
                 </div>
             </header>
 
@@ -170,6 +170,31 @@
 
             btn.classList.remove(...colorClasses);
             btn.classList.add(s.cls);
+        });
+
+        // --- 3. Record Protection Toggle ---
+        const protectBtn = document.getElementById('btn-protect');
+        const recordedBadge = document.getElementById('badge-recorded');
+
+        protectBtn.addEventListener('click', () => {
+            const isActive = protectBtn.classList.contains('is-active');
+            
+            if (isActive) {
+                // To Inactive
+                protectBtn.classList.remove('is-active');
+                protectBtn.classList.add('is-inactive');
+                protectBtn.classList.add('is-outline');
+                protectBtn.textContent = '☆ PROTECT RECORD';
+            } else {
+                // To Active (Protected)
+                protectBtn.classList.remove('is-inactive');
+                protectBtn.classList.remove('is-outline');
+                protectBtn.classList.add('is-active');
+                protectBtn.textContent = '★ PROTECTED';
+                
+                // Ensure RECORDED badge is visible
+                recordedBadge.style.display = 'flex';
+            }
         });
     </script>
 </body>
