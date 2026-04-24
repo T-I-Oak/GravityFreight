@@ -220,6 +220,28 @@
     table-layout: fixed;
 }
 
+/* 特別な行の状態 */
+#archive-screen .ui-table tr.is-latest {
+    background: rgba(0, 255, 170, 0.08); /* status-success (Mint) の微細な透過 */
+    position: relative;
+}
+
+#archive-screen .ui-table tr.is-latest td:first-child {
+    border-left: 2px solid var(--color-status-success);
+}
+
+/* NEW バッジの装飾 */
+#archive-screen .ui-badge.is-new {
+    background: var(--color-status-success);
+    color: rgba(0, 0, 0, 0.9);
+    font-weight: 950;
+    padding: 1px 4px;
+    font-size: 8px;
+    vertical-align: middle;
+    margin-left: var(--space-unit);
+    animation: ui-guide-pulse 2s infinite;
+}
+
 #archive-screen .ui-table.is-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
