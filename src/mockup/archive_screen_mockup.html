@@ -37,19 +37,20 @@
                                 <rect width="24" height="24" fill="white" />
                                 <!-- 手前側の軌道に沿って星を削る -->
                                 <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="black" stroke-width="4.2" transform="rotate(-30 12 12)" />
-                                <!-- 星の奥側は削らないように保護（前面リングの開始点 11.8 に合わせる） -->
-                                <rect x="0" y="0" width="24" height="11.8" fill="white" />
+                                <!-- 星の奥側は削らないように保護（回転軸で半分に分ける） -->
+                                <rect x="0" y="0" width="24" height="12" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
                             <!-- 奥側のリングを星の輪郭で削るためのマスク -->
                             <mask id="mask-back-ring-final">
                                 <rect width="24" height="24" fill="white" />
                                 <circle cx="12" cy="12" r="6.2" fill="black" />
-                                <!-- 奥側（上半分）だけを表示するために 11.8 より下を隠す -->
-                                <rect x="0" y="11.8" width="24" height="12.2" fill="black" />
+                                <!-- 奥側（上半分）だけを表示するために下半分を隠す（回転軸） -->
+                                <rect x="0" y="12" width="24" height="12" fill="black" transform="rotate(-30 12 12)" />
                             </mask>
                             <!-- 手前側のリングだけを表示するためのマスク -->
                             <mask id="mask-front-ring-final">
-                                <rect x="0" y="11.8" width="24" height="12.2" fill="white" />
+                                <!-- 下半分だけを表示（回転軸） -->
+                                <rect x="0" y="12" width="24" height="12" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
                         </defs>
                         
@@ -258,14 +259,29 @@
         <h1 style="margin-bottom: 20px;">FINAL SCALE PREVIEW (400px)</h1>
         <div style="background: #111; padding: 40px; border: 1px solid #333; position: relative;">
             <svg width="400" height="400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- 1. 奥側のリング (Actual Layering) -->
+                <!-- 1. 奥側のリング (Actual) -->
                 <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="#bb86fc" stroke-width="2.2" transform="rotate(-30 12 12)" mask="url(#mask-back-ring-final)" />
                 
-                <!-- 2. 星本体 (Actual Layering) -->
+                <!-- 2. 星本体 (Actual) -->
                 <circle cx="12" cy="12" r="5.5" fill="#bb86fc" mask="url(#mask-planet-front-final)" />
 
                 <!-- 3. 手前側のリング (Distinguished Color: LimeGreen) -->
                 <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="#32cd32" stroke-width="2.2" transform="rotate(-30 12 12)" mask="url(#mask-front-ring-final)" />
+
+                <!-- VISIBLE SHADOWS (OVERLAYS) -->
+                <!-- RED: Gap for back ring (where ring is cut by planet) -->
+                <circle cx="12" cy="12" r="6.2" fill="rgba(255, 0, 0, 0.2)" stroke="red" stroke-width="0.1" />
+                
+                <!-- YELLOW: Gap for planet (where planet is cut by front ring) -->
+                <!-- 星を削る影の範囲を可視化 -->
+                <g mask="url(#mask-front-ring-final)">
+                    <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="rgba(255, 255, 0, 0.6)" stroke-width="4.2" transform="rotate(-30 12 12)" />
+                </g>
+
+                <!-- Debug Legend Text -->
+                <text x="1" y="2" fill="#32cd32" font-size="1" font-weight="bold">LIME: Front Ring</text>
+                <text x="1" y="4" fill="yellow" font-size="1" font-weight="bold">YELLOW: Planet Shadow (Cutout Area)</text>
+                <text x="1" y="6" fill="red" font-size="1" font-weight="bold">RED: Ring Shadow (Behind Planet)</text>
             </svg>
         </div>
         <p style="margin-top: 20px;">Seamless horizontal split and perfect edging confirmed.</p>
