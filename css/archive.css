@@ -62,6 +62,8 @@
     flex: 0 0 auto; /* 幅を自動調整 */
     display: flex;
     flex-direction: column;
+    overflow-y: auto; /* サイドバーが長すぎる場合に対応 */
+    min-height: 0;
 }
 
 #archive-screen .ui-column {
@@ -78,7 +80,7 @@
 #archive-screen #analytics {
     flex: 1;
     display: grid;
-    grid-template-rows: auto 1fr 2fr; /* Header, Graph, Ranking(Section) */
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 2fr); /* minmax(0, ...) で中身による拡大を阻止 */
     gap: var(--space-unit);
     min-height: 0;
     height: 100%;
@@ -156,7 +158,8 @@
 
 /* テーブルの調整 */
 #archive-screen .ui-well.is-scrollable {
-    flex: 1; /* 親(flex:2)の中で残りの全領域を占有 */
+    flex: 1;
+    height: 0; /* 強制的に収縮させてスクロールを発生させる */
     margin-top: var(--space-unit);
     padding: 0;
     min-height: 0;
