@@ -371,8 +371,8 @@
 }
 
 #archive-screen .ui-icon-star.is-active {
-    color: #ffcc00; /* Golden Star */
-    text-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+    color: var(--color-ui-favorite);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--color-ui-favorite), transparent 70%);
 }
 
 #archive-screen .ui-table td {
