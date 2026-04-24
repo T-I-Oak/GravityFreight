@@ -174,10 +174,67 @@
                                 <div class="ui-split-column">
                                     <h3 class="ui-section-title">FLIGHT HISTORY LOGS</h3>
                                 </div>
+                                <div class="ui-tab-group">
+                                    <button id="btn-play-replay" class="ui-button is-primary is-disabled">PLAY REPLAY</button>
+                                </div>
                             </header>
                             
-                            <div class="ui-well">
-                                <p style="opacity: 0.5; font-size: 0.9em; text-align: center; padding: var(--space-double);">CONTENT PENDING RECONSTRUCTION</p>
+                            <div class="ui-well is-scroll-container">
+                                <!-- Replay Table Header -->
+                                <table class="ui-table is-header">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-fav">FAV</th>
+                                            <th class="col-no">NO.</th>
+                                            <th class="col-sector num-sector">SECTOR</th>
+                                            <th class="col-score num-score">SCORE</th>
+                                            <th class="col-date">DATE TIME</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+
+                                <!-- Replay Table Body -->
+                                <div class="ui-table-scroll-area">
+                                    <table class="ui-table is-body" id="replay-table">
+                                        <tbody>
+                                            <tr class="is-inactive">
+                                                <td class="col-fav"><i class="ui-icon-star is-active" title="Unfavorite">★</i></td>
+                                                <td class="col-no">01</td>
+                                                <td class="col-sector num-sector">5</td>
+                                                <td class="col-score num-score">24,800</td>
+                                                <td class="col-date">2026.04.18 14:22</td>
+                                            </tr>
+                                            <tr class="is-inactive">
+                                                <td class="col-fav"><i class="ui-icon-star is-inactive" title="Favorite">★</i></td>
+                                                <td class="col-no">02</td>
+                                                <td class="col-sector num-sector">4</td>
+                                                <td class="col-score num-score">18,410</td>
+                                                <td class="col-date">2026.04.17 09:15</td>
+                                            </tr>
+                                            <tr class="is-inactive">
+                                                <td class="col-fav"><i class="ui-icon-star is-active" title="Unfavorite">★</i></td>
+                                                <td class="col-no">03</td>
+                                                <td class="col-sector num-sector">4</td>
+                                                <td class="col-score num-score">17,200</td>
+                                                <td class="col-date">2026.04.16 23:40</td>
+                                            </tr>
+                                            <tr class="is-inactive">
+                                                <td class="col-fav"><i class="ui-icon-star is-inactive" title="Favorite">★</i></td>
+                                                <td class="col-no">04</td>
+                                                <td class="col-sector num-sector">3</td>
+                                                <td class="col-score num-score">12,900</td>
+                                                <td class="col-date">2026.04.15 11:30</td>
+                                            </tr>
+                                            <tr class="is-inactive">
+                                                <td class="col-fav"><i class="ui-icon-star is-inactive" title="Favorite">★</i></td>
+                                                <td class="col-no">05</td>
+                                                <td class="col-sector num-sector">3</td>
+                                                <td class="col-score num-score">11,400</td>
+                                                <td class="col-date">2026.04.14 18:05</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </section>
 
@@ -207,6 +264,7 @@
     </div>
 
     <script>
+        // Tab Switching Logic
         const tabs = document.querySelectorAll('.ui-tab-group .ui-button[data-tab]');
         const contents = document.querySelectorAll('.tab-content');
 
@@ -222,6 +280,44 @@
                     const isActive = (c.id === `tab-${target}`);
                     c.style.display = isActive ? 'grid' : 'none';
                 });
+            });
+        });
+
+        // Replay Table Interaction Logic
+        const replayRows = document.querySelectorAll('#replay-table tbody tr');
+        const playBtn = document.getElementById('btn-play-replay');
+
+        replayRows.forEach(row => {
+            // Row Selection
+            row.addEventListener('click', (e) => {
+                // Ignore if clicked on star icon specifically (handled separately)
+                if (e.target.classList.contains('ui-icon-star')) return;
+
+                replayRows.forEach(r => {
+                    r.classList.remove('is-active');
+                    r.classList.add('is-inactive');
+                });
+                row.classList.remove('is-inactive');
+                row.classList.add('is-active');
+
+                // Enable Play Button
+                playBtn.classList.remove('is-disabled');
+            });
+
+            // Favorite Toggle
+            const star = row.querySelector('.ui-icon-star');
+            star.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent row selection when clicking star
+                const isActive = star.classList.contains('is-active');
+                if (isActive) {
+                    star.classList.remove('is-active');
+                    star.classList.add('is-inactive');
+                    star.title = "Favorite";
+                } else {
+                    star.classList.remove('is-inactive');
+                    star.classList.add('is-active');
+                    star.title = "Unfavorite";
+                }
             });
         });
     </script>
