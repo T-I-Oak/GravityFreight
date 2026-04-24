@@ -70,6 +70,21 @@
     overflow: hidden;
 }
 
+#archive-screen #analytics {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#archive-screen #analytics .ui-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 0; /* 下部の余白は親のパディングで担保 */
+}
+
 /* 統計セクション (KPI) */
 .kpi-container {
     display: flex;
@@ -107,13 +122,14 @@
     display: block;
     width: 100%;
     max-width: 100%;
-    height: 160px; /* グラフの高さ確保 */
-    margin-top: var(--space-unit);
+    height: 100%; /* コンテナに合わせて伸縮 */
     overflow: hidden;
 }
 
 #archive-screen .ui-well:has(.graph-svg) {
-    min-width: 0;
+    flex: 1; /* 1:2 の "1" */
+    min-height: 120px;
+    margin-top: var(--space-unit);
     overflow: hidden;
 }
 
@@ -131,9 +147,10 @@
 
 /* テーブルの調整 */
 #archive-screen .ui-well.is-scrollable {
-    flex: 1;
+    flex: 2; /* 1:2 の "2" */
     margin-top: var(--space-unit);
     padding: 0; /* テーブル自体がパディングを持つため */
+    min-height: 200px;
 }
 
 #archive-screen .ui-table {
@@ -180,6 +197,24 @@
 
     #archive-screen .ui-well.is-scrollable {
         flex: none;
+        height: auto;
+        min-height: 0;
+    }
+
+    #archive-screen #analytics,
+    #archive-screen #analytics .ui-section {
+        flex: none;
+        display: block;
+    }
+
+    #archive-screen .ui-well:has(.graph-svg) {
+        flex: none;
+        height: auto;
+        min-height: 0;
+    }
+
+    #archive-screen .graph-svg {
+        height: 160px; /* モバイルでは固定高さを復活 */
     }
     
     #archive-screen .kpi-container {
@@ -187,6 +222,11 @@
         flex-wrap: wrap;
         justify-content: center;
         width: 100%;
+    }
+
+    /* 1カラム時はボディ全体でスクロールを許可 */
+    #archive-screen .ui-panel__body {
+        overflow-y: auto;
     }
 
     #archive-screen.ui-panel {
