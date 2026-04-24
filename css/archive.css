@@ -141,6 +141,13 @@
 }
 
 #archive-screen #tab-replays {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-unit);
+}
+
+#archive-screen #tab-achievements {
+    display: grid;
     grid-template-rows: auto 1fr;
     gap: var(--space-unit);
 }
@@ -386,8 +393,8 @@
         min-height: 0;
     }
 
-    #archive-screen #analytics,
-    #archive-screen #analytics .ui-section {
+    #archive-screen #tab-analytics,
+    #archive-screen #tab-analytics .ui-section {
         flex: none;
         display: block;
     }
