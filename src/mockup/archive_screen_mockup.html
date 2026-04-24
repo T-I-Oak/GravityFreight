@@ -30,51 +30,16 @@
 
             <header class="ui-panel__header ui-split-row">
                 <div class="ui-split-column ui-title-group">
-                    <svg class="ui-title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <!-- マスター軌道定義：これ一つを全ての場所で使い回す -->
-                            <ellipse id="saturn-ring-path" cx="12" cy="12" rx="10" ry="3.6" transform="rotate(-30 12 12)" />
-
-                            <!-- 手前のリングが通る場所で星を削るためのマスク -->
-                            <mask id="mask-planet-front-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
-                                <rect x="-10" y="-10" width="44" height="44" fill="white" />
-                                <!-- マスター軌道を使って星を削る (2.2px ring + 0.7px gap*2 = 3.6px) -->
-                                <use href="#saturn-ring-path" stroke="black" stroke-width="3.6" fill="none" />
-                                <!-- 星の右上半分（奥側）は削らないように保護 -->
-                                <rect x="-10" y="-10" width="44" height="22" fill="white" transform="rotate(-30 12 12)" />
-                            </mask>
-                            <!-- 奥側のリングを星の輪郭で削るためのマスク -->
-                            <mask id="mask-back-ring-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
-                                <rect x="-10" y="-10" width="44" height="44" fill="white" />
-                                <circle cx="12" cy="12" r="6.7" fill="black" />
-                                <!-- 右上半分（奥側）だけを表示するために左下半分（手前）を隠す (0.5px下げてオーバーラップを作る) -->
-                                <rect x="-10" y="12.5" width="44" height="22" fill="black" transform="rotate(-30 12 12)" />
-                            </mask>
-                            <!-- 手前側のリングだけを表示するためのマスク -->
-                            <mask id="mask-front-ring-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
-                                <!-- 左下半分（手前側）だけを表示 -->
-                                <rect x="-10" y="12" width="44" height="22" fill="white" transform="rotate(-30 12 12)" />
-                            </mask>
-                        </defs>
-                        
-                        <!-- 1. 奥側のリング (Behind) -->
-                        <use href="#saturn-ring-path" stroke="currentColor" stroke-width="2.2" fill="none" mask="url(#mask-back-ring-final)" />
-                        
-                        <!-- 2. 星本体 -->
-                        <circle cx="12" cy="12" r="6.0" fill="currentColor" mask="url(#mask-planet-front-final)" />
-
-                        <!-- 3. 手前側のリング (Front) -->
-                        <use href="#saturn-ring-path" stroke="currentColor" stroke-width="2.2" fill="none" mask="url(#mask-front-ring-final)" />
-                    </svg>
+                    <i class="ui-icon-saturn"></i>
                     <div class="ui-title-text">
                         <h2 class="ui-panel__title">ANALYTIC ARCHIVE</h2>
                         <span class="ui-panel__subtitle">CENTRAL PILOT RECORDS SYSTEM</span>
                     </div>
                 </div>
                 <div class="ui-tab-group">
-                    <label for="tab-analytics" class="ui-button is-primary is-theme is-active">Analytics</label>
-                    <label for="tab-achievements" class="ui-button is-primary is-theme is-inactive">Achievements</label>
-                    <label for="tab-replays" class="ui-button is-primary is-theme is-inactive">Replays</label>
+                    <label for="tab-analytics" class="ui-button is-primary is-active">Analytics</label>
+                    <label for="tab-achievements" class="ui-button is-primary is-inactive">Achievements</label>
+                    <label for="tab-replays" class="ui-button is-primary is-inactive">Replays</label>
                 </div>
             </header>
 
@@ -144,9 +109,9 @@
                                         <h3 class="ui-section-title">PERSONAL BEST RANKING</h3>
                                     </div>
                                     <div class="ui-tab-group">
-                                        <div class="ui-button is-small is-primary is-sub-theme is-active">Score</div>
-                                        <div class="ui-button is-small is-primary is-sub-theme is-inactive">Sector</div>
-                                        <div class="ui-button is-small is-primary is-sub-theme is-inactive">Collected</div>
+                                        <label for="rank-score" class="ui-button is-small is-primary is-sub-theme is-active">Score</label>
+                                        <label for="rank-sector" class="ui-button is-small is-primary is-sub-theme is-inactive">Sector</label>
+                                        <label for="rank-collected" class="ui-button is-small is-primary is-sub-theme is-inactive">Collected</label>
                                     </div>
                                 </header>
                                 
@@ -251,7 +216,7 @@
             <footer class="ui-panel__footer">
                 <div class="ui-split-row">
                     <span></span> <!-- Spacer to push button right -->
-                    <button class="ui-button is-big is-secondary is-theme">
+                    <button class="ui-button is-big is-secondary">
                         <span class="btn-main-label">CLOSE TERMINAL</span>
                     </button>
                 </div>
