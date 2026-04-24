@@ -21,23 +21,17 @@
     height: 85vh;
     max-width: 840px;
     margin: auto;
-    
-    /* パネル内の基準フォントサイズ */
     font-size: 14px;
-
-    /* 施設画面の作法に従い、ヘッダー・フッターを端まで通す */
     padding: 0;
 }
 
-/* Header & Footer Padding Restoration */
 #archive-screen .ui-panel__header {
     padding: var(--space-double);
     background: transparent;
 }
 
-/* アーカイブ専用テーマカラーの定義 */
 #archive-screen.is-archive-theme {
-    --current-color: #bb86fc; /* Archive Violet */
+    --current-color: #bb86fc;
 }
 
 #archive-screen .ui-title-group {
@@ -52,7 +46,7 @@
     width: 48px;
     height: 48px;
     background-color: currentColor;
-    color: var(--current-color); /* タイトルの紫色に同期 */
+    color: var(--current-color); 
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3Cellipse id='saturn-ring-path' cx='12' cy='12' rx='10' ry='3.6' transform='rotate(-30 12 12)'/%3E%3Cmask id='mask-planet-front-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='3.6' fill='none'/%3E%3Crect x='-10' y='-10' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-back-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Ccircle cx='12' cy='12' r='6.7' fill='black'/%3E%3Crect x='-10' y='12.5' width='44' height='22' fill='black' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-front-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='12' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3C/defs%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-back-ring-final)'/%3E%3Ccircle cx='12' cy='12' r='6.0' fill='black' mask='url(%23mask-planet-front-final)'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-front-ring-final)'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3Cellipse id='saturn-ring-path' cx='12' cy='12' rx='10' ry='3.6' transform='rotate(-30 12 12)'/%3E%3Cmask id='mask-planet-front-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='3.6' fill='none'/%3E%3Crect x='-10' y='-10' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-back-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Ccircle cx='12' cy='12' r='6.7' fill='black'/%3E%3Crect x='-10' y='12.5' width='44' height='22' fill='black' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-front-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='12' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3C/defs%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-back-ring-final)'/%3E%3Ccircle cx='12' cy='12' r='6.0' fill='black' mask='url(%23mask-planet-front-final)'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-front-ring-final)'/%3E%3C/svg%3E");
     mask-size: contain;
@@ -73,7 +67,7 @@
     letter-spacing: 0.05em;
     margin: 0;
     line-height: 1;
-    color: var(--current-color); /* タイトルもテーマカラーに同期 */
+    color: var(--current-color); 
 }
 
 #archive-screen .ui-panel__subtitle {
@@ -85,10 +79,9 @@
 
 #archive-screen .ui-panel__footer {
     padding: var(--space-double);
-    background: transparent; /* 背景色を標準に戻す */
+    background: transparent; 
 }
 
-/* ヘッダー内のレイアウト調整 (右寄せ) */
 #archive-screen .ui-panel__header .ui-split-column,
 #archive-screen .ui-section-header .ui-split-column {
     flex: 1;
@@ -343,14 +336,19 @@
     font-size: 1em;
 }
 
-#archive-screen .col-rank   { width: 10%; }
-#archive-screen .col-score  { width: 22%; }
-#archive-screen .col-sector { width: 15%; }
-#archive-screen .col-count  { width: 23%; }
-#archive-screen .col-date   { width: 30%; }
+/* Analytics Tab Column Layout */
+#tab-analytics .col-rank   { width: 10%; }
+#tab-analytics .col-score  { width: 22%; }
+#tab-analytics .col-sector { width: 15%; }
+#tab-analytics .col-count  { width: 23%; }
+#tab-analytics .col-date   { width: 30%; }
 
-#archive-screen .col-fav    { width: 40px; }
-#archive-screen .col-no     { width: 40px; }
+/* Replay Tab Column Layout */
+#tab-replays .col-fav    { width: 40px; }
+#tab-replays .col-no     { width: 40px; }
+#tab-replays .col-sector { width: 20%; }
+#tab-replays .col-score  { width: 25%; }
+#tab-replays .col-date   { width: 55%; } /* Remaining fluid space */
 
 /* Favorite (Star) Icon Styles */
 #archive-screen .ui-icon-star {
