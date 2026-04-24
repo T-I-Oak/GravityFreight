@@ -120,7 +120,6 @@
 }
 
 /* Facility/Theme States: Now handled by the base class using --current-color */
-.is-home { --current-color: #e0e0e0; } /* Home/Neutral Base Color */
 
 .ui-style--matte .ui-panel.is-repair-dock,
 .ui-style--matte .ui-panel.is-trading-post,
