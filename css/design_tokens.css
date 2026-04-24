@@ -71,6 +71,11 @@
    /* Achievement: Independent */
    --color-num-coin: var(--color-category-coin);
 
+   /* UI State Colors (Semantic)
+       Specific colors for user-driven states. */
+   --color-ui-favorite: #ffcc00;
+   /* Star Gold: For record protection and favorite status */
+
    /* Card Surface Tokens
        Standard backgrounds and borders for item units. */
    --color-bg-card: rgba(20, 25, 40, 0.95);

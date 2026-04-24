@@ -115,6 +115,9 @@ body {
 .is-coin         { --current-color: var(--color-category-coin); }
 .is-cargo        { --current-color: var(--color-category-cargo); }
 
+/* User State Modifiers */
+.is-favorite     { --current-color: var(--color-ui-favorite); }
+
 .is-disabled {
     cursor: default;
     pointer-events: none;
