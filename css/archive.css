@@ -35,6 +35,8 @@
 /* アーカイブ専用テーマカラーの定義 */
 #archive-screen.is-archive-theme {
     --current-color: #bb86fc; /* Archive Violet: 過去の記録を象徴する色 */
+    background: color-mix(in srgb, var(--current-color), #050510 95%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
 }
 
 .ui-title-group {
