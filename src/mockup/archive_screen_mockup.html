@@ -33,24 +33,24 @@
                     <svg class="ui-title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <!-- 手前のリングが通る場所で星を削るためのマスク -->
-                            <mask id="mask-planet-front-final">
-                                <rect width="24" height="24" fill="white" />
+                            <mask id="mask-planet-front-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
+                                <rect x="-10" y="-10" width="44" height="44" fill="white" />
                                 <!-- 手前側の軌道に沿って星を削る -->
                                 <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="black" stroke-width="4.2" transform="rotate(-30 12 12)" />
-                                <!-- 星の奥側は削らないように保護（回転軸） -->
-                                <rect x="-8" y="0" width="40" height="12" fill="white" transform="rotate(-30 12 12)" />
+                                <!-- 星の右上半分（奥側）は削らないように保護 -->
+                                <rect x="-10" y="-10" width="44" height="22" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
                             <!-- 奥側のリングを星の輪郭で削るためのマスク -->
-                            <mask id="mask-back-ring-final">
-                                <rect width="24" height="24" fill="white" />
+                            <mask id="mask-back-ring-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
+                                <rect x="-10" y="-10" width="44" height="44" fill="white" />
                                 <circle cx="12" cy="12" r="6.2" fill="black" />
-                                <!-- 奥側（上半分）だけを表示するために下半分を隠す（回転軸） -->
-                                <rect x="-8" y="12" width="40" height="12" fill="black" transform="rotate(-30 12 12)" />
+                                <!-- 右上半分（奥側）だけを表示するために左下半分（手前）を隠す -->
+                                <rect x="-10" y="12" width="44" height="22" fill="black" transform="rotate(-30 12 12)" />
                             </mask>
                             <!-- 手前側のリングだけを表示するためのマスク -->
-                            <mask id="mask-front-ring-final">
-                                <!-- 下半分だけを表示（回転軸） -->
-                                <rect x="-8" y="12" width="40" height="12" fill="white" transform="rotate(-30 12 12)" />
+                            <mask id="mask-front-ring-final" maskUnits="userSpaceOnUse" x="-10" y="-10" width="44" height="44">
+                                <!-- 左下半分（手前側）だけを表示 -->
+                                <rect x="-10" y="12" width="44" height="22" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
                         </defs>
                         
@@ -259,27 +259,27 @@
         <h1 style="margin-bottom: 20px;">FINAL SCALE PREVIEW (400px)</h1>
         <div style="background: #111; padding: 40px; border: 1px solid #333; position: relative;">
             <svg width="400" height="400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- 1. 奥側のリング (Actual) -->
+                <!-- 1. 奥側のリング (Actual: Masked to Top-Right) -->
                 <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="#bb86fc" stroke-width="2.2" transform="rotate(-30 12 12)" mask="url(#mask-back-ring-final)" />
                 
-                <!-- 2. 星本体 (Actual) -->
+                <!-- 2. 星本体 (Actual: Shadowed on Bottom-Left) -->
                 <circle cx="12" cy="12" r="5.5" fill="#bb86fc" mask="url(#mask-planet-front-final)" />
 
-                <!-- 3. 手前側のリング (LimeGreen) -->
+                <!-- 3. 手前側のリング (LimeGreen: Masked to Bottom-Left) -->
                 <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="#32cd32" stroke-width="2.2" transform="rotate(-30 12 12)" mask="url(#mask-front-ring-final)" />
 
                 <!-- VISIBLE SHADOWS (OVERLAYS) -->
-                <!-- YELLOW: Planet Shadow Area (Matches Mask) -->
+                <!-- YELLOW: Planet Shadow Area (Should align perfectly with Lime ring) -->
                 <g mask="url(#mask-front-ring-final)">
                     <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="rgba(255, 255, 0, 0.4)" stroke-width="4.2" transform="rotate(-30 12 12)" />
                 </g>
 
                 <!-- Debug Legend Text -->
-                <text x="1" y="2" fill="#32cd32" font-size="1" font-weight="bold">LIME: Front Ring</text>
-                <text x="1" y="4" fill="yellow" font-size="1" font-weight="bold">YELLOW: Planet Shadow Area</text>
+                <text x="1" y="2" fill="#32cd32" font-size="1" font-weight="bold">LIME: Front Ring (Bottom-Left)</text>
+                <text x="1" y="4" fill="yellow" font-size="1" font-weight="bold">YELLOW: Planet Shadow (Matches Front Ring)</text>
             </svg>
         </div>
-        <p style="margin-top: 20px;">Now both icon and debug view use the same enlarged rotated masks.</p>
+        <p style="margin-top: 20px;">Fixed coordinate system using maskUnits="userSpaceOnUse".</p>
     </div>
 </body>
 </html>
