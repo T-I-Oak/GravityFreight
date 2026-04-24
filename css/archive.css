@@ -34,23 +34,37 @@
 
 .ui-title-group {
     display: flex;
-    flex-direction: row; /* 強制的に横並び */
+    flex-direction: row;
     align-items: center;
-    gap: var(--space-unit);
+    gap: var(--space-double);
 }
 
 .ui-title-icon {
-    width: 20px;
-    height: 20px;
-    color: var(--color-theme-main); /* ミント色 */
+    width: 32px;
+    height: 32px;
+    color: var(--color-theme-main);
     opacity: 0.9;
 }
 
+.ui-title-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 #archive-screen .ui-panel__title {
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 950;
     letter-spacing: 0.05em;
     margin: 0;
+    line-height: 1;
+}
+
+#archive-screen .ui-panel__subtitle {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.1em;
 }
 
 #archive-screen .ui-panel__footer {
