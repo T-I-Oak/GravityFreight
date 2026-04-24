@@ -32,20 +32,31 @@
                 <div class="ui-split-column ui-title-group">
                     <svg class="ui-title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <mask id="ring-front-mask">
+                            <!-- リングの隙間（縁取り）を作るためのマスク -->
+                            <mask id="saturn-gap-mask">
                                 <rect width="24" height="24" fill="white" />
-                                <!-- 手前のリングが星を跨ぐ部分で星を隠すためのマージン -->
-                                <circle cx="12" cy="12" r="6.5" fill="black" />
+                                <circle cx="12" cy="12" r="6.2" fill="black" />
+                            </mask>
+                            <!-- 手前のリングだけを見せるためのマスク -->
+                            <mask id="ring-front-only">
+                                <rect width="24" height="24" fill="white" />
+                                <rect x="0" y="0" width="24" height="12" fill="black" transform="rotate(-20 12 12)" />
+                            </mask>
+                            <!-- 奥のリングだけを見せるためのマスク -->
+                            <mask id="ring-back-only">
+                                <rect width="24" height="24" fill="white" />
+                                <rect x="0" y="12" width="24" height="12" fill="black" transform="rotate(-20 12 12)" />
                             </mask>
                         </defs>
-                        <!-- Back Ring Arc (Behind the planet) -->
-                        <path d="M19.5 8.5C21.5 9.5 22.5 11 22.5 12C22.5 14.5 17.8 16.5 12 16.5C8.5 16.5 5.5 15.8 3.5 14.5" stroke="currentColor" stroke-width="2.5" transform="rotate(-20 12 12)" />
                         
-                        <!-- Planet Core -->
+                        <!-- 1. 奥側のリング (Masked to be behind planet) -->
+                        <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="2.2" transform="rotate(-20 12 12)" mask="url(#ring-back-only)" />
+                        
+                        <!-- 2. 星本体 (Planet Core) -->
                         <circle cx="12" cy="12" r="5" fill="currentColor" />
 
-                        <!-- Front Ring Arc (In front of the planet) -->
-                        <path d="M3.5 9.5C2.5 10.5 1.5 11.5 1.5 12C1.5 14.5 6.2 16.5 12 16.5C15.5 16.5 18.5 15.8 20.5 14.5" stroke="currentColor" stroke-width="2.5" transform="rotate(-20 12 12)" mask="url(#ring-front-mask)" />
+                        <!-- 3. 手前側のリング (Masked to be in front, with a gap from planet) -->
+                        <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" stroke-width="2.2" transform="rotate(-20 12 12)" mask="url(#saturn-gap-mask)" />
                     </svg>
                     <div class="ui-title-text">
                         <h2 class="ui-panel__title">ANALYTIC ARCHIVE</h2>
