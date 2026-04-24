@@ -27,10 +27,16 @@
 }
 
 /* Header & Footer Padding Restoration */
-#archive-screen .ui-panel__header,
+#archive-screen .ui-panel__header {
+    padding: var(--space-double);
+    background: transparent; /* 背景色を統一 */
+}
+
 #archive-screen .ui-panel__footer {
     padding: var(--space-double);
     background: transparent; /* 背景色を統一 */
+    position: relative;
+    z-index: 10;
 }
 
 /* ヘッダー内のレイアウト調整 (右寄せ) */
@@ -147,6 +153,7 @@
 
 #archive-screen .ui-panel__body {
     padding: 0 var(--space-double) var(--space-double) var(--space-double); /* 上はヘッダーのパディングがあるため0 */
+    overflow: hidden; /* 中身がフッターに被らないように制限 */
 }
 
 #archive-screen .ui-table td {
