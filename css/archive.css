@@ -350,6 +350,31 @@
 #archive-screen .col-count  { width: 23%; }
 #archive-screen .col-date   { width: 30%; }
 
+/* Replay Table specific column widths */
+#archive-screen .col-fav    { width: 48px; text-align: center; }
+#archive-screen .col-no     { width: 48px; text-align: center; }
+#archive-screen #tab-replays .col-sector { width: 15%; }
+#archive-screen #tab-replays .col-score  { width: 20%; }
+
+/* Favorite (Star) Icon Styles */
+#archive-screen .ui-icon-star {
+    cursor: pointer;
+    font-style: normal;
+    font-size: 1.2em;
+    transition: all var(--motion-fast);
+    display: inline-block;
+    user-select: none;
+}
+
+#archive-screen .ui-icon-star.is-inactive {
+    color: rgba(255, 255, 255, 0.1);
+}
+
+#archive-screen .ui-icon-star.is-active {
+    color: #ffcc00; /* Golden Star */
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+}
+
 #archive-screen .ui-table td {
     padding: var(--space-unit) var(--space-double);
     overflow: hidden;
