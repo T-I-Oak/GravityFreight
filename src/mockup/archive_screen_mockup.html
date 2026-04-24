@@ -35,24 +35,24 @@
                             <!-- 下側（手前）のリングが通る場所で星を削るためのマスク -->
                             <mask id="mask-planet-front-final">
                                 <rect width="24" height="24" fill="white" />
-                                <!-- 下側の弧（手前）に沿って星を削る -->
-                                <path d="M 3.34 17 A 10 4 -30 0 0 20.66 7" stroke="black" stroke-width="5" fill="none" />
+                                <!-- 下側の弧（手前）に沿って星を削る（太さを4.2に調整） -->
+                                <path d="M 3.34 16.5 A 10 3.6 -30 0 0 20.66 7.5" stroke="black" stroke-width="4.2" fill="none" />
                             </mask>
-                            <!-- 上側（奥）のリングを削るためのマスク（星との境界に隙間を作る） -->
+                            <!-- 上側（奥）のリングを削るためのマスク -->
                             <mask id="mask-back-ring-final">
                                 <rect width="24" height="24" fill="white" />
-                                <circle cx="12" cy="12" r="5.8" fill="black" />
+                                <circle cx="12" cy="12" r="6.2" fill="black" />
                             </mask>
                         </defs>
                         
-                        <!-- 1. 背面側のリング（上側の弧：星の裏側を通る） -->
-                        <path d="M 3.34 17 A 10 4 -30 0 1 20.66 7" stroke="currentColor" stroke-width="2.5" fill="none" mask="url(#mask-back-ring-final)" />
+                        <!-- 1. 背面側のリング（上側の弧） -->
+                        <path d="M 3.34 16.5 A 10 3.6 -30 0 1 20.66 7.5" stroke="currentColor" stroke-width="2.2" fill="none" mask="url(#mask-back-ring-final)" />
                         
-                        <!-- 2. 星本体（手前を通る下側のリングによって削られる） -->
-                        <circle cx="12" cy="12" r="5" fill="currentColor" mask="url(#mask-planet-front-final)" />
+                        <!-- 2. 星本体（サイズを5.5に拡大） -->
+                        <circle cx="12" cy="12" r="5.5" fill="currentColor" mask="url(#mask-planet-front-final)" />
 
-                        <!-- 3. 前面側のリング（下側の弧：一番手前に重なる） -->
-                        <path d="M 3.34 17 A 10 4 -30 0 0 20.66 7" stroke="currentColor" stroke-width="2.5" fill="none" />
+                        <!-- 3. 前面側のリング（下側の弧） -->
+                        <path d="M 3.34 16.5 A 10 3.6 -30 0 0 20.66 7.5" stroke="currentColor" stroke-width="2.2" fill="none" />
                     </svg>
                     <div class="ui-title-text">
                         <h2 class="ui-panel__title">ANALYTIC ARCHIVE</h2>
