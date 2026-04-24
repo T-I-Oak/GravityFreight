@@ -32,27 +32,36 @@
                 <div class="ui-split-column ui-title-group">
                     <svg class="ui-title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <!-- 下側（手前）のリングが通る場所で星を削るためのマスク -->
+                            <!-- 手前のリングが通る場所で星を削るためのマスク -->
                             <mask id="mask-planet-front-final">
                                 <rect width="24" height="24" fill="white" />
-                                <!-- 前面アークに合わせて星を削る（少し短めに設定） -->
-                                <path d="M 4.5 15.8 A 10 3.6 -30 0 0 19.5 8.2" stroke="black" stroke-width="4.2" fill="none" />
+                                <!-- 手前側の軌道に沿って星を削る -->
+                                <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="black" stroke-width="4.2" transform="rotate(-30 12 12)" />
+                                <!-- 星の奥側（上半分）は削らないように保護 -->
+                                <rect x="0" y="0" width="24" height="12" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
-                            <!-- 上側（奥）のリングを削るためのマスク -->
+                            <!-- 奥側のリングを星の輪郭で削るためのマスク -->
                             <mask id="mask-back-ring-final">
                                 <rect width="24" height="24" fill="white" />
                                 <circle cx="12" cy="12" r="6.2" fill="black" />
+                                <!-- 奥側だけを表示するために下半分を隠す -->
+                                <rect x="0" y="12" width="24" height="12" fill="black" transform="rotate(-30 12 12)" />
+                            </mask>
+                            <!-- 手前側のリングだけを表示するためのマスク -->
+                            <mask id="mask-front-ring-final">
+                                <rect width="0" height="0" x="0" y="0" fill="black" /> <!-- Default hide -->
+                                <rect x="0" y="12" width="24" height="12" fill="white" transform="rotate(-30 12 12)" />
                             </mask>
                         </defs>
                         
-                        <!-- 1. 背面側のリング（広角：前面パーツの下に潜り込ませる） -->
-                        <path d="M 3.0 17.2 A 10 3.6 -30 0 1 21.0 6.8" stroke="currentColor" stroke-width="2.2" fill="none" mask="url(#mask-back-ring-final)" />
+                        <!-- 1. 奥側のリング (Behind) -->
+                        <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="currentColor" stroke-width="2.2" transform="rotate(-30 12 12)" mask="url(#mask-back-ring-final)" />
                         
                         <!-- 2. 星本体 -->
                         <circle cx="12" cy="12" r="5.5" fill="currentColor" mask="url(#mask-planet-front-final)" />
 
-                        <!-- 3. 前面側のリング（狭角：背面パーツの上に重ねる） -->
-                        <path d="M 4.5 15.8 A 10 3.6 -30 0 0 19.5 8.2" stroke="currentColor" stroke-width="2.2" fill="none" />
+                        <!-- 3. 手前側のリング (Front) -->
+                        <ellipse cx="12" cy="12" rx="10" ry="3.6" stroke="currentColor" stroke-width="2.2" transform="rotate(-30 12 12)" mask="url(#mask-front-ring-final)" />
                     </svg>
                     <div class="ui-title-text">
                         <h2 class="ui-panel__title">ANALYTIC ARCHIVE</h2>
