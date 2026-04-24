@@ -169,9 +169,9 @@
 
 /* 平均線（ドット線） */
 #archive-screen .avg-line {
-    stroke-width: 1px;
-    stroke-dasharray: 2, 4;
-    opacity: 0.5;
+    stroke-width: 1.2px;
+    stroke-dasharray: 4, 2;
+    opacity: 0.8;
 }
 
 #archive-screen .avg-line.is-score { stroke: var(--color-num-score); }
