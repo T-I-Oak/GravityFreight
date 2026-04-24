@@ -45,7 +45,12 @@
 
 #archive-screen .ui-tab-group {
     flex: none;
+    display: flex;
     gap: var(--space-unit);
+}
+
+#archive-screen .ui-tab-group input {
+    display: none;
 }
 
 /* 2カラム構成の定義 */
