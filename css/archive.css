@@ -151,42 +151,45 @@
 }
 
 /* テーブルの調整 */
+#archive-screen .ui-panel__body {
+    padding: 0 var(--space-double) var(--space-double) var(--space-double);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 #archive-screen .ui-well.is-scrollable {
     flex: 1;
-    height: 0; /* 強制的に収縮させてスクロールを発生させる */
-    margin-top: var(--space-unit);
-    padding: 0;
     min-height: 0;
 }
 
 #archive-screen .ui-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* 列幅を固定してヘッダーとボディを一致させる */
 }
 
 #archive-screen .ui-table th {
     text-align: left;
     padding: var(--space-unit) var(--space-double);
     font-size: 10px;
-    color: rgba(255, 255, 255, 0.5); /* テキストのみを透過させる */
-    background: #303030; /* Matte Well(0.25) + Panel(#404040) の合成色 */
-    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.8); /* 上端の影のみに制限 */
-    position: sticky;
-    top: 0;
-    z-index: 10; /* HUD(100)より低く、テーブル内では最前面 */
+    color: rgba(255, 255, 255, 0.4);
+    background: transparent; /* パネル背景をそのまま使用 */
 }
 
-#archive-screen .ui-table th:first-child {
-    box-shadow: inset 4px 4px 12px rgba(0, 0, 0, 0.8); /* 一番左のカラムだけ左端の影も付ける */
-}
-
-#archive-screen .ui-panel__body {
-    padding: 0 var(--space-double) var(--space-double) var(--space-double); /* 上はヘッダーのパディングがあるため0 */
-    overflow: hidden; /* 中身がフッターに被らないように制限 */
-}
+/* 列幅の定義 */
+.col-rank  { width: 10%; }
+.col-score { width: 22%; }
+.col-sector { width: 15%; }
+.col-count { width: 23%; }
+.col-date  { width: 30%; }
 
 #archive-screen .ui-table td {
     padding: var(--space-unit) var(--space-double);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #archive-screen .ui-table tr.is-active {
