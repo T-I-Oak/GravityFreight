@@ -23,7 +23,7 @@
     margin: auto;
     
     /* パネル内の基準フォントサイズ */
-    --archive-font-base: 14px;
+    font-size: 14px;
 
     /* 施設画面の作法に従い、ヘッダー・フッターを端まで通す */
     padding: 0;
@@ -68,7 +68,7 @@
 }
 
 #archive-screen .ui-panel__title {
-    font-size: calc(var(--archive-font-base) * 1.714); /* 24px相当 */
+    font-size: 1.7em;
     font-weight: 950;
     letter-spacing: 0.05em;
     margin: 0;
@@ -77,7 +77,7 @@
 }
 
 #archive-screen .ui-panel__subtitle {
-    font-size: 10px;
+    font-size: 0.7em;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.5);
     letter-spacing: 0.1em;
@@ -157,7 +157,7 @@
 
 .kpi-group .ui-stat-label {
     opacity: 0.6;
-    font-size: 10px;
+    font-size: 0.7em;
 }
 
 #archive-screen .kpi-container .ui-well {
@@ -169,7 +169,7 @@
 }
 
 #archive-screen .stat-value {
-    font-size: calc(var(--archive-font-base) * 1.714); /* 24px相当 */
+    font-size: 1.7em;
     font-weight: 950;
     line-height: 1;
 }
@@ -192,7 +192,7 @@
 
 /* グラフ凡例の強調 */
 #archive-screen .ui-stat-label.is-legend.is-active {
-    font-size: calc(var(--archive-font-base) * 0.785); /* 11px相当 */
+    font-size: 0.8em;
     font-weight: 900;
     opacity: 1;
 }
@@ -301,7 +301,7 @@
 #archive-screen .ui-table th {
     text-align: left;
     padding: var(--space-unit) var(--space-double);
-    font-size: 10px;
+    font-size: 0.7em;
     color: rgba(255, 255, 255, 0.4);
 }
 
@@ -317,11 +317,11 @@
 }
 
 #archive-screen .ui-table th.is-active-column {
-    font-size: calc(var(--archive-font-base) * 0.785); /* 11px相当 */
+    font-size: 0.8em;
 }
 
 #archive-screen .ui-table td.is-active-column {
-    font-size: var(--archive-font-base); /* 14px相当 */
+    font-size: 1em;
 }
 
 /* 列幅の定義 */
