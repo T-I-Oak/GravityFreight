@@ -40,14 +40,14 @@
     --current-color: #bb86fc; /* Archive Violet */
 }
 
-.ui-title-group {
+#archive-screen .ui-title-group {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: var(--space-double);
 }
 
-.ui-icon-saturn {
+#archive-screen .ui-icon-saturn {
     display: inline-block;
     width: 48px;
     height: 48px;
@@ -61,7 +61,7 @@
     opacity: 0.9;
 }
 
-.ui-title-text {
+#archive-screen .ui-title-text {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -162,19 +162,19 @@
 }
 
 /* 統計セクション (KPI) */
-.kpi-container {
+#archive-screen .kpi-container {
     display: flex;
     flex-direction: column;
     gap: var(--space-double);
     align-items: center; /* 左右中央寄せ */
 }
 
-.kpi-group {
+#archive-screen .kpi-group {
     align-items: center;
     gap: var(--space-unit);
 }
 
-.kpi-group .ui-stat-label {
+#archive-screen .kpi-group .ui-stat-label {
     opacity: 0.6;
     font-size: 0.7em;
 }
