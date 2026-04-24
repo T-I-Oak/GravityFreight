@@ -197,6 +197,17 @@
 #archive-screen .ui-table th.num-sector { color: var(--color-num-sector); }
 #archive-screen .ui-table th.num-item-count { color: var(--color-num-item-count); }
 
+/* 選択中のカラム（軸）の強調 */
+#archive-screen .ui-table .is-active-column {
+    font-weight: 950; /* 数値用の極太ウェイト */
+    opacity: 1;
+}
+
+#archive-screen .ui-table th.is-active-column {
+    font-size: 11px; /* ヘッダーはわずかに大きく */
+    color: var(--color-num-score); /* アクティブな軸の色をより鮮明に */
+}
+
 /* 列幅の定義 */
 .col-rank  { width: 10%; }
 .col-score { width: 22%; }
