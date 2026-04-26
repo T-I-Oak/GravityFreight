@@ -75,6 +75,71 @@ describe('UIComponents.generateAchievementCardHTML', () => {
     });
 });
 
+describe('UIComponents.generateCardHTML (Core Logic)', () => {
+    const mockItem = {
+        id: 'engine_x',
+        uid: 'user_123',
+        name: 'ハイパードライブ',
+        category: 'booster',
+        description: '高速移動用エンジン。',
+        slots: 2,
+        precisionMultiplier: 1.5,
+        maxCharges: 2,
+        charges: 1
+    };
+
+    it('should generate basic structure with correct data attributes', () => {
+        const html = UIComponents.generateCardHTML(mockItem);
+        expect(html).toContain('<article class="ui-item-card  is-booster   "');
+        expect(html).toContain('data-id="engine_x"');
+        expect(html).toContain('data-uid="user_123"');
+    });
+
+    it('should display name and description', () => {
+        const html = UIComponents.generateCardHTML(mockItem);
+        expect(html).toContain('ハイパードライブ');
+        expect(html).toContain('高速移動用エンジン。');
+    });
+
+    it('should skip description if not provided', () => {
+        const itemNoDesc = { ...mockItem, description: '' };
+        const html = UIComponents.generateCardHTML(itemNoDesc);
+        expect(html).not.toContain('ui-item-card__description');
+    });
+
+    it('should generate footer with specific allowed properties', () => {
+        const html = UIComponents.generateCardHTML(mockItem);
+        expect(html).toContain('SLOTS');
+        expect(html).toContain('2');
+        expect(html).toContain('PRECISION');
+        expect(html).toContain('1.5');
+    });
+
+    it('should apply is-enhanced to properties if enhancement exists', () => {
+        const enhancedItem = {
+            ...mockItem,
+            enhancement: { slots: 1 }
+        };
+        const html = UIComponents.generateCardHTML(enhancedItem);
+        expect(html).toContain('ui-item-card__prop is-enhanced is-additive');
+    });
+
+    it('should apply is-enhanced to gauge if charges are enhanced', () => {
+        const enhancedItem = {
+            ...mockItem,
+            enhancement: { charges: 1 }
+        };
+        const html = UIComponents.generateCardHTML(enhancedItem);
+        expect(html).toContain('ui-durability-gauge is-enhanced');
+    });
+
+    it('should display status badge if provided in options', () => {
+        const html = UIComponents.generateCardHTML(mockItem, { status: 'DELIVERED' });
+        expect(html).toContain('ui-item-card__status is-delivered');
+        expect(html).toContain('DELIVERED');
+    });
+});
+
 describe('UIComponents.generateCardHTML (Variations)', () => {
     const mockItem = {
         id: 'test_item',
@@ -126,5 +191,27 @@ describe('UIComponents.generateRocketDetailsHTML', () => {
         expect(html).toContain('is-mini');
         expect(html).toContain('モジュールA');
         expect(html).toContain('モジュールB');
+    });
+});
+
+describe('UIComponents.generateHPGauge', () => {
+    it('should generate correct number of segments', () => {
+        const html = UIComponents.generateHPGauge(2, 5);
+        const activeSegments = (html.match(/is-active/g) || []).length;
+        const totalSegments = (html.match(/ui-durability-segment/g) || []).length;
+        
+        expect(totalSegments).toBe(5);
+        expect(activeSegments).toBe(2);
+    });
+
+    it('should apply is-enhanced class when isEnhanced is true', () => {
+        const html = UIComponents.generateHPGauge(3, 3, true);
+        expect(html).toContain('ui-durability-gauge is-enhanced');
+    });
+
+    it('should apply size class correctly', () => {
+        const html = UIComponents.generateHPGauge(1, 1, false, 'is-mini');
+        expect(html).toContain('ui-durability-gauge');
+        expect(html).toContain('is-mini');
     });
 });
