@@ -8,13 +8,15 @@ export class UIComponents {
     /**
      * Generates a complete item card HTML string.
      * @param {Object} item - Item data (V1-style flat structure)
-     * @param {Object} options - { isClickable, isEnhanced }
+     * @param {Object} options - { isClickable, isEnhanced, isActive, isCompact, isMini, status }
      */
     static generateCardHTML(item, options = {}) {
         // --- 1. Preparation (Contextual Data) ---
         const category = item.category ? item.category.toLowerCase() : '';
         const clickableClass = (options.isClickable || item.isClickable) ? 'is-clickable' : '';
         const activeClass = options.isActive ? 'is-active' : '';
+        const compactClass = options.isCompact ? 'is-compact' : '';
+        const miniClass = options.isMini ? 'is-mini' : '';
         const categoryClass = category ? `is-${category}` : '';
         const instanceId = item.uid || '';
         const displayName = item.name || `[MISSING_NAME: ${item.id}]`;
@@ -39,7 +41,7 @@ export class UIComponents {
 
         // --- 3. Final Assembly (Isomorphic Frame) ---
         return `
-            <article class="ui-item-card ${clickableClass} ${categoryClass} ${activeClass}" 
+            <article class="ui-item-card ${clickableClass} ${categoryClass} ${activeClass} ${compactClass} ${miniClass}" 
                      data-id="${item.id}" 
                      data-uid="${instanceId}">
                 ${headerHTML}
@@ -125,28 +127,16 @@ export class UIComponents {
      * @param {Array} modules - Array of item objects
      */
     static generateRocketDetailsHTML(modules) {
-        let rows = '';
+        let cards = '';
         modules.forEach(mod => {
-            let meta = '';
-            
-            // Minimalist gauge for modules (always mini)
-            if (mod.maxCharges && mod.maxCharges > 0) {
-                const current = mod.charges !== undefined ? mod.charges : mod.maxCharges;
-                meta = this.generateHPGauge(current, mod.maxCharges, false, 'is-mini');
-            } else if (mod.count && mod.count > 1) {
-                // Minimalist badge for stacks (always mini)
-                meta = `<div class="ui-badge is-stack is-mini">x${mod.count}</div>`;
-            }
-
-            rows += `
-                <div class="ui-module-row ui-split-row">
-                    <span class="ui-module-name">${mod.name}</span>
-                    <div class="ui-module-meta">${meta}</div>
-                </div>
-            `;
+            // Generate each module as a compact mini card
+            cards += this.generateCardHTML(mod, { 
+                isCompact: true, 
+                isMini: true 
+            });
         });
 
-        return `<div class="ui-rocket-details">${rows}</div>`;
+        return `<div class="ui-rocket-details">${cards}</div>`;
     }
 
     /**
