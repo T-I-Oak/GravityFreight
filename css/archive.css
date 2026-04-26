@@ -272,7 +272,6 @@
     opacity: 0.5;
     filter: grayscale(1);
     box-shadow: none;
-    --stamp-color: #777;
 }
 
 .ui-style--printing .ui-achievement-card.is-locked .log-title {
