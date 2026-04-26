@@ -68,6 +68,7 @@
    --color-num-sector: var(--color-theme-sub);
    --color-num-item-count: var(--color-category-cargo);
    --color-num-contract: #e1b2e4;
+   --color-num-achievement: #dcdcdc;
    /* Achievement: Independent */
    --color-num-coin: var(--color-category-coin);
 
