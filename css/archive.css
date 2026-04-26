@@ -159,9 +159,10 @@
     min-height: 0;
 }
 
-#archive-screen .ui-achievement-final-card {
-    background: #d4d4d4;
-    color: #1a1a1a;
+/* 印刷スタイルの局所適用: アチーブメントカード */
+.ui-style--printing .ui-achievement-card {
+    background: var(--print-paper, #dcdcdc);
+    color: var(--print-ink, #1a1a1a);
     border-radius: 1px;
     padding: 12px 16px;
     position: relative;
@@ -174,9 +175,11 @@
     justify-content: center;
     gap: 8px;
     box-sizing: border-box;
+    /* 印刷スタイル特有のフォント継承 */
+    font-family: 'Courier New', Courier, monospace;
 }
 
-#archive-screen .log-bg-seal-group {
+.ui-style--printing .ui-achievement-card .log-bg-seal-group {
     position: absolute;
     top: 50%;
     left: 72%;
@@ -191,23 +194,23 @@
     z-index: 1;
 }
 
-#archive-screen .seal-label-tier {
+.ui-style--printing .ui-achievement-card .seal-label-tier {
     font-family: var(--font-main);
     font-weight: 950;
     font-size: 18px;
-    color: var(--stamp-color);
+    color: var(--stamp-color, inherit);
     letter-spacing: 1.5px;
 }
 
-#archive-screen .seal-num {
-    font-family: 'Georgia', 'Times New Roman', serif; /* 伝統的な印字感のためのセリフ体 */
+.ui-style--printing .ui-achievement-card .seal-num {
+    font-family: 'Georgia', 'Times New Roman', serif;
     font-weight: 900;
     font-size: 78px;
-    color: var(--stamp-color);
+    color: var(--stamp-color, inherit);
     line-height: 1;
 }
 
-#archive-screen .log-title {
+.ui-style--printing .ui-achievement-card .log-title {
     position: relative;
     z-index: 10;
     font-family: var(--font-main);
@@ -218,7 +221,7 @@
     text-transform: uppercase;
 }
 
-#archive-screen .log-data-group {
+.ui-style--printing .ui-achievement-card .log-data-group {
     position: relative;
     z-index: 10;
     display: flex;
@@ -228,14 +231,14 @@
     padding-top: 6px;
 }
 
-#archive-screen .log-method-row {
+.ui-style--printing .ui-achievement-card .log-method-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 10px;
 }
 
-#archive-screen .log-method {
+.ui-style--printing .ui-achievement-card .log-method {
     font-family: var(--font-main);
     font-size: 13px;
     font-weight: 800;
@@ -243,14 +246,14 @@
     text-transform: uppercase;
 }
 
-#archive-screen .log-stats {
+.ui-style--printing .ui-achievement-card .log-stats {
     font-family: var(--font-num);
     font-weight: 900;
     font-size: 14px;
-    color: var(--stamp-color);
+    color: var(--stamp-color, inherit);
 }
 
-#archive-screen .log-gauge-area {
+.ui-style--printing .ui-achievement-card .log-gauge-area {
     position: relative;
     z-index: 10;
     width: 100%;
@@ -258,23 +261,23 @@
     background: rgba(0,0,0,0.15);
 }
 
-#archive-screen .log-gauge-fill {
+.ui-style--printing .ui-achievement-card .log-gauge-fill {
     height: 100%;
-    background: var(--stamp-color);
+    background: var(--stamp-color, currentColor);
     opacity: 0.8;
 }
 
-/* Tier Colors */
-#archive-screen .tier-1 { --stamp-color: #b8860b; }
-#archive-screen .tier-2 { --stamp-color: #a52a2a; }
-#archive-screen .tier-3 { --stamp-color: #2f4f4f; }
-#archive-screen .tier-4 { --stamp-color: #556b2f; }
-#archive-screen .tier-5 { --stamp-color: #696969; }
-#archive-screen .tier-6 { --stamp-color: #2c4a6d; }
-#archive-screen .tier-7 { --stamp-color: #1a3b5a; }
+/* Tier Colors (ui_style_printing.css の .is-tier-N と同期させるための変数定義) */
+.ui-style--printing .ui-achievement-card.is-tier-1 { --stamp-color: #b8860b; }
+.ui-style--printing .ui-achievement-card.is-tier-2 { --stamp-color: #a52a2a; }
+.ui-style--printing .ui-achievement-card.is-tier-3 { --stamp-color: #2f4f4f; }
+.ui-style--printing .ui-achievement-card.is-tier-4 { --stamp-color: #556b2f; }
+.ui-style--printing .ui-achievement-card.is-tier-5 { --stamp-color: #696969; }
+.ui-style--printing .ui-achievement-card.is-tier-6 { --stamp-color: #2c4a6d; }
+.ui-style--printing .ui-achievement-card.is-tier-7 { --stamp-color: #1a3b5a; }
 
-/* Achievement Noise Overlay */
-#archive-screen .ui-achievement-final-card::after {
+/* 印刷スタイルのノイズ合成 */
+.ui-style--printing .ui-achievement-card::after {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
