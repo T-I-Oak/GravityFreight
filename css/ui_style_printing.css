@@ -282,13 +282,13 @@ main.ui-style--printing.impact {
 .ui-style--printing .receipt-official-seal.normal .receipt-stamp-right-half { font-size: 78px; padding: 0 15.6px; }
 .ui-style--printing .receipt-official-seal.mini .receipt-stamp-right-half { font-size: 70px; padding: 0 14px; }
 
-.ui-style--printing .receipt-official-seal.stamp-ss { color: #b8860b; }
-.ui-style--printing .receipt-official-seal.stamp-s  { color: #a52a2a; }
-.ui-style--printing .receipt-official-seal.stamp-a  { color: #2f4f4f; }
-.ui-style--printing .receipt-official-seal.stamp-b  { color: #556b2f; }
-.ui-style--printing .receipt-official-seal.stamp-c  { color: #696969; }
-.ui-style--printing .receipt-official-seal.stamp-d  { color: #2c4a6d; }
-.ui-style--printing .receipt-official-seal.stamp-e  { color: #1a3b5a; }
+.ui-style--printing .tier-1, .ui-style--printing .stamp-ss { color: #b8860b; }
+.ui-style--printing .tier-2, .ui-style--printing .stamp-s  { color: #a52a2a; }
+.ui-style--printing .tier-3, .ui-style--printing .stamp-a  { color: #2f4f4f; }
+.ui-style--printing .tier-4, .ui-style--printing .stamp-b  { color: #556b2f; }
+.ui-style--printing .tier-5, .ui-style--printing .stamp-c  { color: #696969; }
+.ui-style--printing .tier-6, .ui-style--printing .stamp-d  { color: #2c4a6d; }
+.ui-style--printing .tier-7, .ui-style--printing .stamp-e  { color: #1a3b5a; }
 
 /* Barcode */
 .ui-style--printing .barcode-container {

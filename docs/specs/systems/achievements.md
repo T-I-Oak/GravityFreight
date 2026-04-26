@@ -130,7 +130,11 @@
 
 ### 6.3 UI表示
 - タイトル画面の「ACHIEVEMENTS」ボタン、またはターミナルの「ARCHIVE」ボタンからアクセス可能。
-- **階級印 (Tier Seal)**: 達成段階に応じて「TIER I」「TIER II」「TIER III」のスタンプが付与される。ローマ数字にはセリフ体（Georgia等）を使用。
-- **カラーパレット**: 達成段階（Tier）に応じて、Gold/Bronze (Tier I), Silver (Tier II), Slate/Iron (Tier III) の色が適用される。
+- **階級印 (Tier Seal)**: 達成段階に応じて「TIER 1」〜「TIER 7」のスタンプが付与される。ローマ数字またはアラビア数字を使用し、書体にはセリフ体（Georgia等）を使用。
+- **カラーパレット**: 印刷スタイル（ui-style--printing）のスタンプカラーを基準とした 7段階のティアカラーが適用される。
+    - **Tier 1 (最高位)**: `stamp-ss` カラー
+    - **Tier 2**: `stamp-s` カラー
+    - **Tier 3**: `stamp-a` カラー
+    - **Tier 4〜7**: `stamp-b`〜`e` カラーに順次対応
 - **ロック状態**: 未解除の実績はグレースケールおよび透過表示（opacity: 0.5）され、称号部分に「NOT ACHIEVED」のラベルが表示される。
 - **進捗表示**: 次の Tier までの進捗をゲージ（log-gauge）および数値（current / goal）で表示する。最高 Tier 達成後は「MAX」と表記される。
