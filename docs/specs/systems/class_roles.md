@@ -120,6 +120,7 @@
     - 責務:
         - 外部データソース（マスタ）の保持。
         - 静的データ（アイテム、ストーリー、実績定義等）への統一されたアクセスインターフェースの提供。
+        - 詳細は [DataManager Specification](./data_manager.md) を参照。
 - **UIController**
     - 生存期間: App Lifecycle
     - 役割: 表示管理。
