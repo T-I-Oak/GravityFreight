@@ -35,29 +35,19 @@
     - `UIComponents.js` への動的生成メソッドの実装と Fail Fast 設計の導入。
     - 装飾フォント（`UnifrakturMaguntia`）のトークン化による一元管理。
 
+- [x] **Analytic Archive (記録画面) - Achievements タブ**:
+    - [x] アチーブメント仕様の正常化 (V2 Printing Style 準拠 / 7段階Tier定義)。
+    - [x] `AchievementData.js` の構築。
+    - [x] `UIComponents.js` への実績生成ロジック実装（TDDによる品質担保）。
+    - [x] `archive.css` へのデザイン統合とグリッドレイアウトの確立。
+    - [x] サイドバーへの実績進捗（KPI）の統合。
+
 ## Phase 1: Foundation (基盤再構築)
 - [ ] **Archive Style Layer**: `ui_style_archive.css` (計画)
 
 ## Phase 2: Scene Reconstruction (各画面の再構築)
 各画面を新しい4軸モデルとレイヤー構造で順次再定義する。
-- [/] **記録画面（Analytic Archive）の精緻化**
-    - [x] パネル全体
-        - [x] ヘッダーの修正
-        - [x] フッターの修正
-    - [x] analysticsタブ
-        - [x] グラフタイトル部修正
-        - [x] グラフの修正
-        - [x] ランキングテーブルタイトル部修正
-        - [x] ランキングテーブルの修正
-        - [x] グラフ・ランキング間の間隔の調整
-    - [x] Replayタブ
-        - [x] タブ内デザイン、調整（上位20件、お気に入り、一括再生ボタンの実装）
-    - [/] Achivementタブ
-        - [x] アチーブメント仕様の正常化 (V2 Printing Style 準拠 / 7段階Tier定義)
-        - [x] AchievementData.js の作成 (階層構造データ化)
-        - [ ] デザイン統合: モックアップから archive.css へのスタイル移植
-        - [ ] 動的生成: UIComponents.js への生成ロジック実装
-        - [ ] KPI反映: アーカイブ画面左側への達成率表示の追加
+- [x] **記録画面（Analytic Archive）の精緻化**
 - [x] スクロールバー仕様の標準化と .is-scrollable への一本化
 
 ## Phase 3: System Integration (システム統合)
