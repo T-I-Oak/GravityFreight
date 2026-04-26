@@ -58,15 +58,55 @@
 
 .ui-item-card.is-story::before {
     width: 8px;
-    background: repeating-linear-gradient(
-        to right,
-        var(--current-color),
-        var(--current-color) 3px,
-        transparent 3px,
-        transparent 5px,
-        var(--current-color) 5px,
-        var(--current-color) 8px
-    );
+    background: repeating-linear-gradient(to right,
+            var(--current-color),
+            var(--current-color) 3px,
+            transparent 3px,
+            transparent 5px,
+            var(--current-color) 5px,
+            var(--current-color) 8px);
+}
+
+/* Axis-E: Structural Variation (Compact Mode) */
+.ui-item-card.is-compact {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+}
+
+.ui-item-card.is-compact .ui-item-card__description,
+.ui-item-card.is-compact .ui-item-card__footer {
+    display: none;
+}
+
+/* Axis-E: Structural Variation (Mini Mode) */
+.ui-item-card.is-mini {
+    padding: 4px 8px;
+    border-radius: calc(var(--radius-standard) * 0.7);
+}
+
+.ui-item-card.is-mini::before {
+    width: 3px;
+}
+
+.ui-item-card.is-mini .ui-item-card__title {
+    font-size: 11px;
+    line-height: 1.1;
+}
+
+.ui-item-card.is-mini .ui-item-card__header-right {
+    gap: 4px;
+}
+
+.ui-item-card.is-mini .ui-item-card__status {
+    font-size: 8px;
+    padding: 1px 4px;
+}
+
+/* Combination: Compact + Mini */
+.ui-item-card.is-mini.is-compact {
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 /* --- 2. Card Internal Layout --- */
@@ -169,17 +209,12 @@
     padding-top: 4px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
-.ui-module-row {
-    line-height: 1;
-}
-
-.ui-module-name {
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 500;
+/* Override card margins when nested in rocket details for maximum density */
+.ui-rocket-details .ui-item-card {
+    margin-bottom: 0;
 }
 
 /* --- 6. Card Status Indicators --- */
