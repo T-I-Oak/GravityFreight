@@ -1,7 +1,7 @@
 # Gravity Freight V2: Development Backlog
 
 ## 現在のタスク (Current Tasks)
-- [ ] UI コンポーネント生成関数のテストスクリプト整備
+- [ ] なし（次の開発計画の策定待ち）
 
 ## 今後のロードマップ (Roadmap)
 - 最終実装に必要となる各種クラスの実装
