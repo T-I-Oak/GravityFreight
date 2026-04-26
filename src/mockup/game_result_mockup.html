@@ -91,6 +91,7 @@
             const rankScore = grade === 'SS' ? '1st' : '120th';
             const isTopRankSectors = grade === 'SS' || grade === 'S' || grade === 'A';
             const isTopRankCollected = grade === 'SS' || grade === 'S';
+            const isTopRankScore = grade === 'SS';
             // Tier Mapping
             const gradeToTier = { 'SS': 1, 'S': 2, 'A': 3, 'B': 4, 'C': 5, 'D': 6, 'E': 7 };
             const tierNum = gradeToTier[grade];
