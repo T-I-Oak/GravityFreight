@@ -38,11 +38,11 @@
 }
 
 .ui-badge.is-stack.is-mini {
-    min-width: 18px;
-    height: 10px;
-    min-height: 0; /* Override base .ui-badge min-height */
-    padding: 0 3px;
-    font-size: 10px;
+    min-width: 18px !important;
+    height: 10px !important;
+    min-height: 0 !important;
+    padding: 0 3px !important;
+    font-size: 10px !important;
     border-radius: 3px;
 }
 
@@ -83,8 +83,8 @@
 }
 
 .ui-durability-gauge.is-mini .ui-durability-segment {
-    width: 8px;
-    height: 3px;
+    width: 8px !important;
+    height: 3px !important;
 }
 
 .ui-durability-segment.is-active {
