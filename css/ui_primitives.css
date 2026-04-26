@@ -40,6 +40,7 @@
 .ui-badge.is-stack.is-mini {
     min-width: 18px;
     height: 10px;
+    min-height: 0; /* Override base .ui-badge min-height */
     padding: 0 3px;
     font-size: 10px;
     border-radius: 3px;
