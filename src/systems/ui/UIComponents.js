@@ -62,7 +62,9 @@ export class UIComponents {
         // Durability Gauge (Explicit data only)
         if (item.maxCharges !== undefined && item.maxCharges > 0) {
             const isDurableEnhanced = !!(options.isEnhanced || (item.enhancement && item.enhancement.charges > 0));
-            html += this.generateHPGauge(item.charges, item.maxCharges, isDurableEnhanced, miniClass);
+            // Bugfix: Add fallback to maxCharges if charges is undefined
+            const current = item.charges !== undefined ? item.charges : item.maxCharges;
+            html += this.generateHPGauge(current, item.maxCharges, isDurableEnhanced, miniClass);
         }
         
         // Stack Badge
