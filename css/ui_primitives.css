@@ -10,48 +10,62 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box; 
-    min-height: 18px; 
+    
+    /* Geometry Variables: Allows override via modifiers without !important */
+    --badge-min-height: 18px;
+    --badge-height: auto;
+    --badge-padding-x: 8px;
+    --badge-font-size: 10px;
+    --badge-radius: var(--radius-standard);
+
+    min-height: var(--badge-min-height);
+    height: var(--badge-height);
+    padding: 0 var(--badge-padding-x); 
+    font-size: var(--badge-font-size);
+    font-weight: 800;
+    border-radius: var(--badge-radius);
     line-height: 1;
     white-space: nowrap;
-    padding: 0 8px; 
-    font-size: 10px;
-    font-weight: 800;
-    border-radius: var(--radius-standard);
 }
 
 /* Capability: pill-shaped badge */
 .ui-badge.is-capsule {
-    border-radius: var(--radius-pill);
+    --badge-radius: var(--radius-pill);
 }
 
 /* is-stack: derivative for numerical item counts */
 .ui-badge.is-stack {
-    font-size: 13px;
-    font-weight: 900;
+    --badge-font-size: 13px;
+    --badge-padding-x: 6px;
+    --badge-radius: 4px; /* badge(radius-standard)と共通の4px */
+    --badge-height: 17px;
+    
     color: #050a1a;
     background: color-mix(in srgb, var(--current-color), #fff 25%);
-    padding: 0 6px;
-    border-radius: 4px; /* badge(radius-standard)と共通の4px */
     min-width: 28px;
-    height: 17px;
     flex-shrink: 0;
 }
 
 .ui-badge.is-stack.is-mini {
-    min-width: 18px !important;
-    height: 10px !important;
-    min-height: 0 !important;
-    padding: 0 3px !important;
-    font-size: 10px !important;
-    border-radius: 3px;
+    --badge-min-height: 0;
+    --badge-height: 10px;
+    --badge-padding-x: 3px;
+    --badge-font-size: 10px;
+    --badge-radius: 3px;
+    min-width: 18px;
 }
 
 /* --- 2. Durability Gauge System --- */
 .ui-durability-gauge {
+    --gauge-gap: 3px;
+    --gauge-padding: 2px;
+    --gauge-segment-width: 10px;
+    --gauge-segment-height: 5px;
+
     display: flex;
-    gap: 3px;
+    gap: var(--gauge-gap);
     align-items: center;
-    padding: 2px;
+    padding: var(--gauge-padding);
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid transparent;
     border-radius: 2px;
@@ -59,8 +73,8 @@
 }
 
 .ui-durability-gauge.is-mini {
-    gap: 1px;
-    padding: 0;
+    --gauge-gap: 1px;
+    --gauge-padding: 0;
     background: transparent;
     border: none;
 }
@@ -72,8 +86,8 @@
 }
 
 .ui-durability-segment {
-    width: 10px;
-    height: 5px;
+    width: var(--gauge-segment-width);
+    height: var(--gauge-segment-height);
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transform: skewX(-15deg);
@@ -83,8 +97,8 @@
 }
 
 .ui-durability-gauge.is-mini .ui-durability-segment {
-    width: 8px !important;
-    height: 3px !important;
+    --gauge-segment-width: 8px;
+    --gauge-segment-height: 3px;
 }
 
 .ui-durability-segment.is-active {
