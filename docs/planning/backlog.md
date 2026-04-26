@@ -52,8 +52,12 @@
         - [x] グラフ・ランキング間の間隔の調整
     - [x] Replayタブ
         - [x] タブ内デザイン、調整（上位20件、お気に入り、一括再生ボタンの実装）
-    - [ ] Achivementタブ
-        - [ ] タブ内デザイン、調整
+    - [/] Achivementタブ
+        - [x] アチーブメント仕様の正常化 (V2 Printing Style 準拠 / 7段階Tier定義)
+        - [x] AchievementData.js の作成 (階層構造データ化)
+        - [ ] デザイン統合: モックアップから archive.css へのスタイル移植
+        - [ ] 動的生成: UIComponents.js への生成ロジック実装
+        - [ ] KPI反映: アーカイブ画面左側への達成率表示の追加
 - [x] スクロールバー仕様の標準化と .is-scrollable への一本化
 
 ## Phase 3: System Integration (システム統合)
