@@ -15,11 +15,18 @@
     flex-direction: column;
     flex-shrink: 0;
     position: relative;
-    padding: 8px 12px;
-    margin-bottom: 8px;
+    
+    /* Geometry Variables: Managing density without !important */
+    --card-padding-y: 8px;
+    --card-padding-x: 12px;
+    --card-radius: var(--radius-standard);
+    --card-margin-bottom: 8px;
+
+    padding: var(--card-padding-y) var(--card-padding-x);
+    margin-bottom: var(--card-margin-bottom);
     background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-tint, 93%));
     border: 1px solid var(--color-border-card);
-    border-radius: var(--radius-standard);
+    border-radius: var(--card-radius);
     transition: all var(--motion-normal) ease;
     overflow: hidden;
 }
@@ -69,9 +76,8 @@
 
 /* Axis-E: Structural Variation (Compact Mode) */
 .ui-item-card.is-compact {
-    padding-top: 4px;
-    padding-bottom: 4px;
-    margin-bottom: 4px;
+    --card-padding-y: 4px;
+    --card-margin-bottom: 4px;
 }
 
 .ui-item-card.is-compact .ui-item-card__description,
@@ -81,8 +87,9 @@
 
 /* Axis-E: Structural Variation (Mini Mode) */
 .ui-item-card.is-mini {
-    padding: 4px 8px;
-    border-radius: calc(var(--radius-standard) * 0.7);
+    --card-padding-y: 4px;
+    --card-padding-x: 8px;
+    --card-radius: calc(var(--radius-standard) * 0.7);
 }
 
 .ui-item-card.is-mini::before {
@@ -105,8 +112,7 @@
 
 /* Combination: Compact + Mini */
 .ui-item-card.is-mini.is-compact {
-    padding-top: 1px;
-    padding-bottom: 1px;
+    --card-padding-y: 1px;
 }
 
 /* --- 2. Card Internal Layout --- */
