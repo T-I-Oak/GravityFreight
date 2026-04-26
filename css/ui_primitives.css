@@ -127,6 +127,7 @@
 .num-score { color: var(--color-num-score); }
 .num-contract { color: var(--color-num-contract); }
 .num-item-count { color: var(--color-num-item-count); }
+.num-achievements { color: var(--color-num-achievement); }
 
 /* --- 5. Semantic Labels --- */
 .ui-stat-label {
