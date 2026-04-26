@@ -57,22 +57,24 @@ export class UIComponents {
      */
     static generateHeaderRightHTML(item, options) {
         let html = '';
+        const miniClass = options.isMini ? 'is-mini' : '';
 
         // Durability Gauge (Explicit data only)
         if (item.maxCharges !== undefined && item.maxCharges > 0) {
             const isDurableEnhanced = !!(options.isEnhanced || (item.enhancement && item.enhancement.charges > 0));
-            html += this.generateHPGauge(item.charges, item.maxCharges, isDurableEnhanced);
+            html += this.generateHPGauge(item.charges, item.maxCharges, isDurableEnhanced, miniClass);
         }
         
         // Stack Badge
         if (item.count > 1) {
-            html += `<div class="ui-badge is-stack">x${item.count}</div>`;
+            html += `<div class="ui-badge is-stack ${miniClass}">x${item.count}</div>`;
         }
 
         // Status Badge
         if (options.status) {
             const status = options.status.toLowerCase();
-            html += `<span class="ui-item-card__status is-${status}">${status.toUpperCase()}</span>`;
+            const statusMiniClass = options.isMini ? 'is-mini' : '';
+            html += `<span class="ui-item-card__status is-${status} ${statusMiniClass}">${status.toUpperCase()}</span>`;
         }
 
         return html;
