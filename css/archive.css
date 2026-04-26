@@ -150,6 +150,8 @@
 #archive-screen .achievement-showcase {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-content: start; /* 行全体を上寄せ */
+    align-items: start;   /* アイテムを上寄せ（縦に伸ばさない） */
     gap: 12px;
     padding: var(--space-double);
     background: rgba(0, 0, 0, 0.25);
@@ -161,6 +163,7 @@
 
 /* 印刷スタイルの局所適用: アチーブメントカード */
 .ui-style--printing .ui-achievement-card {
+    height: auto; /* 強制的な伸長を防止 */
     background: var(--print-paper, #dcdcdc);
     color: var(--print-ink, #1a1a1a);
     border-radius: 1px;
@@ -198,7 +201,6 @@
     font-family: var(--font-main);
     font-weight: 950;
     font-size: 18px;
-    color: inherit;
     letter-spacing: 1.5px;
 }
 
@@ -206,7 +208,6 @@
     font-family: 'Georgia', 'Times New Roman', serif;
     font-weight: 900;
     font-size: 78px;
-    color: inherit;
     line-height: 1;
 }
 
@@ -250,7 +251,6 @@
     font-family: var(--font-num);
     font-weight: 900;
     font-size: 14px;
-    color: inherit; /* is-tier-N クラスから色を継承 */
 }
 
 .ui-style--printing .ui-achievement-card .log-gauge-area {
@@ -263,7 +263,7 @@
 
 .ui-style--printing .ui-achievement-card .log-gauge-fill {
     height: 100%;
-    background: currentColor; /* is-tier-N クラスから色を継承 */
+    background: currentColor;
     opacity: 0.8;
 }
 
