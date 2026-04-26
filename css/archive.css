@@ -198,7 +198,7 @@
     font-family: var(--font-main);
     font-weight: 950;
     font-size: 18px;
-    color: var(--stamp-color, inherit);
+    color: inherit;
     letter-spacing: 1.5px;
 }
 
@@ -206,7 +206,7 @@
     font-family: 'Georgia', 'Times New Roman', serif;
     font-weight: 900;
     font-size: 78px;
-    color: var(--stamp-color, inherit);
+    color: inherit;
     line-height: 1;
 }
 
@@ -250,7 +250,7 @@
     font-family: var(--font-num);
     font-weight: 900;
     font-size: 14px;
-    color: var(--stamp-color, inherit);
+    color: inherit; /* is-tier-N クラスから色を継承 */
 }
 
 .ui-style--printing .ui-achievement-card .log-gauge-area {
@@ -263,18 +263,9 @@
 
 .ui-style--printing .ui-achievement-card .log-gauge-fill {
     height: 100%;
-    background: var(--stamp-color, currentColor);
+    background: currentColor; /* is-tier-N クラスから色を継承 */
     opacity: 0.8;
 }
-
-/* Tier Colors (ui_style_printing.css の .is-tier-N と同期させるための変数定義) */
-.ui-style--printing .ui-achievement-card.is-tier-1 { --stamp-color: #b8860b; }
-.ui-style--printing .ui-achievement-card.is-tier-2 { --stamp-color: #a52a2a; }
-.ui-style--printing .ui-achievement-card.is-tier-3 { --stamp-color: #2f4f4f; }
-.ui-style--printing .ui-achievement-card.is-tier-4 { --stamp-color: #556b2f; }
-.ui-style--printing .ui-achievement-card.is-tier-5 { --stamp-color: #696969; }
-.ui-style--printing .ui-achievement-card.is-tier-6 { --stamp-color: #2c4a6d; }
-.ui-style--printing .ui-achievement-card.is-tier-7 { --stamp-color: #1a3b5a; }
 
 /* ロック状態（未達成）：印刷スタイルの文脈を保ちつつ視認性を落とす */
 .ui-style--printing .ui-achievement-card.is-locked { 
