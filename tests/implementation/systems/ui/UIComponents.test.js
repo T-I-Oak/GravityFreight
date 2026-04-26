@@ -215,3 +215,55 @@ describe('UIComponents.generateHPGauge', () => {
         expect(html).toContain('is-mini');
     });
 });
+
+describe('UIComponents.generateStoryCardHTML', () => {
+    it('should generate story card with correct title and discovery text', () => {
+        const html = UIComponents.generateStoryCardHTML('T');
+        expect(html).toContain('is-story');
+        expect(html).toContain('母からの押し花');
+        expect(html).toContain('is-trading-post');
+    });
+
+    it('should apply is-new class to icon when isNew is true', () => {
+        const html = UIComponents.generateStoryCardHTML('T', true);
+        expect(html).toContain('is-icon-mail is-new');
+    });
+});
+
+describe('UIComponents.generateStoryModalHTML', () => {
+    it('should generate modal with full story content', () => {
+        const html = UIComponents.generateStoryModalHTML('T');
+        expect(html).toContain('ui-panel is-trading-post is-story');
+        expect(html).toContain('母からの押し花');
+        expect(html).toContain('ui-well');
+        expect(html).toContain('青い花の種');
+        expect(html).toContain('story-modal-close');
+    });
+
+    it('should include facility icon in header', () => {
+        const html = UIComponents.generateStoryModalHTML('R');
+        expect(html).toContain('ui-facility-badge');
+        expect(html).toContain('R');
+    });
+});
+
+describe('UIComponents.generateAchievementGridHTML', () => {
+    const mockAllAchievements = {
+        stat_runs: { label: "フライト回数", tiers: [{ goal: 5, title: "T1" }] },
+        stat_coins: { label: "獲得コイン", tiers: [{ goal: 100, title: "T1" }] }
+    };
+    const mockUserStats = { stat_runs: 2, stat_coins: 150 };
+
+    it('should generate a grid containing all provided achievements', () => {
+        const html = UIComponents.generateAchievementGridHTML(mockAllAchievements, mockUserStats);
+        expect(html).toContain('achievement-showcase is-scrollable');
+        
+        // Check for specific labels
+        expect(html).toContain('フライト回数');
+        expect(html).toContain('獲得コイン');
+        
+        // Check if stats are passed (2/5 for runs, 150/MAX for coins)
+        expect(html).toContain('2 / 5');
+        expect(html).toContain('MAX');
+    });
+});
