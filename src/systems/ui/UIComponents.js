@@ -219,4 +219,102 @@ export class UIComponents {
             </article>
         `;
     }
+
+    /**
+     * Generates a single achievement card wrapped in local printing style.
+     * @param {Object} achievement - Achievement definition from ACHIEVEMENT_DATA
+     * @param {number} statsValue - Current user stat value
+     */
+    static generateAchievementCardHTML(achievement, statsValue) {
+        // 1. Identify tiers (Assuming Hardest to Easiest definition in Data.js)
+        const tiers = achievement.tiers;
+        
+        let currentTier = null;
+        let currentLevel = 0;
+        let nextTier = null;
+
+        for (let i = 0; i < tiers.length; i++) {
+            if (statsValue >= tiers[i].goal) {
+                currentTier = tiers[i];
+                currentLevel = i + 1; // Index 0 -> Level 1
+                nextTier = tiers[i - 1] || null; // The tier just above current
+                break;
+            }
+        }
+
+        // If not even the easiest tier is reached
+        if (!currentTier) {
+            nextTier = tiers[tiers.length - 1];
+        }
+
+        // 2. Prepare Display Data
+        const isLocked = !currentTier;
+        const title = isLocked ? 'NOT ACHIEVED' : currentTier.title;
+        const tierClass = isLocked ? 'is-locked' : `is-tier-${currentLevel}`;
+        
+        // Roman numeral conversion (Simplified for level 1-3)
+        const roman = ['-', 'I', 'II', 'III'][currentLevel] || '';
+
+        // Progress Calculation
+        let progressPercent = 0;
+        let statsLabel = '';
+
+        if (isLocked) {
+            progressPercent = (statsValue / nextTier.goal) * 100;
+            statsLabel = `${statsValue} / ${nextTier.goal}`;
+        } else if (!nextTier) {
+            progressPercent = 100;
+            statsLabel = `${statsValue} / MAX`;
+        } else {
+            // Use absolute progress towards next goal (Intuitive: 12 / 20 = 60%)
+            progressPercent = (statsValue / nextTier.goal) * 100;
+            statsLabel = `${statsValue} / ${nextTier.goal}`;
+        }
+        progressPercent = Math.min(100, Math.max(0, progressPercent));
+
+        // 3. Assemble HTML
+        const sealHTML = isLocked ? '' : `
+            <div class="log-bg-seal-group ${tierClass}">
+                <span class="seal-label-tier">TIER</span>
+                <span class="seal-num">${roman}</span>
+            </div>
+        `;
+
+        return `
+            <div class="ui-style--printing">
+                <div class="ui-achievement-card ${tierClass}">
+                    ${sealHTML}
+                    <div class="log-title">${title}</div>
+                    <div class="log-data-group">
+                        <div class="log-method-row">
+                            <span class="log-method">${achievement.label}</span>
+                            <span class="log-stats ${tierClass}">${statsLabel}</span>
+                        </div>
+                        <div class="log-gauge-area">
+                            <div class="log-gauge-fill ${tierClass}" style="width: ${progressPercent}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Generates a scrollable grid of achievement cards.
+     * @param {Object} allAchievements - ACHIEVEMENT_DATA object
+     * @param {Object} userStats - User stats object (e.g., { stat_runs: 12, ... })
+     */
+    static generateAchievementGridHTML(allAchievements, userStats) {
+        let cardsHTML = '';
+        for (const [key, achievement] of Object.entries(allAchievements)) {
+            const statsValue = userStats[key] || 0;
+            cardsHTML += this.generateAchievementCardHTML(achievement, statsValue);
+        }
+
+        return `
+            <div class="achievement-showcase is-scrollable">
+                ${cardsHTML}
+            </div>
+        `;
+    }
 }
