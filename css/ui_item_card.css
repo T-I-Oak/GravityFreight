@@ -155,13 +155,9 @@
     gap: 12px;
 }
 
-/* Automatic Color Propagation for Icons and Gauges */
+/* Automatic Color Propagation for Icons */
 .ui-item-card .ui-icon {
     color: var(--current-color);
-}
-
-.ui-item-card .ui-durability-segment.is-active {
-    background: var(--current-color);
 }
 
 .ui-item-card__prop {
