@@ -91,7 +91,10 @@
             const rankScore = grade === 'SS' ? '1st' : '120th';
             const isTopRankSectors = grade === 'SS' || grade === 'S' || grade === 'A';
             const isTopRankCollected = grade === 'SS' || grade === 'S';
-            const isTopRankScore = grade === 'SS';
+            // Tier Mapping
+            const gradeToTier = { 'SS': 1, 'S': 2, 'A': 3, 'B': 4, 'C': 5, 'D': 6, 'E': 7 };
+            const tierNum = gradeToTier[grade];
+            const isTopGrade = tierNum <= 2; // SS or S
 
             paper.innerHTML = `
                 <header class="ui-panel__header ui-title-box">
@@ -108,7 +111,7 @@
                             <span class="stat-value num-sector">${sectors} SCS</span>
                         </div>
                         <div class="ui-section-subtitle">
-                            SECTOR RANKING <span class="rank-value ${isTopRankSectors ? 'top-rank' : ''}">${rankSectors}</span> / GRADE <span class="ui-badge grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span>
+                            SECTOR RANKING <span class="rank-value ${isTopRankSectors ? 'is-top-rank' : ''}">${rankSectors}</span> / GRADE <span class="ui-badge grade-value ${isTopGrade ? 'is-top-rank' : ''}">${grade}</span>
                         </div>
                     </section>
 
@@ -118,7 +121,7 @@
                             <span class="stat-value num-item-count">${collected} PCS</span>
                         </div>
                         <div class="ui-section-subtitle">
-                            COLLECTION RANKING <span class="rank-value ${isTopRankCollected ? 'top-rank' : ''}">${rankCollected}</span> / GRADE <span class="ui-badge grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span>
+                            COLLECTION RANKING <span class="rank-value ${isTopRankCollected ? 'is-top-rank' : ''}">${rankCollected}</span> / GRADE <span class="ui-badge grade-value ${isTopGrade ? 'is-top-rank' : ''}">${grade}</span>
                         </div>
                     </section>
 
@@ -130,12 +133,12 @@
                             <span class="stat-value num-score">${score.toLocaleString()} PTS</span>
                         </div>
                         <div class="ui-section-subtitle">
-                            SCORE RANKING <span class="rank-value ${isTopRankScore ? 'top-rank' : ''}">${rankScore}</span> / GRADE <span class="ui-badge grade-value receipt-grade-${grade.toLowerCase()}">${grade}</span>
+                            SCORE RANKING <span class="rank-value ${isTopRankScore ? 'is-top-rank' : ''}">${rankScore}</span> / GRADE <span class="ui-badge grade-value ${isTopGrade ? 'is-top-rank' : ''}">${grade}</span>
                         </div>
                     </section>
 
                     <div class="receipt-stamp-zone">
-                        <div class="receipt-official-seal stamp-${grade.toLowerCase()} ${sizeVariant}" id="report-stamp">
+                        <div class="receipt-official-seal is-tier-${tierNum} ${sizeVariant}" id="report-stamp">
                             <div class="receipt-stamp-left-half">
                                 <div class="receipt-stamp-text-line small">OPERATOR AUTH.</div>
                                 <div class="receipt-stamp-text-line medium">CONTRACT VERIFIED</div>

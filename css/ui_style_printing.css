@@ -176,9 +176,7 @@ main.ui-style--printing.impact {
     font-family: inherit; /* V2 デフォルトの Courier Prime を上書きし、レシートのフォントを継承 */
 }
 
-.ui-style--printing .top-rank,
-.ui-style--printing .receipt-grade-ss,
-.ui-style--printing .receipt-grade-s {
+.ui-style--printing .is-top-rank {
     color: var(--print-ink-red);
 }
 
@@ -282,13 +280,13 @@ main.ui-style--printing.impact {
 .ui-style--printing .receipt-official-seal.normal .receipt-stamp-right-half { font-size: 78px; padding: 0 15.6px; }
 .ui-style--printing .receipt-official-seal.mini .receipt-stamp-right-half { font-size: 70px; padding: 0 14px; }
 
-.ui-style--printing .tier-1, .ui-style--printing .stamp-ss { color: #b8860b; }
-.ui-style--printing .tier-2, .ui-style--printing .stamp-s  { color: #a52a2a; }
-.ui-style--printing .tier-3, .ui-style--printing .stamp-a  { color: #2f4f4f; }
-.ui-style--printing .tier-4, .ui-style--printing .stamp-b  { color: #556b2f; }
-.ui-style--printing .tier-5, .ui-style--printing .stamp-c  { color: #696969; }
-.ui-style--printing .tier-6, .ui-style--printing .stamp-d  { color: #2c4a6d; }
-.ui-style--printing .tier-7, .ui-style--printing .stamp-e  { color: #1a3b5a; }
+.ui-style--printing .is-tier-1 { color: #b8860b; }
+.ui-style--printing .is-tier-2 { color: #a52a2a; }
+.ui-style--printing .is-tier-3 { color: #2f4f4f; }
+.ui-style--printing .is-tier-4 { color: #556b2f; }
+.ui-style--printing .is-tier-5 { color: #696969; }
+.ui-style--printing .is-tier-6 { color: #2c4a6d; }
+.ui-style--printing .is-tier-7 { color: #1a3b5a; }
 
 /* Barcode */
 .ui-style--printing .barcode-container {
