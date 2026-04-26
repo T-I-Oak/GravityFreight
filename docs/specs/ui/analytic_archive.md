@@ -23,6 +23,7 @@
 - **構造**: 各項目は `.ui-split-column` で構成され、ラベルを `.ui-well` の外に配置。
 - **数値の質感**: `.num-contract` (Lifetime Contracts), `.num-item-count` (Total Items) などの意味論的クラスと `.num-sector` を使用し、標準的な数値フォントを適用。
 - **サイズ**: 幅はコンテンツに応じた `auto` (PC時)。内部の `.ui-well` は **120px 固定幅** で中央寄せされる。
+- **実績進捗 (Achievement Progress)**: サイドバー下部に、全実績に対する現在の達成率をパーセンテージ（例: 42%）で表示。
 
 ### 3.3 メインエリア (Right Pane / Main Content)
 - **Analytics タブ**:
@@ -41,7 +42,13 @@
         - 行を選択（クリック）することで、ヘッダー右側の「PLAY REPLAY」ボタンが有効化される。
         - お気に入りアイコンをクリックすることで、保護状態をトグル。
 - **Achievements タブ**:
-    - 実績一覧を表示。詳細は [Achievement System Spec](../systems/achievements.md) を参照。
+    - 実績一覧を表示。各実績は「印刷スタイル（Overprinted Log）」カードとしてレンダリングされる。
+    - **レイアウト**: `.achievement-showcase` 内で `display: grid` を使用。`minmax(300px, 1fr)` によるレスポンシブな多段カラム構成。
+    - **視覚仕様**: 
+        - 局所的な `.ui-style--printing` コンテキストを各カードに適用。
+        - 達成済み実績には、右側に巨大な階級印（Tier Seal）が印字される。
+        - ロック状態の実績はグレースケール（`grayscale(1)`）かつ半透明で表示され、タイトルは「NOT ACHIEVED」に差し替えられる。
+    - **進行状況**: 各カード下部にインク密度の低い（透過）ゲージを表示し、次の Tier までの絶対進捗を視覚化。
 
 ## 4. レスポンシブ設計
 - **ブレークポイント**: 800px 以下。
