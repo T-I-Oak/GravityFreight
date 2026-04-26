@@ -276,6 +276,23 @@
 .ui-style--printing .ui-achievement-card.is-tier-6 { --stamp-color: #2c4a6d; }
 .ui-style--printing .ui-achievement-card.is-tier-7 { --stamp-color: #1a3b5a; }
 
+/* ロック状態（未達成）：印刷スタイルの文脈を保ちつつ視認性を落とす */
+.ui-style--printing .ui-achievement-card.is-locked { 
+    opacity: 0.5;
+    filter: grayscale(1);
+    box-shadow: none;
+    --stamp-color: #777;
+}
+
+.ui-style--printing .ui-achievement-card.is-locked .log-title {
+    color: #444;
+    letter-spacing: 1px;
+}
+
+.ui-style--printing .ui-achievement-card.is-locked .log-method {
+    color: #555;
+}
+
 /* 印刷スタイルのノイズ合成 */
 .ui-style--printing .ui-achievement-card::after {
     content: '';
