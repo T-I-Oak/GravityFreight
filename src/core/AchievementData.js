@@ -43,9 +43,9 @@ export const ACHIEVEMENT_DATA = {
     stat_max_dist: {
         label: "最長航行距離",
         tiers: [
-            { level: 1, goal: 5000, title: "宇宙の測量士" },
-            { level: 2, goal: 2000, title: "無限の旅人" },
-            { level: 3, goal: 1000, title: "地平線の彼方" }
+            { level: 1, goal: 10000, title: "宇宙の測量士" },
+            { level: 2, goal: 5000, title: "無限の旅人" },
+            { level: 3, goal: 3000, title: "地平線の彼方" }
         ]
     },
     stat_distance: {
