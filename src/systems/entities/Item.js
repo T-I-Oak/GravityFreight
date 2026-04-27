@@ -66,15 +66,11 @@ class Item {
                this.precision === otherItem.precision &&
                this.pickupRange === otherItem.pickupRange &&
                this.power === otherItem.power &&
-               this.duration === otherItem.duration &&
                this.precisionMultiplier === otherItem.precisionMultiplier &&
                this.pickupMultiplier === otherItem.pickupMultiplier &&
                this.gravityMultiplier === otherItem.gravityMultiplier &&
                this.powerMultiplier === otherItem.powerMultiplier &&
-               this.arcMultiplier === otherItem.arcMultiplier &&
-               this.onLostBonus === otherItem.onLostBonus &&
-               this.ghostType === otherItem.ghostType &&
-               this.preventsLauncherWear === otherItem.preventsLauncherWear;
+               this.arcMultiplier === otherItem.arcMultiplier;
     }
 
     /**
