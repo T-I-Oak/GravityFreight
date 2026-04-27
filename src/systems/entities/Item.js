@@ -1,4 +1,5 @@
 import DataManager from '../../core/DataManager.js';
+import IDGenerator from '../../core/utils/IDGenerator.js';
 
 /**
  * Item クラス
@@ -11,7 +12,7 @@ class Item {
         this.#master = DataManager.getItemById(masterId);
         
         // 識別子生成
-        this.uid = 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        this.uid = IDGenerator.generate('item');
         
         this.id = this.#master.id;
         
