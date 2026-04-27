@@ -138,24 +138,21 @@
 }
 ```
 
-- `Data.js` からの移行期間中は、内部で `Data.js` の定数をラップする形で実装し、徐々に独立させる。
+## 5. 移行ロードマップ (Migration Roadmap)
 
-## 6. 移行ロードマップ (Migration Roadmap)
+マスタデータを JS ファイル (`Data.js`) から外部データ (`.json`) へ完全に移行するためのプロセス。
 
-マスタデータを JS ファイル (`Data.js`) から外部データ (`.json`) へ完全に移行するための 3 段階のフェーズを定義する。
+### Phase 1: 依存関係の集約 (Wrapper Phase) - [DONE]
+- `DataManager` を実装し、インターフェースを統一。
+- **完了**: 2026-04-27
 
-### Phase 1: 依存関係の集約 (Wrapper Phase)
-- `DataManager` を実装し、内部的には `src/core/Data.js` を import して使用する。
-- アプリケーション全体の `Data.js` への直接参照をすべて `DataManager` 経由にリファクタリングする。
-- **このフェーズの完了条件**: `DataManager` 以外で `Data.js` を import している箇所がゼロになる。
+### Phase 2: データの実体分離 (Extraction Phase) - [DONE]
+- データを JSON ファイルとして分離。
+- `DataManager` が JSON を静的に import する構成に移行。
+- レガシーな `Data.js` および `AchievementData.js` を物理削除。
+- **完了**: 2026-04-27
 
-### Phase 2: データの実体分離 (Extraction Phase)
-- `Data.js` 内のオブジェクトを `.json` ファイル（例: `assets/data/items.json`）として書き出す。
-- `DataManager` がこれらの JSON を読み込むように変更する。
-    - Vite 環境下では `import items from './assets/data/items.json'` として静的にバンドル可能。
-- **このフェーズの完了条件**: `Data.js` がプロジェクトから削除される。
-
-### Phase 3: 高度なデータ管理 (Optimization Phase)
-- 必要に応じて、データの非同期読み込み (`fetch`) や、JSON Schema によるデータ整合性チェックを導入する。
-- 多言語化が必要な場合、言語ごとの JSON ファイルの切り替えロジックを `DataManager` に実装する。
-
+### Phase 3: 高度なデータ管理 (Optimization Phase) - [NEXT]
+- JSON Schema によるデータ整合性チェックの導入。
+- 多言語化対応が必要になった場合の、言語別ファイル切り替えロジック。
+- データの遅延読み込み（必要時）の検討。
