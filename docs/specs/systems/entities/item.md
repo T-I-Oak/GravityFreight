@@ -23,7 +23,7 @@ Item クラスは、ロケット構成パーツおよび発射装備（Chassis, 
 | enhancementCount | number | 累計強化回数 |
 | name | string | 表示名 |
 | category | string | カテゴリ |
-| rarity | number | レアリティ (5〜20) |
+| rarity | string | レアリティ (common, uncommon, rare, anomaly) |
 | description | string | 説明文 |
 | mass | number | 質量 |
 | slots | number | スロット提供数 |
