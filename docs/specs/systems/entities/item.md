@@ -13,7 +13,7 @@
 ### 2.1 プロパティ (Properties)
 
 以下のプロパティは、インスタンスから直接アクセス可能（Getter 含む）である。
-※「強化対象」とあるものは、`enhancement` による補正が適用された後の最終値を返す。
+※「強化対象」とあるものは、[3.1 性能計算ロジック] が適用された後の最終値を返す。
 
 | プロパティ | 型 | 説明 | 備考 |
 | :--- | :--- | :--- | :--- |
@@ -22,23 +22,24 @@
 | `id` | `string` | マスタ定義ID。 | |
 | `category` | `string` | アイテムの分類。 | |
 | `charges` | `number` | 現在の残り回数/耐久度。 | |
-| `enhancement` | `object` | 項目ごとの強化値を保持するオブジェクト。 | `key: bonusValue` 形式 |
+| `enhancementCount` | `number` | 累計の強化成功回数。 | |
+| `enhancement` | `object` | 項目ごとの強化加算値を保持するオブジェクト。 | `key: bonusAmount` 形式 |
 | **【基本情報】** | | | |
 | `name` | `string` | 表示名。 | |
 | `rarity` | `number` | レアリティ (5〜20)。 | |
 | `description` | `string` | 説明文。 | |
 | **【性能プロパティ】** | | | |
-| `mass` | `number` | 質量。 | 強化対象 |
-| `slots` | `number` | スロット提供数。 | 強化対象 |
-| `precision` | `number` | 予測精度（固定値加算）。 | 強化対象 |
-| `pickupRange` | `number` | 回収範囲（固定値加算）。 | 強化対象 |
-| `precisionMultiplier` | `number` | 予測精度の補正倍率。 | 強化対象 |
-| `pickupMultiplier` | `number` | 回収範囲の補正倍率。 | 強化対象 |
-| `gravityMultiplier` | `number` | 重力影響の補正倍率。 | 強化対象 |
-| `powerMultiplier` | `number` | 発射パワーの補正倍率。 | 強化対象 |
-| `arcMultiplier` | `number` | 出口判定エリアの補正倍率。 | 強化対象 |
-| `power` | `number` | 発射台としての基礎パワー。 | 強化対象 |
-| `maxCharges` | `number` | アイテムの最大耐久度。 | 強化対象 |
+| `mass` | `number` | 質量。 | |
+| `slots` | `number` | スロット提供数。 | 強化対象 (`+1`) |
+| `precision` | `number` | 予測精度（固定値加算）。 | |
+| `pickupRange` | `number` | 回収範囲（固定値加算）。 | |
+| `precisionMultiplier` | `number` | 予測精度の補正倍率。 | 強化対象 (`+0.2`) |
+| `pickupMultiplier` | `number` | 回収範囲の補正倍率。 | 強化対象 (`+0.2`) |
+| `gravityMultiplier` | `number` | 重力影響の補正倍率。 | 強化対象 (`-0.1`) |
+| `powerMultiplier` | `number` | 発射パワーの補正倍率。 | |
+| `arcMultiplier` | `number` | 出口判定エリアの補正倍率。 | |
+| `power` | `number` | 発射台としての基礎パワー。 | |
+| `maxCharges` | `number` | アイテムの最大耐久度。 | 強化対象 (`+1`) |
 | **【特殊属性・フラグ】** | | | |
 | `onLostBonus` | `boolean` | ロスト保険フラグ。 | |
 | `ghostType` | `string` | 予測線の表示タイプ。 | |
@@ -56,21 +57,18 @@
 
 #### `getStat(key)`
 - **戻り値**: `number` | `boolean` | `string`
-- **処理**: マスタ値 (`BaseValue`) に対して、`enhancement[key]` が存在すれば加算した値を返す。
+- **処理**: マスタ値 (`BaseValue`) に対して、`enhancement[key]` が存在すれば加算（または減算）した値を返す。
     - `FinalValue = BaseValue + (enhancement[key] || 0)`
-    - フラグ系（`onLostBonus`等）の場合は、マスタ定義の boolean 値をそのまま返す。
+    - `gravityMultiplier` の場合のみ減算し、最小値を `0.1` とする。
 
-#### `consumeCharge(amount = 1)`
-- **処理**: `charges` を減算する。
+#### `upgrade(key)`
+- **処理**: 指定された `key` に応じた増分（[3.2] 参照）を `enhancement[key]` に加え、`enhancementCount` を +1 する。
 
 #### `repair(amount = null)`
-- **処理**: `charges` を加算する。最大値は現在の `maxCharges`（強化込み）。
-
-#### `upgrade(key, bonusAmount)`
-- **処理**: `enhancement[key]` に値を加算する。
+- **処理**: `charges` を回復する（最大 `maxCharges`）。強化回数にはカウントされない。
 
 #### `getSnapshot()`
-- **処理**: 保存・復元に必要な最小限のデータ（`uid`, `id`, `charges`, `enhancement`）を返す。
+- **処理**: 保存・復元に必要な最小限のデータ（`uid`, `id`, `charges`, `enhancementCount`, `enhancement`）を返す。
 
 ---
 
@@ -81,7 +79,14 @@
     - すべての性能プロパティは無効化される（加算値: 0 / 乗算値: 1.0 を返す）。
     - ただし **`mass` だけは物理的実体としてそのまま加算される。**
 
-### 3.2 強化 (Enhancement) のルール
+### 3.2 強化増分 (Enhancement Step)
+`upgrade(key)` 実行時に適用される加算値は以下の通り固定。
+- `slots`: +1
+- `precisionMultiplier`: +0.2
+- `pickupMultiplier`: +0.2
+- `gravityMultiplier`: -0.1 (内部的には加算値 0.1 を管理し計算時に引く)
+- `maxCharges`: +1
+
+### 3.3 強化 (Enhancement) のルール
 - 強化はマスタ値に対する「加算」を基本とする。
-- `maxCharges` も強化対象であり、強化によって使用回数が増加した状態を `maxCharges` として公開する。
 - UI（`UIComponents.js`）はこの `enhancement` オブジェクト内の値を参照してハイライト表示を行う。
