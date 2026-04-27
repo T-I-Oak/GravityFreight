@@ -26,24 +26,35 @@ describe('DataManager', () => {
     });
 
     describe('Facilities API', () => {
-        it('should get facility by ID', () => {
+        it('should get facility by ID and have correct structure', () => {
             const facility = DataManager.getFacilityById('T');
             expect(facility).toBeDefined();
+            expect(facility.id).toBe('T');
             expect(facility.type).toBe('TRADING_POST');
+            expect(facility.name).toBeDefined();
+            expect(facility.icon).toBeDefined();
+            expect(facility.className).toBeDefined();
         });
     });
 
     describe('Content API (Story & Achievements)', () => {
-        it('should get story by ID', () => {
+        it('should get story by ID and have correct structure', () => {
             const story = DataManager.getStoryById('T');
             expect(story).toBeDefined();
             expect(story.branch).toBe('T');
+            expect(story.step).toBeDefined();
+            expect(story.title).toBeDefined();
+            expect(story.discovery).toBeDefined();
+            expect(story.content).toBeDefined();
         });
 
-        it('should get achievement by ID', () => {
+        it('should get achievement by ID and have correct structure', () => {
             const achievement = DataManager.getAchievementById('total_coins');
             expect(achievement).toBeDefined();
             expect(achievement.label).toBeDefined();
+            expect(Array.isArray(achievement.tiers)).toBe(true);
+            expect(achievement.tiers[0].goal).toBeDefined();
+            expect(achievement.tiers[0].title).toBeDefined();
         });
 
         it('should get all achievements', () => {
@@ -54,22 +65,32 @@ describe('DataManager', () => {
     });
 
     describe('Configuration API', () => {
-        it('should get game balance config', () => {
+        it('should get game balance config with required properties', () => {
             const config = DataManager.getGameBalance();
             expect(config).toBeDefined();
+            expect(config.DEFAULT_SHIP_MASS).toBeDefined();
             expect(config.DELIVERY_REWARD).toBeDefined();
+            expect(config.DELIVERY_REWARD.SCORE).toBeDefined();
+            expect(config.DELIVERY_REWARD.COINS).toBeDefined();
+            expect(config.MAGNET_PULSE_GROWTH).toBeDefined();
         });
 
-        it('should get map constants', () => {
+        it('should get map constants with required properties', () => {
             const constants = DataManager.getMapConstants();
             expect(constants).toBeDefined();
             expect(constants.BOUNDARY_RADIUS).toBeDefined();
+            expect(constants.MIN_STAR_DISTANCE).toBeDefined();
+            expect(constants.HOME_STAR_RADIUS).toBeDefined();
+            expect(constants.HOME_STAR_MASS).toBeDefined();
         });
 
         it('should get rarity settings', () => {
             const settings = DataManager.getRaritySettings();
             expect(settings).toBeDefined();
             expect(settings.COMMON).toBeDefined();
+            expect(settings.UNCOMMON).toBeDefined();
+            expect(settings.RARE).toBeDefined();
+            expect(settings.ANOMALY).toBeDefined();
         });
     });
 
@@ -77,8 +98,8 @@ describe('DataManager', () => {
         it('should get initial setup data', () => {
             const setup = DataManager.getInitialSetup();
             expect(setup).toBeDefined();
-            expect(setup.initialInventory).toBeDefined();
-            expect(setup.initialCoins).toBeDefined();
+            expect(Array.isArray(setup.initialInventory)).toBe(true);
+            expect(typeof setup.initialCoins).toBe('number');
         });
     });
 });

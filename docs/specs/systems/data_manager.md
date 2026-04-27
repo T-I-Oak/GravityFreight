@@ -58,41 +58,81 @@
 ### ItemDefinition
 ```javascript
 {
-  id: string,
-  category: string,
-  name: string,
-  rarity: number,
-  description: string,
-  // 以下、カテゴリにより任意
-  mass?: number,
-  slots?: number,
-  precision?: number,
-  power?: number,
-  maxCharges?: number,
-  precisionMultiplier?: number,
-  pickupMultiplier?: number,
-  gravityMultiplier?: number,
+  id: string,       // 一意の識別子 (例: 'hull_light')
+  category: string, // カテゴリ (chassis, logic, launcher, module, booster, coin, cargo)
+  name: string,     // 表示名
+  rarity: number,   // レアリティ値 (1-20)
+  description: string, // 説明文
+  // --- カテゴリ固有プロパティ ---
+  mass?: number,    // 質量
+  slots?: number,   // スロット数
+  power?: number,   // 射出パワー
+  maxCharges?: number, // 最大耐久度/回数
   // ...他
+}
+```
+
+### FacilityInfo
+```javascript
+{
+  id: string,       // 短縮ID ('T', 'R', 'B')
+  type: string,     // 施設タイプ ('TRADING_POST', 'REPAIR_DOCK', 'BLACK_MARKET')
+  name: string,     // 表示名
+  icon: string,     // 表示アイコン文字
+  className: string // CSSクラス名
+}
+```
+
+### GameBalanceConfig (主要なバランス定数)
+```javascript
+{
+  DEFAULT_SHIP_MASS: number,     // ロケットの基本質量
+  DELIVERY_REWARD: { SCORE: number, COINS: number }, // 正しい配送時の報酬
+  UNMATCHED_DELIVERY_REWARD: { SCORE: number, COINS: number }, // 誤配送時の報酬
+  MAX_COIN_DISCOUNT: number,     // コインによる最大割引率
+  MAGNET_PULSE_GROWTH: number,   // 磁気パルス回収範囲の成長率
+  GRAVITY_SCALING_FACTOR: number, // 重力の計算倍率
+  TRAIL_MAX_LENGTH: number       // 航跡の最大保存数
+}
+```
+
+### MapConstants (マップ生成定数)
+```javascript
+{
+  BOUNDARY_RADIUS: number,    // セクターの境界半径
+  MIN_STAR_DISTANCE: number,  // 天体間の最小距離
+  HOME_STAR_RADIUS: number,   // ホーム（発射地点）の天体半径
+  HOME_STAR_MASS: number      // ホーム天体の質量
+}
+```
+
+### RaritySettings
+```javascript
+{
+  COMMON: number,    // 一般 (5)
+  UNCOMMON: number,  // 非凡 (10)
+  RARE: number,      // 希少 (15)
+  ANOMALY: number    // 異常 (20)
 }
 ```
 
 ### StoryDefinition
 ```javascript
 {
-  branch: string, // 'T' | 'R' | 'B'
-  step: number,
-  title: string,
-  discovery: string,
-  content: string
+  branch: string, // 対応する施設ID ('T', 'R', 'B')
+  step: number,   // 段階 (1, 2, 3)
+  title: string,  // ストーリータイトル
+  discovery: string, // 発見時のテキスト
+  content: string // ストーリー本文
 }
 ```
 
 ### AchievementDefinition
 ```javascript
 {
-  label: string,
+  label: string, // 実績の表示ラベル
   tiers: [
-    { goal: number, title: string },
+    { goal: number, title: string }, // 目標値と称号
     // ...
   ]
 }
