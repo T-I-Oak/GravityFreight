@@ -14,13 +14,6 @@ class StackedItem {
         this.representative = null;
     }
 
-    /** 特性プロパティ (representative の値を参照) **/
-    get name() { return this.representative?.name; }
-    get category() { return this.representative?.category; }
-    get rarity() { return this.representative?.rarity; }
-    get description() { return this.representative?.description; }
-    get performance() { return this.representative || undefined; }
-
     /**
      * アイテムをスタックに追加する
      * @param {Item} item 追加するアイテム

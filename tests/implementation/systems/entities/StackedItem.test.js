@@ -89,33 +89,30 @@ describe('StackedItem Class - Basic Operations', () => {
     });
 });
 
-describe('StackedItem Class - Property Proxy and Performance', () => {
-    it('should proxy basic information from the representative item', () => {
+describe('StackedItem Class - Property Access via Representative', () => {
+    it('should allow accessing basic information via the representative item', () => {
         const stack = new StackedItem();
         const item = new Item('hull_light');
         stack.push(item);
 
-        expect(stack.name).toBe(item.name);
-        expect(stack.category).toBe(item.category);
-        expect(stack.rarity).toBe(item.rarity);
-        expect(stack.description).toBe(item.description);
+        expect(stack.representative.name).toBe(item.name);
+        expect(stack.representative.category).toBe(item.category);
+        expect(stack.representative.rarity).toBe(item.rarity);
+        expect(stack.representative.description).toBe(item.description);
     });
 
-    it('should provide performance values from the representative item', () => {
+    it('should provide performance values via the representative item', () => {
         const stack = new StackedItem();
         const item = new Item('hull_light');
         stack.push(item);
 
-        // Item has mass, slots, etc.
-        expect(stack.performance.mass).toBe(item.mass);
-        expect(stack.performance.slots).toBe(item.slots);
+        expect(stack.representative.mass).toBe(item.mass);
+        expect(stack.representative.slots).toBe(item.slots);
     });
 
-    it('should return undefined for proxies when empty', () => {
+    it('should have null representative when empty', () => {
         const stack = new StackedItem();
-        // Natural Failure: accessing representative when null
-        expect(stack.name).toBeUndefined();
-        expect(stack.performance).toBeUndefined();
+        expect(stack.representative).toBeNull();
     });
 });
 
