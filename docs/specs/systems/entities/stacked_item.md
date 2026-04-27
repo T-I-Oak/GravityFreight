@@ -41,7 +41,7 @@
         - 固有の `uid` を生成して設定する。
         - `item.id` を自身の `id` として設定する。
         - `items` 配列に `item` を追加する。
-        - **`representative` を設定する（`items[0]`）。**
+        - `representative` を設定する（`items[0]`）。
         - `true` を返す。
     2. スタックが空でない場合：
         - `item.equals(this.representative)` を実行する。
@@ -52,7 +52,7 @@
 - **戻り値**: `Item | null`
 - **処理**:
     1. `items` 配列の末尾から `Item` を取り出す。
-    2. スタックが空になった場合は `uid`, `id`, **`representative`** をリセット（`null`）する。
+    2. スタックが空になった場合は `uid`, `id`, `representative` をリセット（`null`）する。
     3. 取り出したアイテムを返す。
 
 #### `getSnapshot()`
