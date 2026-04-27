@@ -10,49 +10,13 @@ class StackedItem {
         this.items = [];
         this.uid = null;
         this.id = null;
-    }
-
-    /**
-     * スタック数量
-     */
-    get quantity() {
-        return this.items.length;
-    }
-
-    /**
-     * 代表アイテム（スタックの基準）
-     */
-    get representative() {
-        return this.items.length > 0 ? this.items[0] : null;
-    }
-
-    /** プロキシプロパティ **/
-    get name() { return this.representative?.name; }
-    get category() { return this.representative?.category; }
-    get rarity() { return this.representative?.rarity; }
-    get description() { return this.representative?.description; }
-    
-    /**
-     * 全性能数値の提供
-     */
-    get performance() {
-        if (!this.representative) return undefined;
-        
-        // Item クラスの主要な性能数値をオブジェクトとして返す
-        return {
-            mass: this.representative.mass,
-            slots: this.representative.slots,
-            precision: this.representative.precision,
-            pickupRange: this.representative.pickupRange,
-            power: this.representative.power,
-            maxCharges: this.representative.maxCharges,
-            duration: this.representative.duration,
-            precisionMultiplier: this.representative.precisionMultiplier,
-            pickupMultiplier: this.representative.pickupMultiplier,
-            gravityMultiplier: this.representative.gravityMultiplier,
-            powerMultiplier: this.representative.powerMultiplier,
-            arcMultiplier: this.representative.arcMultiplier
-        };
+        this.quantity = 0;
+        this.representative = null;
+        this.name = undefined;
+        this.category = undefined;
+        this.rarity = undefined;
+        this.description = undefined;
+        this.performance = undefined;
     }
 
     /**
@@ -62,15 +26,30 @@ class StackedItem {
      */
     push(item) {
         if (this.items.length === 0) {
+            // 固有の uid を生成して設定する
             this.uid = IDGenerator.generate('stack');
+            // item.id を自身の id として設定する
             this.id = item.id;
+            // items 配列に item を追加する
             this.items.push(item);
+            // representative を設定する（items[0]）
+            this.representative = this.items[0];
+            
+            // プロパティの設定
+            this.quantity = this.items.length;
+            this.name = this.representative.name;
+            this.category = this.representative.category;
+            this.rarity = this.representative.rarity;
+            this.description = this.representative.description;
+            this.performance = this.representative; // 代表アイテムの値をそのまま提供する
+
             return true;
         }
 
-        // 同一特性チェック
+        // 一致すれば、items 配列に追加
         if (item.equals(this.representative)) {
             this.items.push(item);
+            this.quantity = this.items.length;
             return true;
         }
 
@@ -85,10 +64,18 @@ class StackedItem {
         if (this.items.length === 0) return null;
 
         const item = this.items.pop();
+        this.quantity = this.items.length;
 
+        // スタックが空になった場合は uid, id, representative をリセット（null）する
         if (this.items.length === 0) {
             this.uid = null;
             this.id = null;
+            this.representative = null;
+            this.name = undefined;
+            this.category = undefined;
+            this.rarity = undefined;
+            this.description = undefined;
+            this.performance = undefined;
         }
 
         return item;
@@ -120,7 +107,7 @@ class StackedItem {
             });
         }
 
-        // 保存されていた UID を反映 (pushで生成されたものを上書き)
+        // 保存されていた data.uid で自身の uid を上書きする
         stack.uid = data.uid;
         
         return stack;
