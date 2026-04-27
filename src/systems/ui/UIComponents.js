@@ -2,7 +2,7 @@
  * UIComponents.js
  * Standardized HTML generation logic for Gravity Freight.
  */
-import { STORY_DATA, FACILITY_INFO, getFacilityById } from '../../core/Data.js';
+import DataManager from '../../core/DataManager.js';
 
 export class UIComponents {
     /**
@@ -147,8 +147,8 @@ export class UIComponents {
      * @param {boolean} isNew - Whether to apply a "new" pulse animation
      */
     static generateStoryCardHTML(storyId, isNew = false) {
-        const story = STORY_DATA[storyId];
-        const facilityClass = getFacilityById(story.branch).className;
+        const story = DataManager.getStoryById(storyId);
+        const facilityClass = DataManager.getFacilityById(story.branch).className;
 
         return `
             <article class="ui-item-card is-story is-active is-clickable ${facilityClass}">
@@ -168,9 +168,9 @@ export class UIComponents {
      * @param {string} storyId - Key for STORY_DATA
      */
     static generateStoryModalHTML(storyId) {
-        const story = STORY_DATA[storyId];
+        const story = DataManager.getStoryById(storyId);
 
-        const facility = getFacilityById(story.branch);
+        const facility = DataManager.getFacilityById(story.branch);
         const facilityClass = facility.className;
         const icon = facility.icon;
 
