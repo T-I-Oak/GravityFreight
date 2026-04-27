@@ -1,11 +1,5 @@
 # Update History
 
-## 2026-04-27
-### Systems: StackedItem の実装
-- `IDGenerator` ユーティリティを新規作成し、`Item` および `StackedItem` の UID 生成を共通化。
-- `Item` クラスをリファクタリングし、`IDGenerator` を使用するように変更。
-- `StackedItem` クラスを新規実装。
-    - 同一特性（`Item.equals`）を持つアイテムのみをスタック可能。
-    - 代表個体（`representative`）を介したプロパティ参照方式を採用。
-    - スナップショット（`getSnapshot`, `fromSnapshot`）による永続化に対応。
-- `StackedItem.test.js` による TDD 実装。
+## 1.8.11 (2026/04/27) - スタック型アイテム管理システムの導入
+### 機能改善
+- 同一特性を持つアイテムを一括して管理・運用する仕組みを導入。これにより、大量のアイテムを扱う際のデータ整合性と操作性が向上しました。
