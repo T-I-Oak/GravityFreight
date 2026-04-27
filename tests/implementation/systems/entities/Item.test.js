@@ -31,3 +31,57 @@ describe('Item Class - Basic Initialization', () => {
         expect(item1.uid).not.toBe(item2.uid);
     });
 });
+
+describe('Item Class - Basic Methods', () => {
+    it('should accurately compare items using equals()', () => {
+        const item1 = new Item('pad_standard_d2');
+        const item2 = new Item('pad_standard_d2');
+        const item3 = new Item('pad_precision_d2'); // 別のアイテム
+
+        // uid が違っても性能が同じなら true
+        expect(item1.equals(item2)).toBe(true);
+        expect(item1.equals(item3)).toBe(false);
+
+        // 耐久度が異なれば false
+        item2.consumeCharge(1);
+        expect(item1.equals(item2)).toBe(false);
+
+        // 耐久度を戻せば再度 true になる
+        item2.repair(1);
+        expect(item1.equals(item2)).toBe(true);
+    });
+
+    it('should consume charges correctly', () => {
+        const item = new Item('pad_standard_d2');
+        const initial = item.charges;
+        expect(initial).toBeGreaterThan(0);
+
+        // 1消費
+        const remaining = item.consumeCharge(1);
+        expect(remaining).toBe(initial - 1);
+        expect(item.charges).toBe(initial - 1);
+
+        // 0未満にはならない
+        const zeroRemaining = item.consumeCharge(initial + 10);
+        expect(zeroRemaining).toBe(0);
+        expect(item.charges).toBe(0);
+    });
+
+    it('should repair charges correctly', () => {
+        const item = new Item('pad_standard_d2');
+        const max = item.maxCharges;
+        
+        // 消費してから回復
+        item.consumeCharge(2);
+        expect(item.charges).toBe(max - 2);
+
+        const afterRepair = item.repair(1);
+        expect(afterRepair).toBe(max - 1);
+        expect(item.charges).toBe(max - 1);
+
+        // 最大値を超えない
+        const fullRepair = item.repair(10);
+        expect(fullRepair).toBe(max);
+        expect(item.charges).toBe(max);
+    });
+});
