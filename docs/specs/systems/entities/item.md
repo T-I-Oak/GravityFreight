@@ -44,17 +44,15 @@ Item クラスは、ロケット構成パーツおよび発射装備（Chassis, 
 ### 2.2 メソッド (Methods)
 
 #### constructor(uid, masterId)
-DataManager からマスタ定義を取得し、プロパティを初期化する。
+DataManager からマスタ定義を取得し、プロパティを初期化する。初期状態では enhancement は空（全項目 0）であり、charges は初期の maxCharges と等しい。
 
 #### applyMaintenance()
 要求仕様（拠点機能: 整備工場）に基づく修理または強化を自動的に実行する。戻り値として実行された内容（項目名または "repair"）を返す。
-1. **修理判定**: maxCharges > 0 かつ charges < maxCharges の場合
-   - charges を +1 する。
-   - 強化回数（enhancementCount）は加算しない。
-2. **強化実行**: 修理対象でない場合
-   - 強化可能な項目（[3.2] 参照）からランダムに 1 つを選択する。
-   - 選択された項目の enhancement[key] を +1 し、プロパティ値を更新する。
-   - enhancementCount を +1 する。
+- **修理判定**: maxCharges > 0 かつ charges < maxCharges の場合、`repair()` を実行。
+- **強化実行**: 修理対象でない場合、強化可能な候補（[3.2] 参照）からランダムに 1 つを選択し、値を更新して `enhancementCount` を +1 する。
+
+#### repair(amount = 1)
+charges を指定量回復する。最大値は現在の maxCharges。強化回数にはカウントされない。
 
 #### getSnapshot()
 シリアライズ用の動的データ（uid, id, charges, enhancement）を返す。
