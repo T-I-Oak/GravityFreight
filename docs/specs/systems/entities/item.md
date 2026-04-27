@@ -44,14 +44,17 @@ Item クラスは、ロケット構成パーツおよび発射装備（Chassis, 
 ### 2.2 メソッド (Methods)
 
 #### constructor(uid, masterId)
-DataManager からマスタ定義を取得し、プロパティを初期化する。初期状態では enhancement は空（全項目 0）であり、charges は初期の maxCharges と等しい。
+DataManager からマスタ定義を取得し、プロパティを初期化する。
 
-#### upgrade(key)
-1. enhancement[key] を +1 し、enhancementCount を更新する。
-2. 対象プロパティ（slots 等）の値を、増分（[3.2] 参照）に従って更新する。
-
-#### repair(amount = null)
-charges を回復する。最大値は現在の maxCharges。
+#### applyMaintenance()
+要求仕様（拠点機能: 整備工場）に基づく修理または強化を自動的に実行する。戻り値として実行された内容（項目名または "repair"）を返す。
+1. **修理判定**: maxCharges > 0 かつ charges < maxCharges の場合
+   - charges を +1 する。
+   - 強化回数（enhancementCount）は加算しない。
+2. **強化実行**: 修理対象でない場合
+   - 強化可能な項目（[3.2] 参照）からランダムに 1 つを選択する。
+   - 選択された項目の enhancement[key] を +1 し、プロパティ値を更新する。
+   - enhancementCount を +1 する。
 
 #### getSnapshot()
 シリアライズ用の動的データ（uid, id, charges, enhancement）を返す。
@@ -61,9 +64,13 @@ charges を回復する。最大値は現在の maxCharges。
 ### 3.1 耐久度 0 の扱い
 charges が 0 の場合、外部に提供する性能値（集計用）は無効化されるべきであるが、Item インスタンス内部のプロパティ値自体は変更せず、集計ロジック側で charges を参照して判定することを基本とする。
 
-### 3.2 強化増分 (Enhancement Step)
-- slots: +1
-- precisionMultiplier: +0.2
-- pickupMultiplier: +0.2
-- gravityMultiplier: -0.1 (最小値 0.1)
-- maxCharges: +1
+### 3.2 強化候補と増分 (Enhancement Step)
+強化時に選択される候補およびその増分は以下の通り。
+
+| 項目 | 増分 | 抽出条件 |
+| :--- | :--- | :--- |
+| slots | +1 | なし (常に候補) |
+| precisionMultiplier | +0.2 | なし (常に候補) |
+| pickupMultiplier | +0.2 | なし (常に候補) |
+| gravityMultiplier | -0.1 | 元のマスタ値が存在し、かつ現在の値 > 0.1 |
+| maxCharges | +1 | 元のマスタ値が存在する |
