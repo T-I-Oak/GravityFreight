@@ -92,6 +92,51 @@ class Item {
         this.charges = Math.max(0, this.charges - amount);
         return this.charges;
     }
+
+    /**
+     * ランダムな修理または強化を実行
+     * @returns {string} 実行された内容（項目名または "repair"）
+     */
+    applyMaintenance() {
+        const candidates = ['slots', 'precisionMultiplier', 'pickupMultiplier'];
+
+        if (this.#master.gravityMultiplier !== undefined && this.gravityMultiplier > 0.1) {
+            candidates.push('gravityMultiplier');
+        }
+        if (this.#master.maxCharges !== undefined) {
+            candidates.push('maxCharges');
+        }
+
+        const selected = candidates[Math.floor(Math.random() * candidates.length)];
+
+        if (selected === 'maxCharges') {
+            if (this.charges < this.maxCharges) {
+                this.repair(); // 引数なしで1回復
+                return 'repair';
+            } else {
+                this.maxCharges += 1;
+                this.charges += 1;
+                this.enhancementCount += 1;
+                this.enhancement['maxCharges'] = (this.enhancement['maxCharges'] || 0) + 1;
+                return 'maxCharges';
+            }
+        }
+
+        this.enhancementCount += 1;
+        this.enhancement[selected] = (this.enhancement[selected] || 0) + 1;
+
+        if (selected === 'slots') {
+            this.slots += 1;
+        } else if (selected === 'precisionMultiplier') {
+            this.precisionMultiplier = Math.round((this.precisionMultiplier + 0.2) * 10) / 10;
+        } else if (selected === 'pickupMultiplier') {
+            this.pickupMultiplier = Math.round((this.pickupMultiplier + 0.2) * 10) / 10;
+        } else if (selected === 'gravityMultiplier') {
+            this.gravityMultiplier = Math.round((this.gravityMultiplier - 0.1) * 10) / 10;
+        }
+
+        return selected;
+    }
 }
 
 export default Item;
