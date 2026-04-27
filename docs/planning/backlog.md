@@ -4,7 +4,7 @@
 
 ### 1. Foundation & World (舞台と基盤)
 - [ ] Sector (セクター環境)
-    - [ ] 設計
+    - [x] 設計
     - [ ] 実装
 - [ ] CelestialBody (天体・重力源)
     - [ ] 設計
