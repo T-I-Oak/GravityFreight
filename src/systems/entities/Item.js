@@ -20,10 +20,10 @@ class Item {
         this.enhancementCount = 0;
 
         // 表示・基本情報
-        this.name = this.#master.name || 'Unknown';
-        this.category = this.#master.category || 'misc';
-        this.rarity = this.#master.rarity || 'common';
-        this.description = this.#master.description || '';
+        this.name = this.#master.name;
+        this.category = this.#master.category;
+        this.rarity = this.#master.rarity;
+        this.description = this.#master.description;
         
         // 加算系プロパティ (デフォルト 0)
         this.mass = this.#master.mass ?? 0;
