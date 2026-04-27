@@ -32,8 +32,13 @@
 #### `initialize(dataManager)`
 - **引数**: `DataManager` インスタンス。
 - **処理**:
-    - `dataManager` から配置ルールを取得し、天体 (`CelestialBody`) と目的地 (`ExitArc`) を生成・配置する。
-    - 各天体のアイテム抽選に `this.threshold` を使用する。
+    1. セクター番号 (`number`) と `additionalBodyCount` に基づき、天体の総数を決定する。
+    2. 各天体について以下を順に実行し、`CelestialBody` インスタンスを生成する：
+        - **座標決定**: 既存の天体や目的地と重ならない位置を算出。
+        - **アイテム抽選**: `this.threshold` に基づき、その天体が保持するアイテムリストを決定。
+        - **性質決定**: アイテム内容等に基づき、引力星か斥力星かを決定。
+        - **インスタンス化**: 決定した座標、アイテム、性質をコンストラクタに渡し、インスタンスを生成して保持する。
+    3. 目的地 (`ExitArc`) を 3 つ生成・配置する。
 
 #### `getGravityAt(position)`
 - **引数**: `position: {x, y}`
