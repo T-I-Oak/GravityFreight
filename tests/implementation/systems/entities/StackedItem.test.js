@@ -40,10 +40,10 @@ describe('StackedItem Class - Basic Operations', () => {
 
     it('should reject items with different characteristics', () => {
         const stack = new StackedItem();
-        const item1 = new Item('hull_light');
-        const item2 = new Item('hull_medium');
-        const item3 = new Item('hull_light');
-        item3.consumeCharge(1); // different characteristics due to damage
+        const item1 = new Item('pad_standard_d2'); // Has 2 charges
+        const item2 = new Item('hull_medium'); // Different ID
+        const item3 = new Item('pad_standard_d2');
+        item3.consumeCharge(1); // different characteristics due to damage (1 charge left)
 
         stack.push(item1);
         
