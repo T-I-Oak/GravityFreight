@@ -14,7 +14,7 @@ class StackedItem {
         this.representative = null;
     }
 
-    /** プロキシプロパティ (代表アイテム経由で参照) **/
+    /** 特性プロパティ (representative の値を参照) **/
     get name() { return this.representative?.name; }
     get category() { return this.representative?.category; }
     get rarity() { return this.representative?.rarity; }
@@ -28,21 +28,16 @@ class StackedItem {
      */
     push(item) {
         if (this.items.length === 0) {
-            // 固有の uid を生成して設定する
+            // 初期設定
             this.uid = IDGenerator.generate('stack');
-            // item.id を自身の id として設定する
             this.id = item.id;
-            // items 配列に item を追加する
+            this.representative = item;
             this.items.push(item);
-            // representative を設定する（items[0]）
-            this.representative = this.items[0];
-            // 数量の更新
             this.quantity = this.items.length;
-
             return true;
         }
 
-        // 一致すれば、items 配列に追加
+        // 特性の一致確認
         if (item.equals(this.representative)) {
             this.items.push(item);
             this.quantity = this.items.length;
@@ -62,7 +57,7 @@ class StackedItem {
         const item = this.items.pop();
         this.quantity = this.items.length;
 
-        // スタックが空になった場合は uid, id, representative をリセット（null）する
+        // スタックが空になった場合はリセット
         if (this.items.length === 0) {
             this.uid = null;
             this.id = null;
@@ -98,7 +93,7 @@ class StackedItem {
             });
         }
 
-        // 保存されていた data.uid で自身の uid を上書きする
+        // 保存されていた uid で上書き
         stack.uid = data.uid;
         
         return stack;
