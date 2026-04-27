@@ -63,6 +63,9 @@
 
 #### `upgrade(key)`
 - **処理**: 指定された `key` に応じた増分（[3.2] 参照）を `enhancement[key]` に加え、`enhancementCount` を +1 する。
+- **制限**:
+    - `gravityMultiplier`: 元のマスタ定義に当該プロパティが存在し、かつ現在の値が `0.1` より大きい場合のみ強化可能（最小値 `0.1`）。
+    - `maxCharges`: 元のマスタ定義に `maxCharges` が存在する場合のみ強化可能。
 
 #### `repair(amount = null)`
 - **処理**: `charges` を回復する（最大 `maxCharges`）。強化回数にはカウントされない。
