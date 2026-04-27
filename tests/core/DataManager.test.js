@@ -49,7 +49,7 @@ describe('DataManager', () => {
         });
 
         it('should get achievement by ID and have correct structure', () => {
-            const achievement = DataManager.getAchievementById('total_coins');
+            const achievement = DataManager.getAchievementById('stat_total_coins');
             expect(achievement).toBeDefined();
             expect(achievement.label).toBeDefined();
             expect(Array.isArray(achievement.tiers)).toBe(true);
