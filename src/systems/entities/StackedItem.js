@@ -12,12 +12,14 @@ class StackedItem {
         this.id = null;
         this.quantity = 0;
         this.representative = null;
-        this.name = undefined;
-        this.category = undefined;
-        this.rarity = undefined;
-        this.description = undefined;
-        this.performance = undefined;
     }
+
+    /** プロキシプロパティ (代表アイテム経由で参照) **/
+    get name() { return this.representative?.name; }
+    get category() { return this.representative?.category; }
+    get rarity() { return this.representative?.rarity; }
+    get description() { return this.representative?.description; }
+    get performance() { return this.representative || undefined; }
 
     /**
      * アイテムをスタックに追加する
@@ -34,14 +36,8 @@ class StackedItem {
             this.items.push(item);
             // representative を設定する（items[0]）
             this.representative = this.items[0];
-            
-            // プロパティの設定
+            // 数量の更新
             this.quantity = this.items.length;
-            this.name = this.representative.name;
-            this.category = this.representative.category;
-            this.rarity = this.representative.rarity;
-            this.description = this.representative.description;
-            this.performance = this.representative; // 代表アイテムの値をそのまま提供する
 
             return true;
         }
@@ -71,11 +67,6 @@ class StackedItem {
             this.uid = null;
             this.id = null;
             this.representative = null;
-            this.name = undefined;
-            this.category = undefined;
-            this.rarity = undefined;
-            this.description = undefined;
-            this.performance = undefined;
         }
 
         return item;
