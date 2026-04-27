@@ -26,8 +26,6 @@
 
 - **`getFacilityById(id: string): FacilityInfo`**
     - ID（'T', 'R', 'B'）に一致する施設情報を返す。
-- **`getFacilityByType(type: string): FacilityInfo`**
-    - タイプ名に一致する施設情報を返す。
 
 ### 3.3 ストーリー・実績関連 (Content)
 物語と実績解除の定義へのアクセス。
