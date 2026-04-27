@@ -4,7 +4,6 @@
 - [ ] 各クラスの具体的なインターフェース（プロパティ・メソッド）の策定
 
     ### 1. Foundation & World (舞台と基盤)
-    - [ ] DataManager (マスタデータ提供)
     - [ ] Sector (セクター環境)
     - [ ] CelestialBody (天体・重力源)
     - [ ] ExitArc (目的地)
