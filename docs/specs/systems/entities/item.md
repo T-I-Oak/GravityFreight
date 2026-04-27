@@ -47,9 +47,13 @@ Item クラスは、ロケット構成パーツおよび発射装備（Chassis, 
 DataManager からマスタ定義を取得し、プロパティを初期化する。初期状態では enhancement は空（全項目 0）であり、charges は初期の maxCharges と等しい。
 
 #### applyMaintenance()
-要求仕様（拠点機能: 整備工場）に基づく修理または強化を自動的に実行する。戻り値として実行された内容（項目名または "repair"）を返す。
-- **修理判定**: maxCharges > 0 かつ charges < maxCharges の場合、`repair()` を実行。
-- **強化実行**: 修理対象でない場合、強化可能な候補（[3.2] 参照）からランダムに 1 つを選択し、値を更新して `enhancementCount` を +1 する。
+要求仕様に基づくランダムな修理または強化を実行する。戻り値として実行された内容（項目名または "repair"）を返す。
+1. **候補選定**: 強化可能な項目（[3.2] 参照）からランダムに 1 つを抽選する。
+2. **特殊判定 (耐久性)**: `maxCharges` が選出された場合
+   - `charges < maxCharges` であれば、`repair()` を実行。強化回数（enhancementCount）は加算しない。
+   - `charges === maxCharges` であれば、`maxCharges` を +1 し、強化回数を加算する。
+3. **通常強化**: それ以外が選出された場合
+   - 選択された項目の enhancement[key] を +1 し、値を更新して強化回数を加算する。
 
 #### repair(amount = 1)
 charges を指定量回復する。最大値は現在の maxCharges。強化回数にはカウントされない。
