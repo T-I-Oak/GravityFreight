@@ -28,7 +28,7 @@
     { "id": "mod_emergency", "category": "module", "name": "緊急スラスター", "mass": 1, "maxCharges": 2, "rarity": 20, "description": "境界線でのロストを回避するための、自動方向転換用スラスター。" },
     { "id": "mod_stabilizer", "category": "module", "name": "軌道安定化装置", "mass": 1, "gravityMultiplier": 0.8, "rarity": 20, "description": "強力な重力軽減で軌道を安定させる、1フライト限りの使い切り装置。" },
     { "id": "mod_analyzer", "category": "module", "name": "オービット・アナリスト", "mass": 1, "precisionMultiplier": 1.2, "rarity": 10, "description": "演算アルゴリズムを最適化して予測精度を向上させる解析モジュール。" },
-    { "id": "mod_insurance", "category": "module", "name": "ロスト保険", "mass": 1, "onLostBonus": 1, "rarity": 5, "description": "ロケット消失時に査定価格に応じた保険金が支払われる、重複受給可能な保証プラン。" },
+    { "id": "mod_insurance", "category": "module", "name": "ロスト保険", "mass": 1, "onLostBonus": true, "rarity": 5, "description": "ロケット消失時に査定価格に応じた保険金が支払われる、重複受給可能な保証プラン。" },
     { "id": "mod_gst_breaker", "category": "module", "name": "ブレイカー・ゴースト", "mass": 1, "ghostType": "breaker", "rarity": 15, "description": "スター・ブレイカー作動時の想定軌道を演算し、航法システムへ表示する補助機能。" },
     { "id": "mod_gst_cushion", "category": "module", "name": "クッション・ゴースト", "mass": 1, "ghostType": "cushion", "rarity": 15, "description": "インパクト・クッション作動時の想定軌道を演算し、航法システムへ表示する補助機能。" },
     { "id": "mod_gst_emergency", "category": "module", "name": "スラスター・ゴースト", "mass": 1, "ghostType": "emergency", "rarity": 15, "description": "緊急スラスター作動時の想定軌道を演算し、航法システムへ表示する補助機能。" }
