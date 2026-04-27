@@ -79,9 +79,8 @@ charges を指定量回復し、更新後の charges を返す。最大値は現
 charges を指定量減らし、更新後の charges を返す。最小値は 0。
 
 #### getSnapshot()
-すべての公開プロパティを含むプレーンなオブジェクトを返す。
-- 永続化（保存）時には、再構築に必要な `uid`, `id`, `charges`, `maxCharges`, `enhancement` が必須となる。
-- UI への受け渡し時には、マスタ参照を不要にするため全プロパティを含める。
+永続化（保存）および再構築に必要な、プレーンなオブジェクトを返す。
+- 含めるプロパティ: `uid`, `id`, `charges`, `maxCharges`, `enhancement`
 
 #### static fromSnapshot(data)
 スナップショットデータからインスタンスを再構築（Hydration）して返す。

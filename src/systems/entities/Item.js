@@ -140,7 +140,7 @@ class Item {
 
     /**
      * スナップショットの取得
-     * UIへの提供や永続化（セーブ）のためのプレーンなオブジェクトを返す。
+     * 永続化（セーブ）のために、再構築に必要な最小限のデータを返す。
      * @returns {Object}
      */
     getSnapshot() {
@@ -149,26 +149,7 @@ class Item {
             id: this.id,
             charges: this.charges,
             maxCharges: this.maxCharges,
-            enhancement: { ...this.enhancement },
-            enhancementCount: this.enhancementCount,
-            name: this.name,
-            category: this.category,
-            rarity: this.rarity,
-            description: this.description,
-            mass: this.mass,
-            slots: this.slots,
-            precision: this.precision,
-            pickupRange: this.pickupRange,
-            power: this.power,
-            duration: this.duration,
-            precisionMultiplier: this.precisionMultiplier,
-            pickupMultiplier: this.pickupMultiplier,
-            gravityMultiplier: this.gravityMultiplier,
-            powerMultiplier: this.powerMultiplier,
-            arcMultiplier: this.arcMultiplier,
-            onLostBonus: this.onLostBonus,
-            ghostType: this.ghostType,
-            preventsLauncherWear: this.preventsLauncherWear
+            enhancement: { ...this.enhancement }
         };
     }
 

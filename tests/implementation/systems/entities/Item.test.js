@@ -175,17 +175,22 @@ describe('Item Class - Snapshot', () => {
         mathRandomSpy.mockRestore();
     });
 
-    it('should generate a snapshot with all public properties', () => {
+    it('should generate a snapshot with only essential properties for serialization', () => {
         const item = new Item('pad_standard_d2');
         const snap = item.getSnapshot();
 
-        expect(snap.uid).toBe(item.uid);
-        expect(snap.id).toBe('pad_standard_d2');
-        expect(snap.charges).toBe(item.charges);
-        expect(snap.maxCharges).toBe(item.maxCharges);
-        expect(snap.enhancement).toEqual(item.enhancement);
-        expect(snap.name).toBe(item.name);
-        expect(snap.power).toBe(item.power);
+        // 必須項目のみが含まれることを確認
+        expect(snap).toEqual({
+            uid: item.uid,
+            id: item.id,
+            charges: item.charges,
+            maxCharges: item.maxCharges,
+            enhancement: item.enhancement
+        });
+        
+        // 余分なプロパティが含まれていないことを確認
+        expect(snap.name).toBeUndefined();
+        expect(snap.enhancementCount).toBeUndefined();
     });
 
     it('should hydrate from snapshot and restore enhancements correctly', () => {
