@@ -38,6 +38,39 @@ describe('DataManager', () => {
     });
 
     describe('Content API (Story & Achievements)', () => {
+        it('should have all 39 stories with correct steps and combinations', () => {
+            const facilities = ['T', 'R', 'B'];
+            
+            // Step 1: 3 combinations
+            facilities.forEach(f1 => {
+                const story = DataManager.getStoryById(f1);
+                expect(story, `Story ${f1} missing`).toBeDefined();
+                expect(story.step).toBe(1);
+            });
+
+            // Step 2: 9 combinations
+            facilities.forEach(f1 => {
+                facilities.forEach(f2 => {
+                    const id = f1 + f2;
+                    const story = DataManager.getStoryById(id);
+                    expect(story, `Story ${id} missing`).toBeDefined();
+                    expect(story.step).toBe(2);
+                });
+            });
+
+            // Step 3: 27 combinations
+            facilities.forEach(f1 => {
+                facilities.forEach(f2 => {
+                    facilities.forEach(f3 => {
+                        const id = f1 + f2 + f3;
+                        const story = DataManager.getStoryById(id);
+                        expect(story, `Story ${id} missing`).toBeDefined();
+                        expect(story.step).toBe(3);
+                    });
+                });
+            });
+        });
+
         it('should get story by ID and have correct structure', () => {
             const story = DataManager.getStoryById('T');
             expect(story).toBeDefined();
