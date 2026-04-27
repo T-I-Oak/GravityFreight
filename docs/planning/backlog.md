@@ -24,9 +24,6 @@
     - [ ] 実装
 
 ### 3. Player State & Economy (資産と経済)
-- [ ] StackedItem (スタックアイテムコンテナ)
-    - [ ] 設計
-    - [ ] 実装
 - [ ] Inventory (プレイヤー所持品)
     - [ ] 設計
     - [ ] 実装
