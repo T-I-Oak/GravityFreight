@@ -5,7 +5,7 @@
 
 ## 2. 設計原則 (Design Principles)
 - **Read-Only**: 提供されるデータはすべて読み取り専用であり、呼び出し側による変更は許可されない。
-- **Encapsulation**: 内部のデータ構造（JS オブジェクト、JSON 等）は隠蔽され、メソッドを介してのみアクセス可能とする。
+- **Encapsulation**: 内部のデータ構造（JSON 等）は隠蔽され、メソッドを介してのみアクセス可能とする。
 - **Fail-Fast**: 不正な ID 指定に対しては、沈黙せずに適切なエラーを投げる（Natural Failure を許容し、早期発見を促す）。
 
 ## 3. クラス・インターフェース (API)
@@ -83,7 +83,7 @@
 }
 ```
 
-### GameBalanceConfig (主要なバランス定数)
+### GameBalanceConfig
 ```javascript
 {
   DEFAULT_SHIP_MASS: number,     // ロケットの基本質量
@@ -96,7 +96,7 @@
 }
 ```
 
-### MapConstants (マップ生成定数)
+### MapConstants
 ```javascript
 {
   BOUNDARY_RADIUS: number,    // セクターの境界半径
@@ -138,21 +138,8 @@
 }
 ```
 
-## 5. 移行ロードマップ (Migration Roadmap)
+## 5. 補足・将来の検討事項 (Notes & Future Considerations)
 
-マスタデータを JS ファイル (`Data.js`) から外部データ (`.json`) へ完全に移行するためのプロセス。
-
-### Phase 1: 依存関係の集約 (Wrapper Phase) - [DONE]
-- `DataManager` を実装し、インターフェースを統一。
-- **完了**: 2026-04-27
-
-### Phase 2: データの実体分離 (Extraction Phase) - [DONE]
-- データを JSON ファイルとして分離。
-- `DataManager` が JSON を静的に import する構成に移行。
-- レガシーな `Data.js` および `AchievementData.js` を物理削除。
-- **完了**: 2026-04-27
-
-### Phase 3: 高度なデータ管理 (Optimization Phase) - [NEXT]
-- JSON Schema によるデータ整合性チェックの導入。
-- 多言語化対応が必要になった場合の、言語別ファイル切り替えロジック。
-- データの遅延読み込み（必要時）の検討。
+- **データバリデーション**: 必要に応じて JSON Schema を導入し、整合性を検証することを検討する。
+- **多言語化 (i18n)**: 将来的に必要になった場合、`DataManager` 内部で言語別の JSON 切り替えを実装する。
+- **最適化**: データサイズが肥大化した場合は、動的インポートによる遅延読み込みを検討する。
