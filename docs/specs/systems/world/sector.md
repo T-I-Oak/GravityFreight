@@ -19,14 +19,14 @@
 | `boundaryRadius` | `number` | セクターの有効境界半径。デフォルト 900px。 |
 | `celestialBodies` | `CelestialBody[]` | セクター内に配置された天体（重力源）のリスト。 |
 | `exitArcs` | `ExitArc[]` | セクター境界に配置された目的地（出口）のリスト。 |
-| `starCountBonus` | `number` | 以前のセクターでの累積ボーナス（天体追加数）。 |
+| `additionalBodyCount` | `number` | 以前のセクターでの累積的な天体追加数。 |
 
 ### 2.2 メソッド (Methods)
 
-#### `constructor(sectorNumber, starCountBonus = 0)`
+#### `constructor(sectorNumber, additionalBodyCount = 0)`
 - **引数**:
     - `sectorNumber`: セクター番号。
-    - `starCountBonus`: 累積された天体数ボーナス。
+    - `additionalBodyCount`: 累積された天体追加数。
 - **処理**: 基本プロパティの初期化。`returnBonus` は 1.0 で初期化される。
 
 #### `initialize(dataManager)`
