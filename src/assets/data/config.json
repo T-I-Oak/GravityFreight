@@ -1,0 +1,50 @@
+{
+  "gameBalance": {
+    "DEFAULT_SHIP_MASS": 10,
+    "DELIVERY_REWARD": { "SCORE": 1500, "COINS": 100 },
+    "UNMATCHED_DELIVERY_REWARD": { "SCORE": 0, "COINS": 10 },
+    "MAX_COIN_DISCOUNT": 0.5,
+    "LUCKY_CARGO_DISCOUNT": 0.1,
+    "SHIP_START_OFFSET": 12,
+    "GRADE_STEPS": { "SINGLE": 20, "TOTAL": 50 },
+    "SECTOR_NOTIFICATION_DURATION": 3600,
+    "SCORE_PER_STEP": 1,
+    "TRAIL_MAX_LENGTH": 80,
+    "MAGNET_PULSE_GROWTH": 20,
+    "GRAVITY_SCALING_FACTOR": 0.02,
+    "RETURN_BONUS_INCREMENT": 0.1,
+    "SAFE_DISTANCE_FROM_HOME": 30,
+    "COLLISION_MARGIN": 1,
+    "CUSHION_BOUNCE": 1.0,
+    "EMERGENCY_THRUST_MULT": 0.8
+  },
+  "mapConstants": {
+    "BOUNDARY_RADIUS": 900,
+    "MIN_STAR_DISTANCE": 180,
+    "HOME_STAR_RADIUS": 25,
+    "HOME_STAR_MASS": 4000,
+    "STAR_DEFAULT_RADIUS": 20,
+    "STAR_HIT_MARGIN": 15
+  },
+  "rarity": {
+    "COMMON": 5,
+    "UNCOMMON": 10,
+    "RARE": 15,
+    "ANOMALY": 20
+  },
+  "rarityPrices": {
+    "5": 20,
+    "10": 40,
+    "15": 60,
+    "20": 100
+  },
+  "facilities": {
+    "TRADING_POST": { "id": "T", "type": "TRADING_POST", "name": "TRADING POST", "icon": "T", "className": "is-trading-post" },
+    "REPAIR_DOCK":  { "id": "R", "type": "REPAIR_DOCK",  "name": "REPAIR DOCK",  "icon": "R", "className": "is-repair-dock" },
+    "BLACK_MARKET": { "id": "B", "type": "BLACK_MARKET", "name": "BLACK MARKET", "icon": "B", "className": "is-black-market" }
+  },
+  "initialSetup": {
+    "initialInventory": ["hull_medium", "sensor_normal", "pad_standard_d2"],
+    "initialCoins": 200
+  }
+}
