@@ -137,6 +137,77 @@ class Item {
 
         return selected;
     }
+
+    /**
+     * スナップショットの取得
+     * UIへの提供や永続化（セーブ）のためのプレーンなオブジェクトを返す。
+     * @returns {Object}
+     */
+    getSnapshot() {
+        return {
+            uid: this.uid,
+            id: this.id,
+            charges: this.charges,
+            maxCharges: this.maxCharges,
+            enhancement: { ...this.enhancement },
+            enhancementCount: this.enhancementCount,
+            name: this.name,
+            category: this.category,
+            rarity: this.rarity,
+            description: this.description,
+            mass: this.mass,
+            slots: this.slots,
+            precision: this.precision,
+            pickupRange: this.pickupRange,
+            power: this.power,
+            duration: this.duration,
+            precisionMultiplier: this.precisionMultiplier,
+            pickupMultiplier: this.pickupMultiplier,
+            gravityMultiplier: this.gravityMultiplier,
+            powerMultiplier: this.powerMultiplier,
+            arcMultiplier: this.arcMultiplier,
+            onLostBonus: this.onLostBonus,
+            ghostType: this.ghostType,
+            preventsLauncherWear: this.preventsLauncherWear
+        };
+    }
+
+    /**
+     * スナップショットからの再構築 (Hydration)
+     * @param {Object} data 永続化されたデータ
+     * @returns {Item} 再構築されたItemインスタンス
+     */
+    static fromSnapshot(data) {
+        // 1. マスタIDから初期化
+        const item = new Item(data.id);
+        
+        // 2. 基本的な状態の上書き
+        item.uid = data.uid;
+        item.maxCharges = data.maxCharges;
+        item.charges = data.charges;
+        item.enhancement = data.enhancement ? { ...data.enhancement } : {};
+        
+        // 3. 強化回数と性能プロパティの再計算
+        let totalCount = 0;
+        for (const [key, count] of Object.entries(item.enhancement)) {
+            totalCount += count;
+            
+            // maxCharges は data.maxCharges で既に復元済みなので再計算不要
+            if (key === 'slots') {
+                item.slots += count;
+            } else if (key === 'precisionMultiplier') {
+                item.precisionMultiplier = Math.round((item.precisionMultiplier + 0.2 * count) * 10) / 10;
+            } else if (key === 'pickupMultiplier') {
+                item.pickupMultiplier = Math.round((item.pickupMultiplier + 0.2 * count) * 10) / 10;
+            } else if (key === 'gravityMultiplier') {
+                item.gravityMultiplier = Math.round((item.gravityMultiplier - 0.1 * count) * 10) / 10;
+            }
+        }
+        
+        item.enhancementCount = totalCount;
+        
+        return item;
+    }
 }
 
 export default Item;
