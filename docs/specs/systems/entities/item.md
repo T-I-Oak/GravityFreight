@@ -22,8 +22,8 @@
 | `id` | `string` | マスタ定義ID。 | |
 | `category` | `string` | アイテムの分類。 | |
 | `charges` | `number` | 現在の残り回数/耐久度。 | |
-| `enhancementCount` | `number` | 累計の強化成功回数。 | |
-| `enhancement` | `object` | 項目ごとの強化加算値を保持するオブジェクト。 | `key: bonusAmount` 形式 |
+| `enhancement` | `object` | 項目ごとの**強化回数**を保持するオブジェクト。 | `key: count` 形式 |
+| `enhancementCount` | `number` | 全項目の累計強化回数 (`Sum(enhancement)`)。 | |
 | **【基本情報】** | | | |
 | `name` | `string` | 表示名。 | |
 | `rarity` | `number` | レアリティ (5〜20)。 | |
@@ -57,39 +57,36 @@
 
 #### `getStat(key)`
 - **戻り値**: `number` | `boolean` | `string`
-- **処理**: マスタ値 (`BaseValue`) に対して、`enhancement[key]` が存在すれば加算（または減算）した値を返す。
-    - `FinalValue = BaseValue + (enhancement[key] || 0)`
-    - `gravityMultiplier` の場合のみ減算し、最小値を `0.1` とする。
+- **処理**: マスタ値 (`BaseValue`) に対して、強化回数に基づく補正を行って返す。
+    - `FinalValue = BaseValue + (enhancement[key] * StepValue)`
+    - ※ `StepValue` は [3.2 強化増分] を参照。
 
 #### `upgrade(key)`
-- **処理**: 指定された `key` に応じた増分（[3.2] 参照）を `enhancement[key]` に加え、`enhancementCount` を +1 する。
-- **制限**:
-    - `gravityMultiplier`: 元のマスタ定義に当該プロパティが存在し、かつ現在の値が `0.1` より大きい場合のみ強化可能（最小値 `0.1`）。
-    - `maxCharges`: 元のマスタ定義に `maxCharges` が存在する場合のみ強化可能。
+- **処理**:
+    1. `enhancement[key]` を +1 する。
+    2. 累計強化回数 `enhancementCount` を更新する。
 
 #### `repair(amount = null)`
 - **処理**: `charges` を回復する（最大 `maxCharges`）。強化回数にはカウントされない。
 
 #### `getSnapshot()`
-- **処理**: 保存・復元に必要な最小限のデータ（`uid`, `id`, `charges`, `enhancementCount`, `enhancement`）を返す。
+- **処理**: 保存・復元に必要な最小限のデータ（`uid`, `id`, `charges`, `enhancement`）を返す。
 
 ---
 
 ## 3. ロジック詳細
 
 ### 3.1 耐久度 0 (charges === 0) の扱い
-- `charges` の概念（`maxCharges > 0`）があるアイテムにおいて、`charges` が 0 になった場合：
-    - すべての性能プロパティは無効化される（加算値: 0 / 乗算値: 1.0 を返す）。
-    - ただし **`mass` だけは物理的実体としてそのまま加算される。**
+- `charges` が 0 の場合、`mass` を除くすべての性能プロパティは無効化される（加算値: 0 / 乗算値: 1.0 を返す）。
 
 ### 3.2 強化増分 (Enhancement Step)
-`upgrade(key)` 実行時に適用される加算値は以下の通り固定。
+各項目の強化 1 回あたりの増分（または減分）は以下の通り。
 - `slots`: +1
 - `precisionMultiplier`: +0.2
 - `pickupMultiplier`: +0.2
-- `gravityMultiplier`: -0.1 (内部的には加算値 0.1 を管理し計算時に引く)
+- `gravityMultiplier`: -0.1 (最小値 0.1)
 - `maxCharges`: +1
 
 ### 3.3 強化 (Enhancement) のルール
-- 強化はマスタ値に対する「加算」を基本とする。
-- UI（`UIComponents.js`）はこの `enhancement` オブジェクト内の値を参照してハイライト表示を行う。
+- `enhancement` オブジェクトには「値」ではなく「強化した回数」を記録する。
+- UI（`UIComponents.js`）は、`enhancement[key] > 0` かどうかを見てハイライト表示を制御する。
