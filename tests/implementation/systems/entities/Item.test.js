@@ -163,3 +163,69 @@ describe('Item Class - applyMaintenance', () => {
         expect(candidates).toContain('pickupMultiplier');
     });
 });
+
+describe('Item Class - Snapshot', () => {
+    let mathRandomSpy;
+
+    beforeEach(() => {
+        mathRandomSpy = vi.spyOn(Math, 'random');
+    });
+
+    afterEach(() => {
+        mathRandomSpy.mockRestore();
+    });
+
+    it('should generate a snapshot with all public properties', () => {
+        const item = new Item('pad_standard_d2');
+        const snap = item.getSnapshot();
+
+        expect(snap.uid).toBe(item.uid);
+        expect(snap.id).toBe('pad_standard_d2');
+        expect(snap.charges).toBe(item.charges);
+        expect(snap.maxCharges).toBe(item.maxCharges);
+        expect(snap.enhancement).toEqual(item.enhancement);
+        expect(snap.name).toBe(item.name);
+        expect(snap.power).toBe(item.power);
+    });
+
+    it('should hydrate from snapshot and restore enhancements correctly', () => {
+        const originalItem = new Item('pad_standard_d2');
+        
+        // 強化をシミュレート
+        // slots を選ばせる
+        mathRandomSpy.mockReturnValue(0.0);
+        originalItem.applyMaintenance(); // slots + 1
+        originalItem.applyMaintenance(); // slots + 1
+
+        const snap = originalItem.getSnapshot();
+        
+        const restoredItem = Item.fromSnapshot(snap);
+
+        expect(restoredItem.uid).toBe(originalItem.uid);
+        expect(restoredItem.id).toBe(originalItem.id);
+        expect(restoredItem.charges).toBe(originalItem.charges);
+        expect(restoredItem.maxCharges).toBe(originalItem.maxCharges);
+        expect(restoredItem.slots).toBe(originalItem.slots);
+        expect(restoredItem.enhancementCount).toBe(2);
+        expect(restoredItem.enhancement).toEqual({ slots: 2 });
+        
+        // equals で完全一致することを確認
+        expect(restoredItem.equals(originalItem)).toBe(true);
+    });
+
+    it('should restore maxCharges enhancement correctly', () => {
+        const originalItem = new Item('pad_standard_d2');
+        
+        // maxCharges を選ばせる (リストの最後と仮定)
+        mathRandomSpy.mockReturnValue(0.99);
+        originalItem.applyMaintenance(); // maxCharges + 1
+
+        const snap = originalItem.getSnapshot();
+        const restoredItem = Item.fromSnapshot(snap);
+
+        expect(restoredItem.maxCharges).toBe(originalItem.maxCharges);
+        expect(restoredItem.charges).toBe(originalItem.charges);
+        expect(restoredItem.enhancementCount).toBe(1);
+        expect(restoredItem.equals(originalItem)).toBe(true);
+    });
+});
