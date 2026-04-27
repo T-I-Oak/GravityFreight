@@ -43,8 +43,8 @@ Item クラスは、ロケット構成パーツおよび発射装備（Chassis, 
 
 ### 2.2 メソッド (Methods)
 
-#### constructor(uid, masterId, dynamicState = {})
-DataManager からマスタ定義を取得し、プロパティを初期化する。dynamicState が指定されている場合は、その内容（現在の charges や過去の enhancement 回数）をプロパティに反映する。
+#### constructor(uid, masterId)
+DataManager からマスタ定義を取得し、プロパティを初期化する。初期状態では enhancement は空（全項目 0）であり、charges は初期の maxCharges と等しい。
 
 #### upgrade(key)
 1. enhancement[key] を +1 し、enhancementCount を更新する。
