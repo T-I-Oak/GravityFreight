@@ -49,6 +49,53 @@ class Item {
         // 初期状態の耐久度
         this.charges = this.maxCharges;
     }
+
+    /**
+     * 同性能判定
+     * @param {Item} otherItem 比較対象のアイテム
+     * @returns {boolean} 完全に同性能なら true
+     */
+    equals(otherItem) {
+        if (!otherItem || !(otherItem instanceof Item)) return false;
+        
+        return this.id === otherItem.id &&
+               this.charges === otherItem.charges &&
+               this.maxCharges === otherItem.maxCharges &&
+               this.mass === otherItem.mass &&
+               this.slots === otherItem.slots &&
+               this.precision === otherItem.precision &&
+               this.pickupRange === otherItem.pickupRange &&
+               this.power === otherItem.power &&
+               this.duration === otherItem.duration &&
+               this.precisionMultiplier === otherItem.precisionMultiplier &&
+               this.pickupMultiplier === otherItem.pickupMultiplier &&
+               this.gravityMultiplier === otherItem.gravityMultiplier &&
+               this.powerMultiplier === otherItem.powerMultiplier &&
+               this.arcMultiplier === otherItem.arcMultiplier &&
+               this.onLostBonus === otherItem.onLostBonus &&
+               this.ghostType === otherItem.ghostType &&
+               this.preventsLauncherWear === otherItem.preventsLauncherWear;
+    }
+
+    /**
+     * 耐久度の回復
+     * @param {number} amount 回復量
+     * @returns {number} 更新後の耐久度
+     */
+    repair(amount = 1) {
+        this.charges = Math.min(this.maxCharges, this.charges + amount);
+        return this.charges;
+    }
+
+    /**
+     * 耐久度の消費
+     * @param {number} amount 消費量
+     * @returns {number} 更新後の耐久度
+     */
+    consumeCharge(amount = 1) {
+        this.charges = Math.max(0, this.charges - amount);
+        return this.charges;
+    }
 }
 
 export default Item;
