@@ -46,7 +46,9 @@
 - **処理**: 全天体からの重力影響を合算して返す。
 
 #### `checkCollision(position, radius)`
-- **引数**: `position, radius`
+- **引数**:
+    - `position`: チェック対象（ロケット）の現在座標。
+    - `radius`: チェック対象（ロケット）の衝突判定半径。
 - **戻り値**: `CelestialBody | null`
 - **処理**: ロケットがいずれかの天体に衝突しているか判定する。
 
