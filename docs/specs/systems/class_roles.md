@@ -28,9 +28,8 @@
     - 生存期間: Stage Lifecycle
     - 役割: 航行セッションの環境定義とコンテナ。
     - 責務:
-        - 天体配置、出口の種類、セクター境界の保持。
-        - スナップショットの提供。
-        - セクター内状態（整備工場の利用回数カウント等）の保持。
+        - セクター内に配置される `CelestialBody`（天体）および `ExitArc`（出口）のリストの保持。
+        - セクター境界（Boundary Radius）の保持。
 - **CelestialBody (GravitySource)**
     - 生存期間: Stage Lifecycle
     - 役割: 物理的な天体オブジェクト。
