@@ -18,7 +18,7 @@
     - **決定事項**: `DataManager.loadAllData()`, `GameOrchestrator.boot()` を定義。
 - [ ] 0.2 [機能] 各システムクラスの初期化
     - [ ] 0.2.1 [機能] ユーザー設定の復元（DataManager -> SoundController 等への反映）
-        - **決定事項**: `DataManager.getSettings()`, `SoundController.setSEVolume()`, `CameraController.setZoomRate()` を利用した初期化シーケンス。
+        - **決定事項**: `DataManager.getSEVolume()`, `DataManager.getMapZoomRate()`, `SoundController.setSEVolume()`, `CameraController.setZoomRate()` を利用した初期化シーケンス。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
     - **決定事項**: `UIController.showScreen()` を定義。
 
@@ -39,7 +39,7 @@
     - [x] 1.4.3 [機能] SEスライダー操作時の音量プレビュー再生
     - [x] 1.4.4 [機能] ダイアログを閉じる際の localStorage への永続化
     - [x] 1.4.5 [機能] キャンセル時の設定破棄
-    - **決定事項**: `SoundController.setSEVolume()`, `SoundController.playSE(id, volume)`, `DataManager.saveSettings()` を定義。
+    - **決定事項**: `SoundController.setSEVolume()`, `SoundController.playSE(id, volume)`, `DataManager.setSEVolume()` を定義。
 - [x] 1.5 [UI] バージョン、コピーライト表示
     - **決定事項**: `DataManager.getAppMetadata()` を定義。
 
