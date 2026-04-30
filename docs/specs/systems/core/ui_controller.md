@@ -9,5 +9,13 @@
 
 ## 2. インターフェース (Interface)
 
-- **`showScreen(screenId: string): void`**
-    - 指定された ID に対応する画面（またはコンテキスト）を表示し、それ以外の画面を非表示にする。
+- **`showTitleScreen(): void`**
+- **`showTutorialScreen(): void`**
+- **`showArchiveScreen(): void`**
+- **`showBuildScreen(): void`**
+- **`showSectorStartScreen(): void`**
+- **`showFlightScreen(): void`**
+- **`showFlightResultScreen(): void`**
+- **`showFacilityScreen(): void`**
+- **`showGameResultScreen(): void`**
+- **`showGameOverScreen(): void`**
