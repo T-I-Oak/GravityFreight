@@ -10,3 +10,6 @@
     - ズーム、揺れ（Shake）演出の制御。
 
 ## 2. インターフェース (Interface)
+
+- **`setZoomRate(value: number): void`**
+    - マップの表示倍率を設定する。
