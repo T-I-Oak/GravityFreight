@@ -22,11 +22,17 @@
 - **`getAppMetadata(): AppMetadata`**
     - アプリケーションのバージョン番号、コピーライト表記等のメタデータを返す。
 
-- **`saveSettings(settings: UserSettings): void`**
-    - ユーザー設定（音量等）を `localStorage` へ永続化する。
+- **`setSEVolume(value: number): void`**
+    - SE（効果音）の音量設定（0.0 - 1.0）を内部に保持し、`localStorage` へ永続化する。
 
-- **`getSettings(): UserSettings`**
-    - `localStorage` からユーザー設定を読み込む。存在しない場合はデフォルト値を返す。
+- **`getSEVolume(): number`**
+    - 現在保持されている SE 音量を返す。
+
+- **`setMapZoomRate(value: number): void`**
+    - マップのズーム率を内部に保持し、`localStorage` へ永続化する。
+
+- **`getMapZoomRate(): number`**
+    - 現在保持されているマップズーム率を返す。
 
 - **`getInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
