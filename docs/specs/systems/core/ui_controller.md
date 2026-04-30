@@ -11,9 +11,3 @@
 
 - **`showTitleScreen(): void`**
     - タイトル画面を表示する。
-- **`showSectorStartScreen(): void`**
-    - セクター開始画面（ワープ演出）を表示する。
-- **`showArchiveScreen(): void`**
-    - アーカイブ画面を表示する。
-- **`showTutorialScreen(): void`**
-    - 説明書（チュートリアル）画面を表示する。
