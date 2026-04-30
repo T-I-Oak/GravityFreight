@@ -29,7 +29,7 @@
     - [ ] 1.1.3 [機能] プレイヤー状態の初期化（初期所持金・装備のロード）
     - [ ] 1.1.4 [機能] セクター番号を「0」にセット
     - [ ] 1.1.5 [シナリオ] 「セクター開始画面」への遷移
-    - **決定事項**: `DataManager.getInitialSetup()`, `GameOrchestrator.startGame()` を定義。
+    - **決定事項**: `DataManager.getInitialSetup()`, `SessionState.initialize()`, `GameOrchestrator.startGame()` を定義。
 - [ ] 1.2 [機能] アーカイブ閲覧
 - [ ] 1.3 [機能] 説明書閲覧
 - [x] 1.4 [機能] 音量設定
