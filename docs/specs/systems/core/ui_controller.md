@@ -12,6 +12,11 @@
 
 ## 2. インターフェース (Interface)
 
+- **`constructor()`**
+    - **挙動**:
+        - HTML ドキュメント内から各画面のコンテナ要素や、インタラクションの対象となる主要なボタン（開始ボタン等）を検索し、内部変数に保持する。
+        - 必要な要素が見つからない場合は、初期化エラーを投げる。
+
 - **`showTitleScreen(): void`**
     - タイトル画面を表示する。
 - **`setStartHandler(handler: Function): void`**
