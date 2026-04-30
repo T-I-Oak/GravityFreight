@@ -11,7 +11,11 @@
 
 ## 2. インターフェース (Interface)
 
-### 2.1 ボリューム制御 (Volume Control)
+### 2.1 ライフサイクル (Lifecycle)
+- **`initialize(): void`**
+    - `DataManager` から永続化されている設定値（音量等）を取得し、自身に適用する。
+
+### 2.2 ボリューム制御 (Volume Control)
 - **`setSEVolume(value: number): void`**
     - SE（効果音）の音量を設定する（0.0 - 1.0）。
 - **`getSEVolume(): number`**
