@@ -1,15 +1,12 @@
-# Specification: ItemContainer Class (Skeleton)
+# Specification: ItemContainer Class
 
 ## 1. 役割と責務 (Role & Responsibility)
 
 - **所属ドメイン**: Entity Domain
-- **生存期間**: Exist Lifecycle
-- **役割**: 汎用的なアイテムコンテナ。
+- **生存期間**: Session
+- **役割**: アイテムの集合体（インベントリ）。
 - **責務**:
-  - `StackedItem` のコレクションを保持・管理する。
-  - アイテムの追加（同一アイテムのスタック統合を含む）、削除、移動ロジックの共通化。
-  - `SessionState`（プレイヤー所持品）、`RocketItem`（モジュール構成）、`Rocket`（航行中の一時的な回収アイテム）、`CelestialBody`（星の保持アイテム）など、あらゆる場所で再利用される。
+    - 複数の `Item` または `StackedItem` の保持。
+    - アイテムのリスト提供、検索、容量制限の管理。
 
 ## 2. インターフェース (Interface)
-
-*(シナリオ策定後に追記)*
