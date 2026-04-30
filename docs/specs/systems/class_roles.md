@@ -137,8 +137,8 @@
     - 責務: Starfield の生成、ワープ演出の制御。
 - **WorldRenderer**
     - 生存期間: App Lifecycle
-    - 役割: ワールド描画エンジン。
-    - 責務: 各要素の描画順序の制御。
+    - 役割: ワールド（Canvas）描画エンジン。
+    - 責務: Canvas上における各要素（天体、ロケット、軌道等）の描画順序の制御、および描画ループの実行。
 - **CameraController**
     - 生存期間: App Lifecycle
     - 役割: 視界管理。
