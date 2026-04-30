@@ -18,7 +18,7 @@
     - **決定事項**: `DataManager.loadAllData()`, `GameOrchestrator.boot()` を定義。
 - [ ] 0.2 [機能] 各システムクラスの初期化
     - [ ] 0.2.1 [機能] ユーザー設定の復元（DataManager -> SoundController 等への反映）
-        - **決定事項**: `DataManager.getSEVolume()`, `DataManager.getMapZoomRate()`, `SoundController.setSEVolume()`, `CameraController.setZoomRate()` を利用した初期化シーケンス。
+        - **決定事項**: `SoundController.initialize()`, `CameraController.initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
     - **決定事項**: `UIController.showScreen()` を定義。
 
