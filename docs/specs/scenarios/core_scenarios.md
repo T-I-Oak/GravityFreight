@@ -35,10 +35,10 @@
     - [x] 1.1.4 [機能] セクター番号を「0」にセット
     - [x] 1.1.5 [シナリオ] 「セクター開始画面」への遷移
     - **決定事項**: `SessionState.initialize()`, `GameOrchestrator.startGame()`, `UIController.showSectorStartScreen()` を定義。
-- [ ] 1.2 [機能] アーカイブ閲覧
-    - **決定事項**: `UIController.showArchiveScreen()`, `UIController.setArchiveHandler()` を定義。
-- [ ] 1.3 [機能] 説明書閲覧
-    - **決定事項**: `UIController.showTutorialScreen()`, `UIController.setTutorialHandler()` を定義。
+- [ ] 1.2 [機能] 記録画面の表示
+    - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
+- [ ] 1.3 [機能] 説明書画面の表示
+    - **決定事項**: `UIController.showManualScreen()`, `UIController.setManualHandler()` を定義。
 - [x] 1.4 [機能] 音量設定
     - [x] 1.4.1 [UI] SE音量スライダー
     - [x] 1.4.2 [UI] 閉じるボタン
@@ -80,7 +80,7 @@
 - [ ] 8.1 [機能] 終了理由の表示
 - [ ] 8.2 [機能] 退場演出（逆方向ワープ等）
 
-## 9 チュートリアル画面 (説明書)
+## 9 説明書画面
 **役割**: 全7ページの基本操作解説。実際のビルド・航行クラスを利用したデモ表示を含む。
 - [ ] 9.1 [機能] 基本操作解説（全7ページ）
 - [ ] 9.2 [機能] エンジンクラスを利用した操作デモ
