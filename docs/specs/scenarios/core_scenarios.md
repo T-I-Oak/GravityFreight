@@ -19,8 +19,10 @@
 - [ ] 0.2 [機能] 各システムクラスの初期化
     - [ ] 0.2.1 [機能] ユーザー設定の復元（DataManager -> SoundController 等への反映）
         - **決定事項**: `SoundController.initialize()`, `CameraController.initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
+    - [ ] 0.2.2 [機能] UIハンドラの登録
+        - **決定事項**: `GameOrchestrator.boot()` 内で `UIController.setStartHandler()` 等を呼び出し、UIとロジックを紐付ける。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
-    - **決定事項**: `UIController.setStartHandler()`, `UIController.showTitleScreen()` を定義。`GameOrchestrator` が初期化完了後にハンドラを登録し、タイトル画面を表示する。
+    - **決定事項**: `UIController.showTitleScreen()` を定義。
 
 ## 1 タイトル画面
 **役割**: ゲーム開始、アーカイブ閲覧、説明書閲覧、音量設定。
