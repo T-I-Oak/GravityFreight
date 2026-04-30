@@ -44,7 +44,8 @@
 ### UserSettings
 ```javascript
 {
-  seVolume: number    // SE音量 (0.0 - 1.0)
+  seVolume: number,    // SE音量 (0.0 - 1.0)
+  mapZoomRate: number  // マップのズーム率
 }
 ```
 
