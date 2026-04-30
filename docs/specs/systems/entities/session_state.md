@@ -11,9 +11,10 @@
 
 ## 2. インターフェース (Interface)
 
-- **`initialize(data: InitialSetupData): void`**
+- **`initialize(): void`**
     - ゲーム開始時の初期状態を構築する。
     - **挙動**:
-        - 所持金（`data.initialCoins`）を自身の `coins` にセットする。
-        - セクター番号を `0` にセットする。
-        - `data.initialInventory`（IDの配列）をループし、各IDで `new Item(id)` を実行してインスタンスを生成、自身の `inventory`（ItemContainer）に `addItem()` で追加する。
+        1. `DataManager.getInitialSetup()` を実行し、初期パラメータを取得する。
+        2. 取得した所持金を自身の `coins` にセットする。
+        3. セクター番号を `0` にセットする。
+        4. 取得した初期装備IDリストをループし、各IDで `new Item(id)` を実行してインスタンスを生成、自身の `inventory`（ItemContainer）に `addItem()` で追加する。
