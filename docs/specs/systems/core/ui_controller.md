@@ -20,7 +20,7 @@
 - **`showTitleScreen(): void`**
     - タイトル画面を表示する。
 - **`showSectorStartScreen(): void`**
-    - セクター開始画面（ワープ演出）を表示する。
+    - セクター開始画面を表示する。
 - **`setStartHandler(handler: Function): void`**
     - タイトル画面の「開始ボタン」がクリックされた際のコールバックを登録する。
     - **内部挙動**: 
