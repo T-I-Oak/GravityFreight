@@ -87,7 +87,7 @@
 - **EconomySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 経済・取引ロジック。
-    - 責務: 査定価格の算出、報酬額の計算、取引（Buy/Sell/Repair）の成否判定ロジック。
+    - 責務: アイテムが自己算出する基準価格を合算し、経済ボーナスを加味した最終的な報酬額・取引価格の決定。および取引（Buy/Sell/Repair）の成否判定。
 - **MissionController**
     - 生存期間: Game Lifecycle
     - 役割: セクター進行管理。
