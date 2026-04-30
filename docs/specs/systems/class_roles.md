@@ -61,6 +61,10 @@
     - 生存期間: Game Lifecycle（インスタンスとして）
     - 役割: ゲーム内の全アイテムの基底。
     - 責務: 個別の属性（ID、現在耐久値、強化状態）の保持。
+- **StackedItem** (extends Item)
+    - 生存期間: Game Lifecycle
+    - 役割: 同一IDのアイテムを個数（Stack）で管理する実体。
+    - 責務: 個数管理、分割、統合ロジックの提供。
 - **ItemContainer**
     - 生存期間: Exist Lifecycle
     - 役割: 汎用的なアイテム（StackedItem）のコンテナ。
@@ -88,7 +92,7 @@
     - 生存期間: App Lifecycle (Service)
     - 役割: 経済・取引ロジック。
     - 責務: アイテムが自己算出する基準価格を合算し、経済ボーナスを加味した最終的な報酬額・取引価格の決定。および取引（Buy/Sell/Repair）の成否判定。
-- **MissionController**
+- **GameController**
     - 生存期間: Game Lifecycle
     - 役割: セクター進行管理。
     - 責務: SessionState のセクター番号更新、Sector の生成・破棄管理。
@@ -124,7 +128,7 @@
     - 責務:
         - 外部データソース（マスタ）の保持。
         - 静的データ（アイテム、ストーリー、実績定義等）への統一されたアクセスインターフェースの提供。
-        - 詳細は [DataManager Specification](./data_manager.md) を参照。
+        - 詳細は [DataManager Specification](./core/data_manager.md) を参照。
 - **UIController**
     - 生存期間: App Lifecycle
     - 役割: 表示管理。
@@ -135,6 +139,12 @@
     - 生存期間: App Lifecycle
     - 役割: 遠景演出管理。
     - 責務: Starfield の生成、ワープ演出の制御。
+- **SoundController**
+    - 生存期間: App Lifecycle
+    - 役割: 音響演出管理。
+    - 責務:
+        - SE（効果音）および BGM の再生、ボリューム設定の管理。
+        - 詳細は [SoundController Specification](./core/sound_controller.md) を参照。
 - **WorldRenderer**
     - 生存期間: App Lifecycle
     - 役割: ワールド（Canvas）描画エンジン。
