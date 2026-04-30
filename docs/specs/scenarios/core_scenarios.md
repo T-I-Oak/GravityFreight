@@ -20,7 +20,7 @@
     - [ ] 0.2.1 [機能] ユーザー設定の復元（DataManager -> SoundController 等への反映）
         - **決定事項**: `SoundController.initialize()`, `CameraController.initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
-    - **決定事項**: `UIController.showScreen()` を定義。
+    - **決定事項**: `UIController.showTitleScreen()` を定義。
 
 ## 1 タイトル画面
 **役割**: ゲーム開始、アーカイブ閲覧、説明書閲覧、音量設定。
@@ -30,7 +30,7 @@
     - [ ] 1.1.3 [機能] プレイヤー状態の初期化（初期所持金・装備のロード）
     - [ ] 1.1.4 [機能] セクター番号を「0」にセット
     - [ ] 1.1.5 [シナリオ] 「セクター開始画面」への遷移
-    - **決定事項**: `DataManager.getInitialSetup()`, `SessionState.initialize()`, `GameOrchestrator.startGame()` を定義。
+    - **決定事項**: `DataManager.getInitialSetup()`, `SessionState.initialize()`, `GameOrchestrator.startGame()`, `UIController.showSectorStartScreen()` を定義。
 - [ ] 1.2 [機能] アーカイブ閲覧
 - [ ] 1.3 [機能] 説明書閲覧
 - [x] 1.4 [機能] 音量設定
