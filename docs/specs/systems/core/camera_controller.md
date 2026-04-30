@@ -1,8 +1,12 @@
-# Specification: CameraController Class (Skeleton)
+# Specification: CameraController Class
 
 ## 1. 役割と責務 (Role & Responsibility)
 
 - **所属ドメイン**: System Domain
 - **生存期間**: App Lifecycle
-- **役割**: 視界管理。
-- **責務**: ズーム、パン、座標変換。
+- **役割**: カメラ制御。
+- **責務**:
+    - 追従対象（Rocket等）へのフォーカス。
+    - ズーム、揺れ（Shake）演出の制御。
+
+## 2. インターフェース (Interface)
