@@ -30,6 +30,7 @@
     - 責務:
         - セクター内に配置される `CelestialBody`（天体）および `ExitArc`（出口）のリストの保持。
         - セクター境界（Boundary Radius）の保持。
+        - セクター全体の完全なスナップショットの生成と提供。
 - **CelestialBody (GravitySource)**
     - 生存期間: Stage Lifecycle
     - 役割: 物理的な天体オブジェクト。
