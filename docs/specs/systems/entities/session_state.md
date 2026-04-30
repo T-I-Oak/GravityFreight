@@ -12,5 +12,8 @@
 ## 2. インターフェース (Interface)
 
 - **`initialize(data: InitialSetupData): void`**
-    - ゲーム開始時に呼び出され、初期所持金や初期装備を設定する。
-    - セクター番号を 0 にリセットする。
+    - ゲーム開始時の初期状態を構築する。
+    - **挙動**:
+        - 所持金（`data.initialCoins`）を自身の `coins` にセットする。
+        - セクター番号を `0` にセットする。
+        - `data.initialInventory`（IDの配列）をループし、各IDで `new Item(id)` を実行してインスタンスを生成、自身の `inventory`（ItemContainer）に `addItem()` で追加する。
