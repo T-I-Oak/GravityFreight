@@ -1,10 +1,12 @@
-# Specification: WorldRenderer Class (Skeleton)
+# Specification: WorldRenderer Class
 
 ## 1. 役割と責務 (Role & Responsibility)
 
 - **所属ドメイン**: System Domain
 - **生存期間**: App Lifecycle
-- **役割**: ワールド描画エンジン。
+- **役割**: 描画管理。
 - **責務**:
-  - Canvas上におけるワールド要素（背景、天体、ロケット、予測軌道、エフェクト等）の描画順序の制御。
-  - 1フレームごとの描画ループの実行と、Canvasへの描画コマンドの送出。
+    - PIXI.js を用いたゲーム画面の描画管理。
+    - ステージ上のオブジェクト（Rocket, CelestialBody 等）の描画同期。
+
+## 2. インターフェース (Interface)
