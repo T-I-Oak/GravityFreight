@@ -21,18 +21,18 @@
     - タイトル画面を表示する。
 - **`showSectorStartScreen(): void`**
     - セクター開始画面を表示する。
-- **`showArchiveScreen(): void`**
-    - アーカイブ画面を表示する。
-- **`showTutorialScreen(): void`**
-    - 説明書（チュートリアル）画面を表示する。
+- **`showRecordScreen(): void`**
+    - 記録画面を表示する。
+- **`showManualScreen(): void`**
+    - 説明書（マニュアル）画面を表示する。
 - **`setStartHandler(handler: Function): void`**
     - タイトル画面の「開始ボタン」がクリックされた際のコールバックを登録する。
     - **内部挙動**: 
         1. 内部で保持する開始ボタン要素（DOM）の `click` イベントに、自身のラッパーメソッドを登録する。
         2. クリック発生時、ラッパーメソッド内で `SoundController.playSE()` を呼び出した後、引数で渡された `handler` を実行する。
-- **`setArchiveHandler(handler: Function): void`**
-    - タイトル画面の「アーカイブボタン」がクリックされた際のコールバックを登録する。
+- **`setRecordHandler(handler: Function): void`**
+    - タイトル画面の「記録ボタン」がクリックされた際のコールバックを登録する。
     - **内部挙動**: 開始ボタンと同様に、SE 再生後に引数の `handler` を実行する。
-- **`setTutorialHandler(handler: Function): void`**
+- **`setManualHandler(handler: Function): void`**
     - タイトル画面の「説明書ボタン」がクリックされた際のコールバックを登録する。
     - **内部挙動**: 開始ボタンと同様に、SE 再生後に引数の `handler` を実行する。
