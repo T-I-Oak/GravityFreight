@@ -13,7 +13,10 @@
     - [ ] 実装
 
 ### 2. Core Flight & Physics (飛行と物理)
-- [ ] Rocket (物理実体・航跡保持)
+- [ ] RocketItem (ロケットの静的データ・構成)
+    - [ ] 設計
+    - [ ] 実装
+- [ ] Rocket (航行中の物理実体・航跡保持)
     - [ ] 設計
     - [ ] 実装
 - [ ] PhysicsEngine (物理シミュレーター)
@@ -24,7 +27,7 @@
     - [ ] 実装
 
 ### 3. Player State & Economy (資産と経済)
-- [ ] Inventory (プレイヤー所持品)
+- [ ] ItemContainer (汎用アイテムコンテナ)
     - [ ] 設計
     - [ ] 実装
 - [ ] SessionState (セッション統計・HUDデータ)
