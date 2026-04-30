@@ -1,76 +1,59 @@
 # Gravity Freight V2: Development Backlog
 
-## V2リリースに向けたロードマップ
+## フェーズ 1: 詳細設計 (Architecture & Interface)
+実装に先立ち、システム全体のメッセージパッシングとUI構造を確定させる。
 
-### 1. Foundation & World (舞台と基盤)
-- [ ] CelestialBody (天体・重力源)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] ExitArc (目的地)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] Sector (セクター環境)
-    - [ ] 実装
+- [ ] **画面別機能・UIブレイクダウン**
+    - 全9画面の表示要素、操作ロジック、必要データの洗い出し。
+- [ ] **シナリオベースのインターフェース定義**
+    - 核心シナリオによる22クラス間のメッセージパッシング策定と、メソッド/プロパティの注入。
+- [ ] **データスキーマの最終確定**
+    - 既存の JSON マスタデータに基づいたデータモデルの定義。
 
-### 2. Core Flight & Physics (飛行と物理)
-- [ ] RocketItem (ロケットの静的データ・構成)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] Rocket (航行中の物理実体・航跡保持)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] PhysicsEngine (物理シミュレーター)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] TrajectoryPredictor (軌道予測エンジン)
-    - [ ] 設計
-    - [ ] 実装
+## フェーズ 2: コアシステム実装 (22 Classes - TDD)
+詳細設計で定義されたインターフェースに基づき、ロジックを TDD で実装する。
 
-### 3. Player State & Economy (資産と経済)
-- [ ] ItemContainer (汎用アイテムコンテナ)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] SessionState (セッション統計・HUDデータ)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] EconomySystem (価格・報酬計算)
-    - [ ] 設計
-    - [ ] 実装
+### 2.1 World & Entities
+- [ ] **Sector** (環境コンテナ)
+- [ ] **CelestialBody** (天体・重力源)
+- [ ] **ExitArc** (目的地)
+- [ ] **Rocket** (物理実体)
+- [ ] **RocketItem** (構成データ)
+- [ ] **Item / StackedItem** (アイテム基底)
+- [ ] **ItemContainer** (汎用コンテナ)
 
-### 4. Progression & Content (進行と物語)
-- [ ] MissionController (セクター進行管理)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] StorySystem (物語・既読管理)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] AchievementTracker (累計統計・実績)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] FlightRecorder (リプレイ・スナップショット)
-    - [ ] 設計
-    - [ ] 実装
+### 2.2 Logic & Engines
+- [ ] **PhysicsEngine** (物理シミュレーター)
+- [ ] **TrajectoryPredictor** (軌道予測)
+- [ ] **EconomySystem** (価格・報酬計算)
+- [ ] **MissionController** (進行管理)
+- [ ] **StorySystem** (既読・フラグ管理)
+- [ ] **AchievementTracker** (統計・実績)
+- [ ] **FlightRecorder** (記録・再現)
 
-### 5. View & Interaction (表示と描画)
-- [ ] WorldRenderer (ワールド描画)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] CameraController (カメラ・座標変換)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] BackgroundManager (遠景演出)
-    - [ ] 設計
-    - [ ] 実装
-- [ ] UIController (表示・画面遷移)
-    - [ ] 設計
-    - [ ] 実装
+### 2.3 Infrastructure & Orchestration
+- [ ] **GameOrchestrator** (全体状態管理)
+- [ ] **SessionState** (動的ステータス)
+- [ ] **DataManager** (データプロバイダー)
+- [ ] **UIController** (画面遷移・HUD制御)
+- [ ] **WorldRenderer** (描画エンジン)
+- [ ] **CameraController** (視界管理)
+- [ ] **BackgroundManager** (遠景演出)
 
-### 6. Orchestration (全体統括)
-- [ ] GameOrchestrator (全体統括・ステートマシン)
-    - [ ] 設計
-    - [ ] 実装
+## フェーズ 3: 画面実装 (UI & Scene Logic)
+実装されたコアシステムを組み込み、各シーンのビジュアルとインタラクションを構築する。
 
-## 今後のロードマップ (Roadmap)
-- [ ] 各ドメインの統合テストと最終調整
-- [ ] メインゲームループの結合とステートマシン制御の実装
-- [ ] V1コードからのロジック移植と最終的な経済バランス調整
+- [ ] **SCR-TITLE** (タイトル画面)
+- [ ] **SCR-TUTORIAL** (説明書画面 / How to Play)
+- [ ] **SCR-BUILD** (ビルド画面)
+- [ ] **SCR-SECTOR-START** (セクター開始画面)
+- [ ] **SCR-NAV** (航行画面)
+- [ ] **SCR-FLIGHT-RESULT** (航行結果表示画面)
+- [ ] **SCR-FACILITY** (施設画面)
+- [ ] **SCR-GAME-RESULT** (ゲームリザルト画面)
+- [ ] **SCR-GAME-OVER** (ゲームオーバー画面)
+
+## フェーズ 4: 統合 & 検証 (Integration & Verification)
+- [ ] **全体ステートマシンの結合**: 各画面とオーケストレーターの統合。
+- [ ] **V1 ロジックの完全移植**: 既存の JSON データと計算ロジックの動作検証。
+- [ ] **エンドツーエンドテスト**: タイトルからリザルト、保存/読込までの完走確認。
