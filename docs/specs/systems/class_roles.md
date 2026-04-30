@@ -57,14 +57,14 @@
     - 生存期間: Game Lifecycle（インスタンスとして）
     - 役割: ゲーム内の全アイテムの基底。
     - 責務: 個別の属性（ID、現在耐久値、強化状態）の保持。
-- **Inventory**
-    - 生存期間: Game Lifecycle
-    - 役割: プレイヤーの資産管理。
-    - 責務: 所持アイテム（Itemインスタンス）のリスト管理。
+- **ItemContainer**
+    - 生存期間: Exist Lifecycle
+    - 役割: 汎用的なアイテム（StackedItem）のコンテナ。
+    - 責務: アイテムの追加・削除・スタック統合のロジック共通化。Rocket, CelestialBody, SessionState 等に保持されて利用される。
 - **SessionState**
     - 生存期間: Game Lifecycle
     - 役割: 現在の契約（Contract）における動的ステータスの集約・保持。
-    - 責務: 所持金（Coins）、累計スコア、現在のセクター番号、今回獲得したストーリーID（最大3つ）、統計データの保持。
+    - 責務: 所持金（Coins）、累計スコア、現在のセクター番号、獲得ストーリーID、統計データの保持。およびプレイヤー全体所持品（ItemContainer）の管理。
 
 ---
 
