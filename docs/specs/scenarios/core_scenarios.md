@@ -35,9 +35,9 @@
     - [x] 1.1.4 [機能] セクター番号を「0」にセット
     - [x] 1.1.5 [シナリオ] 「セクター開始画面」への遷移
     - **決定事項**: `SessionState.initialize()`, `GameOrchestrator.startGame()`, `UIController.showSectorStartScreen()` を定義。
-- [ ] 1.2 [機能] 記録画面の表示
+- [x] 1.2 [機能] 記録画面の表示
     - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
-- [ ] 1.3 [機能] 説明書画面の表示
+- [x] 1.3 [機能] 説明書画面の表示
     - **決定事項**: `UIController.showManualScreen()`, `UIController.setManualHandler()` を定義。
 - [x] 1.4 [機能] 音量設定
     - [x] 1.4.1 [UI] SE音量スライダー
