@@ -10,12 +10,10 @@
 ## 2. インターフェース (Interface)
 
 - **`showTitleScreen(): void`**
-- **`showTutorialScreen(): void`**
-- **`showArchiveScreen(): void`**
-- **`showBuildScreen(): void`**
+    - タイトル画面を表示する。
 - **`showSectorStartScreen(): void`**
-- **`showFlightScreen(): void`**
-- **`showFlightResultScreen(): void`**
-- **`showFacilityScreen(): void`**
-- **`showGameResultScreen(): void`**
-- **`showGameOverScreen(): void`**
+    - セクター開始画面（ワープ演出）を表示する。
+- **`showArchiveScreen(): void`**
+    - アーカイブ画面を表示する。
+- **`showTutorialScreen(): void`**
+    - 説明書（チュートリアル）画面を表示する。
