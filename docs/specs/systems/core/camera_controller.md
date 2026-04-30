@@ -11,5 +11,8 @@
 
 ## 2. インターフェース (Interface)
 
+- **`initialize(): void`**
+    - `DataManager` から永続化されている設定値（ズーム率等）を取得し、自身に適用する。
+
 - **`setZoomRate(value: number): void`**
     - マップの表示倍率を設定する。
