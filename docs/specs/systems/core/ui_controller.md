@@ -36,3 +36,10 @@
 - **`setManualHandler(handler: Function): void`**
     - タイトル画面の「説明書ボタン」がクリックされた際のコールバックを登録する。
     - **内部挙動**: 開始ボタンと同様に、SE 再生後に引数の `handler` を実行する。
+
+- **`setResizeHandler(handler: (width: number, height: number) => void): void`**
+    - ウィンドウのリサイズイベントが発生した際のコールバックを登録する。
+    - **内部挙動**: `window` の `resize` イベントを購読し、発生時に現在のウィンドウサイズを引数として `handler` を実行する。
+
+- **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
+    - セクター開始時のタイトル演出（「SECTOR X」）を画面中央に表示する。

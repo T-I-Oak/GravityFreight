@@ -6,9 +6,9 @@
 - **生存期間**: App Lifecycle
 - **役割**: データプロバイダー。
 - **責務**:
-    - 外部データソース（マスタ）の保持。
-    - 静的データ（アイテム、ストーリー、実績定義等）への統一されたアクセスインターフェースの提供。
-    - セーブデータの永続化（LocalStorage）と管理。
+    - **マスタデータの管理**: 静的データ（アイテムカタログ、抽選テーブル定数、初期設定等）の保持と提供。
+    - **永続化管理**: 設定（音量等）や進行実績（最高スコア等）の `LocalStorage` への読み書き。
+    - ※ 進行中のゲームステート（現在のセクター、所持金等）は管理対象外。
 
 ## 2. インターフェース (Interface)
 
@@ -28,14 +28,16 @@
 - **`getSEVolume(): number`**
     - 現在保持されている SE 音量を返す。
 
-- **`setMapZoomRate(value: number): void`**
-    - マップのズーム率を内部に保持し、`localStorage` へ永続化する。
+- **`setCameraState(state: CameraState): void`**
+    - カメラの状態（位置、回転、ズーム等）をまとめて内部に保持し、`localStorage` へ永続化する。
 
-- **`getMapZoomRate(): number`**
-    - 現在保持されているマップズーム率を返す。
+- **`getCameraState(): CameraState`**
+    - 現在保持されているカメラの状態を返す。
 
 - **`getInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
+
+
 
 ## 3. データ構造定義 (Data Structures)
 
@@ -51,7 +53,16 @@
 ```javascript
 {
   seVolume: number,    // SE音量 (0.0 - 1.0)
-  mapZoomRate: number  // マップのズーム率
+  cameraState: CameraState // カメラの視点状態
+}
+```
+
+### CameraState
+```javascript
+{
+  position: { x: number, y: number }, // パン位置
+  rotation: number,                   // 回転角 (ラジアン)
+  zoom: number                        // ズーム倍率
 }
 ```
 
