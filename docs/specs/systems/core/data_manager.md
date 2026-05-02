@@ -69,3 +69,7 @@
 
 - **`_compareVersions(v1: string, v2: string): number`**
     - 2つのバージョン文字列をセマンティックバージョニングに基づき比較する（v1 < v2 なら -1, 一致なら 0, v1 > v2 なら 1）。
+
+- **`_updateLastPlayedVersion(): void`**
+    - `localStorage` に保存されているバージョン情報を、現在の `currentVersion` で上書き更新する。
+    - 通常、`loadAllData()` 内でのマイグレーション完了直後に呼び出される。
