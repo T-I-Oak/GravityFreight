@@ -237,7 +237,9 @@
                 - `UIController.setMailHandler(handler)`: [Caller: `GameOrchestrator`] アイコン押下時のコールバックを登録。
                 - `UIController.showStoryModal(content)`: [Caller: ハンドラ経由の `GameOrchestrator`] 物語閲覧用のモーダルを表示する。
             - **実行シーケンス**:
-                - アイコン押下時、`GameOrchestrator` が登録したハンドラが起動し、`UIController.showStoryModal()` を表示すると同時に `StorySystem.updateReadStatus()` を呼び出して既読化を実行する。
+                - アイコン押下時、`GameOrchestrator` が登録したハンドラが起動。
+                - `UIController.showStoryModal()` を表示し、同時に `StorySystem.updateReadStatus()` を呼び出して既読化を実行する。
+                - **直後に `UIController.updateMailStatus(type, false)` を呼び出し、アイコンの明滅を停止させる。**
 - [ ] 4.2 [機能] アイテムの取得と特殊効果の発動
     - [ ] 4.2.1 [機能] アイテムの自動取得（保持状態への移行）
         - ロケットの回収範囲内にアイテムが入った際、そのアイテムを「保持状態（Held State）」としてマークする。
