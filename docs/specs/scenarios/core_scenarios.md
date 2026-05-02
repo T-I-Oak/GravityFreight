@@ -42,7 +42,7 @@
     - [x] 1.1.3 [機能] プレイヤー状態の初期化（初期所持金・装備のロード）
     - [x] 1.1.4 [機能] セクター番号を「0」にセット
     - [x] 1.1.5 [シナリオ] 「セクター開始画面」への遷移
-    - **決定事項**: `SessionState.initialize()`, `GameOrchestrator.startGame()`, `UIController.showSectorStartScreen()` を定義。
+    - **決定事項**: `SessionState.initialize()`, `GameOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorStartScreen()` を定義。
 - [x] 1.2 [機能] 記録画面の表示
     - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
 - [x] 1.3 [機能] 説明書画面の表示
@@ -216,7 +216,6 @@
             - **Rocket の役割**: `Rocket` 内部でも `updateState` を通じてティック数を保持するが、これは第5章（リザルト）の内訳表示用の記録として使用する。
             - **インターフェース定義**:
                 - `UIController.showNavigationScreen()`: 航行画面への遷移。
-                - `UIController.initHUD(initialData)`: HUD の初期化と表示開始。
                 - `UIController.updateHUDValue(key, value)`: HUD 内の特定の値を更新（ロールカウンター演出をトリガー）。
 - [ ] 4.2 [機能] アイテムの取得と特殊効果の発動
     - [ ] 4.2.1 [機能] アイテムの自動取得（保持状態への移行）
