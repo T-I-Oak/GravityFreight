@@ -31,14 +31,14 @@
 2. データが存在しない場合、引数の `migrationMap.init()` を実行して結果を返す。
 3. データが存在する場合、内部メソッド `_migrate(data, migrationMap)` を通じて最新化されたデータを返す。
 
-- **`getSavedSEVolume(): number`**
-    - 現在保持されている SE 音量を返す（マイグレーション対象外）。
+- **`getSavedSEVolume(migrationMap: object): number`**
+    - 「共通ルール」に基づき、SE 音量設定を取得する。
 
 - **`setSavedSEVolume(value: number): void`**
     - SE（効果音）の音量を `localStorage` へ永続化する。
 
-- **`getSavedCameraState(): CameraState`**
-    - 現在保持されているカメラの状態を返す（マイグレーション対象外）。
+- **`getSavedCameraState(migrationMap: object): CameraState`**
+    - 「共通ルール」に基づき、カメラの状態を取得する。
 
 - **`setSavedCameraState(state: CameraState): void`**
     - カメラの状態を `localStorage` へ永続化する。
