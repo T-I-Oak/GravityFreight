@@ -23,31 +23,37 @@
 - **`getMasterAppMetadata(): AppMetadata`**
     - アプリケーションのバージョン番号、コピーライト表記等のメタデータを返す。
 
+### ユーザーデータ（Saved Data）
+※ 以下の `getSaved*` メソッドは、すべて共通の「マイグレーション付き取得フロー」に従う。
+
+**共通ルール：マイグレーション付き取得フロー**
+1. `localStorage` から指定のキーでデータを取得する。
+2. データが存在しない場合、引数の `migrationMap.init()` を実行して結果を返す。
+3. データが存在する場合、内部メソッド `_migrate(data, migrationMap)` を通じて最新化されたデータを返す。
+
 - **`getSavedSEVolume(): number`**
-    - 現在保持されている SE 音量を返す。
+    - 現在保持されている SE 音量を返す（マイグレーション対象外）。
 
 - **`setSavedSEVolume(value: number): void`**
-    - SE（効果音）の音量設定（0.0 - 1.0）を内部に保持し、`localStorage` へ永続化する。
+    - SE（効果音）の音量を `localStorage` へ永続化する。
 
 - **`getSavedCameraState(): CameraState`**
-    - 現在保持されているカメラの状態を返す。
+    - 現在保持されているカメラの状態を返す（マイグレーション対象外）。
 
 - **`setSavedCameraState(state: CameraState): void`**
-    - カメラの状態（位置、回転、ズーム等）をまとめて内部に保持し、`localStorage` へ永続化する。
+    - カメラの状態を `localStorage` へ永続化する。
 
 - **`getSavedStoryProgress(migrationMap: object): object`**
-    - ストーリー進捗データを取得し、必要に応じて提供された `migrationMap` を用いて最新バージョンへマイグレーションした結果を返す。
-    - データが存在しない場合は `migrationMap.init()` の結果を返す。
+    - 「共通ルール」に基づき、ストーリー進捗データを取得する。
 
 - **`setSavedStoryProgress(data: object): void`**
-    - 最新のストーリー進捗データを `localStorage` へ永続化する。保存時、現在のアプリバージョンをメタデータとして付与する。
+    - ストーリー進捗データを `localStorage` へ永続化する。
 
 - **`getSavedAchievementData(migrationMap: object): object`**
-    - 累計統計・実績データを取得し、必要に応じてマイグレーションした結果を返す。
-    - データが存在しない場合は `migrationMap.init()` の結果を返す。
+    - 「共通ルール」に基づき、累計統計・実績データを取得する。
 
 - **`setSavedAchievementData(data: object): void`**
-    - 最新の累計統計・実績データを `localStorage` へ永続化する。
+    - 累計統計・実績データを `localStorage` へ永続化する。
 
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
@@ -63,7 +69,7 @@
 
 ### 内部メソッド (Private Methods)
 - **`_migrate(data: object, migrationMap: object): object`**
-    - `migrationMap` のキー（バージョン文字列）を `_compareVersions` を用いて昇順にソートする。
+    - `migrationMap` のキーから `init` を除外したものを抽出し、`_compareVersions` を用いて昇順にソートする。
     - ソートされたバージョンのうち、`lastPlayedVersion` よりも新しいものに対応する callback を順次 `data` に適用していく。
     - 最終的な `data` に最新の `version` を付与して返す。
 
