@@ -43,6 +43,9 @@
 - **`getSavedStoryProgress(migrationMap: object): object`**
     - 「共通ルール」に基づき、ストーリー進捗データを取得する。
 
+- **`setSavedStoryProgress(data: object): void`**
+    - ストーリー進捗データを `localStorage` へ永続化する（シナリオ 4.1.2 の既読化等で呼び出される）。
+
 - **`getSavedAchievementData(migrationMap: object): object`**
     - 「共通ルール」に基づき、累計統計・実績データを取得する。
 
