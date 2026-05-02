@@ -29,10 +29,6 @@
 ### StoryProgressData (永続化対象)
 ```javascript
 {
-  readMessageIds: [],    // 既読済みメッセージIDのリスト
-  flags: {               // 進行フラグ管理用のキー・バリュー
-    "has_met_mechanic": boolean,
-    ...
-  }
+  readMessageIds: []    // 既読済みメッセージIDのリスト
 }
 ```
