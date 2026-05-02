@@ -74,3 +74,29 @@
 - **`_updateLastPlayedVersion(): void`**
     - `localStorage` に保存されているバージョン情報を、現在の `currentVersion` で上書き更新する。
     - 通常、`loadAllData()` 内でのマイグレーション完了直後に呼び出される。
+
+## 4. マスタデータ構成 (Master Data Structure)
+
+### `app_metadata.json`
+- **内容**: アプリ自体のメタ情報。
+- **構造**: `{ "appName": string, "copyright": string, "version": string (from package.json) }`
+
+### `initial_setup.json`
+- **内容**: 新規ゲーム開始時の初期状態。
+- **構造**: `{ "initialMoney": number, "initialInventory": ItemUid[] }`
+
+### `config.json`
+- **内容**: ゲームバランス定数。
+- **構造**: `{ "baseStarCount": number, "boundaryRadius": number, ... }`
+
+### `items.json`
+- **内容**: 全アイテムのマスタデータ（カタログ）。
+- **構造**: `{ "items": { [uid: string]: ItemDefinition } }`
+
+### `world_config.json`
+- **内容**: セクター生成・抽選ルール。
+- **構造**: `{ "sectorProbabilities": [...], "itemLotteryTables": { ... } }`
+
+### `stories.json`
+- **内容**: 物語（メッセージ）のマスタ。
+- **構造**: `{ "messages": { [id: string]: StoryMessageDefinition } }`
