@@ -17,6 +17,13 @@
     - `DataManager` から保存された進捗データを取得し、自身の内部状態を初期化する。
     - 内部で `migrationMap`（バージョンごとの変換関数）を定義し、`DataManager.getSavedStoryProgress(migrationMap)` を呼び出すことで、セーブデータの最新化とデフォルト値の適用を同時に行う。
 
+### 状態管理 (State Management) ※シナリオ 4.1.2 に基づく
+- **`isRead(storyId: string): boolean`**
+    - 指定されたストーリーIDが既読かどうかを返す。メールアイコンの明滅判定に使用される。
+
+- **`updateReadStatus(storyId: string): void`**
+    - 指定されたストーリーIDを既読としてマークし、最新の状態を `DataManager.setSavedStoryProgress()` を通じて永続化する。
+
 ## 3. データ構造定義 (Data Structures)
 
 ### StoryProgressData (永続化対象)
