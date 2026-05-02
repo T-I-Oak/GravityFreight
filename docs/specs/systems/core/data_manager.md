@@ -16,8 +16,8 @@
 - **`loadAllData(): Promise<void>`**
     - 外部の JSON マスタデータをすべて非同期でロードし、内部に保持する。
     - `package.json` からバージョン情報を取得し、`app_metadata.json` の内容と統合して `AppMetadata` を構築する。
-    - `localStorage` から前回プレイ時のバージョン（`lastPlayedVersion`）を読み込む。
-    - ロード失敗時はエラーを投げ、アプリケーションの起動を停止させる。
+    - `localStorage` から前回プレイ時のバージョン（`lastPlayedVersion`）を読み込む。※データが存在しない、または読み込みに失敗した場合は `null` となり、致命的なエラーとはみなさない。
+    - **外部マスタデータのロード失敗時**はエラーを投げ、アプリケーションの起動を停止させる。
 
 ### データアクセス (Data Access)
 - **`getMasterAppMetadata(): AppMetadata`**
