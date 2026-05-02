@@ -24,17 +24,28 @@
     4. **初期画面表示**: `uiController.showTitleScreen()` を実行。
 
 - **`startGame(): void`**
-    - 新規ゲームを開始する。プレイヤー状態の初期化、セクター番号の「0」セットを行い、`beginSectorTransition()` をキックする。
+    - 新規ゲームを開始する。
+    1. **ステート初期化**: プレイヤー状態の初期化、セクター番号の「0」セットを実行。
+    2. **HUD初期化**: `SessionState` から初期値を取得し、`UIController.initHUD()` を実行。
+    3. **遷移開始**: `beginSectorTransition()` をキックする。
 
 - **`beginSectorTransition(): Promise<void>`**
     - セクター間の遷移（ワープ演出）シーケンスを以下の順序で統括する。
     1. **演出開始**: `backgroundManager.accelerateWarp(duration)` および `worldRenderer.animateWarpOut(duration)` を実行。ワープSEの再生開始。
     2. **判定と分配**:
         - `sessionState.sectorNumber` を更新。
+        - **HUD更新**: `uiController.updateHUDValue('sector', sessionState.sectorNumber)` を実行。
         - **アノマリー判定**: セクター番号が 5 の倍数かどうかを判定（`isAnomaly`）。
     3. **データ生成**:
         - `isAnomaly` フラグを渡し、`new Sector(sessionState, isAnomaly)` を実行して新マップを生成。
         - 生成したマップを `worldRenderer.setSector()` にセット。
     4. **UI表示**: `uiController.showSectorTitle(num, isAnomaly)` を呼び出し、タイトルを表示。
     5. **演出終了**: `backgroundManager.decelerateWarp(duration)` および `worldRenderer.animateWarpIn(duration)` を実行。完了後にビルド画面（ロケット構成変更）へと遷移させる。
-
+- **`launchRocket(rocket: Rocket, angle: number): void`**
+    - 航行シーケンスを開始する。
+    1. **画面遷移**: `UIController.showNavigationScreen()` を実行。
+    2. **物理初期化**: ロケットの初速をセットし、`worldRenderer.startNavigation(rocket)` を実行。
+    3. **航行ループ開始**: 
+        - 1ティックごとに `PhysicsEngine.step(rocket, sector)` を実行。
+        - **HUD更新**: 自身でカウントした累計ティック数を `baseScore` に加算し、`UIController.updateHUDValue('score', total)` を呼び出す。
+        - **終了判定**: 成功・大破等の判定を監視し、終了時は `showResultScreen()` への遷移をトリガーする。

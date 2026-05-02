@@ -38,6 +38,13 @@
 - **`toWorld(screenPos: Vector2): Vector2`**
     - スクリーン座標をワールド絶対座標に逆変換する。
 
+- **`isInMapArea(screenPos: Vector2): boolean`**
+    - 指定されたスクリーン座標が、マップ領域（セクター境界内）であるかを判定する。
+    - **内部ロジック**:
+        1. `this.toWorld(screenPos)` でワールド座標に変換。
+        2. `DataManager.getWorldConfig().boundaryRadius` を取得。
+        3. 変換後の座標のワールド原点からの距離が、半径以内であれば `true` を返す。
+
 - **`getWorldToScreenMatrix(): Matrix`**
     - 上記の変換（回転・平行移動・スケーリング）を統合した変換行列を返す。
 
