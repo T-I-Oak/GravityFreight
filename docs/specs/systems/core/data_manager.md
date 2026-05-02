@@ -42,6 +42,13 @@
 - **`setSavedStoryProgress(data: object): void`**
     - 最新のストーリー進捗データを `localStorage` へ永続化する。保存時、現在のアプリバージョンをメタデータとして付与する。
 
+- **`getSavedAchievementData(migrationMap: object): object`**
+    - 累計統計・実績データを取得し、必要に応じてマイグレーションした結果を返す。
+    - データが存在しない場合は `migrationMap.init()` の結果を返す。
+
+- **`setSavedAchievementData(data: object): void`**
+    - 最新の累計統計・実績データを `localStorage` へ永続化する。
+
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
 
