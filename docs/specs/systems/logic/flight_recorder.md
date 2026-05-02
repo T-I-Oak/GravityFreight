@@ -28,7 +28,6 @@
 ### FlightRecordIndex (永続化対象)
 ```javascript
 {
-  version: string,       // 最後に保存された際のアプリバージョン
   records: {             // 航行記録のメタデータ集約
     "REC_20260502_001": {
       timestamp: number,

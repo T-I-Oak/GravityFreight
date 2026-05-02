@@ -77,7 +77,7 @@
 - **`_migrate(data: object, migrationMap: object): object`**
     - `migrationMap` のキーから `init` を除外したものを抽出し、`_compareVersions` を用いて昇順にソートする。
     - ソートされたバージョンのうち、`lastPlayedVersion` よりも新しいものに対応する callback を順次 `data` に適用していく。
-    - 最終的な `data` に最新の `version` を付与して返す。
+    - 最新化された `data` を返す。
 
 - **`_compareVersions(v1: string, v2: string): number`**
     - 2つのバージョン文字列をセマンティックバージョニングに基づき比較する（v1 < v2 なら -1, 一致なら 0, v1 > v2 なら 1）。

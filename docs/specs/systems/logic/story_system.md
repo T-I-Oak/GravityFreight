@@ -29,7 +29,6 @@
 ### StoryProgressData (永続化対象)
 ```javascript
 {
-  version: string,       // 最後に保存された際のアプリバージョン
   readMessageIds: [],    // 既読済みメッセージIDのリスト
   flags: {               // 進行フラグ管理用のキー・バリュー
     "has_met_mechanic": boolean,

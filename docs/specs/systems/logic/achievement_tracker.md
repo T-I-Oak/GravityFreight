@@ -29,7 +29,6 @@
 ### AchievementData (永続化対象)
 ```javascript
 {
-  version: string,       // 最後に保存された際のアプリバージョン
   totalTicks: number,    // 累計航行ティック数
   unlockedIds: [],       // 解除済み実績IDのリスト
   stats: {               // 各種累計統計（key-value）
