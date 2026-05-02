@@ -19,7 +19,9 @@
 - [ ] 0.2 [機能] 各システムクラスの初期化
     - [ ] 0.2.1 [機能] ユーザー設定・進捗の復元
         - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
-        - [ ] 0.2.1.2 [機能] StorySystem / AchievementTracker / FlightRecorder の初期化（永続データのロード）
+        - [ ] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
+        - [ ] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
+        - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
         - **決定事項**: 各システムクラスの `initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
     - [x] 0.2.2 [機能] UIハンドラの登録
         - **決定事項**: `GameOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、UI操作およびウィンドウイベント（Resize等）と各システムクラス（GameOrchestrator, WorldRenderer等）の処理を紐付ける。
