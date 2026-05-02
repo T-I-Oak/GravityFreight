@@ -40,14 +40,14 @@
 - **`getSavedCameraState(migrationMap: object): object`**
     - 「共通ルール」に基づき、カメラの状態を取得する。
 
+- **`setSavedCameraState(data: object): void`**
+    - カメラの状態を `localStorage` へ永続化する。
+
 - **`getSavedStoryProgress(migrationMap: object): object`**
     - 「共通ルール」に基づき、ストーリー進捗データを取得する。
 
 - **`setSavedStoryProgress(data: object): void`**
     - ストーリー進捗データを `localStorage` へ永続化する。
-
-- **`getSavedAchievementData(migrationMap: object): object`**
-    - 「共通ルール」に基づき、累計統計・実績データを取得する。
 
 - **`getSavedFlightRecordIndex(migrationMap: object): object`**
     - 「共通ルール」に基づき、航行記録インデックス（過去の全記録の目録）を取得する。
