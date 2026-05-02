@@ -10,3 +10,12 @@
     - 計算結果（座標配列）を Rocket 等へ提供する。
 
 ## 2. インターフェース (Interface)
+
+### メソッド (Methods)
+
+- **`predictPath(rocket: Rocket, sector: Sector): Rocket`**
+    - 現在のロケット構成と角度に基づいた未来の航跡をシミュレーションする。
+    - **内部挙動**:
+        1. 引数で渡された `rocket` のクローンを作成する。
+        2. `PhysicsEngine.step(clone, sector)` を指定された上限ティック分（例: 2400）ループ実行する。
+        3. ループ完了後、航行履歴（`actualTrail`）が蓄積された `clone` を返す。
