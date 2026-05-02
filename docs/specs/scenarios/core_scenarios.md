@@ -226,6 +226,15 @@
             - **インターフェース定義**:
                 - `UIController.showNavigationScreen()`: 航行画面への遷移。
                 - `UIController.updateHUDValue(key, value)`: HUD 内の特定の値を更新（ロールカウンター演出をトリガー）。
+    - [ ] 4.1.2 [UI] メールアイコンの表示（物語へのアクセス）
+        - **通知バッジ表示**:
+            - 未読のストーリーメッセージが存在する場合、アイコン上に通知バッジを表示する。
+        - **決定事項**:
+            - **判定ロジック**: `GameOrchestrator` が定期的に（または遷移時に）`StorySystem` に対して未読の有無を確認し、HUD を更新する。
+            - **インターフェース定義**:
+                - `UIController.updateMailNotification(hasUnread)`: メールの通知バッジの表示/非表示を切り替える。
+                - `UIController.setMailHandler(handler)`: メールアイコン押下時の処理を登録する。
+                - `UIController.showStoryWindow()`: 物語閲覧用のウィンドウを表示する。
 - [ ] 4.2 [機能] アイテムの取得と特殊効果の発動
     - [ ] 4.2.1 [機能] アイテムの自動取得（保持状態への移行）
         - ロケットの回収範囲内にアイテムが入った際、そのアイテムを「保持状態（Held State）」としてマークする。
