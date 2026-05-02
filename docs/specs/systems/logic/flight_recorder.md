@@ -16,10 +16,6 @@
     - `DataManager` から航行記録インデックス（過去の全記録の目録）を取得し、内部状態を初期化する。
     - 内部で `migrationMap` を定義し、`DataManager.getSavedFlightRecordIndex(migrationMap)` を呼び出す。
 
-### データ取得 (Data Access)
-- **`getRecordIndex(): object`**
-    - 過去の航行記録のメタデータ一覧（目録）を返す。記録画面の一覧表示等で使用される。
-
 ## 3. データ構造定義 (Data Structures)
 
 ### FlightRecordIndex (永続化対象)

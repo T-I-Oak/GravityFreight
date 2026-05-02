@@ -40,9 +40,6 @@
 - **`getSavedCameraState(migrationMap: object): object`**
     - 「共通ルール」に基づき、カメラの状態を取得する。
 
-- **`setSavedCameraState(data: object): void`**
-    - カメラの状態を `localStorage` へ永続化する（シナリオ 3.1.1.3 の操作終了時等に呼び出される）。
-
 - **`getSavedStoryProgress(migrationMap: object): object`**
     - 「共通ルール」に基づき、ストーリー進捗データを取得する。
 
@@ -53,8 +50,7 @@
     - 「共通ルール」に基づき、累計統計・実績データを取得する。
 
 - **`getSavedFlightRecordIndex(migrationMap: object): object`**
-    - 「共通ルール」に基づき、航行記録インデックス（過去の全航行データの目録）を取得する。
-
+    - 「共通ルール」に基づき、航行記録インデックス（過去の全記録の目録）を取得する。
 
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
@@ -76,64 +72,3 @@
 
 - **`_compareVersions(v1: string, v2: string): number`**
     - 2つのバージョン文字列をセマンティックバージョニングに基づき比較する（v1 < v2 なら -1, 一致なら 0, v1 > v2 なら 1）。
-
-- **`_updateLastPlayedVersion(): void`**
-    - 保存処理が行われた際、`lastPlayedVersion` を `currentVersion` で更新し、`localStorage` にも同期する。
-
-
-
-## 3. データ構造定義 (Data Structures)
-
-### AppMetadata
-```javascript
-{
-  version: string,    // 接頭辞を含んだ表示用バージョン文字列 (例: "v2.0.0")
-  copyright: string   // コピーライト表記
-}
-```
-
-### UserSettings
-```javascript
-{
-  seVolume: number,    // SE音量 (0.0 - 1.0)
-  cameraState: CameraState // カメラの視点状態
-}
-```
-
-### CameraState
-```javascript
-{
-  position: { x: number, y: number }, // パン位置
-  rotation: number,                   // 回転角 (ラジアン)
-  zoom: number                        // ズーム倍率
-}
-```
-
-### InitialSetupData
-```javascript
-{
-  initialCoins: number,     // 初期所持金
-  initialInventory: string[] // 初期アイテムIDリスト
-}
-```
-
-## 4. マスタデータ構成 (Master Data Configuration)
-
-`loadAllData()` によって読み込まれる外部ファイルの構成案。
-
-### `app_metadata.json`
-※ `version` は `package.json` から取得し、`copyright` は本ファイルで定義する。
-
-```json
-{
-  "copyright": "©2026 T.I.OAK"
-}
-```
-
-### `initial_setup.json`
-```json
-{
-  "initialCoins": 1200,
-  "initialInventory": ["hull_matte", "logic_basic", "launcher_spring"]
-}
-```
