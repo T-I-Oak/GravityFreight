@@ -50,13 +50,51 @@
 - **`setSavedStoryProgress(data: object): void`**
     - ストーリー進捗データを `localStorage` へ永続化する。
 
+- **`getSavedAchievementData(migrationMap: object): object`**
+    - 「共通ルール」に基づき、累計統計・実績データを取得する。
+
+- **`getSavedFlightRecordIndex(migrationMap: object): object`**
+    - 「共通ルール」に基づき、航行記録インデックス（過去の全記録の目録）を取得する。
+
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
 
 - **`getMasterConfig(): MasterConfigData`**
     - ゲーム全体のバランス調整用定数（ベース星数、境界半径等）を返す。
 
-## 3. 内部ロジック (Internal Logic)
+## 3. データ構造定義 (Data Structures)
+
+### AppMetadata
+```javascript
+{
+  appName: string,
+  copyright: string,
+  version: string // package.json からの動的取得
+}
+```
+
+### InitialSetupData
+```javascript
+{
+  initialMoney: number,
+  initialInventory: [
+    { uid: string, durability: number }, // 初期パーツと耐久度
+    ...
+  ]
+}
+```
+
+### MasterConfigData
+```javascript
+{
+  baseStarCount: number,        // 初期天体数
+  boundaryRadius: number,       // セクター境界半径
+  anomalySectorInterval: number, // アノマリー発生間隔（5セクター毎など）
+  blackMarketVisitValue: number // 闇市場訪問時の天体増加量
+}
+```
+
+## 4. 内部ロジック (Internal Logic)
 
 ### 内部ステート (Internal State)
 - **`lastPlayedVersion: string`**: 起動時に `localStorage` から読み取った前回プレイ時のバージョン（存在しない場合は `null`）。
@@ -64,39 +102,80 @@
 
 ### 内部メソッド (Private Methods)
 - **`_migrate(data: object, migrationMap: object): object`**
-    - `migrationMap` のキーから `init` を除外したものを抽出し、`_compareVersions` を用いて昇順にソートする。
-    - ソートされたバージョンのうち、`lastPlayedVersion` よりも新しいものに対応する callback を順次 `data` に適用していく。
-    - 最新化された `data` を返す。
+    1. `migrationMap` のキーから `init` を除外したバージョン文字列のリストを抽出する。
+    2. 抽出したリストを `_compareVersions` を用いて昇順（SemVer順）にソートする。
+    3. ソートされたバージョンのうち、`lastPlayedVersion` よりも新しい（`> lastPlayedVersion`）ものに対応する callback を順次 `data` に適用していく。
+    4. すべての適用が完了した最新状態の `data` を返す。
 
 - **`_compareVersions(v1: string, v2: string): number`**
     - 2つのバージョン文字列をセマンティックバージョニングに基づき比較する（v1 < v2 なら -1, 一致なら 0, v1 > v2 なら 1）。
 
 - **`_updateLastPlayedVersion(): void`**
     - `localStorage` に保存されているバージョン情報を、現在の `currentVersion` で上書き更新する。
-    - 通常、`loadAllData()` 内でのマイグレーション完了直後に呼び出される。
 
-## 4. マスタデータ構成 (Master Data Structure)
+## 5. マスタデータ構成 (Master Data Structure)
 
 ### `app_metadata.json`
-- **内容**: アプリ自体のメタ情報。
-- **構造**: `{ "appName": string, "copyright": string, "version": string (from package.json) }`
+- **構造**: `{ "appName": string, "copyright": string }`
+- **備考**: `version` は実行時に `package.json` から注入される。
 
 ### `initial_setup.json`
-- **内容**: 新規ゲーム開始時の初期状態。
-- **構造**: `{ "initialMoney": number, "initialInventory": ItemUid[] }`
+- **構造**:
+  ```javascript
+  {
+    "initialMoney": 1000,
+    "initialInventory": [
+      { "uid": "launcher_standard", "durability": 10 },
+      ...
+    ]
+  }
+  ```
 
 ### `config.json`
-- **内容**: ゲームバランス定数。
-- **構造**: `{ "baseStarCount": number, "boundaryRadius": number, ... }`
+- **構造**:
+  ```javascript
+  {
+    "baseStarCount": 5,
+    "boundaryRadius": 5000,
+    "anomalySectorInterval": 5,
+    "blackMarketVisitValue": 1
+  }
+  ```
 
 ### `items.json`
-- **内容**: 全アイテムのマスタデータ（カタログ）。
-- **構造**: `{ "items": { [uid: string]: ItemDefinition } }`
+- **構造**:
+  ```javascript
+  {
+    "items": {
+      "item_uid": {
+        "name": string,
+        "type": "launcher" | "booster" | "module",
+        "params": { ... }
+      }
+    }
+  }
+  ```
 
 ### `world_config.json`
-- **内容**: セクター生成・抽選ルール。
-- **構造**: `{ "sectorProbabilities": [...], "itemLotteryTables": { ... } }`
+- **構造**:
+  ```javascript
+  {
+    "sectorProbabilities": { "anomaly": 0.1 },
+    "itemLotteryTables": {
+      "standard": [ { "uid": "item_a", "weight": 10 }, ... ]
+    }
+  }
+  ```
 
 ### `stories.json`
-- **内容**: 物語（メッセージ）のマスタ。
-- **構造**: `{ "messages": { [id: string]: StoryMessageDefinition } }`
+- **構造**:
+  ```javascript
+  {
+    "messages": {
+      "story_id": {
+        "type": "T" | "R" | "B",
+        "text": string
+      }
+    }
+  }
+  ```

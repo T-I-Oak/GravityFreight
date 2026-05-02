@@ -4,16 +4,16 @@
 
 - **所属ドメイン**: Logic Domain
 - **生存期間**: App Lifecycle
-- **役割**: 統計・実績管理。
+- **役割**: 実績・統計管理。
 - **責務**:
-    - プレイを跨いだ累計統計の保持。
-    - 実績解除判定。
+    - 累計統計（移動距離、スコア等）の保持。
+    - 実績（称号・トロフィー）の解禁判定。
 
 ## 2. インターフェース (Interface)
 
 ### ライフサイクル (Lifecycle)
 - **`initialize(): void`**
-    - `DataManager` から累計統計・実績データを取得し、内部状態を初期化する。
+    - `DataManager` から保存された実績・統計データを取得し、自身の内部状態を初期化する。
     - 内部で `migrationMap` を定義し、`DataManager.getSavedAchievementData(migrationMap)` を呼び出す。
 
 ## 3. データ構造定義 (Data Structures)

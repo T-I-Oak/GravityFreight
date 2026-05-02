@@ -12,7 +12,13 @@
 ## 2. インターフェース (Interface)
 
 ### ライフサイクル (Lifecycle)
-- **ステータス**: 未定（各ドメインの仕様策定時に定義する）。
+- **`initialize(): void`**
+    - `DataManager` から航行記録インデックス（過去の全記録の目録）を取得し、内部状態を初期化する。
+    - 内部で `migrationMap` を定義し、`DataManager.getSavedFlightRecordIndex(migrationMap)` を呼び出す。
 
 ## 3. データ構造定義 (Data Structures)
-- **ステータス**: 未定。
+
+### FlightRecordIndex (永続化対象)
+- **ステータス**: 未定（各ドメインの仕様策定時に定義する）。
+- **初期値**: `{}`（空のオブジェクト）。
+- **備考**: 初期化（ロード）ができることのみを現時点で保証する。
