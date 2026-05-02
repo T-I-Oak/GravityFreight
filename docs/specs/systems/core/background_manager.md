@@ -35,11 +35,11 @@
         - `warpSpeed` が一定値を超えている場合、星を Z 軸の手前方向へ移動させる。
         - 前フレームの座標と現在座標を結ぶライン（Streak）を描画し、速度感を演出する。
 
-- **`accelerateWarp(duration: number): void`**
+- **`startWarpEffect(duration: number): void`**
     - 航行開始やワープ突入時に、背景の星々を最高速まで加速させて「超高速移動感」を演出する。
     - 速度の上昇に伴い、星の点が長い光跡（Streak）へと変化し、画面全体に躍動感を与える。
 
-- **`decelerateWarp(duration: number): void`**
+- **`stopWarpEffect(duration: number): void`**
     - ワープ出口に接近した際、最高速から通常速度（1.0）まで減速させ、新セクターへの「到着感」を演出する。
     - 光跡が徐々に短くなって元の点へと戻り、静かな星空へと遷移する。
 
