@@ -53,12 +53,11 @@
 ### 内部ステート (Internal State)
 - **`lastPlayedVersion: string`**: 起動時に `localStorage` から読み取った前回プレイ時のバージョン（存在しない場合は `null`）。
 - **`currentVersion: string`**: `package.json` から読み取った現在のアプリバージョン。
-- **`versionRoadmap: string[]`**: リリース済みの全バージョンが昇順で並んだリスト（マスタデータとして保持）。
 
 ### 内部メソッド (Private Methods)
 - **`_migrate(data: object, migrationMap: object): object`**
-    - `lastPlayedVersion` から `currentVersion` までの差分バージョンを `versionRoadmap` から抽出する。
-    - 抽出された各バージョンに対応する callback が `migrationMap` にあれば、順次 `data` に適用していく。
+    - `migrationMap` のキー（バージョン文字列）を `_compareVersions` を用いて昇順にソートする。
+    - ソートされたバージョンのうち、`lastPlayedVersion` よりも新しいものに対応する callback を順次 `data` に適用していく。
     - 最終的な `data` に最新の `version` を付与して返す。
 
 - **`_compareVersions(v1: string, v2: string): number`**
