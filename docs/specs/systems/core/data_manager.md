@@ -12,13 +12,13 @@
 
 ## 2. インターフェース (Interface)
 
-### 2.1 ライフサイクル (Lifecycle)
+### ライフサイクル (Lifecycle)
 - **`loadAllData(): Promise<void>`**
     - 外部の JSON マスタデータをすべて非同期でロードし、内部に保持する。
     - `package.json` からバージョン情報を取得し、`app_metadata.json` の内容と統合して `AppMetadata` を構築する。
     - ロード失敗時はエラーを投げ、アプリケーションの起動を停止させる。
 
-### 2.2 データアクセス (Data Access)
+### データアクセス (Data Access)
 - **`getAppMetadata(): AppMetadata`**
     - アプリケーションのバージョン番号、コピーライト表記等のメタデータを返す。
 
@@ -36,6 +36,9 @@
 
 - **`getInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
+
+- **`getMasterConfig(): MasterConfigData`**
+    - ゲーム全体のバランス調整用定数（ベース星数、境界半径等）を返す。
 
 
 
