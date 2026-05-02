@@ -63,15 +63,15 @@
     - [x] 2.1.1 [UI] 前セクターのマップ表示（継続）
     - [x] 2.1.2 [シナリオ] 背景の星が高速で流れる（ワープ演出）
         - **決定事項**:
-            - `BackgroundManager.accelerateWarp(duration)` を定義。星の z 移動により光跡を描画し高速感を演出する。
+            - `BackgroundManager.startWarpEffect(duration)` を定義。星の z 移動により光跡を描画し高速感を演出する。
     - [x] 2.1.3 [シナリオ] マップの拡大・消失
         - **決定事項**:
-            - `WorldRenderer.animateWarpOut(duration)` を定義。Scale 1.0→20.0, Alpha 1.0→0.0 へと変化させ消失させる。
+            - `WorldRenderer.startWarpEffect(duration)` を定義。Scale 1.0→20.0, Alpha 1.0→0.0 へと変化させ消失させる。
     - [x] 2.1.4 [機能] 内部状態の維持（前セクター状態を保持）
     - [x] 2.1.5 [機能] セクター 1 開始時の特殊処理（マップなしの状態から開始）
     - [x] 2.1.6 [機能] ワープ音（ホワイトノイズ系SE）の再生開始
         - **決定事項**:
-            - `SoundController.playWarpSound(fadeInDuration)` を定義。
+            - `SoundController.startWarpEffect(fadeInDuration)` を定義。
     - **決定事項**:
         - `CameraController` の視界状態（パン・回転・ズーム）はセクター遷移時にリセットせず、完全に維持する。
         - `WorldRenderer` は演出開始時点の `targetSector` への参照を維持して描画を継続する。
@@ -92,15 +92,14 @@
         - `SessionState.incrementSector()`, `new Sector(sessionState)`, `UIController.showSectorTitle()` を使用して、ワープ演出の裏側で準備を行う。
 - [x] 2.3 [シナリオ] ワープ終了
     - [x] 2.3.1 [シナリオ] 星の流れの減速
-        - `BackgroundManager.decelerateWarp(duration)` を呼び出し、光跡描画を終了させる。
+        - `BackgroundManager.stopWarpEffect(duration)` を呼び出し、光跡描画を終了させる。
     - [x] 2.3.2 [シナリオ] 新セクターのマップ接近・停止
-        - `WorldRenderer.animateWarpIn(duration)` を実行し、遠方（Scale 0.05, Alpha 1.0）からマップを接近・出現させる。
+        - `WorldRenderer.stopWarpEffect(duration)` を実行し、遠方（Scale 0.05, Alpha 1.0）からマップを接近・出現させる。
     - [x] 2.3.3 [機能] ワープ音の停止
-        - `SoundController.stopWarpSound(fadeOutDuration)` を実行し、環境音をフェードアウトさせる。
+        - `SoundController.stopWarpEffect(fadeOutDuration)` を実行し、環境音をフェードアウトさせる。
     - [x] 2.3.4 [機能] ビルド画面（航行準備）への遷移
         - 全演出完了後、`UIController.showBuildScreen()` を実行して第3章へ移行する。
-    - **決定事項**:
-        - `WorldRenderer.animateWarpIn()` は「遠方から接近する」演出のため、Alpha 1.0 のままで開始し、画面全体を星（母星等）が覆い尽くすのを防ぐ。
+        - `WorldRenderer.stopWarpEffect()` は「遠方から接近する」演出のため、Alpha 1.0 のままで開始し、画面全体を星（母星等）が覆い尽くすのを防ぐ。
 
 ## 3 ビルド画面
 **役割**: ロケットのビルド（構成変更）、航行の開始（発射）。
@@ -217,6 +216,7 @@
             - **Rocket の役割**: `Rocket` 内部でも `updateState` を通じてティック数を保持するが、これは第5章（リザルト）の内訳表示用の記録として使用する。
             - **インターフェース定義**:
                 - `UIController.showNavigationScreen()`: 航行画面への遷移。
+                - `UIController.initHUD(initialData)`: HUD の初期化と表示開始。
                 - `UIController.updateHUDValue(key, value)`: HUD 内の特定の値を更新（ロールカウンター演出をトリガー）。
 - [ ] 4.2 [機能] アイテムの取得と特殊効果の発動
     - [ ] 4.2.1 [機能] アイテムの自動取得（保持状態への移行）
