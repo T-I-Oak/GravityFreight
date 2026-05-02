@@ -19,9 +19,7 @@
 - [ ] 0.2 [機能] 各システムクラスの初期化
     - [ ] 0.2.1 [機能] ユーザー設定・進捗の復元
         - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
-        - [ ] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
-        - [ ] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
-        - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
+        - [ ] 0.2.1.2 [機能] StorySystem / AchievementTracker / FlightRecorder の初期化（永続データのロード）
         - **決定事項**: 各システムクラスの `initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
     - [x] 0.2.2 [機能] UIハンドラの登録
         - **決定事項**: `GameOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、UI操作およびウィンドウイベント（Resize等）と各システムクラス（GameOrchestrator, WorldRenderer等）の処理を紐付ける。
@@ -39,15 +37,16 @@
 
 ## 1 タイトル画面
 **役割**: ゲーム開始、アーカイブ閲覧、説明書閲覧、音量設定。
-- [x] 1.1 [機能] ゲーム開始
+- [ ] 1.1 [機能] ゲーム開始
     - [x] 1.1.1 [UI] 開始ボタン
         - [x] 1.1.1.1 [機能] 決定音の再生
             - **決定事項**: **UI レイヤー**（UIController等）の責務。クリック検知時に Orchestrator のハンドラを呼ぶ直前に `SoundController.playSE()` を実行する。
     - [x] 1.1.2 [シナリオ] ボタン押下による「ゲーム開始」プロセスのキック
     - [x] 1.1.3 [機能] プレイヤー状態の初期化（初期所持金・装備のロード）
     - [x] 1.1.4 [機能] セクター番号を「0」にセット
-    - [x] 1.1.5 [シナリオ] 「セクター開始画面」への遷移
-    - **決定事項**: `SessionState.initialize()`, `GameOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorStartScreen()` を定義。
+    - [ ] 1.1.5 [機能] GameController の初期化（セクター管理の開始）
+    - [x] 1.1.6 [シナリオ] 「セクター開始画面」への遷移
+    - **決定事項**: `SessionState.initialize()`, `GameController.initialize()`, `GameOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorStartScreen()` を定義。
 - [x] 1.2 [機能] 記録画面の表示
     - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
 - [x] 1.3 [機能] 説明書画面の表示
