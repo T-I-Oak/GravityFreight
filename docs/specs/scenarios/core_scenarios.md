@@ -22,7 +22,7 @@
         - [ ] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
         - [ ] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
         - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
-        - **決定事項**: 各システムクラスの `initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
+        - **決定事項 (StorySystem)**: `StorySystem` は自身の `initialize()` 内で `DataManager.getSavedStoryProgress(migrationMap)` を呼び出す。自身が定義する `migrationMap` を渡すことで、`DataManager` の共通基盤を通じて最新状態へ復元されたデータを受け取る。
     - [x] 0.2.2 [機能] UIハンドラの登録
         - **決定事項**: `GameOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、UI操作およびウィンドウイベント（Resize等）と各システムクラス（GameOrchestrator, WorldRenderer等）の処理を紐付ける。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
