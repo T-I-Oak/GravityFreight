@@ -19,7 +19,8 @@
 ### メソッド (Methods)
 
 - **`initialize(): void`**
-    - `DataManager.getSEVolume()` を実行し、保存されている音量を自身に適用する。
+    - `DataManager.getSavedSEVolume(migrationMap)` を実行し、保存されている音量を自身に適用する。
+    - `migrationMap` の `init` では、デフォルト音量（例：0.5）を返す。
 
 - **`playSE(id: string, volume?: number): void`**
     - 指定された ID の効果音を一度だけ再生する。
@@ -29,7 +30,7 @@
     - 現在のマスターボリューム（0.0 〜 1.0）を返す。
 
 - **`setSEVolume(volume: number): void`**
-    - マスターボリュームを更新し、`DataManager.setSEVolume()` を通じて永続化する。
+    - マスターボリュームを更新し、`DataManager.setSavedSEVolume()` を通じて永続化する。
 
 - **`startWarpEffect(fadeInDuration: number): void`**
     - ワープ演出用のループSE（ホワイトノイズ等）の再生を開始する。
