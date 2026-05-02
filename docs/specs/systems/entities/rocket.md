@@ -11,7 +11,9 @@
     - **自己更新と集計**: 物理エンジンからの通知に基づき、自身の状態更新、航跡（`actualTrail`）の蓄積、および航行ティック数（スコア）のインクリメントを行う。
     - **成果の保持 (Result Carrier)**: 獲得スコア、回収した貨物（Cargo）、および保持状態の全アイテム（コイン等）を蓄積し、リザルト精算用データとして提供する。
 
-## 2. プロパティ (Properties)
+## 2. インターフェース (Interface)
+
+### プロパティ (Properties)
 
 - `rocketItem: RocketItem`: 構成パーツ情報の参照。
 - `position: Vector2`: 現在のワールド座標。
@@ -23,7 +25,7 @@
 - `heldCargo: Item[]`: 保持状態の貨物リスト。
 - `heldItems: Item[]`: 保持状態のパーツ・消耗品リスト。
 
-## 3. メソッド (Methods)
+### メソッド (Methods)
 
 - `updateState(pos: Vector2, vel: Vector2): void`
     - 自身の `position`, `velocity` を更新する。
