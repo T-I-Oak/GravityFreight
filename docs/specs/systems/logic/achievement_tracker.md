@@ -27,14 +27,6 @@
 ## 3. データ構造定義 (Data Structures)
 
 ### AchievementData (永続化対象)
-```javascript
-{
-  totalTicks: number,    // 累計航行ティック数
-  unlockedIds: [],       // 解除済み実績IDのリスト
-  stats: {               // 各種累計統計（key-value）
-    "total_coins": number,
-    "total_flights": number,
-    ...
-  }
-}
-```
+- **ステータス**: 未定（各ドメインの仕様策定時に定義する）。
+- **初期値**: `{}`（空のオブジェクト）。
+- **備考**: `trackProgress` の呼び出し元および具体的な統計項目が確定した段階で定義を追記する。

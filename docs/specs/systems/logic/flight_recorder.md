@@ -26,16 +26,6 @@
 ## 3. データ構造定義 (Data Structures)
 
 ### FlightRecordIndex (永続化対象)
-```javascript
-{
-  records: {             // 航行記録のメタデータ集約
-    "REC_20260502_001": {
-      timestamp: number,
-      sector: number,
-      score: number,
-      rocketConfig: object
-    },
-    ...
-  }
-}
-```
+- **ステータス**: 未定（各ドメインの仕様策定時に定義する）。
+- **初期値**: `{}`（空のオブジェクト）。
+- **備考**: `saveRecord` 時のメタデータ構造が確定した段階で定義を追記する。
