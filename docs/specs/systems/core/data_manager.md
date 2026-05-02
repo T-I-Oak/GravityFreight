@@ -49,9 +49,6 @@
 - **`setSavedStoryProgress(data: object): void`**
     - ストーリー進捗データを `localStorage` へ永続化する。
 
-- **`getSavedFlightRecordIndex(migrationMap: object): object`**
-    - 「共通ルール」に基づき、航行記録インデックス（過去の全記録の目録）を取得する。
-
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
 
