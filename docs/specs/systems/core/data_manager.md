@@ -19,22 +19,29 @@
     - ロード失敗時はエラーを投げ、アプリケーションの起動を停止させる。
 
 ### データアクセス (Data Access)
-- **`getAppMetadata(): AppMetadata`**
+- **`getMasterAppMetadata(): AppMetadata`**
     - アプリケーションのバージョン番号、コピーライト表記等のメタデータを返す。
 
-- **`setSEVolume(value: number): void`**
-    - SE（効果音）の音量設定（0.0 - 1.0）を内部に保持し、`localStorage` へ永続化する。
-
-- **`getSEVolume(): number`**
+- **`getSavedSEVolume(): number`**
     - 現在保持されている SE 音量を返す。
 
-- **`setCameraState(state: CameraState): void`**
-    - カメラの状態（位置、回転、ズーム等）をまとめて内部に保持し、`localStorage` へ永続化する。
+- **`setSavedSEVolume(value: number): void`**
+    - SE（効果音）の音量設定（0.0 - 1.0）を内部に保持し、`localStorage` へ永続化する。
 
-- **`getCameraState(): CameraState`**
+- **`getSavedCameraState(): CameraState`**
     - 現在保持されているカメラの状態を返す。
 
-- **`getInitialSetup(): InitialSetupData`**
+- **`setSavedCameraState(state: CameraState): void`**
+    - カメラの状態（位置、回転、ズーム等）をまとめて内部に保持し、`localStorage` へ永続化する。
+
+- **`getSavedStoryProgress(migrationMap: object): object`**
+    - ストーリー進捗データを取得し、必要に応じて提供された `migrationMap` を用いて最新バージョンへマイグレーションした結果を返す。
+    - データが存在しない場合は `migrationMap.init()` の結果を返す。
+
+- **`setSavedStoryProgress(data: object): void`**
+    - 最新のストーリー進捗データを `localStorage` へ永続化する。保存時、現在のアプリバージョンをメタデータとして付与する。
+
+- **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
 
 - **`getMasterConfig(): MasterConfigData`**
