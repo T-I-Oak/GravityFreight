@@ -16,12 +16,12 @@
 **役割**: アプリケーションの起動、アセットロード、各種マネージャーのインスタンス化。
 - [x] 0.1 [機能] 静的マスタデータのロード
     - **決定事項**: `DataManager.loadAllData()`, `GameOrchestrator.boot()` を定義。
-- [x] 0.2 [機能] 各システムクラスの初期化
+- [ ] 0.2 [機能] 各システムクラスの初期化
     - [x] 0.2.1 [機能] ユーザー設定・進捗の復元
         - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
         - [x] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
-        - [x] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
-        - [x] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
+        - [ ] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
+        - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
         - **決定事項 (StorySystem)**: `StorySystem` は自身の `initialize()` 内で `DataManager.getSavedStoryProgress(migrationMap)` を呼び出す。自身が定義する `migrationMap` を渡すことで、`DataManager` の共通基盤を通じて最新状態へ復元されたデータを受け取る。
     - [x] 0.2.2 [機能] UIハンドラの登録
         - **決定事項**: `GameOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、UI操作およびウィンドウイベント（Resize等）と各システムクラス（GameOrchestrator, WorldRenderer等）の処理を紐付ける。

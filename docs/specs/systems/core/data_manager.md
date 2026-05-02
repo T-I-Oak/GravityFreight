@@ -18,7 +18,6 @@
     - `package.json` からバージョン情報を取得し、`app_metadata.json` の内容と統合して `AppMetadata` を構築する。
     - `localStorage` から前回プレイ時のバージョン（`lastPlayedVersion`）を読み込む。※データが存在しない、または読み込みに失敗した場合は `null` となり、致命的なエラーとはみなさない。
     - **外部マスタデータのロード失敗時**はエラーを投げ、アプリケーションの起動を停止させる。
-    - ロードおよびマイグレーション完了後、`_updateLastPlayedVersion()` を呼び出し、最新のバージョン情報を `localStorage` へ保存する。
 
 ### データアクセス (Data Access)
 - **`getMasterAppMetadata(): AppMetadata`**
@@ -50,12 +49,6 @@
 - **`setSavedStoryProgress(data: object): void`**
     - ストーリー進捗データを `localStorage` へ永続化する。
 
-- **`getSavedAchievementData(migrationMap: object): object`**
-    - 「共通ルール」に基づき、累計統計・実績データを取得する。
-
-- **`getSavedFlightRecordIndex(migrationMap: object): object`**
-    - 「共通ルール」に基づき、航行記録インデックス（過去の全記録の目録）を取得する。
-
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
 
@@ -67,30 +60,33 @@
 ### AppMetadata
 ```javascript
 {
-  appName: string,
-  copyright: string,
-  version: string // package.json からの動的取得
+  version: string,    // 接頭辞を含んだ表示用バージョン文字列 (例: "v2.0.0")
+  copyright: string   // コピーライト表記
+}
+```
+
+### UserSettings
+```javascript
+{
+  seVolume: number,    // SE音量 (0.0 - 1.0)
+  cameraState: CameraState // カメラの視点状態
+}
+```
+
+### CameraState
+```javascript
+{
+  position: { x: number, y: number }, // パン位置
+  rotation: number,                   // 回転角 (ラジアン)
+  zoom: number                        // ズーム倍率
 }
 ```
 
 ### InitialSetupData
 ```javascript
 {
-  initialMoney: number,
-  initialInventory: [
-    { uid: string, durability: number }, // 初期パーツと耐久度
-    ...
-  ]
-}
-```
-
-### MasterConfigData
-```javascript
-{
-  baseStarCount: number,        // 初期天体数
-  boundaryRadius: number,       // セクター境界半径
-  anomalySectorInterval: number, // アノマリー発生間隔（5セクター毎など）
-  blackMarketVisitValue: number // 闇市場訪問時の天体増加量
+  initialCoins: number,     // 初期所持金
+  initialInventory: string[] // 初期アイテムIDリスト
 }
 ```
 
@@ -113,69 +109,23 @@
 - **`_updateLastPlayedVersion(): void`**
     - `localStorage` に保存されているバージョン情報を、現在の `currentVersion` で上書き更新する。
 
-## 5. マスタデータ構成 (Master Data Structure)
+## 5. マスタデータ構成 (Master Data Configuration)
+
+`loadAllData()` によって読み込まれる外部ファイルの構成案。
 
 ### `app_metadata.json`
-- **構造**: `{ "appName": string, "copyright": string }`
-- **備考**: `version` は実行時に `package.json` から注入される。
+※ `version` は `package.json` から取得し、`copyright` は本ファイルで定義する。
+
+```json
+{
+  "copyright": "©2026 T.I.OAK"
+}
+```
 
 ### `initial_setup.json`
-- **構造**:
-  ```javascript
-  {
-    "initialMoney": 1000,
-    "initialInventory": [
-      { "uid": "launcher_standard", "durability": 10 },
-      ...
-    ]
-  }
-  ```
-
-### `config.json`
-- **構造**:
-  ```javascript
-  {
-    "baseStarCount": 5,
-    "boundaryRadius": 5000,
-    "anomalySectorInterval": 5,
-    "blackMarketVisitValue": 1
-  }
-  ```
-
-### `items.json`
-- **構造**:
-  ```javascript
-  {
-    "items": {
-      "item_uid": {
-        "name": string,
-        "type": "launcher" | "booster" | "module",
-        "params": { ... }
-      }
-    }
-  }
-  ```
-
-### `world_config.json`
-- **構造**:
-  ```javascript
-  {
-    "sectorProbabilities": { "anomaly": 0.1 },
-    "itemLotteryTables": {
-      "standard": [ { "uid": "item_a", "weight": 10 }, ... ]
-    }
-  }
-  ```
-
-### `stories.json`
-- **構造**:
-  ```javascript
-  {
-    "messages": {
-      "story_id": {
-        "type": "T" | "R" | "B",
-        "text": string
-      }
-    }
-  }
-  ```
+```json
+{
+  "initialCoins": 1200,
+  "initialInventory": ["hull_matte", "logic_basic", "launcher_spring"]
+}
+```
