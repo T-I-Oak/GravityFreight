@@ -31,10 +31,10 @@
 - **`setSEVolume(volume: number): void`**
     - マスターボリュームを更新し、`DataManager.setSEVolume()` を通じて永続化する。
 
-- **`playWarpSound(fadeInDuration: number): void`**
+- **`startWarpEffect(fadeInDuration: number): void`**
     - ワープ演出用のループSE（ホワイトノイズ等）の再生を開始する。
     - `fadeInDuration`（秒）をかけて、音量を 0 からマスターボリューム設定値まで滑らかに上昇させる。
 
-- **`stopWarpSound(fadeOutDuration: number): void`**
+- **`stopWarpEffect(fadeOutDuration: number): void`**
     - 再生中のワープ音を停止する。
     - `fadeOutDuration`（秒）をかけて、音量を 0 まで下げてから完全に停止する。
