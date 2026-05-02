@@ -26,12 +26,12 @@
 - **`startGame(): void`**
     - 新規ゲームを開始する。
     1. **ステート初期化**: プレイヤー状態の初期化、セクター番号の「0」セットを実行。
-    2. **HUD初期化**: `SessionState` から初期値を取得し、`UIController.initHUD()` を実行。
+    2. **HUD初期化**: `SessionState` から初期値を取得し、`uiController.initHUD(initialData)` を実行。
     3. **遷移開始**: `beginSectorTransition()` をキックする。
 
 - **`beginSectorTransition(): Promise<void>`**
     - セクター間の遷移（ワープ演出）シーケンスを以下の順序で統括する。
-    1. **演出開始**: `backgroundManager.accelerateWarp(duration)` および `worldRenderer.animateWarpOut(duration)` を実行。ワープSEの再生開始。
+    1. **演出開始**: `backgroundManager.startWarpEffect(duration)`, `worldRenderer.startWarpEffect(duration)`, `soundController.startWarpEffect(duration)` を実行。
     2. **判定と分配**:
         - `sessionState.sectorNumber` を更新。
         - **HUD更新**: `uiController.updateHUDValue('sector', sessionState.sectorNumber)` を実行。
@@ -40,7 +40,7 @@
         - `isAnomaly` フラグを渡し、`new Sector(sessionState, isAnomaly)` を実行して新マップを生成。
         - 生成したマップを `worldRenderer.setSector()` にセット。
     4. **UI表示**: `uiController.showSectorTitle(num, isAnomaly)` を呼び出し、タイトルを表示。
-    5. **演出終了**: `backgroundManager.decelerateWarp(duration)` および `worldRenderer.animateWarpIn(duration)` を実行。完了後にビルド画面（ロケット構成変更）へと遷移させる。
+    5. **演出終了**: `backgroundManager.stopWarpEffect(duration)`, `worldRenderer.stopWarpEffect(duration)`, `soundController.stopWarpEffect(duration)` を実行。完了後にビルド画面（ロケット構成変更）へと遷移させる。
 - **`launchRocket(rocket: Rocket, angle: number): void`**
     - 航行シーケンスを開始する。
     1. **画面遷移**: `UIController.showNavigationScreen()` を実行。
