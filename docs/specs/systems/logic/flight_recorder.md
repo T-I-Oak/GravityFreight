@@ -16,16 +16,9 @@
     - `DataManager` から航行記録インデックス（過去の全記録の目録）を取得し、内部状態を初期化する。
     - 内部で `migrationMap` を定義し、`DataManager.getSavedFlightRecordIndex(migrationMap)` を呼び出す。
 
-### 記録・再現 (Record & Replay)
-- **`saveRecord(record: object): void`**
-    - 今回の航行データを永続化保存し、インデックスにメタデータを追加して `DataManager.setSavedFlightRecordIndex()` で更新する。
-
-- **`loadRecord(recordId: string): object`**
-    - 指定されたIDの航行詳細データをロードして返す。
-
 ## 3. データ構造定義 (Data Structures)
 
 ### FlightRecordIndex (永続化対象)
 - **ステータス**: 未定（各ドメインの仕様策定時に定義する）。
 - **初期値**: `{}`（空のオブジェクト）。
-- **備考**: `saveRecord` 時のメタデータ構造が確定した段階で定義を追記する。
+- **備考**: 初期化（ロード）ができることのみを現時点で保証する。

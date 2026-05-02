@@ -40,26 +40,15 @@
 - **`getSavedCameraState(migrationMap: object): object`**
     - 「共通ルール」に基づき、カメラの状態を取得する。
 
-- **`setSavedCameraState(data: object): void`**
-    - カメラの状態を `localStorage` へ永続化する。
-
 - **`getSavedStoryProgress(migrationMap: object): object`**
     - 「共通ルール」に基づき、ストーリー進捗データを取得する。
-
-- **`setSavedStoryProgress(data: object): void`**
-    - ストーリー進捗データを `localStorage` へ永続化する。
 
 - **`getSavedAchievementData(migrationMap: object): object`**
     - 「共通ルール」に基づき、累計統計・実績データを取得する。
 
-- **`setSavedAchievementData(data: object): void`**
-    - 累計統計・実績データを `localStorage` へ永続化する。
-
 - **`getSavedFlightRecordIndex(migrationMap: object): object`**
     - 「共通ルール」に基づき、航行記録インデックス（過去の全航行データの目録）を取得する。
 
-- **`setSavedFlightRecordIndex(data: object): void`**
-    - 航行記録インデックスを `localStorage` へ永続化する。
 
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
