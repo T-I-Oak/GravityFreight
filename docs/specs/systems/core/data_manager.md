@@ -16,6 +16,7 @@
 - **`loadAllData(): Promise<void>`**
     - 外部の JSON マスタデータをすべて非同期でロードし、内部に保持する。
     - `package.json` からバージョン情報を取得し、`app_metadata.json` の内容と統合して `AppMetadata` を構築する。
+    - `localStorage` から前回プレイ時のバージョン（`lastPlayedVersion`）を読み込む。
     - ロード失敗時はエラーを投げ、アプリケーションの起動を停止させる。
 
 ### データアクセス (Data Access)
@@ -46,6 +47,25 @@
 
 - **`getMasterConfig(): MasterConfigData`**
     - ゲーム全体のバランス調整用定数（ベース星数、境界半径等）を返す。
+
+## 3. 内部ロジック (Internal Logic)
+
+### 内部ステート (Internal State)
+- **`lastPlayedVersion: string`**: 起動時に `localStorage` から読み取った前回プレイ時のバージョン（存在しない場合は `null`）。
+- **`currentVersion: string`**: `package.json` から読み取った現在のアプリバージョン。
+- **`versionRoadmap: string[]`**: リリース済みの全バージョンが昇順で並んだリスト（マスタデータとして保持）。
+
+### 内部メソッド (Private Methods)
+- **`_migrate(data: object, migrationMap: object): object`**
+    - `lastPlayedVersion` から `currentVersion` までの差分バージョンを `versionRoadmap` から抽出する。
+    - 抽出された各バージョンに対応する callback が `migrationMap` にあれば、順次 `data` に適用していく。
+    - 最終的な `data` に最新の `version` を付与して返す。
+
+- **`_compareVersions(v1: string, v2: string): number`**
+    - 2つのバージョン文字列をセマンティックバージョニングに基づき比較する（v1 < v2 なら -1, 一致なら 0, v1 > v2 なら 1）。
+
+- **`_updateLastPlayedVersion(): void`**
+    - 保存処理が行われた際、`lastPlayedVersion` を `currentVersion` で更新し、`localStorage` にも同期する。
 
 
 
