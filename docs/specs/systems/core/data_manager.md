@@ -18,6 +18,7 @@
     - `package.json` からバージョン情報を取得し、`app_metadata.json` の内容と統合して `AppMetadata` を構築する。
     - `localStorage` から前回プレイ時のバージョン（`lastPlayedVersion`）を読み込む。※データが存在しない、または読み込みに失敗した場合は `null` となり、致命的なエラーとはみなさない。
     - **外部マスタデータのロード失敗時**はエラーを投げ、アプリケーションの起動を停止させる。
+    - ロードおよびマイグレーション完了後、`_updateLastPlayedVersion()` を呼び出し、最新のバージョン情報を `localStorage` へ保存する。
 
 ### データアクセス (Data Access)
 - **`getMasterAppMetadata(): AppMetadata`**
