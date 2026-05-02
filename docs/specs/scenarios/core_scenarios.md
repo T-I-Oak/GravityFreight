@@ -50,7 +50,12 @@
     - [x] 1.1.6 [シナリオ] 「セクター開始画面」への遷移
     - **決定事項**: `SessionState.initialize()`, `GameController.initialize()`, `GameOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorStartScreen()` を定義。
 - [x] 1.2 [機能] 記録画面の表示
-    - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
+    - [ ] 1.2.1 [機能] 航行記録一覧の取得と表示
+        - 記録画面を開く際、これまでに保存された全航行の目録を表示する。
+    - **決定事項**:
+        - `UIController.showRecordScreen()`: 記録画面を表示する。
+        - `FlightRecorder.getRecordIndex()`: [Caller: `UIController`] 過去の航行記録のメタデータ一覧（目録）を取得する。
+        - `UIController.setRecordHandler(handler)`: 記録一覧内の特定項目が選択された際の処理を登録する。
 - [x] 1.3 [機能] 説明書画面の表示
     - **決定事項**: `UIController.showManualScreen()`, `UIController.setManualHandler()` を定義。
 - [x] 1.4 [機能] 音量設定
