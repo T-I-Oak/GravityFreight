@@ -16,12 +16,12 @@
 **役割**: アプリケーションの起動、アセットロード、各種マネージャーのインスタンス化。
 - [x] 0.1 [機能] 静的マスタデータのロード
     - **決定事項**: `DataManager.loadAllData()`, `GameOrchestrator.boot()` を定義。
-- [ ] 0.2 [機能] 各システムクラスの初期化
-    - [ ] 0.2.1 [機能] ユーザー設定・進捗の復元
+- [x] 0.2 [機能] 各システムクラスの初期化
+    - [x] 0.2.1 [機能] ユーザー設定・進捗の復元
         - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
-        - [ ] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
-        - [ ] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
-        - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
+        - [x] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
+        - [x] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
+        - [x] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
         - **決定事項 (StorySystem)**: `StorySystem` は自身の `initialize()` 内で `DataManager.getSavedStoryProgress(migrationMap)` を呼び出す。自身が定義する `migrationMap` を渡すことで、`DataManager` の共通基盤を通じて最新状態へ復元されたデータを受け取る。
     - [x] 0.2.2 [機能] UIハンドラの登録
         - **決定事項**: `GameOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、UI操作およびウィンドウイベント（Resize等）と各システムクラス（GameOrchestrator, WorldRenderer等）の処理を紐付ける。
@@ -121,11 +121,14 @@
             - [x] 3.1.1.1.2 [シナリオ] ドラッグ操作の継続性
                 - ドラッグ開始から離すまで操作を継続（キャンバス外やパネル上を通過しても中断しない）
         - [x] 3.1.1.2 [機能] ドラッグ/スクロール量に応じたリアルタイムな描画追従
+        - [ ] 3.1.1.3 [機能] カメラ状態の永続化
+            - ズーム、パン、回転のいずれかの操作が完了した時点で、最新のカメラ状態を保存する。
         - **決定事項**:
             - `CameraController.zoom(factor, screenAnchor)`
             - `CameraController.rotate(anchor, delta)`
             - `CameraController.pan(screenDelta)`
             - **モード判定**: ドラッグ開始時、`CameraController.isInMapArea(screenPos)` の結果に基づき「パン/AIM」または「回転」を選択し、終了まで維持する。
+            - **永続化**: 各操作の終了時（ドラッグ終了、ホイール停止等）、`DataManager.setSavedCameraState()` を呼び出し、現在の `position`, `rotation`, `zoom` を `localStorage` へ書き出す。
             - ※入力はすべてスクリーン座標（左上原点）を基準とし、Camera内部で変換を行う。
     - [x] 3.1.2 [シナリオ] ウィンドウのリサイズ対応
         - [x] 3.1.2.1 [UI] ブラウザのウィンドウサイズ変更に応じた描画領域の自動拡張・縮小
