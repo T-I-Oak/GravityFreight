@@ -121,11 +121,14 @@
             - [x] 3.1.1.1.2 [シナリオ] ドラッグ操作の継続性
                 - ドラッグ開始から離すまで操作を継続（キャンバス外やパネル上を通過しても中断しない）
         - [x] 3.1.1.2 [機能] ドラッグ/スクロール量に応じたリアルタイムな描画追従
+        - [ ] 3.1.1.3 [機能] カメラ状態の永続化
+            - ズーム、パン、回転のいずれかの操作が完了した時点で、最新のカメラ状態を保存する。
         - **決定事項**:
             - `CameraController.zoom(factor, screenAnchor)`
             - `CameraController.rotate(anchor, delta)`
             - `CameraController.pan(screenDelta)`
             - **モード判定**: ドラッグ開始時、`CameraController.isInMapArea(screenPos)` の結果に基づき「パン/AIM」または「回転」を選択し、終了まで維持する。
+            - **永続化**: 各操作の終了時（ドラッグ終了、ホイール停止等）、`DataManager.setSavedCameraState()` を呼び出し、現在の `position`, `rotation`, `zoom` を `localStorage` へ書き出す。
             - ※入力はすべてスクリーン座標（左上原点）を基準とし、Camera内部で変換を行う。
     - [x] 3.1.2 [シナリオ] ウィンドウのリサイズ対応
         - [x] 3.1.2.1 [UI] ブラウザのウィンドウサイズ変更に応じた描画領域の自動拡張・縮小
