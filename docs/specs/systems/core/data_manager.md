@@ -55,6 +55,12 @@
 - **`setSavedAchievementData(data: object): void`**
     - 累計統計・実績データを `localStorage` へ永続化する。
 
+- **`getSavedFlightRecordIndex(migrationMap: object): object`**
+    - 「共通ルール」に基づき、航行記録インデックス（過去の全航行データの目録）を取得する。
+
+- **`setSavedFlightRecordIndex(data: object): void`**
+    - 航行記録インデックスを `localStorage` へ永続化する。
+
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
 
