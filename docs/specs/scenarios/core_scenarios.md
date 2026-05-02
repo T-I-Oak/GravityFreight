@@ -231,12 +231,13 @@
             - ストーリーの種類（T / R / B）に応じたアイコンカラーを表示する。
             - **未読時**: アイコンを明滅（Blinking）させてプレイヤーに通知する。
         - **決定事項**:
+            - **オーケストレーション**: `GameOrchestrator` が主体となって以下の連鎖を制御する。
             - **インターフェース定義**:
-                - `UIController.updateMailStatus(type, isUnread)`: メールの種類に応じた色設定と、未読状態（明滅）を更新する。
-                - `UIController.setMailHandler(handler)`: アイコン押下時のコールバックを登録。
-                - `UIController.showStoryModal(content)`: 物語閲覧用のモーダルを表示する。
+                - `UIController.updateMailStatus(type, isUnread)`: [Caller: `GameOrchestrator`] メールの種類に応じた色設定と、未読状態（明滅）を更新する。
+                - `UIController.setMailHandler(handler)`: [Caller: `GameOrchestrator`] アイコン押下時のコールバックを登録。
+                - `UIController.showStoryModal(content)`: [Caller: ハンドラ経由の `GameOrchestrator`] 物語閲覧用のモーダルを表示する。
             - **実行シーケンス**:
-                - アイコン押下時、モーダルを表示すると同時に `StorySystem.updateReadStatus()` を呼び出して既読化を実行する。
+                - アイコン押下時、`GameOrchestrator` が登録したハンドラが起動し、`UIController.showStoryModal()` を表示すると同時に `StorySystem.updateReadStatus()` を呼び出して既読化を実行する。
 - [ ] 4.2 [機能] アイテムの取得と特殊効果の発動
     - [ ] 4.2.1 [機能] アイテムの自動取得（保持状態への移行）
         - ロケットの回収範囲内にアイテムが入った際、そのアイテムを「保持状態（Held State）」としてマークする。
