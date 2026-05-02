@@ -16,9 +16,13 @@
 **役割**: アプリケーションの起動、アセットロード、各種マネージャーのインスタンス化。
 - [x] 0.1 [機能] 静的マスタデータのロード
     - **決定事項**: `DataManager.loadAllData()`, `GameOrchestrator.boot()` を定義。
-- [x] 0.2 [機能] 各システムクラスの初期化
-    - [x] 0.2.1 [機能] ユーザー設定の復元（DataManager -> SoundController 等への反映）
-        - **決定事項**: `SoundController.initialize()`, `CameraController.initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
+- [ ] 0.2 [機能] 各システムクラスの初期化
+    - [ ] 0.2.1 [機能] ユーザー設定・進捗の復元
+        - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
+        - [ ] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
+        - [ ] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
+        - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
+        - **決定事項**: 各システムクラスの `initialize()` 内で `DataManager` から設定値を取得・適用する自律的な初期化フロー。
     - [x] 0.2.2 [機能] UIハンドラの登録
         - **決定事項**: `GameOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、UI操作およびウィンドウイベント（Resize等）と各システムクラス（GameOrchestrator, WorldRenderer等）の処理を紐付ける。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
@@ -27,6 +31,7 @@
 - [ ] 0.4 [機能] 背景（Starfield）の生成と描画準備
     - [x] 0.4.1 [UI] 遠景の星々の初期配置（Starfieldの生成）
     - [x] 0.4.2 [機能] カメラ回転に応じた背景の連動描画
+    - [ ] 0.4.3 [機能] WorldRenderer の初期化（PIXIアプリケーション生成と Canvas 配置）
     - **決定事項**:
         - `BackgroundManager` を定義し、z軸（奥行き）を持つ星々を管理。
         - カメラの `rotation` に 100% 同期して回転する。
@@ -76,11 +81,13 @@
         - `CameraController` の視界状態（パン・回転・ズーム）はセクター遷移時にリセットせず、完全に維持する。
         - `WorldRenderer` は演出開始時点の `targetSector` への参照を維持して描画を継続する。
         - `GameOrchestrator.beginSectorTransition()` が演出とデータ生成のシーケンスを統括する。
-- [x] 2.2 [機能] 次セクター初期化
+- [ ] 2.2 [機能] 次セクター初期化
     - [x] 2.2.1 [機能] セクター番号のインクリメント
-    - [x] 2.2.2 [機能] 新セクターのマップ生成
-        - [x] 2.2.2.1 [機能] 各星へのアイテム配置（1～2個、world_config の抽選ルール準拠）
-        - [x] 2.2.2.2 [機能] アノマリー配置による星の属性決定（XOR判定：セクターまたはアイテムのいずれかがアノマリーなら斥力化）
+    - [ ] 2.2.2 [機能] 新セクターのマップ生成
+    - [x] 2.2.2.1 [機能] 各星へのアイテム配置（1～2個、world_config の抽選ルール準拠）
+    - [x] 2.2.2.2 [機能] アノマリー配置による星の属性決定（XOR判定：セクターまたはアイテムのいずれかがアノマリーなら斥力化）
+    - [ ] 2.2.2.3 [機能] CelestialBody インスタンスの生成（位置、保持アイテム、極性、質量のセット）
+    - [ ] 2.2.2.4 [機能] ExitArc インスタンスの生成（配置位置、判定範囲、施設タイプのセット）
     - [x] 2.2.3 [UI] セクタータイトル表示
         - [x] 2.2.3.1 [UI] 「SECTOR X」の中央表示
         - [x] 2.2.3.2 [UI] 5の倍数時：「ANOMALY SECTOR X」の表示
@@ -136,7 +143,7 @@
                 - `UIController.openBuildPanel()`, `closeBuildPanel()`, `toggleBuildPanel()` を定義。
                 - パネルヘッダーのボタンクリック時は、`toggleBuildPanel()` を呼び出す。
 
-        - [x] 3.1.3.2 [UI] FLIGHT タブ
+        - [ ] 3.1.3.2 [UI] FLIGHT タブ
             - [x] 3.1.3.2.1 [UI] rocket カテゴリ表示
                 - [x] 3.1.3.2.1.1 [機能] アイテムの排他的選択・解除
                 - [x] 3.1.3.2.1.2 [シナリオ] ロケット選択による AIM 状態の変化
@@ -152,6 +159,7 @@
 
                 - [x] 3.1.3.2.3.2 [シナリオ] ブースターの選択状態切り替え
                     - 選択済みのブースターを再選択したとき、選択が解除される。
+            - [ ] 3.1.3.2.4 [機能] Rocket インスタンスの生成（構成パーツ、初期位置、物理状態の初期化）
             - **決定事項**:
                 - `Rocket` インスタンスがビルド開始時に生成され、パーツ構成（`RocketItem`, `Launcher`, `Booster`）と射出角度（`angle`）を一括管理する。
                 - AIM可能状態において、UI は `TrajectoryPredictor.predictPath(rocket, sector)` を呼び出し、得られたクローンの `actualTrail` を `WorldRenderer` に渡して予測軌道として描画する。
