@@ -26,19 +26,21 @@
 - **`setSector(sector: Sector | null): void`**
     - 描画対象とするセクターを差し替える。
 
-- **`animateWarpEffect(fromScale: number, fromAlpha: number, toScale: number, toAlpha: number, duration: number): void`**
-    - 始点（from）と終点（to）のパラメータを指定して、指定された時間をかけて変化させる汎用演出関数。
-    - 各セマンティックなメソッド（WarpIn/Out等）の内部実装として使用される。
+- **`startNavigation(rocket: Rocket): void`**
+    - 航行画面の描画を開始する。
+    - **内部挙動**: ロケットの描画を有効化し、必要に応じてズームや追従の初期化を行う。
 
-- **`animateWarpOut(duration: number): void`**
+- **`startWarpEffect(duration: number): void`**
     - 現在のセクターから離脱し、ワープ空間へ突入する際の演出を実行する。
     - マップ全体がプレイヤーを追い越すように巨大化しながら透明度を下げ、視覚的に「消失」させる。
     - （内部実装: `animateWarpEffect(1.0, 1.0, 20.0, 0.0, duration)`）
 
-- **`animateWarpIn(duration: number): void`**
+- **`stopWarpEffect(duration: number): void`**
     - ワープを終了し、新しいセクターの入り口に到達した際の演出を実行する。
     - 新しいマップが遠方の極小点から急接近してくるようなスケーリングを行い、期待感を醸成する。
     - （内部実装: `animateWarpEffect(0.05, 1.0, 1.0, 1.0, duration)`）
+
+- **`animateWarpEffect(fromScale: number, fromAlpha: number, toScale: number, toAlpha: number, duration: number): void`**
 
 - **`handleResize(width: number, height: number): void`**
     - ブラウザのウィンドウリサイズ等に同期して呼び出され、PIXI.js のレンダラーサイズを更新する。
