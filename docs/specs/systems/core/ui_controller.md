@@ -55,6 +55,12 @@
     - **内部挙動**: `SessionState` から渡された初期値（スコア、セクター等）を各カウンターにセットする。
 - **`updateHUDValue(key: string, value: number): void`**
     - 航行画面が表示されている間、HUD 内の特定の数値（スコア等）を更新する。
+- **`updateMailStatus(type: string, isUnread: boolean): void`**
+    - メールアイコンの状態（種類に応じた色、未読時の明滅演出）を更新する（シナリオ 4.1.2）。
+- **`setMailHandler(handler: Function): void`**
+    - メールアイコンがクリックされた際のハンドラを登録する（シナリオ 4.1.2）。
+- **`showStoryModal(content: object): void`**
+    - ストーリー閲覧用のモーダルウィンドウを表示する（シナリオ 4.1.2）。
 - **`showResultScreen(resultData: FlightResultData): void`**
     - 航行結果表示画面へ遷移する。
 
