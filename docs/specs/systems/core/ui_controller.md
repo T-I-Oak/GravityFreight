@@ -19,17 +19,16 @@
         1. HTML ドキュメント内から各画面のコンテナ要素や、主要なボタン（開始ボタン、開閉ボタン等）を検索し、内部変数に保持する。
         2. **安全性**: 必要な要素が見つからない場合は、初期化エラー（Error）を投げ、不具合を即座に顕在化させる。
 
-- **`setOperationHandler(element: HTMLElement, handler: Function): void`**
-    - 指定された要素にクリックイベントを登録し、共通の操作音を再生した後にハンドラを実行する。
-    - **内部挙動**:
-        1. 引数で渡された `element` の `addEventListener('click', ...)` を実行する。
-        2. クリック時、`SoundController.playSE('click')`（IDは仮）を再生。
-        3. その後、引数の `handler` を呼び出す。
-        4. ※ `element` が存在しない状態での呼び出しは、JS の標準的な動作によりエラーとして顕在化させる（防御的な null チェックによる隠蔽を行わない）。
+- **`setOperationHandler(element: HTMLElement, handler: Function, seId: string = 'click'): void`**
+    - 指定された要素にクリックイベントを登録し、指定された操作音を再生した後にハンドラを実行する。
+    - **内部挙動**: `addEventListener('click', ...)` を実行し、クリック時に `SoundController.playSE(seId)` を再生してから `handler()` を呼び出す。
 
+- **`setSelectionHandler(element: HTMLElement, dataKey: string, handler: (value: string) => void, seId: string = 'select'): void`**
+    - データ属性（`data-XXX`）の取得を伴うクリックイベントを登録する（アイテム選択用）。
+    - **内部挙動**: クリック時に `SoundController.playSE(seId)` を再生し、`element.dataset[dataKey]` を引数として `handler` を実行する。
 
 - **`setResizeHandler(handler: (width: number, height: number) => void): void`**
-    - ウィンドウのリサイズイベントが発生した際のコールバックを登録する。
+    - ウィンドウのリサイズイベントが発生した際のコールバックを登録する（操作音なし）。
     - **内部挙動**: `window` の `resize` イベントを購読し、発生時に現在のウィンドウサイズを引数として `handler` を実行する。
 
 ### 画面制御メソッド (Screen Control)
@@ -91,3 +90,24 @@
 - **`setBuildPanelHandler(handler: Function): void`**
     - ビルドパネルの「開閉ボタン」にハンドラを登録する。
     - **内部挙動**: 開閉ボタン要素を引数として `setOperationHandler` を呼び出す。
+
+- **`setVolumeHandler(handler: (value: number) => void): void`**
+    - 設定画面の音量スライダー操作時のハンドラを登録する。
+    - **内部挙動**: **シナリオ 1.4** にて定義される、専用のスライダー制御ロジック（音響演出を含む）を介して登録を行う。
+
+- **`setItemSelectionHandler(handler: (uid: string) => void): void`**
+    - ビルドパネル内のアイテム要素が選択された際のハンドラを登録する。
+    - **内部挙動**: 各アイテム要素（`.item-card` 等）に対し、`setSelectionHandler(element, 'uid', handler)` を呼び出す。
+
+- **`setAssembleHandler(handler: Function): void`**
+    - ビルドパネルの「ASSEMBLE ボタン」にハンドラを登録する。
+    - **内部挙動**: ASSEMBLE ボタン要素を引数として `setOperationHandler` を呼び出す。
+
+- **`setLaunchHandler(handler: Function): void`**
+    - ビルド画面の「LAUNCH ボタン」にハンドラを登録する。
+    - **内部挙動**: LAUNCH ボタン要素を引数として `setOperationHandler` を呼び出す。
+
+- **`setCanvasInputHandler(handler: (event: PointerEvent | WheelEvent) => void): void`**
+    - マップ描画領域（Canvas）に対する入力を中継する（操作音なし）。
+    - **内部挙動**: 描画コンテナに対するポインター/ホイールイベントを直接購読し、演出音を介さずに `handler` を実行する。
+    - **注記**: 対象となる Canvas 要素の取得方法は、`WorldRenderer` の初期化仕様に準拠する。
