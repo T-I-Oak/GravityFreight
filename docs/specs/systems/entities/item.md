@@ -44,7 +44,6 @@
     - `coinDiscount: number`: 施設割引率。
     - `score: number`: 獲得スコア。
 - **Enhancement Data**
-    - `enhancementLevel: number`: 累計強化回数。
     - `enhancements: Record<string, number>`: プロパティ別の強化実行回数。
         - **対象キーと 1 回あたりの増分**:
             - `slots`: +1
@@ -56,20 +55,25 @@
 ### メソッド (Methods)
 - **`constructor(id: string)`**
     - 指定された ID に基づき、マスターデータを読み込んで初期化する。
+    - **uid の生成**: `IDGenerator.generate('item')` を用いて生成する。全サブクラスは独自に uid を生成する仕様に変更されたため、クラス名に依存しません。
     - **初期値のルール**:
         - Multiplier 系（`precisionMultiplier` 等）: マスターデータに定義がない場合は `1.0` で初期化する。
         - 加算系（`mass`, `precision`, `slots`, `maxCharges` 等）: マスターデータに定義がない場合は `0` で初期化する。
         - **理由**: `maxCharges` が `0` であることをもって「耐久機能（プロパティ）を保持していない」と判定するため。
 - **`consumeCharge(): boolean`**
-    - 耐久度を 1 減らし、破棄（0 以下）が必要な場合に true を返す。
+    - 耐久度を 1 減らし、`charges <= 0` になった場合に `true`（破棄）を返す。
+    - **`maxCharges === 0` の場合（使い切りアイテム）**: `charges` の操作は行わず、即座に `true`（破棄）を返す。
 - **`getViewData(): ItemViewData`**
     - UI 表示（アイテムカード）用のプレーンオブジェクトを生成して返す。
     - **マッピング**:
         - `uid`: 自身の `uid`
-        - `charges`: `charges` (存在する場合)
-        - `maxCharges`: `maxCharges` (存在する場合)
-        - `stats`: `mass`, `slots` 等の生の数値をキー・バリュー形式で格納。
-        - `isEnhanced`: `enhancementLevel > 0` の場合に `true`。
+        - `name`, `category`, `description`: 自身のプロパティ
+        - **`stats`**: 以下のプロパティを `{ value, enhanceCount }` 形式で格納する。
+            - **Physical**: `mass`, `charges`, `maxCharges`
+            - **Capability**: `precision`, `pickupRange`, `power`, `slots`
+            - **Multipliers**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
+            - ※各項目の `enhanceCount` は、`enhancements[key]`（累計強化回数）を格納する。
+
 - **`enhance(): string`**
     - 自身に対してランダムな強化（または修理）を 1 つ実行する。
     - **抽選ルール**:
@@ -80,14 +84,14 @@
             - 耐久性向上: `maxCharges` が `0` 超の場合に対象。
     - **適用ルール**:
         - **修理**: 「耐久性向上」が選択され、かつ `charges < maxCharges` の場合。
-            - `charges` を +1 する。`enhancementLevel` は加算されない。
+            - `charges` を +1 する（この際、`enhancements` は加算されない）。
         - **強化**: 上記以外の場合。
             - 対象プロパティを規定値分加算する。
             - 特例: `maxCharges` が強化された場合は、同時に `charges` も +1 する。
-            - `enhancements[key]` を +1 し、`enhancementLevel` を +1 する。
+            - `enhancements[key]` を +1 する。
     - **戻り値**: 適用された強化のキー名称（UI でのフィードバック用）。
 - **`equals(other: Item): boolean`**
     - 自身と他のアイテムが「論理的に同一（スタック可能）」であるか判定する。
     - **判定基準**: 
         - ID が一致していること。
-        - 動的性能（現在の耐久度、最大耐久度、強化レベル、および各パラメーターの補正値）が完全に一致していること。
+        - 動的性能（現在の耐久度、最大耐久度、プロパティ別の強化回数 (`enhancements`)、および各パラメーターの補正値）が完全に一致していること。
