@@ -33,13 +33,16 @@
 
 - **`constructor(chassis: Item, logic: Item, modules: Item[])`**
     - 各パーツのインスタンスを受け取り、`modules` を ID ごとに `ModuleStack` へ集約して初期化する。
-    - **`name` の生成**: `chassis.name + " ＋ " + logic.name` として自身の名称を決定する。
+    - **uid の生成**: `IDGenerator.generate('rocketitem')` を用いて生成する。
+    - **name の生成**: `chassis.name + " ＋ " + logic.name` として自身の名称を決定する。
 - **`getViewData(): ItemViewData`**
     - UI 表示（アイテムカード）用のプレーンオブジェクトを生成して返す。
     - **マッピング**:
         - `uid`: 自身の `uid`
-        - `name`: 自身の `name`（シャーシ名＋ロジック名）
+        - `name`: 自身の `name`（シャーシ名 ＋ ロジック名）
         - `category`: "rocket"
-        - `stats`: `mass`, `slots`, `precision`, `pickupRange` 等の集計値を `ItemStats` 形式でセット。
-        - **`modules`**: `chassis.getViewData()`, `logic.getViewData()`, および各 **`ModuleStack.getViewData()`** の結果を再帰的に格納。
-
+        - **`stats`**: 全構成パーツを集計した値を `{ value, enhanceCount }` 形式で格納する。
+            - **Physical (Σ)**: `mass`, `charges`, `maxCharges`
+            - **Capability (Σ)**: `precision`, `pickupRange`, `power`, `slots`
+            - **Multipliers (Π)**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
+        - **`modules` (Composition)**: 構成パーツ（`chassis`, `logic`, および各 `ModuleStack`）の `getViewData()` の結果を再帰的に格納する。
