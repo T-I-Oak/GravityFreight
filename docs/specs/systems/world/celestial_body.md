@@ -11,3 +11,7 @@
     - 保持アイテム（Cargo）の管理。
 
 ## 2. インターフェース (Interface)
+
+### プロパティ (Properties)
+
+### メソッド (Methods)
