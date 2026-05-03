@@ -1,107 +1,97 @@
-# Specification: Item
+# Specification: Item Class
 
-## 1. 概要 (Overview)
+## 1. 役割と責務 (Role & Responsibility)
+- **所属ドメイン**: Entity Domain
+- **生存期間**: Exist Lifecycle
+- **役割**: ゲーム内に存在するすべての個体アイテムの基底クラス。
+- **責務**:
+    - アイテムの基本属性（名称、重量、カテゴリ、特殊効果等）の保持。
+    - 個体ごとの状態（現在の耐久度、強化内容）の管理。
+    - 強化によるパラメーター補正の適用。
 
-Item クラスは、ロケット構成パーツおよび発射装備（Chassis, Logic, Module, Launcher, Booster）の基体となるエンティティである。
+## 2. インターフェース (Interface)
 
-- 生存期間: Exist Lifecycle (生成から消失まで)
-- 役割: 属性（耐久度、強化状態）の保持と性能情報の提供
-- 依存関係: DataManager
+### プロパティ (Properties)
+- **Identity & Meta**
+    - `readonly id: string`: マスターデータ上の ID。
+    - `readonly uid: string`: インスタンス固有のユニーク ID。
+    - `readonly name: string`: 名称。
+    - `readonly category: string`: カテゴリ。
+    - `readonly rarity: string`: レアリティ。
+    - `readonly description: string`: 説明文。
+- **Physical & Status**
+    - `mass: number`: 重量。
+    - `charges: number`: 現在の耐久度。
+    - `maxCharges: number`: 最大耐久度。
+- **Capability (Base Stats)**
+    - `precision: number`: 軌道予測の基礎距離。
+    - `pickupRange: number`: アイテム回収の基礎半径。
+    - `power: number`: 射出パワーの基礎値。
+    - `slots: number`: 提供スロット数。
+- **Multipliers (Bonuses)**
+    - `precisionMultiplier: number`: 予測精度倍率。
+    - `pickupMultiplier: number`: 回収範囲倍率。
+    - `gravityMultiplier: number`: 重力耐性倍率。
+    - `powerMultiplier: number`: 射出パワー倍率。
+    - `arcMultiplier: number`: 出口判定拡大倍率。
+- **Action & Effects**
+    - `duration: number`: 効果持続時間。
+    - `preventsLauncherWear: boolean`: ランチャー摩耗防止フラグ。
+    - `onLostBonus: boolean`: ロスト保険フラグ。
+    - `ghostType: string`: ゴースト表示の種類。
+- **Special (Cargo / Coin)**
+    - `deliveryGoalId: string`: 貨物の目的地。
+    - `coinDiscount: number`: 施設割引率。
+    - `score: number`: 獲得スコア。
+- **Enhancement Data**
+    - `enhancements: Record<string, number>`: プロパティ別の強化実行回数。
+        - **対象キーと 1 回あたりの増分**:
+            - `slots`: +1
+            - `precisionMultiplier`: +0.2
+            - `pickupMultiplier`: +0.2
+            - `gravityMultiplier`: -0.1 (最小 0.1)
+            - `maxCharges`: +1 (耐久アイテムのみ)
 
-## 2. クラス定義 (Class Definition)
+### メソッド (Methods)
+- **`constructor(id: string)`**
+    - 指定された ID に基づき、マスターデータを読み込んで初期化する。
+    - **uid の生成**: `IDGenerator.generate('item')` を用いて生成する。全サブクラスは独自に uid を生成する仕様に変更されたため、クラス名に依存しません。
+    - **初期値のルール**:
+        - Multiplier 系（`precisionMultiplier` 等）: マスターデータに定義がない場合は `1.0` で初期化する。
+        - 加算系（`mass`, `precision`, `slots`, `maxCharges` 等）: マスターデータに定義がない場合は `0` で初期化する。
+        - **理由**: `maxCharges` が `0` であることをもって「耐久機能（プロパティ）を保持していない」と判定するため。
+- **`consumeCharge(): boolean`**
+    - 耐久度を 1 減らし、`charges <= 0` になった場合に `true`（破棄）を返す。
+    - **`maxCharges === 0` の場合（使い切りアイテム）**: `charges` の操作は行わず、即座に `true`（破棄）を返す。
+- **`getViewData(): ItemViewData`**
+    - UI 表示（アイテムカード）用のプレーンオブジェクトを生成して返す。
+    - **マッピング**:
+        - `uid`: 自身の `uid`
+        - `name`, `category`, `description`: 自身のプロパティ
+        - **`stats`**: 以下のプロパティを `{ value, enhanceCount }` 形式で格納する。
+            - **Physical**: `mass`, `charges`, `maxCharges`
+            - **Capability**: `precision`, `pickupRange`, `power`, `slots`
+            - **Multipliers**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
+            - ※各項目の `enhanceCount` は、`enhancements[key]`（累計強化回数）を格納する。
 
-### 2.1 公開プロパティ (Public Properties)
-
-外部から参照可能な、計算・補正済みのプロパティ。
-
-| カテゴリ | 名前 | 型 | 説明 |
-| :--- | :--- | :--- | :--- |
-| **識別・状態** | uid | string | 個体識別用ID |
-| | id | string | マスタ定義ID |
-| | charges | number | 現在の残り回数/耐久度 |
-| | enhancement | object | 項目ごとの強化回数 (key: count 形式) |
-| | enhancementCount | number | 累計強化回数 |
-| **表示・基本** | name | string | 表示名 |
-| | category | string | カテゴリ |
-| | rarity | string | レアリティ (common, uncommon, rare, anomaly) |
-| | description | string | 説明文 |
-| **性能数値** | mass | number | 質量 (デフォルト 0) |
-| | slots | number | スロット提供数 (デフォルト 0) |
-| | precision | number | 予測精度 (デフォルト 0) |
-| | pickupRange | number | 回収範囲 (デフォルト 0) |
-| | precisionMultiplier | number | 予測精度の補正倍率 (デフォルト 1.0) |
-| | pickupMultiplier | number | 回収範囲の補正倍率 (デフォルト 1.0) |
-| | gravityMultiplier | number | 重力影響の補正倍率 (デフォルト 1.0) |
-| | powerMultiplier | number | 発射パワーの補正倍率 (デフォルト 1.0) |
-| | arcMultiplier | number | 出口判定エリアの補正倍率 (デフォルト 1.0) |
-| | power | number | 発射台の基礎パワー (デフォルト 0) |
-| | maxCharges | number | 最大耐久度 (デフォルト 0) |
-| **フラグ・特殊** | onLostBonus | boolean | ロスト保険フラグ (デフォルト false) |
-| | ghostType | string | 予測線の表示タイプ |
-| | duration | number | 効果持続時間 (デフォルト 0) |
-| | preventsLauncherWear | boolean | 発射台摩耗防止フラグ (デフォルト false) |
-
-### 2.2 内部プロパティ (Internal State)
-
-クラス内部でのみ使用される非公開プロパティ。
-
-| 名前 | 型 | 説明 |
-| :--- | :--- | :--- |
-| #master | object | DataManager から取得したマスタ定義データの参照 |
-
-### 2.3 メソッド (Methods)
-
-#### constructor(masterId)
-DataManager からマスタ定義を取得し、プロパティを初期化する。
-- **識別子生成**: インスタンス生成時に、一意な `uid` を自動生成して付与する。
-- **補完ルール**: マスタ定義で未定義（undefined）の項目は、以下のデフォルト値で初期化する。
-    - 加算系プロパティ (`slots`, `maxCharges`, `power`, `precision`, `pickupRange`, `duration` 等): `0`
-    - 乗算系プロパティ (`precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`): `1.0`
-    - フラグ系プロパティ (`onLostBonus`, `preventsLauncherWear`): `false`
-- **初期状態**: enhancement は空（全項目 0）であり、charges は初期の maxCharges と等しい。
-
-#### equals(otherItem)
-引数で渡された `Item` インスタンスと、`id` および「性能数値（補足後の最終値）」の全項目が完全に一致しているかを確認し、真偽値を返す。`uid` が異なっていても、同性能のアイテムであれば `true` となる。
-
-#### applyMaintenance()
-要求仕様に基づくランダムな修理または強化を実行する。戻り値として実行された内容（項目名または "repair"）を返す。
-1. **候補選定**: 強化可能な項目（[3.2] 参照）からランダムに 1 つを抽選する。
-2. **特殊判定 (耐久性)**: `maxCharges` が選出された場合
-   - `charges < maxCharges` であれば、`repair()` を実行。強化回数（enhancementCount）は加算しない。
-   - `charges === maxCharges` であれば、`maxCharges` を +1 し、あわせて `charges` も +1 する。その後、強化回数を加算する。
-3. **通常強化**: それ以外が選出された場合
-   - 選択された項目の enhancement[key] を +1 し、値を更新して強化回数を加算する。
-
-#### repair(amount = 1)
-charges を指定量回復し、更新後の charges を返す。最大値は現在の maxCharges。強化回数にはカウントされない。
-
-#### consumeCharge(amount = 1)
-charges を指定量減らし、更新後の charges を返す。最小値は 0。
-
-#### getSnapshot()
-永続化（保存）および再構築に必要な、プレーンなオブジェクトを返す。
-- 含めるプロパティ: `uid`, `id`, `charges`, `maxCharges`, `enhancement`
-
-#### static fromSnapshot(data)
-スナップショットデータからインスタンスを再構築（Hydration）して返す。
-- **処理**:
-    1. `data.id` で constructor を呼び出し、新たなインスタンスを生成する。
-    2. 生成されたインスタンスの `uid` を、保存されていた `data.uid` で上書きする。
-    3. `charges`, `maxCharges`, `enhancement` を反映し、各性能プロパティを再計算する。
-
-## 3. ロジック詳細
-
-### 3.1 耐久度 0 の扱い
-charges が 0 の場合、外部に提供する性能値（集計用）は無効化されるべきであるが、Item インスタンス内部のプロパティ値自体は変更せず、集計ロジック側で charges を参照して判定することを基本とする。
-※ **mass および maxCharges は、耐久度 0 の影響を受けず、常に本来の値を維持する。**
-
-### 3.2 強化候補と増分 (Enhancement Step)
-強化時に選択される候補およびその増分は以下の通り。
-
-| 項目 | 増分 | 抽出条件 |
-| :--- | :--- | :--- |
-| slots | +1 | なし (常に候補) |
-| precisionMultiplier | +0.2 | なし (常に候補) |
-| pickupMultiplier | +0.2 | なし (常に候補) |
-| gravityMultiplier | -0.1 | 元のマスタ値が存在し、かつ現在の値 > 0.1 |
-| maxCharges | +1 | 元のマスタ値が存在する |
+- **`enhance(): string`**
+    - 自身に対してランダムな強化（または修理）を 1 つ実行する。
+    - **抽選ルール**:
+        - 自身の属性から有効な強化候補をリストアップし、その中からランダムに 1 つを選択する。
+        - 候補: `slots`, `precisionMultiplier`, `pickupMultiplier`
+        - 条件付き候補:
+            - `gravityMultiplier`: 現在の値が `0.1` 超の場合に対象。
+            - 耐久性向上: `maxCharges` が `0` 超の場合に対象。
+    - **適用ルール**:
+        - **修理**: 「耐久性向上」が選択され、かつ `charges < maxCharges` の場合。
+            - `charges` を +1 する（この際、`enhancements` は加算されない）。
+        - **強化**: 上記以外の場合。
+            - 対象プロパティを規定値分加算する。
+            - 特例: `maxCharges` が強化された場合は、同時に `charges` も +1 する。
+            - `enhancements[key]` を +1 する。
+    - **戻り値**: 適用された強化のキー名称（UI でのフィードバック用）。
+- **`equals(other: Item): boolean`**
+    - 自身と他のアイテムが「論理的に同一（スタック可能）」であるか判定する。
+    - **判定基準**: 
+        - ID が一致していること。
+        - 動的性能（現在の耐久度、最大耐久度、プロパティ別の強化回数 (`enhancements`)、および各パラメーターの補正値）が完全に一致していること。

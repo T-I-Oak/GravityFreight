@@ -1,58 +1,39 @@
 # Specification: StackedItem Class
 
-## 1. 概要 (Overview)
+## 1. 役割と責務 (Role & Responsibility)
 
-`StackedItem` クラスは、同一の ID を持ち、かつ `Item.equals` メソッドによって「同一特性（同一性能・同一状態）」であると判定される複数の `Item` インスタンスを保持し、スタック（LIFO）形式で管理するコンテナエンティティである。
-`uid` のみが異なる「完全に同質なアイテム」を効率的に一纏まりとして扱うために使用される。
+- **所属ドメイン**: Entity Domain
+- **生存期間**: Session
+- **役割**: 個数を持つアイテムのコンテナ。
+- **責務**:
+    - 同一 ID のアイテムの個数管理。
+    - アイテムの追加・削除・分割ロジックの提供。
 
-- 生存期間: Exist Lifecycle (生成から消失まで)
-- 依存関係: Item, DataManager
+## 2. インターフェース (Interface)
 
-## 2. クラス定義 (Class Definition)
+### プロパティ (Properties)
+- **`readonly uid: string`**: このスタック（山）自体のユニーク ID。
+- **`readonly id: string`**: マスターデータ上の ID。
+- **`readonly items: Item[]`**: 同一 ID かつ **「全く同じ性能」** を持つ実体（`Item` インスタンス）のリスト。
+- **`count` (Getter)**: 保持しているアイテム数 (`items.length`)。
 
-### 2.1 プロパティ (Properties)
+### メソッド (Methods)
 
-| プロパティ | 型 | 説明 |
-| :--- | :--- | :--- |
-| `uid` | `string | null` | スタック自体の固有識別 ID。最初のアイテム追加時に生成され、空になるとリセットされる。 |
-| `id` | `string | null` | スタックされるアイテムの共通 ID。 |
-| `items` | `Item[]` | 内部に保持されている `Item` インスタンスの配列。 |
-| `quantity` | `number` | 現在のスタック数量。 |
-| `representative` | `Item | null` | スタックの代表アイテム（`items[0]`）。アイテムの名称や性能などの特性は、このオブジェクトを介して参照する。 |
+- **`constructor(item: Item)`**
+    - `uid` を `IDGenerator.generate('stackeditem')` で生成し、`this.uid` に設定する。スタック固有のプレフィックスになる。
+    - `this.id = item.id` をコピーし、スタックのマスターデータ ID を保持する。
 
-### 2.2 メソッド (Methods)
+    - `this.items = [item]` で内部リストを初期化する。
+- **`add(item: Item): boolean`**
+    - アイテムをスタックに追加する。
+    - **判定ルール**: `items[0].equals(item)` が `true` を返す場合のみ追加し、`true` を返す。一致しない場合は何もせず `false` を返す。
+- **`pop(): Item`**
+    - スタックから実体を 1 つ取り出して返す（外部仕様としてはどのインスタンスが返るかは区別しないが、内部的には LIFO で動作する）。
+- **`getViewData(): ItemViewData`**
+    - `items[0].getViewData()` の結果を取得し、`uid` と `count` をスタック固有の値で上書きして返す。
+    - **マッピング**:
+        - `uid`: この **スタック自体の `uid`**（操作用ID）。
+        - `count`: 保持しているアイテム数 (`items.length`)。
+        - それ以外 (`name`, `category`, `description`, `stats` など) は `items[0].getViewData()` の結果をそのまま流用する。
+          - ※`stats` に含まれる `charges`, `maxCharges`, 各種性能値も代表アイテム（`items[0]`）のものがそのまま引き継がれる。
 
-#### `constructor()`
-- 処理: 各プロパティを初期状態で初期化する。
-
-#### `push(item)`
-- 引数: `item`: Item インスタンス。
-- 戻り値: boolean (追加に成功したか)
-- 処理:
-    1. スタックが空の場合、`uid`, `id`, `representative` を設定し、`items` に追加する。
-    2. スタックが空でない場合、`item.equals(this.representative)` で特性が一致する場合のみ `items` に追加する。一致しない場合は `false` を返す。
-
-#### `pop()`
-- 戻り値: Item | null
-- 処理:
-    1. スタックの末尾から `Item` を取り出して返す。
-    2. スタックが空になった場合は `uid`, `id`, `representative` をリセット（`null`）する。
-
-#### `getSnapshot()`
-- 戻り値: object (Plain Data / JSON)
-- データ構造: `{ uid, itemSnapshots: [...] }`
-- 処理: スタック自体の `uid` と、保持している各 `Item` のスナップショットを返す。
-
-#### `static fromSnapshot(data)`
-- 引数: `data`: スナップショットオブジェクト。
-- 戻り値: StackedItem インスタンス
-- 処理:
-    1. インスタンスを生成する。
-    2. スナップショットから Item インスタンスを復元し、順次 `push` する。
-    3. 保存されていた `data.uid` で自身の `uid` を上書きする。
-
-## 3. ロジック詳細
-
-### 3.1 特性参照の挙動
-- 本クラスはアイテム特性を保持しない。利用者は `representative` プロパティ（`Item` インスタンス）を介して、`name`, `mass`, `charges` 等の全てのアイテム属性にアクセスする。
-- スタックが空の場合、`representative` は `null` である。
