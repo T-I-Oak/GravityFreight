@@ -20,11 +20,34 @@
         - `achievementTracker.initialize()`（実績データの復元）
         - `flightRecorder.initialize()`（記録インデックスの構築）
     3. **ハンドラ登録（配線）**:
-        - `uiController.setStartHandler(() => this.startGame())`
-        - `uiController.setRecordHandler(() => uiController.showRecordScreen())`
-        - `uiController.setManualHandler(() => uiController.showManualScreen())`
-        - `uiController.setResizeHandler((w, h) => worldRenderer.handleResize(w, h))`
+        - **タイトル画面**:
+            - `uiController.setStartHandler(() => this.startGame())`
+            - `uiController.setRecordHandler(() => uiController.showRecordScreen())`
+            - `uiController.setManualHandler(() => uiController.showManualScreen())`
+            - `uiController.setVolumeHandler((vol) => soundController.setSEVolume(vol))`
+        - **ビルド画面**:
+            - `uiController.setBuildPanelHandler(() => uiController.toggleBuildPanel())`
+            - `uiController.setItemSelectionHandler((uid) => this.handleItemSelection(uid))`
+            - `uiController.setAssembleHandler(() => this.assembleRocket())`
+            - `uiController.setLaunchHandler(() => this.launchRocket())`
+        - **その他**:
+            - `uiController.setMailHandler(() => this.openStoryModal())`
+            - `uiController.setResizeHandler((w, h) => { worldRenderer.handleResize(w, h); cameraController.handleResize(w, h); })`
+            - `uiController.setCanvasInputHandler((e) => this.handleCanvasInput(e))`
     4. **初期画面表示**: `uiController.showTitleScreen()` を実行。
+
+- **`handleItemSelection(uid: string): void`**
+    - アイテム選択・解除の入力を受け、現在の選択状態を更新する。
+    - **注記**: 具体的な選択ロジック（排他選択・解除ルール等）は、**シナリオ 3.1.3** の設計時に確定させる。
+- **`assembleRocket(): void`**
+    - 選択中のパーツを使用して新たな `RocketItem` を組み上げるプロセスを実行する。
+    - **注記**: 素材の消費や生成の具体的なフローは、**シナリオ 3.1.3.3.4** の設計時に確定させる。
+- **`openStoryModal(): void`**
+    - 航行画面でのアイコン押下等により、ストーリーモーダルを表示し、既読化を行う。
+    - **注記**: `StorySystem` との連携シーケンスの詳細は、**シナリオ 4.1.2** の設計時に確定させる。
+- **`handleCanvasInput(event: PointerEvent | WheelEvent): void`**
+    - Canvas 上での入力を受け、`CameraController` や `TrajectoryPredictor` へ適切な操作を命令する。
+    - **注記**: モード判定（パン/回転/AIM）の具体的なロジックは、**シナリオ 3.1.1** の設計時に確定させる。
 
 - **`startGame(): void`**
     - 新規ゲームを開始する。
