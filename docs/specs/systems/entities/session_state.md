@@ -23,7 +23,7 @@
 - **`initialize(): void`**
     - ゲーム開始時の初期状態を構築する。
     - **挙動**:
-        1. `DataManager.getInitialSetup()` を参照し、初期パラメータを取得。
+        1. `DataManager.getMasterInitialSetup()` を参照し、初期パラメータを取得。
         2. 取得した所持金を自身の `coins` にセット。
         3. セクター番号を `0` にセット。
         4. 闇市場訪問回数を `0` にセット。

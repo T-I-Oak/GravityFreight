@@ -22,8 +22,8 @@
 ### メソッド (Methods)
 
 - **`constructor(item: Item)`**
-    - 最初のアイテムを受け取り、スタックを初期化する。
-    - `super` を呼び出し、自身の `uid`, `id`, `name`, `category` 等を `item` から引き継ぐ。
+    - `uid` を `IDGenerator.generate('modulestack')` で生成し、`this.uid` に設定する。
+    - 引数の `item` から `id`, `name`, `category` をコピーし、初期アイテムとして `items` リストに格納する。
 - **`add(item: Item): void`**
     - アイテムをスタックに追加する。
     - **ルール**: `this.id === item.id` であれば無条件で追加する（性能差は無視する）。
@@ -36,7 +36,12 @@
     - UI 描画用のプレーンオブジェクトを生成して返す。
     - **マッピング**:
         - `uid`: 自身の `uid`
-        - `count`: 保持アイテム数。
-        - `charges`: 自身の `charges` (合計値)
-        - `maxCharges`: 自身の `maxCharges` (合計値)
-        - その他の表示項目（`name`, `category`, `stats` 等）: `items[0].getViewData()` の結果をベースに構築する。
+        - `count`: 保持アイテム数 (`items.length`)
+        - `name`, `category`: `items[0]` から取得
+        - **`stats`**: プロパティごとに集計方法（Σ：加算、または Π：乗算）を適用して格納。
+            - **Physical (Σ)**: `mass`, `charges`, `maxCharges`
+            - **Capability (Σ)**: `precision`, `pickupRange`, `power`, `slots`
+            - **Multipliers (Π)**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
+
+
+

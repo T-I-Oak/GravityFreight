@@ -20,15 +20,20 @@
 ### メソッド (Methods)
 
 - **`constructor(item: Item)`**
-    - 最初のアイテムを受け取り、スタックを初期化する。スタック自体の `uid` を生成する。
+    - `uid` を `IDGenerator.generate('stackeditem')` で生成し、`this.uid` に設定する。スタック固有のプレフィックスになる。
+    - `this.id = item.id` をコピーし、スタックのマスターデータ ID を保持する。
+
+    - `this.items = [item]` で内部リストを初期化する。
 - **`add(item: Item): boolean`**
     - アイテムをスタックに追加する。
     - **判定ルール**: `items[0].equals(item)` が `true` を返す場合のみ追加し、`true` を返す。一致しない場合は何もせず `false` を返す。
 - **`pop(): Item`**
     - スタックから実体を 1 つ取り出して返す（外部仕様としてはどのインスタンスが返るかは区別しないが、内部的には LIFO で動作する）。
 - **`getViewData(): ItemViewData`**
-    - UI 描画（アイテムカード）に必要な情報を集約して返す。
+    - `items[0].getViewData()` の結果を取得し、`uid` と `count` をスタック固有の値で上書きして返す。
     - **マッピング**:
-        - `uid`: この **スタック自体の `uid`**（操作用IDとして使用）。
-        - `count`: 保持しているアイテム数。
-        - その他の表示項目（`name`, `category`, `charges`, `maxCharges`, `stats` 等）: `items[0].getViewData()` の結果をベースに構築する。
+        - `uid`: この **スタック自体の `uid`**（操作用ID）。
+        - `count`: 保持しているアイテム数 (`items.length`)。
+        - それ以外 (`name`, `category`, `description`, `stats` など) は `items[0].getViewData()` の結果をそのまま流用する。
+          - ※`stats` に含まれる `charges`, `maxCharges`, 各種性能値も代表アイテム（`items[0]`）のものがそのまま引き継がれる。
+

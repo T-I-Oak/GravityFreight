@@ -49,13 +49,46 @@
 - **`setSavedStoryProgress(data: object): void`**
     - ストーリー進捗データを `localStorage` へ永続化する。
 
+- **`getSavedAchievementData(migrationMap: object): object`**
+    - 「共通ルール」に基づき、実績・統計データを取得する。
+
+- **`setSavedAchievementData(data: object): void`**
+    - 実績・統計データを `localStorage` へ永続化する。
+
+- **`getSavedFlightRecordIndex(migrationMap: object): object`**
+    - 「共通ルール」に基づき、航行記録インデックスを取得する。
+
+- **`setSavedFlightRecordIndex(data: object): void`**
+    - 航行記録インデックスを `localStorage` へ永続化する。
+
 - **`getMasterInitialSetup(): InitialSetupData`**
     - 新規ゲーム開始時の初期所持金、初期装備アイテムリストを返す。
 
 - **`getMasterConfig(): MasterConfigData`**
     - ゲーム全体のバランス調整用定数（ベース星数、境界半径等）を返す。
 
-## 3. データ構造定義 (Data Structures)
+## 3. 内部ロジック (Internal Logic)
+
+### 内部ステート (Internal State)
+- **`lastPlayedVersion: string`**: 起動時に `localStorage` から読み取った前回プレイ時のバージョン（存在しない場合は `null`）。
+- **`currentVersion: string`**: `package.json` から読み取った現在のアプリバージョン。
+
+### 内部メソッド (Private Methods)
+- **`_migrate(data: object, migrationMap: object): object`**
+    1. `migrationMap` のキーから `init` を除外したバージョン文字列のリストを抽出する。
+    2. 抽出したリストを `_compareVersions` を用いて昇順（SemVer順）にソートする。
+    3. ソートされたバージョンのうち、`lastPlayedVersion` よりも新しい（`> lastPlayedVersion`）ものに対応する callback を順次 `data` に適用していく。
+    4. すべての適用が完了した最新状態の `data` を返す。
+
+- **`_compareVersions(v1: string, v2: string): number`**
+    - 2つのバージョン文字列をセマンティックバージョニングに基づき比較する（v1 < v2 なら -1, 一致なら 0, v1 > v2 なら 1）。
+
+- **`_updateLastPlayedVersion(): void`**
+    - `localStorage` に保存されているバージョン情報を、現在の `currentVersion` で上書き更新する。
+
+
+
+## 4. データ構造定義 (Data Structures)
 
 ### AppMetadata
 ```javascript
@@ -90,24 +123,13 @@
 }
 ```
 
-## 4. 内部ロジック (Internal Logic)
-
-### 内部ステート (Internal State)
-- **`lastPlayedVersion: string`**: 起動時に `localStorage` から読み取った前回プレイ時のバージョン（存在しない場合は `null`）。
-- **`currentVersion: string`**: `package.json` から読み取った現在のアプリバージョン。
-
-### 内部メソッド (Private Methods)
-- **`_migrate(data: object, migrationMap: object): object`**
-    1. `migrationMap` のキーから `init` を除外したバージョン文字列のリストを抽出する。
-    2. 抽出したリストを `_compareVersions` を用いて昇順（SemVer順）にソートする。
-    3. ソートされたバージョンのうち、`lastPlayedVersion` よりも新しい（`> lastPlayedVersion`）ものに対応する callback を順次 `data` に適用していく。
-    4. すべての適用が完了した最新状態の `data` を返す。
-
-- **`_compareVersions(v1: string, v2: string): number`**
-    - 2つのバージョン文字列をセマンティックバージョニングに基づき比較する（v1 < v2 なら -1, 一致なら 0, v1 > v2 なら 1）。
-
-- **`_updateLastPlayedVersion(): void`**
-    - `localStorage` に保存されているバージョン情報を、現在の `currentVersion` で上書き更新する。
+### MasterConfigData
+```javascript
+{
+  baseCelestialCount: number, // 1セクターのベース天体数 (初期値: 5)
+  boundaryRadius: number      // セクター境界半径 (单位: px、初期値: 900)
+}
+```
 
 ## 5. マスタデータ構成 (Master Data Configuration)
 
@@ -127,5 +149,13 @@
 {
   "initialCoins": 1200,
   "initialInventory": ["hull_matte", "logic_basic", "launcher_spring"]
+}
+```
+
+### `master_config.json`
+```json
+{
+  "baseCelestialCount": 5,
+  "boundaryRadius": 900
 }
 ```

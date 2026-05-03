@@ -32,8 +32,10 @@
                 - その天体に配置されたアイテムのレアリティが `ANOMALY` である。
         6. 生成した `CelestialBody` および `ExitArc` のインスタンスを自身に保持する。
 
-- **`static fromSnapshot(snapshot: any): Sector`**
+- **`static fromSnapshot(snapshot: any): Sector`** *(保留)*
     - 保存されたスナップショットデータから `Sector` インスタンスを再構築する（リプレイ用）。
+    - ※ `FlightRecorder` の仕様が未確定のため、インターフェースの詳細はその確定後に定義する。
 
-- **`createSnapshot(): any`**
+- **`createSnapshot(): any`** *(保留)*
     - 現在の天体配置やアイテム状態をシリアライズ可能な形式で返す。
+    - ※ `FlightRecorder` の仕様が未確定のため、インターフェースの詳細はその確定後に定義する。

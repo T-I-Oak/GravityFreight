@@ -56,11 +56,11 @@
 - **`updateHUDValue(key: string, value: number): void`**
     - 航行画面が表示されている間、HUD 内の特定の数値（スコア等）を更新する。
 - **`updateMailStatus(type: string, isUnread: boolean): void`**
-    - メールアイコンの状態（種類に応じた色、未読時の明滅演出）を更新する（シナリオ 4.1.2）。
+    - メールアイコンの状態（種類に応じた色、未読時の明滅演出）を更新する。
 - **`setMailHandler(handler: Function): void`**
-    - メールアイコンがクリックされた際のハンドラを登録する（シナリオ 4.1.2）。
+    - メールアイコンがクリックされた際のハンドラを登録する。
 - **`showStoryModal(content: object): void`**
-    - ストーリー閲覧用のモーダルウィンドウを表示する（シナリオ 4.1.2）。
+    - ストーリー閲覧用のモーダルウィンドウを表示する。
 - **`showResultScreen(resultData: FlightResultData): void`**
     - 航行結果表示画面へ遷移する。
 

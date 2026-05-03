@@ -8,20 +8,19 @@
 - **責務**:
     - ズーム、パン、および回転（原点中心）を含む視界管理。
     - ワールド絶対座標からスクリーン座標への変換ロジックの提供。
-    - 追従対象（Rocket等）へのフォーカス制御。
 
 ## 2. インターフェース (Interface)
 
 ### プロパティ (Properties)
 - **`position: Vector2`**: カメラのパン位置。回転角に応じた相対座標として扱う。
 - **`rotation: number`**: ワールド座標 (0, 0) を中心としたカメラの回転角（ラジアン）。
-- **`zoom: number`**: 表示倍率。
+- **`zoomLevel: number`**: 表示倍率。
 - **`viewportSize: Vector2`**: 現在の表示領域（キャンバス）の幅と高さ。※実行時のみ保持し、永続化は行わない。
 
 ### メソッド (Methods)
 - **`initialize(): void`**
     - `DataManager.getSavedCameraState(migrationMap)` を実行し、永続化されている設定値を自身に適用する。
-    - `migrationMap` の `init` では、デフォルトのカメラ状態（position: {0,0}, rotation: 0, zoom: 1.0）を返す。
+    - `migrationMap` の `init` では、デフォルトのカメラ状態（position: {0,0}, rotation: 0, zoomLevel: 1.0）を返す。
     - ※カメラ状態はセクター遷移やミッション再開時に自動リセットされない。
 
 - **`toScreen(worldPos: Vector2): Vector2`**

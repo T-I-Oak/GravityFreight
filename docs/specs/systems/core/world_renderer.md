@@ -14,12 +14,12 @@
 
 ### プロパティ (Properties)
 - **`targetSector: Sector | null`**: 現在描画対象となっているセクターインスタンスへの参照。
-- **`warpScale: number`**: 演出用の追加倍率（初期値 1.0）。描画時に `camera.zoom` に乗算される。
+- **`warpScale: number`**: 演出用の追加倍率（初期値 1.0）。描画時に `camera.zoomLevel` に乗算される。
 - **`warpAlpha: number`**: 演出用の不透明度（初期値 1.0）。セクター内の全オブジェクトに適用される。
 
 ### メソッド (Methods)
 - **`render(): void`**
-    - メインの描画ループ。
+    - メインの描画ループ。PIXI.js の Application Ticker から毎フレーム呼び出される。
     1. `BackgroundManager.render()` を呼び出し、背景を描画する。
     2. `targetSector` が存在する場合、その中の全オブジェクトを `CameraController.getWorldToScreenMatrix()` を用いてスクリーン上に描画する。
 
@@ -28,7 +28,7 @@
 
 - **`startNavigation(rocket: Rocket): void`**
     - 航行画面の描画を開始する。
-    - **内部挙動**: ロケットの描画を有効化し、必要に応じてズームや追従の初期化を行う。
+    - **内部挙動**: ロケットの描画を有効化する。
 
 - **`startWarpEffect(duration: number): void`**
     - 現在のセクターから離脱し、ワープ空間へ突入する際の演出を実行する。
@@ -40,7 +40,8 @@
     - 新しいマップが遠方の極小点から急接近してくるようなスケーリングを行い、期待感を醸成する。
     - （内部実装: `animateWarpEffect(0.05, 1.0, 1.0, 1.0, duration)`）
 
-- **`animateWarpEffect(fromScale: number, fromAlpha: number, toScale: number, toAlpha: number, duration: number): void`**
+- **`animateWarpEffect(fromScale: number, fromAlpha: number, toScale: number, toAlpha: number, duration: number): void`** *(内部実装専用)*
+    - `startWarpEffect()` / `stopWarpEffect()` から内部的に呼び出される。外部から直接呼び出してはならない。
 
 - **`handleResize(width: number, height: number): void`**
     - ブラウザのウィンドウリサイズ等に同期して呼び出され、PIXI.js のレンダラーサイズを更新する。

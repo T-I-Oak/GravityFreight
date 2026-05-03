@@ -25,7 +25,7 @@
     - 初期の星々をランダムに生成・配置する。
     - 視認性を高めるため、遠近感の異なる複数のレイヤー（Z軸の深さ）を持たせる。
 
-- **`render(ctx: CanvasRenderingContext2D): void`**
+- **`render(): void`**
     - `CameraController` の状態を参照し、背景を描画する。
     - **投影・同期ロジック**:
         1. **仮想ピボットの算出**: `ScreenCenter - (CameraController.position * 0.2)` を背景の回転中心とする。これにより、パンに対して 20% の視差（遅れてついてくる効果）が発生する。
