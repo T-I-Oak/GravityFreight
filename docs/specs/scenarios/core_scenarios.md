@@ -28,7 +28,7 @@
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
     - **決定事項**: `UIController.showTitleScreen()` を定義。
 
-- [ ] 0.4 [機能] 背景（Starfield）の生成と描画準備
+- [x] 0.4 [機能] 背景（Starfield）の生成と描画準備
     - [x] 0.4.1 [UI] 遠景の星々の初期配置（Starfieldの生成）
     - [x] 0.4.2 [機能] カメラ回転に応じた背景の連動描画
     - [x] 0.4.3 [機能] WorldRenderer の初期化（PIXIアプリケーション生成と Canvas 配置）
