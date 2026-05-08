@@ -59,3 +59,72 @@
 - **`handleResize(width: number, height: number): void`**
     - ブラウザのウィンドウリサイズ等に同期して呼び出され、PIXI.js のレンダラーサイズを更新する。
     - 併せて `CameraController.handleResize()` および `BackgroundManager.handleResize()` を呼び出し、各コンポーネントにサイズ変更を通知する。
+
+## 3. 描画階層 (Rendering Layers)
+
+PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描画順序を制御する。
+
+| レイヤー名 | 所属 | 役割 | 備考 |
+| :--- | :--- | :--- | :--- |
+| `backgroundContainer` | `stage` | 遠景（星々）の描画 | `BackgroundManager` が管理 |
+| `worldContainer` | `stage` | カメラ変換を受ける全オブジェクト | `CameraController` が変換を適用 |
+| ∟ `trajectoryLayer` | `world` | 予測軌道（軌道予測線） | エイミング中のみ表示 |
+| ∟ `celestialBodyLayer` | `world` | 天体（惑星・母星） |  |
+| ∟ `exitArcLayer` | `world` | 境界線（奥）および出口（手前） | セクター外縁の円弧群 |
+| ∟ `rocketTrailLayer` | `world` | ロケットの飛行軌跡 |  |
+| ∟ `rocketLayer` | `world` | ロケット本体 |  |
+| ∟ `effectLayer` | `world` | スキャナー波紋、爆発等の演出 |  |
+
+- **描画順**: リストの下にあるものほど手前（前面）に描画される。
+- **座標系**: `worldContainer` 以下のレイヤーはすべてワールド座標系（単位: px）で配置される。
+
+## 4. 各オブジェクトの描画仕様 (Object Rendering Specifications)
+
+`WorldRenderer` は、セクター内の各データオブジェクトに対応する PIXI 要素を構築する。
+- **描画順**: 3章と同様、リストの下にあるものほど手前（前面）に描画される。
+
+### 4.1 天体 (CelestialBody)
+天体ごとの `Container` 内に以下の要素を順に構築する。
+- ∟ `glowSprite` (Glow): 円形グラデーションテクスチャによる発光（最背面）。
+- ∟ `coreShape` (核): `PIXI.Graphics` による天体の実体。
+- ∟ `itemIndicator` (リング): 保持アイテムのカテゴリ色リング（最前面）。
+
+**ビジュアル要件**:
+- **色適用**: `isRepulsion` (斥力) なら `--color-star-repulsion`、`isHome` なら `--color-star-home`、それ以外は `--color-star-normal` を使用。
+
+### 4.2 出口 (ExitArc)
+出口ごとの `Container` 内に以下の要素を順に構築する。
+- ∟ `arcShape` (円弧): 境界線（900px）上に描画される太い円弧（最背面）。
+- ∟ `facilityLabel` (施設名): `PIXI.Text` によるラベル。天地補正（Readable Flip）を適用。
+- ∟ `deliveryIcon` (アイコン): 3D風の段ボールマーカー（最前面）。
+
+**ビジュアル要件**:
+- **天地補正 (Readable Flip)**: 画面下半分に位置する場合、ラベルとアイコンの両方を 180 度反転させ、常にプレイヤーから見て天地が正しくなるように制御する。
+- **エフェクト**: 
+    - `StorySystem.isRead(currentPath + facilityID, true)` が `false`（＝そのルートの先に未読あり）の場合、配送アイコンを明滅させる。
+
+### 4.3 セクター境界線 (Boundary Line)
+`exitArcLayer` の最背面に、セクター全体の広さを示すガイドとして描画される。
+- ∟ `boundaryShape`: 半径 900px の円。
+
+**ビジュアル要件**:
+- 出口（円弧）の土台として機能するため、出口よりも細い実線で描画される。
+
+## 5. デザイン情報の取得 (Design Tokens)
+
+`WorldRenderer` が描画に使用する色は、JS 内にハードコードせず、CSS 変数から取得する。
+
+- **取得タイミング**: 初期化時、およびリサイズ（`handleResize`）時。
+- **変換処理**: CSS のカラー文字列（`#RRGGBB`）を取得し、PIXI が解釈可能な数値形式（`0xRRGGBB`）へ変換して保持する。
+
+## 6. カメラ行列の適用 (Camera Transformation)
+
+ワールド座標系（セクター内）からスクリーン座標系（Canvas表示）への投影は、`worldContainer` に対して一括で行う。
+
+- **行列の更新タイミング**: `CameraController` が座標・ズームを計算した直後。
+- **適用フロー**:
+    1. `CameraController.getWorldToScreenMatrix()` により最新の表示用行列（`PIXI.Matrix`）を取得する。
+    2. `worldContainer.transform.setFromMatrix(matrix)` を実行し、全ワールドレイヤーを一括変換する。
+- **背景との同期**: 
+    - `backgroundContainer` は `worldContainer` の移動量に対し、一定の係数（Parallax係数）を乗算した値を適用し、視差効果を演出する。
+    - 詳細は `BackgroundManager.md` を参照。
