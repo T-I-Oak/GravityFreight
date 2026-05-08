@@ -15,7 +15,18 @@
 ### ライフサイクル (Lifecycle)
 - **`initialize(): void`**
     - `DataManager` から保存された進捗データを取得し、自身の内部状態を初期化する。
-    - 内部で `migrationMap`（バージョンごとの変換関数）を定義し、`DataManager.getSavedStoryProgress(migrationMap)` を呼び出すことで、セーブデータの最新化とデフォルト値の適用を同時に行う。
+    - **内部実装詳細**:
+        1. `MigrationMap`（DataManager 仕様参照）を定義する。
+           - `init()` はデフォルトの `StoryProgressData` を返す。
+        2. `DataManager.getSavedStoryProgress(migrationMap)` を呼び出す。
+        3. 取得したデータの `readMessageIds` を内部変数に展開する。
+
+#### DataManager との連携シーケンス
+1. `StorySystem.initialize()`
+2. 　→ `DataManager.getSavedStoryProgress(migrationMap)`
+3. 　　→ (DataManager 内部) `localStorage` からデータ取得・マイグレーション
+4. 　← 復元された `StoryProgressData` オブジェクトを返す
+5. `StorySystem` が内部状態を更新
 
 ### 状態管理 (State Management)
 - **`isRead(storyId: string): boolean`**

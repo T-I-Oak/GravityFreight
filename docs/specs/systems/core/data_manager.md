@@ -31,32 +31,32 @@
 2. データが存在しない場合、引数の `migrationMap.init()` を実行して結果を返す。
 3. データが存在する場合、内部メソッド `_migrate(data, migrationMap)` を通じて最新化されたデータを返す。
 
-- **`getSavedSEVolume(migrationMap: object): object`**
+- **`getSavedSEVolume(migrationMap: MigrationMap): object`**
     - 「共通ルール」に基づき、SE 音量設定を取得する。
 
 - **`setSavedSEVolume(data: object): void`**
     - SE（効果音）の音量を `localStorage` へ永続化する。
 
-- **`getSavedCameraState(migrationMap: object): object`**
+- **`getSavedCameraState(migrationMap: MigrationMap): object`**
     - 「共通ルール」に基づき、カメラの状態を取得する。
 
 - **`setSavedCameraState(data: object): void`**
     - カメラの状態を `localStorage` へ永続化する。
 
-- **`getSavedStoryProgress(migrationMap: object): object`**
+- **`getSavedStoryProgress(migrationMap: MigrationMap): object`**
     - 「共通ルール」に基づき、ストーリー進捗データを取得する。
 
 - **`setSavedStoryProgress(data: object): void`**
     - ストーリー進捗データを `localStorage` へ永続化する。
 
-- **`getSavedAchievementData(migrationMap: object): object`**
+- **`getSavedAchievementData(migrationMap: MigrationMap): object`**
     - 「共通ルール」に基づき、実績・統計データを取得する。
 
 - **`setSavedAchievementData(data: object): void`**
     - 実績・統計データを `localStorage` へ永続化する。
 
-- **`getSavedFlightRecordIndex(migrationMap: object): object`**
-    - 「共通ルール」に基づき、航行記録インデックスを取得する。
+- **`getSavedFlightRecordIndex(migrationMap: MigrationMap): object`**
+    - 「共通ルール」に基づき、航行記録インデックス（メタデータのリスト）を取得する。
 
 - **`setSavedFlightRecordIndex(data: object): void`**
     - 航行記録インデックスを `localStorage` へ永続化する。
@@ -89,6 +89,15 @@
 
 
 ## 4. データ構造定義 (Data Structures)
+
+### MigrationMap
+DataManager の各 `getSaved*` メソッドに渡す変換手順書。
+```javascript
+{
+  init: () => object,               // (必須) データが存在しない場合の初期データ生成
+  [version: string]: (data: object) => object // (任意) 過去バージョンからの変換ロジック
+}
+```
 
 ### AppMetadata
 ```javascript

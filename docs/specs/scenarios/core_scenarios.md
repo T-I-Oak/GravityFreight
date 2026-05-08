@@ -16,13 +16,13 @@
 **役割**: アプリケーションの起動、アセットロード、各種マネージャーのインスタンス化。
 - [x] 0.1 [機能] 静的マスタデータのロード
     - **決定事項**: `DataManager.loadAllData()`, `AppOrchestrator.boot()` を定義。
-- [ ] 0.2 [機能] 各システムクラスの初期化
-    - [ ] 0.2.1 [機能] ユーザー設定・進捗の復元
+- [x] 0.2 [機能] 各システムクラスの初期化
+    - [x] 0.2.1 [機能] ユーザー設定・進捗の復元
         - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
-        - [ ] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
-        - [ ] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
-        - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
-        - **決定事項 (StorySystem)**: `StorySystem` は自身の `initialize()` 内で `DataManager.getSavedStoryProgress(migrationMap)` を呼び出す。自身が定義する `migrationMap` を渡すことで、`DataManager` の共通基盤を通じて最新状態へ復元されたデータを受け取る。
+        - [x] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
+        - [x] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
+        - [x] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
+        - **決定事項**: `StorySystem`, `AchievementTracker`, `FlightRecorder` は、それぞれの `initialize()` 内で `DataManager` の該当する取得メソッドを呼び出す。その際、各クラスで定義した `MigrationMap`（DataManager 仕様準拠）を渡すことで、初期値の生成およびバージョン間のデータ変換を `DataManager` の共通基盤へ委譲する。
     - [x] 0.2.2 [機能] UIハンドラの登録
         - **決定事項**: `AppOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、タイトル画面等の UI 操作とシステムクラスの処理を紐付ける。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
@@ -40,6 +40,11 @@
             - `container` は `UIController.getMapContainer()` から取得した DOM 要素。
             - 内部で `PIXI.Application` を生成し、`container.appendChild(app.view)` で Canvas を配置。
             - 初期化の最後に `handleResize()` を呼び出し、レンダラーおよび各コンポーネント（Camera, Background）の描画領域を確定させる。
+    - [ ] 0.4.4 [シナリオ] ワールドオブジェクトの描画構造
+        - [ ] 0.4.4.1 [UI] 描画レイヤーの重なり（背景/天体/出口/ロケット/エフェクト）
+        - [ ] 0.4.4.2 [UI] 天体（CelestialBody）の基本表現（核/重力圏/極性エフェクト）
+        - [ ] 0.4.4.3 [UI] 出口（ExitArc）の基本表現（円弧/施設アイコン）
+        - [ ] 0.4.4.4 [機能] カメラ行列（World-to-Screen）の適用フロー
 
 ## 1 タイトル画面
 **役割**: ゲーム開始、アーカイブ閲覧、説明書閲覧、音量設定。
@@ -309,4 +314,7 @@
 ## 10 記録画面
 **役割**: 過去の航行成績、リプレイ、実績達成状況の閲覧。
 - [ ] 10.1 [機能] 過去の航行成績・実績の閲覧
+    - [ ] 10.1.1 [設計] 閲覧対象とする統計項目（累計額、距離等）の定義
+    - [ ] 10.1.2 [設計] 実績（解禁条件と称号）のリスト定義
+    - [ ] 10.1.3 [UI] 統計・実績リストの表示レイアウト
 - [ ] 10.2 [機能] リプレイ再生の管理
