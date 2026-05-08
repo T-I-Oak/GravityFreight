@@ -67,6 +67,11 @@
 - **`showResultScreen(resultData: FlightResultData): void`**
     - 航行結果表示画面へ遷移する。
 
+- **`showSettingsDialog(): void`**
+    - 音量設定ダイアログを表示する。
+- **`hideSettingsDialog(): void`**
+    - 音量設定ダイアログを閉じる。
+
 ### ビルドパネル制御 (Build Panel Control)
 
 - **`openBuildPanel(): void`**
@@ -95,9 +100,22 @@
     - ビルドパネルの「開閉ボタン」にハンドラを登録する。
     - **内部挙動**: 開閉ボタン要素を引数として `setOperationHandler` を呼び出す。
 
+- **`setSettingsCloseHandler(handler: Function): void`**
+    - 設定ダイアログの「閉じる（保存）ボタン」にハンドラを登録する。
+- **`setSettingsCancelHandler(handler: Function): void`**
+    - 設定ダイアログの「キャンセルボタン」にハンドラを登録する。
+
 - **`setVolumeHandler(handler: (value: number) => void): void`**
     - 設定画面の音量スライダー操作時のハンドラを登録する。
-    - **内部挙動**: **シナリオ 1.4** にて定義される、専用のスライダー制御ロジック（音響演出を含む）を介して登録を行う。
+    - **内部挙動**:
+        1. 内部で保持する音量スライダー要素 (`input[type="range"]`) に対し、以下のイベントを購読する。
+        2. **`input` イベント (値の変更通知)**:
+            - 操作中に連続して発生。
+            - スライダーの現在値を 0.0 〜 1.0 の範囲で取得し、`handler(value)` を実行する。
+        3. **`change` イベント (離上時のプレビュー再生)**:
+            - スライダーを離した（値が確定した）瞬間に発生。
+            - `SoundController.playSE('select', sliderValue)` を実行する。
+            - **重要**: `playSE` の第2引数に現在のスライダー値を渡すことで、グローバル音量を変更せずにプレビュー再生を行う。
 
 - **`setItemSelectionHandler(handler: (uid: string) => void): void`**
     - ビルドパネル内のアイテム要素が選択された際のハンドラを登録する。
