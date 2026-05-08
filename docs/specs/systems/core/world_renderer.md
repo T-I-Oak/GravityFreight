@@ -16,8 +16,18 @@
 - **`targetSector: Sector | null`**: 現在描画対象となっているセクターインスタンスへの参照。
 - **`warpScale: number`**: 演出用の追加倍率（初期値 1.0）。描画時に `camera.zoomLevel` に乗算される。
 - **`warpAlpha: number`**: 演出用の不透明度（初期値 1.0）。セクター内の全オブジェクトに適用される。
+- **`canvas: HTMLCanvasElement` (Read-only)**: PIXI レンダラーの `view` 要素。`UIController` 等がイベント登録のために使用する。
 
 ### メソッド (Methods)
+- **`initialize(container: HTMLElement): void`**
+    - PIXI.js の初期化とメインループの開始を行う。
+    - **内部挙動**:
+        1. `PIXI.Application` インスタンスを生成する（透明度・アンチエイリアス等の基本設定を含む）。
+        2. `container` のサイズに合わせてレンダラーのサイズを初期設定する。
+        3. `container.appendChild(app.view)` を実行し、Canvas を DOM に配置する。
+        4. PIXI の Ticker に `this.render` を登録し、メインループを開始する。
+        5. 初期化完了後、`this.handleResize(container.clientWidth, container.clientHeight)` を一度呼び出して各コンポーネントの描画領域を確定させる。
+
 - **`render(): void`**
     - メインの描画ループ。PIXI.js の Application Ticker から毎フレーム呼び出される。
     1. `BackgroundManager.render()` を呼び出し、背景を描画する。
