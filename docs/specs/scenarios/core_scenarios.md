@@ -57,13 +57,16 @@
     - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
 - [x] 1.3 [機能] 説明書画面の表示
     - **決定事項**: `UIController.showManualScreen()`, `UIController.setManualHandler()` を定義。
-- [x] 1.4 [機能] 音量設定
+- [x] 1.4 [機能] 設定画面
+    - **役割**: 各種システム設定（現在は音量のみ）の変更。
     - [x] 1.4.1 [UI] SE音量スライダー
-    - [x] 1.4.2 [UI] 閉じるボタン
-    - [x] 1.4.3 [機能] SEスライダー操作時の音量プレビュー再生
-    - [x] 1.4.4 [機能] ダイアログを閉じる際の localStorage への永続化
-    - [x] 1.4.5 [機能] キャンセル時の設定破棄
-    - **決定事項**: `SoundController.setSEVolume()`, `SoundController.playSE(id, volume)`, `DataManager.setSEVolume()` を定義。
+    - [x] 1.4.2 [UI] 閉じる（保存）ボタン
+    - [x] 1.4.3 [UI] キャンセルボタン
+    - **決定事項**:
+        - **音量反映**: スライダー操作中（`input`イベント）は、UI 上の数値表示等のみを更新する。グローバルな `SoundController.seVolume` はこの時点では変更しない。
+        - **プレビュー音**: スライダーを離した瞬間（`change`イベント）に `SoundController.playSE('select', sliderValue)` を実行する。第2引数にスライダーの値を渡すことで、グローバル設定に関わらず「その音量での聞こえ方」をプレビューする。
+        - **確定・永続化**: 「閉じる（保存）」ボタン押下時に、最新のスライダー値を引数として `SoundController.setSEVolume(sliderValue)` を一度だけ実行する。これによりランタイム更新と `localStorage` 保存が同時に行われる。
+        - **キャンセル**: 「キャンセル」ボタン押下時は、`SoundController` のメソッドを呼ばずにダイアログを閉じる（変更は破棄される）。
 - [x] 1.5 [UI] バージョン、コピーライト表示
     - **決定事項**: `DataManager.getAppMetadata()` を定義。
 
