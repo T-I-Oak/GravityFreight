@@ -36,6 +36,10 @@
         - `BackgroundManager` を定義し、z軸（奥行き）を持つ星々を管理。
         - カメラの `rotation` に 100% 同期して回転する。
         - カメラの `position`（パン）に対して 20% の視差効果（Parallax）を適用して連動する。
+        - **WorldRenderer 初期化**: `AppOrchestrator.boot()` 内で `WorldRenderer.initialize(container, camera, background)` を実行。
+            - `container` は `UIController.getMapContainer()` から取得した DOM 要素。
+            - 内部で `PIXI.Application` を生成し、`container.appendChild(app.view)` で Canvas を配置。
+            - 初期化の最後に `handleResize()` を呼び出し、レンダラーおよび各コンポーネント（Camera, Background）の描画領域を確定させる。
 
 ## 1 タイトル画面
 **役割**: ゲーム開始、アーカイブ閲覧、説明書閲覧、音量設定。
