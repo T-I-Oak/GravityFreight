@@ -15,7 +15,7 @@
 ## 0 全体初期化
 **役割**: アプリケーションの起動、アセットロード、各種マネージャーのインスタンス化。
 - [x] 0.1 [機能] 静的マスタデータのロード
-    - **決定事項**: `DataManager.loadAllData()`, `GameOrchestrator.boot()` を定義。
+    - **決定事項**: `DataManager.loadAllData()`, `AppOrchestrator.boot()` を定義。
 - [ ] 0.2 [機能] 各システムクラスの初期化
     - [ ] 0.2.1 [機能] ユーザー設定・進捗の復元
         - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
@@ -24,7 +24,7 @@
         - [ ] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
         - **決定事項 (StorySystem)**: `StorySystem` は自身の `initialize()` 内で `DataManager.getSavedStoryProgress(migrationMap)` を呼び出す。自身が定義する `migrationMap` を渡すことで、`DataManager` の共通基盤を通じて最新状態へ復元されたデータを受け取る。
     - [x] 0.2.2 [機能] UIハンドラの登録
-        - **決定事項**: `GameOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、UI操作（ボタン、アイテム選択、音量等）およびウィンドウ・Canvasイベントと各システムクラスの処理を紐付ける。
+        - **決定事項**: `AppOrchestrator.boot()` 内で、`UIController` が提供する `setXXXHandler` メソッド群を使用して、タイトル画面等の UI 操作とシステムクラスの処理を紐付ける。
 - [x] 0.3 [機能] 初期状態への遷移（タイトル表示）
     - **決定事項**: `UIController.showTitleScreen()` を定義。
 
@@ -39,16 +39,16 @@
 
 ## 1 タイトル画面
 **役割**: ゲーム開始、アーカイブ閲覧、説明書閲覧、音量設定。
-- [ ] 1.1 [機能] ゲーム開始
+- [x] 1.1 [機能] ゲーム開始
     - [x] 1.1.1 [UI] 開始ボタン
         - [x] 1.1.1.1 [機能] 決定音の再生
             - **決定事項**: **UI レイヤー**（UIController等）の責務。クリック検知時に Orchestrator のハンドラを呼ぶ直前に `SoundController.playSE()` を実行する。
     - [x] 1.1.2 [シナリオ] ボタン押下による「ゲーム開始」プロセスのキック
     - [x] 1.1.3 [機能] プレイヤー状態の初期化（初期所持金・装備のロード）
     - [x] 1.1.4 [機能] セクター番号を「0」にセット
-    - [ ] 1.1.5 [機能] GameController の初期化（セクター管理の開始）
+    - [x] 1.1.5 [機能] GameController の初期化（セクター管理の開始）
     - [x] 1.1.6 [シナリオ] 「セクター開始画面」への遷移
-    - **決定事項**: `SessionState.initialize()`, `GameController.initialize()`, `GameOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorStartScreen()` を定義。
+    - **決定事項**: `SessionState.initialize()`, `GameController.initialize()`, `AppOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorStartScreen()` を定義。
 - [x] 1.2 [機能] 記録画面の表示
     - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
 - [x] 1.3 [機能] 説明書画面の表示
@@ -81,7 +81,7 @@
     - **決定事項**:
         - `CameraController` の視界状態（パン・回転・ズーム）はセクター遷移時にリセットせず、完全に維持する。
         - `WorldRenderer` は演出開始時点の `targetSector` への参照を維持して描画を継続する。
-        - `GameOrchestrator.beginSectorTransition()` が演出とデータ生成のシーケンスを統括する。
+        - `GameController.beginSectorTransition()` が演出とデータ生成のシーケンスを統括する。
 - [ ] 2.2 [機能] 次セクター初期化
     - [x] 2.2.1 [機能] セクター番号のインクリメント
     - [ ] 2.2.2 [機能] 新セクターのマップ生成
@@ -92,8 +92,7 @@
     - [x] 2.2.3 [UI] セクタータイトル表示
         - [x] 2.2.3.1 [UI] 「SECTOR X」の中央表示
         - [x] 2.2.3.2 [UI] 5の倍数時：「ANOMALY SECTOR X」の表示
-    - [ ] 2.2.4 [機能] ANOMALY SECTOR 特殊ルールの適用（引力/斥力の XOR 逆転ロジックの実装）
-        - [INCONSISTENT]: `new Sector(sessionState, isAnomaly)` コンストラクタの定義が Specs に存在しません。
+    - [x] 2.2.4 [機能] ANOMALY SECTOR 特殊ルールの適用（引力/斥力の XOR 逆転ロジックの実装）
     - **決定事項**:
         - **アノマリー極性判定（XOR）**: 天体が斥力（反発）となるのは「セクターがアノマリー」または「保持アイテムがアノマリー」のいずれか一方のみに該当する場合。
         - **天体数決定**: `5 (Base) + sessionState.blackMarketVisits`。
@@ -209,7 +208,7 @@
 
 - [x] 3.2 [機能] 航行の開始（発射）
     - [x] 3.2.1 [シナリオ] 発射ボタン押下による航行シーケンスの開始（3.1.4.1.2 と同期）
-        - `GameOrchestrator.launchRocket(rocket, angle)` を定義。
+        - `GameController.launchRocket(rocket, angle)` を定義。
         - 3.1.4.1.2 に基づき、インベントリからのパーツ抽出（RocketItem, Launcher, Booster）を実行。
         - **UI遷移**: `UIController.showNavigationScreen()` を呼び出し、Chapter 4（航行画面）へ遷移する。
 
@@ -221,7 +220,7 @@
             - HUD は各項目の「真の値」とは別に「表示用の値」を内部保持し、補間アニメーションを行う。
         - **決定事項**:
             - **真の値のソース**: HUD が表示するスコアは **「`SessionState` の累計値 ＋ 今回の航行ティック数」** の合算である。
-            - **通知経路**: `GameOrchestrator` がメインループ内のティック更新に合わせ、累積したティック数をベーススコアに加算して HUD へ通知する。
+            - **通知経路**: `GameController` がメインループ内のティック更新に合わせ、累積したティック数をベーススコアに加算して HUD へ通知する。
             - **Rocket の役割**: `Rocket` 内部でも `updateState` を通じてティック数を保持するが、これは第5章（リザルト）の内訳表示用の記録として使用する。
             - **インターフェース定義**:
                 - `UIController.showNavigationScreen()`: 航行画面への遷移。
@@ -231,13 +230,13 @@
             - ストーリーの種類（T / R / B）に応じたアイコンカラーを表示する。
             - **未読時**: アイコンを明滅（Blinking）させてプレイヤーに通知する。
         - **決定事項**:
-            - **オーケストレーション**: `GameOrchestrator` が主体となって以下の連鎖を制御する。
+            - **オーケストレーション**: `GameController` が主体となって以下の連鎖を制御する。
             - **インターフェース定義**:
-                - `UIController.updateMailStatus(type, isUnread)`: [Caller: `GameOrchestrator`] メールの種類に応じた色設定と、未読状態（明滅）を更新する。
-                - `UIController.setMailHandler(handler)`: [Caller: `GameOrchestrator`] アイコン押下時のコールバックを登録。
-                - `UIController.showStoryModal(content)`: [Caller: ハンドラ経由の `GameOrchestrator`] 物語閲覧用のモーダルを表示する。
+                - `UIController.updateMailStatus(type, isUnread)`: [Caller: `GameController`] メールの種類に応じた色設定と、未読状態（明滅）を更新する。
+                - `UIController.setMailHandler(handler)`: [Caller: `GameController`] アイコン押下時のコールバックを登録。
+                - `UIController.showStoryModal(content)`: [Caller: ハンドラ経由の `GameController`] 物語閲覧用のモーダルを表示する。
             - **実行シーケンス**:
-                - アイコン押下時、`GameOrchestrator` が登録したハンドラが起動。
+                - アイコン押下時、`GameController` が登録したハンドラが起動。
                 - `UIController.showStoryModal()` を表示し、同時に `StorySystem.updateReadStatus()` を呼び出して既読化を実行する。
                 - **直後に `UIController.updateMailStatus(type, false)` を呼び出し、アイコンの明滅を停止させる。**
 - [ ] 4.2 [機能] アイテムの取得と特殊効果の発動
