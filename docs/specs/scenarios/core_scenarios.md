@@ -31,7 +31,7 @@
 - [ ] 0.4 [機能] 背景（Starfield）の生成と描画準備
     - [x] 0.4.1 [UI] 遠景の星々の初期配置（Starfieldの生成）
     - [x] 0.4.2 [機能] カメラ回転に応じた背景の連動描画
-    - [ ] 0.4.3 [機能] WorldRenderer の初期化（PIXIアプリケーション生成と Canvas 配置）
+    - [x] 0.4.3 [機能] WorldRenderer の初期化（PIXIアプリケーション生成と Canvas 配置）
     - **決定事項**:
         - `BackgroundManager` を定義し、z軸（奥行き）を持つ星々を管理。
         - カメラの `rotation` に 100% 同期して回転する。
@@ -67,18 +67,15 @@
 **役割**: セクター初期化処理、ワープ演出の実行。
 - [x] 2.1 [シナリオ] ワープ開始
     - [x] 2.1.1 [UI] 前セクターのマップ表示（継続）
-    - [ ] 2.1.2 [シナリオ] 背景の星が高速で流れる（ワープ演出）
-        - [INCONSISTENT]: `BackgroundManager.startWarpEffect()` の定義が Specs に存在しません。
+    - [x] 2.1.2 [シナリオ] 背景の星が高速で流れる（ワープ演出）
         - **決定事項**:
             - `BackgroundManager.startWarpEffect(duration)` を定義。星の z 移動により光跡を描画し高速感を演出する。
-    - [ ] 2.1.3 [シナリオ] マップの拡大・消失
-        - [INCONSISTENT]: `WorldRenderer.startWarpEffect()` の定義が Specs に存在しません。
+    - [x] 2.1.3 [シナリオ] マップの拡大・消失
         - **決定事項**:
             - `WorldRenderer.startWarpEffect(duration)` を定義。Scale 1.0→20.0, Alpha 1.0→0.0 へと変化させ消失させる。
     - [x] 2.1.4 [機能] 内部状態の維持（前セクター状態を保持）
     - [x] 2.1.5 [機能] セクター 1 開始時の特殊処理（マップなしの状態から開始）
-    - [ ] 2.1.6 [機能] ワープ音（ホワイトノイズ系SE）の再生開始
-        - [INCONSISTENT]: `SoundController.startWarpEffect()` の定義が Specs に存在しません。
+    - [x] 2.1.6 [機能] ワープ音（ホワイトノイズ系SE）の再生開始
         - **決定事項**:
             - `SoundController.startWarpEffect(fadeInDuration)` を定義。
     - **決定事項**:
@@ -96,7 +93,7 @@
         - [x] 2.2.3.1 [UI] 「SECTOR X」の中央表示
         - [x] 2.2.3.2 [UI] 5の倍数時：「ANOMALY SECTOR X」の表示
     - [ ] 2.2.4 [機能] ANOMALY SECTOR 特殊ルールの適用（引力/斥力の XOR 逆転ロジックの実装）
-        - [INCONSISTENT]: `new Sector(sessionState)` コンストラクタの定義が Specs に存在しません。
+        - [INCONSISTENT]: `new Sector(sessionState, isAnomaly)` コンストラクタの定義が Specs に存在しません。
     - **決定事項**:
         - **アノマリー極性判定（XOR）**: 天体が斥力（反発）となるのは「セクターがアノマリー」または「保持アイテムがアノマリー」のいずれか一方のみに該当する場合。
         - **天体数決定**: `5 (Base) + sessionState.blackMarketVisits`。
@@ -125,7 +122,7 @@
             - [x] 3.1.1.1.2 [シナリオ] ドラッグ操作の継続性
                 - ドラッグ開始から離すまで操作を継続（キャンバス外やパネル上を通過しても中断しない）
         - [x] 3.1.1.2 [機能] ドラッグ/スクロール量に応じたリアルタイムな描画追従
-        - [ ] 3.1.1.3 [機能] カメラ状態の永続化
+        - [x] 3.1.1.3 [機能] カメラ状態の永続化
             - ズーム、パン、回転のいずれかの操作が完了した時点で、最新のカメラ状態を保存する。
         - **決定事項**:
             - `CameraController.zoom(factor, screenAnchor)`
@@ -136,8 +133,7 @@
             - ※入力はすべてスクリーン座標（左上原点）を基準とし、Camera内部で変換を行う。
     - [x] 3.1.2 [シナリオ] ウィンドウのリサイズ対応
         - [x] 3.1.2.1 [UI] ブラウザのウィンドウサイズ変更に応じた描画領域の自動拡張・縮小
-        - [ ] 3.1.2.2 [機能] リサイズ後もワールド原点 (0, 0) が常に画面中心に維持される座標計算の更新
-            - [INCONSISTENT]: `CameraController.handleResize()` の具体的な定義が Specs に存在しません。
+        - [x] 3.1.2.2 [機能] リサイズ後もワールド原点 (0, 0) が常に画面中心に維持される座標計算の更新
         - **決定事項**:
             - `CameraController.handleResize(width, height)`
             - `WorldRenderer` がブラウザのリサイズイベントを検知し、Renderer のサイズ更新と共に `CameraController` へ通知する。
@@ -145,8 +141,7 @@
     - [x] 3.1.3 [UI] ビルドパネル
         - [x] 3.1.3.1 [UI] パネルヘッダー
             - [x] 3.1.3.1.1 [UI] パネル開閉ボタン
-                - [ ] 3.1.3.1.1.1 [機能] パネルの開閉トグル
-                    - [INCONSISTENT]: `UIController.toggleBuildPanel()` 等の定義が Specs に存在しません。
+                - [x] 3.1.3.1.1.1 [機能] パネルの開閉トグル
                 - [x] 3.1.3.1.1.2 [シナリオ] パネルの表示状態切り替え
                     - ボタン押下時、パネルの表示/非表示が切り替わる。非表示時はボタンのみが残る。
             - **決定事項**:
