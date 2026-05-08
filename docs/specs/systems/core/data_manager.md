@@ -126,8 +126,19 @@
 ### MasterConfigData
 ```javascript
 {
-  baseCelestialCount: number, // 1セクターのベース天体数 (初期値: 5)
-  boundaryRadius: number      // セクター境界半径 (单位: px、初期値: 900)
+  baseCelestialCount: number,    // 1セクターのベース天体数 (標準: 5)
+  boundaryRadius: number,        // セクター境界半径 (単位: px、標準: 900)
+  placementLimitRadius: number,  // 天体配置制限半径 (単位: px、標準: 700)
+  minBodyDistance: number,       // 天体間最小距離 (単位: px、標準: 180)
+  homeStarRadius: number,        // 母星の半径 (単位: px、標準: 25)
+  homeStarMass: number,          // 母星の質量 (標準: 4000)
+  arcFacilityWidths: {           // 施設ごとの開口幅 (単位: 度)
+    TRADING_POST: number,        // (標準: 60)
+    REPAIR_DOCK: number,         // (標準: 40)
+    BLACK_MARKET: number         // (標準: 20)
+  },
+  arcMaxExpansion: number,       // 配置計算用の最大拡大倍率 (標準: 2.0)
+  arcMinMargin: number           // 出口間の最小マージン角 (単位: 度、標準: 5)
 }
 ```
 
@@ -156,6 +167,17 @@
 ```json
 {
   "baseCelestialCount": 5,
-  "boundaryRadius": 900
+  "boundaryRadius": 900,
+  "placementLimitRadius": 700,
+  "minBodyDistance": 180,
+  "homeStarRadius": 25,
+  "homeStarMass": 4000,
+  "arcFacilityWidths": {
+    "TRADING_POST": 60,
+    "REPAIR_DOCK": 40,
+    "BLACK_MARKET": 20
+  },
+  "arcMaxExpansion": 2.0,
+  "arcMinMargin": 5
 }
 ```
