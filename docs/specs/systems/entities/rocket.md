@@ -32,9 +32,10 @@
 
 ### メソッド (Methods)
 
-- `updateState(pos: Vector2, vel: Vector2): void`
+- `updateState(pos: Vector2, vel: Vector2): number`
     - 自身の `position`, `velocity` を更新する。
     - 同時に `actualTrail` へ現在の座標を追加し、`ticks` をインクリメントする。
+    - **戻り値**: インクリメント後の `ticks` を返す。
 - `getInitialVelocity(): Vector2`
     - `rocketItem`, `launcher`, `booster`, `angle` に基づいて初速ベクトルを算出して返す。
     - 航行開始直前に `GameController` が呼び出し、結果を `velocity` にセットする。

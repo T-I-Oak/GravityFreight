@@ -55,9 +55,21 @@
     - **内部挙動**: 他の画面要素（ビルド画面等）を隠し、HUD 要素の表示状態（`.hide` クラスの除去等）を切り替える。
 - **`initHUD(initialData: object): void`**
     - 契約（ゲーム）開始時に HUD を初期化し、表示を開始する。
-    - **内部挙動**: `SessionState` から渡された初期値（スコア、セクター等）を各カウンターにセットする。
+    - **内部挙動**: 
+        1. `SessionState` から渡された初期値（スコア、セクター、コイン等）を各項目の `internalValue` および `targetValue` の**両方に**セットする。
+        2. 初期値に基づき、演出なし（即座）で DOM に値を反映する。
 - **`updateHUDValue(key: string, value: number): void`**
     - 航行画面が表示されている間、HUD 内の特定の数値（スコア等）を更新する。
+    - **内部挙動 (ロールカウンター演出)**:
+        1. **目標値 (`targetValue`) の保持**: 引数の `value` を目標値として保持する。
+        2. **内部表示値 (`internalValue`) の補間更新**: 
+            - 毎フレーム、現在保持している内部数値（浮動小数点数）を目標値に向けて補間する。
+            - 補間式: `internalValue += (targetValue - internalValue) * 0.2`
+            - **差の絶対値**が 1 未満になった時点で、`internalValue = targetValue` とし補間を終了する。
+        3. **表示への反映 (DOM 更新)**:
+            - **整数化**: `internalValue` を `Math.floor()` 等で整数に丸める。
+            - **フォーマット**: 整数化された数値に 3 桁ごとのカンマを挿入する（例: `1,234`）。
+            - **反映**: フォーマット済みの文字列を DOM のテキストとして書き込む。
 - **`updateMailStatus(type: string, isUnread: boolean): void`**
     - メールアイコンの状態（種類に応じた色、未読時の明滅演出）を更新する。
 - **`setMailHandler(handler: Function): void`**

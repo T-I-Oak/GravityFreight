@@ -45,4 +45,9 @@
     3. **ループ開始**: メインループでの `this.updateFlight()` の呼び出しを有効化。
 
 - **`updateFlight(dt: number): void`**
-    - 航行中の更新処理。物理計算、状態更新、HUD反映、および成功・失敗の判定監視を行う。
+    - 航行中の更新処理（メインループから毎フレーム呼び出し）。物理計算、状態更新、および成功・失敗の判定監視を行う。
+    - **内部挙動**:
+        1. **物理更新**: `PhysicsEngine.step(currentRocket, currentSector)` を実行し、戻り値として最新の `ticks` を受け取る。
+        2. **HUD更新（毎フレーム）**: スコアを算出し、`uiController.updateHUDValue` を通じて通知する。
+            - **スコア**: `sessionState.totalScore + ticks` (累計 + 今回の滞在ティック数)
+        3. **終了判定**: ロケットの位置が境界（900px）を超えたか、天体や出口に衝突したかを判定し、必要に応じて遷移処理を開始する。
