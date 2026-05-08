@@ -9,29 +9,29 @@
 
 ## 2. システム構造図 (System Hierarchy)
 
-Gravity Freight V2 は、`GameOrchestrator` をルートとした階層構造を採用している。上位レイヤーが下位レイヤーを所有し、そのライフサイクルと依存関係を管理する。
+Gravity Freight V2 は、`AppOrchestrator` をルートとした階層構造を採用している。上位レイヤーが下位レイヤーを所有し、そのライフサイクルと依存関係を管理する。
 
 ```mermaid
 graph TD
     %% Root Layer
-    Orchestrator["GameOrchestrator (Root)"]
+    Orchestrator["AppOrchestrator (Root)"]
 
     %% Control Layer
     Orchestrator --> UI["UIController (UI/Input)"]
-    Orchestrator --> GC["GameController (Progression)"]
     Orchestrator --> DM["DataManager (Storage/Master)"]
 
+    %% Logic & System Layer
+    Orchestrator --> GC["GameController (Game Flow/Logic)"]
+    GC --> SS["SessionState (Current Game State)"]
+    SS --> IC["ItemContainer (Inventory)"]
+    GC --> SEC["Sector (Current Map)"]
+    SEC --> ES["EconomySystem (Lottery/Price)"]
+    
     %% System Layer (Infrastructure)
     Orchestrator --> WR["WorldRenderer (Rendering)"]
     WR --> BM["BackgroundManager (Stars)"]
     WR --> CC["CameraController (View/Matrix)"]
     Orchestrator --> SC["SoundController (Audio)"]
-
-    %% Logic & State Layer
-    GC --> SS["SessionState (Current Game State)"]
-    SS --> IC["ItemContainer (Inventory)"]
-    GC --> SEC["Sector (Current Map)"]
-    SEC --> ES["EconomySystem (Lottery/Price)"]
 
     %% Global Services
     Orchestrator --> AT["AchievementTracker"]
@@ -155,8 +155,11 @@ graph TD
         - 取引（Buy/Sell/Repair）の成否判定。
 - **GameController**
     - 生存期間: Game Lifecycle
-    - 役割: セクター進行管理。
-    - 責務: SessionState のセクター番号更新、Sector の生成・破棄管理。
+    - 役割: ゲーム進行・シーン管理。
+    - 責務: 
+        - プレイ中（ワープ〜航行〜リザルト）の一連の画面遷移とロジックの統括。
+        - SessionState のセクター番号更新、Sector の生成・破棄管理。
+        - 航行中の物理計算、スコア計算、終了判定の実行。
 - **StorySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 物語（Story）の選択・永続進捗管理。
@@ -179,10 +182,12 @@ graph TD
 
 描画、入力、全体制御などのインフラストラクチャ。
 
-- **GameOrchestrator**
+- **AppOrchestrator**
     - 生存期間: App Lifecycle
-    - 役割: メインコントローラー。
-    - 責務: 全体ステートマシンの管理、各ライフサイクルの開始・終了（Begin/End Contract）のトリガー。
+    - 役割: アプリ基盤保持・全体指揮。
+    - 責務: 
+        - アプリ共通のインフラクラスの保持と初期化。
+        - タイトル画面の管理と、ゲーム本編（GameController）の起動。
 - **DataManager**
     - 生存期間: App Lifecycle
     - 役割: データプロバイダー。
