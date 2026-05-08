@@ -17,8 +17,9 @@
     1. 各マネージャー・コントローラーをインスタンス化する。
     2. `DataManager.loadAllData()` を実行。
     3. 各システム（Sound, Camera, Background, Story等）の `initialize()` を実行。
-    4. **タイトル画面の配線**: `uiController` を通じて「開始」「記録」「説明書」「音量設定」のハンドラを登録する。
-    5. **初期画面表示**: `uiController.showTitleScreen()` を実行。
+    4. **描画エンジンの初期化**: `WorldRenderer.initialize(uiController.getMapContainer(), camera, background)` を実行。
+    5. **タイトル画面の配線**: `uiController` を通じて「開始」「記録」「説明書」「音量設定」のハンドラを登録する。
+    6. **初期画面表示**: `uiController.showTitleScreen()` を実行。
 
 - **`startGame(): void`**
     - ゲーム本編（プレイセッション）を開始する。
