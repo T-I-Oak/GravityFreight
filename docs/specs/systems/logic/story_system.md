@@ -29,8 +29,14 @@
 5. `StorySystem` が内部状態を更新
 
 ### 状態管理 (State Management)
-- **`isRead(storyId: string): boolean`**
-    - 指定されたストーリーIDが既読かどうかを返す。メールアイコンの明滅判定に使用される。
+- **`isRead(storyId: string, deep: boolean = false): boolean`**
+    - 指定されたストーリーIDが既読かどうかを返す。
+    - **`deep: false` (デフォルト)**: 
+        - 指定された ID に対するピンポイントの既読チェック。
+    - **`deep: true`**: 
+        - 指定された ID および、その ID をプレフィックスに持つすべての派生ストーリー（子孫ノード）をスキャンする。
+        - 自身を含む階層内に一つでも未読があれば `false` を返す。すべて既読の場合のみ `true` を返す。
+        - **用途**: 出口（ExitArc）の段ボールアイコンの明滅（ナビゲーションガイド）に使用。
 
 - **`updateReadStatus(storyId: string): void`**
     - 指定されたストーリーIDを既読としてマークし、最新の状態を `DataManager.setSavedStoryProgress()` を通じて永続化する。
