@@ -37,7 +37,7 @@
     - 同時に `actualTrail` へ現在の座標を追加し、`ticks` をインクリメントする。
 - `getInitialVelocity(): Vector2`
     - `rocketItem`, `launcher`, `booster`, `angle` に基づいて初速ベクトルを算出して返す。
-    - 航行開始直前に `GameOrchestrator` が呼び出し、結果を `velocity` にセットする。
+    - 航行開始直前に `GameController` が呼び出し、結果を `velocity` にセットする。
 - `getTicks(): number`
     - 現在の累計ティック数を返す。
 - `addBonusScore(value: number): void`
