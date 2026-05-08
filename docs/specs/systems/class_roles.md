@@ -7,7 +7,48 @@
 
 ---
 
-## 2. 生存期間の定義 (Lifecycle Definitions)
+## 2. システム構造図 (System Hierarchy)
+
+Gravity Freight V2 は、`GameOrchestrator` をルートとした階層構造を採用している。上位レイヤーが下位レイヤーを所有し、そのライフサイクルと依存関係を管理する。
+
+```mermaid
+graph TD
+    %% Root Layer
+    Orchestrator["GameOrchestrator (Root)"]
+
+    %% Control Layer
+    Orchestrator --> UI["UIController (UI/Input)"]
+    Orchestrator --> GC["GameController (Progression)"]
+    Orchestrator --> DM["DataManager (Storage/Master)"]
+
+    %% System Layer (Infrastructure)
+    Orchestrator --> WR["WorldRenderer (Rendering)"]
+    WR --> BM["BackgroundManager (Stars)"]
+    WR --> CC["CameraController (View/Matrix)"]
+    Orchestrator --> SC["SoundController (Audio)"]
+
+    %% Logic & State Layer
+    GC --> SS["SessionState (Current Game State)"]
+    SS --> IC["ItemContainer (Inventory)"]
+    GC --> SEC["Sector (Current Map)"]
+    SEC --> ES["EconomySystem (Lottery/Price)"]
+
+    %% Global Services
+    Orchestrator --> AT["AchievementTracker"]
+    Orchestrator --> FR["FlightRecorder"]
+    Orchestrator --> Story["StorySystem"]
+    Orchestrator --> PE["PhysicsEngine"]
+    Orchestrator --> TP["TrajectoryPredictor"]
+    
+    %% Key Cross-domain relations (Dashed lines)
+    TP -.->|Use| PE
+    UI -.->|Reference| CC
+    WR -.->|Sync| CC
+```
+
+---
+
+## 3. 生存期間の定義 (Lifecycle Definitions)
 
 システム内でのオブジェクトのライフサイクルを以下の4段階に定義し、データの永続性とリセットの境界を明確にする。
 
