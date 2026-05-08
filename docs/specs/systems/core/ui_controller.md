@@ -31,6 +31,10 @@
     - ウィンドウのリサイズイベントが発生した際のコールバックを登録する（操作音なし）。
     - **内部挙動**: `window` の `resize` イベントを購読し、発生時に現在のウィンドウサイズを引数として `handler` を実行する。
 
+- **`getMapContainer(): HTMLElement`**
+    - マップ描画用のコンテナ要素（Canvas が Append される親要素）を取得する。
+    - **内部挙動**: `constructor` で取得済みの特定の DOM 要素（`.map-canvas-container` 等）を返す。
+
 ### 画面制御メソッド (Screen Control)
 
 - **`showTitleScreen(): void`**

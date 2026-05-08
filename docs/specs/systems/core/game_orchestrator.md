@@ -16,6 +16,7 @@
         - `soundController.initialize()`（設定復元）
         - `cameraController.initialize()`（状態復元）
         - `backgroundManager.initialize()`（背景生成）
+        - `worldRenderer.initialize(uiController.getMapContainer())`（PIXI起動・Canvas配置）
         - `storySystem.initialize()`（ストーリー進捗の復元）
         - `achievementTracker.initialize()`（実績データの復元）
         - `flightRecorder.initialize()`（記録インデックスの構築）
