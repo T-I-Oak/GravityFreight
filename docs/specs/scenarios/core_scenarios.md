@@ -19,7 +19,8 @@
 - [x] 0.2 [機能] 各システムクラスの初期化
     - [x] 0.2.1 [機能] ユーザー設定・進捗の復元
         - [x] 0.2.1.1 [機能] SoundController / CameraController の初期設定適用
-        - [x] 0.2.1.2 [機能] StorySystem の初期化（既読進捗のロード）
+        - [x] 0.2.1.2 [機能] StorySystem の初期化（既読進捗・アーカイブのロード）
+            - **決定事項**: 全プレイを通じた累計既読フラグをロードする。ただし、**現在のプレイ中の HUD（3スロット）は常に空（未解放）から開始**される。
         - [x] 0.2.1.3 [機能] AchievementTracker の初期化（実績データのロード）
         - [x] 0.2.1.4 [機能] FlightRecorder の初期化（記録インデックスの構築）
         - **決定事項**: `StorySystem`, `AchievementTracker`, `FlightRecorder` は、それぞれの `initialize()` 内で `DataManager` の該当する取得メソッドを呼び出す。その際、各クラスで定義した `MigrationMap`（DataManager 仕様準拠）を渡すことで、初期値の生成およびバージョン間のデータ変換を `DataManager` の共通基盤へ委譲する。
@@ -122,12 +123,13 @@
         - `WorldRenderer.stopWarpEffect(duration)` を実行し、遠方（Scale 0.05, Alpha 1.0）からマップを接近・出現させる。
     - [x] 2.3.3 [機能] ワープ音の停止
         - `SoundController.stopWarpEffect(fadeOutDuration)` を実行し、環境音をフェードアウトさせる。
-    - [x] 2.3.4 [機能] ビルド画面（航行準備）への遷移
+    - [x] 2.3.4 [機能] ビルドフェーズへの遷移
         - 全演出完了後、`UIController.showBuildScreen()` を実行して第3章へ移行する。
+        - **決定事項**: `showBuildScreen()` 実行時、ビルドパネルおよび HUD（スコア、メールアイコン等）を同時に表示状態にする。
         - `WorldRenderer.stopWarpEffect()` は「遠方から接近する」演出のため、Alpha 1.0 のままで開始し、画面全体を星（母星等）が覆い尽くすのを防ぐ。
 
-## 3 ビルド画面
-**役割**: ロケットのビルド（構成変更）、航行の開始（発射）。
+## 3 ビルドフェーズ
+**役割**: ロケットのビルド（構成変更）、航行の開始（発射）。HUD およびビルドパネルが表示され、インタラクティブな状態。
 - [x] 3.1 [シナリオ] ビルド画面の構成と基本操作
     - [x] 3.1.1 [シナリオ] 視点操作（パン・回転・ズーム）
         - [x] 3.1.1.1 [UI] ドラッグによる回転・パン、およびホイールによるズーム操作
@@ -145,6 +147,7 @@
             - `CameraController.rotate(anchor, delta)`
             - `CameraController.pan(screenDelta)`
             - **モード判定**: ドラッグ開始時、`CameraController.isInMapArea(screenPos)` の結果に基づき「パン/AIM」または「回転」を選択し、終了まで維持する。
+                - **AIM 操作**: AIM モードが選択されている場合、ドラッグ中はポインタ座標から射出角度（ラジアン）を算出し、継続的に `rocket.setAngle(angle)` を呼び出す。更新のたび、`TrajectoryPredictor.predictPath(rocket, sector)` を実行して予測軌道をリアルタイムに再描画する。
             - **永続化**: 各操作の終了時（ドラッグ終了、ホイール停止等）、`DataManager.setSavedCameraState()` を呼び出し、現在の `position`, `rotation`, `zoom` を `localStorage` へ書き出す。
             - ※入力はすべてスクリーン座標（左上原点）を基準とし、Camera内部で変換を行う。
     - [x] 3.1.2 [シナリオ] ウィンドウのリサイズ対応
@@ -168,21 +171,27 @@
             - [x] 3.1.3.2.1 [UI] rocket カテゴリ表示
                 - [x] 3.1.3.2.1.1 [機能] アイテムの排他的選択（切り替えのみ・解除不可）
                 - [x] 3.1.3.2.1.2 [シナリオ] ロケット選択による AIM 状態の変化
+                    - アイテム選択時、`rocket.setRocketItem(item)` を呼び出して構成を更新し、直後に予測軌道を再計算・描画する。
                     - ロケットとランチャーが共に選択されたとき、AIM 可能状態になる。
             - [x] 3.1.3.2.2 [UI] launcher カテゴリ表示
                 - [x] 3.1.3.2.2.1 [機能] アイテムの排他的選択（切り替えのみ・解除不可）
                 - [x] 3.1.3.2.2.2 [シナリオ] ランチャー選択による AIM 状態の変化
+                    - アイテム選択時、`rocket.setLauncher(item)` を呼び出して構成を更新し、直後に予測軌道を再計算・描画する。
                     - ロケットとランチャーが共に選択されたとき、AIM 可能状態になる。
             - [x] 3.1.3.2.3 [UI] booster カテゴリ表示
                 - [x] 3.1.3.2.3.1 [機能] アイテムの排他的選択・解除
 
                 - [x] 3.1.3.2.3.2 [シナリオ] ブースターの選択状態切り替え
+                    - 選択時、`rocket.setBooster(item)` を、解除時は `setBooster(null)` を呼び出し、直後に予測軌道を再計算・描画する。
                     - 選択済みのブースターを再選択したとき、選択が解除される。
-            - [ ] 3.1.3.2.4 [機能] Rocket インスタンスの生成（構成パーツ、初期位置、物理状態の初期化）
+            - [x] 3.1.3.2.4 [機能] Rocket インスタンスの生成（構成パーツ、初期位置、物理状態の初期化）
             - **決定事項**:
-                - `Rocket` インスタンスがビルド開始時に生成され、パーツ構成（`RocketItem`, `Launcher`, `Booster`）と射出角度（`angle`）を一括管理する。
-                - AIM可能状態において、UI は `TrajectoryPredictor.predictPath(rocket, sector)` を呼び出し、得られたクローンの `actualTrail` を `WorldRenderer` に渡して予測軌道として描画する。
-                - `WorldRenderer` は予測用クローンの本体は描画せず、その履歴（`actualTrail`）のみを実線で描画する。
+                - `Rocket` インスタンスはビルド画面表示時に生成され、AIM可能状態（パーツが選択されている状態）において常に最新の構成を保持する。
+                - **構成の即時反映**: 
+                    - **パーツ変更時**: FLIGHT タブでの選択変更に応じ、該当する `rocket.setRocketItem()`, `setLauncher()`, または `setBooster()` を呼び出して内部参照を更新する。
+                    - **角度操作時**: マップドラッグ（AIM操作）に応じ、`rocket.setAngle()` を呼び出して射出角度を更新する。
+                - **リアルタイム予測**: 上記の更新直後、UI は `TrajectoryPredictor.predictPath(rocket, sector)` を実行し、`WorldRenderer` を通じて予測軌道（`actualTrail`）を再描画する。これにより、パーツ性能（パワーや重力耐性）や角度の変化が即座に視覚化される。
+                - `WorldRenderer` は予測用クローンの本体は描画せず、その履歴（`actualTrail`）のみを実線（または点線）で描画する。
 
         - [x] 3.1.3.3 [UI] ASSEMBLY タブ
             - [x] 3.1.3.3.1 [UI] chassis カテゴリ表示
@@ -222,16 +231,20 @@
                     - ※launcher の消費免除ルール（`preventsLauncherWear`）は手順 2 の直前に判定する。
                 - 航行画面（SCR-NAV）へ遷移する。
                 - ※FLIGHT タブ内の選択状態は、抽出に伴い解除される。
+        - [x] 3.1.5 [シナリオ] 航行準備と AIM 演出
+            - [x] 3.1.5.1 [UI] ソナー波紋の表示開始
+                - **決定事項**: ビルドパネル展開中（AIM状態）、ロケットから回収範囲を示す波紋（Sonar Ripple）を定期的に発生させる。
+            - [x] 3.1.5.2 [機能] 波紋半径と回収ロジックの同期
 
 - [x] 3.2 [機能] 航行の開始（発射）
     - [x] 3.2.1 [シナリオ] 発射ボタン押下による航行シーケンスの開始（3.1.4.1.2 と同期）
         - `GameController.launchRocket(rocket, angle)` を定義。
         - 3.1.4.1.2 に基づき、インベントリからのパーツ抽出（RocketItem, Launcher, Booster）を実行。
-        - **UI遷移**: `UIController.showNavigationScreen()` を呼び出し、Chapter 4（航行画面）へ遷移する。
+        - **UIモード遷移**: `UIController.setFlightMode(true)` を呼び出し、ビルドパネルの操作をロック（無効化）する。HUD およびパネルの表示は維持される。
 
-## 4 航行画面
-**役割**: 航行状態の表示と、リアルタイムな状態変化（アイテム取得・衝突回避・終了判定）の管理。
-- [ ] 4.1 [UI] 航行ステータスのリアルタイム表示（HUD）
+## 4 航行フェーズ
+**役割**: 航行状態の表示（HUD）と、リアルタイムな状態変化（アイテム取得・衝突回避・終了判定）の管理。
+- [ ] 4.1 [UI] 航行ステータスの表示（HUD）
     - [x] 4.1.1 [UI] セクター番号、スコア、所持コインの表示
         - **ロールカウンター演出**: 
             - HUD は内部数値 `internalValue`（浮動小数点数）を保持し、Easing 補間を行う。
@@ -242,39 +255,67 @@
             - **通知経路**: `GameController` が `PhysicsEngine.step()` の戻り値（ティック数）に基づき HUD へ通知。
             - **初期化**: `initHUD` 時に `internalValue` を目標値と同期させ、初回表示は演出なしで即座に反映する。
             - **インターフェース定義**:
-                - `UIController.showNavigationScreen()`: 航行画面への遷移。
+                - `UIController.setFlightMode(isFlight: boolean)`: 航行モードへの切り替え（ビルドパネルのロック/解除）。
                 - `UIController.updateHUDValue(key, value)`: HUD 内の特定の値を更新（ロールカウンター演出をトリガー）。
-    - [ ] 4.1.2 [UI/機能] メールアイコンの表示と制御（物語へのアクセス）
+    - [x] 4.1.2 [UI/機能] メールアイコンの表示と制御（物語へのアクセス）
         - **表示仕様**:
-            - ストーリーの種類（T / R / B）に応じたアイコンカラーを表示する。
-            - **未読時**: アイコンを明滅（Blinking）させてプレイヤーに通知する。
+            - 最後に解放されたストーリーの系列（T / R / B）に応じたアイコンカラーを表示する。
+            - **未読時**: 該当するスロットを常に明滅（Blinking）させてプレイヤーに通知する。
         - **決定事項**:
-            - **オーケストレーション**: `GameController` が主体となって以下の連鎖を制御する。
-            - **インターフェース定義**:
-                - `UIController.updateMailStatus(type, isUnread)`: [Caller: `GameController`] メールの種類に応じた色設定と、未読状態（明滅）を更新する。
-                - `UIController.setMailHandler(handler)`: [Caller: `GameController`] アイコン押下時のコールバックを登録。
-                - `UIController.showStoryModal(content)`: [Caller: ハンドラ経由の `GameController`] 物語閲覧用のモーダルを表示する。
+            - **通知トリガー**: `GameController` が配送成功を検知した瞬間、`StorySystem.unlockNextStep()` を通じて履歴を更新する。その後 `StorySystem.getStoryStatus()` を確認し、対象の ID が**全プレイを通じて未読（初見）である場合のみ**、`UIController.updateMailStatus()` で明滅を開始させる。
             - **実行シーケンス**:
-                - アイコン押下時、`GameController` が登録したハンドラが起動。
-                - `UIController.showStoryModal()` を表示し、同時に `StorySystem.updateReadStatus()` を呼び出して既読化を実行する。
-                - **直後に `UIController.updateMailStatus(type, false)` を呼び出し、アイコンの明滅を停止させる。**
-- [ ] 4.2 [機能] アイテムの取得と特殊効果の発動
-    - [ ] 4.2.1 [機能] アイテムの自動取得（保持状態への移行）
+                - アイコン（スロット）押下時、`GameController` が `StorySystem.getMessageData(id)` で詳細データを取得。
+                - `UIController.showStoryModal()` を表示し、同時に `StorySystem.updateReadStatus()` を実行。
+                - **既読化直後**に `UIController.updateMailStatus(index, type, false)` を呼び出し、該当スロットの明滅を停止させる。
+- [x] 4.2 [機能] アイテムの取得と特殊効果の発動
+    - [x] 4.2.1 [機能] アイテムの自動取得（保持状態への移行）
         - ロケットの回収範囲内にアイテムが入った際、そのアイテムを「保持状態（Held State）」としてマークする。
-    - [ ] 4.2.2 [機能] 衝突・ロスト回避モジュールの判定と消費
+        - **決定事項**:
+            - **所有権の移動**: `PhysicsEngine.step()` 内で各天体の `checkPickup(rocketPos, range)` を呼び出す。
+            - 天体がアイテムを返却した場合、その時点で天体側の保持リストからは即座に削除される。
+            - 取得したアイテムは `rocket.addHeldItem(item)` を通じてロケットの `heldCargo` へ追加される。
+            - 航行中、これらのアイテムは「保持状態（Held State）」としてロケットに紐付いており、リザルト精算（4.3）をもって初めてインベントリへ正式に加算される。
+    - [x] 4.2.2 [機能] 衝突・ロスト回避モジュールの判定と消費
         - **衝突回避**: 天体衝突直前、`Star Breaker` または `Impact Cushion` の Charges があれば消費して回避を実行。
         - **ロスト回避**: 境界（900px）到達時、`Emergency Thruster` の Charges があれば消費して方向転換を実行。
+        - **決定事項**:
+            - **介入タイミング**: `PhysicsEngine.step()` の衝突判定直後、衝突が成立（`collision != null`）した場合に実行する。
+            - **Rocketの責務（内部処理）**:
+                - `rocket.useAvoidanceModule(type, target)` を呼び出す。
+                - **耐久度消費**: 該当モジュールの `Charges` を -1 する。
+                - **状態更新**: 回避後の物理状態（反転、低速化等）へ自身のプロパティを直接書き換える。
+                - **戻り値**: `AvoidanceResult { method, destroyedTarget }` オブジェクトを返す（不可なら `null`）。
+            - **PhysicsEngineの責務（物理継続）**:
+                - 回避成功時、衝突判定をキャンセルし航行を継続させる。
+                - `destroyedTarget` が存在する場合、その天体を演算リスト（`sector.bodies`）から除外する。
+            - **演出連携**: `GameController` は `PhysicsEngine` から渡される回避結果に基づき、対応するエフェクトを `WorldRenderer` で再生する。
 - [ ] 4.3 [機能] 航行終了およびリザルト遷移判定
     - **決定事項**:
-        - 各終了判定が成立した際、`UIController.showResultScreen(rocket.getFlightResult())` を呼び出し、Chapter 5（リザルト画面）へ遷移する。
+        - 各終了判定が成立した際、`GameController` は以下の精算シーケンスを実行した後、`UIController.showResultScreen(navResult)` を呼び出し、Chapter 5（リザルト画面）へ遷移する。
+        - **精算シーケンス**:
+            1.  **成果抽出**: `currentRocket.getFlightResult()` を実行。
+            2.  **報酬・資産の確定**: `EconomySystem.calculateSettlement(collision, flightData)` を実行。
+                *   物理結果と保持アイテムに基づき、報酬内訳、最終スコア、獲得アイテムリスト（インベントリ追加分）、および消費アイテムリストを含む **`SettlementResult`** を生成する。
+            3.  **状態反映**: `sessionState.applySettlement(settlementResult)` を実行。
+                *   報酬（コイン・スコア）を加算し、獲得アイテムをインベントリへ追加する。配送済み貨物や消失パーツはリストから除外される。
+                *   ブラックマーケット到達時は `sessionState` の星の数カウンタを更新する。
+            4.  **物語解放**: `StorySystem.unlockNextStep()` を実行。
+        - **次フェーズの遷移**:
+            *   リザルト画面での確認終了後、`GameController` は `collision` の結果に基づき、各施設フェーズ（交易所・整備工場・闇市場）または母星フェーズ（BUILDING/AIMING）へ状態を遷移させる。
     - [ ] 4.3.1 [機能] ミッション成功（Success）の判定
         - 出口（Exit Arc）への到達。保持アイテムの確定、拠点への遷移。
+        - **物語解放トリガー**: 到達した出口の `type` に基づき、`StorySystem.unlockNextStep(type)` を実行して物語を進行させる。
     - [ ] 4.3.2 [機能] 母星帰還（Returned）の判定
         - 母星（Home Star）への衝突。アイテム回収、発射台耐久度の減算。
     - [ ] 4.3.3 [機能] 遭難（Lost）の判定
         - 回避不能状態での境界（900px）逸脱。ロケットおよび保持アイテムの完全喪失。
     - [ ] 4.3.4 [機能] 大破（Crashed）の判定
         - 回避不能状態での天体（重力源）衝突。保持アイテムの散布、構成パーツの 50% 確率ドロップ/消失。
+- [x] 4.4 [シナリオ] 航行終了と余韻演出
+    - [x] 4.4.1 [UI] 到着/衝突時の描画終息
+        - **決定事項**: ロケットが停止・消失した後も、既存の航跡、荷物、ソナー波紋が消滅するまで描画を継続する。
+    - [x] 4.4.2 [機能] 演出完了待ちの画面遷移
+        - **決定事項**: `GameController` は演出完了（`WorldRenderer` からの通知）を待ってからリザルト画面を表示する。
 
 ## 5 航行結果表示画面
 **役割**: 航行成果の提示と、報酬の確定・セッション状態の更新。

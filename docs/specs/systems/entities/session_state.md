@@ -34,3 +34,10 @@
 
 - **`recordBlackMarketVisit(): void`**
     - 闇市場訪問回数を 1 インクリメントする。
+
+- **`applySettlement(result: SettlementResult): void`**
+    - 航行結果（報酬・アイテム増減）を現在の状態に適用する。
+    - **内部挙動**:
+        1. **金銭・スコア**: `coins += result.totalCoins`, `totalScore += result.totalScore` を実行。
+        2. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
+        3. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。

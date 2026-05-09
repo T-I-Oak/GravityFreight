@@ -19,6 +19,7 @@
 - **`canvas: HTMLCanvasElement` (Read-only)**: PIXI レンダラーの `view` 要素。`UIController` 等がイベント登録のために使用する。
 - **`camera: CameraController`**: 視界制御システムへの参照。
 - **`background: BackgroundManager`**: 背景描画システムへの参照。
+- **`sonarRange: number`**: 現在の回収可能範囲の最大半径。描画ループ内で最新のロケット状態（`rocketItem.pickupRange * rocketItem.pickupMultiplier`）を反映する。
 
 ### メソッド (Methods)
 - **`initialize(container: HTMLElement, camera: CameraController, background: BackgroundManager): void`**
@@ -35,13 +36,28 @@
     - メインの描画ループ。PIXI.js の Application Ticker から毎フレーム呼び出される。
     1. `this.background.render(this.camera)` を呼び出し、背景を描画する。
     2. `targetSector` が存在する場合、その中の全オブジェクトを `this.camera.getWorldToScreenMatrix()` を用いてスクリーン上に描画する。
+    3. 航行中または演出中、自律型オブジェクト（航跡、ソナー、貨物）の状態更新とフェード処理を実行する。
 
 - **`setSector(sector: Sector | null): void`**
     - 描画対象とするセクターを差し替える。
 
 - **`startNavigation(rocket: Rocket): void`**
     - 航行画面の描画を開始する。
-    - **内部挙動**: ロケットの描画を有効化する。
+    - **内部挙動**: ロケットの描画を有効化し、航跡の記録を開始する。
+
+- **`enableSonar(): void`**
+    - ソナー波紋の新規生成を開始する（AIM中および航行中）。
+- **`disableSonar(): void`**
+    - ソナー波紋の新規生成を停止する（既存の波紋は消滅まで描画を継続する）。
+
+- **`playFinishAnimation(result: object): Promise<void>`**
+    - 航行終了時の演出シーケンスを実行し、完了時に Promise を解決する。
+    - **ステータス別の演出挙動**:
+        - **`cleared`**: ロケットと貨物アイコンが出口の中心に吸い込まれるように縮小しながら消滅する。
+        - **`crashed`**: 衝突地点で爆発エフェクトを表示し、ロケットアイコンを即座に消去する。
+        - **`returned`**: 到着地点でロケットが静止し、フェードアウトする。
+        - **`lost`**: ロケットアイコンがその場の透明度を下げて消失する。
+    - **共通処理**: 残存する航跡・ソナー波紋がすべて消滅するまで待機する。
 
 - **`startWarpEffect(duration: number): void`**
     - 現在のセクターから離脱し、ワープ空間へ突入する際の演出を実行する。
@@ -72,8 +88,10 @@ PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描
 | ∟ `celestialBodyLayer` | `world` | 天体（惑星・母星） |  |
 | ∟ `exitArcLayer` | `world` | 境界線（奥）および出口（手前） | セクター外縁の円弧群 |
 | ∟ `rocketTrailLayer` | `world` | ロケットの飛行軌跡 |  |
+| ∟ `freightLayer` | `world` | 荷物（Freight） | ロケットに追従する貨物アイコン |
 | ∟ `rocketLayer` | `world` | ロケット本体 |  |
-| ∟ `effectLayer` | `world` | スキャナー波紋、爆発等の演出 |  |
+| ∟ `sonarLayer` | `world` | ソナー波紋 | 中心から広がるリング状エフェクト |
+| ∟ `effectLayer` | `world` | 爆発等の演出 |  |
 
 - **描画順**: リストの下にあるものほど手前（前面）に描画される。
 - **座標系**: `worldContainer` 以下のレイヤーはすべてワールド座標系（単位: px）で配置される。
@@ -109,6 +127,25 @@ PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描
 
 **ビジュアル要件**:
 - 出口（円弧）の土台として機能するため、出口よりも細い実線で描画される。
+
+### 4.4 ソナー波紋 (Sonar Ripple)
+- **基本構造**: 0.5 の位相差を持つ **2 つの同心円** で構成される。
+- **発生間隔**: 1.0秒ごとに新しいパルスを開始（2 つの円が 2.0秒周期で交互に広がる状態を維持）。
+- **挙動**: 発生地点（ロケット座標）を固定とし、2.0秒かけて半径 0px から `sonarRange` まで線形拡大する。
+- **ビジュアル**: 
+    - **ブレンド**: `Additive`。
+    - **カラー**: `--color-ui-scanner` (`0x00FFCC`) を使用。
+    - **不透明度**: 拡大率 `t (0.0~1.0)` に対し、`(1.0 - t) * 0.9` で減衰。
+    - **形状**: 太さ 2.5px の円環（Stroke）と、不透明度 0.15 の塗り（Fill）。
+- **終了時**: `setSonarActive(false)` が呼ばれた瞬間、新しいパルスの発生のみを停止し、描画中の波紋は消滅するまで維持する。
+
+### 4.5 航行終了演出 (Finish Animation)
+- **物理停止後の挙動**: `GameController` が物理更新を止めた後も、以下のオブジェクトが消滅するまで描画ループを維持する。
+    - **到着 (Cleared) / 帰還 (Returned)**: ロケットを中心に「施設への進入」をイメージした環状エフェクトが広がり、ロケットを包み込むように収束・消失する演出。
+    - **破壊 (Crashed)**: その場で爆発パーティクルを生成。荷物（Freight）は既存の描画ロジック（軌跡追従）に従い、自然に衝突地点へと収束する。
+    - **ロスト (Lost)**: 爆発とは異なる、虚空へパッと消えるような地味な消失演出。
+    - **航跡・ソナー**: 全パーティクルが寿命で消滅するまで、フェードアウト描画を継続。
+- **完了通知**: すべての演出が終了し、画面が静止またはリザルト表示に耐えうる状態になった時点で `playFinishAnimation` の Promise を解決する。
 
 ## 5. デザイン情報の取得 (Design Tokens)
 

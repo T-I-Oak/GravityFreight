@@ -41,11 +41,11 @@
         4. `isRepulsion` が `true` なら `d` を反転させる。
         5. `d * f` を返す。
 
-- **`checkCollision(targetPos: Vector2, targetRadius: number): boolean` (未承認)**
-    - 指定された円（ロケット）との衝突判定を行う。
-    - **判定**: `distance(this.position, targetPos) <= (this.radius + targetRadius)`。
+- **`checkCollision(currentPos: Vector2, prevPos: Vector2, targetRadius: number): boolean`**
+    - CCD (Continuous Collision Detection) を用いた衝突判定を行う。
+    - **判定**: 線分 `prevPos` 〜 `currentPos` と、天体中心 `this.position` との最短距離が `(this.radius + targetRadius)` 以下であるか。
 
-- **`checkPickup(targetPos: Vector2, pickupRadius: number): ItemBase[]` (未承認)**
+- **`checkPickup(targetPos: Vector2, pickupRadius: number): ItemBase[]`**
     - ロケットの回収範囲内に天体が入っているかを判定し、未取得なら保持アイテムをすべて抽出して返す。
     - **判定 (world_config 3.1準拠)**: `(distance(this.position, targetPos) - this.radius) <= pickupRadius`。
     - **挙動**: 
@@ -55,3 +55,5 @@
         4. 退避させておいたアイテムの配列を返す。
         5. 条件を満たさない場合は空配列を返す。
 
+- **`addItems(items: ItemBase[]): void`**
+    - 指定されたアイテムを `this.items` リストに追加する。主にクラッシュ時の遺失物回収ロジックで使用される。

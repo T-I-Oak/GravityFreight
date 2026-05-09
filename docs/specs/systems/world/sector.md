@@ -46,10 +46,10 @@
             - 確定したパラメータ（`angle`, `type`）を渡し、`ExitArc` インスタンスを生成して `exits` リストに追加する。
             - ※ `width` や `radius` はクラス内部で自動解決される。
 
-- **`static fromSnapshot(snapshot: any): Sector`** *(保留)*
-    - 保存されたスナップショットデータから `Sector` インスタンスを再構築する（リプレイ用）。
-    - ※ `FlightRecorder` の仕様が未確定のため、インターフェースの詳細はその確定後に定義する。
+- **`clone(): Sector`**
+    - 現在の状態のコピーを生成して返す。内部的には `createSnapshot()` と `Sector.fromSnapshot()` を組み合わせて実現する。
 
-- **`createSnapshot(): any`** *(保留)*
-    - 現在の天体配置やアイテム状態をシリアライズ可能な形式で返す。
-    - ※ `FlightRecorder` の仕様が未確定のため、インターフェースの詳細はその確定後に定義する。
+- **`static fromSnapshot(snapshot: object): Sector`** *(保留)*
+    - 保存されたスナップショットデータから `Sector` インスタンスを再構築する。リプレイ再生・クローン用。
+- **`createSnapshot(): object`** *(保留)*
+    - 現在のセクターの状態（天体配置、アイテム所持状態、出口構成）をシリアライズ可能な形式で抽出する。リプレイ保存用。

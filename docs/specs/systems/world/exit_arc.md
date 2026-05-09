@@ -26,12 +26,12 @@
         - **`width` の解決**: `type` に基づき `DataManager` から対応する開口幅（60, 40, 20等）を取得してセットする。
         - **`radius` の解決**: `DataManager` から共通の `boundaryRadius`（900等）を取得してセットする。
 
-- **`checkEntrance(targetPos: Vector2): boolean` (未承認)**
+- **`checkEntrance(targetPos: Vector2): boolean`**
     - 指定された座標（ロケットの位置）が、この出口の判定エリアに進入したかを判定する。
     - **判定順序**:
         1. 距離判定: `distance(origin, targetPos) >= this.radius - (DataManager から取得するマージン)`。
         2. 角度判定: `targetPos` の中心角が `[this.angle - this.width/2, this.angle + this.width/2]` の範囲内にあるか。
         3. 両方が真なら `true` を返す。
 
-- **`getFacilityType(): string` (未承認)**
+- **`getFacilityType(): string`** (未承認)
     - この出口に紐付いている施設タイプを返す。

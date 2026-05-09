@@ -46,18 +46,21 @@
 - **`showManualScreen(): void`**
     - 説明書（マニュアル）画面を表示する。
 - **`showBuildScreen(): void`**
-    - ビルド画面を表示する。
-    - **内部挙動**: 画面の切り替えと同時に `openBuildPanel()` を呼び出し、初期状態でパネルが開いた状態にする（この際、操作音は鳴らさない）。
+    - ビルドフェーズを開始する。
+    - **内部挙動**: 画面の切り替えと同時に `openBuildPanel()` および HUD 要素の表示状態（`.hide` クラスの除去等）を切り替え、初期状態で両方が表示された状態にする。
 - **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
     - セクター開始時のタイトル演出（「SECTOR X」）を画面中央に表示する。
-- **`showNavigationScreen(): void`**
-    - 航行画面（SCR-NAV）へ遷移し、HUD を表示する。
-    - **内部挙動**: 他の画面要素（ビルド画面等）を隠し、HUD 要素の表示状態（`.hide` クラスの除去等）を切り替える。
-- **`initHUD(initialData: object): void`**
-    - 契約（ゲーム）開始時に HUD を初期化し、表示を開始する。
+- **`setFlightMode(isFlight: boolean): void`**
+    - 航行モード（発射後）の切り替えを行い、UI の操作権限を制御する。
+    - **内部挙動**:
+        - `isFlight: true`: ビルドパネルおよび関連するボタン（ASSEMBLE, LAUNCH等）に対し、特定の CSS クラス（`.is-locked` 等）を付与し、クリックイベントやホバー演出を無効化する。
+        - `isFlight: false`: ロックを解除し、再度インタラクティブな状態に戻す。
+        - **注意**: HUD およびビルドパネルの表示・非表示はこのメソッドでは変更せず、そのまま維持する。
+- **`initHUD(sessionState: object): void`**
+    - 契約（ゲーム）開始時に HUD を初期化する。
     - **内部挙動**: 
-        1. `SessionState` から渡された初期値（スコア、セクター、コイン等）を各項目の `internalValue` および `targetValue` の**両方に**セットする。
-        2. 初期値に基づき、演出なし（即座）で DOM に値を反映する。
+        1. `sessionState` から初期値（Coins, Sector 等）を取得し、DOM に即座に反映する。
+        2. **メールスロットのリセット**: 全 3 スロットのメールアイコンを `gray` かつ `disabled` 状態にし、一切の明滅を停止させる。
 - **`updateHUDValue(key: string, value: number): void`**
     - 航行画面が表示されている間、HUD 内の特定の数値（スコア等）を更新する。
     - **内部挙動 (ロールカウンター演出)**:
@@ -70,14 +73,25 @@
             - **整数化**: `internalValue` を `Math.floor()` 等で整数に丸める。
             - **フォーマット**: 整数化された数値に 3 桁ごとのカンマを挿入する（例: `1,234`）。
             - **反映**: フォーマット済みの文字列を DOM のテキストとして書き込む。
-- **`updateMailStatus(type: string, isUnread: boolean): void`**
-    - メールアイコンの状態（種類に応じた色、未読時の明滅演出）を更新する。
+- **`updateMailStatus(index: number, type: string, isUnread: boolean): void`**
+    - 指定されたインデックス（0〜2）のメールアイコンの状態（種類に応じた色、未読時の明滅演出）を更新する。
+    - **内部挙動**:
+        - **ボタン有効化**: `type` が存在すれば `disabled` を解除し、`gray` クラスを除去する。
+        - **色の更新**: `type`（'T', 'R', 'B'）に基づき、`.type-t`, `.type-r`, `.type-b` クラスを切り替える。
+        - **明滅の更新**: `isUnread` が `true` の場合、明滅アニメーション用のクラス（`.is-blinking`）を付与し、既読になるまで継続させる。
 - **`setMailHandler(handler: Function): void`**
     - メールアイコンがクリックされた際のハンドラを登録する。
+    - **内部挙動**: 内部で保持するメールアイコン要素を引数として `setOperationHandler` を呼び出す。
 - **`showStoryModal(content: object): void`**
-    - ストーリー閲覧用のモーダルウィンドウを表示する。
+    - ストーリー（メール）閲覧用のモーダルウィンドウを表示する。
+    - **内部挙動**: 
+        1. 引数 `content` から `title`, `discovery` (発見状況), `body` (本文) を抽出し、モーダル内の該当する DOM 要素へセットする。
+        2. **発見演出**: `discovery` テキストを本文より先に、または強調して表示することで、配送アクションとの繋がりを明示する。
+        3. モーダルを表示状態にする。
+        4. モーダル内の「閉じる」ボタンに対して、モーダルを閉じるための内部ハンドラを（操作音付きで）自動登録する。
 - **`showResultScreen(resultData: FlightResultData): void`**
-    - 航行結果表示画面へ遷移する。
+    - 航行結果表示画面（リザルト）へ遷移する。
+    - **内部挙動**: これまで表示されていたビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
 
 - **`showSettingsDialog(): void`**
     - 音量設定ダイアログを表示する。

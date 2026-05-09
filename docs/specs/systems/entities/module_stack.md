@@ -15,9 +15,9 @@
 
 ### プロパティ (Properties)
 - **`readonly items: Item[]`**: 保持している実体リスト。
-- **`charges` (Getter)**: `Σ items[n].charges` (ベースクラスの `charges` をオーバーライド)
-- **`maxCharges` (Getter)**: `Σ items[n].maxCharges` (ベースクラスの `maxCharges` をオーバーライド)
-- **`count` (Getter)**: 保持しているアイテム数 (`items.length`)。
+- **`charges: number`**: 全アイテムの合計耐久度。追加・消費時に都度更新される。
+- **`maxCharges: number`**: 全アイテムの合計最大耐久度。追加時に都度更新される。
+- **`count: number`**: 保持しているアイテム数 (`items.length`)。
 
 ### メソッド (Methods)
 
@@ -26,12 +26,19 @@
     - 引数の `item` から `id`, `name`, `category` をコピーし、初期アイテムとして `items` リストに格納する。
 - **`add(item: Item): void`**
     - アイテムをスタックに追加する。
-    - **ルール**: `this.id === item.id` であれば無条件で追加する（性能差は無視する）。
+    - **ルール**: `this.id === item.id` であれば無条件で追加し、以下のプロパティを更新する。
+        - `items` リストに `item` を追加。
+        - `this.charges += item.charges`
+        - `this.maxCharges += item.maxCharges`
+        - `this.count = this.items.length`
 - **`consumeCharge(): boolean`**
-    - 内部のアイテムのいずれかから耐久度を 1 減らす。
-    - **デフォルト戦略**: リストの最後（LIFO 的）な要素から消費する。
-    - 耐久度が 0 になったアイテムはリストから除去される。
-    - スタック全体が空になった（`count === 0`）場合は `true` を返す。
+    - 内部のアイテムのうち、耐久度が 1 以上残っているものから耐久度を 1 減らす。
+    - **内部手順**:
+        1. 内部リスト `items` を `charges` の昇順（少ない順、かつ 0 を除く）でソートする。
+        2. 耐久度が 1 以上ある先頭のアイテムに対し `consumeCharge()` を実行する。
+        3. **不滅ルール**: アイテムの耐久力が 0 になっても、リストからは除去しない。
+        4. **プロパティ同期**: 減算後、**`this.charges` を 1 減らす**。
+    - **戻り値**: 常に `false` を返す。
 - **`getViewData(): ItemViewData`**
     - UI 描画用のプレーンオブジェクトを生成して返す。
     - **マッピング**:
