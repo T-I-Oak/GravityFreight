@@ -302,11 +302,19 @@
             4.  **物語解放**: `StorySystem.unlockNextStep()` を実行。
         - **次フェーズの遷移**:
             *   リザルト画面での確認終了後、`GameController` は `collision` の結果に基づき、各施設フェーズ（交易所・整備工場・闇市場）または母星フェーズ（BUILDING/AIMING）へ状態を遷移させる。
-    - [ ] 4.3.1 [機能] ミッション成功（Success）の判定
+    - [x] 4.3.1 [機能] ミッション成功（Success）の判定
         - 出口（Exit Arc）への到達。保持アイテムの確定、拠点への遷移。
-        - **物語解放トリガー**: 到達した出口の `type` に基づき、`StorySystem.unlockNextStep(type)` を実行して物語を進行させる。
-    - [ ] 4.3.2 [機能] 母星帰還（Returned）の判定
-        - 母星（Home Star）への衝突。アイテム回収、発射台耐久度の減算。
+        - **決定事項**:
+            - **判定条件**: `PhysicsEngine.step()` の戻り値 `collision.type === 'exit'` であること。
+            - **精算実行**: `EconomySystem.calculateSettlement()` を実行し、到達した出口の種類に応じた報酬（詳細は `requirements/world_config.md` 2.1項 参照）を確定させる。
+            - **物語解放**: 到達した出口の `type` に基づき、`StorySystem.unlockNextStep(type)` を実行して物語を進行させる。
+            - **画面遷移**: 精算完了および演出終了後、`UIController.showFacilityScreen(type)` を呼び出し、該当する施設（交易所・整備工場・闇市場）へ遷移する。
+    - [x] 4.3.2 [機能] 母星帰還（Returned）の判定
+        - 母星（Home Star）への衝突。アイテム回収。
+        - **決定事項**:
+            - **判定条件**: `collision.target.isHome === true` であること。
+            - **挙動**: 保持していた `Cargo` アイテムを母星へ返却（一時預かり）し、リザルト画面を経てビルド画面（Chapter 3）へ戻る。
+            - ※ 発射台の耐久度減算は発射時（3.2.1）に実行済みのため、ここでは行わない。
     - [ ] 4.3.3 [機能] 遭難（Lost）の判定
         - 回避不能状態での境界（900px）逸脱。ロケットおよび保持アイテムの完全喪失。
     - [ ] 4.3.4 [機能] 大破（Crashed）の判定
