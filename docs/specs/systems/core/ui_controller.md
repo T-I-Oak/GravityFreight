@@ -89,9 +89,21 @@
         2. **発見演出**: `discovery` テキストを本文より先に、または強調して表示することで、配送アクションとの繋がりを明示する。
         3. モーダルを表示状態にする。
         4. モーダル内の「閉じる」ボタンに対して、モーダルを閉じるための内部ハンドラを（操作音付きで）自動登録する。
-- **`showResultScreen(resultData: FlightResultData): void`**
+- **`showResultScreen(result: SettlementResult): void`**
     - 航行結果表示画面（リザルト）へ遷移する。
-    - **内部挙動**: これまで表示されていたビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
+    - **内部挙動**:
+        1. これまで表示されていたビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
+        2. **ヘッダー・状態表示**: `result.status` に応じ、見出し（'CLEARED', 'CRASHED' 等）とテーマカラーを変更する。
+        3. **ヒーロー統計 (Hero Stats)**: `totalScore`, `totalCoins` を `ui-well` 内の強調表示エリアにセットする。
+        4. **アクションボタンの動的設定**:
+            - **ラベル**: 到着先（`result.destination`）や状態に基づき、「TO TRADING POST」「BACK TO BASE」等にラベルを書き換える。
+            - **カラー**: 施設や状態に応じたクラス（`.is-trading-post`, `.is-home` 等）をボタンに付与する。
+        5. **明細リスト (Entries) 構築**: 
+            - `result.entries` をループし、**「ラベル」「スコア」「コイン」の 3 列構成**を持つ行要素を生成してコンテナへ追加する。
+            - 値が存在しない項目（`score` や `coin` が省略されている場合）は、**空欄**として表示する。
+        6. **アイテムリスト (Item Report) 構築**: 
+            - `result.itemReport` をループし、`UIComponents.generateItemCardHTML` を用いてカードを生成する。
+            - 配送成功時（`match`）は、「DELIVERY BONUS」の見出しを伴う専用コンテナ（`.report-bonus-list`）内に獲得したボーナスアイテムを表示する。
 
 - **`showSettingsDialog(): void`**
     - 音量設定ダイアログを表示する。
@@ -154,6 +166,18 @@
 - **`setLaunchHandler(handler: Function): void`**
     - ビルド画面の「LAUNCH ボタン」にハンドラを登録する。
     - **内部挙動**: LAUNCH ボタン要素を引数として `setOperationHandler` を呼び出す。
+
+- **`setResultHandler(handler: Function): void`**
+    - リザルト画面の「確定（OK / CONTINUE）ボタン」にハンドラを登録する。
+    - **内部挙動**: リザルト画面内の次へ進むためのボタン要素を引数として `setOperationHandler` を呼び出す。
+
+- **`setProtectHandler(handler: (protected: boolean) => void): void`**
+    - リザルト画面の「レコード保護（PROTECT）ボタン」にハンドラを登録する。
+    - **内部挙動**: クリックごとにボタンのトグル状態（is-active）を切り替え、最新の状態を引数として `handler` を実行する。
+
+- **`setMapToggleHandler(handler: (showMap: boolean) => void): void`**
+    - リザルト画面の「マップ確認（VIEW MAP）ボタン」にハンドラを登録する。
+    - **内部挙動**: リザルトパネルの表示/非表示をトグルし、現在の状態を引数として `handler` を実行する。
 
 - **`setCanvasInputHandler(handler: (event: PointerEvent | WheelEvent) => void): void`**
     - マップ描画領域（Canvas）に対する入力を中継する（操作音なし）。
