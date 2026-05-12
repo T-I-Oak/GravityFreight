@@ -40,4 +40,4 @@
     - **内部挙動**:
         1. **金銭・スコア**: `coins += result.totalCoins`, `totalScore += result.totalScore` を実行。
         2. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
-        3. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
+        4. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。

@@ -64,7 +64,36 @@
             - **計算**: `(ロケット構成パーツの査定価格合計) × N`
             - **明細追加**: `entries` に追加。Coin: `算出額` (Score は省略)。
                 - Label: $N=1$ なら `"Insurance Payout"`、 $N \ge 2$ なら `"Insurance Payout [xN]"`。
-        5. 最終的な資産増減およびステータスを含む `SettlementResult` を生成して返す。
+        5. **幸運の導きの集計**:
+            - `status === 'cleared'` の場合、`heldCargo` 内の `cargo_lucky` の個数をカウントし、`luckyDiscountRate` (個数 * 0.1) を設定する。
+        6. 最終的な資産増減およびステータスを含む `SettlementResult` を生成して返す。
+3.  **施設取引ロジック (Facility Transactions)**:
+
+- **`generateTradingPostStock(session: SessionState): StockItem[]`**
+    - 交易所で販売される 6 個のアイテムリストを生成する。
+    - **ルール**:
+        - `drawLottery` を用い、`excludeCategories: ['cargo', 'coin']` で 6 個抽出。
+        - 各アイテムの `price` は `appraisalValue * 2`（端数切捨て）。
+        - 在庫のうち 1 つをランダムに「特売品」とし、`itemDiscount: 0.3` を設定する。
+- **`calculateFinalPrice(originalPrice: number, luckyDiscount: number, itemDiscount: number = 0): number`**
+    - **共通割引ルール**: `finalDiscount = Math.min(0.5, luckyDiscount + itemDiscount)`
+    - **計算**: `Math.floor(originalPrice * (1.0 - finalDiscount))`
+- **`calculateRepairCost(launcher: Item, luckyDiscount: number): number`**
+    - 基本価格（耐久 1 回復 = 10c）に対し、`calculateFinalPrice` を適用する。
+- **`calculateDismantleCost(countInSession: number, luckyDiscount: number): number`**
+    - 基本価格 `50 * (countInSession + 1)` に対し、`calculateFinalPrice` を適用する。
+- **`drawBlackMarketGacha(type: 'normal' | 'premium', session: SessionState): Item`**
+    - 闇市場のガチャを実行する（価格は 100c / 500c 固定だが、luckyDiscount がある場合は `calculateFinalPrice` を適用した額を session から差し引く）。
+    - **Normal**: `drawLottery(session, 1, { bonusThreshold: 0 })`。50% の確率で 1 回強化を適用。
+    - **Premium**: `drawLottery(session, 1, { bonusThreshold: 5 })`。50% で 2 回、25% で 1 回強化を適用。
+
+- **`checkGameOver(session: SessionState): object | null`**
+    - ゲームオーバー（詰み状態）か判定し、理由を返す。
+    - **戻り値**: 継続可能な場合は `null`。詰んでいる場合は `{ reason: 'NO_PARTS_REMAINING', details: string[] }`。
+    - **判定条件**: 以下のカテゴリごとに、インベントリ内の「使用可能な在庫」を確認する。
+        - **`CHASSIS`**: 在庫が 0 個なら `details` に追加。
+        - **`LOGIC`**: 在庫が 0 個なら `details` に追加。
+        - **`LAUNCHER`**: 耐久度 1 以上の在庫が 0 個なら `details` に追加。
 
 ### データ構造定義 (Data Structures)
 
@@ -75,6 +104,7 @@
 - **`unlockedBranchId: string | null`**: 今回の航行で解放条件（一致配送）を満たした物語ブランチ ID。
 - **`totalScore: number`**: 今回の航行で得た総スコア。
 - **`totalCoins: number`**: 今回獲得した総コイン。
+- **`luckyDiscountRate: number`**: ゴール時に運んだ「幸運の導き」による割引率（0.0～0.5）。
 - **`entries: SettlementEntry[]`**: 報酬の明細リスト（一行にスコアとコインを併記）。
 - **`itemReport: ItemReportEntry[]`**: UI 表示用の構造化されたアイテムリスト（配送とそのボーナスの紐付け等）。
 - **`acquiredItems: Item[]`**: インベントリへ正式に追加されるアイテムの実体リスト（ボーナスアイテム + 回収パーツ）。
@@ -96,3 +126,14 @@
 - **`id: string`**: マスターデータ ID。
 - **`items: Item[]`**: スタックされている実体リスト。
 - **`count: number`**: 合計個数（`items.length`）。
+
+### `StockItem`
+交易所の在庫アイテム情報。
+- **`item: Item`**: アイテム実体。
+- **`originalPrice: number`**: 割引前の基本価格。
+- **`itemDiscount: number`**: アイテム固有の割引率（特売品は 0.3、通常は 0）。
+
+### `DismantleResult`
+解体・強化の結果。
+- **`cost: number`**: 支払った費用。
+- **`acquiredItems: Item[]`**: 強化されて戻ってきたパーツリスト。

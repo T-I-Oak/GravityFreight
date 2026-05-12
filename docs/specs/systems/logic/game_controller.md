@@ -6,11 +6,16 @@
 - **生存期間**: Game Lifecycle
 - **役割**: ゲームプレイ進行の執行者。
 - **責務**: 
-    - **ゲーム内遷移の統括**: ワープ演出、ビルド画面、航行画面、リザルト画面の遷移制御。
-    - **ゲーム内入力の処理**: ビルドパネル操作、Canvas 入力（パン・回転・AIM）の処理。
+    - **ゲーム内遷移の統括**: ワープ演出、ビルド画面、航行画面、リザルト画面、および**各施設画面**の遷移制御。
+    - **ゲーム内入力の処理**: ビルドパネル操作、Canvas 入力（パン・回転・AIM）、および**施設内取引ボタン**の処理。
     - **ロジックの実行**: セクター生成、パーツ消費、物理計算、終了判定。
 
 ## 2. インターフェース (Interface)
+
+### プロパティ (Properties)
+
+- **`currentSector: Sector | null`**: 現在滞在しているセクターのデータインスタンス。
+- **`currentRocket: Rocket | null`**: 現在組み立て済み、または航行中のロケットインスタンス。
 
 ### メソッド (Methods)
 
@@ -24,17 +29,59 @@
     3. **HUD初期化**: `uiController.initHUD(sessionState)` を実行し、初期値（Coins, Sector 等）の表示と、メールスロットのリセット（全ロック）を行う。
     4. **最初のセクターへ**: `this.beginSectorTransition()` を実行。
 
+- **`confirmSettlement(settlement: SettlementResult): void`**
+    - リザルト画面で「確定（OK）」が押された際の挙動を制御する。
+    - **内部挙動**:
+        1. **割引の保存**: `settlement.luckyDiscountRate` を **`currentSector.luckyDiscountRate`** へセットする。
+        2. **分岐判定**:
+            - `settlement.status === 'cleared'` の場合：`enterFacility(settlement.destination)` を実行。
+            - それ以外の場合：
+                - **`const gameOver = EconomySystem.checkGameOver(sessionState)`**
+                - `gameOver` が存在する（null でない）なら、**`uiController.showGameEndSequence(sessionState, gameOver)`** を実行。
+                - `null` なら、`uiController.showBuildScreen()` を実行。
+
+- **`enterFacility(type: string): void`**
+    - 指定された施設（Trading Post, Repair Dock, Black Market）へ入場する。
+    - **内部挙動**:
+        1. **データ準備**:
+            - 交易所の場合、`EconomySystem.generateTradingPostStock(sessionState)` を実行。
+            - その他、施設ごとに必要な動的データ（整備リスト、ガチャメニュー等）を用意する。
+        2. **表示制御**: `uiController.showFacilityScreen(type, data)` を実行。
+        3. **ハンドラ登録**: `uiController` を通じて、施設内ボタン（Buy, Sell, Repair 等）と `handleFacilityAction` を紐付ける。
+
+- **`handleFacilityAction(action: string, context: object): void`**
+    - 施設内での具体的な操作を処理する。
+    - **内部挙動**:
+        - `action === 'buy'`: `sessionState.coins` から支払い、`inventory.addItem` を実行。
+        - `action === 'repair'`: 指定されたランチャーに対し耐久度加算を実行。
+        - **`action === 'dismantle'`**: 
+            - `EconomySystem.dismantleAndEnhance(this.currentRocket)` を実行。
+            - 獲得パーツを `inventory` へ追加し、**`this.currentRocket = null`** を実行してクリアする。
+        - アクションごとに `uiController.updateFacilityCredits` 等を呼び出し表示を更新する。
+
+- **`leaveFacility(): void`**
+    - 施設を出発し、次セクターへ向かう。
+    - **内部挙動**:
+        1. `this.beginSectorTransition()` を実行。
+        2. ※ 次セクター生成時に `Sector` インスタンスが新しくなるため、割引率は自動的に 0 にリセットされる。
+
 - **`handleItemSelection(uid: string): void`**
     - ビルド画面でのアイテム選択を処理する。
 - **`assembleRocket(): void`**
     - ビルド画面でのロケット組み上げを処理する。
+    - **内部挙動**:
+        1. 選択パーツのバリデーションを実行。
+        2. **`this.currentRocket = new Rocket(parts)`** を実行してインスタンスを生成。
+        3. UI 側のローンチボタンを有効化する。
 - **`handleCanvasInput(event: PointerEvent | WheelEvent): void`**
     - Canvas 上での入力（パン、回転、AIM）を処理する。
 
 - **`beginSectorTransition(): Promise<void>`**
     - セクター間の遷移（ワープ演出）シーケンスを統括する。
     1. **演出制御**: 背景・描画・音のワープ演出を開始。
-    2. **ロジック更新**: `sessionState.sectorNumber` 更新、新 `Sector` 生成。
+    2. **ロジック更新**: 
+        - `sessionState.sectorNumber` を更新。
+        - **`this.currentSector = new Sector(sessionState, isAnomaly)`** を実行して新マップを生成。
     3. **同期**: HUD更新、`worldRenderer` への新マップセット、セクタータイトル表示。
     4. **同期**: HUDの数値表示（セクター番号等）を最新状態に更新する。
     5. **演出終了**: 各演出を停止し、完了後に `uiController.showBuildScreen()` を実行。`uiController.setFlightMode(false)` で操作を有効化する。

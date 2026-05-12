@@ -17,6 +17,7 @@
 - **`exits: ExitArc[]`**: セクター外周のゴールリスト。
 - **`sectorNumber: number`**: このセクターの番号。
 - **`isAnomaly: boolean`**: アノマリーセクター（5の倍数）フラグ。
+- **`luckyDiscountRate: number`**: このセクターの施設訪問時に適用される「幸運の導き」割引率（0.0～0.5）。航行終了時に確定する。初期値 0。
 
 ### メソッド (Methods)
 
