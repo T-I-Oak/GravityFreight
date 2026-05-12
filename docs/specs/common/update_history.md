@@ -1,6 +1,8 @@
 # update_history.json 仕様書
 
 `update_history.json` は、ポータルサイトなどで表示するゲームの更新履歴を管理するためのファイルです。
+本ファイルは、プロジェクトにおける唯一の更新履歴管理ファイルであり、従来の `update_history.md` に代わるものです。
+運用上の基本原則（ユーザー視点での記載等）については、[Update History Standard](../../guidelines/update_history_standard.md) を参照してください。
 
 ## ファイル形式
 JSON形式（配列）
