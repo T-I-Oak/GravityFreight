@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 240">
+  <!-- 
+    Gravity Freight V2: Exact-Fit Logo Asset
+    Tightened viewBox to minimize empty space while ensuring full visibility of the neon glow.
+  -->
+  <defs>
+    <filter id="neon" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="b1"/>
+      <feFlood flood-color="#00FFCC" flood-opacity="0.8" result="c1"/>
+      <feComposite in="c1" in2="b1" operator="in" result="g1"/>
+      
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="b2"/>
+      <feFlood flood-color="#00FFCC" flood-opacity="0.4" result="c2"/>
+      <feComposite in="c2" in2="b2" operator="in" result="g2"/>
+      
+      <feGaussianBlur in="SourceAlpha" stdDeviation="15" result="b3"/>
+      <feFlood flood-color="#00FFCC" flood-opacity="0.2" result="c3"/>
+      <feComposite in="c3" in2="b3" operator="in" result="g3"/>
+      
+      <feMerge>
+        <feMergeNode in="g3"/>
+        <feMergeNode in="g2"/>
+        <feMergeNode in="g1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <style>
+    <![CDATA[
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@900&display=swap');
+      .t-main { 
+        font-family: 'Outfit', sans-serif; 
+        font-weight: 900; 
+        fill: #FFFFFF; 
+        letter-spacing: 0.1em; 
+      }
+      .t-sub { 
+        font-family: 'Outfit', sans-serif; 
+        font-weight: 900; 
+        fill: #00FFCC; 
+        letter-spacing: 0.4em; 
+      }
+    ]]>
+  </style>
+
+  <g text-anchor="middle" filter="url(#neon)">
+    <!-- Precisely centered in a tight 1100px wide viewBox -->
+    <text x="550" y="105" class="t-main" font-size="96">GRAVITY FREIGHT</text>
+    <text x="550" y="150" class="t-sub" font-size="28.8">ORBITAL ECHOES</text>
+  </g>
+</svg>
