@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1113 144"
+   version="1.1"
+   id="svg7"
+   sodipodi:docname="logo.svg"
+   width="1113"
+   height="144"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.80727273"
+     inkscape:cx="474.43694"
+     inkscape:cy="48.93018"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg7" />
+  <!-- 
+    Gravity Freight V2: Exact-Fit Logo Asset
+    Tightened viewBox to minimize empty space while ensuring full visibility of the neon glow.
+  -->
+  <defs
+     id="defs6">
+    <filter
+       id="neon"
+       x="-0.065845878"
+       y="-0.58034577"
+       width="1.1316918"
+       height="2.1606915">
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="5"
+         result="b1"
+         id="feGaussianBlur1" />
+      <feFlood
+         flood-color="#00FFCC"
+         flood-opacity="0.8"
+         result="c1"
+         id="feFlood1" />
+      <feComposite
+         in="c1"
+         in2="b1"
+         operator="in"
+         result="g1"
+         id="feComposite1" />
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="10"
+         result="b2"
+         id="feGaussianBlur2" />
+      <feFlood
+         flood-color="#00FFCC"
+         flood-opacity="0.4"
+         result="c2"
+         id="feFlood2" />
+      <feComposite
+         in="c2"
+         in2="b2"
+         operator="in"
+         result="g2"
+         id="feComposite2" />
+      <feGaussianBlur
+         in="SourceAlpha"
+         stdDeviation="15"
+         result="b3"
+         id="feGaussianBlur3" />
+      <feFlood
+         flood-color="#00FFCC"
+         flood-opacity="0.2"
+         result="c3"
+         id="feFlood3" />
+      <feComposite
+         in="c3"
+         in2="b3"
+         operator="in"
+         result="g3"
+         id="feComposite3" />
+      <feMerge
+         id="feMerge6">
+        <feMergeNode
+           in="g3"
+           id="feMergeNode3" />
+        <feMergeNode
+           in="g2"
+           id="feMergeNode4" />
+        <feMergeNode
+           in="g1"
+           id="feMergeNode5" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode6" />
+      </feMerge>
+    </filter>
+  </defs>
+  <style
+     id="style6"><![CDATA[
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@900&display=swap');
+      .t-main { 
+        font-family: 'Outfit', sans-serif; 
+        font-weight: 900; 
+        fill: #FFFFFF; 
+        letter-spacing: 0.1em; 
+      }
+      .t-sub { 
+        font-family: 'Outfit', sans-serif; 
+        font-weight: 900; 
+        fill: #00FFCC; 
+        letter-spacing: 0.4em; 
+      }
+    ]]></style>
+  <g
+     text-anchor="middle"
+     filter="url(#neon)"
+     id="g7"
+     transform="translate(4.5984402,-23.75)">
+    <!-- Precisely centered in a tight 1100px wide viewBox -->
+    <text
+       x="550"
+       y="105"
+       class="t-main"
+       font-size="96px"
+       id="text6"
+       style="display:inline">GRAVITY FREIGHT</text>
+    <text
+       x="550.22949"
+       y="157.12885"
+       class="t-sub"
+       font-size="48.384px"
+       id="text7"
+       style="display:inline;stroke-width:1">ORBITAL ECHOES</text>
+  </g>
+</svg>
