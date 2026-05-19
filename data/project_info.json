@@ -1,0 +1,23 @@
+{
+  "title": "Gravity Freight",
+  "description": "天体の重力を利用して宇宙を往く、ローグライク・航行シミュレーション。限られたリソースで機体をビルドし、予測不能な重力の荒波を越えろ。",
+  "tags": [
+    "ローグライク",
+    "重力航法",
+    "機体ビルド"
+  ],
+  "logo": {
+    "path": "assets/logo.svg",
+    "type": "standard"
+  },
+  "badge": {
+    "content": "7月公開予定",
+    "type": "info"
+  },
+  "button": {
+    "content": "COMING SOON",
+    "url": "https://t-i-oak.github.io/GravityFreight/",
+    "type": "pending"
+  },
+  "image": "assets/thumbnail.png"
+}
