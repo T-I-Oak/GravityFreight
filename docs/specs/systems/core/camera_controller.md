@@ -19,7 +19,7 @@
 
 ### メソッド (Methods)
 - **`initialize(): void`**
-    - `DataManager.getSavedCameraState(migrationMap)` を実行し、永続化されている設定値を自身に適用する。
+    - `GameDataRepository.getSavedCameraState(migrationMap)` を実行し、永続化されている設定値を自身に適用する。
     - `migrationMap` の `init` では、デフォルトのカメラ状態（position: {0,0}, rotation: 0, zoomLevel: 1.0）を返す。
     - ※カメラ状態はセクター遷移やミッション再開時に自動リセットされない。
 
@@ -42,7 +42,7 @@
     - 指定されたスクリーン座標が、マップ領域（セクター境界内）であるかを判定する。
     - **内部ロジック**:
         1. `this.toWorld(screenPos)` でワールド座標に変換。
-        2. `DataManager.getMasterConfig().boundaryRadius` を取得。
+        2. `GameDataRepository.getMasterConfig().boundaryRadius` を取得。
         3. 変換後の座標のワールド原点からの距離が、半径以内であれば `true` を返す。
 
 - **`getWorldToScreenMatrix(): Matrix`**

@@ -7,6 +7,9 @@
 - **役割**: 経済・取引・抽選ロジック。
 - **責務**:
     - **アイテム出現抽選**: `world_config.md` の定義に基づき、指定されたコンテキスト（セクター配置、拠点ボーナス等）に応じたアイテムの重み付け抽選（Lottery）の実行。
+    - **航行結果の精算**: 航行結果と航行中に集計されたデータから、報酬、獲得アイテム、遺失物、割引率を含む `SettlementResult` を生成する。
+    - **施設取引ルール**: 交易所の在庫生成、割引適用後価格、修理費、解体費、闇市場ガチャを計算する。
+    - **ゲームオーバー判定**: 航行結果確定後および施設退出時に共通利用する詰み状態判定を提供する。
 
 ## 2. インターフェース (Interface)
 
@@ -67,7 +70,7 @@
         5. **幸運の導きの集計**:
             - `status === 'cleared'` の場合、`heldCargo` 内の `cargo_lucky` の個数をカウントし、`luckyDiscountRate` (個数 * 0.1) を設定する。
         6. 最終的な資産増減およびステータスを含む `SettlementResult` を生成して返す。
-3.  **施設取引ロジック (Facility Transactions)**:
+### 施設取引ロジック (Facility Transactions)
 
 - **`generateTradingPostStock(session: SessionState): StockItem[]`**
     - 交易所で販売される 6 個のアイテムリストを生成する。
@@ -89,6 +92,7 @@
 
 - **`checkGameOver(session: SessionState): object | null`**
     - ゲームオーバー（詰み状態）か判定し、理由を返す。
+    - **利用箇所**: 航行結果確定後と施設退出時の両方から呼び出される共通判定ロジックとする。
     - **戻り値**: 継続可能な場合は `null`。詰んでいる場合は `{ reason: 'NO_PARTS_REMAINING', details: string[] }`。
     - **判定条件**: 以下のカテゴリごとに、インベントリ内の「使用可能な在庫」を確認する。
         - **`CHASSIS`**: 在庫が 0 個なら `details` に追加。
@@ -105,6 +109,7 @@
 - **`totalScore: number`**: 今回の航行で得た総スコア。
 - **`totalCoins: number`**: 今回獲得した総コイン。
 - **`luckyDiscountRate: number`**: ゴール時に運んだ「幸運の導き」による割引率（0.0～0.5）。
+- **`flightTicks: number`**: 今回の航行で経過した Tick 数。ゲームリザルトの合計航行時間に加算される。
 - **`entries: SettlementEntry[]`**: 報酬の明細リスト（一行にスコアとコインを併記）。
 - **`itemReport: ItemReportEntry[]`**: UI 表示用の構造化されたアイテムリスト（配送とそのボーナスの紐付け等）。
 - **`acquiredItems: Item[]`**: インベントリへ正式に追加されるアイテムの実体リスト（ボーナスアイテム + 回収パーツ）。

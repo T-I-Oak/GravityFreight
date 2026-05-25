@@ -18,7 +18,7 @@ graph TD
 
     %% Control Layer
     Orchestrator --> UI["UIController (UI/Input)"]
-    Orchestrator --> DM["DataManager (Storage/Master)"]
+    Orchestrator --> GDR["GameDataRepository (Data Access)"]
 
     %% Logic & System Layer
     Orchestrator --> GC["GameController (Game Flow/Logic)"]
@@ -26,7 +26,7 @@ graph TD
     SS --> IC["ItemContainer (Inventory)"]
     GC --> SEC["Sector (Current Map)"]
     SEC --> ES["EconomySystem (Lottery/Price)"]
-    
+
     %% System Layer (Infrastructure)
     Orchestrator --> WR["WorldRenderer (Rendering)"]
     WR --> BM["BackgroundManager (Stars)"]
@@ -35,11 +35,12 @@ graph TD
 
     %% Global Services
     Orchestrator --> AT["AchievementTracker"]
+    Orchestrator --> RT["RankTracker"]
     Orchestrator --> FR["FlightRecorder"]
     Orchestrator --> Story["StorySystem"]
     Orchestrator --> PE["PhysicsEngine"]
     Orchestrator --> TP["TrajectoryPredictor"]
-    
+
     %% Key Cross-domain relations (Dashed lines)
     TP -.->|Use| PE
     UI -.->|Reference| CC
@@ -61,7 +62,7 @@ graph TD
 
 ---
 
-## 3. ワールドドメイン (World Domain)
+## 4. ワールドドメイン (World Domain)
 
 宇宙空間を構成する、主に静的・準静的な物理要素。
 
@@ -70,7 +71,7 @@ graph TD
     - 役割: 航行セッションの環境定義とコンテナ。
     - 責務:
         - セクター内に配置される `CelestialBody`（天体）および `ExitArc`（出口）のリストの保持。
-        - セクター境界（Boundary Radius）および 帰還ボーナスの保持。
+        - セクター境界（Boundary Radius）および帰還ボーナスの保持。
         - セクター全体の完全なスナップショットの生成と提供。
 - **CelestialBody (GravitySource)**
     - 生存期間: Stage Lifecycle
@@ -83,7 +84,7 @@ graph TD
 
 ---
 
-## 4. エンティティドメイン (Entity Domain)
+## 5. エンティティドメイン (Entity Domain)
 
 ゲーム内の主要なアクター、およびプレイヤーの資産データ。
 
@@ -100,22 +101,18 @@ graph TD
         - **動的状態の管理**: 自身の物理状態（位置、速度、回転）の保持。
         - **自己更新と集計 (`updateState`)**: 物理エンジンから通知された新しい状態を適用し、同時に航跡データ（`actualTrail`）への追加と航行ティック数（スコア）のインクリメントを自律的に行う。
         - **成果の集計（Result Carrier）**: 航行中に獲得したスコア、所持コインの増分、回収した貨物（Cargo）、および保持状態の全アイテムを蓄積し、リザルト画面に提供する。
-
 - **Item**
     - 生存期間: Exist Lifecycle
     - 役割: ゲーム内の全アイテムの基底。
     - 責務: 個別の属性（ID、現在耐久値、強化状態）の保持。
-
 - **StackedItem**
     - 生存期間: Exist Lifecycle
     - 役割: 同一 ID かつ **「同一性能」** のアイテムを個数で管理する実体。
     - 責務: インベントリ内でのスタック管理、UI 表示（代表値の返却）の提供。
-
 - **ModuleStack**
     - 生存期間: Exist Lifecycle
     - 役割: ロケット内部で、同一 ID のアイテムを **「機能プール」** として一括管理する実体。
     - 責務: 異なる性能のアイテムを統合した合計耐久度の管理、および消費戦略（LIFO/FIFO等）に基づく耐久度減算。
-
 - **ItemContainer**
     - 生存期間: Exist Lifecycle
     - 役割: プレイヤーの所持品（StackedItem）を管理するインベントリの実体。
@@ -127,24 +124,23 @@ graph TD
 
 ---
 
-## 5. ロジックドメイン (Logic Domain)
+## 6. ロジックドメイン (Logic Domain)
 
 ゲームの物理・経済・進行などの「ルール」を実行するステートレスなサービス。
 
 - **PhysicsEngine**
     - 生存期間: App Lifecycle (Service)
     - 役割: 物理シミュレーター。
-    - 責務: 
+    - 責務:
         - ティック単位の積分計算、全天体からの重力合算。
         - 算出された新しい物理状態（位置・速度）を `Rocket` に通知し、`rocket.updateState()` を実行させる。
 - **TrajectoryPredictor**
     - 生存期間: App Lifecycle (Service)
     - 役割: 軌道予測機。
-    - 責務: 
+    - 責務:
         - 未来の航跡計算。
         - `Rocket` のクローンを作成し、`PhysicsEngine` を用いて指定ティック分ループ実行することでシミュレーションを行う。
         - **計算完了後の `Rocket` クローンを返す**。このクローンが持つ `actualTrail`（移動履歴）が、UI 上での「予測軌道」として利用される。
-
 - **EconomySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 経済・取引・抽選ロジック。
@@ -153,53 +149,61 @@ graph TD
         - 交易所・闇市場等の在庫、および排出対象の抽選制御。
         - アイテムが自己算出する基準価格を合算し、経済ボーナスを加味した最終的な報酬額・取引価格の決定。
         - 取引（Buy/Sell/Repair）の成否判定。
+        - 航行結果確定後および施設退出時に共通利用するゲームオーバー判定。
 - **GameController**
     - 生存期間: Game Lifecycle
     - 役割: ゲーム進行・シーン管理。
-    - 責務: 
-        - プレイ中（ワープ〜航行〜リザルト）の一連の画面遷移とロジックの統括。
+    - 責務:
+        - プレイ中（ワープ〜航行〜リザルト〜施設〜ゲーム終了）の一連の画面遷移とロジックの統括。
         - SessionState のセクター番号更新、Sector の生成・破棄管理。
         - 航行中の物理計算、スコア計算、終了判定の実行。
+        - ゲームリザルト表示時点で実績・ランキング確定処理を呼び出す。
 - **StorySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 物語（Story）の選択・永続進捗管理。
     - 責務:
         - ストーリーIDごとの永続的な既読状態（isRead）の管理。
         - 条件に応じたストーリーIDの選出。
-        - 既読フラグの更新と永続化（LocalStorage等）。
+        - 既読フラグの更新と永続化。
 - **AchievementTracker**
     - 生存期間: App Lifecycle
-    - 役割: 統計・実績管理。
-    - 責務: プレイを跨いだ累計統計の保持、実績解除判定。
+    - 役割: 実績管理。
+    - 責務: 実績の達成状況と進捗の保持、実績解除判定。
+- **RankTracker**
+    - 生存期間: App Lifecycle
+    - 役割: ランキング管理。
+    - 責務: ゲーム1プレイ単位の結果をもとに、スコア・到達セクター・回収数などの上位記録を保持する。
 - **FlightRecorder**
     - 生存期間: App Lifecycle
-    - 役割: 記録・リプレイ。
-    - 責務: スナップショットの永続化保存、再現の実行。
+    - 役割: 航行記録・リプレイ管理。
+    - 責務: 1回の航行単位のスナップショット永続化保存、再現の実行。
 
 ---
 
-## 6. システムドメイン (System Domain)
+## 7. システムドメイン (System Domain)
 
 描画、入力、全体制御などのインフラストラクチャ。
 
 - **AppOrchestrator**
     - 生存期間: App Lifecycle
     - 役割: アプリ基盤保持・全体指揮。
-    - 責務: 
+    - 責務:
         - アプリ共通のインフラクラスの保持と初期化。
         - タイトル画面の管理と、ゲーム本編（GameController）の起動。
-- **DataManager**
+- **GameDataRepository**
     - 生存期間: App Lifecycle
-    - 役割: データプロバイダー。
+    - 役割: GravityFreight のデータアクセス統合窓口。
     - 責務:
-        - 外部データソース（マスタ）の保持。
-        - 静的データ（アイテム、ストーリー、実績定義等）への統一されたアクセスインターフェースの提供。
+        - 静的なゲームマスタデータをロードし、各クラスへ提供する。
+        - ユーザーデータを共通 DataManager の `getSavedData` / `setSavedData` で読み書きする。
+        - 各クラスが共通 DataManager や `localStorage` へ直接依存しないようにする。
 - **UIController**
     - 生存期間: App Lifecycle
     - 役割: 表示管理。
     - 責務:
         - 画面遷移、ダイアログ表示の制御。
         - HUDの制御。
+        - UI 操作イベントをアプリ側のハンドラへ中継する。
 - **BackgroundManager**
     - 生存期間: App Lifecycle
     - 役割: 遠景演出管理。

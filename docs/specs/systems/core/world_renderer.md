@@ -69,6 +69,13 @@
     - 新しいマップが遠方の極小点から急接近してくるようなスケーリングを行い、期待感を醸成する。
     - （内部実装: `animateWarpEffect(0.05, 1.0, 1.0, 1.0, duration)`）
 
+- **`playGameEndExitAnimation(duration: number): Promise<void>`**
+    - ゲームオーバー時の退場演出を実行する。
+    - **内部挙動**:
+        1. 現在のセクター表示を維持したまま、カメラまたはマップ表示を現在の宇宙から離脱する方向へ動かす。
+        2. ゲームリザルトパネルが前面に重なるため、背景演出としてリザルト操作を妨げない状態を保つ。
+        3. 演出完了時に Promise を解決する。
+
 - **`animateWarpEffect(fromScale: number, fromAlpha: number, toScale: number, toAlpha: number, duration: number): void`** *(内部実装専用)*
     - `startWarpEffect()` / `stopWarpEffect()` から内部的に呼び出される。外部から直接呼び出してはならない。
 
@@ -137,7 +144,7 @@ PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描
     - **カラー**: `--color-ui-scanner` (`0x00FFCC`) を使用。
     - **不透明度**: 拡大率 `t (0.0~1.0)` に対し、`(1.0 - t) * 0.9` で減衰。
     - **形状**: 太さ 2.5px の円環（Stroke）と、不透明度 0.15 の塗り（Fill）。
-- **終了時**: `setSonarActive(false)` が呼ばれた瞬間、新しいパルスの発生のみを停止し、描画中の波紋は消滅するまで維持する。
+- **終了時**: `disableSonar()` が呼ばれた瞬間、新しいパルスの発生のみを停止し、描画中の波紋は消滅するまで維持する。
 
 ### 4.5 航行終了演出 (Finish Animation)
 - **物理停止後の挙動**: `GameController` が物理更新を止めた後も、以下のオブジェクトが消滅するまで描画ループを維持する。

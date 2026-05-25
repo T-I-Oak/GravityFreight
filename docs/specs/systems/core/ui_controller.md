@@ -105,27 +105,27 @@
             - `result.itemReport` をループし、`UIComponents.generateItemCardHTML` を用いてカードを生成する。
             - 配送成功時（`match`）は、「DELIVERY BONUS」の見出しを伴う専用コンテナ（`.report-bonus-list`）内に獲得したボーナスアイテムを表示する。
 
-- **`showGameEndSequence(session: SessionState, result: object): void`**
+- **`showGameEndSequence(gameResult: GameResultSummary, gameOver: object): void`**
     - ゲーム終了（契約終了）時の最終画面を表示する。
     - **内部挙動**:
-        1. **第8章演出（ベース）**: ゲームオーバー画面を背景として表示し、`result.reason` および **`result.details`（「シャーシ不足」等の具体的な項目リスト）** をメッセージとして表示する。
-        2. **第7章演出（オーバーレイ）**: 統計情報（累計スコア、総獲得コイン、踏破セクター数等）をまとめたリザルトパネルを前面に表示する。
+        1. **ゲームオーバー背景**: ゲームオーバー画面を背景として表示し、`gameOver.reason` および **`gameOver.details`（「シャーシ不足」等の具体的な項目リスト）** をメッセージとして表示する。
+        2. **ゲームリザルトオーバーレイ**: `gameResult` の累計スコア、総獲得コイン、踏破セクター数、合計航行 Tick 数をまとめたリザルトパネルを前面に表示する。
         3. タイトルへ戻るボタンを表示する。
-+
-+- **`showFacilityScreen(type: string, data: object): void`**
-+    - 施設画面（交易所、整備工場、闇市場）を表示する。
-+    - **内部挙動**:
-+        1. **画面切り替え**: 現在の画面を隠し、対象の施設用コンテナを表示する。
-+        2. **ヘッダー構築**: `UIComponents.generateFacilityBadgeHTML(type)` 等を用いて名称とアイコンをセットする。
-+        3. **リスト構築**: `data.items` (StockItem[]) 等をループし、`UIComponents.generateCardHTML` を用いて在庫リストを構築する。
-+        4. **割引表示**: `data.luckyDiscount` > 0 の場合、割引率（例: "20% OFF"）を示すバッジやラベルを表示する。
-+        5. **所持金反映**: `data.coins` を表示エリアにセットする。
-+
-+- **`updateFacilityCredits(value: number): void`**
-+    - 施設画面内の所持金表示を即座に更新する。
-+
-+- **`addFacilityAcquiredItem(item: Item): void`**
-+    - 整備工場や闇市場で新しく獲得したアイテムを、画面右側の「獲得リスト」に追加表示する。
+
+- **`showFacilityScreen(type: string, data: object): void`**
+    - 施設画面（交易所、整備工場、闇市場）を表示する。
+    - **内部挙動**:
+        1. **画面切り替え**: 現在の画面を隠し、対象の施設用コンテナを表示する。
+        2. **ヘッダー構築**: `UIComponents.generateFacilityBadgeHTML(type)` 等を用いて名称とアイコンをセットする。
+        3. **リスト構築**: `data.items` (StockItem[]) 等をループし、`UIComponents.generateItemCardHTML` を用いて在庫リストを構築する。
+        4. **割引表示**: `data.luckyDiscount` > 0 の場合、割引率（例: "20% OFF"）を示すバッジやラベルを表示する。
+        5. **所持金反映**: `data.coins` を表示エリアにセットする。
+
+- **`updateFacilityCredits(value: number): void`**
+    - 施設画面内の所持金表示を即座に更新する。
+
+- **`addFacilityAcquiredItem(item: Item): void`**
+    - 整備工場や闇市場で新しく獲得したアイテムを、画面右側の「獲得リスト」に追加表示する。
 
 - **`showSettingsDialog(): void`**
     - 音量設定ダイアログを表示する。
@@ -193,6 +193,10 @@
     - リザルト画面の「確定（OK / CONTINUE）ボタン」にハンドラを登録する。
     - **内部挙動**: リザルト画面内の次へ進むためのボタン要素を引数として `setOperationHandler` を呼び出す。
 
+- **`setGameEndReturnHandler(handler: Function): void`**
+    - ゲームリザルト画面の「タイトルへ戻る」ボタンにハンドラを登録する。
+    - **内部挙動**: ゲーム終了画面内のタイトル復帰ボタン要素を引数として `setOperationHandler` を呼び出す。
+
 - **`setProtectHandler(handler: (protected: boolean) => void): void`**
     - リザルト画面の「レコード保護（PROTECT）ボタン」にハンドラを登録する。
     - **内部挙動**: クリックごとにボタンのトグル状態（is-active）を切り替え、最新の状態を引数として `handler` を実行する。
@@ -201,13 +205,13 @@
     - リザルト画面の「マップ確認（VIEW MAP）ボタン」にハンドラを登録する。
     - **内部挙動**: リザルトパネルの表示/非表示をトグルし、現在の状態を引数として `handler` を実行する。
 
-+- **`setFacilityActionHandler(handler: (action: string, context: object) => void): void`**
-+    - 施設画面内の各アクションボタン（Buy, Sell, Repair 等）にハンドラを登録する。
-+    - **内部挙動**: ボタンごとの `data-action` や `data-uid` を抽出し、`handler` を実行する。
-+
-+- **`setFacilityDepartHandler(handler: Function): void`**
-+    - 施設画面の「出発（DEPART）ボタン」にハンドラを登録する。
-+    - **内部挙動**: 出発ボタン要素を引数として `setOperationHandler` を呼び出す。
+- **`setFacilityActionHandler(handler: (action: string, context: object) => void): void`**
+    - 施設画面内の各アクションボタン（Buy, Sell, Repair 等）にハンドラを登録する。
+    - **内部挙動**: ボタンごとの `data-action` や `data-uid` を抽出し、`handler` を実行する。
+
+- **`setFacilityDepartHandler(handler: Function): void`**
+    - 施設画面の「出発（DEPART）ボタン」にハンドラを登録する。
+    - **内部挙動**: 出発ボタン要素を引数として `setOperationHandler` を呼び出す。
 
 - **`setCanvasInputHandler(handler: (event: PointerEvent | WheelEvent) => void): void`**
     - マップ描画領域（Canvas）に対する入力を中継する（操作音なし）。
