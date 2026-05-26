@@ -71,8 +71,10 @@
         1. `EconomySystem.checkGameOver(sessionState)` を実行する。
         2. 戻り値が `null` の場合は `false` を返す。
         3. ゲームオーバー結果が返った場合は、ゲームリザルト表示用の `GameResultSummary` を `sessionState.getGameResultSummary()` で取得する。
-        4. `AchievementTracker.recordGameResult(gameResult)` と `RankTracker.recordGameResult(gameResult)` を呼び出し、実績とランキングをゲームリザルト表示時点の確定処理として更新する。
-        5. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
+        4. `GameRecordTracker.recordGameResult(gameResult)` を呼び出し、実績判定や累計KPIが参照する記録値を更新する。
+        5. `RankTracker.recordGameResult(gameResult)` を呼び出し、ランキング表示用レコードを更新する。
+        6. `AchievementTracker.evaluateAchievements()` を呼び出し、更新済みの記録値から実績達成状態を再評価する。
+        7. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
 
 - **`returnToTitle(): void`**
     - ゲーム終了画面のタイトル復帰操作を処理する。

@@ -5,7 +5,7 @@
     - core_scenarios.md で進捗管理するため、Backlogには詳細の進捗は記載しない
     - 1回のセッションで設計するシナリオは1～2個程度とする
 - [ ] 永続データ構造を具体化する
-    - 対象: achievement_data / rank_data / flight_record_index
+    - 対象: game_record_data / rank_data / flight_record_index
     - 共通 DataManager の getSavedData / setSavedData を前提に、各所有クラスのデータ構造を定義する
 - [ ] リプレイ画面の未確定 UI を仕様化する
     - 航行終了後ボーナスの表示方法
