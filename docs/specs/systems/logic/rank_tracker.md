@@ -9,7 +9,7 @@
     - ゲーム1プレイ単位の結果をランキング用データとして保存する。
     - `Score` / `Sector` / `Collected` などのランキングカテゴリごとに上位記録を管理する。
     - 直近のゲーム1プレイ結果を管理する。
-    - 実績達成状態および航行単位のリプレイ記録は担当しない。
+    - 実績達成状態、累計KPI用の記録値、および航行単位のリプレイ記録は担当しない。
 
 ## 2. インターフェース (Interface)
 
@@ -49,6 +49,15 @@
 ### RankData (永続化対象: キー `rank_data`)
 ```javascript
 {
-  // 構造は将来のランキング仕様策定時に確定する
+  records: GamePlayResult[]
 }
 ```
+
+- `records` はランキング表示と直近プレイ結果表示に必要な `GamePlayResult` のみを保持する。
+- `Score` / `Sector` / `Collected` の各Top20と、直近20件の和集合を保存対象とする。
+- 同一 `GamePlayResult.id` が複数カテゴリの保存対象になる場合は1件に統合する。
+- `Sector` ランキングは HUD 表示と揃えるため `reachedSector` を基準にする。
+- `Score` は `score` 降順、`Sector` は `reachedSector` 降順、`Collected` は `collectedItemCount` 降順で並べる。同値の場合は `createdAt` が新しい記録を上位にする。
+- `records` の保存順は実装内部の都合で決めてよい。表示時はカテゴリごとのソート条件で並べ替える。
+- migration の `init()` は `{ records: [] }` を返す。
+- 累計契約回数、累計踏破セクター数、累計回収アイテム数などの通算記録は `GameRecordTracker` の `game_record_data` が保持する。
