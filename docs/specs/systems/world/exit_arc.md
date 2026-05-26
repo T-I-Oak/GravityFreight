@@ -35,3 +35,35 @@
 
 - **`getFacilityType(): string`** (未承認)
     - この出口に紐付いている施設タイプを返す。
+
+- **`createSnapshot(): object`**
+    - 現在の出口状態をシリアライズ可能な形式で抽出する。
+    - **保存対象**:
+        - `angle`
+        - `type`
+    - **保存しない値**:
+        - `width`: `type` から基本幅を再解決する。
+        - `radius`: `GameDataRepository.getMasterConfig().boundaryRadius` から再解決する。
+        - 発射構成による出口判定補正: `Rocket` 側の発射構成から再計算し、航行判定側で同じ条件として適用する。
+
+- **`static fromSnapshot(snapshot: object): ExitArc`**
+    - `ExitArcSnapshot` から出口インスタンスを復元する。
+    - **内部挙動**:
+        1. `angle`, `type` を復元する。
+        2. `radius` はマスタ設定から解決する。
+        3. `width` は施設タイプの基本幅として再解決する。
+        4. スナップショットに不足または不正な値がある場合は、データ整合性エラーとして例外を投げる。
+
+## 3. データ構造定義 (Data Structures)
+
+### ExitArcSnapshot
+```javascript
+{
+  angle: number,
+  type: string
+}
+```
+
+- `angle` は出口の配置結果であり、発射時点のセクター再現に必要な変動値として保存する。
+- `type` は施設種別であり、基本出口幅、報酬、施設遷移の再解決に使用する。
+- 発射構成による有効出口幅の補正は `ExitArcSnapshot` には含めず、復元された `Rocket` の発射構成から航行判定時に再計算する。

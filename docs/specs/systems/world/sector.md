@@ -50,8 +50,40 @@
 - **`clone(): Sector`**
     - 現在の状態のコピーを生成して返す。内部的には `createSnapshot()` と `Sector.fromSnapshot()` を組み合わせて実現する。
 
-- **`static fromSnapshot(snapshot: object): Sector`** *(保留)*
+- **`static fromSnapshot(snapshot: object): Sector`**
     - 保存されたスナップショットデータから `Sector` インスタンスを再構築する。リプレイ再生・クローン用。
+    - **復元対象**: `sectorNumber`, `isAnomaly`, `luckyDiscountRate`, `bodies`, `exits`。
+    - **内部挙動**:
+        1. 通常のランダム生成処理を実行せず、空の `Sector` インスタンスを作成する。
+        2. `snapshot.bodies` の各要素を `CelestialBody.fromSnapshot()` で復元し、`bodies` に格納する。
+        3. `snapshot.exits` の各要素を `ExitArc.fromSnapshot()` で復元し、`exits` に格納する。
+        4. スナップショットに不足または不正な値がある場合は、データ整合性エラーとして例外を投げる。
 
-- **`createSnapshot(): object`** *(保留)*
+- **`createSnapshot(): object`**
     - 現在のセクターの状態（天体配置、アイテム所持状態、出口構成）をシリアライズ可能な形式で抽出する。リプレイ保存用。
+    - **保存対象**:
+        - `sectorNumber`
+        - `isAnomaly`
+        - `luckyDiscountRate`
+        - `bodies`: 各 `CelestialBody.createSnapshot()` の結果
+        - `exits`: 各 `ExitArc.createSnapshot()` の結果
+    - **保存しない値**:
+        - `boundaryRadius`, `placementLimitRadius`, `baseCelestialCount` などのマスタ設定値。
+        - 生成時の乱数 seed や抽選ログ。
+    - **注意**: 発射後の航行中に天体の保持アイテムが回収されるため、リプレイ用 snapshot は `FlightRecorder.captureLaunchSnapshot()` により発射時点で取得する。
+
+## 3. データ構造定義 (Data Structures)
+
+### SectorSnapshot
+```javascript
+{
+  sectorNumber: number,
+  isAnomaly: boolean,
+  luckyDiscountRate: number,
+  bodies: CelestialBodySnapshot[],
+  exits: ExitArcSnapshot[]
+}
+```
+
+- `bodies` は母星を含む全 `CelestialBody` の snapshot を保持する。
+- `exits` はセクター境界上の全 `ExitArc` の snapshot を保持する。
