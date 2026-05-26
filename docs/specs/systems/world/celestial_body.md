@@ -57,3 +57,41 @@
 
 - **`addItems(items: ItemBase[]): void`**
     - 指定されたアイテムを `this.items` リストに追加する。主にクラッシュ時の遺失物回収ロジックで使用される。
+
+- **`createSnapshot(): object`**
+    - 現在の天体状態をシリアライズ可能な形式で抽出する。
+    - **保存対象**:
+        - `position`
+        - `isRepulsion`
+        - `isHome`
+        - `radius`: `isHome === false` の場合のみ、ランダム決定済みの半径として保存する。
+        - `items`: 各 `Item.createSnapshot()` の結果。
+    - **保存しない値**:
+        - `mass`: 通常天体は `radius * radius`、母星はマスタ値から再計算する。
+        - 母星の `radius`: マスタ値から再解決する。
+    - **注意**: `items` は発射時点で天体が保持している未回収アイテムを表す。航行中に回収されると `CelestialBody` から除去されるため、リプレイ用 snapshot は発射時点で取得する。
+
+- **`static fromSnapshot(snapshot: object): CelestialBody`**
+    - `CelestialBodySnapshot` から天体インスタンスを復元する。
+    - **内部挙動**:
+        1. `position`, `isRepulsion`, `isHome` を復元する。
+        2. `isHome === true` の場合、`radius` と `mass` はマスタ値から解決する。
+        3. `isHome === false` の場合、`snapshot.radius` を使用し、`mass = radius * radius` として再計算する。
+        4. `items` は各 item snapshot を `Item.fromSnapshot()` へ渡して復元する。
+        5. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
+
+## 3. データ構造定義 (Data Structures)
+
+### CelestialBodySnapshot
+```javascript
+{
+  position: { x: number, y: number },
+  isRepulsion: boolean,
+  isHome: boolean,
+  radius?: number,
+  items: ItemSnapshot[]
+}
+```
+
+- `radius` は通常天体のみ保存する。母星では保存しない。
+- `items` の各要素は保持している `Item` の snapshot とする。

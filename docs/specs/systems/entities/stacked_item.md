@@ -37,3 +37,34 @@
         - それ以外 (`name`, `category`, `description`, `stats` など) は `items[0].getViewData()` の結果をそのまま流用する。
           - ※`stats` に含まれる `charges`, `maxCharges`, 各種性能値も代表アイテム（`items[0]`）のものがそのまま引き継がれる。
 
+- **`createSnapshot(): object`**
+    - スタック状態をシリアライズ可能な形式で抽出する。
+    - **保存対象**:
+        - `uid`
+        - `items`: 各 `Item.createSnapshot()` の結果
+    - **保存しない値**:
+        - `id`: `items[0]` から再解決する。
+        - `count`: `items.length` から再計算する。
+
+- **`static fromSnapshot(snapshot: object): StackedItem`**
+    - `StackedItemSnapshot` からスタックを復元する。
+    - **内部挙動**:
+        1. `snapshot.items` の各要素を `Item.fromSnapshot()` で復元する。
+        2. 先頭 item で `StackedItem` を生成し、残りの item を `add()` で追加する。
+        3. `snapshot.uid` を復元する。
+        4. `count` は復元した `items.length` から再計算する。
+        5. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
+
+## 3. データ構造定義 (Data Structures)
+
+### StackedItemSnapshot
+```javascript
+{
+  uid: string,
+  items: ItemSnapshot[]
+}
+```
+
+- `items` は同一 ID かつ同一性能の個体リストとする。
+- 復元時に同一性能でない item が混在している場合は、データ整合性エラーとして例外を投げる。
+

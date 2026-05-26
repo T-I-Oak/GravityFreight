@@ -37,11 +37,34 @@
 - **`clone(): Rocket`**
     - 現在の状態のコピーを生成して返す。内部的には `createSnapshot()` と `Rocket.fromSnapshot()` を組み合わせて実現する。
 
-- **`createSnapshot(): object`** *(保留)*
+- **`createSnapshot(): object`**
     - 現在の状態をシリアライズ可能なオブジェクトとして抽出する。
-- **`static fromSnapshot(snapshot: object): Rocket`** *(保留)*
-    - スナップショットデータから新しい `Rocket` インスタンスを生成（復元）する。
+    - **保存対象**:
+        - `uid`
+        - `rocketItem`: `RocketItem.createSnapshot()` の結果
+        - `launcher`: `Item.createSnapshot()` の結果
+        - `booster`: `Item.createSnapshot()` の結果、または `null`
+        - `angle`
+        - `position`
+        - `velocity`
+        - `actualTrail`
+        - `ticks`
+        - `heldCargo`: 各 `Item.createSnapshot()` の結果
+        - `isGhost`
+    - **保存しない値**:
+        - `getInitialVelocity()` で再計算できる初速計算過程。
+        - `getCollectionRange()` / `getPrecision()` のような派生値。
+    - **注意**: リプレイ用の発射時 snapshot では、通常 `ticks` は 0、`actualTrail` と `heldCargo` は空または発射直後の初期状態となる。軌道予測用の `clone()` では、その時点の状態を保持する。
 
+- **`static fromSnapshot(snapshot: object): Rocket`**
+    - スナップショットデータから新しい `Rocket` インスタンスを生成（復元）する。
+    - **内部挙動**:
+        1. `snapshot.rocketItem` を `RocketItem.fromSnapshot()` で復元する。
+        2. `snapshot.launcher` を `Item.fromSnapshot()` で復元する。
+        3. `snapshot.booster` が `null` でなければ `Item.fromSnapshot()` で復元する。
+        4. 復元した発射構成から `Rocket` を生成し、`uid`, `angle`, `position`, `velocity`, `ticks`, `actualTrail`, `heldCargo`, `isGhost` を復元する。
+        5. `heldCargo` は各 item snapshot を `Item.fromSnapshot()` へ渡して復元する。
+        6. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
 
 - `updateState(pos: Vector2, vel: Vector2): number`
     - 自身の `position`, `velocity` を更新する。
@@ -86,3 +109,25 @@
 航行終了時にロケットから抽出される生データ。
 - **`ticks: number`**: 最終的な累計ティック数。
 - **`heldCargo: Item[]`**: 保持状態のまま終了した全アイテムのリスト。
+
+### `RocketSnapshot`
+```javascript
+{
+  uid: string,
+  rocketItem: RocketItemSnapshot,
+  launcher: ItemSnapshot,
+  booster: ItemSnapshot | null,
+  angle: number,
+  position: { x: number, y: number },
+  velocity: { x: number, y: number },
+  actualTrail: { x: number, y: number }[],
+  ticks: number,
+  heldCargo: ItemSnapshot[],
+  isGhost: boolean
+}
+```
+
+- `rocketItem`, `launcher`, `booster` は発射時点の個体 snapshot として保存する。
+- `position` と `velocity` は航行開始時の物理状態を再現するために保存する。
+- `actualTrail`, `ticks`, `heldCargo`, `isGhost` は、その時点の `Rocket` 所有状態を復元するために保存する。
+- リプレイ保存時は発射確定直後に `FlightRecorder.captureLaunchSnapshot()` から呼び出されるため、発射後の航跡や回収物は通常含まれない。

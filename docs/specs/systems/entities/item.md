@@ -96,3 +96,41 @@
     - **判定基準**: 
         - ID が一致していること。
         - 動的性能（現在の耐久度、最大耐久度、プロパティ別の強化回数 (`enhancements`)、および各パラメーターの補正値）が完全に一致していること。
+
+- **`createSnapshot(): object`**
+    - 個体アイテムの所有状態をシリアライズ可能な形式で抽出する。
+    - **保存対象**:
+        - `id`
+        - `uid`
+        - `charges`
+        - `enhancements`
+    - **保存しない値**:
+        - `name`, `category`, `rarity`, `description`: マスタデータから再解決する。
+        - `mass`, `maxCharges`, `precision`, `pickupRange`, `power`, `slots`, 各種 multiplier: マスタデータと `enhancements` から再計算する。
+        - `duration`, `preventsLauncherWear`, `onLostBonus`, `ghostType`, `deliveryGoalId`, `coinDiscount`, `score`: マスタデータから再解決する。
+
+- **`static fromSnapshot(snapshot: object): Item`**
+    - `ItemSnapshot` から個体アイテムを復元する。
+    - **内部挙動**:
+        1. `snapshot.id` を使ってマスタデータから基本値を読み込む。
+        2. `snapshot.uid` を復元する。
+        3. `snapshot.enhancements` を適用し、強化後の性能値を再計算する。
+        4. `snapshot.charges` を復元する。
+        5. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
+
+## 3. データ構造定義 (Data Structures)
+
+### ItemSnapshot
+```javascript
+{
+  id: string,
+  uid: string,
+  charges: number,
+  enhancements: Record<string, number>
+}
+```
+
+- `id` はマスタデータ参照用 ID。
+- `uid` は個体識別子であり、復元後も同一個体として扱うため保存する。
+- `charges` は現在耐久値など、航行結果に影響する個体状態として保存する。
+- `enhancements` は強化状態を表し、強化後の性能値の再計算に使用する。
