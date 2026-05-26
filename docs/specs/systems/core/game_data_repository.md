@@ -63,7 +63,11 @@
 - **`getSavedRankData(migrationMap: MigrationMap): object`**
 - **`setSavedRankData(data: object): void`**
 - **`getSavedFlightRecordIndex(migrationMap: MigrationMap): object`**
+    - 内部で `DataManager.getSavedData('flight_record_index', migrationMap)` を呼び出す。
+    - 戻り値は `FlightRecorder` が所有する `FlightRecordIndex` 構造とする。
 - **`setSavedFlightRecordIndex(data: object): void`**
+    - 内部で `DataManager.setSavedData('flight_record_index', data)` を呼び出す。
+    - `pendingRecordDraft` や `pendingRecord` などの一時状態は保存対象に含めない。
 
 ## 5. 保存対象の分担
 
