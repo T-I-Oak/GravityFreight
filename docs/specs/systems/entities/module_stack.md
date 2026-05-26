@@ -50,5 +50,35 @@
             - **Capability (Σ)**: `precision`, `pickupRange`, `power`, `slots`
             - **Multipliers (Π)**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
 
+- **`createSnapshot(): object`**
+    - ロケット内部のモジュールスタック状態をシリアライズ可能な形式で抽出する。
+    - **保存対象**:
+        - `uid`
+        - `items`: 各 `Item.createSnapshot()` の結果
+    - **保存しない値**:
+        - `id`, `name`, `category`: `items[0]` から再解決する。
+        - `charges`, `maxCharges`, `count`: `items` から再集計する。
+
+- **`static fromSnapshot(snapshot: object): ModuleStack`**
+    - `ModuleStackSnapshot` からモジュールスタックを復元する。
+    - **内部挙動**:
+        1. `snapshot.items` の各要素を `Item.fromSnapshot()` で復元する。
+        2. 先頭 item で `ModuleStack` を生成し、残りの item を `add()` で追加する。
+        3. `snapshot.uid` を復元する。
+        4. `charges`, `maxCharges`, `count` は復元した `items` から再集計する。
+        5. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
+
+## 3. データ構造定義 (Data Structures)
+
+### ModuleStackSnapshot
+```javascript
+{
+  uid: string,
+  items: ItemSnapshot[]
+}
+```
+
+- `items` は同一 ID のモジュール個体を保持する。
+- 同一 ID であれば強化状態や耐久度が異なる個体も含めることができる。
 
 

@@ -46,3 +46,41 @@
             - **Capability (Σ)**: `precision`, `pickupRange`, `power`, `slots`
             - **Multipliers (Π)**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
         - **`modules` (Composition)**: 構成パーツ（`chassis`, `logic`, および各 `ModuleStack`）の `getViewData()` の結果を再帰的に格納する。
+
+- **`createSnapshot(): object`**
+    - 組み上げ済みロケットの構成状態をシリアライズ可能な形式で抽出する。
+    - **保存対象**:
+        - `uid`
+        - `chassis`: `Item.createSnapshot()` の結果
+        - `logic`: `Item.createSnapshot()` の結果
+        - `modules`: 各 `ModuleStack.createSnapshot()` の結果
+    - **保存しない値**:
+        - `name`: `chassis` と `logic` から再生成する。
+        - `mass`, `slots`, `precision`, `pickupRange`, 各種 multiplier などの集計値。
+        - 構成パーツのマスタ由来プロパティ。
+
+- **`static fromSnapshot(snapshot: object): RocketItem`**
+    - `RocketItemSnapshot` から組み上げ済みロケットを復元する。
+    - **内部挙動**:
+        1. `snapshot.chassis` を `Item.fromSnapshot()` で復元する。
+        2. `snapshot.logic` を `Item.fromSnapshot()` で復元する。
+        3. `snapshot.modules` を `ModuleStack.fromSnapshot()` で復元する。
+        4. 復元専用経路で `RocketItem` を生成し、`chassis`, `logic`, `modules`, `uid` を snapshot の内容で復元する。
+        5. 通常 constructor のモジュール集約処理は、復元済み `ModuleStack` の uid や内部 item 状態を失わせないため実行しない。
+        6. 集計性能は復元した構成パーツから再計算する。
+        7. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
+
+## 3. データ構造定義 (Data Structures)
+
+### RocketItemSnapshot
+```javascript
+{
+  uid: string,
+  chassis: ItemSnapshot,
+  logic: ItemSnapshot,
+  modules: ModuleStackSnapshot[]
+}
+```
+
+- 発射構成は ID 参照ではなく、構成パーツの個体 snapshot として保存する。
+- `modules` は同種モジュールを集約した `ModuleStackSnapshot` の配列とする。

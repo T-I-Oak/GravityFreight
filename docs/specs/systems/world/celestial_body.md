@@ -65,7 +65,7 @@
         - `isRepulsion`
         - `isHome`
         - `radius`: `isHome === false` の場合のみ、ランダム決定済みの半径として保存する。
-        - `items`: 各保持物の `createSnapshot()` の結果。
+        - `items`: 各 `Item.createSnapshot()` の結果。
     - **保存しない値**:
         - `mass`: 通常天体は `radius * radius`、母星はマスタ値から再計算する。
         - 母星の `radius`: マスタ値から再解決する。
@@ -77,7 +77,7 @@
         1. `position`, `isRepulsion`, `isHome` を復元する。
         2. `isHome === true` の場合、`radius` と `mass` はマスタ値から解決する。
         3. `isHome === false` の場合、`snapshot.radius` を使用し、`mass = radius * radius` として再計算する。
-        4. `items` は所有構造に従い、各 item snapshot を対応する `fromSnapshot()` へ渡して復元する。
+        4. `items` は各 item snapshot を `Item.fromSnapshot()` へ渡して復元する。
         5. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
 
 ## 3. データ構造定義 (Data Structures)
@@ -89,9 +89,9 @@
   isRepulsion: boolean,
   isHome: boolean,
   radius?: number,
-  items: object[]
+  items: ItemSnapshot[]
 }
 ```
 
 - `radius` は通常天体のみ保存する。母星では保存しない。
-- `items` の各要素は保持している実クラスの snapshot とする。
+- `items` の各要素は保持している `Item` の snapshot とする。
