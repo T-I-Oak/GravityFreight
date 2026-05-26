@@ -45,6 +45,7 @@
     - 記録画面を表示する。
 - **`showManualScreen(): void`**
     - 説明書（マニュアル）画面を表示する。
+    - **責務境界**: 説明書本体のページ描画、背景画像、ページ切り替え、説明用デモは `HowToPlayUI` が担当する。`UIController` は画面表示の入口または既存画面の非表示制御に留める。
 - **`showBuildScreen(): void`**
     - ビルドフェーズを開始する。
     - **内部挙動**: 画面の切り替えと同時に `openBuildPanel()` および HUD 要素の表示状態（`.hide` クラスの除去等）を切り替え、初期状態で両方が表示された状態にする。
@@ -155,7 +156,7 @@
     - **内部挙動**: 内部で保持する記録ボタン要素を引数として `setOperationHandler` を呼び出す。
 - **`setManualHandler(handler: Function): void`**
     - タイトル画面の「説明書ボタン」にハンドラを登録する。
-    - **内部挙動**: 内部で保持する説明書ボタン要素を引数として `setOperationHandler` を呼び出す。
+    - **内部挙動**: 内部で保持する説明書ボタン要素を引数として `setOperationHandler` を呼び出す。登録されるハンドラは `AppOrchestrator` 経由で `HowToPlayUI.show()` へ接続される。
 - **`setBuildPanelHandler(handler: Function): void`**
     - ビルドパネルの「開閉ボタン」にハンドラを登録する。
     - **内部挙動**: 開閉ボタン要素を引数として `setOperationHandler` を呼び出す。

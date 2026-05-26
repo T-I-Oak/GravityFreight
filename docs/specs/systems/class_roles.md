@@ -18,6 +18,8 @@ graph TD
 
     %% Control Layer
     Orchestrator --> UI["UIController (UI/Input)"]
+    Orchestrator --> HTP["HowToPlayUI (Manual Screen)"]
+    HTP --> HTD["HowToPlayDiagrams (Manual Demos)"]
     Orchestrator --> GDR["GameDataRepository (Data Access)"]
 
     %% Logic & System Layer
@@ -204,6 +206,20 @@ graph TD
         - 画面遷移、ダイアログ表示の制御。
         - HUDの制御。
         - UI 操作イベントをアプリ側のハンドラへ中継する。
+- **HowToPlayUI**
+    - 生存期間: App Lifecycle
+    - 役割: 説明書画面コントローラー。
+    - 責務:
+        - How To Play 画面の表示、非表示、ページ遷移を制御する。
+        - `GameDataRepository` から取得した説明書コンテンツを描画する。
+        - 説明書内デモの開始と停止を `HowToPlayDiagrams` へ委譲する。
+- **HowToPlayDiagrams**
+    - 生存期間: App Lifecycle
+    - 役割: 説明書内デモ描画。
+    - 責務:
+        - How To Play 画面内のカード選択デモと canvas アニメーションを管理する。
+        - 実ゲーム状態を変更せず、説明用サンプル状態だけで演出を完結させる。
+        - ページ移動や画面非表示時に、実行中の timer / animation frame を停止する。
 - **BackgroundManager**
     - 生存期間: App Lifecycle
     - 役割: 遠景演出管理。
