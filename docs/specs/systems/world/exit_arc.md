@@ -33,8 +33,15 @@
         2. 角度判定: `targetPos` の中心角が `[this.angle - this.width/2, this.angle + this.width/2]` の範囲内にあるか。
         3. 両方が真なら `true` を返す。
 
-- **`getFacilityType(): string`** (未承認)
-    - この出口に紐付いている施設タイプを返す。
+- **`getFacilityType(): string`**
+    - この出口に紐付いている施設タイプを返す正式 accessor。
+    - **戻り値**: `TRADING_POST`, `REPAIR_DOCK`, `BLACK_MARKET` のいずれか。
+    - **用途**:
+        - 出口到達後の報酬計算。
+        - 施設画面への遷移。
+        - 貨物配送先との一致判定。
+        - StorySystem の分岐解放。
+    - `type` は `ExitArc` の内部状態として保持され、外部連携ではこのメソッドを通じて参照する。
 
 - **`createSnapshot(): object`**
     - 現在の出口状態をシリアライズ可能な形式で抽出する。

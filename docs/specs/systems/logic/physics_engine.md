@@ -27,6 +27,8 @@
                 - **天体破壊**: `avoidance.destroyedTarget` がある場合、**引数で渡された `sector.bodies`** から対象を除外する。
                     - ※予測時（`rocket.isGhost === true`）は、クローンされた `Sector` が渡されるため、オリジナルへの影響はない。
             - **出口到達**: `arc.checkEntrance(newPos)` が真。
+                - `collision.target` には到達した `ExitArc` を設定する。
+                - 到達後の報酬計算、貨物配送、施設遷移は `target.getFacilityType()` で施設タイプを参照する。
             - **境界到達**: `newPos` が `boundaryRadius` を越えた場合。
                 - **回避試行**: `rocket.useAvoidanceModule('boundary', null)` を呼び出す。成功時は衝突判定をキャンセルする。
         5. **アイテム回収判定**:
