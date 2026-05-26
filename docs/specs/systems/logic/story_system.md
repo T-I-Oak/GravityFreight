@@ -80,3 +80,5 @@
   readMessageIds: []    // 既読済みメッセージIDのリスト（全プレイ累計）
 }
 ```
+
+- `AchievementTracker` は `StorySystem` が保持する既読数を参照し、ストーリー既読数実績の進捗を算出する。
