@@ -102,10 +102,11 @@
     - 航行シーケンスを開始する。
     - **内部挙動**:
         1. **パーツ消費**: 耐久度減算を含むアトミックな消費処理を実行。
-        2. **UIモード遷移**: `uiController.setFlightMode(true)` を実行し、ビルドパネルをロックする。
-        3. **描画開始**: `worldRenderer.startNavigation(rocket)` を実行。
-        4. **ソナー開始**: `worldRenderer.enableSonar()` を実行し、波紋の生成を継続する（AIM状態から継続）。
-        5. **ループ開始**: メインループでの `this.updateFlight()` の呼び出しを有効化。
+        2. **発射時 snapshot 記録**: 発射角度、初速、発射構成、セクター状態が確定した直後に `FlightRecorder.captureLaunchSnapshot(rocket, currentSector)` を呼び出す。
+        3. **UIモード遷移**: `uiController.setFlightMode(true)` を実行し、ビルドパネルをロックする。
+        4. **描画開始**: `worldRenderer.startNavigation(rocket)` を実行。
+        5. **ソナー開始**: `worldRenderer.enableSonar()` を実行し、波紋の生成を継続する（AIM状態から継続）。
+        6. **ループ開始**: メインループでの `this.updateFlight()` の呼び出しを有効化。
 
 - **`updateFlight(dt: number): void`**
     - 航行中の更新処理（メインループから毎フレーム呼び出し）。物理計算、状態更新、および成功・失敗の判定監視を行う。
@@ -123,7 +124,7 @@
         2. **状態反映（アトミック）**:
             - `sessionState.applySettlement(settlement)` を実行し、資産を確定させる。
             - **物語解放**: `settlement.unlockedBranchId` が存在する場合、その ID を用いて `StorySystem.unlockNextStep(id)` を実行する。
-            - **リプレイ記録**: 航行単位のリプレイ記録は、この航行終了処理内で `FlightRecorder.recordFlightResult(context)` を呼び出して確定する。
+            - **リプレイ記録**: 航行単位のリプレイ記録は、この航行終了処理内で `FlightRecorder.recordFlightResult(resultContext)` を呼び出して確定する。`resultContext` には航行終了時メタ情報のみを含め、発射時 snapshot は `FlightRecorder` が保持している `pendingRecordDraft` を使用する。
         3. **演出開始**:
             - `worldRenderer.disableSonar()`。
             - `worldRenderer.playFinishAnimation(result)` を実行。

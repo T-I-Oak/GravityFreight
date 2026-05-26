@@ -21,3 +21,4 @@
         3. `PhysicsEngine.step(cloneRocket, cloneSector)` を **`cloneRocket.getPrecision()`** で得られた上限回数分ループ実行する。
         4. 途中で衝突判定（`collision != null`）が発生した場合は、その時点でループを打ち切る。
         5. ループ完了後、航行履歴（`actualTrail`）が蓄積された `cloneRocket` を返す。
+    - **注意**: `Rocket.clone()` / `Sector.clone()` は軌道予測用の独立シミュレーション状態を得るために使用する。snapshot 仕様を利用するが、全クラスに汎用 clone API を要求するものではない。
