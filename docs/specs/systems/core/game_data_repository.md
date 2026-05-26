@@ -58,21 +58,33 @@
 - **`setSavedCameraState(data: object): void`**
 - **`getSavedStoryProgress(migrationMap: MigrationMap): object`**
 - **`setSavedStoryProgress(data: object): void`**
-- **`getSavedAchievementData(migrationMap: MigrationMap): object`**
-- **`setSavedAchievementData(data: object): void`**
+- **`getSavedGameRecordData(migrationMap: MigrationMap): object`**
+    - 内部で `DataManager.getSavedData('game_record_data', migrationMap)` を呼び出す。
+    - 戻り値は `GameRecordTracker` が所有する `GameRecordData` 構造とする。
+- **`setSavedGameRecordData(data: object): void`**
+    - 内部で `DataManager.setSavedData('game_record_data', data)` を呼び出す。
+    - 実績定義、表示ラベル、tier 定義などのマスタデータは保存対象に含めない。
 - **`getSavedRankData(migrationMap: MigrationMap): object`**
+    - 内部で `DataManager.getSavedData('rank_data', migrationMap)` を呼び出す。
+    - 戻り値は `RankTracker` が所有する `RankData` 構造とする。
 - **`setSavedRankData(data: object): void`**
+    - 内部で `DataManager.setSavedData('rank_data', data)` を呼び出す。
+    - 累計KPIや実績判定用の記録値は保存対象に含めない。
 - **`getSavedFlightRecordIndex(migrationMap: MigrationMap): object`**
+    - 内部で `DataManager.getSavedData('flight_record_index', migrationMap)` を呼び出す。
+    - 戻り値は `FlightRecorder` が所有する `FlightRecordIndex` 構造とする。
 - **`setSavedFlightRecordIndex(data: object): void`**
+    - 内部で `DataManager.setSavedData('flight_record_index', data)` を呼び出す。
+    - `pendingRecordDraft` や `pendingRecord` などの一時状態は保存対象に含めない。
 
 ## 5. 保存対象の分担
 
-- `achievement_data`
-    - 所有: `AchievementTracker`
-    - 内容: 実績の達成状況と進捗。
+- `game_record_data`
+    - 所有: `GameRecordTracker`
+    - 内容: 実績判定や Analytics のサイドKPIが参照する累計値・最大値などの記録値。
 - `rank_data`
     - 所有: `RankTracker`
-    - 内容: スコア、到達セクター、回収数などの上位記録。
+    - 内容: スコア、到達セクター、回収数などのランキング表示用レコード。
 - `flight_record_index`
     - 所有: `FlightRecorder`
     - 内容: 航行単位のリプレイ記録インデックス。

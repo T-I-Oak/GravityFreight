@@ -57,6 +57,7 @@
             - `EconomySystem.dismantleAndEnhance(this.currentRocket)` を実行。
             - 獲得パーツを `inventory` へ追加し、**`this.currentRocket = null`** を実行してクリアする。
         - アクションごとに `uiController.updateFacilityCredits` 等を呼び出し表示を更新する。
+        - コイン増減などの実績参照値が変化した場合は `GameRecordTracker` へ反映し、更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
 
 - **`leaveFacility(): void`**
     - 施設を出発し、次セクターへ向かう。
@@ -71,8 +72,10 @@
         1. `EconomySystem.checkGameOver(sessionState)` を実行する。
         2. 戻り値が `null` の場合は `false` を返す。
         3. ゲームオーバー結果が返った場合は、ゲームリザルト表示用の `GameResultSummary` を `sessionState.getGameResultSummary()` で取得する。
-        4. `AchievementTracker.recordGameResult(gameResult)` と `RankTracker.recordGameResult(gameResult)` を呼び出し、実績とランキングをゲームリザルト表示時点の確定処理として更新する。
-        5. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
+        4. `GameRecordTracker.recordGameResult(gameResult)` を呼び出し、契約完了回数など契約終了時にのみ確定する記録値を更新する。
+        5. `AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['lifetime_contracts'] })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
+        6. `RankTracker.recordGameResult(gameResult)` を呼び出し、ランキング表示用レコードを更新する。
+        7. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
 
 - **`returnToTitle(): void`**
     - ゲーム終了画面のタイトル復帰操作を処理する。
@@ -95,6 +98,7 @@
     2. **ロジック更新**: 
         - `sessionState.sectorNumber` を更新。
         - **`this.currentSector = new Sector(sessionState, isAnomaly)`** を実行して新マップを生成。
+        - `SessionState.reachedSector` が更新された場合は、`GameRecordTracker.recordSectorStart(sessionState)` を呼び出し、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['max_reached_sector'] })` を呼び出す。
     3. **同期**: HUDの数値表示（セクター番号等）を最新状態に更新し、`worldRenderer` への新マップセット、セクタータイトル表示を行う。
     4. **演出終了**: 各演出を停止し、完了後に `uiController.showBuildScreen()` を実行。`uiController.setFlightMode(false)` で操作を有効化する。
 
@@ -125,6 +129,7 @@
             - `sessionState.applySettlement(settlement)` を実行し、資産を確定させる。
             - **物語解放**: `settlement.unlockedBranchId` が存在する場合、その ID を用いて `StorySystem.unlockNextStep(id)` を実行する。
             - **リプレイ記録**: 航行単位のリプレイ記録は、この航行終了処理内で `FlightRecorder.recordFlightResult(resultContext)` を呼び出して確定する。`resultContext` には航行終了時メタ情報のみを含め、発射時 snapshot は `FlightRecorder` が保持している `pendingRecordDraft` を使用する。
+            - **実績記録**: 航行終了時点で `GameRecordTracker.recordFlightResult(resultContext)` を必ず呼び出す。その後、航行終了時に更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
         3. **演出開始**:
             - `worldRenderer.disableSonar()`。
             - `worldRenderer.playFinishAnimation(result)` を実行。
@@ -138,5 +143,5 @@
         1. **状況確認**: `StorySystem.getStoryStatus()[index]` から対象の物語 ID を取得する。
         2. **メッセージ取得**: `StorySystem.getMessageData(status.id)` から詳細データを取得。
         3. **モーダル表示**: `uiController.showStoryModal(message)` を実行。
-        4. **既読化・保存**: `StorySystem.updateReadStatus(message.id)` を実行。
+        4. **既読化・保存**: `StorySystem.updateReadStatus(message.id)` を実行する。その後 `AchievementTracker.evaluateAchievements({ source: 'story_read', keys: ['total', 'T', 'R', 'B'] })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
         5. **通知停止**: 該当スロットの明滅を停止させるため、再度 `uiController.updateMailStatus` で状態を更新する。

@@ -113,6 +113,13 @@
 }
 ```
 
+- `records` は永続化済みの航行記録のみを保持する。
+- `pendingRecordDraft` と `pendingRecord` はアプリ実行中の一時状態であり、`flight_record_index` には保存しない。
+- `records` の保持上限は 20 件とする。
+- `records` の保存順は実装内部の都合で決めてよい。表示時は Replays タブ仕様に従い、スコア降順、同スコアなら記録日時が新しい順で並べる。
+- migration の `init()` は `{ records: [] }` を返す。
+- 不正な record、復元不能な snapshot、重複 id はデータ整合性エラーとして扱う。
+
 ### FlightRecord
 1回の航行単位のリプレイ記録。
 ```javascript
@@ -127,6 +134,15 @@
   snapshots: FlightReplaySnapshots
 }
 ```
+
+- `id` は航行記録単位の識別子。お気に入り更新、リプレイ再生、削除候補選定に使用する。
+- `createdAt` は ISO 8601 形式の記録日時とする。
+- `score` はリプレイ一覧の順位判定に使用する最終スコア。
+- `reachedSector` は航行が行われた、または到達したセクター番号を表す。
+- `resultType` は航行終了の種別を表す。
+- `destinationType` は到達施設がある場合のみ施設タイプを保持し、帰還・衝突・遭難では `null` とする。
+- `favorite` は削除保護状態を表す。
+- `snapshots` はリプレイ再現用の発射時初期状態を保持する。
 
 ### FlightReplaySnapshots
 発射時点の航行初期状態。

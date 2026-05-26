@@ -37,6 +37,7 @@ graph TD
 
     %% Global Services
     Orchestrator --> AT["AchievementTracker"]
+    Orchestrator --> GRT["GameRecordTracker"]
     Orchestrator --> RT["RankTracker"]
     Orchestrator --> FR["FlightRecorder"]
     Orchestrator --> Story["StorySystem"]
@@ -159,7 +160,7 @@ graph TD
         - プレイ中（ワープ〜航行〜リザルト〜施設〜ゲーム終了）の一連の画面遷移とロジックの統括。
         - SessionState のセクター番号更新、Sector の生成・破棄管理。
         - 航行中の物理計算、スコア計算、終了判定の実行。
-        - ゲームリザルト表示時点で実績・ランキング確定処理を呼び出す。
+        - ゲームリザルト表示時点で記録値・実績・ランキング確定処理を呼び出す。
 - **StorySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 物語（Story）の選択・永続進捗管理。
@@ -170,7 +171,11 @@ graph TD
 - **AchievementTracker**
     - 生存期間: App Lifecycle
     - 役割: 実績管理。
-    - 責務: 実績の達成状況と進捗の保持、実績解除判定。
+    - 責務: 実績定義と `GameRecordTracker` の記録値を照合し、実績の達成状況と進捗を算出する。
+- **GameRecordTracker**
+    - 生存期間: App Lifecycle
+    - 役割: ゲーム全体の記録値管理。
+    - 責務: 契約終了時の `GameResultSummary` から、実績判定や Analytics のサイドKPIが参照する累計値・最大値などを保持する。
 - **RankTracker**
     - 生存期間: App Lifecycle
     - 役割: ランキング管理。
