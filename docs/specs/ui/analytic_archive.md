@@ -22,7 +22,7 @@
 - 累積統計（KPI）を一覧表示。
 - **構造**: 各項目は `.ui-split-column` で構成され、ラベルを `.ui-well` の外に配置。
 - **表示項目**: 累計突破セクター数、累計契約回数、総回収アイテム数、実績進捗率を表示する。最高到達セクターはサイドバーには表示せず、Analytics タブ内の Personal Best Ranking で扱う。
-- **算出方法**: 累計突破セクター数、累計契約回数、総回収アイテム数は `GameRecordTracker` の `game_record_data` を参照する。実績進捗率は全実績定義に対する達成済み実績の割合とする。
+- **算出方法**: 累計突破セクター数、累計契約回数、総回収アイテム数は `GameRecordTracker` の `game_record_data` を参照する。実績進捗率は `AchievementTracker.getAchievementCompletionRate()` で取得する。
 - **初期表示**: ゲームプレイ結果が0件の場合、累計突破セクター数、累計契約回数、総回収アイテム数は `0`、実績進捗率は `0%` と表示する。
 - **数値の質感**: `.num-sector` (Total Sectors Completed), `.num-contract` (Lifetime Contracts), `.num-item-count` (Total Items) などの意味論的クラスを使用し、標準的な数値フォントを適用。
 - **サイズ**: 幅はコンテンツに応じた `auto` (PC時)。内部の `.ui-well` は **120px 固定幅** で中央寄せされる。
@@ -78,6 +78,7 @@
         - 達成済み実績には、右側に巨大な階級印（Tier Seal）が印字される。
         - ロック状態の実績はグレースケール（`grayscale(1)`）かつ半透明で表示され、タイトルは「NOT ACHIEVED」に差し替えられる。
     - **進行状況**: 各カード下部にインク密度の低い（透過）ゲージを表示し、次の Tier までの絶対進捗を視覚化。
+    - **カード進捗**: 各実績カードの進捗率は `AchievementTracker.getAchievementProgress()` が返す、次の tier までの `progressRate` を使用する。
 
 ## 4. レスポンシブ設計
 - **ブレークポイント**: 800px 以下。

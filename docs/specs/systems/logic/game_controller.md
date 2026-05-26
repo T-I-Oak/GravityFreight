@@ -72,8 +72,8 @@
         2. 戻り値が `null` の場合は `false` を返す。
         3. ゲームオーバー結果が返った場合は、ゲームリザルト表示用の `GameResultSummary` を `sessionState.getGameResultSummary()` で取得する。
         4. `GameRecordTracker.recordGameResult(gameResult)` を呼び出し、実績判定や累計KPIが参照する記録値を更新する。
-        5. `RankTracker.recordGameResult(gameResult)` を呼び出し、ランキング表示用レコードを更新する。
-        6. `AchievementTracker.evaluateAchievements()` を呼び出し、更新済みの記録値から実績達成状態を再評価する。
+        5. 戻り値の `GameRecordChange` を `AchievementTracker.evaluateAchievements(change)` へ渡し、新規到達 tier があれば UI 通知へ渡す。
+        6. `RankTracker.recordGameResult(gameResult)` を呼び出し、ランキング表示用レコードを更新する。
         7. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
 
 - **`returnToTitle(): void`**
@@ -127,6 +127,7 @@
             - `sessionState.applySettlement(settlement)` を実行し、資産を確定させる。
             - **物語解放**: `settlement.unlockedBranchId` が存在する場合、その ID を用いて `StorySystem.unlockNextStep(id)` を実行する。
             - **リプレイ記録**: 航行単位のリプレイ記録は、この航行終了処理内で `FlightRecorder.recordFlightResult(resultContext)` を呼び出して確定する。`resultContext` には航行終了時メタ情報のみを含め、発射時 snapshot は `FlightRecorder` が保持している `pendingRecordDraft` を使用する。
+            - **実績記録**: 航行終了時点で `GameRecordTracker.recordFlightResult(resultContext)` を必ず呼び出す。戻り値を `AchievementTracker.evaluateAchievements(change)` へ渡し、新規到達 tier があれば UI 通知へ渡す。
         3. **演出開始**:
             - `worldRenderer.disableSonar()`。
             - `worldRenderer.playFinishAnimation(result)` を実行。
