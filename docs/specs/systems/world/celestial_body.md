@@ -32,14 +32,21 @@
             - **`mass`**: `this.radius * this.radius` として算出する。
         - その他 `position`, `isRepulsion`, `items` 等を初期化する。
 
-- **`getGravityVector(targetPos: Vector2): Vector2` (未承認)**
-    - 指定された座標（ロケットの位置）に対して、この天体が及ぼす重力ベクトルを計算する。
+- **`getGravityFieldVector(targetPos: Vector2): Vector2`**
+    - 指定された座標に対して、この天体が提供する重力場ベクトルを計算する。
+    - この戻り値は、最終的なロケット加速度ではない。
+    - ロケット重量補正、重力定数、セクター重力倍率、全天体からの合算は `PhysicsEngine` の責務とする。
     - **計算式**:
         1. 距離 `r = distance(this.position, targetPos)`。
         2. 方向ベクトル `d = normalize(this.position - targetPos)`。（天体中心を指すベクトル）
         3. 大きさ `f = this.mass / (r * r)`。
         4. `isRepulsion` が `true` なら `d` を反転させる。
         5. `d * f` を返す。
+    - **扱わない値**:
+        - 重力定数 `G`。
+        - 基準質量 `M_ref` とロケット総重量 `M_rocket` による重量補正。
+        - セクター番号による重力スケーリング。
+        - 特異点回避のスキップ判定。
 
 - **`checkCollision(currentPos: Vector2, prevPos: Vector2, targetRadius: number): boolean`**
     - CCD (Continuous Collision Detection) を用いた衝突判定を行う。

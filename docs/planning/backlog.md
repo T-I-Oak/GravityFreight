@@ -11,8 +11,7 @@
     - 20件保存時の `flight_record_index` サイズを確認する
     - 圧縮の要否、圧縮後サイズ、復元コストを評価する
     - 共通 DataManager の保存方式で問題なく扱えるか確認する
-- [ ] 未承認 API の採否を判断する
-    - CelestialBody.getGravityVector()
+- [ ] 未確定 API の仕様を確定する
     - ExitArc.getFacilityType()
 
 ## 実装
