@@ -1,21 +1,56 @@
 {
-  "title": "Gravity Freight",
-  "description": "天体の重力を利用して宇宙を往く、ローグライク・航行シミュレーション。限られたリソースで機体をビルドし、予測不能な重力の荒波を越えろ。",
+  "title": {
+    "lang-store": {
+      "ja": "Gravity Freight",
+      "en": "Gravity Freight"
+    }
+  },
+  "description": {
+    "lang-store": {
+      "ja": "天体の重力を利用して宇宙を往く、ローグライク・航行シミュレーション。限られたリソースで機体をビルドし、予測不能な重力の荒波を越えろ。",
+      "en": "A roguelike space navigation simulation where you cross the cosmos using celestial gravity. Build your craft with limited resources and ride the unpredictable tides of gravity."
+    }
+  },
   "tags": [
-    "ローグライク",
-    "重力航法",
-    "機体ビルド"
+    {
+      "lang-store": {
+        "ja": "ローグライク",
+        "en": "Roguelike"
+      }
+    },
+    {
+      "lang-store": {
+        "ja": "重力航法",
+        "en": "Gravity Navigation"
+      }
+    },
+    {
+      "lang-store": {
+        "ja": "機体ビルド",
+        "en": "Craft Building"
+      }
+    }
   ],
   "logo": {
     "path": "assets/logo.svg",
     "type": "standard"
   },
   "badge": {
-    "content": "6月公開予定",
+    "content": {
+      "lang-store": {
+        "ja": "6月公開予定",
+        "en": "Coming in June"
+      }
+    },
     "type": "info"
   },
   "button": {
-    "content": "COMING SOON",
+    "content": {
+      "lang-store": {
+        "ja": "COMING SOON",
+        "en": "COMING SOON"
+      }
+    },
     "url": "https://t-i-oak.github.io/GravityFreight/",
     "type": "pending"
   },
