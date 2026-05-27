@@ -68,4 +68,19 @@
     - snapshot 再現
     - 永続データ migration
     - public/data/update_history.json が v0 中は `[]` のままであること
+- [ ] 要求仕様に対するテストを実施する
+    - core_mechanics.md 第1章: ゲーム概要・用語
+    - core_mechanics.md 第2章: 世界構成・座標・時間
+    - core_mechanics.md 第3章: 航行の物理法則
+    - core_mechanics.md 第4章: ゲームサイクルとミッション進行
+    - core_mechanics.md 第5章: 帰還ボーナス
+    - core_mechanics.md 第6章: ベストショット・リプレイ
+    - core_mechanics.md 第7章: スコアシステム
+    - item_catalog.md 第1章: 構成アイテムの分類と役割
+    - item_catalog.md 第2章: 性能算定の規則
+    - item_catalog.md 第3章: アイテム一覧管理表
+    - world_config.md 第1章: 初期設定データ
+    - world_config.md 第2章: 目的地と貨物配送
+    - world_config.md 第3章: アイテム収集と経済システム
+    - world_config.md 第4章: ポストミッション・イベント
 
