@@ -15,11 +15,15 @@
     - 要求仕様テストは `tests/spec/` に配置し、命名は `[prefix]_[章番号]_[名称].test.js` とする
     - 実装テストは `tests/implementation/` に `src/` と同じ構成で配置し、命名は `[元のファイル名].test.js` とする
     - 実装タスクごとに、対象が要求仕様テスト・実装テストのどちらを必要とするかを確認してから着手する
-- [ ] データ基盤を実装する
+- [x] データ基盤を実装する
     - GameDataRepository
     - 共通 DataManager / i18n ライブラリとの接続
     - 静的マスタデータのロード
     - ユーザーデータの getSavedData / setSavedData 経由の読み書き
+- [ ] 旧 DataManager 参照を GameDataRepository へ移行する
+    - src/core/DataManager.js を直接参照しているクラスを差し替える
+    - 旧 tests/core/DataManager.test.js を新構成へ移行または削除する
+    - 移行完了後に旧 src/core/DataManager.js の削除可否を判断する
 - [ ] エンティティ基盤を実装する
     - Item
     - StackedItem
