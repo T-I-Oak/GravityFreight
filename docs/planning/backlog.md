@@ -10,6 +10,11 @@
     - 共通 DataManager の保存方式で問題なく扱えるか確認する
 
 ## 実装
+- [ ] 実装開始前に TDD 方針とテスト命名規約を適用する
+    - 複雑なロジック、状態管理、イベント連鎖を伴う実装は、実装前にテストを作成する
+    - 要求仕様テストは `tests/spec/` に配置し、命名は `[prefix]_[章番号]_[名称].test.js` とする
+    - 実装テストは `tests/implementation/` に `src/` と同じ構成で配置し、命名は `[元のファイル名].test.js` とする
+    - 実装タスクごとに、対象が要求仕様テスト・実装テストのどちらを必要とするかを確認してから着手する
 - [ ] データ基盤を実装する
     - GameDataRepository
     - 共通 DataManager / i18n ライブラリとの接続
@@ -69,6 +74,7 @@
     - 永続データ migration
     - public/data/update_history.json が v0 中は `[]` のままであること
 - [ ] 要求仕様に対するテストを実施する
+    - テストファイルは `tests/spec/` に配置し、命名規約 `[prefix]_[章番号]_[名称].test.js` に従う
     - core_mechanics.md 第1章: ゲーム概要・用語
     - core_mechanics.md 第2章: 世界構成・座標・時間
     - core_mechanics.md 第3章: 航行の物理法則
