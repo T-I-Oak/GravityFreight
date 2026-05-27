@@ -8,6 +8,64 @@
     - 20件保存時の `flight_record_index` サイズを確認する
     - 圧縮の要否、圧縮後サイズ、復元コストを評価する
     - 共通 DataManager の保存方式で問題なく扱えるか確認する
+
 ## 実装
-- [ ] 設計したクラスを実装する（このバックログを実施するときにはクラス一覧をバックログに展開すること）
+- [ ] データ基盤を実装する
+    - GameDataRepository
+    - 共通 DataManager / i18n ライブラリとの接続
+    - 静的マスタデータのロード
+    - ユーザーデータの getSavedData / setSavedData 経由の読み書き
+- [ ] エンティティ基盤を実装する
+    - Item
+    - StackedItem
+    - ModuleStack
+    - ItemContainer
+    - RocketItem
+    - Rocket
+    - SessionState
+- [ ] ワールド生成・再現クラスを実装する
+    - Sector
+    - CelestialBody
+    - ExitArc
+    - createSnapshot / fromSnapshot
+- [ ] 物理・航行ロジックを実装する
+    - PhysicsEngine
+    - TrajectoryPredictor
+    - 航行終了判定
+    - アイテム回収判定
+- [ ] 記録・永続データ系を実装する
+    - GameRecordTracker
+    - RankTracker
+    - AchievementTracker
+    - FlightRecorder
+    - StorySystem
+- [ ] 経済・施設処理を実装する
+    - EconomySystem
+    - 施設報酬
+    - 施設取引
+    - ゲームオーバー判定
+- [ ] 表示・入力基盤を実装する
+    - AppOrchestrator
+    - UIController
+    - WorldRenderer
+    - CameraController
+    - BackgroundManager
+    - SoundController
+- [ ] How To Play を実装する
+    - HowToPlayUI
+    - HowToPlayDiagrams
+- [ ] 画面別 UI を実装する
+    - タイトル
+    - 建造・照準
+    - 航行 HUD
+    - 航行結果
+    - 施設画面
+    - Analytic Archive
+    - リプレイ再生
+    - 実績表示
+- [ ] 結合テストと仕様整合チェックを実施する
+    - core_scenarios の主要導線
+    - snapshot 再現
+    - 永続データ migration
+    - public/data/update_history.json が v0 中は `[]` のままであること
 
