@@ -33,6 +33,15 @@
 - **`getItemDefinition(id: string): object`**
     - 指定されたアイテムIDのマスタ定義を返す。
 
+- **`getItemDefinitionsByCategory(category: string): object[]`**
+    - 指定されたアイテムカテゴリのマスタ定義一覧を返す。該当カテゴリがない場合は空配列を返す。
+
+- **`getAllItemDefinitions(): object[]`**
+    - 全アイテムカテゴリのマスタ定義をフラットな配列として返す。
+
+- **`getFacilityDefinition(idOrType: string): object`**
+    - 施設の短縮 ID（`T`, `R`, `B`）または施設タイプ（`TRADING_POST` など）から施設定義を返す。
+
 - **`getStoryContent(id: string): object`**
     - 指定されたストーリーIDの表示用ストーリーデータを返す。
     - 戻り値のテキストは、共通 i18n ライブラリにより現在のアクティブ言語へ展開済みの値とする。
@@ -44,6 +53,18 @@
 
 - **`getAchievementDefinitions(): object[]`**
     - 実績定義の一覧を返す。
+
+- **`getAchievementDefinition(id: string): object`**
+    - 指定された実績 ID の定義を返す。
+
+- **`getGameBalance(): object`**
+    - ゲームバランス定数を返す。
+
+- **`getMapConstants(): object`**
+    - マップ生成・物理判定で使用する定数を返す。
+
+- **`getRaritySettings(): object`**
+    - レアリティ設定を返す。
 
 - **`getAppMetadata(): AppMetadata`**
     - アプリケーションのバージョン番号、コピーライト表記等のメタデータを返す。

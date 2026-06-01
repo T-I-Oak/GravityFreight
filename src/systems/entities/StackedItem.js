@@ -76,12 +76,12 @@ class StackedItem {
      * @param {Object} data 
      * @returns {StackedItem}
      */
-    static fromSnapshot(data) {
+    static fromSnapshot(data, gameDataRepository) {
         const stack = new StackedItem();
         
         if (data.itemSnapshots && data.itemSnapshots.length > 0) {
             data.itemSnapshots.forEach(snap => {
-                const item = Item.fromSnapshot(snap);
+                const item = Item.fromSnapshot(snap, gameDataRepository);
                 stack.push(item);
             });
         }

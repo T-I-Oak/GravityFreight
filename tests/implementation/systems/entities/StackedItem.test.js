@@ -1,6 +1,19 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import Item from '../../../../src/systems/entities/Item';
 import StackedItem from '../../../../src/systems/entities/StackedItem';
+import GameDataRepository from '../../../../src/core/GameDataRepository.js';
+
+let repository;
+
+beforeAll(async () => {
+    repository = new GameDataRepository({
+        getSavedData: vi.fn(),
+        setSavedData: vi.fn()
+    }, {
+        expandLanguageResource: value => value
+    });
+    await repository.loadAllData();
+});
 
 describe('StackedItem Class - Basic Operations', () => {
     it('should initialize as an empty stack', () => {
@@ -14,7 +27,7 @@ describe('StackedItem Class - Basic Operations', () => {
 
     it('should initialize with properties on first push', () => {
         const stack = new StackedItem();
-        const item = new Item('hull_light');
+        const item = new Item('hull_light', repository);
         const success = stack.push(item);
 
         expect(success).toBe(true);
@@ -26,8 +39,8 @@ describe('StackedItem Class - Basic Operations', () => {
 
     it('should accept items with same characteristics', () => {
         const stack = new StackedItem();
-        const item1 = new Item('hull_light');
-        const item2 = new Item('hull_light'); // different uid but equals() is true
+        const item1 = new Item('hull_light', repository);
+        const item2 = new Item('hull_light', repository); // different uid but equals() is true
         
         stack.push(item1);
         const success = stack.push(item2);
@@ -40,9 +53,9 @@ describe('StackedItem Class - Basic Operations', () => {
 
     it('should reject items with different characteristics', () => {
         const stack = new StackedItem();
-        const item1 = new Item('pad_standard_d2'); // Has 2 charges
-        const item2 = new Item('hull_medium'); // Different ID
-        const item3 = new Item('pad_standard_d2');
+        const item1 = new Item('pad_standard_d2', repository); // Has 2 charges
+        const item2 = new Item('hull_medium', repository); // Different ID
+        const item3 = new Item('pad_standard_d2', repository);
         item3.consumeCharge(1); // different characteristics due to damage (1 charge left)
 
         stack.push(item1);
@@ -58,8 +71,8 @@ describe('StackedItem Class - Basic Operations', () => {
 
     it('should return items in LIFO order on pop', () => {
         const stack = new StackedItem();
-        const item1 = new Item('hull_light');
-        const item2 = new Item('hull_light');
+        const item1 = new Item('hull_light', repository);
+        const item2 = new Item('hull_light', repository);
         
         stack.push(item1);
         stack.push(item2);
@@ -72,7 +85,7 @@ describe('StackedItem Class - Basic Operations', () => {
 
     it('should reset properties when emptied via pop', () => {
         const stack = new StackedItem();
-        const item = new Item('hull_light');
+        const item = new Item('hull_light', repository);
         
         stack.push(item);
         stack.pop();
@@ -92,7 +105,7 @@ describe('StackedItem Class - Basic Operations', () => {
 describe('StackedItem Class - Property Access via Representative', () => {
     it('should allow accessing basic information via the representative item', () => {
         const stack = new StackedItem();
-        const item = new Item('hull_light');
+        const item = new Item('hull_light', repository);
         stack.push(item);
 
         expect(stack.representative.name).toBe(item.name);
@@ -103,7 +116,7 @@ describe('StackedItem Class - Property Access via Representative', () => {
 
     it('should provide performance values via the representative item', () => {
         const stack = new StackedItem();
-        const item = new Item('hull_light');
+        const item = new Item('hull_light', repository);
         stack.push(item);
 
         expect(stack.representative.mass).toBe(item.mass);
@@ -119,8 +132,8 @@ describe('StackedItem Class - Property Access via Representative', () => {
 describe('StackedItem Class - Snapshots', () => {
     it('should generate a valid snapshot including item snapshots', () => {
         const stack = new StackedItem();
-        const item1 = new Item('hull_light');
-        const item2 = new Item('hull_light');
+        const item1 = new Item('hull_light', repository);
+        const item2 = new Item('hull_light', repository);
         stack.push(item1);
         stack.push(item2);
 
@@ -134,13 +147,13 @@ describe('StackedItem Class - Snapshots', () => {
 
     it('should restore from snapshot correctly', () => {
         const stack = new StackedItem();
-        const item1 = new Item('hull_light');
-        const item2 = new Item('hull_light');
+        const item1 = new Item('hull_light', repository);
+        const item2 = new Item('hull_light', repository);
         stack.push(item1);
         stack.push(item2);
 
         const snap = stack.getSnapshot();
-        const restored = StackedItem.fromSnapshot(snap);
+        const restored = StackedItem.fromSnapshot(snap, repository);
 
         expect(restored.uid).toBe(stack.uid);
         expect(restored.quantity).toBe(2);

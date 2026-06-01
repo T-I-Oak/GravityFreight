@@ -46,10 +46,10 @@
         - `id`: `items[0]` から再解決する。
         - `count`: `items.length` から再計算する。
 
-- **`static fromSnapshot(snapshot: object): StackedItem`**
+- **`static fromSnapshot(snapshot: object, gameDataRepository: GameDataRepository): StackedItem`**
     - `StackedItemSnapshot` からスタックを復元する。
     - **内部挙動**:
-        1. `snapshot.items` の各要素を `Item.fromSnapshot()` で復元する。
+        1. `snapshot.items` の各要素を `Item.fromSnapshot(snapshot, gameDataRepository)` で復元する。
         2. 先頭 item で `StackedItem` を生成し、残りの item を `add()` で追加する。
         3. `snapshot.uid` を復元する。
         4. `count` は復元した `items.length` から再計算する。

@@ -53,8 +53,9 @@
             - `maxCharges`: +1 (耐久アイテムのみ)
 
 ### メソッド (Methods)
-- **`constructor(id: string)`**
+- **`constructor(id: string, gameDataRepository: GameDataRepository)`**
     - 指定された ID に基づき、マスターデータを読み込んで初期化する。
+    - マスターデータの取得は `gameDataRepository.getItemDefinition(id)` に委譲する。
     - **uid の生成**: `IDGenerator.generate('item')` を用いて生成する。全サブクラスは独自に uid を生成する仕様に変更されたため、クラス名に依存しません。
     - **初期値のルール**:
         - Multiplier 系（`precisionMultiplier` 等）: マスターデータに定義がない場合は `1.0` で初期化する。
@@ -109,10 +110,10 @@
         - `mass`, `maxCharges`, `precision`, `pickupRange`, `power`, `slots`, 各種 multiplier: マスタデータと `enhancements` から再計算する。
         - `duration`, `preventsLauncherWear`, `onLostBonus`, `ghostType`, `deliveryGoalId`, `coinDiscount`, `score`: マスタデータから再解決する。
 
-- **`static fromSnapshot(snapshot: object): Item`**
+- **`static fromSnapshot(snapshot: object, gameDataRepository: GameDataRepository): Item`**
     - `ItemSnapshot` から個体アイテムを復元する。
     - **内部挙動**:
-        1. `snapshot.id` を使ってマスタデータから基本値を読み込む。
+        1. `snapshot.id` を使って `gameDataRepository` から基本値を読み込む。
         2. `snapshot.uid` を復元する。
         3. `snapshot.enhancements` を適用し、強化後の性能値を再計算する。
         4. `snapshot.charges` を復元する。

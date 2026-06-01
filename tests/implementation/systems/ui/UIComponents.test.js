@@ -1,5 +1,37 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UIComponents } from '../../../../src/systems/ui/UIComponents.js';
+
+const storyRepository = {
+    getStoryContent: vi.fn(id => {
+        const stories = {
+            T: {
+                title: '母からの押し花',
+                discovery: '青い花の種',
+                content: '青い花の種を封筒に入れた。',
+                branch: 'T'
+            },
+            R: {
+                title: '整備士の手紙',
+                discovery: '古い工具',
+                content: '整備記録が残されている。',
+                branch: 'R'
+            }
+        };
+        return stories[id];
+    }),
+    getFacilityDefinition: vi.fn(id => {
+        const facilities = {
+            T: { id: 'T', icon: 'T', className: 'trading-post' },
+            R: { id: 'R', icon: 'R', className: 'repair-dock' }
+        };
+        return facilities[id];
+    })
+};
+
+beforeEach(() => {
+    storyRepository.getStoryContent.mockClear();
+    storyRepository.getFacilityDefinition.mockClear();
+});
 
 describe('UIComponents.generatePlaceholderHTML', () => {
     it('should generate basic placeholder HTML with text and subtext', () => {
@@ -218,21 +250,23 @@ describe('UIComponents.generateHPGauge', () => {
 
 describe('UIComponents.generateStoryCardHTML', () => {
     it('should generate story card with correct title and discovery text', () => {
-        const html = UIComponents.generateStoryCardHTML('T');
+        const html = UIComponents.generateStoryCardHTML('T', storyRepository);
         expect(html).toContain('story-card');
         expect(html).toContain('母からの押し花');
         expect(html).toContain('trading-post');
+        expect(storyRepository.getStoryContent).toHaveBeenCalledWith('T');
+        expect(storyRepository.getFacilityDefinition).toHaveBeenCalledWith('T');
     });
 
     it('should apply is-new class to icon when isNew is true', () => {
-        const html = UIComponents.generateStoryCardHTML('T', true);
+        const html = UIComponents.generateStoryCardHTML('T', storyRepository, true);
         expect(html).toContain('mail state-new');
     });
 });
 
 describe('UIComponents.generateStoryModalHTML', () => {
     it('should generate modal with full story content', () => {
-        const html = UIComponents.generateStoryModalHTML('T');
+        const html = UIComponents.generateStoryModalHTML('T', storyRepository);
         expect(html).toContain('Panel trading-post story-card');
         expect(html).toContain('母からの押し花');
         expect(html).toContain('Well');
@@ -241,7 +275,7 @@ describe('UIComponents.generateStoryModalHTML', () => {
     });
 
     it('should include facility icon in header', () => {
-        const html = UIComponents.generateStoryModalHTML('R');
+        const html = UIComponents.generateStoryModalHTML('R', storyRepository);
         expect(html).toContain('FacilityBadge');
         expect(html).toContain('R');
     });

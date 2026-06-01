@@ -69,9 +69,49 @@ describe('GameDataRepository', () => {
         await repository.loadAllData();
 
         expect(repository.getAppMetadata()).toEqual({
-            version: '0.46.11',
+            version: '0.47.0',
             copyright: expect.any(String)
         });
+    });
+
+    it('provides item master data by id, category, and full list', async () => {
+        await repository.loadAllData();
+
+        expect(repository.getItemDefinition('hull_light').id).toBe('hull_light');
+        expect(repository.getItemDefinitionsByCategory('chassis').length).toBeGreaterThan(0);
+        expect(repository.getAllItemDefinitions().length).toBeGreaterThan(0);
+        expect(repository.getItemDefinitionsByCategory('missing_category')).toEqual([]);
+    });
+
+    it('provides facility definitions by short id or facility type', async () => {
+        await repository.loadAllData();
+
+        expect(repository.getFacilityDefinition('T')).toMatchObject({
+            id: 'T',
+            type: 'TRADING_POST',
+            className: 'trading-post'
+        });
+        expect(repository.getFacilityDefinition('REPAIR_DOCK')).toMatchObject({
+            id: 'R',
+            type: 'REPAIR_DOCK',
+            className: 'repair-dock'
+        });
+        expect(() => repository.getFacilityDefinition('missing')).toThrow('[GameDataRepository] Facility not found: missing');
+    });
+
+    it('provides individual and full achievement definitions', async () => {
+        await repository.loadAllData();
+
+        expect(repository.getAchievementDefinition('stat_total_coins')).toHaveProperty('label');
+        expect(repository.getAchievementDefinitions().length).toBeGreaterThan(0);
+    });
+
+    it('provides raw configuration sections used by game systems', async () => {
+        await repository.loadAllData();
+
+        expect(repository.getGameBalance()).toHaveProperty('DEFAULT_SHIP_MASS');
+        expect(repository.getMapConstants()).toHaveProperty('BOUNDARY_RADIUS');
+        expect(repository.getRaritySettings()).toHaveProperty('COMMON');
     });
 
     it('delegates user data reads and writes to common DataManager keys', () => {

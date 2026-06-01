@@ -69,7 +69,7 @@
 
     <script type="module">
         import { UIComponents } from '../systems/ui/UIComponents.js';
-        import { STORY_DATA } from '../core/DataManager.js';
+        import { STORY_DATA, mockGameDataRepository } from './mock_data.js';
 
         const container = document.getElementById('modal-container');
         const demoBtn = document.getElementById('demo-random-story');
@@ -79,7 +79,7 @@
             const randomKey = keys[Math.floor(Math.random() * keys.length)];
             
             // Generate HTML via UIComponents (Logic from src/systems/ui/UIComponents.js)
-            container.innerHTML = UIComponents.generateStoryModalHTML(randomKey);
+            container.innerHTML = UIComponents.generateStoryModalHTML(randomKey, mockGameDataRepository);
 
             // Setup Close Interaction
             const closeBtn = document.getElementById('story-modal-close');

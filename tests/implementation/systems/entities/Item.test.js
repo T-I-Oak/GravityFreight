@@ -1,11 +1,23 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import Item from '../../../../src/systems/entities/Item';
-import DataManager from '../../../../src/core/DataManager';
+import GameDataRepository from '../../../../src/core/GameDataRepository.js';
+
+let repository;
+
+beforeAll(async () => {
+    repository = new GameDataRepository({
+        getSavedData: vi.fn(),
+        setSavedData: vi.fn()
+    }, {
+        expandLanguageResource: value => value
+    });
+    await repository.loadAllData();
+});
 
 describe('Item Class - Basic Initialization', () => {
-    it('should initialize with properties from DataManager and set defaults', () => {
-        // DataManagerテストコードにあった 'hull_light' を利用
-        const item = new Item('hull_light');
+    it('should initialize with properties from GameDataRepository and set defaults', () => {
+        const getItemDefinitionSpy = vi.spyOn(repository, 'getItemDefinition');
+        const item = new Item('hull_light', repository);
         
         expect(item.id).toBe('hull_light');
         expect(item.uid).toBeDefined();
@@ -23,20 +35,27 @@ describe('Item Class - Basic Initialization', () => {
         // 強化回数は初期0
         expect(item.enhancementCount).toBe(0);
         expect(item.enhancement).toBeDefined();
+        expect(getItemDefinitionSpy).toHaveBeenCalledWith('hull_light');
+
+        getItemDefinitionSpy.mockRestore();
+    });
+
+    it('should require GameDataRepository for master-data access', () => {
+        expect(() => new Item('hull_light')).toThrow('[Item] gameDataRepository is required.');
     });
 
     it('should generate unique UIDs for different instances', () => {
-        const item1 = new Item('hull_light');
-        const item2 = new Item('hull_light');
+        const item1 = new Item('hull_light', repository);
+        const item2 = new Item('hull_light', repository);
         expect(item1.uid).not.toBe(item2.uid);
     });
 });
 
 describe('Item Class - Basic Methods', () => {
     it('should accurately compare items using equals()', () => {
-        const item1 = new Item('pad_standard_d2');
-        const item2 = new Item('pad_standard_d2');
-        const item3 = new Item('pad_precision_d2'); // 別のアイテム
+        const item1 = new Item('pad_standard_d2', repository);
+        const item2 = new Item('pad_standard_d2', repository);
+        const item3 = new Item('pad_precision_d2', repository); // 別のアイテム
 
         // uid が違っても性能が同じなら true
         expect(item1.equals(item2)).toBe(true);
@@ -52,7 +71,7 @@ describe('Item Class - Basic Methods', () => {
     });
 
     it('should consume charges correctly', () => {
-        const item = new Item('pad_standard_d2');
+        const item = new Item('pad_standard_d2', repository);
         const initial = item.charges;
         expect(initial).toBeGreaterThan(0);
 
@@ -68,7 +87,7 @@ describe('Item Class - Basic Methods', () => {
     });
 
     it('should repair charges correctly', () => {
-        const item = new Item('pad_standard_d2');
+        const item = new Item('pad_standard_d2', repository);
         const max = item.maxCharges;
         
         // 消費してから回復
@@ -98,7 +117,7 @@ describe('Item Class - applyMaintenance', () => {
     });
 
     it('should enhance normal properties and increase enhancementCount', () => {
-        const item = new Item('pad_standard_d2');
+        const item = new Item('pad_standard_d2', repository);
         // slots, precisionMultiplier, pickupMultiplier, maxCharges は常に候補 (このアイテムはマスタに maxCharges がある)
         // 候補配列がどう組まれるかによるが、先頭の 'slots' が選ばれるように 0 を返す
         mathRandomSpy.mockReturnValue(0.0);
@@ -113,7 +132,7 @@ describe('Item Class - applyMaintenance', () => {
     });
 
     it('should repair instead of enhancing maxCharges if damaged', () => {
-        const item = new Item('pad_standard_d2');
+        const item = new Item('pad_standard_d2', repository);
         item.consumeCharge(1); // ダメージを与える
 
         // maxCharges が選ばれるように調整 (最後尾と仮定して 0.99)
@@ -127,7 +146,7 @@ describe('Item Class - applyMaintenance', () => {
     });
 
     it('should enhance maxCharges if fully repaired', () => {
-        const item = new Item('pad_standard_d2');
+        const item = new Item('pad_standard_d2', repository);
         // ダメージなし
         const initialMax = item.maxCharges;
 
@@ -143,7 +162,7 @@ describe('Item Class - applyMaintenance', () => {
     });
 
     it('should properly filter candidates based on master existence', () => {
-        const item = new Item('hull_light'); // maxCharges, gravityMultiplier がマスタに無い
+        const item = new Item('hull_light', repository); // maxCharges, gravityMultiplier がマスタに無い
         
         // 何が選ばれても、maxCharges や gravityMultiplier にはならないことを確認
         // (実装内部でこれらが候補配列に含まれていないことを間接的にテストする)
@@ -176,7 +195,7 @@ describe('Item Class - Snapshot', () => {
     });
 
     it('should generate a snapshot with only essential properties for serialization', () => {
-        const item = new Item('pad_standard_d2');
+        const item = new Item('pad_standard_d2', repository);
         const snap = item.getSnapshot();
 
         // 必須項目のみが含まれることを確認
@@ -194,7 +213,7 @@ describe('Item Class - Snapshot', () => {
     });
 
     it('should hydrate from snapshot and restore enhancements correctly', () => {
-        const originalItem = new Item('pad_standard_d2');
+        const originalItem = new Item('pad_standard_d2', repository);
         
         // 強化をシミュレート
         // slots を選ばせる
@@ -204,7 +223,7 @@ describe('Item Class - Snapshot', () => {
 
         const snap = originalItem.getSnapshot();
         
-        const restoredItem = Item.fromSnapshot(snap);
+        const restoredItem = Item.fromSnapshot(snap, repository);
 
         expect(restoredItem.uid).toBe(originalItem.uid);
         expect(restoredItem.id).toBe(originalItem.id);
@@ -219,14 +238,14 @@ describe('Item Class - Snapshot', () => {
     });
 
     it('should restore maxCharges enhancement correctly', () => {
-        const originalItem = new Item('pad_standard_d2');
+        const originalItem = new Item('pad_standard_d2', repository);
         
         // maxCharges を選ばせる (リストの最後と仮定)
         mathRandomSpy.mockReturnValue(0.99);
         originalItem.applyMaintenance(); // maxCharges + 1
 
         const snap = originalItem.getSnapshot();
-        const restoredItem = Item.fromSnapshot(snap);
+        const restoredItem = Item.fromSnapshot(snap, repository);
 
         expect(restoredItem.maxCharges).toBe(originalItem.maxCharges);
         expect(restoredItem.charges).toBe(originalItem.charges);

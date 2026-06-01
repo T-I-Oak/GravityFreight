@@ -107,7 +107,7 @@
 
     <!-- Interactive Mockup Controller & Dynamic Generation -->
     <script type="module">
-        import { PARTS } from '../core/DataManager.js';
+        import { PARTS, mockGameDataRepository } from './mock_data.js';
         import { UIComponents } from '../systems/ui/UIComponents.js';
 
         // --- 1. Dynamic Item Generation ---
@@ -115,7 +115,7 @@
         const itemListContainer = document.getElementById('acquired-items-list');
 
         // A. Story Item (Dynamically generated from ID, marked as NEW)
-        storyContainer.innerHTML = UIComponents.generateStoryCardHTML('T', true);
+        storyContainer.innerHTML = UIComponents.generateStoryCardHTML('T', mockGameDataRepository, true);
 
         let html = '';
         
