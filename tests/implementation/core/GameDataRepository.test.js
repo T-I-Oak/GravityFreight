@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import GameDataRepository from '../../../src/core/GameDataRepository.js';
+import packageData from '../../../package.json';
 
 function createCommonDataManagerStub() {
     return {
@@ -69,7 +70,7 @@ describe('GameDataRepository', () => {
         await repository.loadAllData();
 
         expect(repository.getAppMetadata()).toEqual({
-            version: '0.47.0',
+            version: packageData.version,
             copyright: expect.any(String)
         });
     });

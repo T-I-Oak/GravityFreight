@@ -137,12 +137,13 @@ describe('StackedItem Class - Snapshots', () => {
         stack.push(item1);
         stack.push(item2);
 
-        const snap = stack.getSnapshot();
+        const snap = stack.createSnapshot();
 
         expect(snap.uid).toBe(stack.uid);
-        expect(snap.itemSnapshots).toHaveLength(2);
-        expect(snap.itemSnapshots[0].uid).toBe(item1.uid);
-        expect(snap.itemSnapshots[1].uid).toBe(item2.uid);
+        expect(snap.items).toHaveLength(2);
+        expect(snap.items[0].uid).toBe(item1.uid);
+        expect(snap.items[1].uid).toBe(item2.uid);
+        expect(stack.count).toBe(2);
     });
 
     it('should restore from snapshot correctly', () => {
@@ -152,7 +153,7 @@ describe('StackedItem Class - Snapshots', () => {
         stack.push(item1);
         stack.push(item2);
 
-        const snap = stack.getSnapshot();
+        const snap = stack.createSnapshot();
         const restored = StackedItem.fromSnapshot(snap, repository);
 
         expect(restored.uid).toBe(stack.uid);
