@@ -100,11 +100,7 @@ class RocketItem extends Item {
             rarity: this.rarity,
             description: this.description,
             stats,
-            modules: [
-                this.chassis.getViewData(),
-                this.logic.getViewData(),
-                ...this.modules.map(module => module.getViewData())
-            ]
+            modules: this.modules.map(module => module.getViewData())
         };
     }
 

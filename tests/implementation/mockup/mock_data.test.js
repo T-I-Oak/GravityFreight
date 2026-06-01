@@ -34,7 +34,7 @@ describe('mock_data view data helpers', () => {
 
         expect(viewData.category).toBe('rocket');
         expect(viewData.stats.slots.value).toBeGreaterThan(0);
-        expect(viewData.modules).toHaveLength(3);
-        expect(viewData.modules[2].count).toBe(2);
+        expect(viewData.modules).toHaveLength(1);
+        expect(viewData.modules[0].count).toBe(2);
     });
 });

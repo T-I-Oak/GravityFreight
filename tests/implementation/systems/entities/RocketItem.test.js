@@ -69,7 +69,7 @@ describe('RocketItem', () => {
         expect(rocketItem.precisionMultiplier).toBeUndefined();
     });
 
-    it('generates ItemViewData with recursive component view data', () => {
+    it('generates ItemViewData with module stack view data for card details', () => {
         const rocketItem = createRocketItem();
         const viewData = rocketItem.getViewData();
 
@@ -82,9 +82,10 @@ describe('RocketItem', () => {
         expect(viewData.stats.mass.value).toBe(rocketItem.getMass());
         expect(viewData.stats.slots.value).toBe(rocketItem.getSlots());
         expect(viewData.stats.precisionMultiplier.value).toBe(rocketItem.getPrecisionMultiplier());
-        expect(viewData.modules).toHaveLength(4);
-        expect(viewData.modules[0].uid).toBe(rocketItem.chassis.uid);
-        expect(viewData.modules[1].uid).toBe(rocketItem.logic.uid);
+        expect(viewData.modules).toHaveLength(2);
+        expect(viewData.modules.map(module => module.uid)).toEqual(rocketItem.modules.map(module => module.uid));
+        expect(viewData.modules.some(module => module.uid === rocketItem.chassis.uid)).toBe(false);
+        expect(viewData.modules.some(module => module.uid === rocketItem.logic.uid)).toBe(false);
         expect(viewData.modules.some(module => module.count === 2)).toBe(true);
     });
 
