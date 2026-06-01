@@ -170,6 +170,60 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         expect(html).toContain('item-card-status state-delivered');
         expect(html).toContain('DELIVERED');
     });
+
+    it('should render ItemViewData stats for properties and durability', () => {
+        const viewData = {
+            id: 'view_item',
+            uid: 'view_001',
+            name: 'ビューアイテム',
+            category: 'module',
+            stats: {
+                charges: { value: 1, enhanceCount: 0 },
+                maxCharges: { value: 3, enhanceCount: 1 },
+                slots: { value: 2, enhanceCount: 1 },
+                precisionMultiplier: { value: 1.4, enhanceCount: 2 },
+                pickupMultiplier: { value: 1.2, enhanceCount: 0 },
+                gravityMultiplier: { value: 0.8, enhanceCount: 0 }
+            }
+        };
+
+        const html = UIComponents.generateCardHTML(viewData);
+
+        expect(html).toContain('DurabilityGauge state-enhanced');
+        expect(html).toContain('SLOTS');
+        expect(html).toContain('2');
+        expect(html).toContain('PRECISION');
+        expect(html).toContain('1.4');
+        expect(html).toContain('item-card-prop state-enhanced additive');
+        expect(html).toContain('item-card-prop state-enhanced multiplier');
+    });
+
+    it('should render RocketItem view data with nested component cards', () => {
+        const rocketViewData = {
+            id: 'rocket',
+            uid: 'rocket_001',
+            name: 'ロケット',
+            category: 'rocket',
+            stats: {
+                mass: { value: 12, enhanceCount: 0 },
+                slots: { value: 4, enhanceCount: 0 },
+                precisionMultiplier: { value: 1.2, enhanceCount: 0 }
+            },
+            modules: [
+                { id: 'hull', uid: 'hull_001', name: 'Hull', category: 'chassis', stats: { slots: { value: 2, enhanceCount: 0 } } },
+                { id: 'logic', uid: 'logic_001', name: 'Logic', category: 'logic', stats: { precisionMultiplier: { value: 1.2, enhanceCount: 0 } } },
+                { id: 'mod', uid: 'mod_001', name: 'Module Stack', category: 'module', count: 2, stats: { maxCharges: { value: 4, enhanceCount: 0 }, charges: { value: 3, enhanceCount: 0 } } }
+            ]
+        };
+
+        const html = UIComponents.generateCardHTML(rocketViewData);
+
+        expect(html).toContain('rocket-details');
+        expect(html).toContain('Hull');
+        expect(html).toContain('Logic');
+        expect(html).toContain('Module Stack');
+        expect(html).toContain('x2');
+    });
 });
 
 describe('UIComponents.generateCardHTML (Variations)', () => {
