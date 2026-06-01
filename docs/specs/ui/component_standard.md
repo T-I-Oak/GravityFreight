@@ -23,121 +23,137 @@
 
 ## 2. 主要コンポーネント定義
  
-### 2.1 Item Card (アイテムカード：基本)
-すべてのカード型要素の基盤となるコンポーネント。
-- **基本構造**: `<article data-id="...">`
-- **共通状態・バリエーション**:
-    - 操作可能: ホバー・クリック時のフィードバックを有効化。
-    - 選択中: カテゴリー色を背景に 15〜25% 合成し強調。
-    - カテゴリー: `chassis`, `logic`, `launcher`, `module`, `booster`, `coin`, `cargo`, `rocket` に応じた色情報を付与。
-    - コンパクト: 説明文とフッター（プロパティエリア）を非表示にし、垂直方向のサイズを圧縮する。
-    - ミニ: フォントサイズやパディングを全体的にスケールダウンさせ、高密度レイアウトへの埋め込みに最適化する。
-- **デザイン基準**: 標準パディング `8px 12px`（通常）、`4px 8px`（ミニ）。
-    - **実装上の注意**: ミニモード時のサイズ制約（height等）は、詳細度管理を容易にしつつ、スタイルレイヤー（Matte/Neon）による不適切な上書きを防ぐため、ベースレイヤー側で定義された **CSS ジオメトリ変数** を用いて制御されている。
+### 2.1 Component Class Matrix
+共通コンポーネントは、Function class を中心に、必要な State / Type / Texture / Theme を組み合わせて表現する。
 
-### 2.2 Placeholder Card (プレースホルダー：空のスロット)
-アイテムが存在しない状態を示すためのカード型コンポーネント。
-- **基本構造**: 
-  ```html
-  <article>
-      <div class="placeholder-text">MAIN MESSAGE</div>
-      <div class="placeholder-subtext">Guidance subtext</div>
-  </article>
-  ```
-- **共通状態・バリエーション**:
-    - 注目: ガイドアニメーションを有効化。サブテキストのみが点滅し、ユーザーの注意を引く。
-    - 操作可能: ホバー・クリックフィードバックを有効化。
-    - カテゴリーまたはテーマ: サブテキストにカテゴリー色を付与。枠とメインテキストは常に共通のグレーを維持する。
-- **生成メソッド**: `UIComponents.generatePlaceholderHTML(text, subtext, options)`
-- **デザイン基準**: 境界線は `dashed`（点線）、背景は透明、全体的に `opacity: 0.6` の落ち着いた外観。
+| Component | Function | Type | State | Texture / Theme |
+| :--- | :--- | :--- | :--- | :--- |
+| Item Card | `.ItemCard` | `.chassis`, `.logic`, `.launcher`, `.module`, `.booster`, `.cargo`, `.rocket`, `.story-card` | `.state-clickable`, `.state-selected`, `.state-compact`, `.state-mini`, `.state-enhanced` | 親の `.theme-*` に従う |
+| Placeholder Card | `.ItemCard` | `.placeholder-card` | `.state-clickable`, `.state-new` | 親の `.theme-*` に従う |
+| Durability Gauge | `.DurabilityGauge` | なし | `.state-active`, `.state-enhanced`, `.state-mini` | 親の `.theme-*` に従う |
+| Badge | `.Badge` | `.item-count`, `.rank` | `.state-mini`, `.state-new`, `.state-locked` | 親の `.theme-*` に従う |
+| Button | `.Button` | なし | `.state-primary`, `.state-disabled`, `.state-active` | 親の `.theme-*` に従う |
+| Panel | `.Panel` | 画面固有種別 | `.state-active`, `.state-locked` | `.texture-glass`, `.texture-plate`, `.texture-paper` |
+| Well | `.Well` | なし | なし | `.texture-plate`, `.texture-paper` |
+| Facility Badge | `.FacilityBadge` | `.trading-post`, `.repair-dock`, `.black-market` | なし | 親の `.theme-*` に従う |
+| Story Modal | `.Panel` | `.story-modal` | なし | 親の `.theme-*` に従う |
+| How To Play Slider | `.HowToPlaySlider` | `.how-to-play-screen`, `.how-to-play-slide` | `.state-active`, `.state-animating` | 親の `.theme-*` に従う |
+| Diagram Canvas | `.DiagramCanvas` | `.diagram-area` | なし | 画面固有スタイルで定義 |
 
-### 2.3 Story Card (ストーリーカード：派生)
-アイテムカードを拡張した物語用コンポーネント。
-- **追加種別**: 物語用カードであることを示す種別を付与する。
-- **追加される特性**:
-    - **ダブルライン・インジケーター**: 左端に 8px 幅の特殊ボーダー（3px カテゴリー色 / 2px 隙間 / 3px カテゴリー色）を付与。内部的には `border-left` と `box-shadow` を組み合わせて実装。
-    - **レイアウト調整**: インジケーター分、`padding-left: 16px` となる。
-- **用途**: 物語の発見（Discovery）やログの表示に使用。
+### 2.2 Item Card
+アイテム、貨物、ロケット、物語カードの基盤となるコンポーネント。
 
-### 2.4 Durability Gauge (耐久度ゲージ)
-- **構成**: ゲージ全体とセグメント要素で構成する。
-- **基本形状**: 
-    - **常用サイズ**: 幅10px、高さ5px。
-    - **ミニ版**: 10px 行高に収まる極小サイズ。
-- **デザイン基準**: 点灯時は **`--color-theme-main`**（テーマカラー）を反映。カテゴリー色には依存しない。
-- **実装上の注意**: 高密度表示における視覚的整合性を最優先するため、ミニモード時のセグメントサイズ（8x3px）はベースレイヤーのジオメトリ変数によって厳密に管理されている。
+- **Function**: `.ItemCard`
+- **基本タグ**: `<article>`
+- **識別属性**: 操作用 ID は `data-id` / `data-uid` などの data 属性で渡す。
+- **Type**: アイテムカテゴリは `.chassis`、`.logic`、`.launcher`、`.module`、`.booster`、`.cargo`、`.rocket` を使う。
+- **State**:
+    - `.state-clickable`: ホバー・クリック時のフィードバックを有効化。
+    - `.state-selected`: 選択中。カテゴリ色を背景や枠へ反映して強調する。
+    - `.state-compact`: 説明文を省略し、名称と主要プロパティを優先する。
+    - `.state-mini`: 高密度表示用。サイズは共通トークンで制御する。
+    - `.state-enhanced`: 強化済みプロパティまたは耐久度を示す。
+- **内部要素**: ヘッダー、説明文、プロパティ、ステータス、ロケット詳細は lower-case の種別 class で定義する。
+- **画面固有境界**: 一覧の列幅、並び順、カード間隔は画面固有スタイルで定義する。
 
-### 2.5 UI Badge (汎用バッジ系)
-- **基本構造**: `<div>`
-- **バリエーション**:
-    - スタック数表示: 右上に配置。
-    - ミニ: 10px 行高に最適化された最小サイズ。
-    - **実装上の注意**: ミニ表示では、共通のジオメトリ変数で高さ制約を上書きし、10px の高さを保証する。
+### 2.3 Placeholder Card
+アイテムやスロットが空であることを示すカード。
 
-### 2.6 Enhanced State (強化状態)
-- **用途**: プロパティ値や耐久度に対する視覚的な強調。
-- **状態**: 強化済みであることを示す状態として扱う。
-- **表現基準**:
-    - **数値**: アズールブルー色と `✦` 記号の付与。
-    - **耐久度**: ゴールド（`#ffd700`）の専用外枠を付与。
+- **Function**: `.ItemCard`
+- **Type**: `.placeholder-card`
+- **State**:
+    - `.state-clickable`: クリックで選択や追加へ進める場合に使う。
+    - `.state-new`: ユーザーの注意を促す必要がある場合に使う。
+- **表示内容**: メインメッセージと補足メッセージを持つ。
+- **画面固有境界**: 表示文言、空スロットの数、配置は画面仕様で定義する。
 
-### 2.7 UI Button (ボタン)
-- **基本構造**: `<button>`
-- **状態・バリエーション**:
-    - Primary: 画面内の最優先アクション。塗りつぶし背景。
-    - Large: 大型カプセル形状。高さ 48px（プレイ画面の特定ボタンのみ 76px に拡張）。メインラベルとサブラベルを内包可能。
-    - Disabled: 操作無効状態。
-- **視覚効果**: 発光表現を使う場合は、大型かつ重要な操作に限定する。
+### 2.4 Story Card
+物語の発見やログを表示するカード。
 
-### 2.8 Interactive Icon & State (アイコンと通知)
-- **基本構造**: `<span>`
-- **状態・種別**:
-    - 操作可能: アイコン単体へのユーザー操作（scale変化）を許可。
-    - 新着: 新着通知アニメーションを適用。
-    - メール: 封筒形状のアイコンとして扱う。
-- **共通フィードバック**:
-    - **ホバー時**: 操作可能なアイコンに対して `scale(1.2)` の拡大。
-    - **アクティブ時**: アイコン単体では `scale(0.95)`、大きなカード全体では `scale(0.98)` の縮小を適用。
+- **Function**: `.ItemCard`
+- **Type**: `.story-card`
+- **State**:
+    - `.state-new`: 未読または新着の物語。
+    - `.state-clickable`: クリックで本文を開く場合に使う。
+- **Domain Type**: 施設に紐づく物語は `.trading-post`、`.repair-dock`、`.black-market` を併用する。
+- **表示内容**: タイトル、発見文、通知用 Badge または Icon を持つ。
 
-### 2.9 UI Well (データウェル：くぼみ)
-要素を一歩奥に引っ込ませ、パネル内の「情報のトレイ」として機能させるためのコンポーネント。
-- **基本構造**: `<div>`
-- **デザイン基準**: 
-    - **Base (構造)**: パディング `var(--space-double)` を持ち、角丸（標準 8px）で囲む。
-    - **Style (質感 )**: Matte スタイルでは「左上からの深いインセットシャドウ」と「右下の微細なハイライト」により、物理的な彫り込みを表現する。
-- **用途**: カラムの背景、データの塊の視覚的グルーピング。
+### 2.5 Durability Gauge
+耐久度をセグメントで表示するコンポーネント。
 
-### 2.10 Facility Badge (施設バッジ)
-施設画面（交易所等）のヘッダーで使用される、所属と名称を象徴する高精度バッジ。
-- **基本構造**: 
-  ```html
-  <div class="facility-badge">
-      <div class="badge-icon">...</div>
-      <div class="badge-info">
-          <span class="badge-label">CATEGORY</span>
-          <span class="badge-name">FACILITY NAME</span>
-      </div>
-  </div>
-  ```
-- **デザイン基準**: 背景に `--current-color` の暗い透過色を敷き、左側にソリッドな色の帯（インジケーター：同じく `--current-color` を参照）を持つ。
+- **Function**: `.DurabilityGauge`
+- **State**:
+    - `.state-active`: 点灯中のセグメント。
+    - `.state-enhanced`: 強化済み耐久度。
+    - `.state-mini`: 10px 行高に収める小型表示。
+- **用途**: ItemCard のヘッダー、ロケット詳細、施設修理画面。
+- **画面固有境界**: セグメント数はデータに従い、CSS 側で独自に増減しない。
 
-### 2.11 Story Modal (ストーリーモーダル)
-物語の全文を表示するための大型パネルコンポーネント。
-- **基本構造**: `<article>`
-- **デザイン基準**:
-    - **背景**: 施設カラー（`--current-color`）を 80% 透過で背景に合成。
-    - **導入文**: 太字・イタリック体で強調。
-    - **本文**: 手紙やログの改行を維持（`white-space: pre-wrap`）。
-- **生成メソッド**: `UIComponents.generateStoryModalHTML(content)`
+### 2.6 Badge
+短い状態、数量、ランク、通知を表示する小型コンポーネント。
 
-### 2.12 How To Play Screen (説明書画面)
-説明書画面は、共通 UI 部品と画面固有レイアウトを組み合わせて構成する。
-- **基本スコープ**: `#how-to-play-screen` または同等のトップレベル要素を起点とする。
-- **クラス命名**: 画面固有 class は `how-to-play-*` に統一し、将来のゲーム中 tutorial 用 class と衝突させない。
-- **背景画像**: 各ページに対応する `public/assets/tutorial/slide1.png` から `slide7.png` をページ背景として表示する。
-- **共通部品の利用**: アイテムカード、ボタン、バッジ等は共通スタイルで定義されたコンポーネントを優先して使う。
-- **個別 CSS の範囲**: ページ背景、スライドトラック、本文ブロック、canvas 領域、ページナビゲーションなど、説明書固有の配置・遷移に限定する。
-- **実装上の注意**: β v1 の CSS をそのまま移植せず、共通スタイルと画面スコープの境界に合わせて再構成する。
+- **Function**: `.Badge`
+- **Type**: `.item-count`、`.rank` など、表示対象の意味を併用する。
+- **State**:
+    - `.state-mini`: 小型表示。
+    - `.state-new`: 新着。
+    - `.state-locked`: 未解除。
+- **用途**: スタック数、ランク、実績 tier、通知ラベル。
+
+### 2.7 Button
+ユーザー操作を受ける標準コンポーネント。
+
+- **Function**: `.Button`
+- **基本タグ**: `<button>`
+- **State**:
+    - `.state-primary`: 画面内の最優先アクション。
+    - `.state-disabled`: 操作不可。
+    - `.state-active`: 現在選択中のタブまたはトグル。
+- **内部要素**: メインラベルとサブラベルは lower-case の種別 class で定義する。
+- **画面固有境界**: ボタン幅や配置は画面仕様で定義する。操作状態の意味は共通 State を使う。
+
+### 2.8 Panel / Well
+情報をまとめる大きな枠と、パネル内のトレイ状領域。
+
+- **Panel Function**: `.Panel`
+- **Well Function**: `.Well`
+- **Panel 内部**: ヘッダー、本文、フッターを持てる。
+- **Texture**:
+    - `.texture-glass`: 透明感のあるパネル。
+    - `.texture-plate`: 不透明寄りの端末パネル。
+    - `.texture-paper`: 印刷物風のカードやレポート。
+- **画面固有境界**: パネルの最大幅、高さ、カラム配置は画面仕様で定義する。
+
+### 2.9 Facility Badge
+施設種別と施設名を示すバッジ。
+
+- **Function**: `.FacilityBadge`
+- **Type**: `.facility-badge`
+- **Domain Type**: `.trading-post`、`.repair-dock`、`.black-market`
+- **表示内容**: アイコン、施設カテゴリ、施設名。
+- **用途**: 施設画面、Story Modal、施設に紐づく通知。
+
+### 2.10 Story Modal
+物語の全文を表示する大型パネル。
+
+- **Function**: `.Panel`
+- **Type**: `.story-modal`
+- **Domain Type**: 物語の発生施設に応じた施設種別を併用する。
+- **内部要素**: FacilityBadge、タイトル、導入文、本文、閉じる Button。
+- **本文**: 手紙やログの改行を維持する。
+
+### 2.11 How To Play Components
+説明書画面は、共通コンポーネントと画面固有レイアウトを組み合わせる。
+
+- **画面ルート Type**: `.how-to-play-screen`
+- **Slider Function**: `.HowToPlaySlider`
+- **Slide Type**: `.how-to-play-slide`
+- **Diagram Function**: `.DiagramCanvas`
+- **Diagram Type**: `.diagram-area`
+- **State**:
+    - `.state-active`: 現在表示中のページ。
+    - `.state-animating`: ページ切り替え中。
+- **画面固有境界**: 背景画像、スライドトラック、本文ブロック、ページナビゲーション、canvas の具体配置は How To Play 仕様で定義する。
 
 ---
 
