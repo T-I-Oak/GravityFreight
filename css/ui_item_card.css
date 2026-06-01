@@ -27,6 +27,7 @@
     background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-tint, 93%));
     border: 1px solid var(--color-border-card);
     border-radius: var(--card-radius);
+    min-height: 56px;
     transition: all var(--motion-normal) ease;
     overflow: hidden;
 }
@@ -90,6 +91,7 @@
     --card-padding-y: 4px;
     --card-padding-x: 8px;
     --card-radius: calc(var(--radius-standard) * 0.7);
+    min-height: 0;
 }
 
 .ItemCard.state-mini::before {

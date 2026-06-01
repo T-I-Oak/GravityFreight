@@ -127,7 +127,8 @@ body {
 /* .ScrollArea is now unified at the top of this file */
 
 /* --- 3. Global Metadata Components --- */
-.footer {
+.footer,
+.screen-footer {
     position: absolute;
     bottom: var(--space-unit);
     left: var(--space-double);
