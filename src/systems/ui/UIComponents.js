@@ -21,7 +21,8 @@ export class UIComponents {
         const displayName = item.name || `[MISSING_NAME: ${item.id}]`;
 
         // --- 2. Parts Generation (Sub-components) ---
-        const headerRight = this.generateHeaderRightHTML(item, options);
+        const viewModel = this.normalizeItemViewData(item);
+        const headerRight = this.generateHeaderRightHTML(viewModel, options);
         const headerHTML = `
             <header class="item-card-header SplitRow">
                 <h3 class="item-card-title">${displayName}</h3>
@@ -33,9 +34,9 @@ export class UIComponents {
             ? `<div class="item-card-description">${item.description}</div>`
             : '';
 
-        const footerHTML = this.generateFooterHTML(item, options);
-        const detailsHTML = (category === 'rocket' && Array.isArray(item.modules))
-            ? this.generateRocketDetailsHTML(item.modules)
+        const footerHTML = this.generateFooterHTML(viewModel, options);
+        const detailsHTML = (category === 'rocket' && Array.isArray(viewModel.modules))
+            ? this.generateRocketDetailsHTML(viewModel.modules)
             : '';
 
         // --- 3. Final Assembly (Isomorphic Frame) ---
@@ -60,7 +61,7 @@ export class UIComponents {
 
         // Durability Gauge (Explicit data only)
         if (item.maxCharges !== undefined && item.maxCharges > 0) {
-            const isDurableEnhanced = !!(options.isEnhanced || (item.enhancement && item.enhancement.charges > 0));
+            const isDurableEnhanced = !!(options.isEnhanced || (item.enhancement && (item.enhancement.charges > 0 || item.enhancement.maxCharges > 0)));
             html += this.generateHPGauge(item.charges, item.maxCharges, isDurableEnhanced, miniClass);
         }
 
@@ -108,6 +109,24 @@ export class UIComponents {
         });
 
         return propItems ? `<footer class="item-card-footer"><div class="item-card-prop-group">${propItems}</div></footer>` : '';
+    }
+
+    static normalizeItemViewData(item) {
+        if (!item.stats) {
+            return item;
+        }
+
+        const normalized = {
+            ...item,
+            enhancement: { ...(item.enhancement || {}) }
+        };
+
+        Object.entries(item.stats).forEach(([key, stat]) => {
+            normalized[key] = stat.value;
+            normalized.enhancement[key] = stat.enhanceCount || 0;
+        });
+
+        return normalized;
     }
 
     /**
