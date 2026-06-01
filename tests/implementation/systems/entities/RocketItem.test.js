@@ -52,13 +52,21 @@ describe('RocketItem', () => {
             ...rocketItem.modules.flatMap(module => module.items)
         ];
 
-        expect(rocketItem.mass).toBe(parts.reduce((total, item) => total + item.mass, 0));
-        expect(rocketItem.slots).toBe(parts.reduce((total, item) => total + item.slots, 0));
-        expect(rocketItem.precision).toBe(parts.reduce((total, item) => total + item.precision, 0));
-        expect(rocketItem.pickupRange).toBe(parts.reduce((total, item) => total + item.pickupRange, 0));
-        expect(rocketItem.precisionMultiplier).toBe(parts.reduce((total, item) => total * item.precisionMultiplier, 1));
-        expect(rocketItem.pickupMultiplier).toBe(parts.reduce((total, item) => total * item.pickupMultiplier, 1));
-        expect(rocketItem.gravityMultiplier).toBe(parts.reduce((total, item) => total * item.gravityMultiplier, 1));
+        expect(rocketItem.getMass()).toBe(parts.reduce((total, item) => total + item.mass, 0));
+        expect(rocketItem.getSlots()).toBe(parts.reduce((total, item) => total + item.slots, 0));
+        expect(rocketItem.getPrecision()).toBe(parts.reduce((total, item) => total + item.precision, 0));
+        expect(rocketItem.getPickupRange()).toBe(parts.reduce((total, item) => total + item.pickupRange, 0));
+        expect(rocketItem.getPrecisionMultiplier()).toBe(parts.reduce((total, item) => total * item.precisionMultiplier, 1));
+        expect(rocketItem.getPickupMultiplier()).toBe(parts.reduce((total, item) => total * item.pickupMultiplier, 1));
+        expect(rocketItem.getGravityMultiplier()).toBe(parts.reduce((total, item) => total * item.gravityMultiplier, 1));
+    });
+
+    it('does not expose aggregate stats as direct properties', () => {
+        const rocketItem = createRocketItem();
+
+        expect(rocketItem.mass).toBeUndefined();
+        expect(rocketItem.slots).toBeUndefined();
+        expect(rocketItem.precisionMultiplier).toBeUndefined();
     });
 
     it('generates ItemViewData with recursive component view data', () => {
@@ -71,9 +79,9 @@ describe('RocketItem', () => {
             name: rocketItem.name,
             category: 'rocket'
         });
-        expect(viewData.stats.mass.value).toBe(rocketItem.mass);
-        expect(viewData.stats.slots.value).toBe(rocketItem.slots);
-        expect(viewData.stats.precisionMultiplier.value).toBe(rocketItem.precisionMultiplier);
+        expect(viewData.stats.mass.value).toBe(rocketItem.getMass());
+        expect(viewData.stats.slots.value).toBe(rocketItem.getSlots());
+        expect(viewData.stats.precisionMultiplier.value).toBe(rocketItem.getPrecisionMultiplier());
         expect(viewData.modules).toHaveLength(4);
         expect(viewData.modules[0].uid).toBe(rocketItem.chassis.uid);
         expect(viewData.modules[1].uid).toBe(rocketItem.logic.uid);
@@ -94,7 +102,7 @@ describe('RocketItem', () => {
         expect(restored.uid).toBe(rocketItem.uid);
         expect(restored.name).toBe(rocketItem.name);
         expect(restored.modules.map(module => module.uid)).toEqual(rocketItem.modules.map(module => module.uid));
-        expect(restored.mass).toBe(rocketItem.mass);
-        expect(restored.precisionMultiplier).toBe(rocketItem.precisionMultiplier);
+        expect(restored.getMass()).toBe(rocketItem.getMass());
+        expect(restored.getPrecisionMultiplier()).toBe(rocketItem.getPrecisionMultiplier());
     });
 });

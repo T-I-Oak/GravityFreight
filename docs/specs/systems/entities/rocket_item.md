@@ -19,15 +19,9 @@
     - `readonly logic: Item`: 必須。
     - **`readonly modules: ModuleStack[]`**: ID ごとに集約されたモジュールのプール。
 
-- **Aggregated Stats (Getters)**
-    - `mass`: 全構成パーツの `mass` の合計（Σ）。
-    - `slots`: 全構成パーツの `slots` の合計（Σ）。
-    - `precision`: 全構成パーツの `precision` の合計（Σ）。
-    - `precisionMultiplier`: 全構成パーツの `precisionMultiplier` の乗算結果（Π）。
-    - `pickupRange`: 全構成パーツの `pickupRange` の合計（Σ）。
-    - `pickupMultiplier`: 全構成パーツの `pickupMultiplier` の乗算結果（Π）。
-    - `gravityMultiplier`: 全構成パーツの `gravityMultiplier` の乗算結果（Π）。
-    - ※各ゲッターは、`chassis`, `logic` および `modules` 内の全 `Item` を走査して集計する。
+- **Aggregated Stats**
+    - 集計値は保持プロパティや getter として公開せず、明示的なメソッドで取得する。
+    - `RocketItem` は `Item` を継承するが、`mass`, `slots`, `precisionMultiplier` などの派生値を直接プロパティとして読ませない。
 
 ### メソッド (Methods)
 
@@ -35,6 +29,26 @@
     - 各パーツのインスタンスを受け取り、`modules` を ID ごとに `ModuleStack` へ集約して初期化する。
     - **uid の生成**: `IDGenerator.generate('rocketitem')` を用いて生成する。
     - **name の生成**: `chassis.name + " ＋ " + logic.name` として自身の名称を決定する。
+- **`getMass(): number`**
+    - 全構成パーツの `mass` の合計（Σ）を返す。
+- **`getSlots(): number`**
+    - 全構成パーツの `slots` の合計（Σ）を返す。
+- **`getPrecision(): number`**
+    - 全構成パーツの `precision` の合計（Σ）を返す。
+- **`getPickupRange(): number`**
+    - 全構成パーツの `pickupRange` の合計（Σ）を返す。
+- **`getPower(): number`**
+    - 全構成パーツの `power` の合計（Σ）を返す。
+- **`getCharges(): number` / `getMaxCharges(): number`**
+    - 全構成パーツの現在耐久度・最大耐久度の合計（Σ）を返す。
+- **`getPrecisionMultiplier(): number`**
+    - 全構成パーツの `precisionMultiplier` の乗算結果（Π）を返す。
+- **`getPickupMultiplier(): number`**
+    - 全構成パーツの `pickupMultiplier` の乗算結果（Π）を返す。
+- **`getGravityMultiplier(): number`**
+    - 全構成パーツの `gravityMultiplier` の乗算結果（Π）を返す。
+- **`getPowerMultiplier(): number` / `getArcMultiplier(): number`**
+    - 全構成パーツの該当 multiplier の乗算結果（Π）を返す。
 - **`getViewData(): ItemViewData`**
     - UI 表示（アイテムカード）用のプレーンオブジェクトを生成して返す。
     - **マッピング**:
