@@ -2,7 +2,6 @@
  * UIComponents.js
  * Standardized HTML generation logic for Gravity Freight.
  */
-import DataManager from '../../core/DataManager.js';
 
 export class UIComponents {
     /**
@@ -146,9 +145,13 @@ export class UIComponents {
      * @param {string} storyId - Key for STORY_DATA (e.g., 'T')
      * @param {boolean} isNew - Whether to apply a "new" pulse animation
      */
-    static generateStoryCardHTML(storyId, isNew = false) {
-        const story = DataManager.getStoryById(storyId);
-        const facilityClass = DataManager.getFacilityById(story.branch).className;
+    static generateStoryCardHTML(storyId, gameDataRepository, isNew = false) {
+        if (!gameDataRepository) {
+            throw new Error('[UIComponents] gameDataRepository is required.');
+        }
+
+        const story = gameDataRepository.getStoryContent(storyId);
+        const facilityClass = gameDataRepository.getFacilityDefinition(story.branch).className;
 
         return `
             <article class="ItemCard story-card state-active state-clickable ${facilityClass}">
@@ -167,10 +170,14 @@ export class UIComponents {
      * Generates a complete story modal HTML string.
      * @param {string} storyId - Key for STORY_DATA
      */
-    static generateStoryModalHTML(storyId) {
-        const story = DataManager.getStoryById(storyId);
+    static generateStoryModalHTML(storyId, gameDataRepository) {
+        if (!gameDataRepository) {
+            throw new Error('[UIComponents] gameDataRepository is required.');
+        }
 
-        const facility = DataManager.getFacilityById(story.branch);
+        const story = gameDataRepository.getStoryContent(storyId);
+
+        const facility = gameDataRepository.getFacilityDefinition(story.branch);
         const facilityClass = facility.className;
         const icon = facility.icon;
 

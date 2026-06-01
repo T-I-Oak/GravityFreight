@@ -69,6 +69,26 @@ class GameDataRepository {
         return item;
     }
 
+    getItemDefinitionsByCategory(category) {
+        this.#ensureLoaded();
+        return this.items[category] || [];
+    }
+
+    getAllItemDefinitions() {
+        this.#ensureLoaded();
+        return Object.values(this.items).flat();
+    }
+
+    getFacilityDefinition(idOrType) {
+        this.#ensureLoaded();
+        const facility = this.config.facilities[idOrType]
+            || Object.values(this.config.facilities).find(candidate => candidate.id === idOrType);
+        if (!facility) {
+            throw new Error(`[GameDataRepository] Facility not found: ${idOrType}`);
+        }
+        return facility;
+    }
+
     getStoryContent(id) {
         this.#ensureLoaded();
         return this.expandLanguageResource(this.#requiredById(this.content.stories, id, 'Story'));
@@ -82,6 +102,26 @@ class GameDataRepository {
     getAchievementDefinitions() {
         this.#ensureLoaded();
         return this.expandLanguageResource(Object.values(this.content.achievements || {}));
+    }
+
+    getAchievementDefinition(id) {
+        this.#ensureLoaded();
+        return this.expandLanguageResource(this.#requiredById(this.content.achievements, id, 'Achievement'));
+    }
+
+    getGameBalance() {
+        this.#ensureLoaded();
+        return this.config.gameBalance;
+    }
+
+    getMapConstants() {
+        this.#ensureLoaded();
+        return this.config.mapConstants;
+    }
+
+    getRaritySettings() {
+        this.#ensureLoaded();
+        return this.config.rarity;
     }
 
     getAppMetadata() {

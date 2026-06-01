@@ -1,4 +1,3 @@
-import DataManager from '../../core/DataManager.js';
 import IDGenerator from '../../core/utils/IDGenerator.js';
 
 /**
@@ -8,8 +7,12 @@ import IDGenerator from '../../core/utils/IDGenerator.js';
 class Item {
     #master;
 
-    constructor(masterId) {
-        this.#master = DataManager.getItemById(masterId);
+    constructor(masterId, gameDataRepository) {
+        if (!gameDataRepository) {
+            throw new Error('[Item] gameDataRepository is required.');
+        }
+
+        this.#master = gameDataRepository.getItemDefinition(masterId);
         
         // 識別子生成
         this.uid = IDGenerator.generate('item');
@@ -159,9 +162,9 @@ class Item {
      * @param {Object} data 永続化されたデータ
      * @returns {Item} 再構築されたItemインスタンス
      */
-    static fromSnapshot(data) {
+    static fromSnapshot(data, gameDataRepository) {
         // 1. マスタIDから初期化
-        const item = new Item(data.id);
+        const item = new Item(data.id, gameDataRepository);
         
         // 2. 基本的な状態の上書き
         item.uid = data.uid;
