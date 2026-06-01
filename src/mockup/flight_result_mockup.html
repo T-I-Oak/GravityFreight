@@ -107,7 +107,7 @@
 
     <!-- Interactive Mockup Controller & Dynamic Generation -->
     <script type="module">
-        import { PARTS, mockGameDataRepository } from './mock_data.js';
+        import { PARTS, createItemViewData, mockGameDataRepository } from './mock_data.js';
         import { UIComponents } from '../systems/ui/UIComponents.js';
 
         // --- 1. Dynamic Item Generation ---
@@ -122,21 +122,21 @@
         // B. Chassis x2
         const chassisBase = PARTS.chassis[0];
         if (chassisBase) {
-            html += UIComponents.generateCardHTML({ ...chassisBase, count: 2 });
+            html += UIComponents.generateCardHTML(createItemViewData(chassisBase, {}, { count: 2 }));
         }
 
         // B. Encrypted Data (Delivered)
-        html += UIComponents.generateCardHTML(PARTS.cargo[2], { status: 'delivered' });
+        html += UIComponents.generateCardHTML(createItemViewData(PARTS.cargo[2]), { status: 'delivered' });
 
         // Delivery Bonus Items (Sibling list with title)
         const bonusItems = [PARTS.logic[2], PARTS.module[1], PARTS.booster[2]];
         html += `<div class="report-bonus-list">`;
         html += `<h4 class="report-bonus-title">DELIVERY BONUS</h4>`;
-        html += bonusItems.map(item => UIComponents.generateCardHTML(item)).join('');
+        html += bonusItems.map(item => UIComponents.generateCardHTML(createItemViewData(item))).join('');
         html += `</div>`;
 
         // C. Prototype Capacitor (Unmatched)
-        html += UIComponents.generateCardHTML(PARTS.cargo[1], { status: 'unmatched' });
+        html += UIComponents.generateCardHTML(createItemViewData(PARTS.cargo[1]), { status: 'unmatched' });
 
         itemListContainer.innerHTML = html;
 

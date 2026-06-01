@@ -80,7 +80,7 @@
 
     <script type="module">
         import { UIComponents } from '../systems/ui/UIComponents.js';
-        import { PARTS } from './mock_data.js';
+        import { PARTS, createItemViewData } from './mock_data.js';
 
         // Helper to create a trade entry row
         function createTradeEntry(item, actionType, options = {}) {
@@ -130,12 +130,12 @@
 
         // LEFT COLUMN: BUY (Logic[2], Module[0]x2, Launcher[0], Chassis[1], Chassis[3])
         const buyItems = [
-            { item: PARTS.logic[2], price: 40 },
-            { item: PARTS.module[0], price: 40, discount: { level: 'high', val: 50 } },
-            { item: PARTS.module[0], price: 80, disabled: true },
-            { item: PARTS.launcher[0], price: 28, discount: { level: 'mid', val: 30 } },
-            { item: PARTS.chassis[1], price: 40 },
-            { item: PARTS.chassis[3], price: 109, discount: { level: 'low', val: 10 }, disabled: true }
+            { item: createItemViewData(PARTS.logic[2]), price: 40 },
+            { item: createItemViewData(PARTS.module[0]), price: 40, discount: { level: 'high', val: 50 } },
+            { item: createItemViewData(PARTS.module[0]), price: 80, disabled: true },
+            { item: createItemViewData(PARTS.launcher[0]), price: 28, discount: { level: 'mid', val: 30 } },
+            { item: createItemViewData(PARTS.chassis[1]), price: 40 },
+            { item: createItemViewData(PARTS.chassis[3]), price: 109, discount: { level: 'low', val: 10 }, disabled: true }
         ];
 
         buyItems.forEach(cfg => {
@@ -144,11 +144,11 @@
 
         // RIGHT COLUMN: SELL (Chassis[2], Launcher[0] Durability 1/2)
         const sellItems = [
-            { item: PARTS.chassis[2], price: 20 },
+            { item: createItemViewData(PARTS.chassis[2]), price: 20 },
             { 
-                item: PARTS.launcher[0], 
+                item: createItemViewData(PARTS.launcher[0], { charges: 1 }),
                 price: 13, 
-                card: { charges: 1 } // Launcher[0] has maxCharges: 2
+                card: {}
             }
         ];
 
