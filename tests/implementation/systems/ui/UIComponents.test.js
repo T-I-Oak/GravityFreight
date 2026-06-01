@@ -238,7 +238,7 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         expect(html).not.toContain('GRAVITY');
     });
 
-    it('should render RocketItem view data with nested component cards', () => {
+    it('should render RocketItem view data with nested module cards', () => {
         const rocketViewData = {
             id: 'rocket',
             uid: 'rocket_001',
@@ -250,8 +250,6 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
                 precisionMultiplier: { value: 1.2, enhanceCount: 0 }
             },
             modules: [
-                { id: 'hull', uid: 'hull_001', name: 'Hull', category: 'chassis', stats: { slots: { value: 2, enhanceCount: 0 } } },
-                { id: 'logic', uid: 'logic_001', name: 'Logic', category: 'logic', stats: { precisionMultiplier: { value: 1.2, enhanceCount: 0 } } },
                 { id: 'mod', uid: 'mod_001', name: 'Module Stack', category: 'module', count: 2, stats: { maxCharges: { value: 4, enhanceCount: 0 }, charges: { value: 3, enhanceCount: 0 } } }
             ]
         };
@@ -259,8 +257,6 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         const html = UIComponents.generateCardHTML(rocketViewData);
 
         expect(html).toContain('rocket-details');
-        expect(html).toContain('Hull');
-        expect(html).toContain('Logic');
         expect(html).toContain('Module Stack');
         expect(html).toContain('x2');
     });

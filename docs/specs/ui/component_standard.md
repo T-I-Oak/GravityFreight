@@ -250,7 +250,7 @@
 
 
 ### 5.4 複合構造 (Composition)
-- **`modules` (Array<ItemViewData>, optional)**: **ロケット専用**。内包されているパーツのデータのリスト。
+- **`modules` (Array<ItemViewData>, optional)**: **ロケット専用**。カード詳細に表示するモジュールスタックのデータリスト。
     - 各要素は `generateCardHTML` を通じて再帰的に描画される。
 
 ### 5.5 標準プロパティラベル (Standard Labels)

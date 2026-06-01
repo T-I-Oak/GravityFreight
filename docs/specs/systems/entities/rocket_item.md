@@ -59,7 +59,7 @@
             - **Physical (Σ)**: `mass`, `charges`, `maxCharges`
             - **Capability (Σ)**: `precision`, `pickupRange`, `power`, `slots`
             - **Multipliers (Π)**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
-        - **`modules` (Composition)**: 構成パーツ（`chassis`, `logic`, および各 `ModuleStack`）の `getViewData()` の結果を再帰的に格納する。
+        - **`modules` (Composition)**: Item Card 内の詳細表示用に、各 `ModuleStack` の `getViewData()` の結果を再帰的に格納する。`chassis` と `logic` はロケット名と集計済み `stats` に反映されるため、この一覧には含めない。
 
 - **`createSnapshot(): object`**
     - 組み上げ済みロケットの構成状態をシリアライズ可能な形式で抽出する。
