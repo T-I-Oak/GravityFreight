@@ -196,15 +196,14 @@ describe('Item Class - Snapshot', () => {
 
     it('should generate a snapshot with only essential properties for serialization', () => {
         const item = new Item('pad_standard_d2', repository);
-        const snap = item.getSnapshot();
+        const snap = item.createSnapshot();
 
         // 必須項目のみが含まれることを確認
         expect(snap).toEqual({
             uid: item.uid,
             id: item.id,
             charges: item.charges,
-            maxCharges: item.maxCharges,
-            enhancement: item.enhancement
+            enhancements: item.enhancement
         });
         
         // 余分なプロパティが含まれていないことを確認
@@ -221,7 +220,7 @@ describe('Item Class - Snapshot', () => {
         originalItem.applyMaintenance(); // slots + 1
         originalItem.applyMaintenance(); // slots + 1
 
-        const snap = originalItem.getSnapshot();
+        const snap = originalItem.createSnapshot();
         
         const restoredItem = Item.fromSnapshot(snap, repository);
 
@@ -244,7 +243,7 @@ describe('Item Class - Snapshot', () => {
         mathRandomSpy.mockReturnValue(0.99);
         originalItem.applyMaintenance(); // maxCharges + 1
 
-        const snap = originalItem.getSnapshot();
+        const snap = originalItem.createSnapshot();
         const restoredItem = Item.fromSnapshot(snap, repository);
 
         expect(restoredItem.maxCharges).toBe(originalItem.maxCharges);
