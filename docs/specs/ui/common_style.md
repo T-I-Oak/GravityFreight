@@ -119,7 +119,9 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 | `.rank` | Draft | ランク表示 | RankTracker の結果表示 |
 | `.achievement-card` | Draft | 実績カードの固有種別 | Function は AchievementCard |
 | `.replay-row` | Draft | リプレイ一覧の行 | ReplayTable 内 |
+| `.placeholder-card` | Draft | 空スロットや未設定状態を示すカード | Function は ItemCard |
 | `.story-card` | Draft | 物語表示カード | ItemCard の種別 |
+| `.story-modal` | Draft | 物語全文表示モーダル | Function は Panel |
 | `.facility-badge` | Draft | 施設バッジの固有種別 | Function は FacilityBadge |
 | `.how-to-play-screen` | Draft | How To Play 画面のルート | 画面固有CSSのスコープ起点 |
 | `.how-to-play-slide` | Draft | How To Play の各ページ | 背景画像・遷移の対象 |
