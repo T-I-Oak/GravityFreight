@@ -89,7 +89,7 @@
 
     <script type="module">
         import { UIComponents } from '../systems/ui/UIComponents.js';
-        import { PARTS } from './mock_data.js';
+        import { PARTS, createItemViewData } from './mock_data.js';
 
         // Helper to create a facility entry row (Reusing logic from Trading Post)
         function createFacilityEntry(item, actionLabel, options = {}) {
@@ -136,9 +136,9 @@
         // Using exactly PARTS.launcher[0]
         const repairItems = [
             { 
-                item: PARTS.launcher[0], 
+                item: createItemViewData(PARTS.launcher[0], { charges: 1 }),
                 price: 10,
-                card: { charges: 1 } // Worn state for repair visualization
+                card: {}
             }
         ];
         repairItems.forEach(cfg => {
@@ -149,9 +149,12 @@
         // Using exactly PARTS.chassis[0]
         const dismantleItems = [
             { 
-                item: PARTS.chassis[0], 
+                item: createItemViewData(PARTS.chassis[0], {
+                    slots: PARTS.chassis[0].slots + 1,
+                    enhancement: { slots: 1 }
+                }),
                 price: 50,
-                card: { isEnhanced: true } // Visual demonstration of enhanced parts
+                card: {}
             }
         ];
         dismantleItems.forEach(cfg => {

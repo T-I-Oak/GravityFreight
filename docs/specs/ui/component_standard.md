@@ -172,15 +172,15 @@
 各コンポーネントは `UIComponents.js` を通じて動的に生成することを推奨する。
 
 ### 4.1 Item Card 生成
-- **メソッド**: `UIComponents.generateItemCardHTML(item, options)`
+- **メソッド**: `UIComponents.generateCardHTML(itemViewData, options)`
 - **主要引数**:
-    - `item` (Object): アイテム属性データ。詳細は「5. データ構造定義」を参照。
+    - `itemViewData` (ItemViewData): `Item.getViewData()` / `RocketItem.getViewData()` などから取得した表示用データ。詳細は「5. データ構造定義」を参照。
     - `options` (Object): 
         - `isClickable` (bool): ユーザー操作（ホバーエフェクト等）を許可。
         - `isActive` (bool): 選択状態（強調）として描画。
         - `isCompact` (bool): コンパクトバリエーションを適用（情報の省略）。
         - `isMini` (bool): ミニバリエーションを適用（サイズの縮小）。
-        - `status` (string): 'delivered' (配達済) や 'unmatched' (不適合) などの状態バッジを表示。
+        - `status` (string): `delivered` (配達済) や `unmatched` (不適合) など、この表示箇所に限った状態バッジを表示。`ItemViewData` 本体には含めない。
 
 ### 4.2 Story Card 生成
 - **メソッド**: `UIComponents.generateStoryCardHTML(storyId, gameDataRepository, isNew)`
@@ -214,7 +214,7 @@
 
 ## 5. データ構造定義 (ItemViewData)
 
-`UIComponents.generateItemCardHTML(data, options)` の `data` 引数に渡すべき、表示用のプレーンなオブジェクト構造。
+`UIComponents.generateCardHTML(itemViewData, options)` の `itemViewData` 引数に渡すべき、表示用のプレーンなオブジェクト構造。
 
 ### 5.1 基本プロパティ (Identity & Visuals)
 - **`uid` (string)**: **操作用 ID**。UI がこのアイテムを特定（選択・抽出・分解等）してシステムへ伝えるために使用する。
@@ -228,7 +228,7 @@
 - **`count` (number, optional)**: スタック数。2以上の場合に表示される。
 
 ### 5.3 性能パラメータ (Stats)
-- **`stats` (Object, optional)**: `Item` インスタンスの各プロパティをキーとし、表示用データを値とするオブジェクト。
+- **`stats` (Object, required)**: `Item` インスタンスの各プロパティをキーとし、表示用データを値とするオブジェクト。Item Card の正式入力では必須とし、旧来のフラットな性能プロパティは受け付けない。
 - **各項目の構造**: `{ value: number, enhanceCount: number }`
     - **`value` (number)**: 生の数値。書式設定は UI 側が行う。
     - **`enhanceCount` (number)**: 当該プロパティに対する累計強化実行回数。UI 側で強化状態の判定（0超の場合）や段階表示に使用する。
@@ -251,7 +251,7 @@
 
 ### 5.4 複合構造 (Composition)
 - **`modules` (Array<ItemViewData>, optional)**: **ロケット専用**。内包されているパーツのデータのリスト。
-    - 各要素は `generateItemCardHTML` を通じて再帰的に描画される。
+    - 各要素は `generateCardHTML` を通じて再帰的に描画される。
 
 ### 5.5 標準プロパティラベル (Standard Labels)
 UI上で表示する各種パラメータのラベルは、以下の表記に統一する。

@@ -104,7 +104,7 @@
 
     <script type="module">
         import { UIComponents } from '../systems/ui/UIComponents.js';
-        import { PARTS } from './mock_data.js';
+        import { PARTS, createItemViewData, createRocketItemViewData } from './mock_data.js';
 
         // --- 1. Flatten PARTS from Data.js into a single list ---
         const CATALOG = Object.values(PARTS).flat();
@@ -135,7 +135,7 @@
 
             CATALOG.forEach(item => {
                 // Using the unified production logic with real Data.js objects
-                const html = UIComponents.generateCardHTML(item, { isClickable: true });
+                const html = UIComponents.generateCardHTML(createItemViewData(item), { isClickable: true });
                 
                 const matteDiv = document.createElement('div');
                 matteDiv.innerHTML = html;
@@ -148,12 +148,17 @@
 
             // --- 3. Stack Count Testing (Manual Injection) ---
             const stackTestItem = { 
-                ...CATALOG[0], 
-                count: 2, 
-                name: CATALOG[0].name + " (Stack & Enhanced Test)",
-                maxCharges: 3,
-                charges: 2,
-                enhancement: { slots: 1, charges: 1 }
+                ...createItemViewData(
+                    CATALOG[0],
+                    {
+                        name: CATALOG[0].name + " (Stack & Enhanced Test)",
+                        slots: (CATALOG[0].slots || 0) + 1,
+                        maxCharges: 3,
+                        charges: 2,
+                        enhancement: { slots: 1, charges: 1 }
+                    },
+                    { count: 2 }
+                )
             };
             const stackHtml = UIComponents.generateCardHTML(stackTestItem, { isClickable: true });
             
@@ -165,16 +170,16 @@
 
             // --- 4. Rocket (Nested Modules) Testing ---
             const rocketItem = {
-                id: 'custom-rocket',
-                name: '軽量シャーシ + 広域回収ロジック',
-                category: 'rocket',
-                slots: 4,
-                precisionMultiplier: 1.2,
-                modules: [
-                    { ...PARTS.module[0] },
-                    { ...PARTS.module[1], charges: 1 },
-                    { ...PARTS.module[6], count: 2 }
-                ]
+                ...createRocketItemViewData({
+                    chassis: PARTS.chassis[0],
+                    logic: PARTS.logic[0],
+                    modules: [
+                        { source: PARTS.module[0] },
+                        { source: PARTS.module[1], state: { charges: 1 } },
+                        { source: PARTS.module[6] },
+                        { source: PARTS.module[6] }
+                    ]
+                })
             };
             const rocketHtml = UIComponents.generateCardHTML(rocketItem, { isClickable: true });
             
@@ -200,7 +205,7 @@
                 col.appendChild(header);
 
                 stateSamples.forEach(state => {
-                    const item = { ...baseLogic, name: state.name };
+                    const item = createItemViewData(baseLogic, { name: state.name });
                     const html = UIComponents.generateCardHTML(item, { 
                         isClickable: state.isClickable,
                         isActive: state.isActive
@@ -220,7 +225,7 @@
                 col.appendChild(header);
 
                 // Use the new isCompact option
-                const sampleItem = { ...PARTS.module[1], charges: 1 };
+                const sampleItem = createItemViewData(PARTS.module[1], { charges: 1 });
                 const html = UIComponents.generateCardHTML(sampleItem, { isCompact: true });
                 
                 const div = document.createElement('div');
@@ -236,7 +241,7 @@
                 col.appendChild(header);
 
                 // 7a. Normal-Mini: Use the new isMini option
-                const sampleMini = PARTS.module[2];
+                const sampleMini = createItemViewData(PARTS.module[2]);
                 const htmlMini = UIComponents.generateCardHTML(sampleMini, { isMini: true });
                 const divMini = document.createElement('div');
                 divMini.innerHTML = htmlMini;
@@ -245,7 +250,7 @@
                 col.appendChild(elMini);
 
                 // 7b. Compact-Mini: Use both options (Target for Rocket details)
-                const sampleCompMini = { ...PARTS.module[3], charges: 1 };
+                const sampleCompMini = createItemViewData(PARTS.module[3], { charges: 1 });
                 const htmlCompMini = UIComponents.generateCardHTML(sampleCompMini, { 
                     isCompact: true, 
                     isMini: true 

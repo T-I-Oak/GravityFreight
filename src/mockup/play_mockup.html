@@ -138,43 +138,44 @@
 
     <script type="module">
         import { UIComponents } from '../systems/ui/UIComponents.js';
-        import { PARTS, ITEM_REGISTRY } from './mock_data.js';
+        import { PARTS, ITEM_REGISTRY, createItemViewData, createRocketItemViewData } from './mock_data.js';
 
         // --- 1. Rendering Mock Data ---
         const MOCK_DATA = {
             flight: {
                 rocket: [
                     {
-                        name: '軽量シャーシ + 広域回収ロジック',
-                        category: 'rocket',
-                        slots: 4,
-                        precisionMultiplier: 1.2,
-                        modules: [
-                            { name: 'スロット拡張基盤' },
-                            { name: 'スター・ブレイカー', maxCharges: 2, charges: 1 },
-                            { name: 'ロスト保険', count: 2 }
-                        ]
+                        ...createRocketItemViewData({
+                            chassis: ITEM_REGISTRY['hull_light'],
+                            logic: ITEM_REGISTRY['sensor_short'],
+                            modules: [
+                                { source: ITEM_REGISTRY['mod_capacity'] },
+                                { source: ITEM_REGISTRY['mod_star_breaker'], state: { charges: 1 } },
+                                { source: ITEM_REGISTRY['mod_insurance'] },
+                                { source: ITEM_REGISTRY['mod_insurance'] }
+                            ]
+                        })
                     }
                 ],
                 launcher: [
-                    { ...ITEM_REGISTRY['pad_standard_d2'], isActive: true, charges: 3, maxCharges: 5 },
-                    { ...ITEM_REGISTRY['pad_precision_d2'], isActive: false, charges: 2 }
+                    createItemViewData(ITEM_REGISTRY['pad_standard_d2'], { charges: 3, maxCharges: 5 }, { isActive: true }),
+                    createItemViewData(ITEM_REGISTRY['pad_precision_d2'], { charges: 2 }, { isActive: false })
                 ],
                 booster: [
-                    { ...ITEM_REGISTRY['opt_fuel'], count: 5 },
-                    { ...ITEM_REGISTRY['boost_power'], count: 1 }
+                    createItemViewData(ITEM_REGISTRY['opt_fuel'], {}, { count: 5 }),
+                    createItemViewData(ITEM_REGISTRY['boost_power'], {}, { count: 1 })
                 ]
             },
             assembly: {
                 chassis: [
-                    { ...ITEM_REGISTRY['hull_light'], isActive: true }
+                    createItemViewData(ITEM_REGISTRY['hull_light'], {}, { isActive: true })
                 ],
                 logic: [
-                    { ...ITEM_REGISTRY['sensor_short'], isActive: true }
+                    createItemViewData(ITEM_REGISTRY['sensor_short'], {}, { isActive: true })
                 ],
                 module: [
-                    { ...ITEM_REGISTRY['mod_capacity'] },
-                    { ...ITEM_REGISTRY['mod_star_breaker'], maxCharges: 2, charges: 2 }
+                    createItemViewData(ITEM_REGISTRY['mod_capacity']),
+                    createItemViewData(ITEM_REGISTRY['mod_star_breaker'], { maxCharges: 2, charges: 2 })
                 ]
             }
         };

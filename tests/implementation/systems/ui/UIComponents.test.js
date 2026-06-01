@@ -114,10 +114,12 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         name: 'ハイパードライブ',
         category: 'booster',
         description: '高速移動用エンジン。',
-        slots: 2,
-        precisionMultiplier: 1.5,
-        maxCharges: 2,
-        charges: 1
+        stats: {
+            slots: { value: 2, enhanceCount: 0 },
+            precisionMultiplier: { value: 1.5, enhanceCount: 0 },
+            maxCharges: { value: 2, enhanceCount: 0 },
+            charges: { value: 1, enhanceCount: 0 }
+        }
     };
 
     it('should generate basic structure with correct data attributes', () => {
@@ -150,7 +152,10 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
     it('should apply is-enhanced to properties if enhancement exists', () => {
         const enhancedItem = {
             ...mockItem,
-            enhancement: { slots: 1 }
+            stats: {
+                ...mockItem.stats,
+                slots: { value: 3, enhanceCount: 1 }
+            }
         };
         const html = UIComponents.generateCardHTML(enhancedItem);
         expect(html).toContain('item-card-prop state-enhanced additive');
@@ -159,7 +164,10 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
     it('should apply is-enhanced to gauge if charges are enhanced', () => {
         const enhancedItem = {
             ...mockItem,
-            enhancement: { charges: 1 }
+            stats: {
+                ...mockItem.stats,
+                charges: { value: 1, enhanceCount: 1 }
+            }
         };
         const html = UIComponents.generateCardHTML(enhancedItem);
         expect(html).toContain('DurabilityGauge state-enhanced');
@@ -169,6 +177,15 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         const html = UIComponents.generateCardHTML(mockItem, { status: 'DELIVERED' });
         expect(html).toContain('item-card-status state-delivered');
         expect(html).toContain('DELIVERED');
+    });
+
+    it('should reject legacy flat item stats', () => {
+        expect(() => UIComponents.generateCardHTML({
+            id: 'legacy_item',
+            name: '旧形式',
+            category: 'module',
+            slots: 2
+        })).toThrow('[UIComponents] item.stats is required.');
     });
 
     it('should render ItemViewData stats for properties and durability', () => {
@@ -196,6 +213,29 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         expect(html).toContain('1.4');
         expect(html).toContain('item-card-prop state-enhanced additive');
         expect(html).toContain('item-card-prop state-enhanced multiplier');
+    });
+
+    it('should hide default or zero stats from the property footer', () => {
+        const viewData = {
+            id: 'default_item',
+            uid: 'default_001',
+            name: '既定値アイテム',
+            category: 'module',
+            stats: {
+                slots: { value: 0, enhanceCount: 0 },
+                precisionMultiplier: { value: 1, enhanceCount: 0 },
+                pickupMultiplier: { value: 1, enhanceCount: 0 },
+                gravityMultiplier: { value: 1, enhanceCount: 0 }
+            }
+        };
+
+        const html = UIComponents.generateCardHTML(viewData);
+
+        expect(html).not.toContain('item-card-footer');
+        expect(html).not.toContain('SLOTS');
+        expect(html).not.toContain('PRECISION');
+        expect(html).not.toContain('PICKUP');
+        expect(html).not.toContain('GRAVITY');
     });
 
     it('should render RocketItem view data with nested component cards', () => {
@@ -231,10 +271,12 @@ describe('UIComponents.generateCardHTML (Variations)', () => {
         id: 'test_item',
         name: 'テストアイテム',
         category: 'module',
-        maxCharges: 3,
-        charges: 2,
         count: 5,
-        description: 'テスト用の説明文です。'
+        description: 'テスト用の説明文です。',
+        stats: {
+            maxCharges: { value: 3, enhanceCount: 0 },
+            charges: { value: 2, enhanceCount: 0 }
+        }
     };
 
     it('should apply state-compact class and hide description/footer', () => {
@@ -265,8 +307,22 @@ describe('UIComponents.generateCardHTML (Variations)', () => {
 
 describe('UIComponents.generateRocketDetailsHTML', () => {
     const mockModules = [
-        { name: 'モジュールA', maxCharges: 2, charges: 1 },
-        { name: 'モジュールB', count: 3 }
+        {
+            id: 'module_a',
+            name: 'モジュールA',
+            category: 'module',
+            stats: {
+                maxCharges: { value: 2, enhanceCount: 0 },
+                charges: { value: 1, enhanceCount: 0 }
+            }
+        },
+        {
+            id: 'module_b',
+            name: 'モジュールB',
+            category: 'module',
+            count: 3,
+            stats: {}
+        }
     ];
 
     it('should generate nested mini-compact cards for rocket details', () => {

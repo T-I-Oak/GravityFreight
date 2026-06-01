@@ -103,7 +103,7 @@
             - `result.entries` をループし、**「ラベル」「スコア」「コイン」の 3 列構成**を持つ行要素を生成してコンテナへ追加する。
             - 値が存在しない項目（`score` や `coin` が省略されている場合）は、**空欄**として表示する。
         6. **アイテムリスト (Item Report) 構築**: 
-            - `result.itemReport` をループし、`UIComponents.generateItemCardHTML` を用いてカードを生成する。
+            - `result.itemReport` をループし、`UIComponents.generateCardHTML` を用いてカードを生成する。
             - 配送成功時（`match`）は、「DELIVERY BONUS」の見出しを伴う専用コンテナ（`.report-bonus-list`）内に獲得したボーナスアイテムを表示する。
 
 - **`showGameEndSequence(gameResult: GameResultSummary, gameOver: object): void`**
@@ -118,7 +118,7 @@
     - **内部挙動**:
         1. **画面切り替え**: 現在の画面を隠し、対象の施設用コンテナを表示する。
         2. **ヘッダー構築**: `UIComponents.generateFacilityBadgeHTML(type)` 等を用いて名称とアイコンをセットする。
-        3. **リスト構築**: `data.items` (StockItem[]) 等をループし、`UIComponents.generateItemCardHTML` を用いて在庫リストを構築する。
+        3. **リスト構築**: `data.items` (StockItem[]) 等をループし、`UIComponents.generateCardHTML` を用いて在庫リストを構築する。
         4. **割引表示**: `data.luckyDiscount` > 0 の場合、割引率（例: "20% OFF"）を示すバッジやラベルを表示する。
         5. **所持金反映**: `data.coins` を表示エリアにセットする。
 
