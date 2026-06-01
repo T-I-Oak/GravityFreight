@@ -12,6 +12,7 @@ class Item {
             throw new Error('[Item] gameDataRepository is required.');
         }
 
+        this.gameDataRepository = gameDataRepository;
         this.#master = gameDataRepository.getItemDefinition(masterId);
         
         // 識別子生成
@@ -147,13 +148,49 @@ class Item {
      * 永続化（セーブ）のために、再構築に必要な最小限のデータを返す。
      * @returns {Object}
      */
-    getSnapshot() {
+    createSnapshot() {
         return {
             uid: this.uid,
             id: this.id,
             charges: this.charges,
-            maxCharges: this.maxCharges,
-            enhancement: { ...this.enhancement }
+            enhancements: { ...this.enhancement }
+        };
+    }
+
+    getSnapshot() {
+        return this.createSnapshot();
+    }
+
+    getViewData() {
+        const stats = {};
+        [
+            'mass',
+            'charges',
+            'maxCharges',
+            'precision',
+            'pickupRange',
+            'power',
+            'slots',
+            'precisionMultiplier',
+            'pickupMultiplier',
+            'gravityMultiplier',
+            'powerMultiplier',
+            'arcMultiplier'
+        ].forEach(key => {
+            stats[key] = {
+                value: this[key],
+                enhanceCount: this.enhancement[key] || 0
+            };
+        });
+
+        return {
+            uid: this.uid,
+            id: this.id,
+            name: this.name,
+            category: this.category,
+            rarity: this.rarity,
+            description: this.description,
+            stats
         };
     }
 
@@ -168,18 +205,18 @@ class Item {
         
         // 2. 基本的な状態の上書き
         item.uid = data.uid;
-        item.maxCharges = data.maxCharges;
+        item.enhancement = data.enhancements ? { ...data.enhancements } : { ...(data.enhancement || {}) };
         item.charges = data.charges;
-        item.enhancement = data.enhancement ? { ...data.enhancement } : {};
         
         // 3. 強化回数と性能プロパティの再計算
         let totalCount = 0;
         for (const [key, count] of Object.entries(item.enhancement)) {
             totalCount += count;
             
-            // maxCharges は data.maxCharges で既に復元済みなので再計算不要
             if (key === 'slots') {
                 item.slots += count;
+            } else if (key === 'maxCharges') {
+                item.maxCharges += count;
             } else if (key === 'precisionMultiplier') {
                 item.precisionMultiplier = Math.round((item.precisionMultiplier + 0.2 * count) * 10) / 10;
             } else if (key === 'pickupMultiplier') {

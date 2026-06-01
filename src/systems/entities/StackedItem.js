@@ -14,6 +14,10 @@ class StackedItem {
         this.representative = null;
     }
 
+    get count() {
+        return this.quantity;
+    }
+
     /**
      * アイテムをスタックに追加する
      * @param {Item} item 追加するアイテム
@@ -64,11 +68,15 @@ class StackedItem {
      * スナップショットの取得
      * @returns {Object}
      */
-    getSnapshot() {
+    createSnapshot() {
         return {
             uid: this.uid,
-            itemSnapshots: this.items.map(item => item.getSnapshot())
+            items: this.items.map(item => item.createSnapshot())
         };
+    }
+
+    getSnapshot() {
+        return this.createSnapshot();
     }
 
     /**
@@ -79,8 +87,9 @@ class StackedItem {
     static fromSnapshot(data, gameDataRepository) {
         const stack = new StackedItem();
         
-        if (data.itemSnapshots && data.itemSnapshots.length > 0) {
-            data.itemSnapshots.forEach(snap => {
+        const itemSnapshots = data.items || data.itemSnapshots || [];
+        if (itemSnapshots.length > 0) {
+            itemSnapshots.forEach(snap => {
                 const item = Item.fromSnapshot(snap, gameDataRepository);
                 stack.push(item);
             });
