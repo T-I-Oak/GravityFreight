@@ -6,7 +6,7 @@
 export class UIComponents {
     /**
      * Generates a complete item card HTML string.
-     * @param {Object} item - Item data (V1-style flat structure)
+     * @param {Object} item - ItemViewData
      * @param {Object} options - { isClickable, isEnhanced, isActive, isCompact, isMini, status }
      */
     static generateCardHTML(item, options = {}) {
@@ -96,7 +96,7 @@ export class UIComponents {
         let propItems = '';
         displayProps.forEach(config => {
             const val = item[config.key];
-            if (val !== undefined) {
+            if (this.shouldDisplayProperty(config, val)) {
                 const isEnhanced = item.enhancement && item.enhancement[config.key] > 0;
                 const enhancedClass = isEnhanced ? 'state-enhanced' : '';
 
@@ -111,14 +111,30 @@ export class UIComponents {
         return propItems ? `<footer class="item-card-footer"><div class="item-card-prop-group">${propItems}</div></footer>` : '';
     }
 
+    static shouldDisplayProperty(config, value) {
+        if (value === undefined) {
+            return false;
+        }
+
+        if (config.type === 'additive') {
+            return value !== 0;
+        }
+
+        if (config.type === 'multiplier') {
+            return value !== 1;
+        }
+
+        return true;
+    }
+
     static normalizeItemViewData(item) {
         if (!item.stats) {
-            return item;
+            throw new Error('[UIComponents] item.stats is required.');
         }
 
         const normalized = {
             ...item,
-            enhancement: { ...(item.enhancement || {}) }
+            enhancement: {}
         };
 
         Object.entries(item.stats).forEach(([key, stat]) => {
