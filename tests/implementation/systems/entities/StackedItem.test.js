@@ -129,6 +129,34 @@ describe('StackedItem Class - Property Access via Representative', () => {
     });
 });
 
+describe('StackedItem Class - View Data', () => {
+    it('should return representative view data with stack uid and count', () => {
+        const stack = new StackedItem();
+        const item1 = new Item('hull_light', repository);
+        const item2 = new Item('hull_light', repository);
+
+        stack.push(item1);
+        stack.push(item2);
+
+        const viewData = stack.getViewData();
+        const representativeViewData = item1.getViewData();
+
+        expect(viewData).toMatchObject({
+            ...representativeViewData,
+            uid: stack.uid,
+            count: 2
+        });
+        expect(viewData.uid).not.toBe(item1.uid);
+        expect(viewData.stats.slots.value).toBe(item1.slots);
+    });
+
+    it('should throw when view data is requested from an empty stack', () => {
+        const stack = new StackedItem();
+
+        expect(() => stack.getViewData()).toThrow('[StackedItem] Cannot create view data from an empty stack.');
+    });
+});
+
 describe('StackedItem Class - Snapshots', () => {
     it('should generate a valid snapshot including item snapshots', () => {
         const stack = new StackedItem();
