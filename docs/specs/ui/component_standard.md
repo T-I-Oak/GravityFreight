@@ -183,9 +183,10 @@
         - `status` (string): 'delivered' (配達済) や 'unmatched' (不適合) などの状態バッジを表示。
 
 ### 4.2 Story Card 生成
-- **メソッド**: `UIComponents.generateStoryCardHTML(storyId, isNew)`
+- **メソッド**: `UIComponents.generateStoryCardHTML(storyId, gameDataRepository, isNew)`
 - **主要引数**:
     - `storyId` (string): 物語データを特定する ID。
+    - `gameDataRepository` (GameDataRepository): ストーリー本文と施設定義の取得窓口。
     - `isNew` (bool): 新着通知アニメーションの有無。
 
 ### 4.3 Placeholder Card 生成
@@ -199,9 +200,10 @@
         - `isClickable` (bool): ホバー反応の有効化。
 
 ### 4.4 Story Modal 生成
-- **メソッド**: `UIComponents.generateStoryModalHTML(content)`
+- **メソッド**: `UIComponents.generateStoryModalHTML(storyId, gameDataRepository)`
 - **主要引数**:
-    - `content` (Object): 表示するストーリーの `title`, `discovery`, `body` などを含む表示用データ。
+    - `storyId` (string): 物語データを特定する ID。
+    - `gameDataRepository` (GameDataRepository): ストーリー本文と施設定義の取得窓口。
 
 ### 4.5 Facility Badge 生成
 - **メソッド**: `UIComponents.generateFacilityBadgeHTML(type)`
