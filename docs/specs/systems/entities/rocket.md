@@ -56,7 +56,7 @@
         - `getCollectionRange()` / `getPrecision()` のような派生値。
     - **注意**: リプレイ用の発射時 snapshot では、通常 `ticks` は 0、`actualTrail` と `heldCargo` は空または発射直後の初期状態となる。軌道予測用の `clone()` では、その時点の状態を保持する。
 
-- **`static fromSnapshot(snapshot: object): Rocket`**
+- **`static fromSnapshot(snapshot: object, gameDataRepository: GameDataRepository): Rocket`**
     - スナップショットデータから新しい `Rocket` インスタンスを生成（復元）する。
     - **内部挙動**:
         1. `snapshot.rocketItem` を `RocketItem.fromSnapshot()` で復元する。
@@ -76,7 +76,8 @@
     - 射出角度を更新する。照準フェーズでのリアルタイム予測線更新に使用される。
 - `getInitialVelocity(powerBonus: number = 0): Vector2`
     - 現在セットされている `launcher`, `booster`, `angle` に基づいて初速ベクトルを算出して返す。
-    - **内部計算**: `(launcher.power + (booster?.power ?? 0)) * (1.0 + powerBonus)` を基準速とし、`angle` 方向のベクトルを生成。
+    - **内部計算**: `(rocketItem.getPower() + launcher.power + (booster?.power ?? 0)) * rocketItem.getPowerMultiplier() * launcher.powerMultiplier * (booster?.powerMultiplier ?? 1.0) * (1.0 + powerBonus)` を基準速とし、`angle` 方向のベクトルを生成。
+        - 現時点の item catalog に定義されている booster は `powerMultiplier` による補正を持つ。今後 `power` を持つ booster が追加された場合も、この式に従って加算値と倍率を集計する。
     - **呼び出し**: 航行開始直前に `GameController` が実行し自身の `velocity` にセットするほか、`PhysicsEngine` が予測線の初速として参照する。
 - `getCollectionRange(): number`
     - 現在の回収可能範囲（半径）を計算して返す。
