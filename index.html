@@ -42,7 +42,13 @@
 
 <body>
     <!-- タイトル画面 -->
-    <div id="title-screen">
+    <div id="title-screen" data-title-bg="/GravityFreight/assets/tutorial/slide1.png">
+        <script>
+            const titleScreen = document.getElementById('title-screen');
+            if (titleScreen?.dataset.titleBg) {
+                titleScreen.style.setProperty('--title-bg-image', `url('${titleScreen.dataset.titleBg}')`);
+            }
+        </script>
         <canvas id="title-bg-canvas"></canvas>
         <div class="title-container ui-title-box">
             <h1 class="text-display">GRAVITY FREIGHT</h1>
