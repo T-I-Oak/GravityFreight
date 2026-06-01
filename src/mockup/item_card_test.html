@@ -43,12 +43,12 @@
             background: rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
         }
-        .ui-panel {
+        .Panel {
             height: 100%;
             display: flex;
             flex-direction: column;
         }
-        .ui-panel__body {
+        .panel-body {
             padding: 20px;
             overflow-y: auto;
             flex: 1;
@@ -79,23 +79,23 @@
 </head>
 <body>
     <main class="comparison-grid">
-        <section class="theme-column ui-style--matte">
-            <article class="ui-panel">
-                <header class="ui-panel__header">
+        <section class="theme-column theme-matte">
+            <article class="Panel">
+                <header class="panel-header">
                     <h1 class="theme-label">Matte Style</h1>
                 </header>
-                <div class="ui-panel__body" id="matte-column">
+                <div class="panel-body" id="matte-column">
                     <!-- Cards are appended here -->
                 </div>
             </article>
         </section>
 
-        <section class="theme-column ui-style--neon">
-            <article class="ui-panel">
-                <header class="ui-panel__header">
+        <section class="theme-column theme-neon">
+            <article class="Panel">
+                <header class="panel-header">
                     <h1 class="theme-label">Neon Style</h1>
                 </header>
-                <div class="ui-panel__body" id="neon-column">
+                <div class="panel-body" id="neon-column">
                     <!-- Cards are appended here -->
                 </div>
             </article>
@@ -216,7 +216,7 @@
             [matteCol, neonCol].forEach(col => {
                 const header = document.createElement('h2');
                 header.className = 'section-divider';
-                header.textContent = 'Compact Mode (.is-compact)';
+                header.textContent = 'Compact Mode (.state-compact)';
                 col.appendChild(header);
 
                 // Use the new isCompact option
@@ -232,7 +232,7 @@
             [matteCol, neonCol].forEach(col => {
                 const header = document.createElement('h2');
                 header.className = 'section-divider';
-                header.textContent = 'Mini Mode (.is-mini)';
+                header.textContent = 'Mini Mode (.state-mini)';
                 col.appendChild(header);
 
                 // 7a. Normal-Mini: Use the new isMini option

@@ -25,53 +25,53 @@
 </head>
 
 <body id="facility-screen">
-    <main class="ui-style--matte ui-flex-center">
-        <section class="ui-panel is-trading-post">
-            <header class="ui-panel__header">
-                <div class="ui-facility-badge">T</div>
+    <main class="theme-matte FlexCenter">
+        <section class="Panel trading-post">
+            <header class="panel-header">
+                <div class="FacilityBadge">T</div>
                 <div class="facility-title-group">
-                    <h1 class="ui-panel__title">TRADING POST</h1>
-                    <span class="ui-panel__subtitle">貨物取引やパーツの売買ができる中継基地。</span>
+                    <h1 class="panel-title">TRADING POST</h1>
+                    <span class="panel-subtitle">貨物取引やパーツの売買ができる中継基地。</span>
                 </div>
             </header>
 
-            <div class="ui-panel__body">
-                <div class="ui-well">
-                    <div class="ui-columns">
+            <div class="panel-body">
+                <div class="Well">
+                    <div class="ColumnSet">
                         <!-- Left Column: Buy Items -->
-                        <section class="ui-column is-scrollable">
-                            <header class="ui-section-header">
-                                <h3 class="ui-section-title">販売中のアイテム</h3>
-                                <span class="ui-section-subtitle">ステーションで販売されている高度なパーツです。</span>
+                        <section class="Column ScrollArea">
+                            <header class="section-header">
+                                <h3 class="section-title">販売中のアイテム</h3>
+                                <span class="section-subtitle">ステーションで販売されている高度なパーツです。</span>
                             </header>
 
-                            <div class="ui-item-list" id="buy-list">
+                            <div class="item-list" id="buy-list">
                                 <!-- Items will be injected here via script -->
-                            </div> <!-- /.ui-item-list -->
+                            </div> <!-- /.item-list -->
                         </section>
 
                         <!-- Right Column: Sell Items -->
-                        <section class="ui-column is-scrollable">
-                            <header class="ui-section-header">
-                                <h3 class="ui-section-title">パーツの売却</h3>
-                                <span class="ui-section-subtitle">不要なパーツを売却して資金を獲得できます。</span>
+                        <section class="Column ScrollArea">
+                            <header class="section-header">
+                                <h3 class="section-title">パーツの売却</h3>
+                                <span class="section-subtitle">不要なパーツを売却して資金を獲得できます。</span>
                             </header>
 
-                            <div class="ui-item-list" id="sell-list">
+                            <div class="item-list" id="sell-list">
                                 <!-- Items will be injected here via script -->
                             </div>
                         </section>
-                    </div> <!-- /.ui-columns -->
-                </div> <!-- /.ui-well -->
-            </div> <!-- /.ui-panel__body -->
+                    </div> <!-- /.ColumnSet -->
+                </div> <!-- /.Well -->
+            </div> <!-- /.panel-body -->
 
             <!-- Global Actions Section -->
-            <footer class="ui-panel__footer">
+            <footer class="panel-footer">
                 <div class="player-credits">
                     <span class="credits-label">CREDITS:</span>
-                    <span class="credits-value num-coin" id="player-credits-value">420 c</span>
+                    <span class="credits-value coin" id="player-credits-value">420 c</span>
                 </div>
-                <button class="ui-button is-primary is-big is-trading-post" id="depart-station">
+                <button class="Button state-primary button-large trading-post" id="depart-station">
                     <span class="btn-main-label">TO NEXT SECTOR</span>
                 </button>
             </footer>
@@ -85,7 +85,7 @@
         // Helper to create a trade entry row
         function createTradeEntry(item, actionType, options = {}) {
             const entry = document.createElement('div');
-            entry.className = 'trade-entry ui-split-row';
+            entry.className = 'trade-entry SplitRow';
 
             const itemArea = document.createElement('div');
             itemArea.className = 'trade-item-area';
@@ -95,26 +95,26 @@
             itemArea.innerHTML = UIComponents.generateCardHTML(item, cardOptions);
 
             const actionArea = document.createElement('div');
-            actionArea.className = 'trade-action-area ui-split-column';
+            actionArea.className = 'trade-action-area SplitColumn';
             
             const group = document.createElement('div');
             group.className = 'trade-action-group';
             
             const price = document.createElement('div');
-            price.className = 'trade-price num-coin';
+            price.className = 'trade-price coin';
             price.textContent = `${options.price} c`;
             group.appendChild(price);
 
             if (options.discount) {
                 const badge = document.createElement('div');
-                badge.className = `ui-badge is-discount ${options.discount.level}`;
+                badge.className = `Badge discount ${options.discount.level}`;
                 badge.innerHTML = `<span class="sticker-num">${options.discount.val}</span><span class="sticker-pct">% OFF</span>`;
                 group.appendChild(badge);
             }
 
             const button = document.createElement('button');
-            button.className = `ui-button is-primary${actionType === 'sell' ? ' is-sub-theme' : ''}`;
-            if (options.disabled) button.classList.add('is-disabled');
+            button.className = `Button state-primary${actionType === 'sell' ? ' color-theme-sub' : ''}`;
+            if (options.disabled) button.classList.add('state-disabled');
             button.textContent = actionType.toUpperCase();
 
             actionArea.appendChild(group);
@@ -131,11 +131,11 @@
         // LEFT COLUMN: BUY (Logic[2], Module[0]x2, Launcher[0], Chassis[1], Chassis[3])
         const buyItems = [
             { item: PARTS.logic[2], price: 40 },
-            { item: PARTS.module[0], price: 40, discount: { level: 'is-high', val: 50 } },
+            { item: PARTS.module[0], price: 40, discount: { level: 'high', val: 50 } },
             { item: PARTS.module[0], price: 80, disabled: true },
-            { item: PARTS.launcher[0], price: 28, discount: { level: 'is-mid', val: 30 } },
+            { item: PARTS.launcher[0], price: 28, discount: { level: 'mid', val: 30 } },
             { item: PARTS.chassis[1], price: 40 },
-            { item: PARTS.chassis[3], price: 109, discount: { level: 'is-low', val: 10 }, disabled: true }
+            { item: PARTS.chassis[3], price: 109, discount: { level: 'low', val: 10 }, disabled: true }
         ];
 
         buyItems.forEach(cfg => {

@@ -4,7 +4,7 @@
    Managing Paper & Ink textures and Receipt animations
    ========================================= */
 
-.ui-style--printing {
+.theme-printing {
     /* Print Color Palette (V1 Based) */
     --print-paper: #dcdcdc;
     --print-ink: #1a1a1a;
@@ -15,7 +15,7 @@
 }
 
 /* --- Container: Overlay/Main in Print Style --- */
-main.ui-style--printing {
+main.theme-printing {
     background: rgba(0, 0, 0, 0.85);
     display: flex;
     flex-direction: column;
@@ -26,7 +26,7 @@ main.ui-style--printing {
 }
 
 /* 衝撃揺れのアニメーション (Old game_result.css:11) */
-main.ui-style--printing.impact {
+main.theme-printing.impact {
     animation: paperImpactShake 0.4s ease-out;
 }
 
@@ -39,7 +39,7 @@ main.ui-style--printing.impact {
 }
 
 /* --- Component: Panel (The Paper) --- */
-.ui-style--printing .ui-panel.is-receipt {
+.theme-printing .Panel.receipt {
     background: var(--print-paper);
     color: var(--print-ink);
     padding: 50px 40px;
@@ -68,7 +68,7 @@ main.ui-style--printing.impact {
     border: none;
 }
 
-.ui-style--printing.active .ui-panel.is-receipt {
+.theme-printing.state-active .Panel.receipt {
     /* 排出アニメーションは紙単体で実行 */
     animation: receiptPrintFeed 1.6s cubic-bezier(0.2, 0.5, 0.1, 1.0) forwards;
 }
@@ -87,56 +87,56 @@ main.ui-style--printing.impact {
 }
 
 /* --- Component: Typography --- */
-.ui-style--printing .text-display,
-.ui-style--printing .text-sub-display {
+.theme-printing .text-display,
+.theme-printing .text-sub-display {
     color: var(--print-ink);
     filter: none;
     text-shadow: none;
 }
 
-.ui-style--printing .ui-panel__header {
+.theme-printing .panel-header {
     text-align: center;
     margin-bottom: 30px;
 }
 
-.ui-style--printing .ui-stat-label {
+.theme-printing .stat-label {
     font-size: inherit;
     font-weight: inherit;
     letter-spacing: inherit;
 }
 
 /* --- Component: Divider (Ink Line) --- */
-.ui-style--printing .ui-divider {
+.theme-printing .divider {
     border-top: 1px solid rgba(0, 0, 0, 0.3);
     margin: var(--space-unit) 0;
     width: 100%;
 }
 
-.ui-style--printing .ui-divider.is-dotted {
+.theme-printing .divider.dotted {
     border-top-style: dashed;
 }
 
-.ui-style--printing .ui-divider.is-solid {
+.theme-printing .divider.solid {
     border-top-style: solid;
     border-top-width: 2px;
     border-top-color: #000;
 }
 
 /* --- Component: Rows & Sections --- */
-.ui-style--printing .ui-split-row {
+.theme-printing .SplitRow {
     color: var(--print-ink);
     font-size: 16px;
     font-weight: 600;
     margin: 10px 0 2px 0;
 }
 
-.ui-style--printing .ui-section.is-hero .ui-split-row {
+.theme-printing .section.hero .SplitRow {
     font-size: 24px;
     font-weight: 600;
     margin-top: 15px;
 }
 
-.ui-style--printing .ui-section-subtitle {
+.theme-printing .section-subtitle {
     text-align: right;
     font-size: 14px;
     opacity: 0.9;
@@ -147,28 +147,28 @@ main.ui-style--printing.impact {
 }
 
 /* Ranking & Grade specific size tuning */
-.ui-style--printing .rank-value,
-.ui-style--printing .ui-badge {
+.theme-printing .rank-value,
+.theme-printing .Badge {
     font-size: 1.3em;
     font-weight: 600;
 }
 
-.ui-style--printing .rank-value {
-    font-family: inherit; /* num-score (Mono) を使わず印字フォントを継承 */
+.theme-printing .rank-value {
+    font-family: inherit; /* score (Mono) を使わず印字フォントを継承 */
 }
 
 /* --- Component: Badge (Grade) --- */
-.ui-style--printing .ui-badge {
+.theme-printing .Badge {
     background: transparent;
     padding: 0;
     border: none;
     color: inherit;
 }
 
-.ui-style--printing .num-score,
-.ui-style--printing .num-sector,
-.ui-style--printing .num-coin,
-.ui-style--printing .num-item-count {
+.theme-printing .score,
+.theme-printing .sector,
+.theme-printing .coin,
+.theme-printing .item-count {
     color: var(--print-ink);
     text-shadow: none;
     font-size: inherit; /* Row のサイズを継承 */
@@ -176,12 +176,12 @@ main.ui-style--printing.impact {
     font-family: inherit; /* V2 デフォルトの Courier Prime を上書きし、レシートのフォントを継承 */
 }
 
-.ui-style--printing .is-top-rank {
+.theme-printing .state-top-rank {
     color: var(--print-ink-red);
 }
 
 /* --- Component: Button (The Stamp/Ink Block) --- */
-.ui-style--printing .ui-button {
+.theme-printing .Button {
     background: var(--print-ink);
     color: var(--print-paper);
     border: none;
@@ -197,17 +197,17 @@ main.ui-style--printing.impact {
     letter-spacing: 2px;
 }
 
-.ui-style--printing .ui-button:hover:not(:disabled) {
+.theme-printing .Button:hover:not(:disabled) {
     background: #000;
     transform: scale(1.02);
 }
 
-.ui-style--printing .ui-button:active:not(:disabled) {
+.theme-printing .Button:active:not(:disabled) {
     transform: scale(0.98);
 }
 
 /* --- Stamp Zone & Official Seal --- */
-.ui-style--printing .receipt-stamp-zone {
+.theme-printing .receipt-stamp-zone {
     height: 146px;
     margin: 35px 0 15px 0;
     display: flex;
@@ -217,7 +217,7 @@ main.ui-style--printing.impact {
     contain: size layout; 
 }
 
-.ui-style--printing .receipt-official-seal {
+.theme-printing .receipt-official-seal {
     position: absolute;
     display: flex;
     flex-direction: row;
@@ -236,11 +236,11 @@ main.ui-style--printing.impact {
     --stamp-y: 0px;
 }
 
-.ui-style--printing .receipt-official-seal.huge { border-width: 8px; }
-.ui-style--printing .receipt-official-seal.normal { border-width: 6px; }
-.ui-style--printing .receipt-official-seal.mini { border-width: 5px; }
+.theme-printing .receipt-official-seal.huge { border-width: 8px; }
+.theme-printing .receipt-official-seal.normal { border-width: 6px; }
+.theme-printing .receipt-official-seal.mini { border-width: 5px; }
 
-.ui-style--printing .receipt-official-seal.active {
+.theme-printing .receipt-official-seal.state-active {
     animation: receiptStampImpact 0.4s cubic-bezier(0.1, 0.9, 0.2, 1.2) forwards;
 }
 
@@ -249,7 +249,7 @@ main.ui-style--printing.impact {
     100% { transform: rotate(var(--stamp-rot)) scale(1) translate(var(--stamp-x), var(--stamp-y)); opacity: 0.85; }
 }
 
-.ui-style--printing .receipt-stamp-left-half {
+.theme-printing .receipt-stamp-left-half {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -258,40 +258,42 @@ main.ui-style--printing.impact {
     width: auto;
 }
 
-.ui-style--printing .receipt-official-seal.huge .receipt-stamp-left-half { padding: 0 15px; border-right-width: 6px; gap: 6px; height: 140px; }
-.ui-style--printing .receipt-official-seal.normal .receipt-stamp-left-half { padding: 0 11.5px; border-right-width: 4.6px; gap: 4.6px; height: 108px; }
-.ui-style--printing .receipt-official-seal.mini .receipt-stamp-left-half { padding: 0 10.5px; border-right-width: 4.2px; gap: 4.2px; height: 98px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-left-half { padding: 0 15px; border-right-width: 6px; gap: 6px; height: 140px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-left-half { padding: 0 11.5px; border-right-width: 4.6px; gap: 4.6px; height: 108px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-left-half { padding: 0 10.5px; border-right-width: 4.2px; gap: 4.2px; height: 98px; }
 
-.ui-style--printing .receipt-stamp-text-line { font-weight: 950; white-space: nowrap; text-transform: uppercase; }
-.ui-style--printing .receipt-official-seal.huge .receipt-stamp-text-line.small { font-size: 11px; letter-spacing: 2.8px; }
-.ui-style--printing .receipt-official-seal.normal .receipt-stamp-text-line.small { font-size: 8.5px; letter-spacing: 2.1px; }
-.ui-style--printing .receipt-official-seal.mini .receipt-stamp-text-line.small { font-size: 7.7px; letter-spacing: 1.9px; }
+.theme-printing .receipt-stamp-text-line { font-weight: 950; white-space: nowrap; text-transform: uppercase; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.small { font-size: 11px; letter-spacing: 2.8px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.small { font-size: 8.5px; letter-spacing: 2.1px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.small { font-size: 7.7px; letter-spacing: 1.9px; }
 
-.ui-style--printing .receipt-official-seal.huge .receipt-stamp-text-line.medium { font-size: 16px; letter-spacing: 0.1px; }
-.ui-style--printing .receipt-official-seal.normal .receipt-stamp-text-line.medium { font-size: 12.4px; letter-spacing: 0.08px; }
-.ui-style--printing .receipt-official-seal.mini .receipt-stamp-text-line.medium { font-size: 11.2px; letter-spacing: 0.07px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.medium { font-size: 16px; letter-spacing: 0.1px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.medium { font-size: 12.4px; letter-spacing: 0.08px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.medium { font-size: 11.2px; letter-spacing: 0.07px; }
 
-.ui-style--printing .receipt-official-seal.huge .receipt-stamp-text-line.large { font-size: 32px; letter-spacing: 8px; }
-.ui-style--printing .receipt-official-seal.normal .receipt-stamp-text-line.large { font-size: 25px; letter-spacing: 6.2px; }
-.ui-style--printing .receipt-official-seal.mini .receipt-stamp-text-line.large { font-size: 22.4px; letter-spacing: 5.6px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.large { font-size: 32px; letter-spacing: 8px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.large { font-size: 25px; letter-spacing: 6.2px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.large { font-size: 22.4px; letter-spacing: 5.6px; }
 
-.ui-style--printing .receipt-stamp-right-half { font-weight: 950; line-height: 1; text-align: center; display: flex; align-items: center; justify-content: center; width: auto; }
-.ui-style--printing .receipt-official-seal.huge .receipt-stamp-right-half { font-size: 100px; padding: 0 20px; }
-.ui-style--printing .receipt-official-seal.normal .receipt-stamp-right-half { font-size: 78px; padding: 0 15.6px; }
-.ui-style--printing .receipt-official-seal.mini .receipt-stamp-right-half { font-size: 70px; padding: 0 14px; }
+.theme-printing .receipt-stamp-right-half { font-weight: 950; line-height: 1; text-align: center; display: flex; align-items: center; justify-content: center; width: auto; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-right-half { font-size: 100px; padding: 0 20px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-right-half { font-size: 78px; padding: 0 15.6px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-right-half { font-size: 70px; padding: 0 14px; }
 
-.ui-style--printing .is-tier-1 { color: #b8860b; }
-.ui-style--printing .is-tier-2 { color: #a52a2a; }
-.ui-style--printing .is-tier-3 { color: #2f4f4f; }
-.ui-style--printing .is-tier-4 { color: #556b2f; }
-.ui-style--printing .is-tier-5 { color: #696969; }
-.ui-style--printing .is-tier-6 { color: #2c4a6d; }
-.ui-style--printing .is-tier-7 { color: #1a3b5a; }
+.theme-printing .tier-1 { color: #b8860b; }
+.theme-printing .tier-2 { color: #a52a2a; }
+.theme-printing .tier-3 { color: #2f4f4f; }
+.theme-printing .tier-4 { color: #556b2f; }
+.theme-printing .tier-5 { color: #696969; }
+.theme-printing .tier-6 { color: #2c4a6d; }
+.theme-printing .tier-7 { color: #1a3b5a; }
 
 /* Barcode */
-.ui-style--printing .barcode-container {
+.theme-printing .barcode-container {
     margin: 10px 0 5px;
     height: 55px;
+    min-height: 55px;
+    flex-shrink: 0;
     width: 100%;
     background: 
         linear-gradient(90deg, #000 1px, transparent 1px) 0 0 / 4px 100%,
@@ -304,22 +306,22 @@ main.ui-style--printing.impact {
 }
 
 /* Footer Metadata */
-.ui-style--printing .ui-panel__footer {
+.theme-printing .panel-footer {
     text-align: center;
     font-size: 10px;
     margin-top: 5px; 
     line-height: 1.6;
 }
 
-.ui-style--printing .auth-status,
-.ui-style--printing .timestamp {
+.theme-printing .auth-status,
+.theme-printing .timestamp {
     opacity: 0.8;
 }
 
 /* --- Scrollbar Tuning for Print --- */
-.ui-style--printing *::-webkit-scrollbar-track {
+.theme-printing *::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.05);
 }
-.ui-style--printing *::-webkit-scrollbar-thumb {
+.theme-printing *::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.15);
 }

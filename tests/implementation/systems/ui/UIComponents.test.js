@@ -4,24 +4,24 @@ import { UIComponents } from '../../../../src/systems/ui/UIComponents.js';
 describe('UIComponents.generatePlaceholderHTML', () => {
     it('should generate basic placeholder HTML with text and subtext', () => {
         const html = UIComponents.generatePlaceholderHTML('Main Text', 'Sub Text');
-        expect(html).toContain('ui-item-card is-placeholder');
+        expect(html).toContain('ItemCard placeholder-card');
         expect(html).toContain('<div class="placeholder-text">Main Text</div>');
         expect(html).toContain('<div class="placeholder-subtext">Sub Text</div>');
     });
 
     it('should apply notable class when isNotable is true', () => {
         const html = UIComponents.generatePlaceholderHTML('T', 'S', { isNotable: true });
-        expect(html).toContain('is-notable');
+        expect(html).toContain('state-notable');
     });
 
     it('should apply clickable class when isClickable is true', () => {
         const html = UIComponents.generatePlaceholderHTML('T', 'S', { isClickable: true });
-        expect(html).toContain('is-clickable');
+        expect(html).toContain('state-clickable');
     });
 
     it('should apply category class when category is provided', () => {
         const html = UIComponents.generatePlaceholderHTML('T', 'S', { category: 'theme' });
-        expect(html).toContain('is-theme');
+        expect(html).toContain('theme');
     });
 
     it('should combine multiple options correctly', () => {
@@ -30,10 +30,10 @@ describe('UIComponents.generatePlaceholderHTML', () => {
             isClickable: true, 
             category: 'home' 
         });
-        expect(html).toContain('is-placeholder');
-        expect(html).toContain('is-notable');
-        expect(html).toContain('is-clickable');
-        expect(html).toContain('is-home');
+        expect(html).toContain('placeholder-card');
+        expect(html).toContain('state-notable');
+        expect(html).toContain('state-clickable');
+        expect(html).toContain('home');
     });
 });
 
@@ -49,8 +49,8 @@ describe('UIComponents.generateAchievementCardHTML', () => {
 
     it('should generate locked card when no tiers are achieved', () => {
         const html = UIComponents.generateAchievementCardHTML(mockAchievement, 1);
-        expect(html).toContain('ui-style--printing');
-        expect(html).toContain('ui-achievement-card is-locked');
+        expect(html).toContain('theme-printing');
+        expect(html).toContain('AchievementCard state-locked');
         expect(html).toContain('NOT ACHIEVED');
         expect(html).toContain('1 / 5');
         expect(html).toContain('style="width: 20%;"');
@@ -58,17 +58,17 @@ describe('UIComponents.generateAchievementCardHTML', () => {
 
     it('should generate tier card when some tiers are achieved', () => {
         const html = UIComponents.generateAchievementCardHTML(mockAchievement, 12);
-        expect(html).toContain('ui-achievement-card');
-        expect(html).not.toContain('is-locked');
+        expect(html).toContain('AchievementCard');
+        expect(html).not.toContain('state-locked');
         expect(html).toContain('最初の契約');
-        expect(html).toContain('is-tier-3');
+        expect(html).toContain('tier-3');
         expect(html).toContain('12 / 20');
         expect(html).toContain('style="width: 60%;"');
     });
 
     it('should generate max tier card when all tiers are achieved', () => {
         const html = UIComponents.generateAchievementCardHTML(mockAchievement, 105);
-        expect(html).toContain('is-tier-1');
+        expect(html).toContain('tier-1');
         expect(html).toContain('不屈のコントラクター');
         expect(html).toContain('MAX');
         expect(html).toContain('style="width: 100%;"');
@@ -90,7 +90,7 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
 
     it('should generate basic structure with correct data attributes', () => {
         const html = UIComponents.generateCardHTML(mockItem);
-        expect(html).toContain('<article class="ui-item-card  is-booster   "');
+        expect(html).toContain('<article class="ItemCard  booster   "');
         expect(html).toContain('data-id="engine_x"');
         expect(html).toContain('data-uid="user_123"');
     });
@@ -104,7 +104,7 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
     it('should skip description if not provided', () => {
         const itemNoDesc = { ...mockItem, description: '' };
         const html = UIComponents.generateCardHTML(itemNoDesc);
-        expect(html).not.toContain('ui-item-card__description');
+        expect(html).not.toContain('item-card-description');
     });
 
     it('should generate footer with specific allowed properties', () => {
@@ -121,7 +121,7 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
             enhancement: { slots: 1 }
         };
         const html = UIComponents.generateCardHTML(enhancedItem);
-        expect(html).toContain('ui-item-card__prop is-enhanced is-additive');
+        expect(html).toContain('item-card-prop state-enhanced additive');
     });
 
     it('should apply is-enhanced to gauge if charges are enhanced', () => {
@@ -130,12 +130,12 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
             enhancement: { charges: 1 }
         };
         const html = UIComponents.generateCardHTML(enhancedItem);
-        expect(html).toContain('ui-durability-gauge is-enhanced');
+        expect(html).toContain('DurabilityGauge state-enhanced');
     });
 
     it('should display status badge if provided in options', () => {
         const html = UIComponents.generateCardHTML(mockItem, { status: 'DELIVERED' });
-        expect(html).toContain('ui-item-card__status is-delivered');
+        expect(html).toContain('item-card-status state-delivered');
         expect(html).toContain('DELIVERED');
     });
 });
@@ -151,29 +151,29 @@ describe('UIComponents.generateCardHTML (Variations)', () => {
         description: 'テスト用の説明文です。'
     };
 
-    it('should apply is-compact class and hide description/footer', () => {
+    it('should apply state-compact class and hide description/footer', () => {
         const html = UIComponents.generateCardHTML(mockItem, { isCompact: true });
-        expect(html).toContain('ui-item-card');
-        expect(html).toContain('is-compact');
+        expect(html).toContain('ItemCard');
+        expect(html).toContain('state-compact');
         // Structure check: Title should exist, but descriptions are hidden via CSS classes
         expect(html).toContain('テストアイテム');
     });
 
-    it('should apply is-mini class to card, gauge, and badge', () => {
+    it('should apply state-mini class to card, gauge, and badge', () => {
         const html = UIComponents.generateCardHTML(mockItem, { isMini: true });
-        expect(html).toContain('is-mini');
-        // Gauge should have is-mini
-        expect(html).toContain('ui-durability-gauge');
-        expect(html).toContain('is-mini');
-        // Stack badge should have is-mini
-        expect(html).toContain('ui-badge is-stack');
-        expect(html).toContain('is-mini');
+        expect(html).toContain('state-mini');
+        // Gauge should have state-mini
+        expect(html).toContain('DurabilityGauge');
+        expect(html).toContain('state-mini');
+        // Stack badge should have state-mini
+        expect(html).toContain('Badge item-count');
+        expect(html).toContain('state-mini');
     });
 
-    it('should combine is-compact and is-mini correctly', () => {
+    it('should combine state-compact and state-mini correctly', () => {
         const html = UIComponents.generateCardHTML(mockItem, { isCompact: true, isMini: true });
-        expect(html).toContain('is-compact');
-        expect(html).toContain('is-mini');
+        expect(html).toContain('state-compact');
+        expect(html).toContain('state-mini');
     });
 });
 
@@ -185,10 +185,10 @@ describe('UIComponents.generateRocketDetailsHTML', () => {
 
     it('should generate nested mini-compact cards for rocket details', () => {
         const html = UIComponents.generateRocketDetailsHTML(mockModules);
-        expect(html).toContain('ui-rocket-details');
-        expect(html).toContain('ui-item-card');
-        expect(html).toContain('is-compact');
-        expect(html).toContain('is-mini');
+        expect(html).toContain('rocket-details');
+        expect(html).toContain('ItemCard');
+        expect(html).toContain('state-compact');
+        expect(html).toContain('state-mini');
         expect(html).toContain('モジュールA');
         expect(html).toContain('モジュールB');
     });
@@ -197,8 +197,8 @@ describe('UIComponents.generateRocketDetailsHTML', () => {
 describe('UIComponents.generateHPGauge', () => {
     it('should generate correct number of segments', () => {
         const html = UIComponents.generateHPGauge(2, 5);
-        const activeSegments = (html.match(/is-active/g) || []).length;
-        const totalSegments = (html.match(/ui-durability-segment/g) || []).length;
+        const activeSegments = (html.match(/state-active/g) || []).length;
+        const totalSegments = (html.match(/durability-segment/g) || []).length;
         
         expect(totalSegments).toBe(5);
         expect(activeSegments).toBe(2);
@@ -206,43 +206,43 @@ describe('UIComponents.generateHPGauge', () => {
 
     it('should apply is-enhanced class when isEnhanced is true', () => {
         const html = UIComponents.generateHPGauge(3, 3, true);
-        expect(html).toContain('ui-durability-gauge is-enhanced');
+        expect(html).toContain('DurabilityGauge state-enhanced');
     });
 
     it('should apply size class correctly', () => {
-        const html = UIComponents.generateHPGauge(1, 1, false, 'is-mini');
-        expect(html).toContain('ui-durability-gauge');
-        expect(html).toContain('is-mini');
+        const html = UIComponents.generateHPGauge(1, 1, false, 'state-mini');
+        expect(html).toContain('DurabilityGauge');
+        expect(html).toContain('state-mini');
     });
 });
 
 describe('UIComponents.generateStoryCardHTML', () => {
     it('should generate story card with correct title and discovery text', () => {
         const html = UIComponents.generateStoryCardHTML('T');
-        expect(html).toContain('is-story');
+        expect(html).toContain('story-card');
         expect(html).toContain('母からの押し花');
-        expect(html).toContain('is-trading-post');
+        expect(html).toContain('trading-post');
     });
 
     it('should apply is-new class to icon when isNew is true', () => {
         const html = UIComponents.generateStoryCardHTML('T', true);
-        expect(html).toContain('is-icon-mail is-new');
+        expect(html).toContain('mail state-new');
     });
 });
 
 describe('UIComponents.generateStoryModalHTML', () => {
     it('should generate modal with full story content', () => {
         const html = UIComponents.generateStoryModalHTML('T');
-        expect(html).toContain('ui-panel is-trading-post is-story');
+        expect(html).toContain('Panel trading-post story-card');
         expect(html).toContain('母からの押し花');
-        expect(html).toContain('ui-well');
+        expect(html).toContain('Well');
         expect(html).toContain('青い花の種');
         expect(html).toContain('story-modal-close');
     });
 
     it('should include facility icon in header', () => {
         const html = UIComponents.generateStoryModalHTML('R');
-        expect(html).toContain('ui-facility-badge');
+        expect(html).toContain('FacilityBadge');
         expect(html).toContain('R');
     });
 });
@@ -256,7 +256,7 @@ describe('UIComponents.generateAchievementGridHTML', () => {
 
     it('should generate a grid containing all provided achievements', () => {
         const html = UIComponents.generateAchievementGridHTML(mockAllAchievements, mockUserStats);
-        expect(html).toContain('achievement-showcase is-scrollable');
+        expect(html).toContain('achievement-showcase ScrollArea');
         
         // Check for specific labels
         expect(html).toContain('フライト回数');

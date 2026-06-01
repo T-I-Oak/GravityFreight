@@ -13,25 +13,25 @@ export class UIComponents {
     static generateCardHTML(item, options = {}) {
         // --- 1. Preparation (Contextual Data) ---
         const category = item.category ? item.category.toLowerCase() : '';
-        const clickableClass = (options.isClickable || item.isClickable) ? 'is-clickable' : '';
-        const activeClass = options.isActive ? 'is-active' : '';
-        const compactClass = options.isCompact ? 'is-compact' : '';
-        const miniClass = options.isMini ? 'is-mini' : '';
-        const categoryClass = category ? `is-${category}` : '';
+        const clickableClass = (options.isClickable || item.isClickable) ? 'state-clickable' : '';
+        const activeClass = options.isActive ? 'state-active' : '';
+        const compactClass = options.isCompact ? 'state-compact' : '';
+        const miniClass = options.isMini ? 'state-mini' : '';
+        const categoryClass = category ? `${category}` : '';
         const instanceId = item.uid || '';
         const displayName = item.name || `[MISSING_NAME: ${item.id}]`;
 
         // --- 2. Parts Generation (Sub-components) ---
         const headerRight = this.generateHeaderRightHTML(item, options);
         const headerHTML = `
-            <header class="ui-item-card__header ui-split-row">
-                <h3 class="ui-item-card__title">${displayName}</h3>
-                <div class="ui-item-card__header-right">${headerRight}</div>
+            <header class="item-card-header SplitRow">
+                <h3 class="item-card-title">${displayName}</h3>
+                <div class="item-card-header-right">${headerRight}</div>
             </header>
         `;
 
-        const bodyHTML = item.description 
-            ? `<div class="ui-item-card__description">${item.description}</div>` 
+        const bodyHTML = item.description
+            ? `<div class="item-card-description">${item.description}</div>`
             : '';
 
         const footerHTML = this.generateFooterHTML(item, options);
@@ -41,8 +41,8 @@ export class UIComponents {
 
         // --- 3. Final Assembly (Isomorphic Frame) ---
         return `
-            <article class="ui-item-card ${clickableClass} ${categoryClass} ${activeClass} ${compactClass} ${miniClass}" 
-                     data-id="${item.id}" 
+            <article class="ItemCard ${clickableClass} ${categoryClass} ${activeClass} ${compactClass} ${miniClass}"
+                     data-id="${item.id}"
                      data-uid="${instanceId}">
                 ${headerHTML}
                 ${bodyHTML}
@@ -57,24 +57,24 @@ export class UIComponents {
      */
     static generateHeaderRightHTML(item, options) {
         let html = '';
-        const miniClass = options.isMini ? 'is-mini' : '';
+        const miniClass = options.isMini ? 'state-mini' : '';
 
         // Durability Gauge (Explicit data only)
         if (item.maxCharges !== undefined && item.maxCharges > 0) {
             const isDurableEnhanced = !!(options.isEnhanced || (item.enhancement && item.enhancement.charges > 0));
             html += this.generateHPGauge(item.charges, item.maxCharges, isDurableEnhanced, miniClass);
         }
-        
+
         // Stack Badge
         if (item.count > 1) {
-            html += `<div class="ui-badge is-stack ${miniClass}">x${item.count}</div>`;
+            html += `<div class="Badge item-count ${miniClass}">x${item.count}</div>`;
         }
 
         // Status Badge
         if (options.status) {
             const status = options.status.toLowerCase();
-            const statusMiniClass = options.isMini ? 'is-mini' : '';
-            html += `<span class="ui-item-card__status is-${status} ${statusMiniClass}">${status.toUpperCase()}</span>`;
+            const statusMiniClass = options.isMini ? 'state-mini' : '';
+            html += `<span class="item-card-status state-${status} ${statusMiniClass}">${status.toUpperCase()}</span>`;
         }
 
         return html;
@@ -86,11 +86,11 @@ export class UIComponents {
     static generateFooterHTML(item, options) {
         // Defined list of displayed properties and their semantic types
         const displayProps = [
-            { key: 'slots', label: 'SLOTS', type: 'is-additive' },
-            { key: 'slotsMax', label: 'MAX SLOTS', type: 'is-additive' },
-            { key: 'precisionMultiplier', label: 'PRECISION', type: 'is-multiplier' },
-            { key: 'pickupMultiplier', label: 'PICKUP', type: 'is-multiplier' },
-            { key: 'gravityMultiplier', label: 'GRAVITY', type: 'is-multiplier' }
+            { key: 'slots', label: 'SLOTS', type: 'additive' },
+            { key: 'slotsMax', label: 'MAX SLOTS', type: 'additive' },
+            { key: 'precisionMultiplier', label: 'PRECISION', type: 'multiplier' },
+            { key: 'pickupMultiplier', label: 'PICKUP', type: 'multiplier' },
+            { key: 'gravityMultiplier', label: 'GRAVITY', type: 'multiplier' }
         ];
 
         let propItems = '';
@@ -98,17 +98,17 @@ export class UIComponents {
             const val = item[config.key];
             if (val !== undefined) {
                 const isEnhanced = item.enhancement && item.enhancement[config.key] > 0;
-                const enhancedClass = isEnhanced ? 'is-enhanced' : '';
-                
+                const enhancedClass = isEnhanced ? 'state-enhanced' : '';
+
                 propItems += `
-                    <div class="ui-item-card__prop ${enhancedClass} ${config.type}">
-                        <span class="ui-item-card__prop-label">${config.label}</span>
-                        <span class="ui-item-card__prop-value">${val}</span>
+                    <div class="item-card-prop ${enhancedClass} ${config.type}">
+                        <span class="item-card-prop-label">${config.label}</span>
+                        <span class="item-card-prop-value">${val}</span>
                     </div>`;
             }
         });
 
-        return propItems ? `<footer class="ui-item-card__footer"><div class="ui-item-card__prop-group">${propItems}</div></footer>` : '';
+        return propItems ? `<footer class="item-card-footer"><div class="item-card-prop-group">${propItems}</div></footer>` : '';
     }
 
     /**
@@ -116,12 +116,12 @@ export class UIComponents {
      */
     static generateHPGauge(current, max, isEnhanced = false, sizeClass = '') {
         let segments = '';
-        const enhancedClass = isEnhanced ? 'is-enhanced' : '';
+        const enhancedClass = isEnhanced ? 'state-enhanced' : '';
         for (let i = 0; i < max; i++) {
-            const isActive = i < current ? 'is-active' : '';
-            segments += `<div class="ui-durability-segment ${isActive}"></div>`;
+            const isActive = i < current ? 'state-active' : '';
+            segments += `<div class="durability-segment ${isActive}"></div>`;
         }
-        return `<div class="ui-durability-gauge ${enhancedClass} ${sizeClass}">${segments}</div>`;
+        return `<div class="DurabilityGauge ${enhancedClass} ${sizeClass}">${segments}</div>`;
     }
 
     /**
@@ -132,13 +132,13 @@ export class UIComponents {
         let cards = '';
         modules.forEach(mod => {
             // Generate each module as a compact mini card
-            cards += this.generateCardHTML(mod, { 
-                isCompact: true, 
-                isMini: true 
+            cards += this.generateCardHTML(mod, {
+                isCompact: true,
+                isMini: true
             });
         });
 
-        return `<div class="ui-rocket-details">${cards}</div>`;
+        return `<div class="rocket-details">${cards}</div>`;
     }
 
     /**
@@ -151,14 +151,14 @@ export class UIComponents {
         const facilityClass = DataManager.getFacilityById(story.branch).className;
 
         return `
-            <article class="ui-item-card is-story is-active is-clickable ${facilityClass}">
-                <header class="ui-item-card__header ui-split-row">
-                    <h3 class="ui-item-card__title">${story.title}</h3>
-                    <div class="ui-item-card__header-right">
-                        <span class="ui-icon is-icon-mail ${isNew ? 'is-new' : ''}"></span>
+            <article class="ItemCard story-card state-active state-clickable ${facilityClass}">
+                <header class="item-card-header SplitRow">
+                    <h3 class="item-card-title">${story.title}</h3>
+                    <div class="item-card-header-right">
+                        <span class="Icon mail ${isNew ? 'state-new' : ''}"></span>
                     </div>
                 </header>
-                <div class="ui-item-card__description">${story.discovery}</div>
+                <div class="item-card-description">${story.discovery}</div>
             </article>
         `;
     }
@@ -175,19 +175,19 @@ export class UIComponents {
         const icon = facility.icon;
 
         return `
-            <article class="ui-panel ${facilityClass} is-story">
-                <header class="ui-panel__header">
-                    <div class="ui-facility-badge">${icon}</div>
-                    <h1 class="ui-panel__title">${story.title}</h1>
+            <article class="Panel ${facilityClass} story-card">
+                <header class="panel-header">
+                    <div class="FacilityBadge">${icon}</div>
+                    <h1 class="panel-title">${story.title}</h1>
                 </header>
 
-                <div class="ui-panel__body is-scrollable">
-                    <div class="is-intro">${story.discovery}</div>
-                    <div class="ui-well">${story.content}</div>
+                <div class="panel-body ScrollArea">
+                    <div class="intro">${story.discovery}</div>
+                    <div class="Well">${story.content}</div>
                 </div>
 
-                <footer class="ui-panel__footer">
-                    <button class="ui-button is-big" id="story-modal-close">CLOSE</button>
+                <footer class="panel-footer">
+                    <button class="Button button-large" id="story-modal-close">CLOSE</button>
                 </footer>
             </article>
         `;
@@ -200,12 +200,12 @@ export class UIComponents {
      * @param {Object} options - { category, isNotable, isClickable }
      */
     static generatePlaceholderHTML(text, subtext, options = {}) {
-        const category = options.category ? `is-${options.category}` : '';
-        const notable = options.isNotable ? 'is-notable' : '';
-        const clickable = options.isClickable ? 'is-clickable' : '';
+        const category = options.category ? `${options.category}` : '';
+        const notable = options.isNotable ? 'state-notable' : '';
+        const clickable = options.isClickable ? 'state-clickable' : '';
 
         return `
-            <article class="ui-item-card is-placeholder ${category} ${notable} ${clickable}">
+            <article class="ItemCard placeholder-card ${category} ${notable} ${clickable}">
                 <div class="placeholder-text">${text}</div>
                 <div class="placeholder-subtext">${subtext}</div>
             </article>
@@ -220,7 +220,7 @@ export class UIComponents {
     static generateAchievementCardHTML(achievement, statsValue) {
         // 1. Identify tiers (Assuming Hardest to Easiest definition in Data.js)
         const tiers = achievement.tiers;
-        
+
         let currentTier = null;
         let currentLevel = 0;
         let nextTier = null;
@@ -242,8 +242,8 @@ export class UIComponents {
         // 2. Prepare Display Data
         const isLocked = !currentTier;
         const title = isLocked ? 'NOT ACHIEVED' : currentTier.title;
-        const tierClass = isLocked ? 'is-locked' : `is-tier-${currentLevel}`;
-        
+        const tierClass = isLocked ? 'state-locked' : `tier-${currentLevel}`;
+
         // Roman numeral conversion (Simplified for level 1-3)
         const roman = ['-', 'I', 'II', 'III'][currentLevel] || '';
 
@@ -273,8 +273,8 @@ export class UIComponents {
         `;
 
         return `
-            <div class="ui-style--printing">
-                <div class="ui-achievement-card ${tierClass}">
+            <div class="theme-printing">
+                <div class="AchievementCard ${tierClass}">
                     ${sealHTML}
                     <div class="log-title">${title}</div>
                     <div class="log-data-group">
@@ -304,7 +304,7 @@ export class UIComponents {
         }
 
         return `
-            <div class="achievement-showcase is-scrollable">
+            <div class="achievement-showcase ScrollArea">
                 ${cardsHTML}
             </div>
         `;

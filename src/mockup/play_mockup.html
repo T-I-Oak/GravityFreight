@@ -20,32 +20,32 @@
     <link rel="stylesheet" href="../../css/play.css">
 </head>
 <body style="background: #050510 url('../../assets/tutorial/slide1.png') no-repeat center center fixed; background-size: cover;">
-    <main id="play-scene-container" class="ui-style--neon">
-        <header id="play-hud" class="ui-panel is-sub-theme">
+    <main id="play-scene-container" class="theme-neon">
+        <header id="play-hud" class="Panel color-theme-sub">
             <div class="hud-logo-header">
-                <div class="ui-title-box">
-                    <h1 class="text-display is-logo">GRAVITY FREIGHT</h1>
-                    <span class="text-sub-display is-logo">ORBITAL ECHOES</span>
+                <div class="TitleBox">
+                    <h1 class="text-display logo">GRAVITY FREIGHT</h1>
+                    <span class="text-sub-display logo">ORBITAL ECHOES</span>
                 </div>
                 <div class="hud-messages">
-                    <span class="ui-icon is-icon-mail is-trading-post is-new is-clickable"></span>
-                    <span class="ui-icon is-icon-mail is-repair-dock is-clickable"></span>
-                    <span class="ui-icon is-icon-mail is-disabled"></span>
+                    <span class="Icon mail trading-post state-new state-clickable"></span>
+                    <span class="Icon mail repair-dock state-clickable"></span>
+                    <span class="Icon mail state-disabled"></span>
                 </div>
             </div>
             
             <div class="hud-stats">
-                <div class="ui-split-column">
-                    <span class="ui-stat-label">SECTOR</span>
-                    <span class="stat-value num-sector">12</span>
+                <div class="SplitColumn">
+                    <span class="stat-label">SECTOR</span>
+                    <span class="stat-value sector">12</span>
                 </div>
-                <div class="ui-split-column">
-                    <span class="ui-stat-label">COIN</span>
-                    <span class="stat-value num-coin">1,234</span>
+                <div class="SplitColumn">
+                    <span class="stat-label">COIN</span>
+                    <span class="stat-value coin">1,234</span>
                 </div>
-                <div class="ui-split-column">
-                    <span class="ui-stat-label">SCORE</span>
-                    <span class="stat-value num-score">1,234,567</span>
+                <div class="SplitColumn">
+                    <span class="stat-label">SCORE</span>
+                    <span class="stat-value score">1,234,567</span>
                 </div>
             </div>
         </header>
@@ -55,37 +55,37 @@
         <div class="play-viewport"></div>
 
         <!-- Right Panel: Selection / Inventory -->
-        <aside id="inventory-panel" class="ui-panel is-sub-theme">
-            <header class="ui-panel__header ui-split-row">
-                <div class="ui-tab-group">
-                    <button class="ui-tab is-clickable is-active" data-tab="flight">FLIGHT</button>
-                    <button class="ui-tab is-clickable" data-tab="assembly">ASSEMBLY</button>
+        <aside id="inventory-panel" class="Panel color-theme-sub">
+            <header class="panel-header SplitRow">
+                <div class="TabGroup">
+                    <button class="Tab state-clickable state-active" data-tab="flight">FLIGHT</button>
+                    <button class="Tab state-clickable" data-tab="assembly">ASSEMBLY</button>
                 </div>
-                <div class="ui-panel-toggle is-clickable" id="btn-toggle-panel">
-                    <span class="ui-icon is-icon-chevron-down toggle-icon"></span>
+                <div class="PanelToggle state-clickable" id="btn-toggle-panel">
+                    <span class="Icon chevron-down toggle-icon"></span>
                 </div>
             </header>
 
-            <div class="ui-panel__body is-scrollable" id="panel-content">
+            <div class="panel-body ScrollArea" id="panel-content">
                 <!-- Tab: FLIGHT -->
                 <div class="tab-content" id="tab-flight">
-                    <section class="ui-section is-rocket" id="section-rocket">
-                        <header class="ui-section-header">
-                            <h3 class="ui-section-title">ROCKET</h3>
+                    <section class="section rocket" id="section-rocket">
+                        <header class="section-header">
+                            <h3 class="section-title">ROCKET</h3>
                         </header>
                         <div class="item-list" id="list-rocket"></div>
                     </section>
 
-                    <section class="ui-section is-launcher" id="section-launcher">
-                        <header class="ui-section-header">
-                            <h3 class="ui-section-title">LAUNCHER</h3>
+                    <section class="section launcher" id="section-launcher">
+                        <header class="section-header">
+                            <h3 class="section-title">LAUNCHER</h3>
                         </header>
                         <div class="item-list" id="list-launcher"></div>
                     </section>
 
-                    <section class="ui-section is-booster" id="section-booster">
-                        <header class="ui-section-header">
-                            <h3 class="ui-section-title">BOOSTER</h3>
+                    <section class="section booster" id="section-booster">
+                        <header class="section-header">
+                            <h3 class="section-title">BOOSTER</h3>
                         </header>
                         <div class="item-list" id="list-booster"></div>
                     </section>
@@ -93,27 +93,27 @@
 
                 <!-- Tab: ASSEMBLY -->
                 <div id="tab-assembly" class="tab-content" style="display:none;">
-                    <section class="ui-section is-chassis">
-                        <header class="ui-section-header">
-                            <h3 class="ui-section-title">CHASSIS</h3>
+                    <section class="section chassis">
+                        <header class="section-header">
+                            <h3 class="section-title">CHASSIS</h3>
                         </header>
                         <div class="item-list" id="list-chassis"></div>
                     </section>
-                    <section class="ui-section is-logic">
-                        <header class="ui-section-header">
-                            <h3 class="ui-section-title">LOGIC</h3>
+                    <section class="section logic">
+                        <header class="section-header">
+                            <h3 class="section-title">LOGIC</h3>
                         </header>
                         <div class="item-list" id="list-logic"></div>
                     </section>
-                    <section class="ui-section is-module">
-                        <header class="ui-section-header">
-                            <h3 class="ui-section-title">MODULES</h3>
+                    <section class="section module">
+                        <header class="section-header">
+                            <h3 class="section-title">MODULES</h3>
                         </header>
                         <div class="item-list" id="list-module"></div>
                     </section>
 
                     <div class="assembly-actions">
-                        <button class="ui-button is-primary is-big is-disabled is-notable is-assembly" id="demo-assemble-btn">
+                        <button class="Button state-primary button-large state-disabled state-notable assembly" id="demo-assemble-btn">
                             <span class="btn-main-label">ASSEMBLE ROCKET</span>
                             <span class="btn-sub-label">シャーシとロジックを選択すると建造できます</span>
                         </button>
@@ -124,14 +124,14 @@
 
         <!-- Right Bottom Action -->
         <div class="action-dock">
-            <button class="ui-button is-primary is-big is-disabled is-notable is-launch" id="demo-launch-btn">
+            <button class="Button state-primary button-large state-disabled state-notable launch" id="demo-launch-btn">
                 <span class="btn-main-label">LAUNCH ENGINE</span>
                 <span class="btn-sub-label">ロケットと発射台を選択すると発射できます</span>
             </button>
         </div>
     </main>
 
-    <footer class="ui-footer">
+    <footer class="screen-footer">
         <span>VER 1.8.2</span>
         <span>© T.I.OAK 2026</span>
     </footer>
@@ -208,7 +208,7 @@
             // Add placeholder if empty
             if (items.length === 0) {
                 container.innerHTML = `
-                    <div class="ui-item-placeholder">
+                    <div class="item-placeholder">
                         <span class="placeholder-text">データなし</span>
                     </div>`;
             }
@@ -223,17 +223,17 @@
         if (toggleBtn && panel) {
             toggleBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                panel.classList.toggle('is-collapsed');
+                panel.classList.toggle('state-collapsed');
             });
         }
 
-        const tabs = document.querySelectorAll('.ui-tab[data-tab]');
+        const tabs = document.querySelectorAll('.Tab[data-tab]');
         const contents = document.querySelectorAll('.tab-content');
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const target = tab.getAttribute('data-tab');
-                tabs.forEach(t => t.classList.toggle('is-active', t === tab));
+                tabs.forEach(t => t.classList.toggle('state-active', t === tab));
                 contents.forEach(c => {
                     const isActive = (c.id === `tab-${target}`);
                     c.style.display = isActive ? 'block' : 'none';
@@ -247,15 +247,15 @@
         ];
         demoBtns.forEach(btn => {
             if (btn) {
-                btn.classList.add('is-disabled', 'is-notable');
-                btn.addEventListener('click', () => btn.classList.toggle('is-disabled'));
+                btn.classList.add('state-disabled', 'state-notable');
+                btn.addEventListener('click', () => btn.classList.toggle('state-disabled'));
             }
         });
     </script>
 
     <!-- Mockup Toggle Helper: Allow clicking even when disabled to test feedback -->
     <style>
-        .is-launch, .is-assembly {
+        .launch, .assembly {
             pointer-events: auto !important; 
         }
     </style>

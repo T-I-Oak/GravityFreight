@@ -3,7 +3,7 @@
    Layer: Context / View (Specific)
    ========================================= */
 
-#flight-result-screen .ui-panel {
+#flight-result-screen .Panel {
     width: 70vw;
     height: 85vh;
     max-width: 640px;
@@ -15,31 +15,31 @@
 }
 
 @media screen and (max-width: 600px) {
-    #flight-result-screen .ui-panel {
+    #flight-result-screen .Panel {
         width: 95vw;
         height: 90vh;
     }
 }
 
 /* Panel Layout: Sections now inherit panel-level padding/gap logic */
-#flight-result-screen .ui-panel__header,
-#flight-result-screen .ui-panel__body,
-#flight-result-screen .ui-panel__footer {
+#flight-result-screen .panel-header,
+#flight-result-screen .panel-body,
+#flight-result-screen .panel-footer {
     padding: 0; /* 個別パディングを廃止 */
 }
 
-#flight-result-screen .ui-panel__footer {
+#flight-result-screen .panel-footer {
     display: flex;
     justify-content: space-between;
 }
 
 /* Layout Specific Adjustments */
-#flight-result-screen .ui-columns {
+#flight-result-screen .ColumnSet {
     gap: var(--space-double); /* パディングと統一 */
 }
 
 /* Header Specific Adjustments */
-#flight-result-screen .ui-panel__title {
+#flight-result-screen .panel-title {
     margin: var(--space-unit) 0 0 0;
     font-size: 24px;
     font-weight: 900;
@@ -54,13 +54,13 @@
 }
 
 /* Local State: RECORDED Visuals */
-.ui-badge.is-recorded {
+.Badge.state-recorded {
     background: #ff3333;
     color: #ffffff;
     border: none;
 }
 
-.ui-badge.is-recorded .recorded-text {
+.Badge.state-recorded .recorded-text {
     animation: flight-recorded-pulse 2s ease-in-out infinite;
 }
 
@@ -70,17 +70,17 @@
 }
 
 /* Data Row Visuals: Context-specific for reports */
-.ui-split-row.is-data-row {
+.SplitRow.data-row {
     font-size: 14px; /* 全体でフォントサイズを指定 */
     padding: 8px 0;
     border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
-.ui-split-row.is-data-row .report-data-label {
+.SplitRow.data-row .report-data-label {
     opacity: 0.7;
 }
 
-.ui-split-row.is-data-row .report-data-value {
+.SplitRow.data-row .report-data-value {
     font-family: 'Courier Prime', monospace;
     font-weight: 700;
 }

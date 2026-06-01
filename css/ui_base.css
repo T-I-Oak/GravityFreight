@@ -32,7 +32,7 @@
     outline: none !important;
 }
 
-.is-scrollable {
+.ScrollArea {
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -52,14 +52,14 @@ body {
 }
 
 /* --- 2. Interactive Foundations (Semantic) --- */
-.ui-button,
-.is-clickable {
+.Button,
+.state-clickable {
     cursor: pointer;
     user-select: none;
     transition: all var(--motion-fast);
 }
 
-.ui-button {
+.Button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -73,8 +73,8 @@ body {
     transition: all var(--motion-fast);
 }
 
-/* is-big: Specialized large action button (Capsule shape) */
-.ui-button.is-big {
+/* button-large: Specialized large action button (Capsule shape) */
+.Button.button-large {
     height: 48px;
     padding: 0 32px;
     border-radius: var(--radius-pill);
@@ -82,14 +82,14 @@ body {
     flex-direction: column;
 }
 
-.ui-button.is-big .btn-main-label {
+.Button.button-large .btn-main-label {
     font-size: 16px;
     font-weight: 950;
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 
-.ui-button.is-big .btn-sub-label {
+.Button.button-large .btn-sub-label {
     font-size: 10px;
     font-weight: 800;
     opacity: 0.6;
@@ -97,37 +97,37 @@ body {
 }
 
 /* Category Color Modifiers (Overrides base component defaults) */
-.is-trading-post { --current-color: var(--color-facility-trading-post); }
-.is-repair-dock  { --current-color: var(--color-facility-repair-dock); }
-.is-black-market { --current-color: var(--color-facility-black-market); }
+.trading-post { --current-color: var(--color-facility-trading-post); }
+.repair-dock  { --current-color: var(--color-facility-repair-dock); }
+.black-market { --current-color: var(--color-facility-black-market); }
 
-.is-theme        { --current-color: var(--color-theme-main); }
-.is-sub-theme    { --current-color: var(--color-theme-sub); }
-.is-home         { --current-color: var(--color-world-home-star); }
+.color-theme-main        { --current-color: var(--color-theme-main); }
+.color-theme-sub    { --current-color: var(--color-theme-sub); }
+.home         { --current-color: var(--color-world-home-star); }
 
 /* Category Mappings (Axis-D: Structure) */
-.is-rocket       { --current-color: var(--color-category-rockets); }
-.is-launcher     { --current-color: var(--color-category-launchers); }
-.is-chassis      { --current-color: var(--color-category-chassis); }
-.is-logic        { --current-color: var(--color-category-logic); }
-.is-module       { --current-color: var(--color-category-module); }
-.is-booster      { --current-color: var(--color-category-boosters); }
-.is-coin         { --current-color: var(--color-category-coin); }
-.is-cargo        { --current-color: var(--color-category-cargo); }
+.rocket       { --current-color: var(--color-category-rockets); }
+.launcher     { --current-color: var(--color-category-launchers); }
+.chassis      { --current-color: var(--color-category-chassis); }
+.logic        { --current-color: var(--color-category-logic); }
+.module       { --current-color: var(--color-category-module); }
+.booster      { --current-color: var(--color-category-boosters); }
+.coin         { --current-color: var(--color-category-coin); }
+.cargo        { --current-color: var(--color-category-cargo); }
 
 /* User State Modifiers */
-.is-favorite     { --current-color: var(--color-ui-favorite); }
+.favorite     { --current-color: var(--color-ui-favorite); }
 
-.is-disabled {
+.state-disabled {
     cursor: default;
     pointer-events: none;
     user-select: none;
 }
 
-/* .is-scrollable is now unified at the top of this file */
+/* .ScrollArea is now unified at the top of this file */
 
 /* --- 3. Global Metadata Components --- */
-.ui-footer {
+.footer {
     position: absolute;
     bottom: var(--space-unit);
     left: var(--space-double);

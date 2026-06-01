@@ -4,17 +4,17 @@
    Focus: Opaque materials, solid colors, pure contrast
    ========================================= */
 
-.ui-style--matte {
+.theme-matte {
     background: #050510;
     color: #ffffff;
 }
 
-/* --- [A] ui-item-card: Matte Expression --- */
-.ui-style--matte .ui-item-card {
+/* --- [A] ItemCard: Matte Expression --- */
+.theme-matte .ItemCard {
     --color-bg-card: #14192d;
 }
 
-.ui-style--matte .ui-item-card.is-clickable:hover {
+.theme-matte .ItemCard.state-clickable:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -24,7 +24,7 @@
 /* No specific overrides needed for Matte indicator beyond base logic */
 
 /* --- Placeholder: Matte Expression --- */
-.ui-style--matte .ui-item-card.is-placeholder {
+.theme-matte .ItemCard.placeholder-card {
     border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -32,39 +32,39 @@
 /* --- Component Style: Badges --- */
 
 /* Style Layer: Matte texture for general badges */
-.ui-style--matte .ui-badge {
+.theme-matte .Badge {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 0.8);
 }
 
-.ui-style--matte .ui-badge.is-active {
+.theme-matte .Badge.state-active {
     background: color-mix(in srgb, var(--current-color), #000 40%);
     border-color: color-mix(in srgb, var(--current-color), #000 40%);
     color: #ffffff;
 }
 
-.ui-style--matte .ui-badge.is-inactive {
+.theme-matte .Badge.state-inactive {
     background: transparent !important;
     border-color: color-mix(in srgb, var(--current-color), transparent 60%);
     color: var(--current-color);
 }
 
-.ui-style--matte .ui-badge.is-clickable:hover {
+.theme-matte .Badge.state-clickable:hover {
     filter: brightness(1.2);
     border-color: var(--current-color);
 }
 
 
 /* Style Layer (Specialization): Stack Badge color expression */
-.ui-style--matte .ui-badge.is-stack {
+.theme-matte .Badge.item-count {
     background: var(--current-color);
     color: #050510;
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 /* --- Components: Data Wells (Recessed/Inward Plate) --- */
-.ui-style--matte .ui-well {
+.theme-matte .Well {
     background: rgba(0, 0, 0, 0.25);
     border-radius: 8px; /* 4pxだと沈み込みの角が潰れて見えるため、8pxを標準とする */
     /* 物理的なくぼみを表現するためのボーダー */
@@ -77,24 +77,24 @@
 }
 
 /* --- Components: Card Status Colors --- */
-.ui-style--matte .ui-item-card__status.is-delivered {
+.theme-matte .item-card-status.state-delivered {
     color: var(--color-theme-main);
     background: color-mix(in srgb, var(--color-theme-main), transparent 90%);
 }
-.ui-style--matte .ui-item-card__status.is-delivered::before {
+.theme-matte .item-card-status.state-delivered::before {
     content: '✓ ';
 }
 
-.ui-style--matte .ui-item-card__status.is-unmatched {
+.theme-matte .item-card-status.state-unmatched {
     color: #ff4488;
     background: rgba(255, 68, 136, 0.1);
 }
-.ui-style--matte .ui-item-card__status.is-unmatched::before {
+.theme-matte .item-card-status.state-unmatched::before {
     content: '✗ ';
 }
 
 /* Props & Descriptions */
-.ui-style--matte .ui-item-card__description {
+.theme-matte .item-card-description {
     color: rgba(255, 255, 255, 0.6);
     line-height: 1.25;
 }
@@ -104,18 +104,18 @@
 /* Enhanced visuals unified in base */
 
 /* Composite Elements: Rocket Detail area divider */
-.ui-style--matte .ui-rocket-details {
+.theme-matte .rocket-details {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.ui-style--matte .ui-module-name {
+.theme-matte .module-name {
     color: rgba(255, 255, 255, 0.5);
 }
 
 /* --- Panel Expressions: Matte Surface (Physical Plate) --- */
 
 /* Base Panel Style: Dynamic Surface (Themed Matte Plate) */
-.ui-style--matte .ui-panel {
+.theme-matte .Panel {
     background: color-mix(in srgb, var(--current-color), #404040 90%); 
     border: 2px solid color-mix(in srgb, var(--current-color), transparent 80%);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
@@ -124,38 +124,38 @@
 /* --- Button Expressions: Matte Solid State Logic --- */
 
 /* 1. Default State: Outline-style with vivid border and dark fill */
-.ui-style--matte .ui-button {
+.theme-matte .Button {
     border-width: 2px;
     border-color: color-mix(in srgb, var(--current-color), #000 40%);
     background: color-mix(in srgb, var(--current-color), #000 85%);
     color: #ffffff;
 }
 
-.ui-style--matte .ui-button:hover:not(.is-disabled) {
+.theme-matte .Button:hover:not(.state-disabled) {
     border-color: color-mix(in srgb, var(--current-color), #000 25%);
     background: color-mix(in srgb, var(--current-color), #000 75%);
 }
 
 /* 2. Highlight State: Absolute solid fill (Border = Background) */
-.ui-style--matte .ui-button.is-primary,
-.ui-style--matte .ui-button.is-active {
+.theme-matte .Button.state-primary,
+.theme-matte .Button.state-active {
     border-color: color-mix(in srgb, var(--current-color), #000 40%);
     background: color-mix(in srgb, var(--current-color), #000 40%);
     color: #ffffff;
 }
 
-.ui-style--matte .ui-button.is-primary:hover:not(.is-disabled),
-.ui-style--matte .ui-button.is-active:hover:not(.is-disabled) {
+.theme-matte .Button.state-primary:hover:not(.state-disabled),
+.theme-matte .Button.state-active:hover:not(.state-disabled) {
     border-color: color-mix(in srgb, var(--current-color), #000 25%);
     background: color-mix(in srgb, var(--current-color), #000 25%);
 }
 
 /* 3. Disabled & Inactive States */
-.ui-style--matte .ui-button.is-inactive {
+.theme-matte .Button.state-inactive {
     background: transparent !important;
 }
 
-.ui-style--matte .ui-button.is-disabled {
+.theme-matte .Button.state-disabled {
     border-color: rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.2);
@@ -163,8 +163,8 @@
 }
 
 /* --- Global Interaction Feedback (Tactile Response) --- */
-.ui-style--matte .ui-button:active:not(.is-disabled),
-.ui-style--matte .is-clickable:active:not(.is-disabled) {
+.theme-matte .Button:active:not(.state-disabled),
+.theme-matte .state-clickable:active:not(.state-disabled) {
     transform: perspective(1px) scale(0.97);
     filter: brightness(0.9);
 }
