@@ -3,20 +3,20 @@
    Layer: Context / View (Specific)
    ========================================= */
 
-#facility-screen .ui-panel {
+#facility-screen .Panel {
     width: 85vw;
     height: 85vh;
     max-width: 1080px;
     margin: auto;
-    
+
     padding: 0; /* ヘッダー・フッターを端まで通すため */
-    gap: 0; 
+    gap: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-#facility-screen .ui-panel__header {
+#facility-screen .panel-header {
     padding: var(--space-double);
     display: flex;
     align-items: center;
@@ -25,7 +25,7 @@
     margin-bottom: 0;
 }
 
-#facility-screen .ui-panel__body {
+#facility-screen .panel-body {
     padding: 0;
     flex: 1;
     overflow: hidden;
@@ -33,7 +33,7 @@
     flex-direction: column;
 }
 
-#facility-screen .ui-well {
+#facility-screen .Well {
     margin: 0 var(--space-double);
     padding: var(--space-double);
     flex: 1;
@@ -41,7 +41,7 @@
     overflow: hidden;
 }
 
-#facility-screen .ui-panel__footer {
+#facility-screen .panel-footer {
     padding: var(--space-double);
     display: flex;
     align-items: center;
@@ -70,13 +70,13 @@
     line-height: 1;
 }
 
-#facility-screen .ui-columns {
+#facility-screen .ColumnSet {
     gap: var(--space-double);
     height: 100%;
 }
 
 @media screen and (max-width: 800px) {
-    #facility-screen .ui-panel {
+    #facility-screen .Panel {
         width: 95vw;
         height: 90vh;
     }
@@ -84,8 +84,8 @@
 
 /* Facility Specific Components */
 
-/* is-discount: Simplified Discount Label */
-#facility-screen .ui-badge.is-discount {
+/* discount: Simplified Discount Label */
+#facility-screen .Badge.discount {
     display: inline-flex;
     align-items: baseline;
     gap: 1px;
@@ -95,17 +95,17 @@
     font-weight: 900;
     padding: 1px 4px;
     white-space: nowrap;
-    
+
     /* レイアウトと回転 */
     margin-left: 4px;
     margin-top: 0;
     transform: rotate(20deg);
-    
+
     /* 装飾の排除 */
     border: none;
     box-shadow: none;
     text-shadow: none;
-    
+
     position: relative;
     z-index: 2;
     pointer-events: none;
@@ -148,11 +148,11 @@
 }
 
 #facility-screen .facility-badge,
-#facility-screen .ui-facility-badge {
+#facility-screen .FacilityBadge {
     /* 共通コンポーネント ui_facility_badge.css へ移行 */
 }
 
-#facility-screen .ui-panel__title {
+#facility-screen .panel-title {
     font-size: 24px;
     font-weight: 900;
     letter-spacing: 0.05em;
@@ -160,7 +160,7 @@
     line-height: 1.1;
 }
 
-#facility-screen .ui-panel__subtitle {
+#facility-screen .panel-subtitle {
     font-size: 11px;
     opacity: 0.7;
     margin: 2px 0 0 0;
@@ -168,14 +168,14 @@
 }
 
 /* Section Headlines */
-#facility-screen .ui-section-title {
+#facility-screen .section-title {
     font-size: 12px;
     font-weight: 900;
     letter-spacing: 0.05em;
     margin: 0 0 2px 0;
 }
 
-#facility-screen .ui-section-subtitle {
+#facility-screen .section-subtitle {
     color: rgba(255, 255, 255, 0.6);
     margin: 0 0 16px 0;
     line-height: 1.4;
@@ -191,7 +191,7 @@
     flex-shrink: 0;
 }
 
-#facility-screen .ui-split-row {
+#facility-screen .SplitRow {
     gap: var(--space-unit);
 }
 
@@ -214,7 +214,7 @@
     letter-spacing: -1px;
 }
 
-#facility-screen .trade-action-area .ui-button {
+#facility-screen .trade-action-area .Button {
     width: 100%;
     padding: 0;
     height: 24px;
@@ -223,31 +223,31 @@
     min-height: auto;
 }
 
-#facility-screen .ui-badge.is-discount .sticker-num { 
-    font-size: 11px; 
-    letter-spacing: -0.5px; 
-    line-height: 1; 
+#facility-screen .Badge.discount .sticker-num {
+    font-size: 11px;
+    letter-spacing: -0.5px;
+    line-height: 1;
 }
 
-#facility-screen .ui-badge.is-discount .sticker-pct { 
-    font-size: 7px; 
-    margin-right: 1px; 
+#facility-screen .Badge.discount .sticker-pct {
+    font-size: 7px;
+    margin-right: 1px;
 }
 
 /* Modifier: Low Discount */
-#facility-screen .ui-badge.is-discount.is-low { 
-    background: linear-gradient(135deg, #a1887f, #8d6e63); 
+#facility-screen .Badge.discount.low {
+    background: linear-gradient(135deg, #a1887f, #8d6e63);
 }
 
 /* Modifier: Mid Discount */
-#facility-screen .ui-badge.is-discount.is-mid { 
-    background: linear-gradient(135deg, #ff5722, #f44336); 
+#facility-screen .Badge.discount.mid {
+    background: linear-gradient(135deg, #ff5722, #f44336);
 }
 
 /* Modifier: High Discount */
-#facility-screen .ui-badge.is-discount.is-high { 
-    background: linear-gradient(135deg, #e91e63, #9c27b0); 
-    animation: facility-discount-pulse 1.5s infinite ease-in-out; 
+#facility-screen .Badge.discount.high {
+    background: linear-gradient(135deg, #e91e63, #9c27b0);
+    animation: facility-discount-pulse 1.5s infinite ease-in-out;
 }
 
 @keyframes facility-discount-pulse {

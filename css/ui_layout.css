@@ -13,7 +13,7 @@ main {
 }
 
 /* --- 2. UI Panel System --- */
-.ui-panel {
+.Panel {
     border-radius: var(--radius-standard);
     padding: 0;
     box-sizing: border-box;
@@ -27,35 +27,35 @@ main {
     max-height: 100%;
 }
 
-.ui-panel__header {
+.panel-header {
     flex-shrink: 0;
 }
 
-.ui-panel__body {
+.panel-body {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
 }
 
-.ui-panel__footer {
+.panel-footer {
     flex-shrink: 0;
 }
 
-.ui-panel.is-collapsed {
+.Panel.state-collapsed {
     height: 32px !important;
     overflow: visible;
 }
 
-.ui-panel.is-collapsed .ui-panel__body {
+.Panel.state-collapsed .panel-body {
     display: none;
 }
 
-.ui-panel.is-collapsed .toggle-icon {
+.Panel.state-collapsed .toggle-icon {
     transform: rotate(180deg);
 }
 
-.ui-panel-toggle {
+.PanelToggle {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -64,7 +64,7 @@ main {
 }
 
 /* --- 3. Column & Grid System --- */
-.ui-columns {
+.ColumnSet {
     display: flex;
     flex-direction: row;
     flex: 1;
@@ -72,7 +72,7 @@ main {
     gap: var(--space-unit);
 }
 
-.ui-column {
+.Column {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -81,45 +81,45 @@ main {
 
 @media screen and (max-width: 800px) {
     /* 1カラム化時は全体コンテナでのスクロールを標準とする */
-    .ui-columns {
+    .ColumnSet {
         flex-direction: column;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
     
-    .ui-columns > .ui-column {
+    .ColumnSet > .Column {
         flex: none;
     }
 
     /* カラム側の個別スクロールを解除し、親に展開させる */
-    .ui-columns .is-scrollable {
+    .ColumnSet .ScrollArea {
         overflow: visible;
         height: auto;
         flex: none;
     }
 }
 
-.ui-split-row {
+.SplitRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* is-data-row: Logical role for split-rows that present key-value data */
-.ui-split-row.is-data-row {
+/* data-row: Logical role for split-rows that present key-value data */
+.SplitRow.data-row {
     width: 100%;
 }
 
 /* --- 4. Sectioning --- */
-.ui-section {
+.section {
     margin-bottom: var(--space-unit);
 }
 
-.ui-section-header {
+.section-header {
     margin-bottom: 4px;
 }
 
-.ui-section-title {
+.section-title {
     margin: 0;
     font-size: 12px;
     font-weight: 950;
@@ -127,20 +127,20 @@ main {
     text-transform: uppercase;
 }
 
-.ui-section-subtitle {
+.section-subtitle {
     display: block;
     font-size: 10px;
     line-height: 1.4;
 }
 
 /* --- 5. Navigational Layouts --- */
-.ui-tab-group {
+.TabGroup {
     display: flex;
     gap: 0;
     flex: 1;
 }
 
-.ui-tab {
+.Tab {
     flex: 1;
     height: 32px;
     display: flex;
@@ -157,20 +157,20 @@ main {
 }
 
 /* --- 6. Abstract Utilities --- */
-.ui-flex-center {
+.FlexCenter {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.ui-split-column {
+.SplitColumn {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.ui-title-box {
+.TitleBox {
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -182,18 +182,18 @@ main {
 }
 
 /* --- 7. Data Visualization Layouts --- */
-.ui-stat-group {
+.stat-group {
     display: flex;
     gap: var(--space-double);
     flex-wrap: wrap;
 }
 
-.ui-split-column .stat-value {
+.SplitColumn .stat-value {
     font-size: var(--text-size-title);
     line-height: 1;
 }
 
-.ui-split-column.is-hero .stat-value {
+.SplitColumn.hero .stat-value {
     font-size: 24px;
     font-weight: 900;
 }

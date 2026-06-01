@@ -6,11 +6,11 @@
 
 /* --- 1. Base Item Card Structure --- */
 
-/* .ui-item-card: The unified data unit for Gravity Freight V2.
+/* .ItemCard: The unified data unit for Gravity Freight V2.
    [設計上の例外処置]: アイテムカードが「カテゴリーの色に染まる」特性は、ネオン/マット両スタイルで
    共通の視覚体験を維持し、コードの二重定義を防ぐため、敢えて Base レイヤーで定義されています。
    これにより、全スタイルで「カテゴリーのアイデンティティ」が保証されます。 */
-.ui-item-card {
+.ItemCard {
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
@@ -32,21 +32,21 @@
 }
 
 /* Active/Selected State: Structural signaling and enhanced tint */
-.ui-item-card.is-active {
+.ItemCard.state-active {
     background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-active, 80%));
     border-color: color-mix(in srgb, var(--current-color), #fff 40%);
 }
 
-.ui-item-card.is-clickable {
+.ItemCard.state-clickable {
     cursor: pointer;
 }
 
-.ui-item-card.is-clickable:hover {
+.ItemCard.state-clickable:hover {
     filter: brightness(1.1);
 }
 
 /* Category indicator bar: Shared structure for all themes */
-.ui-item-card::before {
+.ItemCard::before {
     content: '';
     position: absolute;
     left: -1px;
@@ -59,11 +59,11 @@
 }
 
 /* Axis-E: Structural Variation (Story Specialization) */
-.ui-item-card.is-story {
+.ItemCard.story-card {
     padding-left: 16px;
 }
 
-.ui-item-card.is-story::before {
+.ItemCard.story-card::before {
     width: 8px;
     background: repeating-linear-gradient(to right,
             var(--current-color),
@@ -75,54 +75,54 @@
 }
 
 /* Axis-E: Structural Variation (Compact Mode) */
-.ui-item-card.is-compact {
+.ItemCard.state-compact {
     --card-padding-y: 4px;
     --card-margin-bottom: 4px;
 }
 
-.ui-item-card.is-compact .ui-item-card__description,
-.ui-item-card.is-compact .ui-item-card__footer {
+.ItemCard.state-compact .item-card-description,
+.ItemCard.state-compact .item-card-footer {
     display: none;
 }
 
 /* Axis-E: Structural Variation (Mini Mode) */
-.ui-item-card.is-mini {
+.ItemCard.state-mini {
     --card-padding-y: 4px;
     --card-padding-x: 8px;
     --card-radius: calc(var(--radius-standard) * 0.7);
 }
 
-.ui-item-card.is-mini::before {
+.ItemCard.state-mini::before {
     width: 3px;
 }
 
-.ui-item-card.is-mini .ui-item-card__title {
+.ItemCard.state-mini .item-card-title {
     font-size: 11px;
     line-height: 1.1;
 }
 
-.ui-item-card.is-mini .ui-item-card__header-right {
+.ItemCard.state-mini .item-card-header-right {
     gap: 4px;
 }
 
-.ui-item-card.is-mini .ui-item-card__status {
+.ItemCard.state-mini .item-card-status {
     font-size: 8px;
     padding: 1px 4px;
 }
 
 /* Combination: Compact + Mini */
-.ui-item-card.is-mini.is-compact {
+.ItemCard.state-mini.state-compact {
     --card-padding-y: 1px;
 }
 
 /* --- 2. Card Internal Layout --- */
-.ui-item-card .ui-item-card__header {
+.ItemCard .item-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.ui-item-card__title {
+.item-card-title {
     margin: 0;
     font-size: 13px;
     font-weight: 800;
@@ -133,21 +133,21 @@
     flex: 1;
 }
 
-.ui-item-card .ui-item-card__header-right {
+.ItemCard .item-card-header-right {
     display: flex;
     align-items: center;
     gap: var(--space-unit);
     flex-shrink: 0;
 }
 
-.ui-item-card__description {
+.item-card-description {
     margin: 0 0 2px 0;
     font-size: 11px;
     color: rgba(255, 255, 255, 0.7);
     line-height: 1.3;
 }
 
-.ui-item-card__footer {
+.item-card-footer {
     display: flex;
     justify-content: flex-start;
     margin-top: 4px;
@@ -155,18 +155,18 @@
 }
 
 /* --- 3. Property Display System --- */
-.ui-item-card__prop-group {
+.item-card-prop-group {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 }
 
 /* Automatic Color Propagation for Icons */
-.ui-item-card .ui-icon {
+.ItemCard .Icon {
     color: var(--current-color);
 }
 
-.ui-item-card__prop {
+.item-card-prop {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -176,14 +176,14 @@
     border-radius: var(--radius-pill);
 }
 
-.ui-item-card__prop-label {
+.item-card-prop-label {
     font-size: 9px;
     font-weight: 800;
     color: rgba(255, 255, 255, 0.4);
     text-transform: uppercase;
 }
 
-.ui-item-card__prop-value {
+.item-card-prop-value {
     color: #ffffff;
     font-family: var(--font-num);
     font-size: 11px;
@@ -191,7 +191,7 @@
 }
 
 /* Property Decoration: Handled in CSS to separate logic from presentation */
-.ui-item-card__prop.is-multiplier .ui-item-card__prop-value::before {
+.item-card-prop.multiplier .item-card-prop-value::before {
     content: 'x';
     font-size: 0.9em;
     margin-right: 1px;
@@ -199,17 +199,17 @@
 }
 
 /* Enhanced State: Special visuals for upgraded properties */
-.ui-item-card__prop.is-enhanced {
+.item-card-prop.state-enhanced {
     border-color: #00d4ff;
     background: rgba(0, 212, 255, 0.1);
 }
 
-.ui-item-card__prop.is-enhanced .ui-item-card__prop-value {
+.item-card-prop.state-enhanced .item-card-prop-value {
     color: #00d4ff;
 }
 
 /* --- 4. Rocket & Module Specifics --- */
-.ui-rocket-details {
+.rocket-details {
     margin-top: 6px;
     border-top: 1px dashed rgba(255, 255, 255, 0.1);
     padding-top: 4px;
@@ -219,12 +219,12 @@
 }
 
 /* Override card margins when nested in rocket details for maximum density */
-.ui-rocket-details .ui-item-card {
+.rocket-details .ItemCard {
     margin-bottom: 0;
 }
 
 /* --- 6. Card Status Indicators --- */
-.ui-item-card__status {
+.item-card-status {
     font-size: 9px;
     font-weight: 900;
     padding: 2px 6px;
@@ -232,9 +232,9 @@
 }
 
 /* --- 7. Placeholder State --- */
-/* .is-placeholder: Structural representation of an empty slot.
+/* .placeholder-card: Structural representation of an empty slot.
    Maintains layout density while signaling missing content. */
-.ui-item-card.is-placeholder {
+.ItemCard.placeholder-card {
     border-style: dashed;
     background-color: transparent;
     pointer-events: none;
@@ -249,16 +249,16 @@
 }
 
 /* Enable interactions only if clickable */
-.ui-item-card.is-placeholder.is-clickable {
+.ItemCard.placeholder-card.state-clickable {
     pointer-events: auto;
     cursor: pointer;
 }
 
-.ui-item-card.is-placeholder::before {
+.ItemCard.placeholder-card::before {
     display: none;
 }
 
-.ui-item-card.is-placeholder .placeholder-text {
+.ItemCard.placeholder-card .placeholder-text {
     font-size: 11px;
     font-weight: 900;
     letter-spacing: 0.05em;
@@ -267,7 +267,7 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
-.ui-item-card.is-placeholder .placeholder-subtext {
+.ItemCard.placeholder-card .placeholder-subtext {
     font-size: 9px;
     font-weight: 800;
     letter-spacing: 0.02em;
@@ -276,8 +276,8 @@
     opacity: 1;
 }
 
-/* is-notable (Guidance): Adds color and pulse animation to the subtext only */
-.ui-item-card.is-placeholder.is-notable .placeholder-subtext {
+/* state-notable (Guidance): Adds color and pulse animation to the subtext only */
+.ItemCard.placeholder-card.state-notable .placeholder-subtext {
     color: var(--current-color);
     animation: ui-guide-pulse 2s infinite ease-in-out;
 }

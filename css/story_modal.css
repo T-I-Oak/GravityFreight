@@ -4,7 +4,7 @@
    Focus: Narrative immersion and message delivery
    ========================================= */
 
-.ui-panel.is-story {
+.Panel.story-card {
     width: 90vw;
     max-width: 480px;
     height: auto;
@@ -20,11 +20,11 @@
         inset 0 0 30px color-mix(in srgb, var(--current-color), transparent 90%);
     border-radius: 16px;
     
-    /* Center positioning helper when used within ui-flex-center */
+    /* Center positioning helper when used within FlexCenter */
     margin: auto;
 }
 
-.ui-panel.is-story .ui-panel__header {
+.Panel.story-card .panel-header {
     padding: var(--space-double);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -32,7 +32,7 @@
     gap: var(--space-double);
 }
 
-.ui-panel.is-story .ui-panel__title {
+.Panel.story-card .panel-title {
     font-size: 24px;
     font-weight: 900;
     color: #ffffff;
@@ -42,7 +42,7 @@
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
-.ui-panel.is-story .ui-panel__body {
+.Panel.story-card .panel-body {
     padding: var(--space-double);
     line-height: 1.8;
     font-size: 14px;
@@ -51,7 +51,7 @@
     flex-direction: column;
 }
 
-.ui-panel.is-story .is-intro {
+.Panel.story-card .intro {
     font-size: 14px;
     font-weight: 900;
     font-style: italic;
@@ -65,13 +65,13 @@
     box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 50%);
 }
 
-.ui-panel.is-story .ui-well {
+.Panel.story-card .Well {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
     white-space: pre-wrap; /* 手紙の改行を維持 */
 }
 
-.ui-panel.is-story .ui-panel__footer {
+.Panel.story-card .panel-footer {
     padding: var(--space-double);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;

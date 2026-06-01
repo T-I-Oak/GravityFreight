@@ -18,38 +18,38 @@
     <link rel="stylesheet" href="../../css/ui_style_neon.css">
     <link rel="stylesheet" href="../../css/title.css">
 </head>
-<body class="ui-style--neon">
+<body class="theme-neon">
 
     <!-- 仕様 3. セマンティクス表に基づき画面ルートを main に定義 -->
     <main id="title-screen">
 
         <!-- コンテンツを中央に寄せるための見えないコンテナ -->
-        <div class="title-content-wrapper ui-flex-center">
-            <!-- ロゴエリア：特にカード構造ではないため div (ui-title-box) で構成 -->
-            <div class="ui-title-box">
-                <h1 class="text-display is-logo">GRAVITY FREIGHT</h1>
-                <span class="text-sub-display is-logo">ORBITAL ECHOES</span>
+        <div class="title-content-wrapper FlexCenter">
+            <!-- ロゴエリア：特にカード構造ではないため div (TitleBox) で構成 -->
+            <div class="TitleBox">
+                <h1 class="text-display logo">GRAVITY FREIGHT</h1>
+                <span class="text-sub-display logo">ORBITAL ECHOES</span>
             </div>
 
             <!-- ボタンメニュー：コンテナとしての div を使用 -->
-            <div class="ui-menu-buttons">
-                <button class="ui-button is-primary is-big is-clickable">
+            <div class="menu-buttons">
+                <button class="Button state-primary button-large state-clickable">
                     <span class="btn-main-label">BEGIN CONTRACT</span>
                 </button>
-                <button class="ui-button is-big is-clickable">
+                <button class="Button button-large state-clickable">
                     <span class="btn-main-label">HOW TO PLAY</span>
                 </button>
-                <button class="ui-button is-big is-clickable">
+                <button class="Button button-large state-clickable">
                     <span class="btn-main-label">RECORDS</span>
                 </button>
             </div>
         </div>
 
         <!-- 設定指示器： div を使用 -->
-        <div class="ui-button is-clickable" id="title-settings-btn">⚙</div>
+        <div class="Button state-clickable" id="title-settings-btn">⚙</div>
 
         <!-- 仕様 3. バージョン等の「属性情報」として末尾に footer を配置 -->
-        <footer class="ui-footer">
+        <footer class="screen-footer">
             <span>v2.0.0</span>
             <span>© T.I.OAK 2026</span>
         </footer>

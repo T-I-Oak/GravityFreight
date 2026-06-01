@@ -5,7 +5,7 @@
    ========================================= */
 
 /* --- 1. Badge System --- */
-.ui-badge {
+.Badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -29,12 +29,12 @@
 }
 
 /* Capability: pill-shaped badge */
-.ui-badge.is-capsule {
+.Badge.capsule {
     --badge-radius: var(--radius-pill);
 }
 
-/* is-stack: derivative for numerical item counts */
-.ui-badge.is-stack {
+/* item-count: derivative for numerical item counts */
+.Badge.item-count {
     --badge-font-size: 13px;
     --badge-padding-x: 6px;
     --badge-radius: 4px; /* badge(radius-standard)と共通の4px */
@@ -46,7 +46,7 @@
     flex-shrink: 0;
 }
 
-.ui-badge.is-stack.is-mini {
+.Badge.item-count.state-mini {
     --badge-min-height: 0;
     --badge-height: 10px;
     --badge-padding-x: 3px;
@@ -56,7 +56,7 @@
 }
 
 /* --- 2. Durability Gauge System --- */
-.ui-durability-gauge {
+.DurabilityGauge {
     --gauge-gap: 3px;
     --gauge-padding: 2px;
     --gauge-segment-width: 10px;
@@ -72,20 +72,20 @@
     transition: all 0.2s ease;
 }
 
-.ui-durability-gauge.is-mini {
+.DurabilityGauge.state-mini {
     --gauge-gap: 1px;
     --gauge-padding: 0;
     background: transparent;
     border: none;
 }
 
-.ui-durability-gauge.is-enhanced {
+.DurabilityGauge.state-enhanced {
     border-color: #ffd700;
     padding: 3px;
     background: rgba(255, 215, 0, 0.05);
 }
 
-.ui-durability-segment {
+.durability-segment {
     width: var(--gauge-segment-width);
     height: var(--gauge-segment-height);
     background: rgba(255, 255, 255, 0.1);
@@ -96,17 +96,17 @@
     transition: all var(--motion-normal) ease;
 }
 
-.ui-durability-gauge.is-mini .ui-durability-segment {
+.DurabilityGauge.state-mini .durability-segment {
     --gauge-segment-width: 8px;
     --gauge-segment-height: 3px;
 }
 
-.ui-durability-segment.is-active {
+.durability-segment.state-active {
     background: var(--color-theme-main);
 }
 
 /* --- 3. Icon System (SVG Masks) --- */
-.ui-icon {
+.Icon {
     display: inline-block;
     width: 1.2em;
     height: 1.2em;
@@ -121,31 +121,31 @@
     flex-shrink: 0;
 }
 
-.is-icon-mail {
+.mail {
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E");
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E");
 }
 
-.is-icon-chevron-down {
+.chevron-down {
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 }
 
 /* --- 4. Numerical Branding --- */
-.num-sector, .num-coin, .num-score, .num-contract, .num-item-count {
+.sector, .coin, .score, .contract, .item-count {
     font-family: var(--font-num);
     font-weight: 900;
 }
 
-.num-sector { color: var(--color-num-sector); }
-.num-coin { color: var(--color-num-coin); }
-.num-score { color: var(--color-num-score); }
-.num-contract { color: var(--color-num-contract); }
-.num-item-count { color: var(--color-num-item-count); }
-.num-achievements { color: var(--color-num-achievement); }
+.sector { color: var(--color-num-sector); }
+.coin { color: var(--color-num-coin); }
+.score { color: var(--color-num-score); }
+.contract { color: var(--color-num-contract); }
+.item-count { color: var(--color-num-item-count); }
+.achievement-rate { color: var(--color-num-achievement); }
 
 /* --- 5. Semantic Labels --- */
-.ui-stat-label {
+.stat-label {
     font-size: 9px;
     font-weight: 900;
     text-transform: uppercase;
@@ -153,14 +153,14 @@
 }
 
 /* --- 6. Message & Indicator Wrappers --- */
-.ui-msg-icon {
+.message-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
 /* --- 7. Logo Specific Primitives (Cleaned) --- */
-.is-logo.text-display {
+.logo.text-display {
     font-family: var(--font-num);
     font-size: 18px;
     font-weight: 900;
@@ -170,7 +170,7 @@
     text-transform: uppercase;
 }
 
-.is-logo.text-sub-display {
+.logo.text-sub-display {
     font-family: var(--font-num);
     font-size: 8px;
     font-weight: 900;
@@ -182,8 +182,8 @@
 
 /* --- 8. Animation & State Primitives --- */
 
-/* is-new: mail icon specific pulse animation (Unified with HUD neon-pulse rhythm) */
-.ui-icon.is-icon-mail.is-new {
+/* state-new: mail icon specific pulse animation (Unified with HUD neon-pulse rhythm) */
+.Icon.mail.state-new {
     animation: ui-mail-pulse 1.5s infinite ease-in-out;
 }
 
@@ -210,19 +210,19 @@
     }
 }
 
-/* is-clickable icons: Visual feedback for interactive icons */
-.ui-icon.is-clickable {
+/* state-clickable icons: Visual feedback for interactive icons */
+.Icon.state-clickable {
     cursor: pointer;
     transition: all var(--motion-fast) ease;
 }
 
-.ui-icon.is-clickable:hover {
+.Icon.state-clickable:hover {
     transform: scale(1.2);
     filter: brightness(1.2);
 }
 
 /* --- 9. Data Wells --- */
-.ui-well {
+.Well {
     border-radius: var(--radius-standard);
     padding: var(--space-double);
     border: 1px solid transparent;

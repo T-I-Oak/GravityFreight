@@ -25,62 +25,62 @@
 </head>
 
 <body id="facility-screen">
-    <main class="ui-style--matte ui-flex-center">
-        <section class="ui-panel is-repair-dock">
-            <header class="ui-panel__header">
-                <div class="ui-facility-badge">R</div>
+    <main class="theme-matte FlexCenter">
+        <section class="Panel repair-dock">
+            <header class="panel-header">
+                <div class="FacilityBadge">R</div>
                 <div class="facility-title-group">
-                    <h1 class="ui-panel__title">REPAIR DOCK</h1>
-                    <span class="ui-panel__subtitle">発射台の整備やロケットの分解・強化を行える高度な設備。</span>
+                    <h1 class="panel-title">REPAIR DOCK</h1>
+                    <span class="panel-subtitle">発射台の整備やロケットの分解・強化を行える高度な設備。</span>
                 </div>
             </header>
 
-            <div class="ui-panel__body">
-                <div class="ui-well">
-                    <div class="ui-columns">
+            <div class="panel-body">
+                <div class="Well">
+                    <div class="ColumnSet">
                         <!-- Left Column: Maintenance & Dismantle -->
-                        <section class="ui-column is-scrollable">
+                        <section class="Column ScrollArea">
                             <!-- Section 1: Launcher Maintenance -->
-                            <header class="ui-section-header">
-                                <h3 class="ui-section-title">発射台のメンテナンス</h3>
-                                <span class="ui-section-subtitle">ランチャーの使用回数を全回復します。</span>
+                            <header class="section-header">
+                                <h3 class="section-title">発射台のメンテナンス</h3>
+                                <span class="section-subtitle">ランチャーの使用回数を全回復します。</span>
                             </header>
-                            <div class="ui-item-list" id="repair-list">
+                            <div class="item-list" id="repair-list">
                                 <!-- Generated via JS -->
                             </div>
 
                             <!-- Section 2: Rocket Dismantle -->
-                            <header class="ui-section-header">
-                                <h3 class="ui-section-title">ロケットの分解・強化</h3>
-                                <span class="ui-section-subtitle">機体を解体し、構成パーツをインベントリに回収します。</span>
+                            <header class="section-header">
+                                <h3 class="section-title">ロケットの分解・強化</h3>
+                                <span class="section-subtitle">機体を解体し、構成パーツをインベントリに回収します。</span>
                             </header>
-                            <div class="ui-item-list" id="dismantle-list">
+                            <div class="item-list" id="dismantle-list">
                                 <!-- Generated via JS -->
                             </div>
                         </section>
 
                         <!-- Right Column: Result / History -->
-                        <section class="ui-column is-scrollable">
-                            <header class="ui-section-header">
-                                <h3 class="ui-section-title">強化済みパーツ（受取り）</h3>
-                                <span class="ui-section-subtitle">分解・強化によって回収されたパーツの一覧。</span>
+                        <section class="Column ScrollArea">
+                            <header class="section-header">
+                                <h3 class="section-title">強化済みパーツ（受取り）</h3>
+                                <span class="section-subtitle">分解・強化によって回収されたパーツの一覧。</span>
                             </header>
 
-                            <div class="ui-item-list" id="received-list">
+                            <div class="item-list" id="received-list">
                                 <!-- Placeholder Example -->
                             </div>
                         </section>
-                    </div> <!-- /.ui-columns -->
-                </div> <!-- /.ui-well -->
-            </div> <!-- /.ui-panel__body -->
+                    </div> <!-- /.ColumnSet -->
+                </div> <!-- /.Well -->
+            </div> <!-- /.panel-body -->
 
             <!-- Global Actions Section -->
-            <footer class="ui-panel__footer">
+            <footer class="panel-footer">
                 <div class="player-credits">
                     <span class="credits-label">CREDITS:</span>
-                    <span class="credits-value num-coin" id="player-credits-value">50 c</span>
+                    <span class="credits-value coin" id="player-credits-value">50 c</span>
                 </div>
-                <button class="ui-button is-primary is-big is-repair-dock" id="depart-station">
+                <button class="Button state-primary button-large repair-dock" id="depart-station">
                     <span class="btn-main-label">DEPART FROM STATION</span>
                 </button>
             </footer>
@@ -94,7 +94,7 @@
         // Helper to create a facility entry row (Reusing logic from Trading Post)
         function createFacilityEntry(item, actionLabel, options = {}) {
             const entry = document.createElement('div');
-            entry.className = 'trade-entry ui-split-row';
+            entry.className = 'trade-entry SplitRow';
 
             const itemArea = document.createElement('div');
             itemArea.className = 'trade-item-area';
@@ -104,20 +104,20 @@
             itemArea.innerHTML = UIComponents.generateCardHTML(item, cardOptions);
 
             const actionArea = document.createElement('div');
-            actionArea.className = 'trade-action-area ui-split-column';
+            actionArea.className = 'trade-action-area SplitColumn';
             
             const group = document.createElement('div');
             group.className = 'trade-action-group';
             
             const price = document.createElement('div');
-            price.className = 'trade-price num-coin';
+            price.className = 'trade-price coin';
             price.textContent = `${options.price} c`;
             group.appendChild(price);
 
             const button = document.createElement('button');
-            button.className = `ui-button is-primary`;
+            button.className = `Button state-primary`;
             
-            if (options.disabled) button.classList.add('is-disabled');
+            if (options.disabled) button.classList.add('state-disabled');
             button.textContent = actionLabel.toUpperCase();
 
             actionArea.appendChild(group);

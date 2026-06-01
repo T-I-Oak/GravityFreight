@@ -35,7 +35,7 @@
     border-bottom: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
 }
 
-#play-scene-container .ui-panel__body {
+#play-scene-container .panel-body {
     padding: var(--space-double);
 }
 
@@ -104,19 +104,19 @@
 
 
 /* Large Action Buttons: Specialized branding for critical mission phases */
-#play-screen .is-launch { --current-color: var(--color-category-launchers); }
-#play-screen .is-assembly { --current-color: var(--color-theme-main); }
+#play-screen .launch { --current-color: var(--color-category-launchers); }
+#play-screen .assembly { --current-color: var(--color-theme-main); }
 
 /* Play scene specific overrides for large action buttons */
-#play-screen .ui-button.is-big {
+#play-screen .Button.button-large {
     height: 76px;
     border-width: 3px;
     width: 100%;
 }
 
 /* Mission-Specific Disabled Logic */
-#play-screen .is-launch.is-disabled,
-#play-screen .is-assembly.is-disabled {
+#play-screen .launch.state-disabled,
+#play-screen .assembly.state-disabled {
     filter: none; /* Override global neon grayscale */
     opacity: 1;    /* Override global neon opacity to allow bright children */
     cursor: not-allowed;
@@ -126,8 +126,8 @@
 }
 
 /* 6. DISABLED + NOTABLE (Guide Awareness Pulse) */
-#play-screen .is-launch.is-disabled.is-notable .btn-sub-label,
-#play-screen .is-assembly.is-disabled.is-notable .btn-sub-label {
+#play-screen .launch.state-disabled.state-notable .btn-sub-label,
+#play-screen .assembly.state-disabled.state-notable .btn-sub-label {
     color: var(--current-color);
     text-shadow: 0 0 12px var(--current-color);
     animation: ui-guide-pulse 2s infinite ease-in-out;

@@ -26,62 +26,62 @@
 </head>
 
 <body>
-    <main id="flight-result-screen" class="ui-style--matte ui-flex-center">
-        <section class="ui-panel is-home">
+    <main id="flight-result-screen" class="theme-matte FlexCenter">
+        <section class="Panel home">
 
             <!-- Header Section -->
-            <header class="ui-panel__header ui-split-row">
-                <h2 id="report-title" class="ui-panel__title is-trading-post">SECTOR 1 COMPLETED</h2>
+            <header class="panel-header SplitRow">
+                <h2 id="report-title" class="panel-title trading-post">SECTOR 1 COMPLETED</h2>
                 <div class="flight-report-status">
-                    <div id="badge-recorded" class="ui-badge is-recorded is-capsule"><span class="recorded-text">● RECORDED</span></div>
-                    <div id="btn-protect" class="ui-badge is-favorite is-outline is-inactive is-clickable is-capsule">☆ PROTECT RECORD</div>
+                    <div id="badge-recorded" class="Badge state-recorded capsule"><span class="recorded-text">● RECORDED</span></div>
+                    <div id="btn-protect" class="Badge favorite outline state-inactive state-clickable capsule">☆ PROTECT RECORD</div>
                 </div>
             </header>
 
             <!-- Content Area -->
-            <div class="ui-panel__body ui-columns">
+            <div class="panel-body ColumnSet">
                 <!-- Left Column: Performance data -->
-                <section class="ui-column is-scrollable">
-                    <header class="ui-section-header">
-                        <h3 class="ui-section-title">FLIGHT PERFORMANCE DATA</h3>
+                <section class="Column ScrollArea">
+                    <header class="section-header">
+                        <h3 class="section-title">FLIGHT PERFORMANCE DATA</h3>
                     </header>
 
                     <div class="flight-report-summary">
-                        <div class="ui-well">
-                            <div class="ui-stat-group">
-                                <div class="ui-split-column is-hero">
-                                    <span class="ui-stat-label">FLIGHT SCORE</span>
-                                    <span class="stat-value num-score">3,260</span>
+                        <div class="Well">
+                            <div class="stat-group">
+                                <div class="SplitColumn hero">
+                                    <span class="stat-label">FLIGHT SCORE</span>
+                                    <span class="stat-value score">3,260</span>
                                 </div>
-                                <div class="ui-split-column is-hero">
-                                    <span class="ui-stat-label">CREDITS EARNED</span>
-                                    <span class="stat-value num-coin">30</span>
+                                <div class="SplitColumn hero">
+                                    <span class="stat-label">CREDITS EARNED</span>
+                                    <span class="stat-value coin">30</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="ui-split-row is-data-row">
+                    <div class="SplitRow data-row">
                         <span class="report-data-label">Flight Duration Score</span>
-                        <span class="report-data-value num-score">+260</span>
+                        <span class="report-data-value score">+260</span>
                     </div>
-                    <div class="ui-split-row is-data-row">
+                    <div class="SplitRow data-row">
                         <span class="report-data-label">REPAIR DOCK Reward</span>
-                        <span class="report-data-value num-score">+3,000</span>
+                        <span class="report-data-value score">+3,000</span>
                     </div>
-                    <div class="ui-split-row is-data-row">
+                    <div class="SplitRow data-row">
                         <span class="report-data-label">REPAIR DOCK Reward Coin</span>
-                        <span class="report-data-value num-coin">+30</span>
+                        <span class="report-data-value coin">+30</span>
                     </div>
                 </section>
 
                 <!-- Right Column: Acquired assets -->
-                <section class="ui-column is-scrollable">
-                    <header class="ui-section-header">
-                        <h3 class="ui-section-title">COLLECTED SPACE ASSETS</h3>
+                <section class="Column ScrollArea">
+                    <header class="section-header">
+                        <h3 class="section-title">COLLECTED SPACE ASSETS</h3>
                     </header>
 
-                    <div class="ui-item-list">
+                    <div class="item-list">
                         <!-- Dynamic Story Section -->
                         <div id="story-item-container"></div>
 
@@ -94,11 +94,11 @@
             </div>
 
             <!-- Global Actions Section -->
-            <footer class="ui-panel__footer">
-                <button class="ui-button is-big" id="btn-view-map">
+            <footer class="panel-footer">
+                <button class="Button button-large" id="btn-view-map">
                     <span class="btn-main-label">VIEW MAP</span>
                 </button>
-                <button class="ui-button is-primary is-big is-trading-post" id="main-action-btn">
+                <button class="Button state-primary button-large trading-post" id="main-action-btn">
                     <span class="btn-main-label">TO TRADING POST</span>
                 </button>
             </footer>
@@ -142,12 +142,12 @@
 
         // --- 2. View State Controller ---
         const states = [
-            { title: 'SECTOR 1 COMPLETED',  btn: 'TO TRADING POST',    cls: 'is-trading-post' },
-            { title: 'SECTOR 1 COMPLETED',  btn: 'TO REPAIR DOCK',     cls: 'is-repair-dock'  },
-            { title: 'SECTOR 1 COMPLETED',  btn: 'TO BLACK MARKET',    cls: 'is-black-market' },
-            { title: 'ROCKET RECOVERED',    btn: 'BACK TO BASE',       cls: 'is-home'        },
-            { title: 'SHIP CRASHED',        btn: 'RETRY FLIGHT',       cls: 'is-home'        },
-            { title: 'LOST IN SPACE',       btn: 'RETRY FLIGHT',       cls: 'is-home'        }
+            { title: 'SECTOR 1 COMPLETED',  btn: 'TO TRADING POST',    cls: 'trading-post' },
+            { title: 'SECTOR 1 COMPLETED',  btn: 'TO REPAIR DOCK',     cls: 'repair-dock'  },
+            { title: 'SECTOR 1 COMPLETED',  btn: 'TO BLACK MARKET',    cls: 'black-market' },
+            { title: 'ROCKET RECOVERED',    btn: 'BACK TO BASE',       cls: 'home'        },
+            { title: 'SHIP CRASHED',        btn: 'RETRY FLIGHT',       cls: 'home'        },
+            { title: 'LOST IN SPACE',       btn: 'RETRY FLIGHT',       cls: 'home'        }
         ];
 
         let currentState = 0;
@@ -163,7 +163,7 @@
             btn.querySelector('.btn-main-label').textContent = s.btn;
 
             // Update classes for both Title and Button for color propagation
-            const colorClasses = ['is-repair-dock', 'is-trading-post', 'is-black-market', 'is-home'];
+            const colorClasses = ['repair-dock', 'trading-post', 'black-market', 'home'];
             
             title.classList.remove(...colorClasses);
             title.classList.add(s.cls);
@@ -176,19 +176,19 @@
         const recordedBadge = document.getElementById('badge-recorded');
 
         protectBtn.addEventListener('click', () => {
-            const isActive = protectBtn.classList.contains('is-active');
+            const isActive = protectBtn.classList.contains('state-active');
             
             if (isActive) {
                 // To Inactive
-                protectBtn.classList.remove('is-active');
-                protectBtn.classList.add('is-inactive');
-                protectBtn.classList.add('is-outline');
+                protectBtn.classList.remove('state-active');
+                protectBtn.classList.add('state-inactive');
+                protectBtn.classList.add('outline');
                 protectBtn.textContent = '☆ PROTECT RECORD';
             } else {
                 // To Active (Protected)
-                protectBtn.classList.remove('is-inactive');
-                protectBtn.classList.remove('is-outline');
-                protectBtn.classList.add('is-active');
+                protectBtn.classList.remove('state-inactive');
+                protectBtn.classList.remove('outline');
+                protectBtn.classList.add('state-active');
                 protectBtn.textContent = '★ PROTECTED';
                 
                 // Ensure RECORDED badge is visible

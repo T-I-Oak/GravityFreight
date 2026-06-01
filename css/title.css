@@ -22,18 +22,18 @@
     gap: 32px; /* Explicit gap between title-box and menu buttons */
 }
 
-#title-screen .text-display.is-logo {
+#title-screen .text-display.logo {
     font-size: clamp(3rem, 12vw, 6rem);
     max-width: 90vw;
     transition: font-size 0.2s ease;
 }
 
-#title-screen .text-sub-display.is-logo {
+#title-screen .text-sub-display.logo {
     font-size: 1.8rem;
     margin-top: 0.5rem;
 }
 
-.ui-menu-buttons {
+.menu-buttons {
     display: flex;
     flex-direction: column;
     gap: var(--space-double);
@@ -43,8 +43,8 @@
     margin: 0 auto;
 }
 
-#title-screen .ui-menu-buttons .ui-button {
-    /* Base styles are now managed by .ui-button and .is-big in ui_base.css */
+#title-screen .menu-buttons .Button {
+    /* Base styles are now managed by .Button and .button-large in ui_base.css */
     width: 100%;
 }
 

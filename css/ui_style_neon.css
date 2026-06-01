@@ -4,12 +4,12 @@
    Focus: Cyber-glow, vibrant colors, scanned textures
    ========================================= */
 
-.ui-style--neon {
+.theme-neon {
     color: #ffffff;
 }
 
 /* --- [A] Base Panel: Neon Expression --- */
-.ui-style--neon .ui-panel {
+.theme-neon .Panel {
     background: rgba(10, 20, 40, 0.4);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
@@ -18,7 +18,7 @@
 }
 
 /* Logic: Panel "De-materialization" for minimal HUD footprint when inactive */
-.ui-style--neon .ui-panel.is-collapsed {
+.theme-neon .Panel.state-collapsed {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
@@ -26,32 +26,32 @@
     -webkit-backdrop-filter: none;
 }
 
-.ui-style--neon .ui-panel.is-collapsed .ui-tab-group {
+.theme-neon .Panel.state-collapsed .TabGroup {
     visibility: hidden;
     /* Removing info-clutter while keeping toggle */
 }
 
 /* --- [B] HUD Specific Style --- */
 
-.ui-style--neon .ui-title-box {
+.theme-neon .TitleBox {
     text-align: center;
 }
 
 /* Logo Flavor Expression: White core with multi-layered cyan bloom for depth */
-.ui-style--neon .is-logo.text-display {
+.theme-neon .logo.text-display {
     text-shadow:
         0 0 10px rgba(0, 212, 255, 0.8),
         0 0 20px rgba(0, 212, 255, 0.4),
         0 0 30px rgba(0, 212, 255, 0.2);
 }
 
-.ui-style--neon .is-logo.text-sub-display {
+.theme-neon .logo.text-sub-display {
     text-shadow:
         0 0 15px rgba(0, 212, 255, 0.6),
         0 0 30px rgba(0, 212, 255, 0.3);
 }
 
-.ui-style--neon .ui-stat-label {
+.theme-neon .stat-label {
     color: #ffffff;
     font-size: 9px;
     letter-spacing: 0.05em;
@@ -61,64 +61,64 @@
 }
 
 /* Axis-D: Flavor-based glows to emphasize data identity */
-.ui-style--neon .num-sector {
+.theme-neon .sector {
     text-shadow: 0 0 8px var(--color-num-sector);
 }
 
-.ui-style--neon .num-coin {
+.theme-neon .coin {
     text-shadow: 0 0 8px var(--color-num-coin);
 }
 
-.ui-style--neon .num-score {
+.theme-neon .score {
     text-shadow: 0 0 8px var(--color-num-score);
 }
 
 
-.ui-style--neon .ui-panel__header {
+.theme-neon .panel-header {
     background: rgba(0, 0, 0, 0.3);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Logical Reset: Ensuring the entire surface vanishes upon collapse */
-.ui-style--neon .ui-panel.is-collapsed .ui-panel__header {
+.theme-neon .Panel.state-collapsed .panel-header {
     background: transparent;
     border-bottom: none;
 }
 
-.ui-style--neon .ui-tab {
+.theme-neon .Tab {
     color: rgba(255, 255, 255, 0.4);
 }
 
 /* Hover: Subtle surface activation */
-.ui-style--neon .ui-tab:hover:not(.is-active) {
+.theme-neon .Tab:hover:not(.state-active) {
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.8);
 }
 
 /* Active Highlight: Deep-linked thematic signaling with bloom effect */
-.ui-style--neon .ui-tab.is-active {
+.theme-neon .Tab.state-active {
     background: color-mix(in srgb, var(--color-theme-sub), transparent 85%);
     color: var(--color-theme-sub);
     box-shadow: inset 0 -2px 0 var(--color-theme-sub);
     text-shadow: 0 0 10px color-mix(in srgb, var(--color-theme-sub), transparent 40%);
 }
 
-/* --- ui-item-card: Neon Expression --- */
-.ui-style--neon .ui-item-card {
+/* --- ItemCard: Neon Expression --- */
+.theme-neon .ItemCard {
     --color-bg-card: rgba(20, 25, 40, 0.5);
 }
 
-.ui-style--neon .ui-item-card.is-clickable:hover {
+.theme-neon .ItemCard.state-clickable:hover {
     border-color: color-mix(in srgb, var(--current-color), #fff 60%);
     box-shadow: 0 0 6px color-mix(in srgb, var(--current-color), transparent 60%);
     transform: translateY(-1px);
 }
 
-.ui-style--neon .ui-item-card__title {
+.theme-neon .item-card-title {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
-.ui-style--neon .ui-item-card__description {
+.theme-neon .item-card-description {
     margin-bottom: 2px;
 }
 
@@ -126,14 +126,14 @@
 
 /* Footer & Layout Sync with Base */
 
-.ui-style--neon .ui-item-card__prop-group {
+.theme-neon .item-card-prop-group {
     display: flex;
     gap: var(--space-double);
 }
 
 /* Property structure unified in base */
 
-.ui-style--neon .ui-item-card__prop-value {
+.theme-neon .item-card-prop-value {
     color: #ffffff;
     font-family: var(--font-num);
     font-size: 11px;
@@ -142,13 +142,13 @@
 }
 
 /* Rocket Module List: Specific nested information for complex assemblies */
-.ui-style--neon .ui-rocket-details {
+.theme-neon .rocket-details {
     margin-top: 8px;
     border-top: 1px dashed rgba(255, 255, 255, 0.1);
     padding-top: 6px;
 }
 
-.ui-style--neon .ui-module-row {
+.theme-neon .module-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -158,7 +158,7 @@
 }
 
 /* Section Header Decoration: High-density labeling using category color signals */
-.ui-style--neon .ui-section-header {
+.theme-neon .section-header {
     border-left: none;
     /* Removed as per user request */
     margin: 12px 0 6px 0;
@@ -166,7 +166,7 @@
     padding-left: 0;
 }
 
-.ui-style--neon .ui-section-title {
+.theme-neon .section-title {
     color: var(--current-color);
     font-size: 10px;
     font-weight: 900;
@@ -176,10 +176,10 @@
     opacity: 0.5;
 }
 
-/* Category Color Contexts for Section Titles - Now Inherited from global .is-xxx */
+/* Category Color Contexts for Section Titles - Now Inherited from domain color type classes */
 
 /* UI Placeholder: High-contrast guidance for empty states */
-.ui-style--neon .ui-item-card.is-placeholder {
+.theme-neon .ItemCard.placeholder-card {
     border-color: rgba(255, 255, 255, 0.15);
     background: rgba(255, 255, 255, 0.02);
 }
@@ -188,7 +188,7 @@
 /* --- 6. Interaction Layer: Button Aesthetics --- */
 
 /* Base Neon Button: "Clear Glass" with sharpened emissive edges */
-.ui-style--neon .ui-button {
+.theme-neon .Button {
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid color-mix(in srgb, var(--current-color), transparent 75%);
     color: var(--current-color);
@@ -199,32 +199,32 @@
     transition: all var(--motion-fast) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.ui-style--neon .ui-button:hover:not(.is-disabled) {
+.theme-neon .Button:hover:not(.state-disabled) {
     background: color-mix(in srgb, var(--current-color), transparent 80%);
     border-color: color-mix(in srgb, var(--current-color), #fff 30%);
     box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 70%);
     transform: translateY(-1px);
 }
 
-.ui-style--neon .ui-button.is-big:hover:not(.is-disabled) {
+.theme-neon .Button.button-large:hover:not(.state-disabled) {
     box-shadow: 0 0 30px var(--current-color);
 }
 
-.ui-style--neon .ui-button:active:not(.is-disabled),
-.ui-style--neon .is-clickable:active:not(.is-disabled) {
+.theme-neon .Button:active:not(.state-disabled),
+.theme-neon .state-clickable:active:not(.state-disabled) {
     transform: scale(0.98);
     filter: brightness(1.2);
 }
 
 /* Primary Button: "Tinted Glass" - clearer but with strong identity */
-.ui-style--neon .ui-button.is-primary {
+.theme-neon .Button.state-primary {
     background: color-mix(in srgb, var(--current-color), transparent 85%);
     border-color: color-mix(in srgb, var(--current-color), #fff 60%);
     box-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 80%);
     font-weight: 900;
 }
 
-.ui-style--neon .ui-button.is-primary:hover:not(.is-disabled) {
+.theme-neon .Button.state-primary:hover:not(.state-disabled) {
     background: color-mix(in srgb, var(--current-color), transparent 70%);
     border-color: color-mix(in srgb, var(--current-color), #fff 70%);
     box-shadow: 0 0 25px color-mix(in srgb, var(--current-color), transparent 60%);
@@ -233,14 +233,14 @@
 /* --- 7. Status & State Layer --- */
 
 /* 5. DISABLED / OFF: Thermal Throttling / Power-Down state */
-.ui-style--neon .ui-button.is-disabled {
+.theme-neon .Button.state-disabled {
     filter: grayscale(0.8);
     opacity: 0.5;
     cursor: not-allowed;
 }
 
 /* Panel Controls: Visual density for utility icons */
-.ui-style--neon .ui-panel-toggle {
+.theme-neon .PanelToggle {
     width: 24px;
     height: 24px;
     margin: 4px;
@@ -255,7 +255,7 @@
     transition: all 0.2s ease;
 }
 
-.ui-style--neon .ui-panel-toggle:hover {
+.theme-neon .PanelToggle:hover {
     color: #ffffff;
     border-color: var(--color-theme-sub);
     background: color-mix(in srgb, var(--color-theme-sub), transparent 80%);
@@ -266,25 +266,25 @@
 /* Utilities & Indicators */
 
 /* Message Icons (HUD Specific Size & Branding) */
-#play-hud .hud-messages .ui-icon {
+#play-hud .hud-messages .Icon {
     font-size: 16px;
     transition: all 0.2s ease;
 }
 
-#play-hud .hud-messages .ui-icon.is-trading-post {
+#play-hud .hud-messages .Icon.trading-post {
     color: var(--color-facility-trading-post);
 }
 
-#play-hud .hud-messages .ui-icon.is-repair-dock {
+#play-hud .hud-messages .Icon.repair-dock {
     color: var(--color-facility-repair-dock);
 }
 
-#play-hud .hud-messages .ui-icon.is-disabled {
+#play-hud .hud-messages .Icon.state-disabled {
     color: rgba(255, 255, 255, 0.15);
 }
 
 /* Resource Badges: High-feedback markers for data counting with V1 black-core aesthetic */
-.ui-style--neon .ui-badge.is-stack {
+.theme-neon .Badge.item-count {
     background: var(--current-color);
     color: #050510;
     box-shadow: 0 0 12px color-mix(in srgb, var(--current-color), transparent 40%);
