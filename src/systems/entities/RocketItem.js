@@ -4,6 +4,7 @@ import IDGenerator from '../../core/utils/IDGenerator.js';
 
 const ADDITIVE_STATS = ['mass', 'charges', 'maxCharges', 'precision', 'pickupRange', 'power', 'slots'];
 const MULTIPLIER_STATS = ['precisionMultiplier', 'pickupMultiplier', 'gravityMultiplier', 'powerMultiplier', 'arcMultiplier'];
+const AGGREGATE_STAT_KEYS = [...ADDITIVE_STATS, ...MULTIPLIER_STATS];
 
 class RocketItem extends Item {
     constructor(chassis, logic, modules = []) {
@@ -12,6 +13,9 @@ class RocketItem extends Item {
         }
 
         super(chassis.id, chassis.gameDataRepository);
+        AGGREGATE_STAT_KEYS.forEach(key => {
+            delete this[key];
+        });
         this.uid = IDGenerator.generate('rocketitem');
         this.id = 'rocket';
         this.category = 'rocket';
@@ -23,91 +27,67 @@ class RocketItem extends Item {
         this.description = '';
     }
 
-    get mass() {
+    getMass() {
         return this._sum('mass');
     }
 
-    set mass(_value) {}
-
-    get slots() {
+    getSlots() {
         return this._sum('slots');
     }
 
-    set slots(_value) {}
-
-    get precision() {
+    getPrecision() {
         return this._sum('precision');
     }
 
-    set precision(_value) {}
-
-    get pickupRange() {
+    getPickupRange() {
         return this._sum('pickupRange');
     }
 
-    set pickupRange(_value) {}
-
-    get power() {
+    getPower() {
         return this._sum('power');
     }
 
-    set power(_value) {}
-
-    get charges() {
+    getCharges() {
         return this._sum('charges');
     }
 
-    set charges(_value) {}
-
-    get maxCharges() {
+    getMaxCharges() {
         return this._sum('maxCharges');
     }
 
-    set maxCharges(_value) {}
-
-    get precisionMultiplier() {
+    getPrecisionMultiplier() {
         return this._multiply('precisionMultiplier');
     }
 
-    set precisionMultiplier(_value) {}
-
-    get pickupMultiplier() {
+    getPickupMultiplier() {
         return this._multiply('pickupMultiplier');
     }
 
-    set pickupMultiplier(_value) {}
-
-    get gravityMultiplier() {
+    getGravityMultiplier() {
         return this._multiply('gravityMultiplier');
     }
 
-    set gravityMultiplier(_value) {}
-
-    get powerMultiplier() {
+    getPowerMultiplier() {
         return this._multiply('powerMultiplier');
     }
 
-    set powerMultiplier(_value) {}
-
-    get arcMultiplier() {
+    getArcMultiplier() {
         return this._multiply('arcMultiplier');
     }
-
-    set arcMultiplier(_value) {}
 
     getViewData() {
         const stats = {};
 
         ADDITIVE_STATS.forEach(key => {
             stats[key] = {
-                value: this[key],
+                value: this._getAggregatedStatValue(key),
                 enhanceCount: this._sumEnhancements(key)
             };
         });
 
         MULTIPLIER_STATS.forEach(key => {
             stats[key] = {
-                value: this[key],
+                value: this._getAggregatedStatValue(key),
                 enhanceCount: this._sumEnhancements(key)
             };
         });
@@ -187,6 +167,11 @@ class RocketItem extends Item {
 
     _sumEnhancements(key) {
         return this._allParts().reduce((total, item) => total + (item.enhancement?.[key] || 0), 0);
+    }
+
+    _getAggregatedStatValue(key) {
+        const methodName = `get${key[0].toUpperCase()}${key.slice(1)}`;
+        return this[methodName]();
     }
 }
 
