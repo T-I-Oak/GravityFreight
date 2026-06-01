@@ -64,6 +64,18 @@ class StackedItem {
         return item;
     }
 
+    getViewData() {
+        if (!this.representative) {
+            throw new Error('[StackedItem] Cannot create view data from an empty stack.');
+        }
+
+        return {
+            ...this.representative.getViewData(),
+            uid: this.uid,
+            count: this.count
+        };
+    }
+
     /**
      * スナップショットの取得
      * @returns {Object}
