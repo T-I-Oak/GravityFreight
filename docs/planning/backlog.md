@@ -30,16 +30,17 @@
 - [x] M0: データ基盤とアイテム系エンティティを実装する
     - [x] GameDataRepository / Item / StackedItem / ModuleStack / ItemContainer / RocketItem / Rocket
     - [x] 要求仕様テストの入口を作る
-- [ ] M1: ゲーム進行状態とワールド snapshot の土台を実装する
+- [x] M1: ゲーム進行状態とワールド snapshot の土台を実装する
     - [x] SessionState
-    - [ ] Sector
+    - [x] Sector
     - [x] CelestialBody
     - [x] ExitArc
-    - [ ] createSnapshot / fromSnapshot によるワールド再現
-    - [ ] world snapshot の基礎サイズを測定する
+    - [x] createSnapshot / fromSnapshot によるワールド再現
+    - [x] world snapshot の基礎サイズを測定する
         - リプレイ20件保存時の最終判断ではなく、異常に大きい snapshot 構造を早期検知するための参考測定とする
         - 保存件数削減で対応可能な規模か、件数を減らしても問題になりそうな規模かの感触を確認する
         - 目安: 1 sector の world snapshot は 15KiB 以内を目標、25KiB 超で警告、40KiB 超で構造見直し候補とする
+        - v0.64 測定値: `Sector.createSnapshot()` の UTF-16 相当サイズは 2932 bytes（通常セクター、天体6件、出口3件、各天体に coin item 1件）
 - [ ] M2: 最小航行シミュレーションを実装する
     - [ ] PhysicsEngine
     - [ ] 航行終了判定
@@ -69,10 +70,10 @@
     - [x] Rocket
     - [x] SessionState
 - [ ] ワールド生成・再現クラスを実装する
-    - [ ] Sector
+    - [x] Sector
     - [x] CelestialBody
     - [x] ExitArc
-    - [ ] createSnapshot / fromSnapshot
+    - [x] createSnapshot / fromSnapshot
 - [ ] 物理・航行ロジックを実装する
     - [ ] PhysicsEngine
     - [ ] TrajectoryPredictor

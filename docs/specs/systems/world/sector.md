@@ -21,7 +21,7 @@
 
 ### メソッド (Methods)
 
-- **`constructor(session: SessionState, isAnomaly: boolean)`**
+- **`constructor(session: SessionState, isAnomaly: boolean, gameDataRepository: GameDataRepository, economySystem: EconomySystem)`**
     - **挙動**:
         1. 引数の `isAnomaly` を自身のプロパティに保持する。
         2. **母星（Home Star）の配置**:
@@ -50,7 +50,7 @@
 - **`clone(): Sector`**
     - 現在の状態のコピーを生成して返す。内部的には `createSnapshot()` と `Sector.fromSnapshot()` を組み合わせて実現する。
 
-- **`static fromSnapshot(snapshot: object): Sector`**
+- **`static fromSnapshot(snapshot: object, gameDataRepository: GameDataRepository): Sector`**
     - 保存されたスナップショットデータから `Sector` インスタンスを再構築する。リプレイ再生・クローン用。
     - **復元対象**: `sectorNumber`, `isAnomaly`, `luckyDiscountRate`, `bodies`, `exits`。
     - **内部挙動**:
