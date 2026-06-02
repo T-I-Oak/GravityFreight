@@ -1,0 +1,3063 @@
+/* =========================================
+   Gravity Freight V2: Design Tokens
+   Core Semantic Definitions
+   ========================================= */
+
+:root {
+   /* Base Surface & Text
+       The fundamental canvas of the application. */
+   --color-bg-base: #050510;
+   /* Deep Space Black */
+   --color-text-base: #ffffff;
+   /* Primary font color (white by default) */
+
+   /* Theme Colors
+       The core visual identity of the project. */
+   --color-theme-main: #00ffcc;
+   /* Mint Cyan: Primary Brand Color */
+   --color-theme-sub: #4488ff;
+   /* Traversal Blue: Secondary Brand Color */
+
+   /* Dynamic Color Handle (Default: Main Theme) */
+   --current-color: var(--color-theme-main);
+
+   /* Facility Colors
+       Fixed pillars of the station environment. */
+   --color-facility-trading-post: #00a62a;
+   /* Commercial Green */
+   --color-facility-repair-dock: #2979ff;
+   /* Industrial Blue */
+   --color-facility-black-market: #cf1744;
+   /* Prohibited Red */
+
+   /* Category Colors
+       Balanced for visibility and logical identity.
+       - Warm: Logic, Launchers (Active energy/spark)
+       - Cool: Boosters, Modules (Passive/Electric tech)
+       - Neutral: Chassis, Rockets, Cargo (Physical mass) */
+   --color-category-chassis: #78909c;
+   /* Steel: Structural base */
+   --color-category-logic: #fdd835;
+   /* Yellow: Intellectual spark */
+   --color-category-module: #9575cd;
+   /* Muted Purple: Internal hardware */
+   --color-category-rockets: #b0bec5;
+   /* Slate: Gliding projectile mass */
+   --color-category-launchers: #ffa726;
+   /* Orange: Launch force and ignition */
+   --color-category-boosters: #00e5ff;
+   /* Vivid Cyan: Kinetic pulse */
+   --color-category-coin: #ffd700;
+   /* Gold: Standard currency */
+   --color-category-cargo: #607d8b;
+   /* Concrete: Industrial freight */
+
+   /* World & Entity Colors (Canvas)
+       Authoritative colors for game world rendering. */
+   --color-world-bg:             #050510;
+   --color-world-home-star:      #ff6600;
+   --color-world-normal-star:    #ffcc00;
+   --color-world-repulsive-star: #e100ff;
+   --color-world-scanner:        #00ffcc;
+   --color-world-boundary:       rgba(255, 255, 255, 0.1);
+   --color-world-prediction:     rgba(255, 255, 255, 0.6);
+
+   /* Numeric Data Colors
+       Derived tokens based on the semantic relationship of data types. */
+   --color-num-score: var(--color-theme-main);
+   --color-num-sector: var(--color-theme-sub);
+   --color-num-item-count: var(--color-category-cargo);
+   --color-num-contract: #e1b2e4;
+   --color-num-achievement: #dcdcdc;
+   /* Achievement: Independent */
+   --color-num-coin: var(--color-category-coin);
+
+   /* UI State Colors (Semantic)
+       Specific colors for user-driven states. */
+   --color-ui-favorite: #ffcc00;
+   /* Star Gold: For record protection and favorite status */
+
+   /* Card Surface Tokens
+       Standard backgrounds and borders for item units. */
+   --color-bg-card: rgba(20, 25, 40, 0.95);
+   --color-border-card: rgba(255, 255, 255, 0.1);
+
+   /* Visual Layout Tokens
+       Strictly minimized options to ensure standardization. */
+   --space-unit: 8px;
+   --space-double: 16px;
+
+   --radius-standard: 4px;
+   --radius-pill: 100px;
+   /* Capsule shape for primary actions */
+   --radius-round: 50%;
+
+   --border-width: 1px;
+
+   /* Typography Tokens
+       Limited to three levels of hierarchy. */
+   --font-main: 'Inter', 'Noto Sans JP', sans-serif;
+   --font-num: 'Outfit', 'Noto Sans JP', sans-serif;
+   --font-special: 'UnifrakturMaguntia', serif;
+
+   --text-size-title: 16px;
+   --text-size-main: 12px;
+   --text-size-caption: 10px;
+
+   /* Z-Index Hierarchy
+       Managing the vertical stack of the UI. */
+   --z-world: 10;
+   --z-hud: 100;
+   --z-panel: 200;
+   --z-modal: 500;
+   --z-system: 900;
+
+   /* --- Effects & Motion --- */
+   --blur: 6px;
+   /* Glassmorphism diffusion strength */
+   --motion-fast: 150ms;
+   /* Snappy interaction feedback */
+   --motion-normal: 300ms;
+   /* Standard transition timing */
+}/* =========================================
+   Gravity Freight V2: Base Capabilities
+   Layer: Base / Capability (A-Axis)
+   Managing Global Resets and Interactive Foundations
+   ========================================= */
+
+/* --- 1. Immersion Reset & Global Definitions --- */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    
+    /* プロジェクト標準のスクロールバースタイル (グローバル定義) */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+*:focus {
+    outline: none !important;
+}
+
+.ScrollArea {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--color-bg-base);
+    color: var(--color-text-base);
+    font-family: var(--font-main);
+    font-size: var(--text-size-main);
+    line-height: 1.5;
+}
+
+/* --- 2. Interactive Foundations (Semantic) --- */
+.Button,
+.state-clickable {
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--motion-fast);
+}
+
+.Button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    font-family: var(--font-main);
+    font-weight: 800;
+    border-radius: var(--radius-standard);
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    text-decoration: none;
+    transition: all var(--motion-fast);
+}
+
+/* button-large: Specialized large action button (Capsule shape) */
+.Button.button-large {
+    height: 48px;
+    padding: 0 32px;
+    border-radius: var(--radius-pill);
+    border-width: 2px;
+    flex-direction: column;
+}
+
+.Button.button-large .btn-main-label {
+    font-size: 16px;
+    font-weight: 950;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.Button.button-large .btn-sub-label {
+    font-size: 10px;
+    font-weight: 800;
+    opacity: 0.6;
+    margin-top: -2px;
+}
+
+/* Category Color Modifiers (Overrides base component defaults) */
+.trading-post { --current-color: var(--color-facility-trading-post); }
+.repair-dock  { --current-color: var(--color-facility-repair-dock); }
+.black-market { --current-color: var(--color-facility-black-market); }
+
+.color-theme-main        { --current-color: var(--color-theme-main); }
+.color-theme-sub    { --current-color: var(--color-theme-sub); }
+.home         { --current-color: var(--color-world-home-star); }
+
+/* Category Mappings (Axis-D: Structure) */
+.rocket       { --current-color: var(--color-category-rockets); }
+.launcher     { --current-color: var(--color-category-launchers); }
+.chassis      { --current-color: var(--color-category-chassis); }
+.logic        { --current-color: var(--color-category-logic); }
+.module       { --current-color: var(--color-category-module); }
+.booster      { --current-color: var(--color-category-boosters); }
+.coin         { --current-color: var(--color-category-coin); }
+.cargo        { --current-color: var(--color-category-cargo); }
+
+/* User State Modifiers */
+.favorite     { --current-color: var(--color-ui-favorite); }
+
+.state-disabled {
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* .ScrollArea is now unified at the top of this file */
+
+/* --- 3. Global Metadata Components --- */
+.footer,
+.screen-footer {
+    position: absolute;
+    bottom: var(--space-unit);
+    left: var(--space-double);
+    display: flex;
+    gap: var(--space-double);
+    font-size: var(--text-size-caption);
+    opacity: 0.3;
+    z-index: var(--z-hud);
+    pointer-events: none;
+}
+/* =========================================
+   Gravity Freight V2: Layout & Structure
+   Layer: Base / Capability (A-Axis)
+   Managing Panels, Columns, and Generic Containers
+   ========================================= */
+
+/* --- 1. Screen Structures (Semantic Roots) --- */
+main {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- 2. UI Panel System --- */
+.Panel {
+    border-radius: var(--radius-standard);
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid transparent;
+    transition: all var(--motion-normal);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.panel-header {
+    flex-shrink: 0;
+}
+
+.panel-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.panel-footer {
+    flex-shrink: 0;
+}
+
+.Panel.state-collapsed {
+    height: 32px !important;
+    overflow: visible;
+}
+
+.Panel.state-collapsed .panel-body {
+    display: none;
+}
+
+.Panel.state-collapsed .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.PanelToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* --- 3. Column & Grid System --- */
+.ColumnSet {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    gap: var(--space-unit);
+}
+
+.Column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+@media screen and (max-width: 800px) {
+    /* 1カラム化時は全体コンテナでのスクロールを標準とする */
+    .ColumnSet {
+        flex-direction: column;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .ColumnSet > .Column {
+        flex: none;
+    }
+
+    /* カラム側の個別スクロールを解除し、親に展開させる */
+    .ColumnSet .ScrollArea {
+        overflow: visible;
+        height: auto;
+        flex: none;
+    }
+}
+
+.SplitRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* data-row: Logical role for split-rows that present key-value data */
+.SplitRow.data-row {
+    width: 100%;
+}
+
+/* --- 4. Sectioning --- */
+.section {
+    margin-bottom: var(--space-unit);
+}
+
+.section-header {
+    margin-bottom: 4px;
+}
+
+.section-title {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 950;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.section-subtitle {
+    display: block;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* --- 5. Navigational Layouts --- */
+.TabGroup {
+    display: flex;
+    gap: 0;
+    flex: 1;
+}
+
+.Tab {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+/* --- 6. Abstract Utilities --- */
+.FlexCenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.SplitColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.TitleBox {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.text-display,
+.text-sub-display {
+    margin: 0;
+}
+
+/* --- 7. Data Visualization Layouts --- */
+.stat-group {
+    display: flex;
+    gap: var(--space-double);
+    flex-wrap: wrap;
+}
+
+.SplitColumn .stat-value {
+    font-size: var(--text-size-title);
+    line-height: 1;
+}
+
+.SplitColumn.hero .stat-value {
+    font-size: 24px;
+    font-weight: 900;
+}
+/* =========================================
+   Gravity Freight V2: UI Primitives
+   Layer: Base / Capability (A-Axis)
+   Managing Atoms: Badges, Icons, and Gauges
+   ========================================= */
+
+/* --- 1. Badge System --- */
+.Badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box; 
+    
+    /* Geometry Variables: Allows override via modifiers without !important */
+    --badge-min-height: 18px;
+    --badge-height: auto;
+    --badge-padding-x: 8px;
+    --badge-font-size: 10px;
+    --badge-radius: var(--radius-standard);
+
+    min-height: var(--badge-min-height);
+    height: var(--badge-height);
+    padding: 0 var(--badge-padding-x); 
+    font-size: var(--badge-font-size);
+    font-weight: 800;
+    border-radius: var(--badge-radius);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Capability: pill-shaped badge */
+.Badge.capsule {
+    --badge-radius: var(--radius-pill);
+}
+
+/* item-count: derivative for numerical item counts */
+.Badge.item-count {
+    --badge-font-size: 13px;
+    --badge-padding-x: 6px;
+    --badge-radius: 4px; /* badge(radius-standard)と共通の4px */
+    --badge-height: 17px;
+    
+    color: #050a1a;
+    background: color-mix(in srgb, var(--current-color), #fff 25%);
+    min-width: 28px;
+    flex-shrink: 0;
+}
+
+.Badge.item-count.state-mini {
+    --badge-min-height: 0;
+    --badge-height: 10px;
+    --badge-padding-x: 3px;
+    --badge-font-size: 10px;
+    --badge-radius: 3px;
+    min-width: 18px;
+}
+
+/* --- 2. Durability Gauge System --- */
+.DurabilityGauge {
+    --gauge-gap: 3px;
+    --gauge-padding: 2px;
+    --gauge-segment-width: 10px;
+    --gauge-segment-height: 5px;
+
+    display: flex;
+    gap: var(--gauge-gap);
+    align-items: center;
+    padding: var(--gauge-padding);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+.DurabilityGauge.state-mini {
+    --gauge-gap: 1px;
+    --gauge-padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.DurabilityGauge.state-enhanced {
+    border-color: #ffd700;
+    padding: 3px;
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.durability-segment {
+    width: var(--gauge-segment-width);
+    height: var(--gauge-segment-height);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: skewX(-15deg);
+    border-radius: 1px;
+    flex-shrink: 0;
+    transition: all var(--motion-normal) ease;
+}
+
+.DurabilityGauge.state-mini .durability-segment {
+    --gauge-segment-width: 8px;
+    --gauge-segment-height: 3px;
+}
+
+.durability-segment.state-active {
+    background: var(--color-theme-main);
+}
+
+/* --- 3. Icon System (SVG Masks) --- */
+.Icon {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
+    background-color: currentColor;
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center;
+    flex-shrink: 0;
+}
+
+.mail {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z'%3E%3C/path%3E%3Cpolyline points='22,6 12,13 2,6'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.chevron-down {
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* --- 4. Numerical Branding --- */
+.sector, .coin, .score, .contract, .item-count {
+    font-family: var(--font-num);
+    font-weight: 900;
+}
+
+.sector { color: var(--color-num-sector); }
+.coin { color: var(--color-num-coin); }
+.score { color: var(--color-num-score); }
+.contract { color: var(--color-num-contract); }
+.item-count { color: var(--color-num-item-count); }
+.achievement-rate { color: var(--color-num-achievement); }
+
+/* --- 5. Semantic Labels --- */
+.stat-label {
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* --- 6. Message & Indicator Wrappers --- */
+.message-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- 7. Logo Specific Primitives (Cleaned) --- */
+.logo.text-display {
+    font-family: var(--font-num);
+    font-size: 18px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.logo.text-sub-display {
+    font-family: var(--font-num);
+    font-size: 8px;
+    font-weight: 900;
+    color: var(--color-theme-main);
+    letter-spacing: 0.4em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+/* --- 8. Animation & State Primitives --- */
+
+/* state-new: mail icon specific pulse animation (Unified with HUD neon-pulse rhythm) */
+.Icon.mail.state-new {
+    animation: ui-mail-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes ui-mail-pulse {
+    0%, 100% { 
+        opacity: 0.8; 
+        filter: brightness(1) drop-shadow(0 0 1px currentColor); 
+    }
+    50% { 
+        opacity: 1; 
+        filter: brightness(1.5) drop-shadow(0 0 6px currentColor); 
+    }
+}
+
+/* ui-guide-pulse: Guidance animation for placeholders and specific CTAs */
+@keyframes ui-guide-pulse {
+    0%, 100% { 
+        opacity: 0.6; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.05);
+    }
+}
+
+/* state-clickable icons: Visual feedback for interactive icons */
+.Icon.state-clickable {
+    cursor: pointer;
+    transition: all var(--motion-fast) ease;
+}
+
+.Icon.state-clickable:hover {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+}
+
+/* --- 9. Data Wells --- */
+.Well {
+    border-radius: var(--radius-standard);
+    padding: var(--space-double);
+    border: 1px solid transparent;
+    transition: all var(--motion-normal);
+}
+/* =========================================
+   Gravity Freight V2: Item Card Component
+   Layer: Base / Capability (A-Axis)
+   Managing unified data units for items and modules
+   ========================================= */
+
+/* --- 1. Base Item Card Structure --- */
+
+/* .ItemCard: The unified data unit for Gravity Freight V2.
+   [設計上の例外処置]: アイテムカードが「カテゴリーの色に染まる」特性は、ネオン/マット両スタイルで
+   共通の視覚体験を維持し、コードの二重定義を防ぐため、敢えて Base レイヤーで定義されています。
+   これにより、全スタイルで「カテゴリーのアイデンティティ」が保証されます。 */
+.ItemCard {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    
+    /* Geometry Variables: Managing density without !important */
+    --card-padding-y: 8px;
+    --card-padding-x: 12px;
+    --card-radius: var(--radius-standard);
+    --card-margin-bottom: 8px;
+
+    padding: var(--card-padding-y) var(--card-padding-x);
+    margin-bottom: var(--card-margin-bottom);
+    background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-tint, 93%));
+    border: 1px solid var(--color-border-card);
+    border-radius: var(--card-radius);
+    transition: all var(--motion-normal) ease;
+    overflow: hidden;
+}
+
+/* Active/Selected State: Structural signaling and enhanced tint */
+.ItemCard.state-active {
+    background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-active, 80%));
+    border-color: color-mix(in srgb, var(--current-color), #fff 40%);
+}
+
+.ItemCard.state-clickable {
+    cursor: pointer;
+}
+
+.ItemCard.state-clickable:hover {
+    filter: brightness(1.1);
+}
+
+/* Category indicator bar: Shared structure for all themes */
+.ItemCard::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    width: 4px;
+    background: var(--current-color);
+    border-radius: var(--radius-standard) 0 0 var(--radius-standard);
+    transition: all 0.2s ease;
+}
+
+/* Axis-E: Structural Variation (Story Specialization) */
+.ItemCard.story-card {
+    padding-left: 16px;
+}
+
+.ItemCard.story-card::before {
+    width: 8px;
+    background: repeating-linear-gradient(to right,
+            var(--current-color),
+            var(--current-color) 3px,
+            transparent 3px,
+            transparent 5px,
+            var(--current-color) 5px,
+            var(--current-color) 8px);
+}
+
+/* Axis-E: Structural Variation (Compact Mode) */
+.ItemCard.state-compact {
+    --card-padding-y: 4px;
+    --card-margin-bottom: 4px;
+}
+
+.ItemCard.state-compact .item-card-description,
+.ItemCard.state-compact .item-card-footer {
+    display: none;
+}
+
+/* Axis-E: Structural Variation (Mini Mode) */
+.ItemCard.state-mini {
+    --card-padding-y: 4px;
+    --card-padding-x: 8px;
+    --card-radius: calc(var(--radius-standard) * 0.7);
+}
+
+.ItemCard.state-mini::before {
+    width: 3px;
+}
+
+.ItemCard.state-mini .item-card-title {
+    font-size: 11px;
+    line-height: 1.1;
+}
+
+.ItemCard.state-mini .item-card-header-right {
+    gap: 4px;
+}
+
+.ItemCard.state-mini .item-card-status {
+    font-size: 8px;
+    padding: 1px 4px;
+}
+
+/* Combination: Compact + Mini */
+.ItemCard.state-mini.state-compact {
+    --card-padding-y: 1px;
+}
+
+/* --- 2. Card Internal Layout --- */
+.ItemCard .item-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-card-title {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.ItemCard .item-card-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+    flex-shrink: 0;
+}
+
+.item-card-description {
+    margin: 0 0 2px 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.3;
+}
+
+.item-card-footer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 4px;
+    padding-top: 4px;
+}
+
+/* --- 3. Property Display System --- */
+.item-card-prop-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Automatic Color Propagation for Icons */
+.ItemCard .Icon {
+    color: var(--current-color);
+}
+
+.item-card-prop {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-pill);
+}
+
+.item-card-prop-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+}
+
+.item-card-prop-value {
+    color: #ffffff;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* Property Decoration: Handled in CSS to separate logic from presentation */
+.item-card-prop.multiplier .item-card-prop-value::before {
+    content: 'x';
+    font-size: 0.9em;
+    margin-right: 1px;
+    opacity: 0.7;
+}
+
+/* Enhanced State: Special visuals for upgraded properties */
+.item-card-prop.state-enhanced {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.item-card-prop.state-enhanced .item-card-prop-value {
+    color: #00d4ff;
+}
+
+/* --- 4. Rocket & Module Specifics --- */
+.rocket-details {
+    margin-top: 6px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Override card margins when nested in rocket details for maximum density */
+.rocket-details .ItemCard {
+    margin-bottom: 0;
+}
+
+/* --- 6. Card Status Indicators --- */
+.item-card-status {
+    font-size: 9px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+/* --- 7. Placeholder State --- */
+/* .placeholder-card: Structural representation of an empty slot.
+   Maintains layout density while signaling missing content. */
+.ItemCard.placeholder-card {
+    border-style: dashed;
+    background-color: transparent;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 56px;
+    padding: 8px 12px;
+    opacity: 0.6;
+    gap: 1px;
+}
+
+/* Enable interactions only if clickable */
+.ItemCard.placeholder-card.state-clickable {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.ItemCard.placeholder-card::before {
+    display: none;
+}
+
+.ItemCard.placeholder-card .placeholder-text {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: none;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.ItemCard.placeholder-card .placeholder-subtext {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.4);
+    opacity: 1;
+}
+
+/* state-notable (Guidance): Adds color and pulse animation to the subtext only */
+.ItemCard.placeholder-card.state-notable .placeholder-subtext {
+    color: var(--current-color);
+    animation: ui-guide-pulse 2s infinite ease-in-out;
+}
+/* =========================================
+   Gravity Freight V2: Facility Badge
+   Layer: Base / Capability (A-Axis)
+   Managing the distinctive insignia for orbital facilities.
+   ========================================= */
+
+.FacilityBadge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 4px solid var(--current-color);
+    border-radius: 12px;
+    color: var(--current-color);
+    font-family: var(--font-special);
+    font-size: 48px;
+    line-height: 1;
+    flex-shrink: 0;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 
+                inset 0 0 20px color-mix(in srgb, var(--current-color), transparent 90%);
+    box-sizing: border-box;
+    padding-top: 5px; /* 重心調整: タイポグラフィの特性に合わせた補正 */
+}
+
+/* Style Layer: Neon - High vibrancy and glow */
+.theme-neon .FacilityBadge {
+    filter: brightness(1.3);
+    background: color-mix(in srgb, var(--current-color), transparent 95%);
+    box-shadow: 0 0 25px color-mix(in srgb, var(--current-color), transparent 40%),
+                inset 0 0 15px color-mix(in srgb, var(--current-color), transparent 70%);
+    /* border-color はベースの --current-color を継承 */
+}
+
+/* Style Layer: Matte - Solid and weathered */
+.theme-matte .FacilityBadge {
+    filter: brightness(0.7);
+    background: rgba(0, 0, 0, 0.7);
+}
+/* =========================================
+   Gravity Freight V2: Neon Style Layer
+   Layer: Style / Aesthetic (Emissive)
+   Focus: Cyber-glow, vibrant colors, scanned textures
+   ========================================= */
+
+.theme-neon {
+    color: #ffffff;
+}
+
+/* --- [A] Base Panel: Neon Expression --- */
+.theme-neon .Panel {
+    background: rgba(10, 20, 40, 0.4);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 60%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Logic: Panel "De-materialization" for minimal HUD footprint when inactive */
+.theme-neon .Panel.state-collapsed {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.theme-neon .Panel.state-collapsed .TabGroup {
+    visibility: hidden;
+    /* Removing info-clutter while keeping toggle */
+}
+
+/* --- [B] HUD Specific Style --- */
+
+.theme-neon .TitleBox {
+    text-align: center;
+}
+
+/* Logo Flavor Expression: White core with multi-layered cyan bloom for depth */
+.theme-neon .logo.text-display {
+    text-shadow:
+        0 0 10px rgba(0, 212, 255, 0.8),
+        0 0 20px rgba(0, 212, 255, 0.4),
+        0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.theme-neon .logo.text-sub-display {
+    text-shadow:
+        0 0 15px rgba(0, 212, 255, 0.6),
+        0 0 30px rgba(0, 212, 255, 0.3);
+}
+
+.theme-neon .stat-label {
+    color: #ffffff;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    opacity: 0.25;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+/* Axis-D: Flavor-based glows to emphasize data identity */
+.theme-neon .sector {
+    text-shadow: 0 0 8px var(--color-num-sector);
+}
+
+.theme-neon .coin {
+    text-shadow: 0 0 8px var(--color-num-coin);
+}
+
+.theme-neon .score {
+    text-shadow: 0 0 8px var(--color-num-score);
+}
+
+
+.theme-neon .panel-header {
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Logical Reset: Ensuring the entire surface vanishes upon collapse */
+.theme-neon .Panel.state-collapsed .panel-header {
+    background: transparent;
+    border-bottom: none;
+}
+
+.theme-neon .Tab {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Hover: Subtle surface activation */
+.theme-neon .Tab:hover:not(.state-active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Active Highlight: Deep-linked thematic signaling with bloom effect */
+.theme-neon .Tab.state-active {
+    background: color-mix(in srgb, var(--color-theme-sub), transparent 85%);
+    color: var(--color-theme-sub);
+    box-shadow: inset 0 -2px 0 var(--color-theme-sub);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--color-theme-sub), transparent 40%);
+}
+
+/* --- ItemCard: Neon Expression --- */
+.theme-neon .ItemCard {
+    --color-bg-card: rgba(20, 25, 40, 0.5);
+}
+
+.theme-neon .ItemCard.state-clickable:hover {
+    border-color: color-mix(in srgb, var(--current-color), #fff 60%);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--current-color), transparent 60%);
+    transform: translateY(-1px);
+}
+
+.theme-neon .item-card-title {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.theme-neon .item-card-description {
+    margin-bottom: 2px;
+}
+
+/* --- Durability Gauge (Overrides Disabled) --- */
+
+/* Footer & Layout Sync with Base */
+
+.theme-neon .item-card-prop-group {
+    display: flex;
+    gap: var(--space-double);
+}
+
+/* Property structure unified in base */
+
+.theme-neon .item-card-prop-value {
+    color: #ffffff;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Rocket Module List: Specific nested information for complex assemblies */
+.theme-neon .rocket-details {
+    margin-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 6px;
+}
+
+.theme-neon .module-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2px;
+}
+
+/* Section Header Decoration: High-density labeling using category color signals */
+.theme-neon .section-header {
+    border-left: none;
+    /* Removed as per user request */
+    margin: 12px 0 6px 0;
+    /* Reduced padding/margin for better density */
+    padding-left: 0;
+}
+
+.theme-neon .section-title {
+    color: var(--current-color);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--current-color), transparent 40%);
+    opacity: 0.5;
+}
+
+/* Category Color Contexts for Section Titles - Now Inherited from domain color type classes */
+
+/* UI Placeholder: High-contrast guidance for empty states */
+.theme-neon .ItemCard.placeholder-card {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+
+/* --- 6. Interaction Layer: Button Aesthetics --- */
+
+/* Base Neon Button: "Clear Glass" with sharpened emissive edges */
+.theme-neon .Button {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 75%);
+    color: var(--current-color);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--current-color), transparent 90%);
+    text-shadow: 0 0 4px color-mix(in srgb, var(--current-color), transparent 40%);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    transition: all var(--motion-fast) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-neon .Button:hover:not(.state-disabled) {
+    background: color-mix(in srgb, var(--current-color), transparent 80%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 30%);
+    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 70%);
+    transform: translateY(-1px);
+}
+
+.theme-neon .Button.button-large:hover:not(.state-disabled) {
+    box-shadow: 0 0 30px var(--current-color);
+}
+
+.theme-neon .Button:active:not(.state-disabled),
+.theme-neon .state-clickable:active:not(.state-disabled) {
+    transform: scale(0.98);
+    filter: brightness(1.2);
+}
+
+/* Primary Button: "Tinted Glass" - clearer but with strong identity */
+.theme-neon .Button.state-primary {
+    background: color-mix(in srgb, var(--current-color), transparent 85%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 60%);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 80%);
+    font-weight: 900;
+}
+
+.theme-neon .Button.state-primary:hover:not(.state-disabled) {
+    background: color-mix(in srgb, var(--current-color), transparent 70%);
+    border-color: color-mix(in srgb, var(--current-color), #fff 70%);
+    box-shadow: 0 0 25px color-mix(in srgb, var(--current-color), transparent 60%);
+}
+
+/* --- 7. Status & State Layer --- */
+
+/* 5. DISABLED / OFF: Thermal Throttling / Power-Down state */
+.theme-neon .Button.state-disabled {
+    filter: grayscale(0.8);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Panel Controls: Visual density for utility icons */
+.theme-neon .PanelToggle {
+    width: 24px;
+    height: 24px;
+    margin: 4px;
+    /* Providing breathing room within the header */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-standard);
+    color: color-mix(in srgb, var(--color-theme-sub), transparent 40%);
+    transition: all 0.2s ease;
+}
+
+.theme-neon .PanelToggle:hover {
+    color: #ffffff;
+    border-color: var(--color-theme-sub);
+    background: color-mix(in srgb, var(--color-theme-sub), transparent 80%);
+    box-shadow: 0 0 15px var(--color-theme-sub);
+}
+
+
+/* Utilities & Indicators */
+
+/* Message Icons (HUD Specific Size & Branding) */
+#play-hud .hud-messages .Icon {
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+#play-hud .hud-messages .Icon.trading-post {
+    color: var(--color-facility-trading-post);
+}
+
+#play-hud .hud-messages .Icon.repair-dock {
+    color: var(--color-facility-repair-dock);
+}
+
+#play-hud .hud-messages .Icon.state-disabled {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+/* Resource Badges: High-feedback markers for data counting with V1 black-core aesthetic */
+.theme-neon .Badge.item-count {
+    background: var(--current-color);
+    color: #050510;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--current-color), transparent 40%);
+    text-shadow: none;
+    /* Black text must stay crisp */
+}
+/* =========================================
+   Gravity Freight V2: Matte Style Layer
+   Layer: Style / Aesthetic (Expressions)
+   Focus: Opaque materials, solid colors, pure contrast
+   ========================================= */
+
+.theme-matte {
+    background: #050510;
+    color: #ffffff;
+}
+
+/* --- [A] ItemCard: Matte Expression --- */
+.theme-matte .ItemCard {
+    --color-bg-card: #14192d;
+}
+
+.theme-matte .ItemCard.state-clickable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Axis-D: Flavor Visualization (Category Color Borders) 
+   Structural identification via solid indicator from base. */
+/* No specific overrides needed for Matte indicator beyond base logic */
+
+/* --- Placeholder: Matte Expression --- */
+.theme-matte .ItemCard.placeholder-card {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* --- Component Style: Badges --- */
+
+/* Style Layer: Matte texture for general badges */
+.theme-matte .Badge {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.theme-matte .Badge.state-active {
+    background: color-mix(in srgb, var(--current-color), #000 40%);
+    border-color: color-mix(in srgb, var(--current-color), #000 40%);
+    color: #ffffff;
+}
+
+.theme-matte .Badge.state-inactive {
+    background: transparent !important;
+    border-color: color-mix(in srgb, var(--current-color), transparent 60%);
+    color: var(--current-color);
+}
+
+.theme-matte .Badge.state-clickable:hover {
+    filter: brightness(1.2);
+    border-color: var(--current-color);
+}
+
+
+/* Style Layer (Specialization): Stack Badge color expression */
+.theme-matte .Badge.item-count {
+    background: var(--current-color);
+    color: #050510;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* --- Components: Data Wells (Recessed/Inward Plate) --- */
+.theme-matte .Well {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px; /* 4pxだと沈み込みの角が潰れて見えるため、8pxを標準とする */
+    /* 物理的なくぼみを表現するためのボーダー */
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    
+    /* 左上からのインセットシャドウ */
+    box-shadow: inset 4px 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Components: Card Status Colors --- */
+.theme-matte .item-card-status.state-delivered {
+    color: var(--color-theme-main);
+    background: color-mix(in srgb, var(--color-theme-main), transparent 90%);
+}
+.theme-matte .item-card-status.state-delivered::before {
+    content: '✓ ';
+}
+
+.theme-matte .item-card-status.state-unmatched {
+    color: #ff4488;
+    background: rgba(255, 68, 136, 0.1);
+}
+.theme-matte .item-card-status.state-unmatched::before {
+    content: '✗ ';
+}
+
+/* Props & Descriptions */
+.theme-matte .item-card-description {
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.25;
+}
+
+/* Property Overrides (Disabled) */
+
+/* Enhanced visuals unified in base */
+
+/* Composite Elements: Rocket Detail area divider */
+.theme-matte .rocket-details {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.theme-matte .module-name {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- Panel Expressions: Matte Surface (Physical Plate) --- */
+
+/* Base Panel Style: Dynamic Surface (Themed Matte Plate) */
+.theme-matte .Panel {
+    background: color-mix(in srgb, var(--current-color), #404040 90%); 
+    border: 2px solid color-mix(in srgb, var(--current-color), transparent 80%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* --- Button Expressions: Matte Solid State Logic --- */
+
+/* 1. Default State: Outline-style with vivid border and dark fill */
+.theme-matte .Button {
+    border-width: 2px;
+    border-color: color-mix(in srgb, var(--current-color), #000 40%);
+    background: color-mix(in srgb, var(--current-color), #000 85%);
+    color: #ffffff;
+}
+
+.theme-matte .Button:hover:not(.state-disabled) {
+    border-color: color-mix(in srgb, var(--current-color), #000 25%);
+    background: color-mix(in srgb, var(--current-color), #000 75%);
+}
+
+/* 2. Highlight State: Absolute solid fill (Border = Background) */
+.theme-matte .Button.state-primary,
+.theme-matte .Button.state-active {
+    border-color: color-mix(in srgb, var(--current-color), #000 40%);
+    background: color-mix(in srgb, var(--current-color), #000 40%);
+    color: #ffffff;
+}
+
+.theme-matte .Button.state-primary:hover:not(.state-disabled),
+.theme-matte .Button.state-active:hover:not(.state-disabled) {
+    border-color: color-mix(in srgb, var(--current-color), #000 25%);
+    background: color-mix(in srgb, var(--current-color), #000 25%);
+}
+
+/* 3. Disabled & Inactive States */
+.theme-matte .Button.state-inactive {
+    background: transparent !important;
+}
+
+.theme-matte .Button.state-disabled {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.2);
+    cursor: not-allowed;
+}
+
+/* --- Global Interaction Feedback (Tactile Response) --- */
+.theme-matte .Button:active:not(.state-disabled),
+.theme-matte .state-clickable:active:not(.state-disabled) {
+    transform: perspective(1px) scale(0.97);
+    filter: brightness(0.9);
+}/* =========================================
+   Gravity Freight V2: Printing Style Layer
+   Layer: Style / Expression (C-Axis)
+   Managing Paper & Ink textures and Receipt animations
+   ========================================= */
+
+.theme-printing {
+    /* Print Color Palette (V1 Based) */
+    --print-paper: #dcdcdc;
+    --print-ink: #1a1a1a;
+    --print-ink-dim: #444444;
+    --print-ink-red: #b22d2d;
+    
+    background: #000000;
+}
+
+/* --- Container: Overlay/Main in Print Style --- */
+main.theme-printing {
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* 水平方向中央 */
+    justify-content: flex-end; /* 垂直方向下部 (レシートは画面下部から排出) */
+    padding-bottom: 5vh;
+    z-index: 6000;
+}
+
+/* 衝撃揺れのアニメーション (Old game_result.css:11) */
+main.theme-printing.impact {
+    animation: paperImpactShake 0.4s ease-out;
+}
+
+@keyframes paperImpactShake {
+    0% { transform: translateY(0); }
+    10% { transform: translateY(8px); } /* 叩きつけられた重み */
+    25% { transform: translateY(-2px); }
+    45% { transform: translateY(1px); }
+    100% { transform: translateY(0); }
+}
+
+/* --- Component: Panel (The Paper) --- */
+.theme-printing .Panel.receipt {
+    background: var(--print-paper);
+    color: var(--print-ink);
+    padding: 50px 40px;
+    border-radius: 0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    
+    /* Global Typography reset for Print */
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: none;
+
+    width: 460px;
+    max-width: 95vw;
+    max-height: 90vh;
+    margin: 0 auto;
+    scrollbar-gutter: stable;
+    will-change: transform;
+    
+    /* Animation Initial State */
+    transform: translateY(110%);
+    
+    /* Zigzag Edge */
+    clip-path: polygon(
+        0% 0%, 2.5% 2%, 5% 0%, 7.5% 2%, 10% 0%, 12.5% 2%, 15% 0%, 17.5% 2%, 20% 0%, 22.5% 2%, 25% 0%, 27.5% 2%, 30% 0%, 32.5% 2%, 35% 0%, 37.5% 2%, 40% 0%, 42.5% 2%, 45% 0%, 47.5% 2%, 50% 0%, 52.5% 2%, 55% 0%, 57.5% 2%, 60% 0%, 62.5% 2%, 65% 0%, 67.5% 2%, 70% 0%, 72.5% 2%, 75% 0%, 77.5% 2%, 80% 0%, 82.5% 2%, 85% 0%, 87.5% 2%, 90% 0%, 92.5% 2%, 95% 0%, 97.5% 2%, 100% 0%, 
+        100% 100%, 0% 100%
+    );
+    border: none;
+}
+
+.theme-printing.state-active .Panel.receipt {
+    /* 排出アニメーションは紙単体で実行 */
+    animation: receiptPrintFeed 1.6s cubic-bezier(0.2, 0.5, 0.1, 1.0) forwards;
+}
+
+@keyframes receiptPrintFeed {
+    /* 最初は小刻みに送る (ガタ、ガタ...) */
+    0%   { transform: translateY(110%) rotate(0.1deg); }
+    15%  { transform: translateY(100%) rotate(-0.1deg); }
+    20%  { transform: translateY(100%) rotate(0deg); }
+    35%  { transform: translateY(85%) rotate(0.1deg); }
+    40%  { transform: translateY(85%) rotate(-0.1deg); }
+    55%  { transform: translateY(70%) rotate(0.1deg); }
+    60%  { transform: translateY(70%) rotate(0deg); }
+    /* 最後は目標地点まで一気にスムーズに送る (...スーッ) */
+    100% { transform: translateY(0) rotate(0); }
+}
+
+/* --- Component: Typography --- */
+.theme-printing .text-display,
+.theme-printing .text-sub-display {
+    color: var(--print-ink);
+    filter: none;
+    text-shadow: none;
+}
+
+.theme-printing .panel-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.theme-printing .stat-label {
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+}
+
+/* --- Component: Divider (Ink Line) --- */
+.theme-printing .divider {
+    border-top: 1px solid rgba(0, 0, 0, 0.3);
+    margin: var(--space-unit) 0;
+    width: 100%;
+}
+
+.theme-printing .divider.dotted {
+    border-top-style: dashed;
+}
+
+.theme-printing .divider.solid {
+    border-top-style: solid;
+    border-top-width: 2px;
+    border-top-color: #000;
+}
+
+/* --- Component: Rows & Sections --- */
+.theme-printing .SplitRow {
+    color: var(--print-ink);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 10px 0 2px 0;
+}
+
+.theme-printing .section.hero .SplitRow {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.theme-printing .section-subtitle {
+    text-align: right;
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 600;
+    margin-top: 5px;
+    padding-right: 15px;
+    letter-spacing: 0.5px;
+}
+
+/* Ranking & Grade specific size tuning */
+.theme-printing .rank-value,
+.theme-printing .Badge {
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.theme-printing .rank-value {
+    font-family: inherit; /* score (Mono) を使わず印字フォントを継承 */
+}
+
+/* --- Component: Badge (Grade) --- */
+.theme-printing .Badge {
+    background: transparent;
+    padding: 0;
+    border: none;
+    color: inherit;
+}
+
+.theme-printing .score,
+.theme-printing .sector,
+.theme-printing .coin,
+.theme-printing .item-count {
+    color: var(--print-ink);
+    text-shadow: none;
+    font-size: inherit; /* Row のサイズを継承 */
+    font-weight: inherit; /* V2 デフォルトの 900 を上書きし、Row のウェイトを継承 */
+    font-family: inherit; /* V2 デフォルトの Courier Prime を上書きし、レシートのフォントを継承 */
+}
+
+.theme-printing .state-top-rank {
+    color: var(--print-ink-red);
+}
+
+/* --- Component: Button (The Stamp/Ink Block) --- */
+.theme-printing .Button {
+    background: var(--print-ink);
+    color: var(--print-paper);
+    border: none;
+    border-radius: 1px;
+    box-shadow: none;
+    font-family: inherit;
+    transition: all var(--motion-fast);
+    margin: 30px auto 0;
+    width: 65%;
+    max-width: 280px;
+    padding: 16px;
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+.theme-printing .Button:hover:not(:disabled) {
+    background: #000;
+    transform: scale(1.02);
+}
+
+.theme-printing .Button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+/* --- Stamp Zone & Official Seal --- */
+.theme-printing .receipt-stamp-zone {
+    height: 146px;
+    margin: 35px 0 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    contain: size layout; 
+}
+
+.theme-printing .receipt-official-seal {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    font-family: 'Inter', sans-serif;
+    transform: rotate(0deg) scale(0);
+    opacity: 0;
+    user-select: none;
+    pointer-events: none;
+    border-style: solid;
+    border-color: currentColor;
+    width: max-content;
+    align-items: stretch;
+    z-index: 100;
+    --stamp-rot: -5deg;
+    --stamp-x: 0px;
+    --stamp-y: 0px;
+}
+
+.theme-printing .receipt-official-seal.huge { border-width: 8px; }
+.theme-printing .receipt-official-seal.normal { border-width: 6px; }
+.theme-printing .receipt-official-seal.mini { border-width: 5px; }
+
+.theme-printing .receipt-official-seal.state-active {
+    animation: receiptStampImpact 0.4s cubic-bezier(0.1, 0.9, 0.2, 1.2) forwards;
+}
+
+@keyframes receiptStampImpact {
+    0% { transform: rotate(-45deg) scale(3) translate(0, 0); opacity: 0; }
+    100% { transform: rotate(var(--stamp-rot)) scale(1) translate(var(--stamp-x), var(--stamp-y)); opacity: 0.85; }
+}
+
+.theme-printing .receipt-stamp-left-half {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: solid currentColor;
+    text-align: left;
+    width: auto;
+}
+
+.theme-printing .receipt-official-seal.huge .receipt-stamp-left-half { padding: 0 15px; border-right-width: 6px; gap: 6px; height: 140px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-left-half { padding: 0 11.5px; border-right-width: 4.6px; gap: 4.6px; height: 108px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-left-half { padding: 0 10.5px; border-right-width: 4.2px; gap: 4.2px; height: 98px; }
+
+.theme-printing .receipt-stamp-text-line { font-weight: 950; white-space: nowrap; text-transform: uppercase; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.small { font-size: 11px; letter-spacing: 2.8px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.small { font-size: 8.5px; letter-spacing: 2.1px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.small { font-size: 7.7px; letter-spacing: 1.9px; }
+
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.medium { font-size: 16px; letter-spacing: 0.1px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.medium { font-size: 12.4px; letter-spacing: 0.08px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.medium { font-size: 11.2px; letter-spacing: 0.07px; }
+
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.large { font-size: 32px; letter-spacing: 8px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.large { font-size: 25px; letter-spacing: 6.2px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.large { font-size: 22.4px; letter-spacing: 5.6px; }
+
+.theme-printing .receipt-stamp-right-half { font-weight: 950; line-height: 1; text-align: center; display: flex; align-items: center; justify-content: center; width: auto; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-right-half { font-size: 100px; padding: 0 20px; }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-right-half { font-size: 78px; padding: 0 15.6px; }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-right-half { font-size: 70px; padding: 0 14px; }
+
+.theme-printing .tier-1 { color: #b8860b; }
+.theme-printing .tier-2 { color: #a52a2a; }
+.theme-printing .tier-3 { color: #2f4f4f; }
+.theme-printing .tier-4 { color: #556b2f; }
+.theme-printing .tier-5 { color: #696969; }
+.theme-printing .tier-6 { color: #2c4a6d; }
+.theme-printing .tier-7 { color: #1a3b5a; }
+
+/* Barcode */
+.theme-printing .barcode-container {
+    margin: 10px 0 5px;
+    height: 55px;
+    min-height: 55px;
+    flex-shrink: 0;
+    width: 100%;
+    background: 
+        linear-gradient(90deg, #000 1px, transparent 1px) 0 0 / 4px 100%,
+        linear-gradient(90deg, #000 2px, transparent 2px) 7px 0 / 12px 100%,
+        linear-gradient(90deg, #000 3px, transparent 3px) 15px 0 / 8px 100%,
+        linear-gradient(90deg, #000 4px, transparent 4px) 30px 0 / 15px 100%,
+        linear-gradient(90deg, #000 2px, transparent 2px) 42px 0 / 10px 100%;
+    background-repeat: repeat-x;
+    opacity: 0.8;
+}
+
+/* Footer Metadata */
+.theme-printing .panel-footer {
+    text-align: center;
+    font-size: 10px;
+    margin-top: 5px; 
+    line-height: 1.6;
+}
+
+.theme-printing .auth-status,
+.theme-printing .timestamp {
+    opacity: 0.8;
+}
+
+/* --- Scrollbar Tuning for Print --- */
+.theme-printing *::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+.theme-printing *::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+}
+/* =========================================
+   Gravity Freight V2: Title Screen Layout
+   Layer: Context / Individual
+   Focus: Screen-specific centering and branding focus
+   ========================================= */
+
+#title-screen {
+    display: flex; /* Root uses flex to align the inner container */
+    align-items: center;
+    justify-content: center;
+    background: #050510 var(--title-bg-image, none) no-repeat center center;
+    background-size: cover;
+}
+
+/* Invisible container for title content */
+.title-content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px; /* Explicit gap between title-box and menu buttons */
+}
+
+#title-screen .text-display.logo {
+    font-size: clamp(3rem, 12vw, 6rem);
+    max-width: 90vw;
+    transition: font-size 0.2s ease;
+}
+
+#title-screen .text-sub-display.logo {
+    font-size: 1.8rem;
+    margin-top: 0.5rem;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-double);
+    width: 640px;
+    max-width: 90vw;
+    min-width: 240px;
+    margin: 0 auto;
+}
+
+#title-screen .menu-buttons .Button {
+    /* Base styles are now managed by .Button and .button-large in ui_base.css */
+    width: 100%;
+}
+
+/* Specific position for the settings gear on the title screen */
+#title-settings-btn {
+    position: absolute;
+    top: var(--space-double);
+    right: var(--space-double);
+    width: auto;
+    height: auto;
+    padding: 0;
+    
+    /* Subtle minimalist style */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    text-shadow: none; /* Override global neon text-shadow */
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 32px;
+    line-height: 1;
+    transition: color var(--motion-fast), transform var(--motion-normal) ease;
+    cursor: pointer;
+}
+
+#title-settings-btn:hover {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+    color: #ffffff;
+    transform: rotate(90deg);
+}
+
+#title-settings-btn:active {
+    transform: rotate(90deg) scale(0.9);
+    filter: brightness(1.2);
+    transition: transform 0.05s; /* Snappy feedback */
+}
+/* =========================================
+   Gravity Freight V2: Play Scene Layout
+   Layer: Context / Individual
+   Focus: Screen-specific positioning and HUD structure
+   ========================================= */
+
+#play-scene-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- 1. HUD Layout --- */
+#play-hud {
+    position: absolute;
+    top: var(--space-double);
+    left: var(--space-double);
+    display: flex;
+    flex-direction: column;
+    z-index: var(--z-hud);
+    min-width: 320px;
+    pointer-events: none; /* Allow clicks to pass through empty space */
+}
+
+#play-hud > * {
+    pointer-events: auto; /* Ensure interactive elements capture input */
+}
+
+/* HUD Header: Horizontal alignment with tight branding integration */
+#play-hud .hud-logo-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    padding: var(--space-double);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+}
+
+#play-scene-container .panel-body {
+    padding: var(--space-double);
+}
+
+/* Logic: Grouped message indicators with defined spatial density */
+#play-hud .hud-messages {
+    display: flex;
+    gap: 4px;
+}
+
+#play-hud .hud-stats {
+    display: flex;
+    gap: var(--space-double);
+    padding: var(--space-double);
+}
+
+#play-hud .stat-label {
+    font-size: var(--text-size-caption);
+    font-weight: 800;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+}
+
+#play-hud .stat-value {
+    font-family: var(--font-num);
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+/* --- 2. Main Game Viewport --- */
+#play-screen {
+    flex: 1;
+    position: relative;
+    /* Z-index removed to allow children to participant in global stacking */
+}
+
+#play-screen .play-viewport {
+    width: 100%;
+    height: 100%;
+    z-index: var(--z-world);
+}
+
+/* --- 3. Sidebar (Inventory Panel) --- */
+#inventory-panel {
+    position: absolute;
+    top: var(--space-double);
+    right: var(--space-double);
+    width: 340px;
+    max-height: calc(100% - var(--space-double) - 108px);
+    display: flex;
+    flex-direction: column;
+    z-index: var(--z-panel);
+}
+
+/* --- 4. Bottom Action Dock --- */
+/* Positioned at bottom-right corner, aligned perfectly with the build panel width. */
+#play-scene-container .action-dock {
+    position: absolute;
+    bottom: var(--space-double);
+    right: var(--space-double);
+    width: 340px;
+    display: flex;
+    justify-content: center;
+    z-index: var(--z-panel);
+}
+
+
+/* Large Action Buttons: Specialized branding for critical mission phases */
+#play-screen .launch { --current-color: var(--color-category-launchers); }
+#play-screen .assembly { --current-color: var(--color-theme-main); }
+
+/* Play scene specific overrides for large action buttons */
+#play-screen .Button.button-large {
+    height: 76px;
+    border-width: 3px;
+    width: 100%;
+}
+
+/* Mission-Specific Disabled Logic */
+#play-screen .launch.state-disabled,
+#play-screen .assembly.state-disabled {
+    filter: none; /* Override global neon grayscale */
+    opacity: 1;    /* Override global neon opacity to allow bright children */
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* 6. DISABLED + NOTABLE (Guide Awareness Pulse) */
+#play-screen .launch.state-disabled.state-notable .btn-sub-label,
+#play-screen .assembly.state-disabled.state-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: ui-guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+
+/* --- 5. Global Footer (Moved to ui_base.css) --- */
+/* =========================================
+   Gravity Freight V2: Flight Result Screen
+   Layer: Context / View (Specific)
+   ========================================= */
+
+#flight-result-screen .Panel {
+    width: 70vw;
+    height: 85vh;
+    max-width: 640px;
+    margin: auto;
+    
+    /* 統一されたパディングとセクション間ギャップ */
+    padding: var(--space-double);
+    gap: var(--space-double);
+}
+
+@media screen and (max-width: 600px) {
+    #flight-result-screen .Panel {
+        width: 95vw;
+        height: 90vh;
+    }
+}
+
+/* Panel Layout: Sections now inherit panel-level padding/gap logic */
+#flight-result-screen .panel-header,
+#flight-result-screen .panel-body,
+#flight-result-screen .panel-footer {
+    padding: 0; /* 個別パディングを廃止 */
+}
+
+#flight-result-screen .panel-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Layout Specific Adjustments */
+#flight-result-screen .ColumnSet {
+    gap: var(--space-double); /* パディングと統一 */
+}
+
+/* Header Specific Adjustments */
+#flight-result-screen .panel-title {
+    margin: var(--space-unit) 0 0 0;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: var(--current-color);
+}
+
+.flight-report-status {
+    display: flex;
+    gap: var(--space-unit);
+    align-items: center;
+}
+
+/* Local State: RECORDED Visuals */
+.Badge.state-recorded {
+    background: #ff3333;
+    color: #ffffff;
+    border: none;
+}
+
+.Badge.state-recorded .recorded-text {
+    animation: flight-recorded-pulse 2s ease-in-out infinite;
+}
+
+@keyframes flight-recorded-pulse {
+    0%, 100% { color: #ffffff; }
+    50% { color: #cccccc; }
+}
+
+/* Data Row Visuals: Context-specific for reports */
+.SplitRow.data-row {
+    font-size: 14px; /* 全体でフォントサイズを指定 */
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.SplitRow.data-row .report-data-label {
+    opacity: 0.7;
+}
+
+.SplitRow.data-row .report-data-value {
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+}
+
+/* Bonus Item Container: Indented list for rewards */
+#flight-result-screen .report-bonus-list {
+    margin-top: 0;
+    margin-bottom: 0; /* 下マージンを削除 */
+    margin-left: 16px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0; 
+}
+
+#flight-result-screen .report-bonus-title {
+    font-size: 10px;
+    font-weight: 950;
+    color: var(--color-theme-main);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    
+    /* 上下の余白を完全に排除（上側はカードに近づけるためネガティブマージン） */
+    margin: -8px 0 0 4px;
+    padding: 0;
+    
+    opacity: 0.5;
+}
+
+/* Optional: Make bonus cards slightly smaller or more subtle if needed, 
+   but for now keep standard cards */
+/* =========================================
+   Gravity Freight V2: Facility Screen
+   Layer: Context / View (Specific)
+   ========================================= */
+
+#facility-screen .Panel {
+    width: 85vw;
+    height: 85vh;
+    max-width: 1080px;
+    margin: auto;
+
+    padding: 0; /* ヘッダー・フッターを端まで通すため */
+    gap: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#facility-screen .panel-header {
+    padding: var(--space-double);
+    display: flex;
+    align-items: center;
+    gap: var(--space-double);
+    justify-content: flex-start; /* 左寄せ */
+    margin-bottom: 0;
+}
+
+#facility-screen .panel-body {
+    padding: 0;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#facility-screen .Well {
+    margin: 0 var(--space-double);
+    padding: var(--space-double);
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+#facility-screen .panel-footer {
+    padding: var(--space-double);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#facility-screen .player-credits {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-unit);
+}
+
+#facility-screen .credits-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+}
+
+#facility-screen .credits-value {
+    font-family: var(--font-num);
+    font-size: 40px; /* 重厚感を出すため大型化 */
+    font-weight: 900;
+    color: var(--color-category-coin);
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    line-height: 1;
+}
+
+#facility-screen .ColumnSet {
+    gap: var(--space-double);
+    height: 100%;
+}
+
+@media screen and (max-width: 800px) {
+    #facility-screen .Panel {
+        width: 95vw;
+        height: 90vh;
+    }
+}
+
+/* Facility Specific Components */
+
+/* discount: Simplified Discount Label */
+#facility-screen .Badge.discount {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    background: #444;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 1px 4px;
+    white-space: nowrap;
+
+    /* レイアウトと回転 */
+    margin-left: 4px;
+    margin-top: 0;
+    transform: rotate(20deg);
+
+    /* 装飾の排除 */
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Trading Post Specific Layout Fixes */
+#facility-screen .trade-entry {
+    margin-bottom: var(--space-standard);
+    min-width: 0;
+    gap: var(--space-standard);
+    align-items: stretch;
+}
+
+#facility-screen .trade-item-area {
+    flex: 1;
+    min-width: 0;
+}
+
+#facility-screen .trade-action-area {
+    flex-shrink: 0;
+    width: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-unit);
+}
+
+#facility-screen .trade-price {
+    font-family: var(--font-num);
+    font-size: 14px;
+    font-weight: 900;
+    text-align: right;
+}
+
+#facility-screen .trade-action-group {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+}
+
+#facility-screen .facility-badge,
+#facility-screen .FacilityBadge {
+    /* 共通コンポーネント ui_facility_badge.css へ移行 */
+}
+
+#facility-screen .panel-title {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    margin: 0;
+    line-height: 1.1;
+}
+
+#facility-screen .panel-subtitle {
+    font-size: 11px;
+    opacity: 0.7;
+    margin: 2px 0 0 0;
+    line-height: 1.2;
+}
+
+/* Section Headlines */
+#facility-screen .section-title {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    margin: 0 0 2px 0;
+}
+
+#facility-screen .section-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 16px 0;
+    line-height: 1.4;
+}
+
+#facility-screen .trade-item-area {
+    flex: 1;
+    min-width: 0; /* 防止 flex 項目溢出 */
+}
+
+#facility-screen .trade-action-area {
+    width: 110px;
+    flex-shrink: 0;
+}
+
+#facility-screen .SplitRow {
+    gap: var(--space-unit);
+}
+
+#facility-screen .trade-action-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 4px;
+}
+
+#facility-screen .trade-price {
+    font-family: var(--font-num);
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--color-category-coin);
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+#facility-screen .trade-action-area .Button {
+    width: 100%;
+    padding: 0;
+    height: 24px;
+    font-size: 11px;
+    line-height: 24px;
+    min-height: auto;
+}
+
+#facility-screen .Badge.discount .sticker-num {
+    font-size: 11px;
+    letter-spacing: -0.5px;
+    line-height: 1;
+}
+
+#facility-screen .Badge.discount .sticker-pct {
+    font-size: 7px;
+    margin-right: 1px;
+}
+
+/* Modifier: Low Discount */
+#facility-screen .Badge.discount.low {
+    background: linear-gradient(135deg, #a1887f, #8d6e63);
+}
+
+/* Modifier: Mid Discount */
+#facility-screen .Badge.discount.mid {
+    background: linear-gradient(135deg, #ff5722, #f44336);
+}
+
+/* Modifier: High Discount */
+#facility-screen .Badge.discount.high {
+    background: linear-gradient(135deg, #e91e63, #9c27b0);
+    animation: facility-discount-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes facility-discount-pulse {
+    0%, 100% { transform: rotate(20deg) scale(1); filter: brightness(1); }
+    50% { transform: rotate(20deg) scale(1.05); filter: brightness(1.2); }
+}
+/* =========================================
+   Gravity Freight V2: Analytic Archive Screen
+   Layer: Context / View (Specific)
+   ========================================= */
+
+#archive-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#archive-screen.Panel {
+    width: 90vw;
+    height: 85vh;
+    max-width: 840px;
+    margin: auto;
+    font-size: 14px;
+    padding: 0;
+}
+
+#archive-screen .panel-header {
+    padding: var(--space-double);
+    background: transparent;
+}
+
+#archive-screen.archive {
+    --current-color: #bb86fc;
+}
+
+#archive-screen .title-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-double);
+}
+
+#archive-screen .icon-saturn {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    background-color: currentColor;
+    color: var(--current-color);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3Cellipse id='saturn-ring-path' cx='12' cy='12' rx='10' ry='3.6' transform='rotate(-30 12 12)'/%3E%3Cmask id='mask-planet-front-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='3.6' fill='none'/%3E%3Crect x='-10' y='-10' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-back-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Ccircle cx='12' cy='12' r='6.7' fill='black'/%3E%3Crect x='-10' y='12.5' width='44' height='22' fill='black' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-front-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='12' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3C/defs%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-back-ring-final)'/%3E%3Ccircle cx='12' cy='12' r='6.0' fill='black' mask='url(%23mask-planet-front-final)'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-front-ring-final)'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3Cellipse id='saturn-ring-path' cx='12' cy='12' rx='10' ry='3.6' transform='rotate(-30 12 12)'/%3E%3Cmask id='mask-planet-front-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='3.6' fill='none'/%3E%3Crect x='-10' y='-10' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-back-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='-10' width='44' height='44' fill='white'/%3E%3Ccircle cx='12' cy='12' r='6.7' fill='black'/%3E%3Crect x='-10' y='12.5' width='44' height='22' fill='black' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3Cmask id='mask-front-ring-final' maskUnits='userSpaceOnUse' x='-10' y='-10' width='44' height='44'%3E%3Crect x='-10' y='12' width='44' height='22' fill='white' transform='rotate(-30 12 12)'/%3E%3C/mask%3E%3C/defs%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-back-ring-final)'/%3E%3Ccircle cx='12' cy='12' r='6.0' fill='black' mask='url(%23mask-planet-front-final)'/%3E%3Cuse href='%23saturn-ring-path' stroke='black' stroke-width='2.2' fill='none' mask='url(%23mask-front-ring-final)'/%3E%3C/svg%3E");
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    opacity: 0.9;
+}
+
+#archive-screen .title-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#archive-screen .panel-title {
+    font-size: 1.7em;
+    font-weight: 950;
+    letter-spacing: 0.05em;
+    margin: 0;
+    line-height: 1;
+    color: var(--current-color);
+}
+
+#archive-screen .panel-subtitle {
+    font-size: 0.7em;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.1em;
+}
+
+#archive-screen .panel-footer {
+    padding: var(--space-double);
+    background: transparent;
+}
+
+#archive-screen .panel-header .SplitColumn,
+#archive-screen .section-header .SplitColumn {
+    flex: 1;
+}
+
+#archive-screen .TabGroup {
+    flex: none;
+    display: flex;
+    gap: var(--space-unit);
+}
+
+/* 2カラム構成の定義 */
+#archive-screen .ColumnSet {
+    flex: 1;
+    min-height: 0;
+    gap: var(--space-double); /* ボディのマージンと同じ値に設定 */
+}
+
+#archive-screen .Column.aside {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* サイドバーが長すぎる場合に対応 */
+    min-height: 0;
+}
+
+#archive-screen .Column.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+#archive-screen #tab-analytics,
+#archive-screen #tab-replays,
+#archive-screen #tab-achievements {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Initial active state or when toggled by JS */
+#archive-screen #tab-analytics {
+    display: grid; /* これがないと比率指定が機能しない */
+    grid-template-rows: auto minmax(120px, 1fr) minmax(240px, 2fr);
+    gap: var(--space-unit);
+}
+
+#archive-screen #tab-replays {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-unit);
+}
+
+#archive-screen #tab-achievements {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-unit);
+}
+
+/* --- Achievement Tab Content --- */
+
+#archive-screen .achievement-showcase {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-content: start; /* 行全体を上寄せ */
+    align-items: start;   /* アイテムを上寄せ（縦に伸ばさない） */
+    gap: 12px;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: inset 4px 4px 12px rgba(0, 0, 0, 0.8);
+    border-radius: var(--radius-standard);
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* 印刷スタイルの局所適用: アチーブメントカード */
+.theme-printing .AchievementCard {
+    height: auto; /* 強制的な伸長を防止 */
+    background: var(--print-paper, #dcdcdc);
+    color: var(--print-ink, #1a1a1a);
+    border-radius: 1px;
+    padding: 12px 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 2px 4px 8px rgba(0,0,0,0.5);
+    min-width: 300px;
+    min-height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    /* 印刷スタイル特有のフォント継承 */
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.theme-printing .AchievementCard .log-bg-seal-group {
+    position: absolute;
+    top: 50%;
+    left: 72%;
+    transform: translate(-50%, -50%) rotate(-10deg);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.12;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.theme-printing .AchievementCard .seal-label-tier {
+    font-family: var(--font-main);
+    font-weight: 950;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+}
+
+.theme-printing .AchievementCard .seal-num {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-weight: 900;
+    font-size: 78px;
+    line-height: 1;
+}
+
+.theme-printing .AchievementCard .log-title {
+    position: relative;
+    z-index: 10;
+    font-family: var(--font-main);
+    font-weight: 950;
+    font-size: 1.15em;
+    color: #000;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.theme-printing .AchievementCard .log-data-group {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid rgba(0,0,0,0.15);
+    padding-top: 6px;
+}
+
+.theme-printing .AchievementCard .log-method-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.theme-printing .AchievementCard .log-method {
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 800;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.theme-printing .AchievementCard .log-stats {
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: 14px;
+}
+
+.theme-printing .AchievementCard .log-gauge-area {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 4px;
+    background: rgba(0,0,0,0.15);
+}
+
+.theme-printing .AchievementCard .log-gauge-fill {
+    height: 100%;
+    background: currentColor;
+    opacity: 0.8;
+}
+
+/* ロック状態（未達成）：印刷スタイルの文脈を保ちつつ視認性を落とす */
+.theme-printing .AchievementCard.state-locked {
+    opacity: 0.5;
+    filter: grayscale(1);
+    box-shadow: none;
+}
+
+.theme-printing .AchievementCard.state-locked .log-title {
+    color: #444;
+    letter-spacing: 1px;
+}
+
+.theme-printing .AchievementCard.state-locked .log-method {
+    color: #555;
+}
+
+/* 印刷スタイルのノイズ合成 */
+.theme-printing .AchievementCard::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    z-index: 5;
+}
+
+#archive-screen #tab-analytics .section {
+    grid-row: 3;
+    display: flex;
+    flex-direction: column;
+    min-height: 240px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+/* 統計セクション (KPI) */
+#archive-screen .kpi-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-double);
+    align-items: center; /* 左右中央寄せ */
+}
+
+#archive-screen .kpi-group {
+    align-items: center;
+    gap: var(--space-unit);
+}
+
+#archive-screen .kpi-group .stat-label {
+    opacity: 0.6;
+    font-size: 0.7em;
+}
+
+#archive-screen .kpi-container .Well {
+    width: 120px; /* 左カラムの統計項目のみ固定幅 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-unit) 0;
+}
+
+#archive-screen .stat-value {
+    font-size: 1.7em;
+    font-weight: 950;
+    line-height: 1;
+}
+
+/* グラフセクション */
+#archive-screen .graph-svg {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 100%; /* コンテナに合わせて伸縮 */
+    overflow: hidden;
+}
+
+#archive-screen .Well:has(.graph-svg) {
+    grid-row: 2;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* グラフ凡例の強調 */
+#archive-screen .stat-label.legend.state-active {
+    font-size: 0.8em;
+    font-weight: 900;
+    opacity: 1;
+}
+
+/* グラフ折れ線スタイル */
+#archive-screen .graph-line {
+    transition: all var(--motion-fast);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#archive-screen .graph-line.score { stroke: var(--color-num-score); }
+#archive-screen .graph-line.sector { stroke: var(--color-num-sector); }
+#archive-screen .graph-line.item-count { stroke: var(--color-num-item-count); }
+
+#archive-screen .graph-line.state-active {
+    stroke-width: 3px;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+}
+
+#archive-screen .graph-line:not(.state-active) {
+    stroke-width: 1px;
+    opacity: 0.7;
+}
+
+/* 平均線（ドット線） */
+#archive-screen .avg-line {
+    stroke-width: 1.2px;
+    stroke-dasharray: 4, 2;
+    opacity: 0.8;
+}
+
+#archive-screen .avg-line.score { stroke: var(--color-num-score); }
+#archive-screen .avg-line.sector { stroke: var(--color-num-sector); }
+#archive-screen .avg-line.item-count { stroke: var(--color-num-item-count); }
+
+/* 凡例の装飾 (Context レイヤーで追加) */
+#archive-screen .stat-label.legend::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 2px;
+    vertical-align: middle;
+    margin-right: 8px;
+    background: currentColor;
+    opacity: 0.8;
+}
+
+/* テーブルの調整 */
+#archive-screen .panel-body {
+    padding: 0 var(--space-double);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#archive-screen .Well.ScrollArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    padding: 0; /* スクロールバーを端に寄せるために 0 に戻す */
+}
+
+#archive-screen .archive-table-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+#archive-screen .ArchiveTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* 特別な行の状態 */
+#archive-screen .ArchiveTable tr.state-new {
+    /* theme-main (Mint) の微細な透過。color-mix を用いてテーマ色に依存させる */
+    background: color-mix(in srgb, var(--color-theme-main), transparent 92%);
+    position: relative;
+}
+
+#archive-screen .ArchiveTable tr.state-new td:first-child {
+    border-left: 2px solid var(--color-theme-main);
+}
+
+/* NEW バッジの装飾 */
+#archive-screen .Badge.state-new {
+    background: var(--color-theme-main);
+    color: rgba(0, 0, 0, 0.9);
+    font-weight: 950;
+    padding: 1px 4px;
+    font-size: 8px;
+    vertical-align: middle;
+    margin-left: var(--space-unit);
+    animation: none;
+}
+
+#archive-screen .ArchiveTable.table-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#archive-screen .ArchiveTable th {
+    text-align: left;
+    padding: var(--space-unit) var(--space-double);
+    font-size: 0.7em;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* num-* クラスが直接指定されている場合はその色を優先 */
+#archive-screen .ArchiveTable th.score { color: var(--color-num-score); }
+#archive-screen .ArchiveTable th.sector { color: var(--color-num-sector); }
+#archive-screen .ArchiveTable th.item-count { color: var(--color-num-item-count); }
+
+/* 選択中のカラム（軸）の強調 */
+#archive-screen .ArchiveTable .state-active-column {
+    /* ウェイトは num-* 側の定義を尊重するため削除 */
+    opacity: 1;
+}
+
+#archive-screen .ArchiveTable th.state-active-column {
+    font-size: 0.8em;
+}
+
+#archive-screen .ArchiveTable td.state-active-column {
+    font-size: 1em;
+}
+
+/* Analytics Tab Column Layout */
+#archive-screen #tab-analytics .col-rank   { width: 10%; }
+#archive-screen #tab-analytics .col-score  { width: 22%; }
+#archive-screen #tab-analytics .col-sector { width: 15%; }
+#archive-screen #tab-analytics .col-count  { width: 23%; }
+#archive-screen #tab-analytics .col-date   { width: 30%; }
+
+/* Replay Tab Column Layout */
+#archive-screen #tab-replays .col-fav    { width: 64px; }
+#archive-screen #tab-replays .col-no     { width: 64px; }
+#archive-screen #tab-replays .col-sector { width: 20%; }
+#archive-screen #tab-replays .col-score  { width: 25%; }
+#archive-screen #tab-replays .col-date   { width: 55%; }
+
+/* Favorite (Star) Icon Styles */
+#archive-screen .favorite-star {
+    cursor: pointer;
+    font-style: normal;
+    font-size: 1.2em;
+    transition: all var(--motion-fast);
+    display: inline-block;
+    user-select: none;
+}
+
+#archive-screen .favorite-star.state-inactive {
+    color: rgba(255, 255, 255, 0.1);
+}
+
+#archive-screen .favorite-star.state-active {
+    color: var(--color-ui-favorite);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--color-ui-favorite), transparent 70%);
+}
+
+#archive-screen .ArchiveTable td {
+    padding: var(--space-unit) var(--space-double);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#archive-screen .ArchiveTable tr.state-active {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* モバイル・1カラム時のレスポンシブ対応 */
+@media screen and (max-width: 800px) {
+    #archive-screen .Column.aside {
+        flex: none;
+        width: 100%;
+        border: none;
+    }
+
+    #archive-screen .Column.main {
+        flex: none;
+        width: 100%;
+        min-width: 0;
+    }
+
+    #archive-screen .Well.ScrollArea {
+        flex: none;
+        height: auto;
+        min-height: 0;
+    }
+
+    #archive-screen #tab-analytics,
+    #archive-screen #tab-analytics .section {
+        flex: none;
+        display: block;
+    }
+
+    #archive-screen .Well:has(.graph-svg) {
+        flex: none;
+        height: auto;
+        min-height: 0;
+    }
+
+    #archive-screen .graph-svg {
+        height: 160px; /* モバイルでの視認性を確保するための固定高 */
+    }
+
+    #archive-screen .kpi-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* 1カラム時はボディ全体でスクロールを許可 */
+    #archive-screen .panel-body {
+        overflow-y: auto;
+    }
+
+    #archive-screen.Panel {
+        width: 95vw;
+        height: 90vh;
+        max-width: 95vw;
+        max-height: 90vh;
+    }
+}
+/* =========================================
+   Gravity Freight V2: Story Modal
+   Layer: Context / View (Specific)
+   Focus: Narrative immersion and message delivery
+   ========================================= */
+
+.Panel.story-card {
+    width: 90vw;
+    max-width: 480px;
+    height: auto;
+    max-height: 90vh;
+    
+    background: linear-gradient(135deg, 
+        color-mix(in srgb, var(--current-color), transparent 80%), 
+        rgba(5, 10, 30, 0.9)
+    );
+    border: 2px solid color-mix(in srgb, var(--current-color), #ffffff 50%);
+    box-shadow: 
+        0 0 60px color-mix(in srgb, var(--current-color), transparent 85%),
+        inset 0 0 30px color-mix(in srgb, var(--current-color), transparent 90%);
+    border-radius: 16px;
+    
+    /* Center positioning helper when used within FlexCenter */
+    margin: auto;
+}
+
+.Panel.story-card .panel-header {
+    padding: var(--space-double);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-double);
+}
+
+.Panel.story-card .panel-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    margin: 0;
+    line-height: 1.1;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.Panel.story-card .panel-body {
+    padding: var(--space-double);
+    line-height: 1.8;
+    font-size: 14px;
+    gap: var(--space-double);
+    display: flex;
+    flex-direction: column;
+}
+
+.Panel.story-card .intro {
+    font-size: 14px;
+    font-weight: 900;
+    font-style: italic;
+    color: #050a1e;
+    padding: var(--space-double) 24px;
+    background: color-mix(in srgb, var(--current-color), #ffffff 75%);
+    border-radius: var(--radius-standard);
+    margin: 0 var(--space-double);
+    line-height: 1.5;
+    /* 発光感ではなく、ソリッドな強調に変更 */
+    box-shadow: 0 0 15px color-mix(in srgb, var(--current-color), transparent 50%);
+}
+
+.Panel.story-card .Well {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: pre-wrap; /* 手紙の改行を維持 */
+}
+
+.Panel.story-card .panel-footer {
+    padding: var(--space-double);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

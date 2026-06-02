@@ -11,24 +11,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="GravityFreight/css/base.css">
-    <link rel="stylesheet" href="GravityFreight/css/layout.css">
-    <link rel="stylesheet" href="GravityFreight/css/buttons.css">
-    <link rel="stylesheet" href="GravityFreight/css/ui.css">
-    <link rel="stylesheet" href="GravityFreight/css/title-screen.css">
-    <link rel="stylesheet" href="GravityFreight/css/item-card.css">
-    <link rel="stylesheet" href="GravityFreight/css/mission-hud.css">
-    <link rel="stylesheet" href="GravityFreight/css/build-panel.css">
-    <link rel="stylesheet" href="GravityFreight/css/result-screen.css">
-    <link rel="stylesheet" href="GravityFreight/css/receipt-screen.css">
-    <link rel="stylesheet" href="GravityFreight/css/event-screen.css">
-    <link rel="stylesheet" href="GravityFreight/css/how-to-play.css">
-    <link rel="stylesheet" href="GravityFreight/css/star-info.css">
-    <link rel="stylesheet" href="GravityFreight/css/story-overlay.css">
-    <link rel="stylesheet" href="GravityFreight/css/animations.css">
-    <link rel="stylesheet" href="GravityFreight/css/sector-notification.css">
-    <link rel="stylesheet" href="GravityFreight/css/achievements.css">
-    <link rel="stylesheet" href="GravityFreight/css/responsive.css">
 
 
 
@@ -41,11 +23,18 @@
 
 
 
+  <link rel="stylesheet" crossorigin href="/GravityFreight/assets/main-DlTUxFUx.css">
 </head>
 
 <body>
     <!-- タイトル画面 -->
-    <div id="title-screen">
+    <div id="title-screen" data-title-bg="/GravityFreight/assets/tutorial/slide1.png">
+        <script>
+            const titleScreen = document.getElementById('title-screen');
+            if (titleScreen?.dataset.titleBg) {
+                titleScreen.style.setProperty('--title-bg-image', `url('${titleScreen.dataset.titleBg}')`);
+            }
+        </script>
         <canvas id="title-bg-canvas"></canvas>
         <div class="title-container ui-title-box">
             <h1 class="text-display">GRAVITY FREIGHT</h1>
