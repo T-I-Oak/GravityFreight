@@ -67,10 +67,21 @@ function createDemoRocket(repository, launchAngle = DEFAULT_LAUNCH_ANGLE) {
     );
     const launcher = new Item('pad_standard_d2', repository);
     const booster = new Item('boost_expander', repository);
-    const rocket = new Rocket(rocketItem, launcher, booster, launchAngle, { x: 60, y: 0 });
+    const rocket = new Rocket(rocketItem, launcher, booster, launchAngle, createLaunchPosition(repository, launchAngle));
 
     rocket.velocity = rocket.getInitialVelocity(0);
     return rocket;
+}
+
+function createLaunchPosition(repository, launchAngle) {
+    const config = repository.getMasterConfig();
+    const balance = repository.getGameBalance();
+    const launchRadius = config.homeStarRadius + (balance.SHIP_START_OFFSET ?? 0);
+
+    return {
+        x: Math.cos(launchAngle) * launchRadius,
+        y: Math.sin(launchAngle) * launchRadius
+    };
 }
 
 export function createDevNavigationDemo(repository, options = {}) {

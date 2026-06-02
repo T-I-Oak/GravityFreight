@@ -52,7 +52,7 @@ describe('navigation demo', () => {
         expect(demo.sector.sectorNumber).toBe(1);
         expect(demo.sector.bodies.length).toBeGreaterThan(1);
         expect(demo.sector.exits).toHaveLength(3);
-        expect(demo.rocket.position).toEqual({ x: 60, y: 0 });
+        expect(Math.hypot(demo.rocket.position.x, demo.rocket.position.y)).toBeCloseTo(37);
         expect(demo.rocket.velocity.x).toBeGreaterThan(0);
         expect(demo.prediction.isGhost).toBe(true);
         expect(demo.prediction.actualTrail.length).toBeGreaterThan(0);
