@@ -139,9 +139,13 @@ class Rocket {
     }
 
     getInitialVelocity(powerBonus = 0) {
+        const referenceMass = this.#getReferenceMass();
+        const rocketMass = Math.max(this.rocketItem?.getMass?.() ?? referenceMass, Number.EPSILON);
+        const massFactor = Math.sqrt(referenceMass / rocketMass);
         const speed = this.#additive('power')
             * this.#multiplier('powerMultiplier')
-            * (1.0 + powerBonus);
+            * (1.0 + powerBonus)
+            * massFactor;
 
         return {
             x: Math.cos(this.angle) * speed,
@@ -260,6 +264,10 @@ class Rocket {
         return this.rocketItem?.chassis?.gameDataRepository
             || this.launcher?.gameDataRepository
             || this.booster?.gameDataRepository;
+    }
+
+    #getReferenceMass() {
+        return this.#getGameDataRepository()?.getGameBalance?.().DEFAULT_SHIP_MASS ?? 10;
     }
 }
 

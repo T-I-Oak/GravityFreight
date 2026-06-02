@@ -78,7 +78,8 @@ describe('Rocket', () => {
             * rocketItem.getPowerMultiplier()
             * launcher.powerMultiplier
             * booster.powerMultiplier
-            * 1.5;
+            * 1.5
+            * Math.sqrt(repository.getGameBalance().DEFAULT_SHIP_MASS / rocketItem.getMass());
 
         expect(velocity.x).toBeCloseTo(0, 10);
         expect(velocity.y).toBeCloseTo(expectedSpeed, 10);

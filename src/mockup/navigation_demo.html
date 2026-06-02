@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Freight Dev Navigation Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/design_tokens.css">
+    <link rel="stylesheet" href="../../css/ui_base.css">
+    <link rel="stylesheet" href="../../css/ui_layout.css">
+    <link rel="stylesheet" href="../../css/ui_primitives.css">
+    <link rel="stylesheet" href="../../css/ui_style_neon.css">
+    <link rel="stylesheet" href="../../css/navigation_demo.css">
+</head>
+<body class="theme-neon">
+    <main class="DevNavigationDemo">
+        <section class="dev-navigation-stage">
+            <canvas class="dev-navigation-canvas" data-dev-navigation-canvas></canvas>
+        </section>
+
+        <aside class="Panel dev-navigation-panel">
+            <header class="panel-header dev-navigation-header">
+                <h1 class="dev-navigation-title">NAVIGATION DEMO</h1>
+                <span class="dev-navigation-version">M3</span>
+            </header>
+
+            <label class="dev-navigation-angle-control">
+                <span>ANGLE</span>
+                <input type="range" min="-180" max="180" step="1" value="13" data-dev-navigation-angle>
+                <strong data-dev-navigation-angle-value>13 deg</strong>
+            </label>
+
+            <div class="dev-navigation-controls">
+                <button class="Button state-primary state-clickable" data-dev-navigation-start>RUN</button>
+                <button class="Button state-clickable" data-dev-navigation-pause>PAUSE</button>
+                <button class="Button state-clickable" data-dev-navigation-step>STEP</button>
+                <button class="Button state-clickable" data-dev-navigation-reset>RESET</button>
+            </div>
+
+            <dl class="dev-navigation-readout">
+                <div>
+                    <dt>SECTOR</dt>
+                    <dd data-dev-navigation-sector>0</dd>
+                </div>
+                <div>
+                    <dt>TICK</dt>
+                    <dd data-dev-navigation-tick>0</dd>
+                </div>
+                <div>
+                    <dt>POSITION</dt>
+                    <dd data-dev-navigation-position>0, 0</dd>
+                </div>
+                <div>
+                    <dt>VELOCITY</dt>
+                    <dd data-dev-navigation-velocity>0, 0</dd>
+                </div>
+                <div>
+                    <dt>RESULT</dt>
+                    <dd data-dev-navigation-result>NAVIGATING</dd>
+                </div>
+            </dl>
+        </aside>
+    </main>
+
+    <script type="module" src="./navigation_demo_page.js"></script>
+</body>
+</html>

@@ -76,7 +76,9 @@
     - 射出角度を更新する。照準フェーズでのリアルタイム予測線更新に使用される。
 - `getInitialVelocity(powerBonus: number = 0): Vector2`
     - 現在セットされている `launcher`, `booster`, `angle` に基づいて初速ベクトルを算出して返す。
-    - **内部計算**: `(rocketItem.getPower() + launcher.power + (booster?.power ?? 0)) * rocketItem.getPowerMultiplier() * launcher.powerMultiplier * (booster?.powerMultiplier ?? 1.0) * (1.0 + powerBonus)` を基準速とし、`angle` 方向のベクトルを生成。
+    - **内部計算**: `(rocketItem.getPower() + launcher.power + (booster?.power ?? 0)) * rocketItem.getPowerMultiplier() * launcher.powerMultiplier * (booster?.powerMultiplier ?? 1.0) * (1.0 + powerBonus) * sqrt(M_ref / rocketItem.getMass())` を基準速とし、`angle` 方向のベクトルを生成。
+        - `M_ref` は `GameDataRepository.getGameBalance().DEFAULT_SHIP_MASS` を使用する。取得できない場合は `10` を既定値とする。
+        - β v1 と同様に、重いロケットほど初速が下がる。
         - 現時点の item catalog に定義されている booster は `powerMultiplier` による補正を持つ。今後 `power` を持つ booster が追加された場合も、この式に従って加算値と倍率を集計する。
     - **呼び出し**: 航行開始直前に `GameController` が実行し自身の `velocity` にセットするほか、`PhysicsEngine` が予測線の初速として参照する。
 - `getCollectionRange(): number`
