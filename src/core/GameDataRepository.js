@@ -50,10 +50,13 @@ class GameDataRepository {
         return {
             baseCelestialCount: 5,
             boundaryRadius: this.config.mapConstants.BOUNDARY_RADIUS,
+            homeStarPosition: { ...this.config.mapConstants.HOME_STAR_POSITION },
             placementLimitRadius: 700,
             minBodyDistance: this.config.mapConstants.MIN_STAR_DISTANCE,
+            placementAttemptLimit: this.config.mapConstants.PLACEMENT_ATTEMPT_LIMIT,
             homeStarRadius: this.config.mapConstants.HOME_STAR_RADIUS,
             homeStarMass: this.config.mapConstants.HOME_STAR_MASS,
+            simulationTickSeconds: this.config.gameBalance.SIMULATION_TICK_SECONDS,
             arcFacilityWidths: { ...ARC_FACILITY_WIDTHS },
             arcMaxExpansion: 2.0,
             arcMinMargin: 5

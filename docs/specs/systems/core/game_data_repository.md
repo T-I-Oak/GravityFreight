@@ -150,10 +150,13 @@
 {
   baseCelestialCount: number,
   boundaryRadius: number,
+  homeStarPosition: { x: number, y: number },
   placementLimitRadius: number,
   minBodyDistance: number,
+  placementAttemptLimit: number,
   homeStarRadius: number,
   homeStarMass: number,
+  simulationTickSeconds: number,
   arcFacilityWidths: {
     TRADING_POST: number,
     REPAIR_DOCK: number,
