@@ -10,9 +10,9 @@
 - [ ] 初版リリース前に `common_style.md` の移行期間中の対応節を削除する
     - リリース版ドキュメントには β v1 / 旧仕様の class 名を残さない
 - [ ] FlightReplaySnapshots 完成後に保存データサイズを検証する
-    - 20件保存時の `flight_record_index` サイズを確認する
-    - 圧縮の要否、圧縮後サイズ、復元コストを評価する
-    - 共通 DataManager の保存方式で問題なく扱えるか確認する
+    - [ ] 20件保存時の `flight_record_index` サイズを確認する
+    - [ ] 圧縮の要否、圧縮後サイズ、復元コストを評価する
+    - [ ] 共通 DataManager の保存方式で問題なく扱えるか確認する
 
 ## 実装
 - [ ] 実装開始前に TDD 方針とテスト命名規約を適用する
@@ -21,79 +21,79 @@
     - 実装テストは `tests/implementation/` に `src/` と同じ構成で配置し、命名は `[元のファイル名].test.js` とする
     - 実装タスクごとに、対象が要求仕様テスト・実装テストのどちらを必要とするかを確認してから着手する
 - [x] データ基盤を実装する
-    - GameDataRepository
-    - 共通 DataManager / i18n ライブラリとの接続
-    - 静的マスタデータのロード
-    - ユーザーデータの getSavedData / setSavedData 経由の読み書き
+    - [x] GameDataRepository
+    - [x] 共通 DataManager / i18n ライブラリとの接続
+    - [x] 静的マスタデータのロード
+    - [x] ユーザーデータの getSavedData / setSavedData 経由の読み書き
 - [ ] エンティティ基盤を実装する
-    - Item
-    - StackedItem
-    - ModuleStack
-    - ItemContainer
-    - RocketItem
-    - Rocket
-    - SessionState
+    - [x] Item
+    - [x] StackedItem
+    - [x] ModuleStack
+    - [x] ItemContainer
+    - [x] RocketItem
+    - [x] Rocket
+    - [ ] SessionState
 - [ ] ワールド生成・再現クラスを実装する
-    - Sector
-    - CelestialBody
-    - ExitArc
-    - createSnapshot / fromSnapshot
+    - [ ] Sector
+    - [ ] CelestialBody
+    - [ ] ExitArc
+    - [ ] createSnapshot / fromSnapshot
 - [ ] 物理・航行ロジックを実装する
-    - PhysicsEngine
-    - TrajectoryPredictor
-    - Rocket.useAvoidanceModule の具体挙動
+    - [ ] PhysicsEngine
+    - [ ] TrajectoryPredictor
+    - [ ] Rocket.useAvoidanceModule の具体挙動
         - 回避モジュールの選択条件、charges 消費、速度更新、対象破壊の責務分担を確定してから実装する
-    - 航行終了判定
-    - アイテム回収判定
+    - [ ] 航行終了判定
+    - [ ] アイテム回収判定
 - [ ] 記録・永続データ系を実装する
-    - GameRecordTracker
-    - RankTracker
-    - AchievementTracker
-    - FlightRecorder
-    - StorySystem
+    - [ ] GameRecordTracker
+    - [ ] RankTracker
+    - [ ] AchievementTracker
+    - [ ] FlightRecorder
+    - [ ] StorySystem
 - [ ] 経済・施設処理を実装する
-    - EconomySystem
-    - 施設報酬
-    - 施設取引
-    - ゲームオーバー判定
+    - [ ] EconomySystem
+    - [ ] 施設報酬
+    - [ ] 施設取引
+    - [ ] ゲームオーバー判定
 - [ ] 表示・入力基盤を実装する
-    - AppOrchestrator
-    - UIController
-    - WorldRenderer
-    - CameraController
-    - BackgroundManager
-    - SoundController
+    - [ ] AppOrchestrator
+    - [ ] UIController
+    - [ ] WorldRenderer
+    - [ ] CameraController
+    - [ ] BackgroundManager
+    - [ ] SoundController
 - [ ] How To Play を実装する
-    - HowToPlayUI
-    - HowToPlayDiagrams
+    - [ ] HowToPlayUI
+    - [ ] HowToPlayDiagrams
 - [ ] 画面別 UI を実装する
-    - タイトル
-    - 建造・照準
-    - 航行 HUD
-    - 航行結果
-    - 施設画面
-    - Analytic Archive
-    - リプレイ再生
-    - 実績表示
+    - [ ] タイトル
+    - [ ] 建造・照準
+    - [ ] 航行 HUD
+    - [ ] 航行結果
+    - [ ] 施設画面
+    - [ ] Analytic Archive
+    - [ ] リプレイ再生
+    - [ ] 実績表示
 - [ ] 結合テストと仕様整合チェックを実施する
-    - core_scenarios の主要導線
-    - snapshot 再現
-    - 永続データ migration
-    - public/data/update_history.json が v0 中は `[]` のままであること
+    - [ ] core_scenarios の主要導線
+    - [ ] snapshot 再現
+    - [ ] 永続データ migration
+    - [ ] public/data/update_history.json が v0 中は `[]` のままであること
 - [ ] 要求仕様に対するテストを実施する
     - テストファイルは `tests/spec/` に配置し、命名規約 `[prefix]_[章番号]_[名称].test.js` に従う
-    - core_mechanics.md 第1章: ゲーム概要・用語
-    - core_mechanics.md 第2章: 世界構成・座標・時間
-    - core_mechanics.md 第3章: 航行の物理法則
-    - core_mechanics.md 第4章: ゲームサイクルとミッション進行
-    - core_mechanics.md 第5章: 帰還ボーナス
-    - core_mechanics.md 第6章: ベストショット・リプレイ
-    - core_mechanics.md 第7章: スコアシステム
-    - item_catalog.md 第1章: 構成アイテムの分類と役割
-    - item_catalog.md 第2章: 性能算定の規則
-    - item_catalog.md 第3章: アイテム一覧管理表
-    - world_config.md 第1章: 初期設定データ
-    - world_config.md 第2章: 目的地と貨物配送
-    - world_config.md 第3章: アイテム収集と経済システム
-    - world_config.md 第4章: ポストミッション・イベント
+    - [ ] `core_mechanics_01_terms.test.js`: core_mechanics.md 第1章: ゲーム概要・用語
+    - [x] `core_mechanics_02_world_time.test.js`: core_mechanics.md 第2章: 世界構成・座標・時間
+    - [ ] `core_mechanics_03_physics.test.js`: core_mechanics.md 第3章: 航行の物理法則
+    - [ ] `core_mechanics_04_game_cycle.test.js`: core_mechanics.md 第4章: ゲームサイクルとミッション進行
+    - [ ] `core_mechanics_05_return_bonus.test.js`: core_mechanics.md 第5章: 帰還ボーナス
+    - [ ] `core_mechanics_06_replay.test.js`: core_mechanics.md 第6章: ベストショット・リプレイ
+    - [ ] `core_mechanics_07_scoring.test.js`: core_mechanics.md 第7章: スコアシステム
+    - [ ] `item_catalog_01_item_roles.test.js`: item_catalog.md 第1章: 構成アイテムの分類と役割
+    - [x] `item_catalog_02_spec_calculation.test.js`: item_catalog.md 第2章: 性能算定の規則
+    - [ ] `item_catalog_03_item_master.test.js`: item_catalog.md 第3章: アイテム一覧管理表
+    - [ ] `world_config_01_initial_setup.test.js`: world_config.md 第1章: 初期設定データ
+    - [ ] `world_config_02_destinations_delivery.test.js`: world_config.md 第2章: 目的地と貨物配送
+    - [ ] `world_config_03_collection_economy.test.js`: world_config.md 第3章: アイテム収集と経済システム
+    - [ ] `world_config_04_post_mission_events.test.js`: world_config.md 第4章: ポストミッション・イベント
 
