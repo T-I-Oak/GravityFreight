@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import GameDataRepository from '../../../src/core/GameDataRepository.js';
 import {
+    advanceDevNavigationDemo,
     createDevNavigationDemo,
     renderDevNavigationFrame,
     tickDevNavigationDemo
@@ -94,6 +95,16 @@ describe('navigation demo', () => {
 
         expect(result.collision.type).toBe('boundary');
         expect(demo.rocket.actualTrail).toEqual([]);
+    });
+
+    it('advances with the same fixed timestep accumulator as the runtime loop', () => {
+        const demo = createDevNavigationDemo(repository);
+
+        const steps = advanceDevNavigationDemo(demo, 0.016);
+
+        expect(steps).toBe(8);
+        expect(demo.rocket.ticks).toBe(8);
+        expect(demo.accumulator).toBeCloseTo(0);
     });
 
     it('renders a nonblank canvas frame through the drawing adapter', () => {

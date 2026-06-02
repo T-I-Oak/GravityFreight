@@ -1,12 +1,12 @@
 import GameDataRepository from '../core/GameDataRepository.js';
 import {
+    advanceDevNavigationDemo,
     createDevNavigationDemo,
     renderDevNavigationFrame,
     resetDevNavigationDemo,
     tickDevNavigationDemo
 } from './navigation_demo.js';
 
-const STEPS_PER_FRAME = 4;
 const RAD_TO_DEG = 180 / Math.PI;
 const DEG_TO_RAD = Math.PI / 180;
 
@@ -104,12 +104,17 @@ async function initialize() {
 
     window.addEventListener('resize', render);
 
-    function frame() {
-        if (demo.isRunning && !demo.lastResult?.collision) {
-            for (let i = 0; i < STEPS_PER_FRAME && !demo.lastResult?.collision; i += 1) {
-                tickDevNavigationDemo(demo);
-            }
+    let lastFrameTime = null;
+
+    function frame(timestamp) {
+        if (lastFrameTime === null) {
+            lastFrameTime = timestamp;
         }
+
+        if (demo.isRunning && !demo.lastResult?.collision) {
+            advanceDevNavigationDemo(demo, (timestamp - lastFrameTime) / 1000);
+        }
+        lastFrameTime = timestamp;
         render();
         window.requestAnimationFrame(frame);
     }

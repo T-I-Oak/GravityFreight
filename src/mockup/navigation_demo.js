@@ -9,6 +9,7 @@ const WORLD_VIEW_RADIUS = 980;
 const DEMO_CANVAS_WIDTH = 960;
 const DEMO_CANVAS_HEIGHT = 720;
 const DEFAULT_LAUNCH_ANGLE = 0.22;
+const MAX_STEPS_PER_FRAME = 10;
 
 function createItemSnapshot(id, repository) {
     return new Item(id, repository).createSnapshot();
@@ -104,9 +105,24 @@ export function createDevNavigationDemo(repository, options = {}) {
         trajectoryPredictor,
         prediction,
         launchAngle,
+        accumulator: 0,
         isRunning: false,
         lastResult: null
     };
+}
+
+export function advanceDevNavigationDemo(demo, elapsedSeconds, maxSteps = MAX_STEPS_PER_FRAME) {
+    const tickSeconds = demo.repository.getMasterConfig().simulationTickSeconds;
+    let steps = 0;
+
+    demo.accumulator += elapsedSeconds;
+    while (demo.accumulator >= tickSeconds && steps < maxSteps && !demo.lastResult?.collision) {
+        tickDevNavigationDemo(demo);
+        demo.accumulator -= tickSeconds;
+        steps += 1;
+    }
+
+    return steps;
 }
 
 export function tickDevNavigationDemo(demo) {
