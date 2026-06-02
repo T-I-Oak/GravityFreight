@@ -33,7 +33,7 @@
 - [ ] M1: ゲーム進行状態とワールド snapshot の土台を実装する
     - [x] SessionState
     - [ ] Sector
-    - [ ] CelestialBody
+    - [x] CelestialBody
     - [ ] ExitArc
     - [ ] createSnapshot / fromSnapshot によるワールド再現
     - [ ] world snapshot の基礎サイズを測定する
@@ -70,7 +70,7 @@
     - [x] SessionState
 - [ ] ワールド生成・再現クラスを実装する
     - [ ] Sector
-    - [ ] CelestialBody
+    - [x] CelestialBody
     - [ ] ExitArc
     - [ ] createSnapshot / fromSnapshot
 - [ ] 物理・航行ロジックを実装する

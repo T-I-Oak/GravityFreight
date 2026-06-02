@@ -156,6 +156,9 @@
   placementAttemptLimit: number,
   homeStarRadius: number,
   homeStarMass: number,
+  starRadiusMin: number,
+  starRadiusMax: number,
+  starDefaultRadius: number,
   simulationTickSeconds: number,
   arcFacilityWidths: {
     TRADING_POST: number,

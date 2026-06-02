@@ -40,6 +40,9 @@ describe('GameDataRepository', () => {
         expect(config.minBodyDistance).toBe(180);
         expect(config.homeStarRadius).toBe(25);
         expect(config.homeStarMass).toBe(4000);
+        expect(config.starRadiusMin).toBe(30);
+        expect(config.starRadiusMax).toBe(60);
+        expect(config.starDefaultRadius).toBe(20);
         expect(config.arcFacilityWidths).toEqual({
             TRADING_POST: 60,
             REPAIR_DOCK: 40,
