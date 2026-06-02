@@ -34,7 +34,7 @@
     - [x] SessionState
     - [ ] Sector
     - [x] CelestialBody
-    - [ ] ExitArc
+    - [x] ExitArc
     - [ ] createSnapshot / fromSnapshot によるワールド再現
     - [ ] world snapshot の基礎サイズを測定する
         - リプレイ20件保存時の最終判断ではなく、異常に大きい snapshot 構造を早期検知するための参考測定とする
@@ -71,7 +71,7 @@
 - [ ] ワールド生成・再現クラスを実装する
     - [ ] Sector
     - [x] CelestialBody
-    - [ ] ExitArc
+    - [x] ExitArc
     - [ ] createSnapshot / fromSnapshot
 - [ ] 物理・航行ロジックを実装する
     - [ ] PhysicsEngine
