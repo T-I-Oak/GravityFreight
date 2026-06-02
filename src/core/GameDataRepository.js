@@ -130,6 +130,11 @@ class GameDataRepository {
         return this.config.rarity;
     }
 
+    getRarityPrices() {
+        this.#ensureLoaded();
+        return { ...this.config.rarityPrices };
+    }
+
     getAppMetadata() {
         return {
             version: packageData.version,
