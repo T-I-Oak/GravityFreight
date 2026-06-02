@@ -23,12 +23,15 @@
 ### メソッド (Methods)
 
 - **`constructor(params: object)`**
-    - **引数**: `position`, `isRepulsion`, `isHome`, `items` を含むオブジェクト。
+    - **引数**: `position`, `radius`, `isRepulsion`, `isHome`, `items` を含むオブジェクト。
+    - `GameDataRepository` を受け取り、母星の既定半径・質量、および通常天体の半径範囲を取得する。
     - **挙動**:
-        - **`isHome` が `true` の場合**:
+        - **`radius` が指定された場合**:
+            - 母星・通常天体のどちらであっても、指定された `radius` を使用し、`mass = radius * radius` として算出する。
+        - **`isHome` が `true` かつ `radius` が省略された場合**:
             - `GameDataRepository.getMasterConfig()` から `homeStarRadius` および `homeStarMass` を取得してセットする。
-        - **それ以外の場合**:
-            - **`radius`**: マスタ設定の規定範囲（30〜60px）からランダムに決定する。
+        - **通常天体で `radius` が省略された場合**:
+            - **`radius`**: `GameDataRepository.getMasterConfig()` の `starRadiusMin`〜`starRadiusMax` からランダムに決定する。
             - **`mass`**: `this.radius * this.radius` として算出する。
         - その他 `position`, `isRepulsion`, `items` 等を初期化する。
 
@@ -71,14 +74,14 @@
         - `position`
         - `isRepulsion`
         - `isHome`
-        - `radius`: `isHome === false` の場合のみ、ランダム決定済みの半径として保存する。
+        - `radius`: `isHome === false` の場合、または母星であってもマスタ既定値と異なる半径が指定されている場合に保存する。
         - `items`: 各 `Item.createSnapshot()` の結果。
     - **保存しない値**:
         - `mass`: 通常天体は `radius * radius`、母星はマスタ値から再計算する。
-        - 母星の `radius`: マスタ値から再解決する。
+        - 母星の `radius`: snapshot に `radius` がない場合はマスタ値から再解決する。
     - **注意**: `items` は発射時点で天体が保持している未回収アイテムを表す。航行中に回収されると `CelestialBody` から除去されるため、リプレイ用 snapshot は発射時点で取得する。
 
-- **`static fromSnapshot(snapshot: object): CelestialBody`**
+- **`static fromSnapshot(snapshot: object, gameDataRepository: GameDataRepository): CelestialBody`**
     - `CelestialBodySnapshot` から天体インスタンスを復元する。
     - **内部挙動**:
         1. `position`, `isRepulsion`, `isHome` を復元する。
