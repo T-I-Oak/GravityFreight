@@ -37,6 +37,7 @@ class ModuleStack extends Item {
         if (target) {
             target.consumeCharge(1);
             this.charges = Math.max(0, this.charges - 1);
+            return true;
         }
 
         return false;
