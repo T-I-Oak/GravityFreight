@@ -4,10 +4,50 @@ import RocketItem from './RocketItem.js';
 
 const ZERO_VECTOR = { x: 0, y: 0 };
 
+const REAL_AVOIDANCE_MODULES = {
+    breaker: 'mod_star_breaker',
+    cushion: 'mod_cushion',
+    emergency: 'mod_emergency'
+};
+
+const GHOST_AVOIDANCE_MODULES = {
+    breaker: 'mod_gst_breaker',
+    cushion: 'mod_gst_cushion',
+    emergency: 'mod_gst_emergency'
+};
+
 function copyVector(vector = ZERO_VECTOR) {
     return {
         x: vector.x ?? 0,
         y: vector.y ?? 0
+    };
+}
+
+function vectorLength(vector) {
+    return Math.hypot(vector.x, vector.y);
+}
+
+function normalizeVector(vector) {
+    const length = vectorLength(vector);
+    if (length === 0) {
+        return copyVector();
+    }
+
+    return {
+        x: vector.x / length,
+        y: vector.y / length
+    };
+}
+
+function dotVector(a, b) {
+    return a.x * b.x + a.y * b.y;
+}
+
+function reflectVector(vector, normal) {
+    const dot = dotVector(vector, normal);
+    return {
+        x: vector.x - 2 * dot * normal.x,
+        y: vector.y - 2 * dot * normal.y
     };
 }
 
@@ -121,7 +161,35 @@ class Rocket {
         this.heldCargo.push(item);
     }
 
-    useAvoidanceModule() {
+    useAvoidanceModule(type, target) {
+        if (type === 'body') {
+            if (this.#canUseAvoidance('breaker')) {
+                this.#consumeAvoidance('breaker');
+                return {
+                    method: 'star_breaker',
+                    destroyedTarget: target
+                };
+            }
+
+            if (this.#canUseAvoidance('cushion')) {
+                this.#consumeAvoidance('cushion');
+                this.velocity = reflectVector(this.velocity, this.#getBodyNormal(target));
+                return {
+                    method: 'cushion',
+                    destroyedTarget: null
+                };
+            }
+        }
+
+        if (type === 'boundary' && this.#canUseAvoidance('emergency')) {
+            this.#consumeAvoidance('emergency');
+            this.velocity = reflectVector(this.velocity, this.#getBoundaryNormal());
+            return {
+                method: 'emergency',
+                destroyedTarget: null
+            };
+        }
+
         return null;
     }
 
@@ -153,6 +221,39 @@ class Rocket {
         }
 
         return this.rocketItem?.[key] ?? (key.endsWith('Multiplier') ? 1 : 0);
+    }
+
+    #canUseAvoidance(kind) {
+        const module = this.#findAvoidanceModule(kind);
+        if (!module) {
+            return false;
+        }
+
+        return this.isGhost || module.charges > 0;
+    }
+
+    #consumeAvoidance(kind) {
+        if (this.isGhost) {
+            return;
+        }
+
+        this.#findAvoidanceModule(kind)?.consumeCharge();
+    }
+
+    #findAvoidanceModule(kind) {
+        const id = this.isGhost ? GHOST_AVOIDANCE_MODULES[kind] : REAL_AVOIDANCE_MODULES[kind];
+        return this.rocketItem?.modules?.find(module => module.id === id);
+    }
+
+    #getBodyNormal(target) {
+        return normalizeVector({
+            x: this.position.x - (target?.position?.x ?? 0),
+            y: this.position.y - (target?.position?.y ?? 0)
+        });
+    }
+
+    #getBoundaryNormal() {
+        return normalizeVector(this.position);
     }
 
     #getGameDataRepository() {

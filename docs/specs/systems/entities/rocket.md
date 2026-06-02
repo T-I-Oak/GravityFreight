@@ -89,11 +89,18 @@
     - 衝突または境界到達時に、適切な手段で回避を試みる。
     - **内部挙動**:
         1. **回避可否の判定**:
-            - **通常時**: 該当する回避モジュールを検索。`Charges > 0` の個体があれば **Charges を 1 減算** し、回避実行ステップへ進む。
-            - **予測時（isGhost）**: 装備品から今回の回避種別に対応する `ghostType`（'avoidance' | 'destruction' 等）を検索。存在すれば（実モジュールの有無や Charges に関わらず）回避実行ステップへ進む。
+            - **通常時**: 該当する通常モジュールを検索。`Charges > 0` の個体があれば **Charges を 1 減算** し、回避実行ステップへ進む。
+            - **予測時（isGhost）**: 通常モジュールは無視し、該当するゴースト系モジュールが搭載されていれば回避実行ステップへ進む。Charges は消費しない。
         2. **回避実行（共通処理）**:
             - 判定をパスした場合、自身の `velocity` 等を回避後の物理状態に直接書き換え、適切な `AvoidanceResult` を生成して返す。
         3. **失敗**: 上記の条件を満たさない場合は `null` を返す。
+    - **body 衝突時の優先順位**:
+        1. `mod_star_breaker` / `mod_gst_breaker`: 対象天体を破壊し、`method: 'star_breaker'`, `destroyedTarget: target` を返す。天体上の未回収アイテムは破壊に伴い失われる。
+        2. `mod_cushion` / `mod_gst_cushion`: 対象天体の中心からロケット位置へ向かう法線で速度を反射し、`method: 'cushion'`, `destroyedTarget: null` を返す。
+    - **boundary 到達時**:
+        - `mod_emergency` / `mod_gst_emergency`: 原点からロケット位置へ向かう境界法線で速度を反射し、`method: 'emergency'`, `destroyedTarget: null` を返す。
+    - **速度制限**:
+        - `star_breaker` / `cushion` 発動後の速度制限は、異常速度が問題になった場合に別途仕様化する。現時点では速度の上限補正は行わない。
     - **戻り値**: 回避成功時は `AvoidanceResult` を返し、不可なら `null` を返す。
 - `getFlightResult(): FlightResultData`
     - 精算に必要な生データ（ticks, heldCargo）を抽出して返す。

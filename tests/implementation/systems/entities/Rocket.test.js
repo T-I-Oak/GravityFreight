@@ -28,6 +28,17 @@ function createRocketParts() {
     return { rocketItem, launcher, booster };
 }
 
+function createRocketPartsWithModules(moduleIds) {
+    const rocketItem = new RocketItem(
+        new Item('hull_medium', repository),
+        new Item('sensor_normal', repository),
+        moduleIds.map(id => new Item(id, repository))
+    );
+    const launcher = new Item('pad_standard_d2', repository);
+
+    return { rocketItem, launcher };
+}
+
 describe('Rocket', () => {
     it('initializes flight state from launch equipment', () => {
         const { rocketItem, launcher, booster } = createRocketParts();
@@ -123,14 +134,6 @@ describe('Rocket', () => {
         });
     });
 
-    it('exposes the avoidance module interface without concrete behavior yet', () => {
-        const { rocketItem, launcher } = createRocketParts();
-        const rocket = new Rocket(rocketItem, launcher, null, 0);
-
-        expect(rocket.useAvoidanceModule('body', {})).toBeNull();
-        expect(rocket.useAvoidanceModule('boundary', null)).toBeNull();
-    });
-
     it('marks cloned prediction rockets as ghosts only through setGhost', () => {
         const { rocketItem, launcher } = createRocketParts();
         const rocket = new Rocket(rocketItem, launcher, null, 0);
@@ -213,5 +216,92 @@ describe('Rocket', () => {
         expect(rocket.launcher).toBe(nextLauncher);
         expect(rocket.booster).toBe(booster);
         expect(rocket.angle).toBe(1.25);
+    });
+
+    it('uses star breaker first on body collision and consumes one real charge', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_star_breaker', 'mod_cushion']);
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+        const target = { position: { x: 10, y: 0 } };
+
+        const result = rocket.useAvoidanceModule('body', target);
+
+        expect(result).toEqual({
+            method: 'star_breaker',
+            destroyedTarget: target
+        });
+        expect(rocketItem.modules.find(module => module.id === 'mod_star_breaker').charges).toBe(1);
+        expect(rocketItem.modules.find(module => module.id === 'mod_cushion').charges).toBe(2);
+    });
+
+    it('uses cushion on body collision when breaker is unavailable and reflects velocity', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_cushion']);
+        const rocket = new Rocket(rocketItem, launcher, null, 0, { x: 10, y: 0 });
+        rocket.velocity = { x: -4, y: 3 };
+        const target = {
+            position: { x: 0, y: 0 }
+        };
+
+        const result = rocket.useAvoidanceModule('body', target);
+
+        expect(result).toEqual({
+            method: 'cushion',
+            destroyedTarget: null
+        });
+        expect(rocket.velocity).toEqual({ x: 4, y: 3 });
+        expect(rocketItem.modules.find(module => module.id === 'mod_cushion').charges).toBe(1);
+    });
+
+    it('uses emergency thruster on boundary collision and reflects velocity across the boundary normal', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_emergency']);
+        const rocket = new Rocket(rocketItem, launcher, null, 0, { x: 900, y: 0 });
+        rocket.velocity = { x: 5, y: 2 };
+
+        const result = rocket.useAvoidanceModule('boundary', null);
+
+        expect(result).toEqual({
+            method: 'emergency',
+            destroyedTarget: null
+        });
+        expect(rocket.velocity).toEqual({ x: -5, y: 2 });
+        expect(rocketItem.modules.find(module => module.id === 'mod_emergency').charges).toBe(1);
+    });
+
+    it('ignores real modules and uses ghost modules without consuming charges when ghost', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_star_breaker', 'mod_gst_breaker']);
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+        const target = { position: { x: 10, y: 0 } };
+        rocket.setGhost();
+
+        const result = rocket.useAvoidanceModule('body', target);
+
+        expect(result).toEqual({
+            method: 'star_breaker',
+            destroyedTarget: target
+        });
+        expect(rocketItem.modules.find(module => module.id === 'mod_star_breaker').charges).toBe(2);
+        expect(rocketItem.modules.find(module => module.id === 'mod_gst_breaker').charges).toBe(0);
+    });
+
+    it('uses ghost breaker before ghost cushion when both are available', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_gst_breaker', 'mod_gst_cushion']);
+        const rocket = new Rocket(rocketItem, launcher, null, 0, { x: 10, y: 0 });
+        rocket.velocity = { x: -4, y: 0 };
+        rocket.setGhost();
+
+        const result = rocket.useAvoidanceModule('body', { position: { x: 0, y: 0 } });
+
+        expect(result.method).toBe('star_breaker');
+        expect(rocket.velocity).toEqual({ x: -4, y: 0 });
+    });
+
+    it('returns null when matching avoidance modules are missing or depleted', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_star_breaker']);
+        const breaker = rocketItem.modules.find(module => module.id === 'mod_star_breaker');
+        breaker.consumeCharge();
+        breaker.consumeCharge();
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+
+        expect(rocket.useAvoidanceModule('body', { position: { x: 0, y: 0 } })).toBeNull();
+        expect(rocket.useAvoidanceModule('boundary', null)).toBeNull();
     });
 });

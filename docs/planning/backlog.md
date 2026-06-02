@@ -77,8 +77,7 @@
 - [ ] 物理・航行ロジックを実装する
     - [x] PhysicsEngine
     - [ ] TrajectoryPredictor
-    - [ ] Rocket.useAvoidanceModule の具体挙動
-        - 回避モジュールの選択条件、charges 消費、速度更新、対象破壊の責務分担を確定してから実装する
+    - [x] Rocket.useAvoidanceModule の具体挙動
     - [x] 航行終了判定
     - [x] アイテム回収判定
 - [ ] 記録・永続データ系を実装する

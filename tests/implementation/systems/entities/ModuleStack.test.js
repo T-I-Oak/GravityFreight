@@ -47,10 +47,20 @@ describe('ModuleStack', () => {
         const beforeCount = stack.count;
         const beforeCharges = stack.charges;
 
-        expect(stack.consumeCharge()).toBe(false);
+        expect(stack.consumeCharge()).toBe(true);
         expect(item1.charges).toBe(0);
         expect(stack.count).toBe(beforeCount);
         expect(stack.charges).toBe(beforeCharges - 1);
+    });
+
+    it('returns false when no module charge remains', () => {
+        const item = new Item('mod_star_breaker', repository);
+        const stack = new ModuleStack(item);
+
+        stack.consumeCharge();
+        stack.consumeCharge();
+
+        expect(stack.consumeCharge()).toBe(false);
     });
 
     it('creates and restores snapshots without storing derived totals', () => {
