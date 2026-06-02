@@ -42,9 +42,9 @@
         - 目安: 1 sector の world snapshot は 15KiB 以内を目標、25KiB 超で警告、40KiB 超で構造見直し候補とする
         - v0.64 測定値: `Sector.createSnapshot()` の UTF-16 相当サイズは 2932 bytes（通常セクター、天体6件、出口3件、各天体に coin item 1件）
 - [ ] M2: 最小航行シミュレーションを実装する
-    - [ ] PhysicsEngine
-    - [ ] 航行終了判定
-    - [ ] アイテム回収判定
+    - [x] PhysicsEngine
+    - [x] 航行終了判定
+    - [x] アイテム回収判定
     - [ ] TrajectoryPredictor
 - [ ] M3: ブラウザで最小航行を確認できる導線を作る
     - [ ] 既存 mock または dev 用導線で、生成済み sector と rocket を描画する
@@ -75,12 +75,12 @@
     - [x] ExitArc
     - [x] createSnapshot / fromSnapshot
 - [ ] 物理・航行ロジックを実装する
-    - [ ] PhysicsEngine
+    - [x] PhysicsEngine
     - [ ] TrajectoryPredictor
     - [ ] Rocket.useAvoidanceModule の具体挙動
         - 回避モジュールの選択条件、charges 消費、速度更新、対象破壊の責務分担を確定してから実装する
-    - [ ] 航行終了判定
-    - [ ] アイテム回収判定
+    - [x] 航行終了判定
+    - [x] アイテム回収判定
 - [ ] 記録・永続データ系を実装する
     - [ ] GameRecordTracker
     - [ ] RankTracker

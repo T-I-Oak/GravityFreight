@@ -91,6 +91,23 @@ describe('Rocket', () => {
         );
     });
 
+    it('calculates arc multiplier from launch configuration', () => {
+        const rocketItem = new RocketItem(
+            new Item('hull_medium', repository),
+            new Item('sensor_normal', repository),
+            []
+        );
+        const launcher = new Item('pad_standard_d2', repository);
+        const booster = new Item('boost_expander', repository);
+        const rocket = new Rocket(rocketItem, launcher, booster, 0);
+
+        expect(rocket.getArcMultiplier()).toBe(
+            rocketItem.getArcMultiplier()
+            * launcher.arcMultiplier
+            * booster.arcMultiplier
+        );
+    });
+
     it('stores held items and exposes flight result data', () => {
         const { rocketItem, launcher } = createRocketParts();
         const rocket = new Rocket(rocketItem, launcher, null, 0);
@@ -104,6 +121,14 @@ describe('Rocket', () => {
             ticks: 1,
             heldCargo: [cargo]
         });
+    });
+
+    it('exposes the avoidance module interface without concrete behavior yet', () => {
+        const { rocketItem, launcher } = createRocketParts();
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+
+        expect(rocket.useAvoidanceModule('body', {})).toBeNull();
+        expect(rocket.useAvoidanceModule('boundary', null)).toBeNull();
     });
 
     it('marks cloned prediction rockets as ghosts only through setGhost', () => {

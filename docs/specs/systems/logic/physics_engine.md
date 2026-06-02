@@ -14,6 +14,9 @@
 
 ### メソッド (Methods)
 
+- **`constructor(gameDataRepository: GameDataRepository)`**
+    - シミュレーション時間、境界半径、重力スケーリング係数などのマスタ設定を参照するため、`GameDataRepository` を受け取る。
+
 - **`step(rocket: Rocket, sector: Sector): object`**
     - 1ティック分の物理更新と衝突・出口・境界判定を実行する。
     - **内部挙動**:
@@ -26,7 +29,8 @@
                 - **継続処理**: 戻り値（`avoidance`）が `null` でない場合、衝突判定をキャンセルし航行を継続。
                 - **天体破壊**: `avoidance.destroyedTarget` がある場合、**引数で渡された `sector.bodies`** から対象を除外する。
                     - ※予測時（`rocket.isGhost === true`）は、クローンされた `Sector` が渡されるため、オリジナルへの影響はない。
-            - **出口到達**: `arc.checkEntrance(newPos)` が真。
+            - **出口到達**: `arc.checkEntrance(newPos, rocket.getArcMultiplier())` が真。
+                - 判定時は `rocket.getArcMultiplier()` を `widthMultiplier` として渡し、発射構成による出口幅補正を反映する。
                 - `collision.target` には到達した `ExitArc` を設定する。
                 - 到達後の報酬計算、貨物配送、施設遷移は `target.getFacilityType()` で施設タイプを参照する。
             - **境界到達**: `newPos` が `boundaryRadius` を越えた場合。

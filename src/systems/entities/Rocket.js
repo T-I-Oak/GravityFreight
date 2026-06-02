@@ -113,8 +113,16 @@ class Rocket {
         return this.#additive('pickupRange') * this.#multiplier('pickupMultiplier');
     }
 
+    getArcMultiplier() {
+        return this.#multiplier('arcMultiplier');
+    }
+
     addHeldItem(item) {
         this.heldCargo.push(item);
+    }
+
+    useAvoidanceModule() {
+        return null;
     }
 
     getFlightResult() {
