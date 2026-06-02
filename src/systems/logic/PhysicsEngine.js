@@ -50,7 +50,8 @@ class PhysicsEngine {
             sector.bodies = sector.bodies.filter(body => body !== detection.avoidance.destroyedTarget);
         }
 
-        const ticks = rocket.updateState(newPos, newVel);
+        const finalVel = this.#resolveFinalVelocity(rocket, newVel, detection.avoidance);
+        const ticks = rocket.updateState(newPos, finalVel);
 
         if (!detection.collision) {
             this.#collectItems(rocket, sector);
@@ -161,6 +162,18 @@ class PhysicsEngine {
                 rocket.addHeldItem(item);
             });
         });
+    }
+
+    #resolveFinalVelocity(rocket, newVel, avoidance) {
+        if (!avoidance) {
+            return newVel;
+        }
+
+        if (avoidance.method === 'cushion' || avoidance.method === 'emergency') {
+            return copyVector(rocket.velocity);
+        }
+
+        return newVel;
     }
 
     #getTickSeconds() {

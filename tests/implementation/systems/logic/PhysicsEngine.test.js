@@ -185,7 +185,7 @@ describe('PhysicsEngine', () => {
     it('detects boundary and allows boundary avoidance to cancel it', () => {
         const engine = new PhysicsEngine(repository);
         const avoidance = {
-            method: 'thruster',
+            method: 'emergency',
             destroyedTarget: null
         };
         const rocket = createRocket({
@@ -201,6 +201,28 @@ describe('PhysicsEngine', () => {
         expect(rocket.useAvoidanceModule).toHaveBeenCalledWith('boundary', null);
         expect(result.collision).toBeNull();
         expect(result.avoidance).toBe(avoidance);
+    });
+
+    it('keeps velocity changed by cushion or emergency avoidance after state update', () => {
+        const engine = new PhysicsEngine(repository);
+        const avoidance = {
+            method: 'emergency',
+            destroyedTarget: null
+        };
+        const rocket = createRocket({
+            position: { x: 899, y: 0 },
+            velocity: { x: 1000, y: 0 },
+            rocketItem: { getMass: vi.fn(() => 10) },
+            useAvoidanceModule: vi.fn(function useAvoidanceModule() {
+                rocket.velocity = { x: -1000, y: 0 };
+                return avoidance;
+            })
+        });
+        const sector = createSector({ sectorNumber: 1 });
+
+        engine.step(rocket, sector);
+
+        expect(rocket.velocity).toEqual({ x: -1000, y: 0 });
     });
 
     it('moves picked up items from bodies to the rocket after movement', () => {

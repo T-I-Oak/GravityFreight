@@ -13,6 +13,10 @@
 
 ### メソッド (Methods)
 
+- **`constructor(physicsEngine: PhysicsEngine)`**
+    - 予測シミュレーションの 1 tick 更新を委譲する `PhysicsEngine` を受け取る。
+    - `TrajectoryPredictor` は物理計算の詳細を実装せず、予測用 clone の生成とシミュレーションループ制御のみを担当する。
+
 - **`predictPath(rocket: Rocket, sector: Sector): Rocket`**
     - 現在のロケット構成と角度に基づいた未来の航跡をシミュレーションする。
     - **内部挙動**:
