@@ -12,7 +12,7 @@
 ## 2. インターフェース (Interface)
 
 ### プロパティ (Properties)
-- **`sectorNumber: number`**: 現在のセクター番号（初期値 0）。
+- **`sectorNumber: number`**: 現在到達しているセクター番号（初期値 0）。ワープ演出は前セクターのマップ表示から始まり、演出途中で次セクターを生成・表示へ切り替える。その次セクター生成時に 1 インクリメントする。
 - **`totalScore: number`**: 現在の累計スコア。
 - **`totalEarnedCoins: number`**: 現在のゲームプレイ中に獲得したコインの累計。
 - **`totalFlightTicks: number`**: 現在のゲームプレイ中に経過した航行 Tick 数の合計。
@@ -47,8 +47,9 @@
         4. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
         5. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
 
-- **`getGameResultSummary(): GameResultSummary`**
+- **`getGameResultSummary(context: { completedSectors: number }): GameResultSummary`**
     - ゲームリザルト画面およびゲーム1プレイ結果記録に渡す最終集計値を返す。
+    - `completedSectors` は成功・失敗・施設滞在などの呼び出し文脈で決まるため、`SessionState` の保持プロパティにはせず、呼び出し側が明示的に渡す。
     - **戻り値**:
         - `totalScore`: 累計スコア。
         - `totalCoins`: ゲームプレイ中に獲得した総コイン。

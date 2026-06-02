@@ -95,8 +95,10 @@
 - **`beginSectorTransition(): Promise<void>`**
     - セクター間の遷移（ワープ演出）シーケンスを統括する。
     1. **演出制御**: 背景・描画・音のワープ演出を開始。
+        - ワープ演出の開始時点では、`currentSector` は前セクターのままとし、前セクターのマップへズームインして加速する演出を行う。
+        - 演出途中で遠方から次セクターのマップが現れるタイミングで、新しい `Sector` を生成して `currentSector` を切り替える。
     2. **ロジック更新**: 
-        - `sessionState.sectorNumber` を更新。
+        - 次セクター生成時に `sessionState.sectorNumber` を更新。
         - **`this.currentSector = new Sector(sessionState, isAnomaly)`** を実行して新マップを生成。
         - `SessionState.reachedSector` が更新された場合は、`GameRecordTracker.recordSectorStart(sessionState)` を呼び出し、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['max_reached_sector'] })` を呼び出す。
     3. **同期**: HUDの数値表示（セクター番号等）を最新状態に更新し、`worldRenderer` への新マップセット、セクタータイトル表示を行う。

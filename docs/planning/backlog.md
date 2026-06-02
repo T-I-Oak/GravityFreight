@@ -31,7 +31,7 @@
     - [x] GameDataRepository / Item / StackedItem / ModuleStack / ItemContainer / RocketItem / Rocket
     - [x] 要求仕様テストの入口を作る
 - [ ] M1: ゲーム進行状態とワールド snapshot の土台を実装する
-    - [ ] SessionState
+    - [x] SessionState
     - [ ] Sector
     - [ ] CelestialBody
     - [ ] ExitArc
@@ -67,7 +67,7 @@
     - [x] ItemContainer
     - [x] RocketItem
     - [x] Rocket
-    - [ ] SessionState
+    - [x] SessionState
 - [ ] ワールド生成・再現クラスを実装する
     - [ ] Sector
     - [ ] CelestialBody
