@@ -28,21 +28,21 @@ function createDemoSector(repository) {
             },
             {
                 position: { x: 330, y: 95 },
-                radius: 42,
+                radius: 24,
                 isRepulsion: false,
                 isHome: false,
                 items: [createItemSnapshot('coin_100', repository)]
             },
             {
                 position: { x: 145, y: -285 },
-                radius: 38,
+                radius: 20,
                 isRepulsion: true,
                 isHome: false,
                 items: [createItemSnapshot('cargo_safe', repository)]
             },
             {
                 position: { x: -280, y: 210 },
-                radius: 52,
+                radius: 28,
                 isRepulsion: false,
                 isHome: false,
                 items: [createItemSnapshot('mod_capacity', repository)]

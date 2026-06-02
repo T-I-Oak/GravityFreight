@@ -1,6 +1,8 @@
 import Item from '../entities/Item.js';
 
 const ZERO_VECTOR = { x: 0, y: 0 };
+const V1_BODY_RADIUS_OFFSET = 2;
+const V1_BODY_RADIUS_SCALE = 5;
 
 function copyVector(vector = ZERO_VECTOR) {
     return {
@@ -137,7 +139,7 @@ class CelestialBody {
             return config.homeStarMass;
         }
 
-        return this.radius * this.radius;
+        return ((this.radius - V1_BODY_RADIUS_OFFSET) * V1_BODY_RADIUS_SCALE) ** 2;
     }
 }
 

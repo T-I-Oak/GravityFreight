@@ -42,9 +42,9 @@ describe('CelestialBody', () => {
         }, repository);
 
         expect(home.radius).toBe(40);
-        expect(home.mass).toBe(1600);
+        expect(home.mass).toBe(36100);
         expect(normal.radius).toBe(35);
-        expect(normal.mass).toBe(1225);
+        expect(normal.mass).toBe(27225);
     });
 
     it('uses configured random radius range for normal bodies when radius is omitted', () => {
@@ -54,8 +54,8 @@ describe('CelestialBody', () => {
             position: { x: 100, y: -50 }
         }, repository);
 
-        expect(body.radius).toBe(45);
-        expect(body.mass).toBe(2025);
+        expect(body.radius).toBeCloseTo(23.213203435596427);
+        expect(body.mass).toBeCloseTo(11250);
         randomSpy.mockRestore();
     });
 
@@ -71,12 +71,12 @@ describe('CelestialBody', () => {
         }, repository);
 
         expect(attractive.getGravityFieldVector({ x: 0, y: 0 })).toEqual({
-            x: 2.4,
-            y: 3.2
+            x: 38.4,
+            y: 51.2
         });
         expect(repulsive.getGravityFieldVector({ x: 0, y: 0 })).toEqual({
-            x: -2.4,
-            y: -3.2
+            x: -38.4,
+            y: -51.2
         });
     });
 
@@ -131,7 +131,7 @@ describe('CelestialBody', () => {
         });
         expect(restored.position).toEqual(body.position);
         expect(restored.radius).toBe(30);
-        expect(restored.mass).toBe(900);
+        expect(restored.mass).toBe(19600);
         expect(restored.items[0].uid).toBe(item.uid);
     });
 

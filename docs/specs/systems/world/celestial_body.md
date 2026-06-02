@@ -27,12 +27,13 @@
     - `GameDataRepository` を受け取り、母星の既定半径・質量、および通常天体の半径範囲を取得する。
     - **挙動**:
         - **`radius` が指定された場合**:
-            - 母星・通常天体のどちらであっても、指定された `radius` を使用し、`mass = radius * radius` として算出する。
+            - 母星・通常天体のどちらであっても、指定された `radius` を使用し、`mass = ((radius - 2) * 5)^2` として算出する。
+            - この換算式は、β v1 の通常天体質量レンジ `5000-20000` と描画半径の関係を維持するためのもの。
         - **`isHome` が `true` かつ `radius` が省略された場合**:
             - `GameDataRepository.getMasterConfig()` から `homeStarRadius` および `homeStarMass` を取得してセットする。
         - **通常天体で `radius` が省略された場合**:
             - **`radius`**: `GameDataRepository.getMasterConfig()` の `starRadiusMin`〜`starRadiusMax` からランダムに決定する。
-            - **`mass`**: `this.radius * this.radius` として算出する。
+            - **`mass`**: `((this.radius - 2) * 5)^2` として算出する。
         - その他 `position`, `isRepulsion`, `items` 等を初期化する。
 
 - **`getGravityFieldVector(targetPos: Vector2): Vector2`**
@@ -77,7 +78,7 @@
         - `radius`: `isHome === false` の場合、または母星であってもマスタ既定値と異なる半径が指定されている場合に保存する。
         - `items`: 各 `Item.createSnapshot()` の結果。
     - **保存しない値**:
-        - `mass`: 通常天体は `radius * radius`、母星はマスタ値から再計算する。
+        - `mass`: 通常天体は `((radius - 2) * 5)^2`、母星はマスタ値から再計算する。
         - 母星の `radius`: snapshot に `radius` がない場合はマスタ値から再解決する。
     - **注意**: `items` は発射時点で天体が保持している未回収アイテムを表す。航行中に回収されると `CelestialBody` から除去されるため、リプレイ用 snapshot は発射時点で取得する。
 
@@ -86,7 +87,7 @@
     - **内部挙動**:
         1. `position`, `isRepulsion`, `isHome` を復元する。
         2. `isHome === true` の場合、`radius` と `mass` はマスタ値から解決する。
-        3. `isHome === false` の場合、`snapshot.radius` を使用し、`mass = radius * radius` として再計算する。
+        3. `isHome === false` の場合、`snapshot.radius` を使用し、`mass = ((radius - 2) * 5)^2` として再計算する。
         4. `items` は各 item snapshot を `Item.fromSnapshot()` へ渡して復元する。
         5. 復元できない snapshot はデータ整合性エラーとして例外を投げる。
 
