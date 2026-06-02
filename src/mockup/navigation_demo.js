@@ -5,7 +5,7 @@ import PhysicsEngine from '../systems/logic/PhysicsEngine.js';
 import TrajectoryPredictor from '../systems/logic/TrajectoryPredictor.js';
 import Sector from '../systems/world/Sector.js';
 
-const WORLD_VIEW_RADIUS = 980;
+const WORLD_VIEW_SCALE = 0.5;
 const DEMO_CANVAS_WIDTH = 960;
 const DEMO_CANVAS_HEIGHT = 720;
 const DEFAULT_LAUNCH_ANGLE = 0.22;
@@ -160,10 +160,8 @@ export function renderDevNavigationFrame(ctx, demo) {
 }
 
 function createWorldTransform(width, height) {
-    const scale = Math.min(width, height) / (WORLD_VIEW_RADIUS * 2);
-
     return {
-        scale,
+        scale: WORLD_VIEW_SCALE,
         centerX: width / 2,
         centerY: height / 2,
         toScreen(point) {

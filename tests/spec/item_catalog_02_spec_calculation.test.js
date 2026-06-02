@@ -89,7 +89,8 @@ describe('item_catalog.md chapter 2: spec calculation rules', () => {
         const expectedPower = (rocketItem.getPower() + launcher.power + (booster.power ?? 0))
             * rocketItem.getPowerMultiplier()
             * launcher.powerMultiplier
-            * booster.powerMultiplier;
+            * booster.powerMultiplier
+            * Math.sqrt(repository.getGameBalance().DEFAULT_SHIP_MASS / rocketItem.getMass());
         const expectedPrecision = (rocketItem.getPrecision() + launcher.precision + (booster.precision ?? 0))
             * rocketItem.getPrecisionMultiplier()
             * launcher.precisionMultiplier
