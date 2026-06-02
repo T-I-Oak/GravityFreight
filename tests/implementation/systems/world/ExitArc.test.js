@@ -47,6 +47,16 @@ describe('ExitArc', () => {
         expect(arc.checkEntrance({ x: 901, y: 0 })).toBe(false);
     });
 
+    it('applies launch configuration width multiplier when checking entrance', () => {
+        const arc = new ExitArc({
+            angle: 0,
+            type: 'BLACK_MARKET'
+        }, repository);
+
+        expect(arc.checkEntrance({ x: 900, y: 159 }, 1)).toBe(false);
+        expect(arc.checkEntrance({ x: 900, y: 159 }, 2)).toBe(true);
+    });
+
     it('handles angle ranges that cross 0 degrees', () => {
         const arc = new ExitArc({
             angle: 350,

@@ -81,6 +81,8 @@
     - **呼び出し**: 航行開始直前に `GameController` が実行し自身の `velocity` にセットするほか、`PhysicsEngine` が予測線の初速として参照する。
 - `getCollectionRange(): number`
     - 現在の回収可能範囲（半径）を計算して返す。
+- `getArcMultiplier(): number`
+    - 現在の構成（RocketItem, Launcher, Booster）から、出口判定に適用する開口幅倍率を算出して返す。
 - `addHeldItem(item: Item): void`
     - 取得したアイテムを `heldCargo` リストに追加する。
 - `useAvoidanceModule(type: 'body' | 'boundary', target: object | null): AvoidanceResult | null`

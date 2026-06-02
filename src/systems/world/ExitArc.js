@@ -29,13 +29,13 @@ class ExitArc {
         this.radius = config.boundaryRadius;
     }
 
-    checkEntrance(targetPos) {
+    checkEntrance(targetPos, widthMultiplier = 1) {
         const distance = Math.hypot(targetPos.x, targetPos.y);
         if (distance < this.radius) {
             return false;
         }
 
-        return shortestAngleDistance(positionAngleDegrees(targetPos), this.angle) <= this.width / 2;
+        return shortestAngleDistance(positionAngleDegrees(targetPos), this.angle) <= (this.width * widthMultiplier) / 2;
     }
 
     getFacilityType() {

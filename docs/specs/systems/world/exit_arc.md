@@ -27,11 +27,11 @@
         - **`width` の解決**: `type` に基づき `GameDataRepository.getMasterConfig().arcFacilityWidths` から対応する開口幅を取得してセットする。
         - **`radius` の解決**: `GameDataRepository.getMasterConfig().boundaryRadius` を取得してセットする。
 
-- **`checkEntrance(targetPos: Vector2): boolean`**
+- **`checkEntrance(targetPos: Vector2, widthMultiplier: number = 1): boolean`**
     - 指定された座標（ロケットの位置）が、この出口の判定エリアに進入したかを判定する。
     - **判定順序**:
         1. 距離判定: `distance(origin, targetPos) >= this.radius`。
-        2. 角度判定: `targetPos` の中心角が `[this.angle - this.width/2, this.angle + this.width/2]` の範囲内にあるか。
+        2. 角度判定: `targetPos` の中心角が `[this.angle - (this.width * widthMultiplier)/2, this.angle + (this.width * widthMultiplier)/2]` の範囲内にあるか。
         3. 両方が真なら `true` を返す。
 
 - **`getFacilityType(): string`**
