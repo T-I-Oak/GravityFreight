@@ -10,6 +10,11 @@
 - [ ] 初版リリース前に `common_style.md` の移行期間中の対応節を削除する
     - リリース版ドキュメントには β v1 / 旧仕様の class 名を残さない
 - [ ] FlightReplaySnapshots 完成後に保存データサイズを検証する
+    - 目標: Gravity Freight の保存データ総量は 1MiB 以内を目安とする
+    - 目標: リプレイ関連データは 20件保存時に 600KiB 以内、1件平均 30KiB 以内を目安とする
+    - 警告: リプレイ関連データが 20件で 700KiB、または 1件平均 35KiB を超える場合は圧縮や保存項目削減を検討する
+    - 見直し: リプレイ関連データが 20件で 800KiB、または 1件平均 40KiB を超える場合は snapshot 構造を見直す
+    - 測定方法: localStorage で保存される文字列サイズを重視し、`JSON.stringify(data).length * 2` による UTF-16 相当 byte を基準値とする。参考値として `TextEncoder` による UTF-8 byte も併記する
     - [ ] 20件保存時の `flight_record_index` サイズを確認する
     - [ ] 圧縮の要否、圧縮後サイズ、復元コストを評価する
     - [ ] 共通 DataManager の保存方式で問題なく扱えるか確認する
@@ -20,6 +25,36 @@
     - 要求仕様テストは `tests/spec/` に配置し、命名は `[prefix]_[章番号]_[名称].test.js` とする
     - 実装テストは `tests/implementation/` に `src/` と同じ構成で配置し、命名は `[元のファイル名].test.js` とする
     - 実装タスクごとに、対象が要求仕様テスト・実装テストのどちらを必要とするかを確認してから着手する
+
+### 実装順マイルストーン
+- [x] M0: データ基盤とアイテム系エンティティを実装する
+    - [x] GameDataRepository / Item / StackedItem / ModuleStack / ItemContainer / RocketItem / Rocket
+    - [x] 要求仕様テストの入口を作る
+- [ ] M1: ゲーム進行状態とワールド snapshot の土台を実装する
+    - [ ] SessionState
+    - [ ] Sector
+    - [ ] CelestialBody
+    - [ ] ExitArc
+    - [ ] createSnapshot / fromSnapshot によるワールド再現
+    - [ ] world snapshot の基礎サイズを測定する
+        - リプレイ20件保存時の最終判断ではなく、異常に大きい snapshot 構造を早期検知するための参考測定とする
+        - 保存件数削減で対応可能な規模か、件数を減らしても問題になりそうな規模かの感触を確認する
+        - 目安: 1 sector の world snapshot は 15KiB 以内を目標、25KiB 超で警告、40KiB 超で構造見直し候補とする
+- [ ] M2: 最小航行シミュレーションを実装する
+    - [ ] PhysicsEngine
+    - [ ] 航行終了判定
+    - [ ] アイテム回収判定
+    - [ ] TrajectoryPredictor
+- [ ] M3: ブラウザで最小航行を確認できる導線を作る
+    - [ ] 既存 mock または dev 用導線で、生成済み sector と rocket を描画する
+    - [ ] 固定条件または最小入力で発射し、ロケットの移動・衝突・出口・境界を確認できるようにする
+    - [ ] この段階では施設、記録、リプレイ、実績、経済の完成を要求しない
+- [ ] M4: 航行終了後の記録・経済・施設導線を接続する
+    - [ ] EconomySystem / 施設報酬 / 施設取引 / ゲームオーバー判定
+    - [ ] GameRecordTracker / RankTracker / AchievementTracker / FlightRecorder / StorySystem
+    - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
+
+### ドメイン別タスク
 - [x] データ基盤を実装する
     - [x] GameDataRepository
     - [x] 共通 DataManager / i18n ライブラリとの接続
