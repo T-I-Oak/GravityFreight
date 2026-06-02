@@ -21,6 +21,7 @@
 
 - **`constructor(params: object)`**
     - **引数**: `angle`, `type` を含むオブジェクト。
+    - `GameDataRepository` を受け取り、出口幅と境界半径を取得する。
     - **挙動**:
         - `angle`, `type` をプロパティにセットする。
         - **`width` の解決**: `type` に基づき `GameDataRepository.getMasterConfig().arcFacilityWidths` から対応する開口幅を取得してセットする。
@@ -53,7 +54,7 @@
         - `radius`: `GameDataRepository.getMasterConfig().boundaryRadius` から再解決する。
         - 発射構成による出口判定補正: `Rocket` 側の発射構成から再計算し、航行判定側で同じ条件として適用する。
 
-- **`static fromSnapshot(snapshot: object): ExitArc`**
+- **`static fromSnapshot(snapshot: object, gameDataRepository: GameDataRepository): ExitArc`**
     - `ExitArcSnapshot` から出口インスタンスを復元する。
     - **内部挙動**:
         1. `angle`, `type` を復元する。
