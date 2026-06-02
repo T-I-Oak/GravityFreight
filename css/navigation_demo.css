@@ -60,6 +60,30 @@
     margin-bottom: 14px;
 }
 
+.dev-navigation-angle-control {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) 56px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: rgba(255, 255, 255, 0.48);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.dev-navigation-angle-control input {
+    width: 100%;
+    accent-color: var(--color-theme-main);
+}
+
+.dev-navigation-angle-control strong {
+    color: #ffffff;
+    font-family: var(--font-num);
+    font-size: 11px;
+    text-align: right;
+}
+
 .dev-navigation-controls .Button {
     min-width: 0;
     padding: 6px 8px;

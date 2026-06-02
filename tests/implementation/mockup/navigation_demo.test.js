@@ -72,6 +72,16 @@ describe('navigation demo', () => {
         expect(demo.prediction.actualTrail).toHaveLength(initialPredictionLength);
     });
 
+    it('can create and reset the demo with a supplied launch angle', () => {
+        const demo = createDevNavigationDemo(repository, {
+            launchAngle: Math.PI / 2
+        });
+
+        expect(demo.launchAngle).toBe(Math.PI / 2);
+        expect(demo.rocket.velocity.y).toBeGreaterThan(0);
+        expect(Math.abs(demo.rocket.velocity.x)).toBeLessThan(0.001);
+    });
+
     it('stops ticking after a collision has been recorded', () => {
         const demo = createDevNavigationDemo(repository);
         demo.lastResult = {

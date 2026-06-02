@@ -7,6 +7,8 @@ import {
 } from './navigation_demo.js';
 
 const STEPS_PER_FRAME = 4;
+const RAD_TO_DEG = 180 / Math.PI;
+const DEG_TO_RAD = Math.PI / 180;
 
 function createCommonDataManagerStub() {
     const store = new Map();
@@ -34,6 +36,7 @@ function setStatus(elements, demo) {
     elements.tick.textContent = String(demo.rocket.ticks);
     elements.position.textContent = `${position.x.toFixed(1)}, ${position.y.toFixed(1)}`;
     elements.velocity.textContent = `${velocity.x.toFixed(1)}, ${velocity.y.toFixed(1)}`;
+    elements.angle.textContent = `${Math.round(demo.launchAngle * RAD_TO_DEG)} deg`;
     elements.result.textContent = demo.lastResult?.collision?.type || 'NAVIGATING';
 }
 
@@ -58,6 +61,13 @@ function bindControls(demo, controls, render) {
         resetDevNavigationDemo(demo);
         render();
     });
+
+    controls.angle.addEventListener('input', () => {
+        resetDevNavigationDemo(demo, {
+            launchAngle: Number(controls.angle.value) * DEG_TO_RAD
+        });
+        render();
+    });
 }
 
 async function initialize() {
@@ -72,6 +82,7 @@ async function initialize() {
     const elements = {
         sector: document.querySelector('[data-dev-navigation-sector]'),
         tick: document.querySelector('[data-dev-navigation-tick]'),
+        angle: document.querySelector('[data-dev-navigation-angle-value]'),
         position: document.querySelector('[data-dev-navigation-position]'),
         velocity: document.querySelector('[data-dev-navigation-velocity]'),
         result: document.querySelector('[data-dev-navigation-result]')
@@ -87,7 +98,8 @@ async function initialize() {
         start: document.querySelector('[data-dev-navigation-start]'),
         pause: document.querySelector('[data-dev-navigation-pause]'),
         step: document.querySelector('[data-dev-navigation-step]'),
-        reset: document.querySelector('[data-dev-navigation-reset]')
+        reset: document.querySelector('[data-dev-navigation-reset]'),
+        angle: document.querySelector('[data-dev-navigation-angle]')
     }, render);
 
     window.addEventListener('resize', render);

@@ -8,6 +8,7 @@ import Sector from '../systems/world/Sector.js';
 const WORLD_VIEW_RADIUS = 980;
 const DEMO_CANVAS_WIDTH = 960;
 const DEMO_CANVAS_HEIGHT = 720;
+const DEFAULT_LAUNCH_ANGLE = 0.22;
 
 function createItemSnapshot(id, repository) {
     return new Item(id, repository).createSnapshot();
@@ -55,7 +56,7 @@ function createDemoSector(repository) {
     }, repository);
 }
 
-function createDemoRocket(repository) {
+function createDemoRocket(repository, launchAngle = DEFAULT_LAUNCH_ANGLE) {
     const rocketItem = new RocketItem(
         new Item('hull_medium', repository),
         new Item('sensor_normal', repository),
@@ -66,19 +67,20 @@ function createDemoRocket(repository) {
     );
     const launcher = new Item('pad_standard_d2', repository);
     const booster = new Item('boost_expander', repository);
-    const rocket = new Rocket(rocketItem, launcher, booster, 0.22, { x: 60, y: 0 });
+    const rocket = new Rocket(rocketItem, launcher, booster, launchAngle, { x: 60, y: 0 });
 
     rocket.velocity = rocket.getInitialVelocity(0);
     return rocket;
 }
 
-export function createDevNavigationDemo(repository) {
+export function createDevNavigationDemo(repository, options = {}) {
     if (!repository) {
         throw new Error('[navigation_demo] repository is required.');
     }
 
+    const launchAngle = options.launchAngle ?? DEFAULT_LAUNCH_ANGLE;
     const sector = createDemoSector(repository);
-    const rocket = createDemoRocket(repository);
+    const rocket = createDemoRocket(repository, launchAngle);
     const physicsEngine = new PhysicsEngine(repository);
     const trajectoryPredictor = new TrajectoryPredictor(physicsEngine);
     const prediction = trajectoryPredictor.predictPath(rocket, sector);
@@ -90,6 +92,7 @@ export function createDevNavigationDemo(repository) {
         physicsEngine,
         trajectoryPredictor,
         prediction,
+        launchAngle,
         isRunning: false,
         lastResult: null
     };
@@ -104,8 +107,10 @@ export function tickDevNavigationDemo(demo) {
     return demo.lastResult;
 }
 
-export function resetDevNavigationDemo(demo) {
-    const next = createDevNavigationDemo(demo.repository);
+export function resetDevNavigationDemo(demo, options = {}) {
+    const next = createDevNavigationDemo(demo.repository, {
+        launchAngle: options.launchAngle ?? demo.launchAngle
+    });
     Object.assign(demo, next);
     return demo;
 }
