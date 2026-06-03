@@ -200,7 +200,8 @@ class Rocket {
     getFlightResult() {
         return {
             ticks: this.ticks,
-            heldCargo: this.heldCargo
+            heldCargo: this.heldCargo,
+            rocketItem: this.rocketItem
         };
     }
 

@@ -104,6 +104,15 @@ class RocketItem extends Item {
         };
     }
 
+    getCompositionParts() {
+        return this._allParts();
+    }
+
+    calculateAppraisalValue() {
+        return this.getCompositionParts()
+            .reduce((total, item) => total + item.calculateAppraisalValue(), 0);
+    }
+
     createSnapshot() {
         return {
             uid: this.uid,

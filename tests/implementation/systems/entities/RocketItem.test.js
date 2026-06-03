@@ -61,6 +61,20 @@ describe('RocketItem', () => {
         expect(rocketItem.getGravityMultiplier()).toBe(parts.reduce((total, item) => total * item.gravityMultiplier, 1));
     });
 
+    it('exposes composition parts and calculates appraisal as the sum of those parts', () => {
+        const rocketItem = createRocketItem();
+        const parts = [
+            rocketItem.chassis,
+            rocketItem.logic,
+            ...rocketItem.modules.flatMap(module => module.items)
+        ];
+
+        expect(rocketItem.getCompositionParts()).toEqual(parts);
+        expect(rocketItem.calculateAppraisalValue()).toBe(
+            parts.reduce((total, item) => total + item.calculateAppraisalValue(), 0)
+        );
+    });
+
     it('does not expose aggregate stats as direct properties', () => {
         const rocketItem = createRocketItem();
 

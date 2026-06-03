@@ -296,7 +296,7 @@
         - 各終了判定が成立した際、`GameController` は以下の精算シーケンスを実行した後、`UIController.showResultScreen(navResult)` を呼び出し、Chapter 5（リザルト画面）へ遷移する。
         - **精算シーケンス**:
             1.  **成果抽出**: `currentRocket.getFlightResult()` を実行。
-            2.  **報酬・資産の確定**: `EconomySystem.calculateSettlement(collision, flightData)` を実行。
+            2.  **報酬・資産の確定**: `EconomySystem.calculateSettlement(collision, flightData, sessionState)` を実行。
                 *   物理結果と保持アイテムに基づき、報酬内訳、最終スコア、獲得アイテムリスト（インベントリ追加分）、および消費アイテムリストを含む **`SettlementResult`** を生成する。
             3.  **状態反映**: `sessionState.applySettlement(settlementResult)` を実行。
                 *   報酬（コイン・スコア）を加算し、獲得アイテムをインベントリへ追加する。配送済み貨物や消失パーツはリストから除外される。
@@ -327,7 +327,7 @@
         - 回避不能状態での天体（重力源）衝突。保持アイテムの散布、構成パーツの 50% 確率ドロップ/消失。
         - **決定事項**:
             - **判定条件**: `collision.type === 'body'` 且つ `!target.isHome` であること。
-            - **挙動**: 保持アイテムおよび構成パーツ（50% の確率で生存判定）を、**衝突した天体へ移動（蓄積）**させる。
+            - **挙動**: 保持アイテムおよび `RocketItem` 内の構成パーツ（chassis / logic / modules、50% の確率で生存判定）を、**衝突した天体へ移動（蓄積）**させる。
             - **救済措置**: 遭難時と同様、`mod_insurance` による保険金が精算時に支払われる。
 - [x] 4.4 [シナリオ] 航行終了と余韻演出
     - [x] 4.4.1 [UI] 到着/衝突時の描画終息

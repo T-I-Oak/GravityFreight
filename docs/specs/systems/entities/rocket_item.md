@@ -49,6 +49,12 @@
     - 全構成パーツの `gravityMultiplier` の乗算結果（Π）を返す。
 - **`getPowerMultiplier(): number` / `getArcMultiplier(): number`**
     - 全構成パーツの該当 multiplier の乗算結果（Π）を返す。
+- **`getCompositionParts(): Item[]`**
+    - `RocketItem` を構成する実体パーツ（chassis / logic / modules 内の item）を配列で返す。
+    - 返却対象は保険金計算および crashed 時の 50% 生存判定に使用する。
+- **`calculateAppraisalValue(): number`**
+    - `getCompositionParts()` が返す各 Item の `calculateAppraisalValue()` の合計を返す。
+    - `launcher` と `booster` は `RocketItem` の構成外であるため含めない。
 - **`getViewData(): ItemViewData`**
     - UI 表示（アイテムカード）用のプレーンオブジェクトを生成して返す。
     - **マッピング**:

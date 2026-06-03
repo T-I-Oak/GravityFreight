@@ -28,8 +28,9 @@
         2. 各アイテムの重みを計算: `しきい値 - 出現率`
         3. 重みに基づき、`options.excludeCategories` を除外したプールから指定された `count` 分を抽出・インスタンス化して返す。
 
-- **`calculateSettlement(collision: object, flightData: FlightResultData): SettlementResult`**
+- **`calculateSettlement(collision: object, flightData: FlightResultData, session: SessionState): SettlementResult`**
     - 航行結果に基づき、報酬の内訳と資産の変化を確定させる。
+    - `session` は配送ボーナス抽選のセクター番号参照に使用する。抽選の責務は `EconomySystem` が持ち、`Rocket` は配送ボーナスを抽選しない。
     - **内部ロジック**:
         0. **ステータス（status）と目的地（destination）の決定**:
             - `collision.type === 'arc'` → `'cleared'`, `destination = target.getFacilityType()`
@@ -49,7 +50,7 @@
             - **スタック集約ルール**: アイテムを一つずつ取り出し、既存の各 `StackedItem` に対して `add(item)` を実行する。`true` が返れば集約完了とし、すべてのスタックが `false` を返した場合のみ新規スタックを生成する。
             - **一致配送（Match）**:
                 - 同一の貨物を集約した `ItemReportEntry (type: 'delivery', status: 'match')` を作成する（`StackedItem` の集約ルールを適用）。
-                - そのグループに属する全貨物から発生した **全ボーナスアイテム** を、`StackedItem` のルールに従って集約し、`bonusItems` に格納する。
+                - そのグループに属する全貨物から発生した **全ボーナスアイテム** を、`session.sectorNumber` を参照した `drawLottery()` で抽選し、`StackedItem` のルールに従って集約し、`bonusItems` に格納する。
                 - ボーナス実体のうち、コインは `totalCoins` に加算し、パーツ類は `acquiredItems` に追加する。
                 - **物語解放**: `unlockedBranchId` に対象施設のブランチ ID を設定する。
             - **不一致配送（Unmatched）**:
@@ -60,11 +61,11 @@
                 - パーツ（Chassis, Logic, Module, Booster）のみを `acquiredItems` に追加する。
         3. **アイテムの移動判定**:
             - **帰還（Returned）**: `Cargo` 種別のアイテムを母星（`collision.target`）の `lostToTarget` に格納。
-            - **大破（Crashed）**: `heldCargo` および生存した構成パーツ（50% 判定）を衝突天体の `lostToTarget` に格納。
+            - **大破（Crashed）**: `heldCargo` および生存した `RocketItem` 内の構成パーツ（chassis / logic / modules、50% 判定）を衝突天体の `lostToTarget` に格納。
         4. **保険金の算定と明細追加**:
             - `status` が `'crashed'` または `'lost'` の場合のみ実行。
-            - `mod_insurance` 装備時、その個数を $N$ とする。
-            - **計算**: `(ロケット構成パーツの査定価格合計) × N`
+            - `RocketItem` 内に `mod_insurance` 装備時、その個数を $N$ とする。
+            - **計算**: `RocketItem` 内の構成パーツ（chassis / logic / modules）の査定価格合計 × N
             - **明細追加**: `entries` に追加。Coin: `算出額` (Score は省略)。
                 - Label: $N=1$ なら `"Insurance Payout"`、 $N \ge 2$ なら `"Insurance Payout [xN]"`。
         5. **幸運の導きの集計**:

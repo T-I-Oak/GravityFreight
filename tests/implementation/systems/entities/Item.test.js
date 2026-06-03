@@ -103,6 +103,14 @@ describe('Item Class - Basic Methods', () => {
         expect(fullRepair).toBe(max);
         expect(item.charges).toBe(max);
     });
+
+    it('should calculate appraisal value from rarity, durability, and enhancement count', () => {
+        const item = new Item('pad_standard_d4', repository);
+        item.consumeCharge(2);
+        item.enhancementCount = 2;
+
+        expect(item.calculateAppraisalValue()).toBe(43);
+    });
 });
 
 describe('Item Class - applyMaintenance', () => {
