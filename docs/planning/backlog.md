@@ -54,6 +54,7 @@
     - [ ] EconomySystem / 施設報酬 / 施設取引 / ゲームオーバー判定
         - [x] EconomySystem 基礎実装（抽選、査定、共通価格計算、Trading Post 在庫、ゲームオーバー判定）
         - [x] SettlementResult 生成（施設報酬、配送、拾得コイン、保険、遺失物、割引率）
+        - [x] 施設取引用の共通資産反映メソッド
         - [ ] Black Market 複数アイテムガチャと確率エンチャント
         - [ ] Repair Dock の修理、解体、強化
     - [ ] GameRecordTracker / RankTracker / AchievementTracker / FlightRecorder / StorySystem
@@ -94,6 +95,7 @@
     - [ ] EconomySystem
         - [x] 抽選、査定、共通価格計算、Trading Post 在庫、ゲームオーバー判定
         - [x] SettlementResult 生成
+        - [x] 施設取引用の共通資産反映メソッド
         - [ ] Black Market 複数アイテムガチャ
         - [ ] Repair Dock 修理、解体、強化
     - [ ] 施設報酬

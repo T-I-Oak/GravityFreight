@@ -82,6 +82,48 @@ describe('SessionState', () => {
         expect(target.addItems).toHaveBeenCalledWith(lostItems);
     });
 
+    it('applies transaction asset changes in one place and returns record deltas', () => {
+        const session = new SessionState(repository);
+        const acquiredItems = [
+            new Item('mod_capacity', repository),
+            new Item('coin_100', repository)
+        ];
+        session.initialize();
+
+        const delta = session.applyTransaction({
+            spentCoins: 120,
+            earnedCoins: 50,
+            acquiredItems
+        });
+
+        expect(session.coins).toBe(130);
+        expect(session.totalEarnedCoins).toBe(50);
+        expect(session.collectedItemCount).toBe(2);
+        expect(session.inventory.getItemsByCategory('module')).toHaveLength(1);
+        expect(session.inventory.getItemsByCategory('coin')).toHaveLength(1);
+        expect(delta).toEqual({
+            spentCoins: 120,
+            earnedCoins: 50,
+            acquiredItemCount: 2
+        });
+    });
+
+    it('rejects transactions that spend more coins than the session has without changing assets', () => {
+        const session = new SessionState(repository);
+        session.initialize();
+
+        expect(() => session.applyTransaction({
+            spentCoins: 201,
+            earnedCoins: 0,
+            acquiredItems: [new Item('mod_capacity', repository)]
+        })).toThrow('[SessionState] Not enough coins for transaction.');
+
+        expect(session.coins).toBe(200);
+        expect(session.totalEarnedCoins).toBe(0);
+        expect(session.collectedItemCount).toBe(0);
+        expect(session.inventory.getItemsByCategory('module')).toHaveLength(0);
+    });
+
     it('creates game result summary with explicit completed sector context', () => {
         const session = new SessionState(repository);
         session.initialize();
