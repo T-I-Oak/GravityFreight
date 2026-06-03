@@ -146,13 +146,29 @@ graph TD
         - **計算完了後の `Rocket` クローンを返す**。このクローンが持つ `actualTrail`（移動履歴）が、UI 上での「予測軌道」として利用される。
 - **EconomySystem**
     - 生存期間: App Lifecycle (Service)
-    - 役割: 経済・取引・抽選ロジック。
+    - 役割: 経済・取引・抽選ロジックの外部窓口。
     - 責務:
         - セクター内のアイテム出現・抽選（マップ配置）の制御。
-        - 交易所・闇市場等の在庫、および排出対象の抽選制御。
-        - アイテムが自己算出する基準価格を合算し、経済ボーナスを加味した最終的な報酬額・取引価格の決定。
-        - 取引（Buy/Sell/Repair）の成否判定。
+        - 航行結果精算、交易所在庫、共通価格計算を内部サービスへ委譲する。
         - 航行結果確定後および施設退出時に共通利用するゲームオーバー判定。
+- **SettlementCalculator**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 航行終了時精算ロジック。
+    - 責務:
+        - 衝突結果と `FlightResultData` から `SettlementResult` を生成する。
+        - 配送、拾得コイン、施設報酬、保険金、遺失物、割引率を集計する。
+- **PricingService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 共通価格計算。
+    - 責務:
+        - 共通割引ルール、修理費、解体費を計算する。
+        - アイテム自身が算出する査定額に対し、施設横断の価格補正を適用する。
+- **TradingPostService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: Trading Post 取引準備。
+    - 責務:
+        - 交易所在庫を生成し、特売品を設定する。
+        - アイテム抽選は `EconomySystem.drawLottery()` へ委譲する。
 - **GameController**
     - 生存期間: Game Lifecycle
     - 役割: ゲーム進行・シーン管理。
