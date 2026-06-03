@@ -47,6 +47,16 @@
         4. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
         5. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
 
+- **`applyTransaction(transaction: TransactionResult): TransactionDelta`**
+    - 施設取引などの資産変化を現在の状態に適用する。
+    - コイン支払い、コイン取得、アイテム取得はアチーブメント・記録に影響するため、個別画面や施設サービスで直接 `coins` / `inventory` を変更せず、このメソッドへ集約する。
+    - **内部挙動**:
+        1. `spentCoins` が現在の `coins` を超える場合は、状態を変更せず例外を投げる。
+        2. `coins = coins - spentCoins + earnedCoins` を実行。
+        3. `totalEarnedCoins += earnedCoins` を実行。
+        4. `acquiredItems` の各アイテムを `inventory` へ追加し、`collectedItemCount` を加算する。
+        5. 記録・実績更新に使える `TransactionDelta` を返す。
+
 - **`getGameResultSummary(context: { completedSectors: number }): GameResultSummary`**
     - ゲームリザルト画面およびゲーム1プレイ結果記録に渡す最終集計値を返す。
     - `completedSectors` は成功・失敗・施設滞在などの呼び出し文脈で決まるため、`SessionState` の保持プロパティにはせず、呼び出し側が明示的に渡す。
@@ -70,5 +80,25 @@
   reachedSector: number,
   totalFlightTicks: number,
   collectedItemCount: number
+}
+```
+
+### `TransactionResult`
+施設取引などで確定した資産変化。
+```javascript
+{
+  spentCoins: number,
+  earnedCoins: number,
+  acquiredItems: Item[]
+}
+```
+
+### `TransactionDelta`
+記録・実績更新用の差分。
+```javascript
+{
+  spentCoins: number,
+  earnedCoins: number,
+  acquiredItemCount: number
 }
 ```

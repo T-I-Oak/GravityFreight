@@ -51,13 +51,13 @@
 - **`handleFacilityAction(action: string, context: object): void`**
     - 施設内での具体的な操作を処理する。
     - **内部挙動**:
-        - `action === 'buy'`: `sessionState.coins` から支払い、`inventory.addItem` を実行。
-        - `action === 'repair'`: 指定されたランチャーに対し耐久度加算を実行。
+        - `action === 'buy'`: 施設サービスが返した取引結果を `sessionState.applyTransaction(transaction)` へ渡す。
+        - `action === 'repair'`: 修理費を含む取引結果を `sessionState.applyTransaction(transaction)` へ渡し、指定されたランチャーに対し耐久度加算を実行。
         - **`action === 'dismantle'`**: 
             - `EconomySystem.dismantleAndEnhance(this.currentRocket)` を実行。
-            - 獲得パーツを `inventory` へ追加し、**`this.currentRocket = null`** を実行してクリアする。
+            - 返却された取引結果を `sessionState.applyTransaction(transaction)` へ渡し、**`this.currentRocket = null`** を実行してクリアする。
         - アクションごとに `uiController.updateFacilityCredits` 等を呼び出し表示を更新する。
-        - コイン増減などの実績参照値が変化した場合は `GameRecordTracker` へ反映し、更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
+        - `applyTransaction()` が返す `TransactionDelta` を `GameRecordTracker` へ反映し、更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
 
 - **`leaveFacility(): void`**
     - 施設を出発し、次セクターへ向かう。

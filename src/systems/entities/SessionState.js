@@ -31,6 +31,27 @@ class SessionState {
         this.blackMarketVisits += 1;
     }
 
+    applyTransaction(transaction = {}) {
+        const spentCoins = transaction.spentCoins ?? 0;
+        const earnedCoins = transaction.earnedCoins ?? 0;
+        const acquiredItems = transaction.acquiredItems ?? [];
+
+        if (this.coins < spentCoins) {
+            throw new Error('[SessionState] Not enough coins for transaction.');
+        }
+
+        this.coins = this.coins - spentCoins + earnedCoins;
+        this.totalEarnedCoins += earnedCoins;
+        this.collectedItemCount += acquiredItems.length;
+        acquiredItems.forEach(item => this.inventory.addItem(item));
+
+        return {
+            spentCoins,
+            earnedCoins,
+            acquiredItemCount: acquiredItems.length
+        };
+    }
+
     applySettlement(result = {}) {
         const totalCoins = result.totalCoins ?? 0;
         const totalScore = result.totalScore ?? 0;
