@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vite
 import GameDataRepository from '../../../../src/core/GameDataRepository.js';
 import Item from '../../../../src/systems/entities/Item.js';
 import ItemContainer from '../../../../src/systems/entities/ItemContainer.js';
+import RocketItem from '../../../../src/systems/entities/RocketItem.js';
 import SessionState from '../../../../src/systems/entities/SessionState.js';
 import EconomySystem from '../../../../src/systems/logic/EconomySystem.js';
 
@@ -115,5 +116,123 @@ describe('EconomySystem', () => {
             reason: 'NO_PARTS_REMAINING',
             details: ['CHASSIS', 'LOGIC', 'LAUNCHER']
         });
+    });
+
+    it('settles a cleared delivery with facility reward, collected coins, coin bonus, and lucky discount', () => {
+        const cargo = new Item('cargo_safe', repository);
+        const lucky = new Item('cargo_lucky', repository);
+        const collectedCoin = new Item('coin_100', repository);
+        const bonusCoin = new Item('coin_200', repository);
+        vi.spyOn(economySystem, 'drawLottery').mockReturnValue([bonusCoin]);
+
+        const settlement = economySystem.calculateSettlement({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        }, {
+            ticks: 12,
+            heldCargo: [cargo, lucky, collectedCoin],
+            rocketItem: new RocketItem(
+                new Item('hull_medium', repository),
+                new Item('sensor_normal', repository),
+                []
+            )
+        }, session);
+
+        expect(settlement.status).toBe('cleared');
+        expect(settlement.destination).toBe('TRADING_POST');
+        expect(settlement.unlockedBranchId).toBe('T');
+        expect(settlement.totalScore).toBe(3512);
+        expect(settlement.totalCoins).toBe(420);
+        expect(settlement.luckyDiscountRate).toBe(0.1);
+        expect(settlement.flightTicks).toBe(12);
+        expect(settlement.acquiredItems).toEqual([]);
+        expect(settlement.lostToTarget).toBeNull();
+        expect(settlement.entries).toEqual([
+            { label: 'Flight Duration', score: 12 },
+            { label: 'TRADING POST', score: 2000, coin: 20 },
+            { label: '通商物資', score: 1500, coin: 300 },
+            { label: 'Collected Coins', coin: 100 }
+        ]);
+        expect(settlement.itemReport).toHaveLength(3);
+        expect(settlement.itemReport[0].type).toBe('delivery');
+        expect(settlement.itemReport[0].status).toBe('match');
+        expect(settlement.itemReport[0].bonusItems[0].id).toBe('coin_200');
+        expect(settlement.itemReport[1].status).toBe('unmatched');
+        expect(settlement.itemReport[2].type).toBe('other');
+    });
+
+    it('settles crash by placing held items and surviving rocket parts on the target and paying insurance', () => {
+        const target = { addItems: vi.fn() };
+        const rocketItem = new RocketItem(
+            new Item('hull_medium', repository),
+            new Item('sensor_normal', repository),
+            [new Item('mod_insurance', repository)]
+        );
+        const heldCoin = new Item('coin_100', repository);
+        const heldCargo = new Item('cargo_safe', repository);
+        vi.spyOn(Math, 'random').mockReturnValue(0.4);
+
+        const settlement = economySystem.calculateSettlement({
+            type: 'body',
+            target
+        }, {
+            ticks: 20,
+            heldCargo: [heldCoin, heldCargo],
+            rocketItem
+        }, session);
+
+        expect(settlement.status).toBe('crashed');
+        expect(settlement.destination).toBeNull();
+        expect(settlement.totalScore).toBe(20);
+        expect(settlement.totalCoins).toBe(60);
+        expect(settlement.entries).toEqual([
+            { label: 'Flight Duration', score: 20 },
+            { label: 'Insurance Payout', coin: 60 }
+        ]);
+        expect(settlement.lostToTarget.target).toBe(target);
+        expect(settlement.lostToTarget.items.map(item => item.uid)).toEqual([
+            heldCoin.uid,
+            heldCargo.uid,
+            rocketItem.chassis.uid,
+            rocketItem.logic.uid,
+            rocketItem.modules[0].items[0].uid
+        ]);
+        expect(settlement.acquiredItems).toEqual([]);
+    });
+
+    it('groups same delivery cargo and draws bonus items for every delivered cargo', () => {
+        const cargoA = new Item('cargo_safe', repository);
+        const cargoB = new Item('cargo_safe', repository);
+        const bonusParts = [
+            new Item('mod_capacity', repository),
+            new Item('coin_100', repository)
+        ];
+        vi.spyOn(economySystem, 'drawLottery').mockReturnValue(bonusParts);
+
+        const settlement = economySystem.calculateSettlement({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        }, {
+            ticks: 5,
+            heldCargo: [cargoA, cargoB],
+            rocketItem: new RocketItem(
+                new Item('hull_medium', repository),
+                new Item('sensor_normal', repository),
+                []
+            )
+        }, session);
+
+        expect(economySystem.drawLottery).toHaveBeenCalledWith(session, 2, {
+            bonusThreshold: 5,
+            excludeCategories: ['cargo']
+        });
+        expect(settlement.itemReport).toHaveLength(1);
+        expect(settlement.itemReport[0].item.count).toBe(2);
+        expect(settlement.entries).toContainEqual({
+            label: '通商物資',
+            score: 3000,
+            coin: 300
+        });
+        expect(settlement.acquiredItems).toEqual([bonusParts[0]]);
     });
 });

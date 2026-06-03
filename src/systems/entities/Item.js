@@ -29,6 +29,9 @@ class Item {
         this.category = this.#master.category;
         this.rarity = this.#master.rarity;
         this.description = this.#master.description;
+        this.score = this.#master.score ?? 0;
+        this.deliveryGoalId = this.#master.deliveryGoalId;
+        this.coinDiscount = this.#master.coinDiscount ?? 0;
         
         // 加算系プロパティ (デフォルト 0)
         this.mass = this.#master.mass ?? 0;
@@ -86,6 +89,19 @@ class Item {
     repair(amount = 1) {
         this.charges = Math.min(this.maxCharges, this.charges + amount);
         return this.charges;
+    }
+
+    calculateAppraisalValue() {
+        const rarityRate = this.#getRarityRate();
+        const basePrice = this.gameDataRepository.getRarityPrices()[String(rarityRate)];
+        if (!Number.isFinite(basePrice)) {
+            throw new Error(`[Item] Rarity price not found: ${this.rarity}`);
+        }
+
+        const conditionCorrection = this.#calculateConditionCorrection();
+        const enhancementCorrection = 1 + (this.enhancementCount || 0) * 0.1;
+
+        return Math.floor(basePrice * conditionCorrection * enhancementCorrection);
     }
 
     /**
@@ -229,6 +245,22 @@ class Item {
         item.enhancementCount = totalCount;
         
         return item;
+    }
+
+    #getRarityRate() {
+        const rate = this.gameDataRepository.getRaritySettings()[this.rarity.toUpperCase()];
+        if (!Number.isFinite(rate)) {
+            throw new Error(`[Item] Rarity setting not found: ${this.rarity}`);
+        }
+        return rate;
+    }
+
+    #calculateConditionCorrection() {
+        if (this.maxCharges <= 0) {
+            return 1;
+        }
+
+        return (this.charges + 1) / (this.maxCharges + 1);
     }
 }
 

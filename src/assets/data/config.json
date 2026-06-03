@@ -44,9 +44,9 @@
     "20": 100
   },
   "facilities": {
-    "TRADING_POST": { "id": "T", "type": "TRADING_POST", "name": "TRADING POST", "icon": "T", "className": "trading-post" },
-    "REPAIR_DOCK":  { "id": "R", "type": "REPAIR_DOCK",  "name": "REPAIR DOCK",  "icon": "R", "className": "repair-dock" },
-    "BLACK_MARKET": { "id": "B", "type": "BLACK_MARKET", "name": "BLACK MARKET", "icon": "B", "className": "black-market" }
+    "TRADING_POST": { "id": "T", "type": "TRADING_POST", "name": "TRADING POST", "icon": "T", "className": "trading-post", "rewardScore": 2000, "rewardCoins": 20, "bonusItemCount": 1 },
+    "REPAIR_DOCK":  { "id": "R", "type": "REPAIR_DOCK",  "name": "REPAIR DOCK",  "icon": "R", "className": "repair-dock", "rewardScore": 3000, "rewardCoins": 30, "bonusItemCount": 2 },
+    "BLACK_MARKET": { "id": "B", "type": "BLACK_MARKET", "name": "BLACK MARKET", "icon": "B", "className": "black-market", "rewardScore": 5000, "rewardCoins": 50, "bonusItemCount": 3 }
   },
   "initialSetup": {
     "initialInventory": ["hull_medium", "sensor_normal", "pad_standard_d2"],

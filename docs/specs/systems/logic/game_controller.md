@@ -126,7 +126,7 @@
     - **内部挙動**:
         1. **成果データの確定**:
             - `const flightData = currentRocket.getFlightResult()` を取得。
-            - `const settlement = EconomySystem.calculateSettlement(result, flightData)` を実行。
+            - `const settlement = EconomySystem.calculateSettlement(result, flightData, sessionState)` を実行。
         2. **状態反映（アトミック）**:
             - `sessionState.applySettlement(settlement)` を実行し、資産を確定させる。
             - **物語解放**: `settlement.unlockedBranchId` が存在する場合、その ID を用いて `StorySystem.unlockNextStep(id)` を実行する。

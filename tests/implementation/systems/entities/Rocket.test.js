@@ -131,7 +131,8 @@ describe('Rocket', () => {
         expect(rocket.heldCargo).toEqual([cargo]);
         expect(rocket.getFlightResult()).toEqual({
             ticks: 1,
-            heldCargo: [cargo]
+            heldCargo: [cargo],
+            rocketItem
         });
     });
 

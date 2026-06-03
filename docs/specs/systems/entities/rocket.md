@@ -105,7 +105,8 @@
         - `star_breaker` / `cushion` 発動後の速度制限は、異常速度が問題になった場合に別途仕様化する。現時点では速度の上限補正は行わない。
     - **戻り値**: 回避成功時は `AvoidanceResult` を返し、不可なら `null` を返す。
 - `getFlightResult(): FlightResultData`
-    - 精算に必要な生データ（ticks, heldCargo）を抽出して返す。
+    - 精算に必要なロケット由来の生データ（ticks, heldCargo, rocketItem）を抽出して返す。
+    - セクター番号や配送ボーナス抽選は `Rocket` の責務ではないため含めない。
 - `getPrecision(): number`
     - 現在の構成（RocketItem, Launcher, Booster）から、シミュレーションすべき最大ティック数（予測線の長さ）を算出して返す。
     - **計算の根拠**: 各パーツの `precision` および `precisionMultiplier` を集計して算出する。
@@ -121,6 +122,7 @@
 航行終了時にロケットから抽出される生データ。
 - **`ticks: number`**: 最終的な累計ティック数。
 - **`heldCargo: Item[]`**: 保持状態のまま終了した全アイテムのリスト。
+- **`rocketItem: RocketItem`**: 発射したロケット本体。保険金と crashed 時の構成パーツ生存判定に使用する。
 
 ### `RocketSnapshot`
 ```javascript

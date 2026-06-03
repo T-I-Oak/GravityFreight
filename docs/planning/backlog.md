@@ -53,7 +53,7 @@
 - [ ] M4: 航行終了後の記録・経済・施設導線を接続する
     - [ ] EconomySystem / 施設報酬 / 施設取引 / ゲームオーバー判定
         - [x] EconomySystem 基礎実装（抽選、査定、共通価格計算、Trading Post 在庫、ゲームオーバー判定）
-        - [ ] SettlementResult 生成（施設報酬、配送、拾得コイン、保険、遺失物、割引率）
+        - [x] SettlementResult 生成（施設報酬、配送、拾得コイン、保険、遺失物、割引率）
         - [ ] Black Market 複数アイテムガチャと確率エンチャント
         - [ ] Repair Dock の修理、解体、強化
     - [ ] GameRecordTracker / RankTracker / AchievementTracker / FlightRecorder / StorySystem
@@ -93,7 +93,7 @@
 - [ ] 経済・施設処理を実装する
     - [ ] EconomySystem
         - [x] 抽選、査定、共通価格計算、Trading Post 在庫、ゲームオーバー判定
-        - [ ] SettlementResult 生成
+        - [x] SettlementResult 生成
         - [ ] Black Market 複数アイテムガチャ
         - [ ] Repair Dock 修理、解体、強化
     - [ ] 施設報酬
