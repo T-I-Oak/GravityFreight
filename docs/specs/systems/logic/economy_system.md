@@ -4,12 +4,24 @@
 
 - **所属ドメイン**: Logic Domain (Service)
 - **生存期間**: App Lifecycle
-- **役割**: 経済・取引・抽選ロジック。
+- **役割**: 経済・取引・抽選ロジックの外部窓口。
 - **責務**:
     - **アイテム出現抽選**: `world_config.md` の定義に基づき、指定されたコンテキスト（セクター配置、拠点ボーナス等）に応じたアイテムの重み付け抽選（Lottery）の実行。
-    - **航行結果の精算**: 航行結果と航行中に集計されたデータから、報酬、獲得アイテム、遺失物、割引率を含む `SettlementResult` を生成する。
-    - **施設取引ルール**: 交易所の在庫生成、割引適用後価格、修理費、解体費、闇市場ガチャを計算する。
+    - **航行結果の精算**: `SettlementCalculator` へ委譲し、報酬、獲得アイテム、遺失物、割引率を含む `SettlementResult` を生成する。
+    - **施設取引ルール**: 共通価格は `PricingService`、交易所在庫は `TradingPostService` へ委譲する。
     - **ゲームオーバー判定**: 航行結果確定後および施設退出時に共通利用する詰み状態判定を提供する。
+    - **Facade**: GameController や Sector など外部利用者は、原則として個別サービスではなく `EconomySystem` を呼び出す。
+
+### 内部サービス
+
+- **`SettlementCalculator`**
+    - 航行終了時の精算処理を担当する。
+    - `drawLottery()` が必要な配送ボーナス抽選は、`EconomySystem` を lottery service として受け取り委譲する。
+- **`PricingService`**
+    - 共通割引計算、修理費、解体費など、施設をまたいで使う価格計算を担当する。
+- **`TradingPostService`**
+    - Trading Post の在庫生成と特売品設定を担当する。
+    - アイテム抽選は `EconomySystem` を lottery service として受け取り委譲する。
 
 ## 2. インターフェース (Interface)
 
