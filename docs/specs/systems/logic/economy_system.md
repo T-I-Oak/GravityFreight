@@ -32,7 +32,7 @@
     - 航行結果に基づき、報酬の内訳と資産の変化を確定させる。
     - **内部ロジック**:
         0. **ステータス（status）と目的地（destination）の決定**:
-            - `collision.type === 'exit'` → `'cleared'`, `destination = target.label`
+            - `collision.type === 'arc'` → `'cleared'`, `destination = target.getFacilityType()`
             - `collision.type === 'body'` 且つ `target.isHome` → `'returned'`, `destination = null`
             - `collision.type === 'body'` 且つ `!target.isHome` → `'crashed'`, `destination = null`
             - それ以外（画面外逸脱等） → `'lost'`, `destination = null`
@@ -45,12 +45,12 @@
                 - `BLACK MARKET`: Score: 5000, Coin: 50, Label: `"BLACK MARKET"`
             - **拾得コイン**: Coin: `totalCollected`, Label: `"Collected Coins"`（Score は省略）
         2. **アイテム・配送結果の集計とレポート作成**:
-            - `flightData.heldCargo` および `flightData.collectedItems` を精査し、`itemReport` を構築する。
+            - `flightData.heldCargo` を精査し、貨物・コイン・パーツ等を分類して `itemReport` を構築する。
             - **スタック集約ルール**: アイテムを一つずつ取り出し、既存の各 `StackedItem` に対して `add(item)` を実行する。`true` が返れば集約完了とし、すべてのスタックが `false` を返した場合のみ新規スタックを生成する。
             - **一致配送（Match）**:
                 - 同一の貨物を集約した `ItemReportEntry (type: 'delivery', status: 'match')` を作成する（`StackedItem` の集約ルールを適用）。
                 - そのグループに属する全貨物から発生した **全ボーナスアイテム** を、`StackedItem` のルールに従って集約し、`bonusItems` に格納する。
-                - ボーナス実体はすべて `acquiredItems` に追加する。
+                - ボーナス実体のうち、コインは `totalCoins` に加算し、パーツ類は `acquiredItems` に追加する。
                 - **物語解放**: `unlockedBranchId` に対象施設のブランチ ID を設定する。
             - **不一致配送（Unmatched）**:
                 - `ItemReportEntry (type: 'delivery', status: 'unmatched')` を作成。
@@ -85,10 +85,11 @@
     - 基本価格（耐久 1 回復 = 10c）に対し、`calculateFinalPrice` を適用する。
 - **`calculateDismantleCost(countInSession: number, luckyDiscount: number): number`**
     - 基本価格 `50 * (countInSession + 1)` に対し、`calculateFinalPrice` を適用する。
-- **`drawBlackMarketGacha(type: 'normal' | 'premium', session: SessionState): Item`**
+- **`drawBlackMarketGacha(type: 'normal' | 'premium', session: SessionState): Item[]`**
     - 闇市場のガチャを実行する（価格は 100c / 500c 固定だが、luckyDiscount がある場合は `calculateFinalPrice` を適用した額を session から差し引く）。
-    - **Normal**: `drawLottery(session, 1, { bonusThreshold: 0 })`。50% の確率で 1 回強化を適用。
-    - **Premium**: `drawLottery(session, 1, { bonusThreshold: 5 })`。50% で 2 回、25% で 1 回強化を適用。
+    - 各アイテムは、抽選後に強化判定を行い、強化後の査定価格を合計して排出ライン到達を判定する。
+    - **Normal**: 強化後の査定価格合計が 100c 以上になるまで `drawLottery(session, 1, { bonusThreshold: 0, excludeCategories: ['cargo', 'coin'] })` を繰り返す。各アイテムは 50% の確率で 1 回強化される。
+    - **Premium**: 強化後の査定価格合計が 500c 以上になるまで `drawLottery(session, 1, { bonusThreshold: 5, excludeCategories: ['cargo', 'coin'] })` を繰り返す。各アイテムは 50% で 2 回、25% で 1 回強化される。
 
 - **`checkGameOver(session: SessionState): object | null`**
     - ゲームオーバー（詰み状態）か判定し、理由を返す。
@@ -104,7 +105,7 @@
 ### `SettlementResult`
 精算処理の最終結果。
 - **`status: 'cleared' | 'returned' | 'crashed' | 'lost'`**: 航行の最終的な結末。
-- **`destination: string | null`**: 到達した出口の名称（例: "TRADING POST"）。クリア時以外は `null`。
+- **`destination: string | null`**: 到達した出口の施設タイプ（例: `TRADING_POST`）。クリア時以外は `null`。
 - **`unlockedBranchId: string | null`**: 今回の航行で解放条件（一致配送）を満たした物語ブランチ ID。
 - **`totalScore: number`**: 今回の航行で得た総スコア。
 - **`totalCoins: number`**: 今回獲得した総コイン。
