@@ -1,6 +1,7 @@
 import Item from '../entities/Item.js';
 import BlackMarketService from './BlackMarketService.js';
 import PricingService from './PricingService.js';
+import RepairDockService from './RepairDockService.js';
 import SettlementCalculator from './SettlementCalculator.js';
 import TradingPostService from './TradingPostService.js';
 
@@ -21,6 +22,7 @@ class EconomySystem {
         this.settlementCalculator = new SettlementCalculator(gameDataRepository, this);
         this.tradingPostService = new TradingPostService(this);
         this.blackMarketService = new BlackMarketService(this, this.pricingService);
+        this.repairDockService = new RepairDockService(this.pricingService);
     }
 
     drawLottery(session, count, options = {}) {
@@ -52,6 +54,14 @@ class EconomySystem {
 
     drawBlackMarketGacha(type, session, luckyDiscount = 0) {
         return this.blackMarketService.drawGacha(type, session, luckyDiscount);
+    }
+
+    createRepairTransaction(launcher, luckyDiscount = 0) {
+        return this.repairDockService.createRepairTransaction(launcher, luckyDiscount);
+    }
+
+    createDismantleTransaction(rocketItem, countInSession, luckyDiscount = 0) {
+        return this.repairDockService.createDismantleTransaction(rocketItem, countInSession, luckyDiscount);
     }
 
     calculateFinalPrice(originalPrice, luckyDiscount, itemDiscount = 0) {

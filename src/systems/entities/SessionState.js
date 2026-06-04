@@ -33,12 +33,29 @@ class SessionState {
 
     applyTransaction(transaction = {}) {
         const spentCoins = transaction.spentCoins ?? 0;
-        const earnedCoins = transaction.earnedCoins ?? 0;
-        const acquiredItems = transaction.acquiredItems ?? [];
+        const baseEarnedCoins = transaction.earnedCoins ?? 0;
+        const baseAcquiredItems = transaction.acquiredItems ?? [];
+        const requiredItems = transaction.requiredItems ?? [];
+        const removedItems = transaction.removedItems ?? [];
 
         if (this.coins < spentCoins) {
             throw new Error('[SessionState] Not enough coins for transaction.');
         }
+        [...requiredItems, ...removedItems].forEach(item => {
+            if (!this.inventory.hasItem(item)) {
+                throw new Error('[SessionState] Transaction item is not in inventory.');
+            }
+        });
+
+        const removedItemResults = removedItems.map(item => this.inventory.removeItem(item));
+        const commitResult = transaction.onCommit ? transaction.onCommit({
+            removedItems: removedItemResults
+        }) : {};
+        const earnedCoins = baseEarnedCoins + (commitResult.earnedCoins ?? 0);
+        const acquiredItems = [
+            ...baseAcquiredItems,
+            ...(commitResult.acquiredItems ?? [])
+        ];
 
         this.coins = this.coins - spentCoins + earnedCoins;
         this.totalEarnedCoins += earnedCoins;
@@ -48,7 +65,8 @@ class SessionState {
         return {
             spentCoins,
             earnedCoins,
-            acquiredItemCount: acquiredItems.length
+            acquiredItemCount: acquiredItems.length,
+            removedItemCount: removedItemResults.length
         };
     }
 

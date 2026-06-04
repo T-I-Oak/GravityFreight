@@ -114,6 +114,24 @@ describe('EconomySystem', () => {
         expect(economySystem.blackMarketService.drawGacha).toHaveBeenCalledWith('normal', session, 0);
     });
 
+    it('delegates Repair Dock repair and dismantle transactions', () => {
+        const launcher = new Item('pad_standard_d4', repository);
+        const rocketItem = new RocketItem(
+            new Item('hull_medium', repository),
+            new Item('sensor_normal', repository),
+            []
+        );
+        const repairTransaction = { spentCoins: 10 };
+        const dismantleTransaction = { spentCoins: 50 };
+        vi.spyOn(economySystem.repairDockService, 'createRepairTransaction').mockReturnValue(repairTransaction);
+        vi.spyOn(economySystem.repairDockService, 'createDismantleTransaction').mockReturnValue(dismantleTransaction);
+
+        expect(economySystem.createRepairTransaction(launcher, 0.1)).toBe(repairTransaction);
+        expect(economySystem.createDismantleTransaction(rocketItem, 2, 0.1)).toBe(dismantleTransaction);
+        expect(economySystem.repairDockService.createRepairTransaction).toHaveBeenCalledWith(launcher, 0.1);
+        expect(economySystem.repairDockService.createDismantleTransaction).toHaveBeenCalledWith(rocketItem, 2, 0.1);
+    });
+
     it('returns null when the session still has chassis, logic, and a usable launcher', () => {
         expect(economySystem.checkGameOver(session)).toBeNull();
     });

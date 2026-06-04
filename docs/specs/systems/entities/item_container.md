@@ -22,6 +22,11 @@
     - **ルール**: `stacks` 内に「同一 ID かつ同一性能」のスタックが存在すればそこに追加し、存在しなければ新しい `StackedItem` を作成してリストに加える。
 - **`getItemsByCategory(category: string): StackedItem[]`**
     - 指定されたカテゴリに属する全 `StackedItem` のリストを抽出して返す。
+- **`hasItem(item: Item): boolean`**
+    - 指定された `Item` インスタンスがコンテナ内に存在するかを返す。
+- **`removeItem(item: Item): Item | null`**
+    - 指定された `Item` インスタンスをコンテナから削除して返す。
+    - **クリーンアップ**: 削除した結果、対象スタックが空になった場合は `stacks` リストからその `StackedItem` を除去する。
 - **`popItemByUid(stackUid: string): Item`**
     - `stacks` 内から、指定された **「`StackedItem` の UID」** を持つスタックを探し、その中から `Item` インスタンスを 1 つ取り出して返す。
     - **クリーンアップ**: 取り出した結果、`stack.count === 0` になった場合は、`stacks` リストからその `StackedItem` を除去する。

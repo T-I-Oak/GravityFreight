@@ -49,13 +49,17 @@
 
 - **`applyTransaction(transaction: TransactionResult): TransactionDelta`**
     - 施設取引などの資産変化を現在の状態に適用する。
-    - コイン支払い、コイン取得、アイテム取得はアチーブメント・記録に影響するため、個別画面や施設サービスで直接 `coins` / `inventory` を変更せず、このメソッドへ集約する。
+    - コイン支払い、コイン取得、アイテム取得、アイテム削除はアチーブメント・記録に影響するため、個別画面や施設サービスで直接 `coins` / `inventory` を変更せず、このメソッドへ集約する。
+    - 施設固有の副作用（例: Repair Dock の修理・強化）は `onCommit` callback に委譲する。ただし callback は支払いと対象 item の存在確認が通った後にのみ実行される。
     - **内部挙動**:
         1. `spentCoins` が現在の `coins` を超える場合は、状態を変更せず例外を投げる。
-        2. `coins = coins - spentCoins + earnedCoins` を実行。
-        3. `totalEarnedCoins += earnedCoins` を実行。
-        4. `acquiredItems` の各アイテムを `inventory` へ追加し、`collectedItemCount` を加算する。
-        5. 記録・実績更新に使える `TransactionDelta` を返す。
+        2. `requiredItems` / `removedItems` が inventory に存在するか確認し、存在しない場合は状態を変更せず例外を投げる。
+        3. `removedItems` を inventory から削除する。
+        4. `onCommit` が指定されていれば実行し、追加の `earnedCoins` / `acquiredItems` を受け取る。
+        5. `coins = coins - spentCoins + earnedCoins` を実行。
+        6. `totalEarnedCoins += earnedCoins` を実行。
+        7. `acquiredItems` の各アイテムを `inventory` へ追加し、`collectedItemCount` を加算する。
+        8. 記録・実績更新に使える `TransactionDelta` を返す。
 
 - **`getGameResultSummary(context: { completedSectors: number }): GameResultSummary`**
     - ゲームリザルト画面およびゲーム1プレイ結果記録に渡す最終集計値を返す。
@@ -89,7 +93,13 @@
 {
   spentCoins: number,
   earnedCoins: number,
-  acquiredItems: Item[]
+  acquiredItems: Item[],
+  requiredItems?: Item[],
+  removedItems?: Item[],
+  onCommit?: (context: { removedItems: Item[] }) => {
+    earnedCoins?: number,
+    acquiredItems?: Item[]
+  }
 }
 ```
 
@@ -99,6 +109,7 @@
 {
   spentCoins: number,
   earnedCoins: number,
-  acquiredItemCount: number
+  acquiredItemCount: number,
+  removedItemCount: number
 }
 ```

@@ -25,6 +25,10 @@
 - **`BlackMarketService`**
     - Black Market の 100c / 500c ガチャを担当する。
     - アイテム抽選は `EconomySystem` を lottery service として受け取り委譲し、資産反映は `SessionState.applyTransaction()` に任せる。
+- **`RepairDockService`**
+    - Repair Dock の修理、解体、強化の取引準備を担当する。
+    - 支払い、対象 item の存在確認、inventory への反映は `SessionState.applyTransaction()` に任せる。
+    - 修理・強化など施設固有の副作用は、支払い成功後に実行される `TransactionResult.onCommit` に閉じ込める。
 
 ## 2. インターフェース (Interface)
 
@@ -108,6 +112,16 @@
     - 各アイテムは、抽選後に強化判定を行い、強化後の査定価格を合計して排出ライン到達を判定する。
     - **Normal**: 強化後の査定価格合計が 100c 以上になるまで `drawLottery(session, 1, { bonusThreshold: 0, excludeCategories: ['cargo', 'coin'] })` を繰り返す。各アイテムは 50% の確率で 1 回強化される。
     - **Premium**: 強化後の査定価格合計が 500c 以上になるまで `drawLottery(session, 1, { bonusThreshold: 5, excludeCategories: ['cargo', 'coin'] })` を繰り返す。各アイテムは 50% で 2 回、25% で 1 回強化される。
+- **`createRepairTransaction(launcher: Item, luckyDiscount: number): TransactionResult`**
+    - Repair Dock の発射台修理取引を作成する。
+    - 対象は inventory 内の damaged launcher とし、`requiredItems` に対象 launcher を指定する。
+    - コストは耐久 1 回復につき 10c。luckyDiscount がある場合は `calculateFinalPrice` を適用する。
+    - `onCommit` は支払い成功後に `launcher.repair(1)` を実行する。
+- **`createDismantleTransaction(rocketItem: RocketItem, countInSession: number, luckyDiscount: number): TransactionResult`**
+    - Repair Dock のロケット解体・強化取引を作成する。
+    - `removedItems` に対象 `RocketItem` を指定する。
+    - コストは `50 * (countInSession + 1)`。luckyDiscount がある場合は `calculateFinalPrice` を適用する。
+    - `onCommit` は支払い成功後、`RocketItem.getCompositionParts()` で取り出した chassis / logic / module item に `Item.applyMaintenance()` を 1 回ずつ実行し、`acquiredItems` として返す。
 
 - **`checkGameOver(session: SessionState): object | null`**
     - ゲームオーバー（詰み状態）か判定し、理由を返す。

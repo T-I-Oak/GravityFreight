@@ -104,7 +104,8 @@ describe('SessionState', () => {
         expect(delta).toEqual({
             spentCoins: 120,
             earnedCoins: 50,
-            acquiredItemCount: 2
+            acquiredItemCount: 2,
+            removedItemCount: 0
         });
     });
 
@@ -122,6 +123,55 @@ describe('SessionState', () => {
         expect(session.totalEarnedCoins).toBe(0);
         expect(session.collectedItemCount).toBe(0);
         expect(session.inventory.getItemsByCategory('module')).toHaveLength(0);
+    });
+
+    it('removes transaction items and runs commit callback after validation', () => {
+        const session = new SessionState(repository);
+        const removedItem = new Item('mod_capacity', repository);
+        const acquiredItem = new Item('hull_light', repository);
+        const onCommit = vi.fn().mockReturnValue({
+            acquiredItems: [acquiredItem],
+            earnedCoins: 20
+        });
+        session.initialize();
+        session.inventory.addItem(removedItem);
+
+        const delta = session.applyTransaction({
+            spentCoins: 50,
+            removedItems: [removedItem],
+            onCommit
+        });
+
+        expect(onCommit).toHaveBeenCalledWith({
+            removedItems: [removedItem]
+        });
+        expect(session.coins).toBe(170);
+        expect(session.totalEarnedCoins).toBe(20);
+        expect(session.collectedItemCount).toBe(1);
+        expect(session.inventory.hasItem(removedItem)).toBe(false);
+        expect(session.inventory.hasItem(acquiredItem)).toBe(true);
+        expect(delta).toEqual({
+            spentCoins: 50,
+            earnedCoins: 20,
+            acquiredItemCount: 1,
+            removedItemCount: 1
+        });
+    });
+
+    it('rejects transactions when required items are missing before running callbacks', () => {
+        const session = new SessionState(repository);
+        const missingItem = new Item('mod_capacity', repository);
+        const onCommit = vi.fn();
+        session.initialize();
+
+        expect(() => session.applyTransaction({
+            spentCoins: 50,
+            requiredItems: [missingItem],
+            onCommit
+        })).toThrow('[SessionState] Transaction item is not in inventory.');
+
+        expect(onCommit).not.toHaveBeenCalled();
+        expect(session.coins).toBe(200);
     });
 
     it('creates game result summary with explicit completed sector context', () => {

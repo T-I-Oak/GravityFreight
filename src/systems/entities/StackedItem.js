@@ -64,6 +64,24 @@ class StackedItem {
         return item;
     }
 
+    remove(item) {
+        const itemIndex = this.items.indexOf(item);
+        if (itemIndex < 0) {
+            return null;
+        }
+
+        const [removed] = this.items.splice(itemIndex, 1);
+        this.quantity = this.items.length;
+
+        if (this.items.length === 0) {
+            this.uid = null;
+            this.id = null;
+            this.representative = null;
+        }
+
+        return removed;
+    }
+
     getViewData() {
         if (!this.representative) {
             throw new Error('[StackedItem] Cannot create view data from an empty stack.');

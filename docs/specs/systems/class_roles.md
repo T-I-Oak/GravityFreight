@@ -176,6 +176,13 @@ graph TD
         - 100c / 500c の排出ライン、抽選補正、確率エンチャントを適用してガチャ結果を生成する。
         - アイテム抽選は `EconomySystem.drawLottery()` へ委譲する。
         - 所持金や inventory は直接変更せず、`SessionState.applyTransaction()` 用の `TransactionResult` を返す。
+- **RepairDockService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: Repair Dock 取引準備。
+    - 責務:
+        - 発射台修理、ロケット解体・強化の `TransactionResult` を生成する。
+        - 支払い、対象 item の存在確認、inventory 反映は `SessionState.applyTransaction()` へ委譲する。
+        - 修理・強化の施設固有処理は、支払い成功後に実行される `onCommit` callback として定義する。
 - **GameController**
     - 生存期間: Game Lifecycle
     - 役割: ゲーム進行・シーン管理。

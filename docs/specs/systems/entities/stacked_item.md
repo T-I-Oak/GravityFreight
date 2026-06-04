@@ -29,6 +29,10 @@
     - **判定ルール**: `items[0].equals(item)` が `true` を返す場合のみ追加し、`true` を返す。一致しない場合は何もせず `false` を返す。
 - **`pop(): Item`**
     - スタックから実体を 1 つ取り出して返す（外部仕様としてはどのインスタンスが返るかは区別しないが、内部的には LIFO で動作する）。
+- **`remove(item: Item): Item | null`**
+    - 指定された `Item` インスタンスをスタックから削除して返す。
+    - 対象 item が存在しない場合は `null` を返す。
+    - 削除後は `count` を更新し、空スタックになった場合は `uid` / `id` / `representative` をリセットする。
 - **`getViewData(): ItemViewData`**
     - `items[0].getViewData()` の結果を取得し、`uid` と `count` をスタック固有の値で上書きして返す。
     - **マッピング**:

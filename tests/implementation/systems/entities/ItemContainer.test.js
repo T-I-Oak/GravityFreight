@@ -57,4 +57,19 @@ describe('ItemContainer', () => {
         expect(container.stacks).toEqual([]);
         expect(container.popItemByUid(stackUid)).toBeNull();
     });
+
+    it('checks and removes a specific item instance', () => {
+        const container = new ItemContainer();
+        const first = new Item('hull_light', repository);
+        const second = new Item('hull_light', repository);
+        container.addItem(first);
+        container.addItem(second);
+
+        expect(container.hasItem(first)).toBe(true);
+        expect(container.removeItem(first)).toBe(first);
+        expect(container.hasItem(first)).toBe(false);
+        expect(container.hasItem(second)).toBe(true);
+        expect(container.stacks[0].count).toBe(1);
+        expect(container.removeItem(first)).toBeNull();
+    });
 });
