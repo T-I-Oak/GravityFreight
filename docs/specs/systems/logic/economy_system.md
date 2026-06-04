@@ -22,6 +22,9 @@
 - **`TradingPostService`**
     - Trading Post の在庫生成と特売品設定を担当する。
     - アイテム抽選は `EconomySystem` を lottery service として受け取り委譲する。
+- **`BlackMarketService`**
+    - Black Market の 100c / 500c ガチャを担当する。
+    - アイテム抽選は `EconomySystem` を lottery service として受け取り委譲し、資産反映は `SessionState.applyTransaction()` に任せる。
 
 ## 2. インターフェース (Interface)
 
@@ -98,8 +101,10 @@
     - 基本価格（耐久 1 回復 = 10c）に対し、`calculateFinalPrice` を適用する。
 - **`calculateDismantleCost(countInSession: number, luckyDiscount: number): number`**
     - 基本価格 `50 * (countInSession + 1)` に対し、`calculateFinalPrice` を適用する。
-- **`drawBlackMarketGacha(type: 'normal' | 'premium', session: SessionState): Item[]`**
-    - 闇市場のガチャを実行する（価格は 100c / 500c 固定だが、luckyDiscount がある場合は `calculateFinalPrice` を適用した額を session から差し引く）。
+- **`drawBlackMarketGacha(type: 'normal' | 'premium', session: SessionState, luckyDiscount: number): TransactionResult`**
+    - 闇市場のガチャを実行し、`SessionState.applyTransaction()` に渡す資産変化を返す。
+    - 価格は 100c / 500c を基準とし、luckyDiscount がある場合は `calculateFinalPrice` を適用した額を `spentCoins` に設定する。
+    - `EconomySystem` / `BlackMarketService` は session の所持金や inventory を直接変更しない。
     - 各アイテムは、抽選後に強化判定を行い、強化後の査定価格を合計して排出ライン到達を判定する。
     - **Normal**: 強化後の査定価格合計が 100c 以上になるまで `drawLottery(session, 1, { bonusThreshold: 0, excludeCategories: ['cargo', 'coin'] })` を繰り返す。各アイテムは 50% の確率で 1 回強化される。
     - **Premium**: 強化後の査定価格合計が 500c 以上になるまで `drawLottery(session, 1, { bonusThreshold: 5, excludeCategories: ['cargo', 'coin'] })` を繰り返す。各アイテムは 50% で 2 回、25% で 1 回強化される。

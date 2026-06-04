@@ -169,6 +169,13 @@ graph TD
     - 責務:
         - 交易所在庫を生成し、特売品を設定する。
         - アイテム抽選は `EconomySystem.drawLottery()` へ委譲する。
+- **BlackMarketService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: Black Market ガチャ取引準備。
+    - 責務:
+        - 100c / 500c の排出ライン、抽選補正、確率エンチャントを適用してガチャ結果を生成する。
+        - アイテム抽選は `EconomySystem.drawLottery()` へ委譲する。
+        - 所持金や inventory は直接変更せず、`SessionState.applyTransaction()` 用の `TransactionResult` を返す。
 - **GameController**
     - 生存期間: Game Lifecycle
     - 役割: ゲーム進行・シーン管理。

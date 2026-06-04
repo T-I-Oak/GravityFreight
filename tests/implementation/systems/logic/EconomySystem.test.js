@@ -102,6 +102,18 @@ describe('EconomySystem', () => {
         expect(stock.filter(entry => entry.itemDiscount === 0)).toHaveLength(5);
     });
 
+    it('delegates Black Market gacha and returns a transaction result', () => {
+        const transaction = {
+            spentCoins: 100,
+            earnedCoins: 0,
+            acquiredItems: [new Item('mod_stabilizer', repository)]
+        };
+        vi.spyOn(economySystem.blackMarketService, 'drawGacha').mockReturnValue(transaction);
+
+        expect(economySystem.drawBlackMarketGacha('normal', session, 0)).toBe(transaction);
+        expect(economySystem.blackMarketService.drawGacha).toHaveBeenCalledWith('normal', session, 0);
+    });
+
     it('returns null when the session still has chassis, logic, and a usable launcher', () => {
         expect(economySystem.checkGameOver(session)).toBeNull();
     });
