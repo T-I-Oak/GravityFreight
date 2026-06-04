@@ -61,6 +61,21 @@
 
 - `AchievementProgress` は表示・判定結果であり、現時点では永続化しない。
 - 実績定義そのもの、表示ラベル、tier の `goal` / `title`、参照ソース、参照キー、最大値判定か最小値判定かの条件種別は `content.json` のマスタデータとして扱う。
+- 実績定義は以下の形を基本とする。
+```javascript
+{
+  id: string,
+  source: 'game_record' | 'story_read',
+  key: string,
+  condition: 'max',
+  label: string,
+  tiers: [
+    { goal: number, title: string }
+  ]
+}
+```
+- `tiers` は高い目標値から低い目標値へ並べる。配列 index + 1 を tier 番号として扱うため、最上位 tier は `1` とする。
+- 現在の実績定義はすべて `condition: 'max'` とし、最小値・連続数などの条件は該当実績を追加する時点で条件種別を拡張する。
 - `source: 'game_record'` の実績は `GameRecordData` の記録値を参照する。
 - `source: 'story_read'` の実績は `StoryProgressData.readMessageIds` の件数を参照する。ストーリー既読数実績はこのソースを使用する。
 - 達成済み tier は参照ソース側の現在値とマスタ定義の `tiers[].goal` を照合して算出する。

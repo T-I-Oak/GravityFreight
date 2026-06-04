@@ -60,7 +60,7 @@
     - [ ] GameRecordTracker / RankTracker / AchievementTracker / FlightRecorder / StorySystem
         - [x] GameRecordTracker
         - [x] RankTracker
-        - [ ] AchievementTracker
+        - [x] AchievementTracker
         - [ ] FlightRecorder
         - [x] StorySystem
     - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
@@ -98,7 +98,7 @@
 - [ ] 記録・永続データ系を実装する
     - [x] GameRecordTracker
     - [x] RankTracker
-    - [ ] AchievementTracker
+    - [x] AchievementTracker
     - [ ] FlightRecorder
     - [x] StorySystem
 - [ ] 経済・施設処理を実装する

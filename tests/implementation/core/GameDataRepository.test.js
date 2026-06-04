@@ -113,7 +113,13 @@ describe('GameDataRepository', () => {
     it('provides individual and full achievement definitions', async () => {
         await repository.loadAllData();
 
-        expect(repository.getAchievementDefinition('stat_total_coins')).toHaveProperty('label');
+        expect(repository.getAchievementDefinition('stat_total_coins')).toMatchObject({
+            id: 'stat_total_coins',
+            source: 'game_record',
+            key: 'total_earned_coins',
+            condition: 'max',
+            label: expect.any(String)
+        });
         expect(repository.getAchievementDefinitions().length).toBeGreaterThan(0);
     });
 
