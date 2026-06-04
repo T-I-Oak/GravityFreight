@@ -33,14 +33,15 @@
     - ウィンドウのリサイズイベントが発生した際のコールバックを登録する（操作音なし）。
     - **内部挙動**: `window` の `resize` イベントを購読し、発生時に現在のウィンドウサイズを引数として `handler` を実行する。
 
-- **`getMapContainer(): HTMLElement`**
-    - マップ描画用のコンテナ要素（Canvas が Append される親要素）を取得する。
-    - **内部挙動**: `constructor` で取得済みの特定の DOM 要素（`.map-canvas-container` 等）を返す。
+- **`getMapCanvas(): HTMLCanvasElement`**
+    - マップ描画用 Canvas (`#gameCanvas`) を取得する。
+    - **内部挙動**: `constructor` で取得済みの DOM 要素を返し、`AppOrchestrator` が `WorldRenderer.initialize()` に渡す。
 
 ### 画面制御メソッド (Screen Control)
 
 - **`showTitleScreen(): void`**
     - タイトル画面を表示する。
+    - **内部挙動**: タイトル画面を表示し、HUD、ビルドパネル、航行結果画面、施設画面を非表示にする。
 - **`showSectorStartScreen(): void`**
     - セクター開始画面を表示する。
 - **`showRecordScreen(): void`**
@@ -50,7 +51,7 @@
     - **責務境界**: 説明書本体のページ描画、背景画像、ページ切り替え、説明用デモは `HowToPlayUI` が担当する。`UIController` は画面表示の入口または既存画面の非表示制御に留める。
 - **`showBuildScreen(): void`**
     - ビルドフェーズを開始する。
-    - **内部挙動**: 画面の切り替えと同時に `openBuildPanel()` および HUD 要素の表示状態（`.hide` クラスの除去等）を切り替え、初期状態で両方が表示された状態にする。
+    - **内部挙動**: タイトル、航行結果画面、施設画面を非表示にし、HUD とビルドパネルを表示する。
 - **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
     - セクター開始時のタイトル演出（「SECTOR X」）を画面中央に表示する。
 - **`setFlightMode(isFlight: boolean): void`**

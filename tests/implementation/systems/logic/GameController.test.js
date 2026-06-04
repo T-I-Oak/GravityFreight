@@ -114,6 +114,10 @@ function createController(settlement = createSettlement()) {
     const sessionState = {
         sectorNumber: 3,
         coins: 120,
+        initialize: vi.fn(() => {
+            sessionState.sectorNumber = 0;
+            sessionState.coins = 120;
+        }),
         inventory: {
             stacks: [inventoryStack, launcherStack],
             getItemsByCategory: vi.fn(category => (category === 'launcher' ? [launcherStack] : []))
@@ -205,14 +209,18 @@ function createController(settlement = createSettlement()) {
         getPendingRecord: vi.fn(() => null)
     };
     const storySystem = {
+        resetSession: vi.fn(),
         unlockNextStep: vi.fn(),
         getStoryStatus: vi.fn(() => [{ id: 'T', type: 'T', isUnread: true }])
     };
     const uiController = {
         showResultScreen: vi.fn(),
         showFacilityScreen: vi.fn(),
+        initHUD: vi.fn(),
         setFacilityActionHandler: vi.fn(),
         setFacilityDepartHandler: vi.fn(),
+        setResultHandler: vi.fn(),
+        setGameEndReturnHandler: vi.fn(),
         updateFacilityCredits: vi.fn(),
         updateHUDValue: vi.fn(),
         setFlightMode: vi.fn(),
@@ -269,6 +277,23 @@ describe('GameController', () => {
 
     beforeEach(() => {
         context = createController();
+    });
+
+    it('starts a contract by initializing session state, HUD, handlers, and the first sector', async () => {
+        await context.controller.start();
+
+        expect(context.sessionState.initialize).toHaveBeenCalled();
+        expect(context.storySystem.resetSession).toHaveBeenCalled();
+        expect(context.uiController.initHUD).toHaveBeenCalledWith(context.sessionState);
+        expect(context.uiController.setResultHandler).toHaveBeenCalled();
+        expect(context.uiController.setGameEndReturnHandler).toHaveBeenCalled();
+        expect(context.sessionState.sectorNumber).toBe(1);
+        expect(context.sectorFactory).toHaveBeenCalledWith({
+            sessionState: context.sessionState,
+            isAnomaly: false
+        });
+        expect(context.worldRenderer.setSector).toHaveBeenCalledWith(context.controller.currentSector);
+        expect(context.uiController.showBuildScreen).toHaveBeenCalled();
     });
 
     it('settles navigation end and shows a flight result view model', async () => {

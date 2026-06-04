@@ -23,6 +23,7 @@ class GameController {
         this.storySystem = infrastructure.storySystem;
         this.uiController = infrastructure.uiController;
         this.worldRenderer = infrastructure.worldRenderer;
+        this.appOrchestrator = infrastructure.appOrchestrator;
         this.currentSector = null;
         this.currentRocket = null;
         this.repairDockDismantleCount = 0;
@@ -33,6 +34,16 @@ class GameController {
             || new SectorProgressionController(infrastructure);
     }
 
+    async start() {
+        this.sessionState.initialize();
+        this.storySystem.resetSession?.();
+        this.uiController.initHUD(this.sessionState);
+        this.uiController.setResultHandler?.(() => this.confirmSettlement(this.lastSettlement));
+        this.uiController.setGameEndReturnHandler?.(() => this.returnToTitle());
+
+        return this.beginSectorTransition();
+    }
+
     async handleNavigationEnd(result) {
         if (!this.currentRocket || !this.currentSector) {
             throw new Error('[GameController] currentRocket and currentSector are required.');
@@ -40,6 +51,7 @@ class GameController {
 
         const flightData = this.currentRocket.getFlightResult();
         const settlement = this.economySystem.calculateSettlement(result, flightData, this.sessionState);
+        this.lastSettlement = settlement;
         this.sessionState.applySettlement(settlement);
 
         if (settlement.unlockedBranchId) {
@@ -111,6 +123,10 @@ class GameController {
 
         await this.beginSectorTransition();
         return false;
+    }
+
+    returnToTitle() {
+        this.appOrchestrator?.returnToTitle?.();
     }
 
     checkGameOverAndStartEndSequence(context = {}) {

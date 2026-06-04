@@ -13,18 +13,82 @@ class UIController {
             throw new Error('[UIController] gameDataRepository is required.');
         }
 
+        this.titleScreen = this.document.querySelector('#title-screen');
+        this.startButton = this.document.querySelector('#start-game-btn');
         this.resultScreen = this.#requiredElement('#flight-result-screen');
         this.facilityScreen = this.#requiredElement('#facility-screen');
         this.hud = this.document.querySelector('#play-hud, #mission-hud');
         this.buildPanel = this.document.querySelector('#build-overlay, #terminal-panel');
         this.launchControl = this.document.querySelector('#launch-control');
+        this.mapCanvas = this.document.querySelector('#gameCanvas');
+        this.hudValues = {
+            sector: this.document.querySelector('#sector-display'),
+            score: this.document.querySelector('#score-display'),
+            coin: this.document.querySelector('#coin-display')
+        };
+        this.mailButtons = [
+            this.document.querySelector('#mail-btn-0'),
+            this.document.querySelector('#mail-btn-1'),
+            this.document.querySelector('#mail-btn-2')
+        ].filter(Boolean);
+    }
+
+    showTitleScreen() {
+        this.#show(this.titleScreen);
+        this.#hide(this.resultScreen);
+        this.#hide(this.facilityScreen);
+        this.#hide(this.hud);
+        this.#hide(this.buildPanel);
+        this.#hide(this.launchControl);
+    }
+
+    showBuildScreen() {
+        this.#hide(this.titleScreen);
+        this.#hide(this.resultScreen);
+        this.#hide(this.facilityScreen);
+        this.#show(this.hud);
+        this.#show(this.buildPanel);
+        this.#hide(this.launchControl);
+    }
+
+    initHUD(sessionState) {
+        this.updateHUDValue('sector', sessionState.sectorNumber);
+        this.updateHUDValue('score', sessionState.totalScore ?? 0);
+        this.updateHUDValue('coin', sessionState.coins ?? 0);
+        this.mailButtons.forEach(button => {
+            button.disabled = true;
+            button.classList.remove('type-t', 'type-r', 'type-b', 'is-blinking');
+            button.classList.add('gray');
+        });
+    }
+
+    updateHUDValue(key, value) {
+        const element = this.hudValues[key];
+        if (element) {
+            element.textContent = this.#formatNumber(value);
+        }
+    }
+
+    setFlightMode(isFlight) {
+        this.buildPanel?.classList.toggle('is-locked', !!isFlight);
+        this.launchControl?.classList.toggle('is-locked', !!isFlight);
+    }
+
+    getMapCanvas() {
+        return this.mapCanvas;
+    }
+
+    setStartHandler(handler) {
+        this.setOperationHandler(this.#requiredElement('#start-game-btn'), handler);
     }
 
     showResultScreen(viewData) {
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
         this.#hide(this.launchControl);
-        this.resultScreen.hidden = false;
+        this.#hide(this.titleScreen);
+        this.#hide(this.facilityScreen);
+        this.#show(this.resultScreen);
         this.resultScreen.innerHTML = this.flightResultComponents.generateHTML(viewData, this.gameDataRepository);
     }
 
@@ -33,7 +97,8 @@ class UIController {
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
         this.#hide(this.launchControl);
-        this.facilityScreen.hidden = false;
+        this.#hide(this.titleScreen);
+        this.#show(this.facilityScreen);
         this.facilityScreen.innerHTML = this.facilityComponents.generateHTML({ ...viewData, type });
     }
 
@@ -109,6 +174,14 @@ class UIController {
     #hide(element) {
         if (element) {
             element.hidden = true;
+            element.classList.add('hidden');
+        }
+    }
+
+    #show(element) {
+        if (element) {
+            element.hidden = false;
+            element.classList.remove('hidden');
         }
     }
 
