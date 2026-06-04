@@ -24,6 +24,9 @@ class GameController {
         this.currentSector = null;
         this.currentRocket = null;
         this.repairDockDismantleCount = 0;
+        this.currentFacilityType = null;
+        this.currentFacilityViewData = null;
+        this.currentTradingPostStock = null;
     }
 
     async handleNavigationEnd(result) {
@@ -76,15 +79,21 @@ class GameController {
     }
 
     enterFacility(type) {
+        this.currentFacilityType = type;
+        this.currentTradingPostStock = type === 'TRADING_POST'
+            ? this.economySystem.generateTradingPostStock(this.sessionState)
+            : null;
         const viewData = this.#createFacilityViewData(type);
-        this.uiController.showFacilityScreen(type, viewData);
-        this.uiController.setFacilityActionHandler?.((action, context) => this.handleFacilityAction(action, context));
-        this.uiController.setFacilityDepartHandler?.(() => this.leaveFacility());
+        this.#showFacilityView(type, viewData);
         return viewData;
     }
 
     handleFacilityAction(action, context) {
-        throw new Error(`[GameController] Facility action is not connected yet: ${action} (${context.uid})`);
+        const transaction = this.#createFacilityTransaction(action, context);
+        const delta = this.sessionState.applyTransaction(transaction);
+
+        this.#afterFacilityTransaction(action, context, delta);
+        return delta;
     }
 
     leaveFacility() {
@@ -197,7 +206,7 @@ class GameController {
     }
 
     #createTradingPostSections(luckyDiscount) {
-        const stockEntries = this.economySystem.generateTradingPostStock(this.sessionState)
+        const stockEntries = this.currentTradingPostStock
             .map(stock => this.#createTradeEntry({
                 action: 'buy',
                 actionLabel: this.gameDataRepository.getUiText('facility.actions.buy'),
@@ -328,6 +337,113 @@ class GameController {
         }[type];
 
         return this.gameDataRepository.getUiText(`facility.${group}.${key}`);
+    }
+
+    #showFacilityView(type, viewData) {
+        this.currentFacilityViewData = viewData;
+        this.uiController.showFacilityScreen(type, viewData);
+        this.uiController.setFacilityActionHandler?.((action, context) => this.handleFacilityAction(action, context));
+        this.uiController.setFacilityDepartHandler?.(() => this.leaveFacility());
+    }
+
+    #refreshFacilityView() {
+        const viewData = this.#createFacilityViewData(this.currentFacilityType);
+        this.#showFacilityView(this.currentFacilityType, viewData);
+    }
+
+    #createFacilityTransaction(action, context = {}) {
+        if (this.currentFacilityType === 'TRADING_POST' && action === 'buy') {
+            const entry = this.#findFacilityEntry(action, context.uid);
+            return {
+                spentCoins: entry.price,
+                earnedCoins: 0,
+                acquiredItems: [entry.item]
+            };
+        }
+
+        if (this.currentFacilityType === 'TRADING_POST' && action === 'sell') {
+            const stack = this.sessionState.inventory.stacks.find(candidate => candidate.uid === context.uid);
+            if (!stack) {
+                throw new Error(`[GameController] Sell target not found: ${context.uid}`);
+            }
+            const item = stack.items[stack.items.length - 1];
+            return {
+                spentCoins: 0,
+                earnedCoins: this.economySystem.calculateAppraisalValue(stack.representative),
+                removedItems: [item]
+            };
+        }
+
+        if (this.currentFacilityType === 'REPAIR_DOCK' && action === 'repair') {
+            return this.economySystem.createRepairTransaction(
+                this.#findInventoryItemByUid(context.uid),
+                this.currentSector?.luckyDiscountRate ?? 0
+            );
+        }
+
+        if (this.currentFacilityType === 'REPAIR_DOCK' && action === 'dismantle') {
+            const entry = this.#findFacilityEntry(action, context.uid);
+            return this.economySystem.createDismantleTransaction(
+                entry.item,
+                this.repairDockDismantleCount,
+                this.currentSector?.luckyDiscountRate ?? 0
+            );
+        }
+
+        if (this.currentFacilityType === 'BLACK_MARKET' && action === 'buy_normal') {
+            return this.economySystem.drawBlackMarketGacha('normal', this.sessionState, this.currentSector?.luckyDiscountRate ?? 0);
+        }
+
+        if (this.currentFacilityType === 'BLACK_MARKET' && action === 'buy_premium') {
+            return this.economySystem.drawBlackMarketGacha('premium', this.sessionState, this.currentSector?.luckyDiscountRate ?? 0);
+        }
+
+        throw new Error(`[GameController] Unknown facility action: ${action}`);
+    }
+
+    #afterFacilityTransaction(action, context, delta) {
+        if (this.currentFacilityType === 'TRADING_POST' && action === 'buy') {
+            this.currentTradingPostStock = this.currentTradingPostStock
+                .filter(stock => stock.item.uid !== context.uid);
+        }
+
+        if (this.currentFacilityType === 'REPAIR_DOCK' && action === 'dismantle') {
+            this.currentRocket = null;
+            this.repairDockDismantleCount += 1;
+        }
+
+        const updatedKeys = this.gameRecordTracker.recordTransaction(delta, {
+            currentCoins: this.sessionState.coins
+        });
+        if (updatedKeys.length > 0) {
+            this.achievementTracker.evaluateAchievements({
+                source: 'game_record',
+                keys: updatedKeys
+            });
+        }
+
+        this.uiController.updateFacilityCredits?.(this.sessionState.coins);
+        this.#refreshFacilityView();
+    }
+
+    #findFacilityEntry(action, uid) {
+        const entry = this.currentFacilityViewData?.sections
+            .flatMap(section => section.entries)
+            .find(candidate => candidate.action === action && candidate.uid === uid);
+        if (!entry) {
+            throw new Error(`[GameController] Facility entry not found: ${action} (${uid})`);
+        }
+        return entry;
+    }
+
+    #findInventoryItemByUid(uid) {
+        const item = this.sessionState.inventory.stacks
+            .flatMap(stack => stack.items)
+            .find(candidate => candidate.uid === uid);
+        if (!item) {
+            throw new Error(`[GameController] Inventory item not found: ${uid}`);
+        }
+        return item;
     }
 }
 

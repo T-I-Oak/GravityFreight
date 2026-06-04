@@ -77,27 +77,60 @@ function createController(settlement = createSettlement()) {
         }))
     };
     const currentSector = { luckyDiscountRate: 0 };
+    const sellItem = {
+        uid: 'sell_item',
+        category: 'module',
+        getViewData: vi.fn(() => ({
+            uid: 'sell_item',
+            id: 'mod_capacity',
+            name: 'Capacity Module',
+            category: 'module',
+            stats: {}
+        }))
+    };
+    const damagedLauncher = {
+        uid: 'launcher_damaged',
+        category: 'launcher',
+        charges: 0,
+        maxCharges: 2,
+        getViewData: vi.fn(() => ({
+            uid: 'launcher_damaged',
+            id: 'pad_standard_d2',
+            name: 'Standard Pad',
+            category: 'launcher',
+            stats: {}
+        }))
+    };
     const inventoryStack = {
         uid: 'stack_sell',
-        representative: {
-            uid: 'sell_item',
-            category: 'module',
-            getViewData: vi.fn(() => ({
-                uid: 'sell_item',
-                id: 'mod_capacity',
-                name: 'Capacity Module',
-                category: 'module',
-                stats: {}
-            }))
-        }
+        representative: sellItem,
+        items: [sellItem]
+    };
+    const launcherStack = {
+        uid: 'stack_launcher',
+        representative: damagedLauncher,
+        items: [damagedLauncher]
     };
     const sessionState = {
         sectorNumber: 3,
         coins: 120,
         inventory: {
-            stacks: [inventoryStack],
-            getItemsByCategory: vi.fn(() => [])
+            stacks: [inventoryStack, launcherStack],
+            getItemsByCategory: vi.fn(category => (category === 'launcher' ? [launcherStack] : []))
         },
+        applyTransaction: vi.fn(transaction => {
+            const spentCoins = transaction.spentCoins ?? 0;
+            const earnedCoins = transaction.earnedCoins ?? 0;
+            const acquiredItemCount = transaction.acquiredItems?.length ?? 0;
+            const removedItemCount = transaction.removedItems?.length ?? 0;
+            sessionState.coins = sessionState.coins - spentCoins + earnedCoins;
+            return {
+                spentCoins,
+                earnedCoins,
+                acquiredItemCount,
+                removedItemCount
+            };
+        }),
         applySettlement: vi.fn(),
         getGameResultSummary: vi.fn(() => ({
             totalScore: 3260,
@@ -129,10 +162,27 @@ function createController(settlement = createSettlement()) {
         calculateFinalPrice: vi.fn((price, lucky, itemDiscount = 0) => Math.floor(price * (1 - Math.min(0.5, lucky + itemDiscount)))),
         calculateAppraisalValue: vi.fn(() => 40),
         calculateRepairCost: vi.fn(() => 8),
-        calculateDismantleCost: vi.fn(() => 40)
+        calculateDismantleCost: vi.fn(() => 40),
+        createRepairTransaction: vi.fn(launcher => ({
+            spentCoins: 8,
+            earnedCoins: 0,
+            requiredItems: [launcher]
+        })),
+        createDismantleTransaction: vi.fn(rocketItem => ({
+            spentCoins: 40,
+            earnedCoins: 0,
+            removedItems: [rocketItem],
+            acquiredItems: [{ uid: 'enhanced_part' }]
+        })),
+        drawBlackMarketGacha: vi.fn(type => ({
+            spentCoins: type === 'premium' ? 500 : 100,
+            earnedCoins: 0,
+            acquiredItems: [{ uid: `${type}_item` }]
+        }))
     };
     const gameRecordTracker = {
-        recordFlightResult: vi.fn(() => ['total_launches', 'total_score'])
+        recordFlightResult: vi.fn(() => ['total_launches', 'total_score']),
+        recordTransaction: vi.fn(() => ['total_spent_coins'])
     };
     const achievementTracker = {
         evaluateAchievements: vi.fn(() => [{ achievementId: 'stat_launches', tier: 3, value: 20 }])
@@ -150,6 +200,7 @@ function createController(settlement = createSettlement()) {
         showFacilityScreen: vi.fn(),
         setFacilityActionHandler: vi.fn(),
         setFacilityDepartHandler: vi.fn(),
+        updateFacilityCredits: vi.fn(),
         showBuildScreen: vi.fn()
     };
     const worldRenderer = {
@@ -319,5 +370,96 @@ describe('GameController', () => {
         });
         expect(context.uiController.setFacilityActionHandler).toHaveBeenCalled();
         expect(context.uiController.setFacilityDepartHandler).toHaveBeenCalled();
+    });
+
+    it('applies Trading Post buy transactions and refreshes the facility view', () => {
+        context.currentSector.luckyDiscountRate = 0.2;
+        context.controller.enterFacility('TRADING_POST');
+
+        const delta = context.controller.handleFacilityAction('buy', { uid: 'stock_item' });
+
+        expect(context.sessionState.applyTransaction).toHaveBeenCalledWith({
+            spentCoins: 40,
+            earnedCoins: 0,
+            acquiredItems: [expect.objectContaining({ uid: 'stock_item' })]
+        });
+        expect(delta).toMatchObject({
+            spentCoins: 40,
+            earnedCoins: 0,
+            acquiredItemCount: 1,
+            removedItemCount: 0
+        });
+        expect(context.gameRecordTracker.recordTransaction).toHaveBeenCalledWith(delta, {
+            currentCoins: 80
+        });
+        expect(context.achievementTracker.evaluateAchievements).toHaveBeenLastCalledWith({
+            source: 'game_record',
+            keys: ['total_spent_coins']
+        });
+        expect(context.uiController.updateFacilityCredits).toHaveBeenCalledWith(80);
+
+        const refreshedView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
+        expect(refreshedView.sections[0].entries).toEqual([]);
+    });
+
+    it('applies Trading Post sell transactions from an inventory stack', () => {
+        context.controller.enterFacility('TRADING_POST');
+
+        const delta = context.controller.handleFacilityAction('sell', { uid: 'stack_sell' });
+
+        expect(context.sessionState.applyTransaction).toHaveBeenCalledWith({
+            spentCoins: 0,
+            earnedCoins: 40,
+            removedItems: [expect.objectContaining({ uid: 'sell_item' })]
+        });
+        expect(context.gameRecordTracker.recordTransaction).toHaveBeenCalledWith(delta, {
+            currentCoins: 160
+        });
+        expect(context.uiController.updateFacilityCredits).toHaveBeenCalledWith(160);
+    });
+
+    it('delegates Repair Dock repair and dismantle transactions', () => {
+        const rocketItem = {
+            uid: 'rocket_item',
+            getViewData: vi.fn(() => ({
+                uid: 'rocket_item',
+                id: 'rocket_item',
+                name: 'Current Rocket',
+                category: 'rocket',
+                stats: {}
+            }))
+        };
+        context.controller.currentRocket = { rocketItem };
+        context.currentSector.luckyDiscountRate = 0.2;
+        context.controller.enterFacility('REPAIR_DOCK');
+
+        context.controller.handleFacilityAction('repair', { uid: 'launcher_damaged' });
+        context.controller.handleFacilityAction('dismantle', { uid: 'rocket_item' });
+
+        expect(context.economySystem.createRepairTransaction).toHaveBeenCalledWith(
+            expect.objectContaining({ uid: 'launcher_damaged' }),
+            0.2
+        );
+        expect(context.economySystem.createDismantleTransaction).toHaveBeenCalledWith(rocketItem, 0, 0.2);
+        const refreshedView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
+        expect(refreshedView.sections[1].entries).toEqual([]);
+    });
+
+    it('delegates Black Market premium transactions', () => {
+        context.currentSector.luckyDiscountRate = 0.2;
+        context.controller.enterFacility('BLACK_MARKET');
+
+        context.controller.handleFacilityAction('buy_premium', { uid: 'black_market_premium' });
+
+        expect(context.economySystem.drawBlackMarketGacha).toHaveBeenCalledWith(
+            'premium',
+            context.sessionState,
+            0.2
+        );
+        expect(context.sessionState.applyTransaction).toHaveBeenCalledWith({
+            spentCoins: 500,
+            earnedCoins: 0,
+            acquiredItems: [expect.objectContaining({ uid: 'premium_item' })]
+        });
     });
 });

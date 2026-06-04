@@ -50,18 +50,19 @@
             - 施設画面の説明、セクション名、ボタン名、空表示文言は `GameDataRepository.getUiText()` で UI resource から取得する。
         2. **表示制御**: `uiController.showFacilityScreen(type, data)` を実行。
         3. **ハンドラ登録**: `uiController` を通じて、施設内ボタン（Buy, Sell, Repair 等）と `handleFacilityAction` を紐付ける。
-    - **段階実装**: 施設入場時の表示データ接続を先に実装し、取引実行による資産反映は `handleFacilityAction()` の実装タスクで接続する。
+    - Trading Post の販売在庫は入場時に生成し、取引後の再表示では同じ在庫状態を使用する。
 
 - **`handleFacilityAction(action: string, context: object): void`**
     - 施設内での具体的な操作を処理する。
     - **内部挙動**:
-        - `action === 'buy'`: 施設サービスが返した取引結果を `sessionState.applyTransaction(transaction)` へ渡す。
-        - `action === 'repair'`: 修理費を含む取引結果を `sessionState.applyTransaction(transaction)` へ渡し、指定されたランチャーに対し耐久度加算を実行。
-        - **`action === 'dismantle'`**: 
-            - `EconomySystem.dismantleAndEnhance(this.currentRocket)` を実行。
-            - 返却された取引結果を `sessionState.applyTransaction(transaction)` へ渡し、**`this.currentRocket = null`** を実行してクリアする。
-        - アクションごとに `uiController.updateFacilityCredits` 等を呼び出し表示を更新する。
+        - Trading Post の `buy`: 入場時に生成した販売在庫から対象 item を取得し、購入価格と取得 item を含む `TransactionResult` を作成する。取引成功後は販売在庫から対象 item を除外する。
+        - Trading Post の `sell`: inventory stack から売却対象 item を取得し、査定額と削除 item を含む `TransactionResult` を作成する。
+        - Repair Dock の `repair`: 指定された launcher を取得し、`EconomySystem.createRepairTransaction()` が返す `TransactionResult` を使用する。
+        - Repair Dock の `dismantle`: 現在の RocketItem を対象に `EconomySystem.createDismantleTransaction()` が返す `TransactionResult` を使用する。取引成功後は **`this.currentRocket = null`** を実行し、同一滞在中の解体回数を更新する。
+        - Black Market の `buy_normal` / `buy_premium`: `EconomySystem.drawBlackMarketGacha()` が返す `TransactionResult` を使用する。
+        - 作成した `TransactionResult` は `sessionState.applyTransaction(transaction)` へ渡す。支払い、item 追加・削除、施設固有の `onCommit` callback 実行は `SessionState` 側で一括反映する。
         - `applyTransaction()` が返す `TransactionDelta` を `GameRecordTracker` へ反映し、更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
+        - 取引後は施設画面の coin 表示を更新し、同じ施設の表示データを再生成して画面を更新する。
 
 - **`leaveFacility(): void`**
     - 施設を出発し、次セクターへ向かう。
