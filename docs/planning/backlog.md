@@ -59,7 +59,7 @@
         - [x] Repair Dock の修理、解体、強化
     - [ ] GameRecordTracker / RankTracker / AchievementTracker / FlightRecorder / StorySystem
         - [x] GameRecordTracker
-        - [ ] RankTracker
+        - [x] RankTracker
         - [ ] AchievementTracker
         - [ ] FlightRecorder
         - [ ] StorySystem
@@ -92,7 +92,7 @@
     - [x] アイテム回収判定
 - [ ] 記録・永続データ系を実装する
     - [x] GameRecordTracker
-    - [ ] RankTracker
+    - [x] RankTracker
     - [ ] AchievementTracker
     - [ ] FlightRecorder
     - [ ] StorySystem

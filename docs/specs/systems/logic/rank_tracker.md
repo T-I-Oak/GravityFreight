@@ -22,7 +22,7 @@
         2. `GameDataRepository.getSavedRankData(migrationMap)` を呼び出す。
 
 ### ランキング更新 (Ranking Update)
-- **`recordGameResult(gameResult: GameResultSummary): void`**
+- **`recordGameResult(gameResult: GameResultSummary): RankUpdateResult`**
     - 契約終了時のゲームリザルトを、ランキングデータへ反映する。
     - **呼び出しタイミング**: 契約終了が確定し、ゲームリザルトを表示する時点。
     - **内部挙動**:
@@ -30,6 +30,19 @@
         2. `Score` / `Sector` / `Collected` の各ランキングへ反映する。
         3. 直近のゲーム1プレイ結果へ反映する。
         4. `GameDataRepository.setSavedRankData(data)` で永続化する。
+        5. 追加された記録のカテゴリ別順位を返す。Top20 圏外の場合は該当順位を `null` とする。
+
+- **`getRanking(category: 'score' | 'sector' | 'collected'): GamePlayResult[]`**
+    - 指定カテゴリの Top20 を表示用に返す。
+    - `score` は `score` 降順、`sector` は `reachedSector` 降順、`collected` は `collectedItemCount` 降順で並べる。
+    - 同値の場合は `createdAt` が新しい記録を上位にする。
+
+- **`getRecentResults(): GamePlayResult[]`**
+    - 直近20件のゲーム1プレイ結果を `createdAt` 降順で返す。
+
+- **`getRankData(): RankData`**
+    - 現在保持しているランキング保存データを返す。
+    - 呼び出し側が内部状態を変更できないよう、防御的コピーを返す。
 
 ## 3. データ構造定義 (Data Structures)
 
@@ -43,6 +56,16 @@
   completedSectors: number,
   reachedSector: number,
   collectedItemCount: number
+}
+```
+
+### RankUpdateResult
+追加された `GamePlayResult` のカテゴリ別順位。
+```javascript
+{
+  scoreRank: number | null,
+  sectorRank: number | null,
+  collectedRank: number | null
 }
 ```
 
