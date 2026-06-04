@@ -2098,6 +2098,10 @@ main.theme-printing.impact {
 
 /* Data Row Visuals: Context-specific for reports */
 .SplitRow.data-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 7ch 7ch;
+    column-gap: var(--space-unit);
+    align-items: center;
     font-size: 14px; /* 全体でフォントサイズを指定 */
     padding: 8px 0;
     border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
@@ -2105,11 +2109,27 @@ main.theme-printing.impact {
 
 .SplitRow.data-row .report-data-label {
     opacity: 0.7;
+    white-space: nowrap;
 }
 
 .SplitRow.data-row .report-data-value {
     font-family: 'Courier Prime', monospace;
     font-weight: 700;
+    text-align: right;
+}
+
+.SplitRow.data-row .report-data-value.score {
+    justify-self: end;
+}
+
+.SplitRow.data-row .report-data-value.coin {
+    justify-self: end;
+}
+
+@media screen and (max-width: 600px) {
+    .SplitRow.data-row .report-data-label {
+        white-space: normal;
+    }
 }
 
 /* Bonus Item Container: Indented list for rewards */
