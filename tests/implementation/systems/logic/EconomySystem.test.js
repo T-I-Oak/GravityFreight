@@ -148,7 +148,7 @@ describe('EconomySystem', () => {
         });
     });
 
-    it('settles a cleared delivery with facility reward, collected coins, coin bonus, and lucky discount', () => {
+    it('settles a cleared delivery with delivery bonus, collected coins, coin bonus, and lucky discount', () => {
         const cargo = new Item('cargo_safe', repository);
         const lucky = new Item('cargo_lucky', repository);
         const collectedCoin = new Item('coin_100', repository);
@@ -179,8 +179,8 @@ describe('EconomySystem', () => {
         expect(settlement.lostToTarget).toBeNull();
         expect(settlement.entries).toEqual([
             { label: 'Flight Duration', score: 12 },
-            { label: 'TRADING POST', score: 2000, coin: 20 },
-            { label: '通商物資', score: 1500, coin: 300 },
+            { label: 'Goal Bonus', score: 2000, coin: 20 },
+            { label: 'Delivery Bonus', score: 1500, coin: 300 },
             { label: 'Collected Coins', coin: 100 }
         ]);
         expect(settlement.itemReport).toHaveLength(3);
@@ -259,7 +259,7 @@ describe('EconomySystem', () => {
         expect(settlement.itemReport).toHaveLength(1);
         expect(settlement.itemReport[0].item.count).toBe(2);
         expect(settlement.entries).toContainEqual({
-            label: '通商物資',
+            label: 'Delivery Bonus',
             score: 3000,
             coin: 300
         });

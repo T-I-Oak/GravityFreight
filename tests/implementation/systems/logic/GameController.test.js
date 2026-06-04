@@ -12,7 +12,7 @@ function createSettlement(overrides = {}) {
         flightTicks: 260,
         entries: [
             { label: 'Flight Duration', score: 260 },
-            { label: 'Trading Post', score: 3000, coin: 30 }
+            { label: 'Goal Bonus', score: 3000, coin: 30 }
         ],
         itemReport: [],
         acquiredItems: [{ id: 'bonus_item' }],

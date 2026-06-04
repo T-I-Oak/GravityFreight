@@ -67,6 +67,30 @@ describe('SettlementCalculator', () => {
         expect(settlement.totalCoins).toBe(420);
     });
 
+    it('combines matched and unmatched delivery rewards into one delivery bonus entry', () => {
+        const calculator = new SettlementCalculator(repository, lotteryService);
+        const bonusCoin = new Item('coin_200', repository);
+        lotteryService.drawLottery.mockReturnValue([bonusCoin]);
+
+        const settlement = calculator.calculate({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        }, {
+            ticks: 12,
+            heldCargo: [
+                new Item('cargo_safe', repository),
+                new Item('cargo_normal', repository)
+            ],
+            rocketItem: createRocketItem()
+        }, session);
+
+        expect(settlement.entries).toEqual([
+            { label: 'Flight Duration', score: 12 },
+            { label: 'Goal Bonus', score: 2000, coin: 20 },
+            { label: 'Delivery Bonus', score: 1500, coin: 310 }
+        ]);
+    });
+
     it('settles crash insurance from RocketItem composition only', () => {
         const calculator = new SettlementCalculator(repository, lotteryService);
         const rocketItem = createRocketItem(['mod_insurance']);

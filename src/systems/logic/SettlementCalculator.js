@@ -31,7 +31,7 @@ class SettlementCalculator {
             totalScore += facility.rewardScore;
             totalCoins += facility.rewardCoins;
             entries.push({
-                label: facility.name,
+                label: 'Goal Bonus',
                 score: facility.rewardScore,
                 coin: facility.rewardCoins
             });
@@ -74,7 +74,7 @@ class SettlementCalculator {
         if (insurancePayout > 0) {
             totalCoins += insurancePayout;
             entries.push({
-                label: this.#createInsuranceLabel(flightData.rocketItem),
+                label: 'Insurance Payout',
                 coin: insurancePayout
             });
         }
@@ -128,8 +128,9 @@ class SettlementCalculator {
                     const score = balance.UNMATCHED_DELIVERY_REWARD.SCORE * cargoGroup.length;
                     result.coins += coins;
                     result.score += score;
-                    result.entries.push({
-                        label: cargo.name,
+                    this.#appendSettlementEntry(result.entries, {
+                        label: 'Delivery Bonus',
+                        score,
                         coin: coins
                     });
                     return;
@@ -155,14 +156,29 @@ class SettlementCalculator {
                 result.score += deliveryScore;
                 result.coins += deliveryCoins;
                 result.unlockedBranchId = facility.id;
-                result.entries.push({
-                    label: cargo.name,
+                this.#appendSettlementEntry(result.entries, {
+                    label: 'Delivery Bonus',
                     score: deliveryScore,
                     coin: deliveryCoins
                 });
             });
 
         return result;
+    }
+
+    #appendSettlementEntry(entries, nextEntry) {
+        const entry = entries.find(candidate => candidate.label === nextEntry.label);
+        if (!entry) {
+            entries.push({ ...nextEntry });
+            return;
+        }
+
+        if (nextEntry.score !== undefined) {
+            entry.score = (entry.score || 0) + nextEntry.score;
+        }
+        if (nextEntry.coin !== undefined) {
+            entry.coin = (entry.coin || 0) + nextEntry.coin;
+        }
     }
 
     #sumCoinValues(items) {
@@ -247,11 +263,6 @@ class SettlementCalculator {
         }
 
         return rocketItem.calculateAppraisalValue() * this.#countInsuranceModules(rocketItem);
-    }
-
-    #createInsuranceLabel(rocketItem) {
-        const count = this.#countInsuranceModules(rocketItem);
-        return count === 1 ? 'Insurance Payout' : `Insurance Payout [x${count}]`;
     }
 
     #countInsuranceModules(rocketItem) {

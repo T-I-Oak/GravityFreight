@@ -392,7 +392,7 @@ describe('UIComponents.generateFlightResultHTML', () => {
         const item = {
             id: 'cargo_safe',
             uid: 'stack_1',
-            name: '安全貨物',
+            name: '通商物資',
             category: 'cargo',
             description: '壊れにくい貨物。',
             count: 2,
@@ -414,7 +414,10 @@ describe('UIComponents.generateFlightResultHTML', () => {
             replay: { recorded: true, favorite: false, pending: false },
             entries: [
                 { label: 'Flight Duration', score: 260 },
-                { label: 'Trading Post Reward', score: 3000, coin: 30 }
+                { label: 'Goal Bonus', score: 3000, coin: 30 },
+                { label: 'Delivery Bonus', score: 1500, coin: 310 },
+                { label: 'Collected Coins', coin: 100 },
+                { label: 'Insurance Payout', coin: 120 }
             ],
             itemReport: [
                 { type: 'delivery', status: 'match', item, bonusItems: [bonus] }
@@ -428,9 +431,16 @@ describe('UIComponents.generateFlightResultHTML', () => {
         expect(html).toContain('3,260');
         expect(html).toContain('+3,000');
         expect(html).toContain('+30');
+        expect(html).toContain('<span class="report-data-label">Goal Bonus</span>');
+        expect(html).toContain('<span class="report-data-label">Delivery Bonus</span>');
+        expect(html).toContain('<span class="report-data-value score">+3,000</span>');
+        expect(html).toContain('<span class="report-data-value coin">+30</span>');
+        expect(html).toContain('<span class="report-data-value coin">+310</span>');
+        expect(html).toContain('<span class="report-data-label">Collected Coins</span>');
+        expect(html).toContain('<span class="report-data-label">Insurance Payout</span>');
         expect(html).toContain('RECORDED');
         expect(html).toContain('PROTECT RECORD');
-        expect(html).toContain('安全貨物');
+        expect(html).toContain('通商物資');
         expect(html).toContain('DELIVERY BONUS');
         expect(html).toContain('Power Booster');
         expect(html).toContain('母からの押し花');
