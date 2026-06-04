@@ -151,6 +151,206 @@
           "en": "DELIVERY BONUS"
         }
       }
+    },
+    "facility": {
+      "common": {
+        "credits": {
+          "lang-store": {
+            "ja": "CREDITS:",
+            "en": "CREDITS:"
+          }
+        },
+        "depart": {
+          "lang-store": {
+            "ja": "TO NEXT SECTOR",
+            "en": "TO NEXT SECTOR"
+          }
+        },
+        "emptyText": {
+          "lang-store": {
+            "ja": "NO ITEMS",
+            "en": "NO ITEMS"
+          }
+        },
+        "emptySubtext": {
+          "lang-store": {
+            "ja": "現在表示できる項目はありません。",
+            "en": "No items are currently available."
+          }
+        }
+      },
+      "actions": {
+        "buy": {
+          "lang-store": {
+            "ja": "BUY",
+            "en": "BUY"
+          }
+        },
+        "sell": {
+          "lang-store": {
+            "ja": "SELL",
+            "en": "SELL"
+          }
+        },
+        "repair": {
+          "lang-store": {
+            "ja": "REPAIR",
+            "en": "REPAIR"
+          }
+        },
+        "dismantle": {
+          "lang-store": {
+            "ja": "DISMANTLE",
+            "en": "DISMANTLE"
+          }
+        }
+      },
+      "descriptions": {
+        "tradingPost": {
+          "lang-store": {
+            "ja": "貨物取引やパーツの売買ができる中継基地。",
+            "en": "A relay station for cargo trading and parts exchange."
+          }
+        },
+        "repairDock": {
+          "lang-store": {
+            "ja": "発射台の整備やロケットの分解・強化を行える高度な設備。",
+            "en": "An advanced facility for launcher maintenance and rocket dismantling."
+          }
+        },
+        "blackMarket": {
+          "lang-store": {
+            "ja": "通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。",
+            "en": "A market for rare parts and enhanced one-off components."
+          }
+        }
+      },
+      "sections": {
+        "tradingPostBuy": {
+          "title": {
+            "lang-store": {
+              "ja": "販売中のアイテム",
+              "en": "Items for Sale"
+            }
+          },
+          "subtitle": {
+            "lang-store": {
+              "ja": "ステーションで販売されている高度なパーツです。",
+              "en": "Advanced parts available at this station."
+            }
+          }
+        },
+        "tradingPostSell": {
+          "title": {
+            "lang-store": {
+              "ja": "パーツの売却",
+              "en": "Sell Parts"
+            }
+          },
+          "subtitle": {
+            "lang-store": {
+              "ja": "不要なパーツを売却して資金を獲得できます。",
+              "en": "Sell unneeded parts to earn credits."
+            }
+          }
+        },
+        "repairDockRepair": {
+          "title": {
+            "lang-store": {
+              "ja": "発射台のメンテナンス",
+              "en": "Launcher Maintenance"
+            }
+          },
+          "subtitle": {
+            "lang-store": {
+              "ja": "ランチャーの使用回数を回復します。",
+              "en": "Restore launcher charges."
+            }
+          }
+        },
+        "repairDockDismantle": {
+          "title": {
+            "lang-store": {
+              "ja": "ロケットの分解・強化",
+              "en": "Dismantle and Enhance"
+            }
+          },
+          "subtitle": {
+            "lang-store": {
+              "ja": "機体を解体し、構成パーツをインベントリに回収します。",
+              "en": "Dismantle the rocket and recover its parts."
+            }
+          }
+        },
+        "repairDockReceived": {
+          "title": {
+            "lang-store": {
+              "ja": "強化済みパーツ（受取り）",
+              "en": "Enhanced Parts"
+            }
+          },
+          "subtitle": {
+            "lang-store": {
+              "ja": "分解・強化によって回収されたパーツの一覧。",
+              "en": "Parts recovered through dismantling and enhancement."
+            }
+          }
+        },
+        "blackMarketStock": {
+          "title": {
+            "lang-store": {
+              "ja": "闇セクターの仕入れ品",
+              "en": "Black Sector Stock"
+            }
+          },
+          "subtitle": {
+            "lang-store": {
+              "ja": "ドック滞在につき1回のみ、性能が強化された一点物を入手できます。",
+              "en": "Acquire enhanced one-off parts once per dock stay."
+            }
+          }
+        },
+        "blackMarketAcquired": {
+          "title": {
+            "lang-store": {
+              "ja": "獲得アイテム",
+              "en": "Acquired Items"
+            }
+          },
+          "subtitle": {
+            "lang-store": {
+              "ja": "購入によって獲得したアイテムが表示されます。",
+              "en": "Purchased items appear here."
+            }
+          }
+        }
+      },
+      "blackMarket": {
+        "normalName": {
+          "lang-store": {
+            "ja": "通常取引",
+            "en": "Standard Deal"
+          }
+        },
+        "normalDescription": {
+          "lang-store": {
+            "ja": "資産価値 100c 以上のアイテムを入手します。",
+            "en": "Acquire items worth at least 100c."
+          }
+        },
+        "premiumName": {
+          "lang-store": {
+            "ja": "プレミアム取引",
+            "en": "Premium Deal"
+          }
+        },
+        "premiumDescription": {
+          "lang-store": {
+            "ja": "資産価値 500c 以上のアイテムを入手します。",
+            "en": "Acquire items worth at least 500c."
+          }
+        }
+      }
     }
   }
 }

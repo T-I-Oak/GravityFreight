@@ -219,6 +219,14 @@
     - 画面固有の見出し、リプレイ状態、明細行、ボタン文言は `GameDataRepository.getUiText()` から取得する。
 - **境界**: アイテムカード自体の構造は `UIComponents` の責務であり、航行結果画面は配置と意味付けだけを担当する。
 
+### 4.7 Facility 生成
+- **メソッド**: `FacilityComponents.generateHTML(viewData)`
+- **責務**:
+    - 施設画面全体の HTML を生成する。
+    - `UIComponents.generateCardHTML` と `UIComponents.generatePlaceholderHTML` を組み合わせる。
+    - 施設メタ情報、セクション、取引候補、所持コインを `GameController` が作成した view data から描画する。
+- **境界**: 取引成立時の資産反映、記録・実績更新、施設固有の副作用は `GameController` / `EconomySystem` / `SessionState` の責務であり、Facility 生成処理は表示だけを担当する。
+
 ---
 
 ## 5. データ構造定義 (ItemViewData)

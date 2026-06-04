@@ -23,6 +23,7 @@ class GameController {
         this.worldRenderer = infrastructure.worldRenderer;
         this.currentSector = null;
         this.currentRocket = null;
+        this.repairDockDismantleCount = 0;
     }
 
     async handleNavigationEnd(result) {
@@ -57,6 +58,37 @@ class GameController {
         const viewData = this.#createFlightResultViewData(settlement, replayRecord, achievements);
         this.uiController.showResultScreen(viewData);
         return viewData;
+    }
+
+    confirmSettlement(settlement) {
+        if (this.currentSector) {
+            this.currentSector.luckyDiscountRate = settlement.luckyDiscountRate ?? 0;
+        }
+
+        if (settlement.status === 'cleared') {
+            this.enterFacility(settlement.destination);
+            return;
+        }
+
+        if (!this.checkGameOverAndStartEndSequence?.()) {
+            this.uiController.showBuildScreen?.();
+        }
+    }
+
+    enterFacility(type) {
+        const viewData = this.#createFacilityViewData(type);
+        this.uiController.showFacilityScreen(type, viewData);
+        this.uiController.setFacilityActionHandler?.((action, context) => this.handleFacilityAction(action, context));
+        this.uiController.setFacilityDepartHandler?.(() => this.leaveFacility());
+        return viewData;
+    }
+
+    handleFacilityAction(action, context) {
+        throw new Error(`[GameController] Facility action is not connected yet: ${action} (${context.uid})`);
+    }
+
+    leaveFacility() {
+        throw new Error('[GameController] Facility departure is not connected yet.');
     }
 
     #createFlightResultContext(settlement) {
@@ -130,6 +162,172 @@ class GameController {
             (text, [key, value]) => text.replaceAll(`{${key}}`, value),
             template
         );
+    }
+
+    #createFacilityViewData(type) {
+        const facility = this.gameDataRepository.getFacilityDefinition(type);
+        const luckyDiscount = this.currentSector?.luckyDiscountRate ?? 0;
+
+        return {
+            type,
+            name: facility.name,
+            icon: facility.icon,
+            themeClass: facility.className || FACILITY_THEME_CLASSES[type] || 'home',
+            description: this.#getFacilityText(type, 'descriptions'),
+            coins: this.sessionState.coins,
+            luckyDiscountRate: luckyDiscount,
+            creditsLabel: this.gameDataRepository.getUiText('facility.common.credits'),
+            departLabel: this.gameDataRepository.getUiText('facility.common.depart'),
+            sections: this.#createFacilitySections(type, luckyDiscount)
+        };
+    }
+
+    #createFacilitySections(type, luckyDiscount) {
+        if (type === 'TRADING_POST') {
+            return this.#createTradingPostSections(luckyDiscount);
+        }
+        if (type === 'REPAIR_DOCK') {
+            return this.#createRepairDockSections(luckyDiscount);
+        }
+        if (type === 'BLACK_MARKET') {
+            return this.#createBlackMarketSections(luckyDiscount);
+        }
+
+        throw new Error(`[GameController] Unknown facility type: ${type}`);
+    }
+
+    #createTradingPostSections(luckyDiscount) {
+        const stockEntries = this.economySystem.generateTradingPostStock(this.sessionState)
+            .map(stock => this.#createTradeEntry({
+                action: 'buy',
+                actionLabel: this.gameDataRepository.getUiText('facility.actions.buy'),
+                item: stock.item,
+                price: this.economySystem.calculateFinalPrice(stock.originalPrice, luckyDiscount, stock.itemDiscount),
+                discountRate: luckyDiscount + stock.itemDiscount
+            }));
+        const sellEntries = this.sessionState.inventory.stacks
+            .filter(stack => !['cargo', 'coin'].includes(stack.representative.category))
+            .map(stack => this.#createTradeEntry({
+                action: 'sell',
+                actionLabel: this.gameDataRepository.getUiText('facility.actions.sell'),
+                item: stack.representative,
+                price: this.economySystem.calculateAppraisalValue(stack.representative),
+                uid: stack.uid
+            }));
+
+        return [
+            this.#createFacilitySection('buy', 'tradingPostBuy', stockEntries),
+            this.#createFacilitySection('sell', 'tradingPostSell', sellEntries)
+        ];
+    }
+
+    #createRepairDockSections(luckyDiscount) {
+        const repairEntries = this.sessionState.inventory.getItemsByCategory('launcher')
+            .flatMap(stack => stack.items)
+            .filter(item => item.charges < item.maxCharges)
+            .map(item => this.#createTradeEntry({
+                action: 'repair',
+                actionLabel: this.gameDataRepository.getUiText('facility.actions.repair'),
+                item,
+                price: this.economySystem.calculateRepairCost(item, luckyDiscount)
+            }));
+        const rocketItem = this.currentRocket?.rocketItem;
+        const dismantleEntries = rocketItem ? [
+            this.#createTradeEntry({
+                action: 'dismantle',
+                actionLabel: this.gameDataRepository.getUiText('facility.actions.dismantle'),
+                item: rocketItem,
+                price: this.economySystem.calculateDismantleCost(this.repairDockDismantleCount, luckyDiscount)
+            })
+        ] : [];
+
+        return [
+            this.#createFacilitySection('repair', 'repairDockRepair', repairEntries),
+            this.#createFacilitySection('dismantle', 'repairDockDismantle', dismantleEntries),
+            this.#createFacilitySection('received', 'repairDockReceived', [])
+        ];
+    }
+
+    #createBlackMarketSections(luckyDiscount) {
+        const entries = [
+            this.#createMenuEntry(
+                'black_market_normal',
+                this.gameDataRepository.getUiText('facility.blackMarket.normalName'),
+                this.gameDataRepository.getUiText('facility.blackMarket.normalDescription'),
+                'black-market',
+                'buy_normal',
+                this.gameDataRepository.getUiText('facility.actions.buy'),
+                this.economySystem.calculateFinalPrice(100, luckyDiscount)
+            ),
+            this.#createMenuEntry(
+                'black_market_premium',
+                this.gameDataRepository.getUiText('facility.blackMarket.premiumName'),
+                this.gameDataRepository.getUiText('facility.blackMarket.premiumDescription'),
+                'black-market',
+                'buy_premium',
+                this.gameDataRepository.getUiText('facility.actions.buy'),
+                this.economySystem.calculateFinalPrice(500, luckyDiscount)
+            )
+        ];
+
+        return [
+            this.#createFacilitySection('black-market', 'blackMarketStock', entries),
+            this.#createFacilitySection('acquired', 'blackMarketAcquired', [])
+        ];
+    }
+
+    #createTradeEntry({ action, actionLabel, item, price, uid = item.uid, discountRate = 0 }) {
+        return {
+            action,
+            actionLabel,
+            uid,
+            item,
+            itemViewData: item.getViewData(),
+            price,
+            discountPercent: Math.round(Math.min(0.5, discountRate) * 100),
+            disabled: this.sessionState.coins < price
+        };
+    }
+
+    #createMenuEntry(id, name, description, category, action, actionLabel, price) {
+        return {
+            action,
+            actionLabel,
+            uid: id,
+            itemViewData: {
+                uid: id,
+                id,
+                name,
+                category,
+                description,
+                stats: {}
+            },
+            price,
+            discountPercent: 0,
+            disabled: this.sessionState.coins < price
+        };
+    }
+
+    #createFacilitySection(id, resourceKey, entries) {
+        return {
+            id,
+            title: this.gameDataRepository.getUiText(`facility.sections.${resourceKey}.title`),
+            subtitle: this.gameDataRepository.getUiText(`facility.sections.${resourceKey}.subtitle`),
+            entries,
+            emptyText: this.gameDataRepository.getUiText('facility.common.emptyText'),
+            emptySubtext: this.gameDataRepository.getUiText('facility.common.emptySubtext'),
+            themeClass: 'home'
+        };
+    }
+
+    #getFacilityText(type, group) {
+        const key = {
+            TRADING_POST: 'tradingPost',
+            REPAIR_DOCK: 'repairDock',
+            BLACK_MARKET: 'blackMarket'
+        }[type];
+
+        return this.gameDataRepository.getUiText(`facility.${group}.${key}`);
     }
 }
 

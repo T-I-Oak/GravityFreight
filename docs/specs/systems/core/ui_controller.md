@@ -122,10 +122,11 @@
     - 施設画面（交易所、整備工場、闇市場）を表示する。
     - **内部挙動**:
         1. **画面切り替え**: 現在の画面を隠し、対象の施設用コンテナを表示する。
-        2. **ヘッダー構築**: `UIComponents.generateFacilityBadgeHTML(type)` 等を用いて名称とアイコンをセットする。
-        3. **リスト構築**: `data.items` (StockItem[]) 等をループし、`UIComponents.generateCardHTML` を用いて在庫リストを構築する。
-        4. **割引表示**: `data.luckyDiscount` > 0 の場合、割引率（例: "20% OFF"）を示すバッジやラベルを表示する。
-        5. **所持金反映**: `data.coins` を表示エリアにセットする。
+        2. **HTML 生成**: `FacilityComponents.generateHTML(data)` で施設画面 HTML を生成し、`#facility-screen` に反映する。
+        3. **ヘッダー構築**: `data.name` / `data.icon` / `data.description` / `data.themeClass` を用いて名称、アイコン、説明、施設テーマを表示する。
+        4. **リスト構築**: `data.sections[].entries` をループし、`UIComponents.generateCardHTML` を用いて取引候補リストを構築する。
+        5. **割引表示**: `entry.discountPercent` > 0 の場合、割引率（例: "20% OFF"）を示すバッジを表示する。
+        6. **所持金反映**: `data.coins` を表示エリアにセットする。
 
 - **`updateFacilityCredits(value: number): void`**
     - 施設画面内の所持金表示を即座に更新する。

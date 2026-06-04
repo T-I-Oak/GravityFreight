@@ -50,6 +50,7 @@ describe('UIController', () => {
     beforeEach(() => {
         document.body.innerHTML = `
             <main id="flight-result-screen" hidden></main>
+            <main id="facility-screen" hidden></main>
             <header id="play-hud"></header>
             <section id="build-overlay"></section>
             <section id="launch-control"></section>
@@ -98,5 +99,62 @@ describe('UIController', () => {
         expect(() => new UIController({ gameDataRepository: repository })).toThrow(
             '[UIController] Required element not found: #flight-result-screen'
         );
+    });
+
+    it('renders a facility screen and registers facility handlers', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const actionHandler = vi.fn();
+        const departHandler = vi.fn();
+
+        controller.showFacilityScreen('TRADING_POST', {
+            name: 'TRADING POST',
+            icon: 'T',
+            themeClass: 'trading-post',
+            description: '貨物取引やパーツの売買ができる中継基地。',
+            coins: 120,
+            creditsLabel: 'CREDITS:',
+            departLabel: 'TO NEXT SECTOR',
+            sections: [
+                {
+                    id: 'buy',
+                    title: '販売中のアイテム',
+                    subtitle: 'ステーションで販売されている高度なパーツです。',
+                    entries: [
+                        {
+                            action: 'buy',
+                            actionLabel: 'BUY',
+                            uid: 'item_1',
+                            price: 40,
+                            discountPercent: 30,
+                            disabled: false,
+                            itemViewData: {
+                                uid: 'item_1',
+                                id: 'sensor_long',
+                                name: 'Long Sensor',
+                                category: 'logic',
+                                stats: {}
+                            }
+                        }
+                    ],
+                    emptyText: 'NO ITEMS',
+                    emptySubtext: '現在表示できる項目はありません。',
+                    themeClass: 'trading-post'
+                }
+            ]
+        });
+        controller.setFacilityActionHandler(actionHandler);
+        controller.setFacilityDepartHandler(departHandler);
+
+        document.querySelector('.facility-action-button').click();
+        document.querySelector('.facility-depart-button').click();
+
+        expect(document.querySelector('#facility-screen').hidden).toBe(false);
+        expect(document.querySelector('#flight-result-screen').hidden).toBe(true);
+        expect(document.querySelector('#facility-screen').textContent).toContain('TRADING POST');
+        expect(document.querySelector('#facility-screen').textContent).toContain('Long Sensor');
+        expect(document.querySelector('#facility-screen').textContent).toContain('120 c');
+        expect(actionHandler).toHaveBeenCalledWith('buy', { uid: 'item_1' });
+        expect(departHandler).toHaveBeenCalledTimes(1);
+        expect(soundController.playSE).toHaveBeenCalledTimes(2);
     });
 });

@@ -44,9 +44,13 @@
     - **内部挙動**:
         1. **データ準備**:
             - 交易所の場合、`EconomySystem.generateTradingPostStock(sessionState)` を実行。
-            - その他、施設ごとに必要な動的データ（整備リスト、ガチャメニュー等）を用意する。
+            - Trading Post は、販売在庫と inventory 内の売却候補を表示用データへ変換する。
+            - Repair Dock は、破損 launcher の修理候補と、現在の RocketItem の分解候補を表示用データへ変換する。
+            - Black Market は、100c / 500c 取引メニューを表示用データへ変換する。
+            - 施設画面の説明、セクション名、ボタン名、空表示文言は `GameDataRepository.getUiText()` で UI resource から取得する。
         2. **表示制御**: `uiController.showFacilityScreen(type, data)` を実行。
         3. **ハンドラ登録**: `uiController` を通じて、施設内ボタン（Buy, Sell, Repair 等）と `handleFacilityAction` を紐付ける。
+    - **段階実装**: 施設入場時の表示データ接続を先に実装し、取引実行による資産反映は `handleFacilityAction()` の実装タスクで接続する。
 
 - **`handleFacilityAction(action: string, context: object): void`**
     - 施設内での具体的な操作を処理する。

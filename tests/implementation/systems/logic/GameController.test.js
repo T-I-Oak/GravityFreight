@@ -23,6 +23,11 @@ function createSettlement(overrides = {}) {
 
 function createController(settlement = createSettlement()) {
     const gameDataRepository = {
+        getFacilityDefinition: vi.fn(type => ({
+            TRADING_POST: { name: 'TRADING POST', icon: 'T', className: 'trading-post' },
+            REPAIR_DOCK: { name: 'REPAIR DOCK', icon: 'R', className: 'repair-dock' },
+            BLACK_MARKET: { name: 'BLACK MARKET', icon: 'B', className: 'black-market' }
+        })[type]),
         getUiText: vi.fn(key => ({
             'flightResult.titles.cleared': 'SECTOR {sector} COMPLETED',
             'flightResult.titles.returned': 'ROCKET RECOVERED',
@@ -31,7 +36,36 @@ function createController(settlement = createSettlement()) {
             'flightResult.titles.complete': 'FLIGHT COMPLETE',
             'flightResult.actions.toFacility': 'TO {facility}',
             'flightResult.actions.backToBase': 'BACK TO BASE',
-            'flightResult.actions.continue': 'CONTINUE'
+            'flightResult.actions.continue': 'CONTINUE',
+            'facility.common.credits': 'CREDITS:',
+            'facility.common.depart': 'TO NEXT SECTOR',
+            'facility.common.emptyText': 'NO ITEMS',
+            'facility.common.emptySubtext': 'No items are currently available.',
+            'facility.actions.buy': 'BUY',
+            'facility.actions.sell': 'SELL',
+            'facility.actions.repair': 'REPAIR',
+            'facility.actions.dismantle': 'DISMANTLE',
+            'facility.descriptions.tradingPost': 'Trading post description',
+            'facility.descriptions.repairDock': 'Repair dock description',
+            'facility.descriptions.blackMarket': 'Black market description',
+            'facility.sections.tradingPostBuy.title': 'Items for Sale',
+            'facility.sections.tradingPostBuy.subtitle': 'Advanced parts available at this station.',
+            'facility.sections.tradingPostSell.title': 'Sell Parts',
+            'facility.sections.tradingPostSell.subtitle': 'Sell unneeded parts to earn credits.',
+            'facility.sections.repairDockRepair.title': 'Launcher Maintenance',
+            'facility.sections.repairDockRepair.subtitle': 'Restore launcher charges.',
+            'facility.sections.repairDockDismantle.title': 'Dismantle and Enhance',
+            'facility.sections.repairDockDismantle.subtitle': 'Dismantle the rocket and recover its parts.',
+            'facility.sections.repairDockReceived.title': 'Enhanced Parts',
+            'facility.sections.repairDockReceived.subtitle': 'Parts recovered through dismantling and enhancement.',
+            'facility.sections.blackMarketStock.title': 'Black Sector Stock',
+            'facility.sections.blackMarketStock.subtitle': 'Acquire enhanced one-off parts once per dock stay.',
+            'facility.sections.blackMarketAcquired.title': 'Acquired Items',
+            'facility.sections.blackMarketAcquired.subtitle': 'Purchased items appear here.',
+            'facility.blackMarket.normalName': 'Standard Deal',
+            'facility.blackMarket.normalDescription': 'Acquire items worth at least 100c.',
+            'facility.blackMarket.premiumName': 'Premium Deal',
+            'facility.blackMarket.premiumDescription': 'Acquire items worth at least 500c.'
         })[key])
     };
     const currentRocket = {
@@ -43,8 +77,27 @@ function createController(settlement = createSettlement()) {
         }))
     };
     const currentSector = { luckyDiscountRate: 0 };
+    const inventoryStack = {
+        uid: 'stack_sell',
+        representative: {
+            uid: 'sell_item',
+            category: 'module',
+            getViewData: vi.fn(() => ({
+                uid: 'sell_item',
+                id: 'mod_capacity',
+                name: 'Capacity Module',
+                category: 'module',
+                stats: {}
+            }))
+        }
+    };
     const sessionState = {
         sectorNumber: 3,
+        coins: 120,
+        inventory: {
+            stacks: [inventoryStack],
+            getItemsByCategory: vi.fn(() => [])
+        },
         applySettlement: vi.fn(),
         getGameResultSummary: vi.fn(() => ({
             totalScore: 3260,
@@ -56,7 +109,27 @@ function createController(settlement = createSettlement()) {
         }))
     };
     const economySystem = {
-        calculateSettlement: vi.fn(() => settlement)
+        calculateSettlement: vi.fn(() => settlement),
+        generateTradingPostStock: vi.fn(() => [
+            {
+                item: {
+                    uid: 'stock_item',
+                    getViewData: vi.fn(() => ({
+                        uid: 'stock_item',
+                        id: 'sensor_long',
+                        name: 'Long Sensor',
+                        category: 'logic',
+                        stats: {}
+                    }))
+                },
+                originalPrice: 80,
+                itemDiscount: 0.3
+            }
+        ]),
+        calculateFinalPrice: vi.fn((price, lucky, itemDiscount = 0) => Math.floor(price * (1 - Math.min(0.5, lucky + itemDiscount)))),
+        calculateAppraisalValue: vi.fn(() => 40),
+        calculateRepairCost: vi.fn(() => 8),
+        calculateDismantleCost: vi.fn(() => 40)
     };
     const gameRecordTracker = {
         recordFlightResult: vi.fn(() => ['total_launches', 'total_score'])
@@ -73,7 +146,11 @@ function createController(settlement = createSettlement()) {
         getStoryStatus: vi.fn(() => [{ id: 'T', type: 'T', isUnread: true }])
     };
     const uiController = {
-        showResultScreen: vi.fn()
+        showResultScreen: vi.fn(),
+        showFacilityScreen: vi.fn(),
+        setFacilityActionHandler: vi.fn(),
+        setFacilityDepartHandler: vi.fn(),
+        showBuildScreen: vi.fn()
     };
     const worldRenderer = {
         disableSonar: vi.fn(),
@@ -201,5 +278,46 @@ describe('GameController', () => {
         await expect(context.controller.handleNavigationEnd({ type: 'arc' }))
             .rejects
             .toThrow('[GameController] currentRocket and currentSector are required.');
+    });
+
+    it('confirms cleared settlement and enters the destination facility with real display data', () => {
+        const settlement = createSettlement({ luckyDiscountRate: 0.2 });
+
+        context.controller.confirmSettlement(settlement);
+
+        expect(context.currentSector.luckyDiscountRate).toBe(0.2);
+        expect(context.economySystem.generateTradingPostStock).toHaveBeenCalledWith(context.sessionState);
+        expect(context.uiController.showFacilityScreen).toHaveBeenCalledWith(
+            'TRADING_POST',
+            expect.objectContaining({
+                name: 'TRADING POST',
+                icon: 'T',
+                themeClass: 'trading-post',
+                description: 'Trading post description',
+                coins: 120,
+                luckyDiscountRate: 0.2
+            })
+        );
+        const viewData = context.uiController.showFacilityScreen.mock.calls[0][1];
+        expect(viewData.sections[0].id).toBe('buy');
+        expect(viewData.sections[0].title).toBe('Items for Sale');
+        expect(viewData.sections[0].entries[0]).toMatchObject({
+            action: 'buy',
+            actionLabel: 'BUY',
+            uid: 'stock_item',
+            price: 40,
+            discountPercent: 50,
+            disabled: false
+        });
+        expect(viewData.sections[1].id).toBe('sell');
+        expect(viewData.sections[1].entries[0]).toMatchObject({
+            action: 'sell',
+            actionLabel: 'SELL',
+            uid: 'stack_sell',
+            price: 40,
+            disabled: false
+        });
+        expect(context.uiController.setFacilityActionHandler).toHaveBeenCalled();
+        expect(context.uiController.setFacilityDepartHandler).toHaveBeenCalled();
     });
 });
