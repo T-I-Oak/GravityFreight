@@ -22,6 +22,18 @@ function createSettlement(overrides = {}) {
 }
 
 function createController(settlement = createSettlement()) {
+    const gameDataRepository = {
+        getUiText: vi.fn(key => ({
+            'flightResult.titles.cleared': 'SECTOR {sector} COMPLETED',
+            'flightResult.titles.returned': 'ROCKET RECOVERED',
+            'flightResult.titles.crashed': 'SHIP CRASHED',
+            'flightResult.titles.lost': 'LOST IN SPACE',
+            'flightResult.titles.complete': 'FLIGHT COMPLETE',
+            'flightResult.actions.toFacility': 'TO {facility}',
+            'flightResult.actions.backToBase': 'BACK TO BASE',
+            'flightResult.actions.continue': 'CONTINUE'
+        })[key])
+    };
     const currentRocket = {
         getFlightResult: vi.fn(() => ({
             ticks: 260,
@@ -76,7 +88,8 @@ function createController(settlement = createSettlement()) {
         flightRecorder,
         storySystem,
         uiController,
-        worldRenderer
+        worldRenderer,
+        gameDataRepository
     });
     controller.currentRocket = currentRocket;
     controller.currentSector = currentSector;
@@ -92,7 +105,8 @@ function createController(settlement = createSettlement()) {
         flightRecorder,
         storySystem,
         uiController,
-        worldRenderer
+        worldRenderer,
+        gameDataRepository
     };
 }
 

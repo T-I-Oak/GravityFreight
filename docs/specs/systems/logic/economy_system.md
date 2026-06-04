@@ -58,9 +58,9 @@
             - それ以外（画面外逸脱等） → `'lost'`, `destination = null`
         1. **基本明細（SettlementEntry）の作成**:
             - 報酬の発生源ごとに `entries` を追加する。不要な 0 はプロパティごと省略する。
-            - **Flight Duration**: Label: `"Flight Duration"`, Score: `flightData.ticks`（Coin は省略）
-            - **Goal Bonus**: 施設到達報酬。Label: `"Goal Bonus"`、Score/Coin は到達施設の `rewardScore` / `rewardCoins`。
-            - **拾得コイン**: Coin: `totalCollected`, Label: `"Collected Coins"`（Score は省略）
+            - **Flight Duration**: Label は UI resource `flightResult.entries.flightDuration` を使用し、Score: `flightData.ticks`（Coin は省略）
+            - **Goal Bonus**: 施設到達報酬。Label は UI resource `flightResult.entries.goalBonus` を使用し、Score/Coin は到達施設の `rewardScore` / `rewardCoins`。
+            - **拾得コイン**: Label は UI resource `flightResult.entries.collectedCoins` を使用し、Coin: `totalCollected`（Score は省略）
         2. **アイテム・配送結果の集計とレポート作成**:
             - `flightData.heldCargo` を精査し、貨物・コイン・パーツ等を分類して `itemReport` を構築する。
             - **スタック集約ルール**: アイテムを一つずつ取り出し、既存の各 `StackedItem` に対して `add(item)` を実行する。`true` が返れば集約完了とし、すべてのスタックが `false` を返した場合のみ新規スタックを生成する。
@@ -68,11 +68,11 @@
                 - 同一の貨物を集約した `ItemReportEntry (type: 'delivery', status: 'match')` を作成する（`StackedItem` の集約ルールを適用）。
                 - そのグループに属する全貨物から発生した **全ボーナスアイテム** を、`session.sectorNumber` を参照した `drawLottery()` で抽選し、`StackedItem` のルールに従って集約し、`bonusItems` に格納する。
                 - ボーナス実体のうち、コインは `totalCoins` に加算し、パーツ類は `acquiredItems` に追加する。
-                - `entries` に Label: `"Delivery Bonus"`、Score/Coin: 配送成功報酬 + ボーナスコインを追加する。
+                - `entries` に UI resource `flightResult.entries.deliveryBonus` の Label で、Score/Coin: 配送成功報酬 + ボーナスコインを追加する。
                 - **物語解放**: `unlockedBranchId` に対象施設のブランチ ID を設定する。
             - **不一致配送（Unmatched）**:
                 - `ItemReportEntry (type: 'delivery', status: 'unmatched')` を作成。
-                - 不一致配送報酬は Label: `"Delivery Bonus"` の明細へ加算する。配送成功報酬がある場合は同じ明細に合算する。
+                - 不一致配送報酬は UI resource `flightResult.entries.deliveryBonus` の明細へ加算する。配送成功報酬がある場合は同じ明細に合算する。
             - **その他回収物（Other）**:
                 - 配送以外で拾った全アイテムに対し、`StackedItem` のルールに従って集計・スタック化を行う。
                 - 各スタックに対し `ItemReportEntry (type: 'other')` を作成する。
@@ -84,7 +84,7 @@
             - `status` が `'crashed'` または `'lost'` の場合のみ実行。
             - `RocketItem` 内に `mod_insurance` 装備時、その個数を $N$ とする。
             - **計算**: `RocketItem` 内の構成パーツ（chassis / logic / modules）の査定価格合計 × N
-            - **明細追加**: `entries` に Label: `"Insurance Payout"`、Coin: `算出額` を追加する（Score は省略）。複数モジュールによる倍率は算出額に反映し、Label には個数を含めない。
+            - **明細追加**: `entries` に UI resource `flightResult.entries.insurancePayout` の Label で、Coin: `算出額` を追加する（Score は省略）。複数モジュールによる倍率は算出額に反映し、Label には個数を含めない。
         5. **幸運の導きの集計**:
             - `status === 'cleared'` の場合、`heldCargo` 内の `cargo_lucky` の個数をカウントし、`luckyDiscountRate` (個数 * 0.1) を設定する。
         6. 最終的な資産増減およびステータスを含む `SettlementResult` を生成して返す。

@@ -169,7 +169,8 @@
 
 ## 4. コンポーネント生成メソッド (Generation Methods)
 
-各コンポーネントは `UIComponents.js` を通じて動的に生成することを推奨する。
+共通部品は `UIComponents.js` を通じて動的に生成することを推奨する。
+画面全体または画面固有の複合表示は、責務が膨らまないように画面別の生成クラスへ分離する。
 
 ### 4.1 Item Card 生成
 - **メソッド**: `UIComponents.generateCardHTML(itemViewData, options)`
@@ -209,6 +210,14 @@
 - **メソッド**: `UIComponents.generateFacilityBadgeHTML(type)`
 - **主要引数**:
     - `type` (string): 施設タイプ（`TRADING_POST`, `REPAIR_DOCK`, `BLACK_MARKET`）。
+
+### 4.6 Flight Result 生成
+- **メソッド**: `FlightResultComponents.generateHTML(viewData, gameDataRepository)`
+- **責務**:
+    - 航行結果画面全体の HTML を生成する。
+    - `UIComponents.generateCardHTML` / `UIComponents.generateStoryCardHTML` などの共通部品を組み合わせる。
+    - 画面固有の見出し、リプレイ状態、明細行、ボタン文言は `GameDataRepository.getUiText()` から取得する。
+- **境界**: アイテムカード自体の構造は `UIComponents` の責務であり、航行結果画面は配置と意味付けだけを担当する。
 
 ---
 

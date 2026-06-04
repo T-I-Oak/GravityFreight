@@ -25,13 +25,16 @@ class SettlementCalculator {
         let totalCoins = 0;
         let unlockedBranchId = null;
 
-        entries.push({ label: 'Flight Duration', score: flightData.ticks || 0 });
+        entries.push({
+            label: this.gameDataRepository.getUiText('flightResult.entries.flightDuration'),
+            score: flightData.ticks || 0
+        });
 
         if (facility) {
             totalScore += facility.rewardScore;
             totalCoins += facility.rewardCoins;
             entries.push({
-                label: 'Goal Bonus',
+                label: this.gameDataRepository.getUiText('flightResult.entries.goalBonus'),
                 score: facility.rewardScore,
                 coin: facility.rewardCoins
             });
@@ -66,7 +69,10 @@ class SettlementCalculator {
         );
 
         if (collectedCoin > 0) {
-            entries.push({ label: 'Collected Coins', coin: collectedCoin });
+            entries.push({
+                label: this.gameDataRepository.getUiText('flightResult.entries.collectedCoins'),
+                coin: collectedCoin
+            });
         }
 
         const lostToTarget = this.#createLostToTarget(status, collision, heldItems, flightData.rocketItem);
@@ -74,7 +80,7 @@ class SettlementCalculator {
         if (insurancePayout > 0) {
             totalCoins += insurancePayout;
             entries.push({
-                label: 'Insurance Payout',
+                label: this.gameDataRepository.getUiText('flightResult.entries.insurancePayout'),
                 coin: insurancePayout
             });
         }
@@ -129,7 +135,7 @@ class SettlementCalculator {
                     result.coins += coins;
                     result.score += score;
                     this.#appendSettlementEntry(result.entries, {
-                        label: 'Delivery Bonus',
+                        label: this.gameDataRepository.getUiText('flightResult.entries.deliveryBonus'),
                         score,
                         coin: coins
                     });
@@ -157,7 +163,7 @@ class SettlementCalculator {
                 result.coins += deliveryCoins;
                 result.unlockedBranchId = facility.id;
                 this.#appendSettlementEntry(result.entries, {
-                    label: 'Delivery Bonus',
+                    label: this.gameDataRepository.getUiText('flightResult.entries.deliveryBonus'),
                     score: deliveryScore,
                     coin: deliveryCoins
                 });

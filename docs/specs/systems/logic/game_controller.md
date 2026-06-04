@@ -138,6 +138,7 @@
         4. **演出完了待機**: `await` により演出完了を待機する。
         5. **画面遷移**:
             - `settlement`、リプレイ保存状態、実績通知、ストーリー状態から航行結果表示用 view data を生成する。
+            - 航行結果タイトルと遷移ボタン文言は `GameDataRepository.getUiText()` で UI resource から取得する。セクター番号や施設名が必要な文言は取得後に `{sector}` / `{facility}` を置換する。
             - `uiController.showResultScreen(viewData)` を呼び出す。
 
 - **`handleMailClick(index: number): void`**

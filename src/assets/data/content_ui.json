@@ -1,0 +1,156 @@
+{
+  "ui": {
+    "flightResult": {
+      "titles": {
+        "cleared": {
+          "lang-store": {
+            "ja": "SECTOR {sector} COMPLETED",
+            "en": "SECTOR {sector} COMPLETED"
+          }
+        },
+        "returned": {
+          "lang-store": {
+            "ja": "ROCKET RECOVERED",
+            "en": "ROCKET RECOVERED"
+          }
+        },
+        "crashed": {
+          "lang-store": {
+            "ja": "SHIP CRASHED",
+            "en": "SHIP CRASHED"
+          }
+        },
+        "lost": {
+          "lang-store": {
+            "ja": "LOST IN SPACE",
+            "en": "LOST IN SPACE"
+          }
+        },
+        "complete": {
+          "lang-store": {
+            "ja": "FLIGHT COMPLETE",
+            "en": "FLIGHT COMPLETE"
+          }
+        }
+      },
+      "actions": {
+        "toFacility": {
+          "lang-store": {
+            "ja": "TO {facility}",
+            "en": "TO {facility}"
+          }
+        },
+        "backToBase": {
+          "lang-store": {
+            "ja": "BACK TO BASE",
+            "en": "BACK TO BASE"
+          }
+        },
+        "continue": {
+          "lang-store": {
+            "ja": "CONTINUE",
+            "en": "CONTINUE"
+          }
+        },
+        "viewMap": {
+          "lang-store": {
+            "ja": "VIEW MAP",
+            "en": "VIEW MAP"
+          }
+        }
+      },
+      "sections": {
+        "performance": {
+          "lang-store": {
+            "ja": "FLIGHT PERFORMANCE DATA",
+            "en": "FLIGHT PERFORMANCE DATA"
+          }
+        },
+        "assets": {
+          "lang-store": {
+            "ja": "COLLECTED SPACE ASSETS",
+            "en": "COLLECTED SPACE ASSETS"
+          }
+        }
+      },
+      "stats": {
+        "score": {
+          "lang-store": {
+            "ja": "FLIGHT SCORE",
+            "en": "FLIGHT SCORE"
+          }
+        },
+        "credits": {
+          "lang-store": {
+            "ja": "CREDITS EARNED",
+            "en": "CREDITS EARNED"
+          }
+        }
+      },
+      "entries": {
+        "flightDuration": {
+          "lang-store": {
+            "ja": "Flight Duration Score",
+            "en": "Flight Duration Score"
+          }
+        },
+        "goalBonus": {
+          "lang-store": {
+            "ja": "Goal Bonus",
+            "en": "Goal Bonus"
+          }
+        },
+        "deliveryBonus": {
+          "lang-store": {
+            "ja": "Delivery Bonus",
+            "en": "Delivery Bonus"
+          }
+        },
+        "collectedCoins": {
+          "lang-store": {
+            "ja": "Collected Coins",
+            "en": "Collected Coins"
+          }
+        },
+        "insurancePayout": {
+          "lang-store": {
+            "ja": "Insurance Payout",
+            "en": "Insurance Payout"
+          }
+        }
+      },
+      "replay": {
+        "recorded": {
+          "lang-store": {
+            "ja": "● RECORDED",
+            "en": "● RECORDED"
+          }
+        },
+        "notRecorded": {
+          "lang-store": {
+            "ja": "NOT RECORDED",
+            "en": "NOT RECORDED"
+          }
+        },
+        "protected": {
+          "lang-store": {
+            "ja": "★ PROTECTED",
+            "en": "★ PROTECTED"
+          }
+        },
+        "protectRecord": {
+          "lang-store": {
+            "ja": "☆ PROTECT RECORD",
+            "en": "☆ PROTECT RECORD"
+          }
+        }
+      },
+      "bonusTitle": {
+        "lang-store": {
+          "ja": "DELIVERY BONUS",
+          "en": "DELIVERY BONUS"
+        }
+      }
+    }
+  }
+}

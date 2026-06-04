@@ -1,16 +1,3 @@
-const STATUS_TITLES = {
-    cleared: sector => `SECTOR ${sector} COMPLETED`,
-    returned: () => 'ROCKET RECOVERED',
-    crashed: () => 'SHIP CRASHED',
-    lost: () => 'LOST IN SPACE'
-};
-
-const STATUS_ACTIONS = {
-    returned: 'BACK TO BASE',
-    crashed: 'BACK TO BASE',
-    lost: 'BACK TO BASE'
-};
-
 const FACILITY_THEME_CLASSES = {
     TRADING_POST: 'trading-post',
     REPAIR_DOCK: 'repair-dock',
@@ -25,6 +12,7 @@ const FACILITY_LABELS = {
 
 class GameController {
     constructor(infrastructure = {}) {
+        this.gameDataRepository = infrastructure.gameDataRepository;
         this.sessionState = infrastructure.sessionState;
         this.economySystem = infrastructure.economySystem;
         this.gameRecordTracker = infrastructure.gameRecordTracker;
@@ -83,12 +71,10 @@ class GameController {
 
     #createFlightResultViewData(settlement, replayRecord, achievements) {
         const pendingRecord = this.flightRecorder.getPendingRecord();
-        const titleFactory = STATUS_TITLES[settlement.status] || (() => 'FLIGHT COMPLETE');
-
         const storyStatus = this.storySystem.getStoryStatus();
 
         return {
-            title: titleFactory(this.sessionState.sectorNumber),
+            title: this.#getTitle(settlement),
             status: settlement.status,
             themeClass: this.#getThemeClass(settlement),
             totalScore: settlement.totalScore,
@@ -117,10 +103,33 @@ class GameController {
 
     #getActionLabel(settlement) {
         if (settlement.status === 'cleared' && settlement.destination) {
-            return `TO ${FACILITY_LABELS[settlement.destination] || settlement.destination}`;
+            return this.#formatText(
+                this.gameDataRepository.getUiText('flightResult.actions.toFacility'),
+                { facility: FACILITY_LABELS[settlement.destination] || settlement.destination }
+            );
         }
 
-        return STATUS_ACTIONS[settlement.status] || 'CONTINUE';
+        if (settlement.status === 'returned' || settlement.status === 'crashed' || settlement.status === 'lost') {
+            return this.gameDataRepository.getUiText('flightResult.actions.backToBase');
+        }
+
+        return this.gameDataRepository.getUiText('flightResult.actions.continue');
+    }
+
+    #getTitle(settlement) {
+        const titleKey = settlement.status
+            ? `flightResult.titles.${settlement.status}`
+            : 'flightResult.titles.complete';
+        const title = this.gameDataRepository.getUiText(titleKey);
+
+        return this.#formatText(title, { sector: this.sessionState.sectorNumber });
+    }
+
+    #formatText(template, values) {
+        return Object.entries(values).reduce(
+            (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+            template
+        );
     }
 }
 

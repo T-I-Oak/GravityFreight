@@ -1,5 +1,6 @@
 import itemsData from '../assets/data/items.json';
-import contentData from '../assets/data/content.json';
+import storiesData from '../assets/data/content_stories.json';
+import uiData from '../assets/data/content_ui.json';
 import configData from '../assets/data/config.json';
 import Item from '../systems/entities/Item.js';
 import RocketItem from '../systems/entities/RocketItem.js';
@@ -8,7 +9,7 @@ export const PARTS = itemsData;
 export const ITEM_REGISTRY = Object.fromEntries(
     Object.values(itemsData).flat().map(item => [item.id, item])
 );
-export const STORY_DATA = contentData.stories;
+export const STORY_DATA = storiesData.stories;
 export const RARITY = configData.rarity;
 
 export const mockGameDataRepository = {
@@ -21,7 +22,15 @@ export const mockGameDataRepository = {
     },
 
     getStoryContent(id) {
-        return contentData.stories[id];
+        return storiesData.stories[id];
+    },
+
+    getUiText(path) {
+        const value = path.split('.').reduce((current, key) => current?.[key], uiData.ui);
+        if (value === undefined) {
+            throw new Error(`[mockGameDataRepository] UI text not found: ${path}`);
+        }
+        return value['lang-store']?.en ?? value;
     },
 
     getFacilityDefinition(idOrType) {

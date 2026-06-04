@@ -20,6 +20,7 @@
 - **`loadAllData(): Promise<void>`**
     - GravityFreight の静的マスタデータをロードし、内部に保持する。
     - `lang-store` を含む表示リソースは、共通 i18n ライブラリのロード・展開 API を通じて取得する。
+    - content 系データは用途別に `content_stories.json`、`content_achievements.json`、`content_ui.json` へ分割し、`GameDataRepository` が統合窓口として提供する。
     - 外部マスタデータのロード失敗時はエラーを投げ、アプリケーションの起動を停止させる。
 
 ## 3. マスタデータ取得
@@ -61,6 +62,11 @@
 
 - **`getAchievementDefinition(id: string): object`**
     - 指定された実績 ID の定義を返す。
+
+- **`getUiText(path: string): string`**
+    - 指定された UI resource path の表示文言を返す。
+    - 戻り値のテキストは、共通 i18n ライブラリにより現在のアクティブ言語へ展開済みの値とする。
+    - UI resource は `content_ui.json` に定義し、画面固有のラベル、ボタン名、セクション名などに使用する。
 
 - **`getGameBalance(): object`**
     - ゲームバランス定数を返す。

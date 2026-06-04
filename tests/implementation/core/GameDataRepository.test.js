@@ -69,6 +69,16 @@ describe('GameDataRepository', () => {
         expect(expandLanguageResource).toHaveBeenCalled();
     });
 
+    it('returns i18n-expanded UI text by path', async () => {
+        expandLanguageResource.mockImplementation(value => `expanded:${value['lang-store'].en}`);
+        await repository.loadAllData();
+
+        expect(repository.getUiText('flightResult.entries.goalBonus')).toBe('expanded:Goal Bonus');
+        expect(() => repository.getUiText('flightResult.entries.missing')).toThrow(
+            '[GameDataRepository] UI text not found: flightResult.entries.missing'
+        );
+    });
+
     it('returns story ids without exposing story content data', async () => {
         await repository.loadAllData();
 

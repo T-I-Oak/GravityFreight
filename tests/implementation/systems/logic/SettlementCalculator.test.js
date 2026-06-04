@@ -13,8 +13,6 @@ beforeAll(async () => {
     repository = new GameDataRepository({
         getSavedData: vi.fn(),
         setSavedData: vi.fn()
-    }, {
-        expandLanguageResource: value => value
     });
     await repository.loadAllData();
 });
@@ -85,9 +83,42 @@ describe('SettlementCalculator', () => {
         }, session);
 
         expect(settlement.entries).toEqual([
-            { label: 'Flight Duration', score: 12 },
+            { label: 'Flight Duration Score', score: 12 },
             { label: 'Goal Bonus', score: 2000, coin: 20 },
             { label: 'Delivery Bonus', score: 1500, coin: 310 }
+        ]);
+    });
+
+    it('uses repository UI text resources for settlement entry labels', () => {
+        const calculator = new SettlementCalculator({
+            getFacilityDefinition: () => ({
+                id: 'T',
+                rewardScore: 2000,
+                rewardCoins: 20,
+                bonusItemCount: 1
+            }),
+            getGameBalance: () => ({
+                DELIVERY_REWARD: { SCORE: 1500, COINS: 100 },
+                UNMATCHED_DELIVERY_REWARD: { SCORE: 0, COINS: 10 },
+                MAX_COIN_DISCOUNT: 0.5
+            }),
+            getUiText: key => `ui:${key}`
+        }, lotteryService);
+        lotteryService.drawLottery.mockReturnValue([]);
+
+        const settlement = calculator.calculate({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        }, {
+            ticks: 12,
+            heldCargo: [new Item('cargo_safe', repository)],
+            rocketItem: createRocketItem()
+        }, session);
+
+        expect(settlement.entries).toEqual([
+            { label: 'ui:flightResult.entries.flightDuration', score: 12 },
+            { label: 'ui:flightResult.entries.goalBonus', score: 2000, coin: 20 },
+            { label: 'ui:flightResult.entries.deliveryBonus', score: 1500, coin: 100 }
         ]);
     });
 
@@ -107,7 +138,7 @@ describe('SettlementCalculator', () => {
 
         expect(settlement.totalCoins).toBe(60);
         expect(settlement.entries).toEqual([
-            { label: 'Flight Duration', score: 20 },
+            { label: 'Flight Duration Score', score: 20 },
             { label: 'Insurance Payout', coin: 60 }
         ]);
     });

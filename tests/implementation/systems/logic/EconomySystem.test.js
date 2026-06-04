@@ -14,8 +14,6 @@ beforeAll(async () => {
     repository = new GameDataRepository({
         getSavedData: vi.fn(),
         setSavedData: vi.fn()
-    }, {
-        expandLanguageResource: value => value
     });
     await repository.loadAllData();
 });
@@ -178,7 +176,7 @@ describe('EconomySystem', () => {
         expect(settlement.acquiredItems).toEqual([]);
         expect(settlement.lostToTarget).toBeNull();
         expect(settlement.entries).toEqual([
-            { label: 'Flight Duration', score: 12 },
+            { label: 'Flight Duration Score', score: 12 },
             { label: 'Goal Bonus', score: 2000, coin: 20 },
             { label: 'Delivery Bonus', score: 1500, coin: 300 },
             { label: 'Collected Coins', coin: 100 }
@@ -216,7 +214,7 @@ describe('EconomySystem', () => {
         expect(settlement.totalScore).toBe(20);
         expect(settlement.totalCoins).toBe(60);
         expect(settlement.entries).toEqual([
-            { label: 'Flight Duration', score: 20 },
+            { label: 'Flight Duration Score', score: 20 },
             { label: 'Insurance Payout', coin: 60 }
         ]);
         expect(settlement.lostToTarget.target).toBe(target);

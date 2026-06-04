@@ -25,12 +25,26 @@ const storyRepository = {
             R: { id: 'R', icon: 'R', className: 'repair-dock' }
         };
         return facilities[id];
-    })
+    }),
+    getUiText: vi.fn(key => ({
+        'flightResult.replay.recorded': '● RECORDED',
+        'flightResult.replay.notRecorded': 'NOT RECORDED',
+        'flightResult.replay.protected': '★ PROTECTED',
+        'flightResult.replay.protectRecord': '☆ PROTECT RECORD',
+        'flightResult.sections.performance': 'FLIGHT PERFORMANCE DATA',
+        'flightResult.sections.assets': 'COLLECTED SPACE ASSETS',
+        'flightResult.stats.score': 'FLIGHT SCORE',
+        'flightResult.stats.credits': 'CREDITS EARNED',
+        'flightResult.actions.viewMap': 'VIEW MAP',
+        'flightResult.actions.continue': 'CONTINUE',
+        'flightResult.bonusTitle': 'DELIVERY BONUS'
+    })[key])
 };
 
 beforeEach(() => {
     storyRepository.getStoryContent.mockClear();
     storyRepository.getFacilityDefinition.mockClear();
+    storyRepository.getUiText.mockClear();
 });
 
 describe('UIComponents.generatePlaceholderHTML', () => {
@@ -384,84 +398,6 @@ describe('UIComponents.generateStoryModalHTML', () => {
         const html = UIComponents.generateStoryModalHTML('R', storyRepository);
         expect(html).toContain('FacilityBadge');
         expect(html).toContain('R');
-    });
-});
-
-describe('UIComponents.generateFlightResultHTML', () => {
-    it('renders flight result summary, entries, items, and replay status', () => {
-        const item = {
-            id: 'cargo_safe',
-            uid: 'stack_1',
-            name: '通商物資',
-            category: 'cargo',
-            description: '壊れにくい貨物。',
-            count: 2,
-            stats: {}
-        };
-        const bonus = {
-            id: 'boost_power',
-            uid: 'stack_2',
-            name: 'Power Booster',
-            category: 'booster',
-            stats: {}
-        };
-        const html = UIComponents.generateFlightResultHTML({
-            title: 'SECTOR 3 COMPLETED',
-            themeClass: 'trading-post',
-            totalScore: 3260,
-            totalCoins: 30,
-            actionLabel: 'TO TRADING POST',
-            replay: { recorded: true, favorite: false, pending: false },
-            entries: [
-                { label: 'Flight Duration', score: 260 },
-                { label: 'Goal Bonus', score: 3000, coin: 30 },
-                { label: 'Delivery Bonus', score: 1500, coin: 310 },
-                { label: 'Collected Coins', coin: 100 },
-                { label: 'Insurance Payout', coin: 120 }
-            ],
-            itemReport: [
-                { type: 'delivery', status: 'match', item, bonusItems: [bonus] }
-            ],
-            storyCards: [
-                { id: 'T', type: 'T', isUnread: true }
-            ]
-        }, storyRepository);
-
-        expect(html).toContain('SECTOR 3 COMPLETED');
-        expect(html).toContain('3,260');
-        expect(html).toContain('+3,000');
-        expect(html).toContain('+30');
-        expect(html).toContain('<span class="report-data-label">Goal Bonus</span>');
-        expect(html).toContain('<span class="report-data-label">Delivery Bonus</span>');
-        expect(html).toContain('<span class="report-data-value score">+3,000</span>');
-        expect(html).toContain('<span class="report-data-value coin">+30</span>');
-        expect(html).toContain('<span class="report-data-value coin">+310</span>');
-        expect(html).toContain('<span class="report-data-label">Collected Coins</span>');
-        expect(html).toContain('<span class="report-data-label">Insurance Payout</span>');
-        expect(html).toContain('RECORDED');
-        expect(html).toContain('PROTECT RECORD');
-        expect(html).toContain('通商物資');
-        expect(html).toContain('DELIVERY BONUS');
-        expect(html).toContain('Power Booster');
-        expect(html).toContain('母からの押し花');
-        expect(html).toContain('TO TRADING POST');
-    });
-
-    it('renders pending replay state for unsaved records', () => {
-        const html = UIComponents.generateFlightResultHTML({
-            title: 'LOST IN SPACE',
-            themeClass: 'home',
-            totalScore: 260,
-            totalCoins: 0,
-            actionLabel: 'BACK TO BASE',
-            replay: { recorded: false, favorite: false, pending: true },
-            entries: [],
-            itemReport: []
-        }, storyRepository);
-
-        expect(html).toContain('NOT RECORDED');
-        expect(html).toContain('☆ PROTECT RECORD');
-        expect(html).toContain('BACK TO BASE');
     });
 });
 

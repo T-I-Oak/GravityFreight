@@ -31,48 +31,55 @@
     <!-- Interactive Mockup Controller & Dynamic Generation -->
     <script type="module">
         import { PARTS, createItemViewData, mockGameDataRepository } from './mock_data.js';
-        import { UIComponents } from '../systems/ui/UIComponents.js';
+        import { FlightResultComponents } from '../systems/ui/FlightResultComponents.js';
 
         const screen = document.getElementById('flight-result-screen');
+        function formatText(template, values) {
+            return Object.entries(values).reduce(
+                (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+                template
+            );
+        }
+
         const states = [
             {
-                title: 'SECTOR 1 COMPLETED',
-                actionLabel: 'TO TRADING POST',
+                title: formatText(mockGameDataRepository.getUiText('flightResult.titles.cleared'), { sector: 1 }),
+                actionLabel: formatText(mockGameDataRepository.getUiText('flightResult.actions.toFacility'), { facility: 'TRADING POST' }),
                 themeClass: 'trading-post',
                 status: 'cleared',
                 replay: { recorded: true, favorite: false, pending: false }
             },
             {
-                title: 'SECTOR 1 COMPLETED',
-                actionLabel: 'TO REPAIR DOCK',
+                title: formatText(mockGameDataRepository.getUiText('flightResult.titles.cleared'), { sector: 1 }),
+                actionLabel: formatText(mockGameDataRepository.getUiText('flightResult.actions.toFacility'), { facility: 'REPAIR DOCK' }),
                 themeClass: 'repair-dock',
                 status: 'cleared',
                 replay: { recorded: true, favorite: false, pending: false }
             },
             {
-                title: 'SECTOR 1 COMPLETED',
-                actionLabel: 'TO BLACK MARKET',
+                title: formatText(mockGameDataRepository.getUiText('flightResult.titles.cleared'), { sector: 1 }),
+                actionLabel: formatText(mockGameDataRepository.getUiText('flightResult.actions.toFacility'), { facility: 'BLACK MARKET' }),
                 themeClass: 'black-market',
                 status: 'cleared',
                 replay: { recorded: true, favorite: false, pending: false }
             },
             {
-                title: 'ROCKET RECOVERED',
-                actionLabel: 'BACK TO BASE',
+                title: mockGameDataRepository.getUiText('flightResult.titles.returned'),
+                actionLabel: mockGameDataRepository.getUiText('flightResult.actions.backToBase'),
                 themeClass: 'home',
                 status: 'returned',
                 replay: { recorded: true, favorite: false, pending: false }
             },
             {
-                title: 'SHIP CRASHED',
-                actionLabel: 'BACK TO BASE',
+                title: mockGameDataRepository.getUiText('flightResult.titles.crashed'),
+                actionLabel: mockGameDataRepository.getUiText('flightResult.actions.backToBase'),
                 themeClass: 'home',
                 status: 'crashed',
                 replay: { recorded: false, favorite: false, pending: true }
             },
             {
-                title: 'LOST IN SPACE',
-                actionLabel: 'BACK TO BASE',
+                title: mockGameDataRepository.getUiText('flightResult.titles.lost'),
+                actionLabel: mockGameDataRepository.getUiText('flightResult.actions.backToBase'),
                 themeClass: 'home',
                 status: 'lost',
                 replay: { recorded: false, favorite: false, pending: true }
@@ -85,11 +92,11 @@
                 totalScore: 4760,
                 totalCoins: 560,
                 entries: [
-                    { label: 'Flight Duration Score', score: 260 },
-                    { label: 'Goal Bonus', score: 3000, coin: 30 },
-                    { label: 'Delivery Bonus', score: 1500, coin: 310 },
-                    { label: 'Collected Coins', coin: 100 },
-                    { label: 'Insurance Payout', coin: 120 }
+                    { label: mockGameDataRepository.getUiText('flightResult.entries.flightDuration'), score: 260 },
+                    { label: mockGameDataRepository.getUiText('flightResult.entries.goalBonus'), score: 3000, coin: 30 },
+                    { label: mockGameDataRepository.getUiText('flightResult.entries.deliveryBonus'), score: 1500, coin: 310 },
+                    { label: mockGameDataRepository.getUiText('flightResult.entries.collectedCoins'), coin: 100 },
+                    { label: mockGameDataRepository.getUiText('flightResult.entries.insurancePayout'), coin: 120 }
                 ],
                 storyCards: [{ id: 'T', type: 'T', isUnread: true }],
                 itemReport: [
@@ -118,7 +125,7 @@
 
         let currentState = 0;
         function render() {
-            screen.innerHTML = UIComponents.generateFlightResultHTML(createViewData(states[currentState]), mockGameDataRepository);
+            screen.innerHTML = FlightResultComponents.generateHTML(createViewData(states[currentState]), mockGameDataRepository);
             screen.querySelector('.Button.state-primary').addEventListener('click', (event) => {
                 event.preventDefault();
                 currentState = (currentState + 1) % states.length;

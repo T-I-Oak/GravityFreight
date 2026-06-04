@@ -20,7 +20,7 @@
            - `init()` はデフォルトの `StoryProgressData` を返す。
         2. `GameDataRepository.getSavedStoryProgress(migrationMap)` を呼び出す。
         3. 取得したデータの `readMessageIds` を `Set<string>` に変換し、内部変数 `readIds` に保持する。
-        4. **マスタデータの解析**: 物語データ（`content.json`）の全キーを取得し、実在するストーリーIDの集合（`masterIds`）を `Set<string>` として生成・保持する。
+        4. **マスタデータの解析**: 物語データ（`content_stories.json`）の全キーを取得し、実在するストーリーIDの集合（`masterIds`）を `Set<string>` として生成・保持する。
         5. セッション変数 `history` を `""` に初期化する。
 
 #### GameDataRepository との連携シーケンス
@@ -86,7 +86,7 @@
 ### 内部状態 (Instance Properties / Memory only)
 - **`history`**: `string` (現在のゲーム内での配送履歴。例: `"TR"`)。タイトル画面に戻るたびに `""` にリセットされる。
 - **`readIds`**: `Set<string>` (累計既読IDの集合)。検索効率化のため初期化時に作成。
-- **`masterIds`**: `Set<string>` (全ストーリーIDの集合)。`content.json` のキーから生成。
+- **`masterIds`**: `Set<string>` (全ストーリーIDの集合)。`content_stories.json` のキーから生成。
 
 ### StoryProgressData (永続化対象)
 - **役割**: `GameDataRepository` を通じて保存されるデータ構造。

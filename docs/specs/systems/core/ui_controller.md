@@ -15,6 +15,8 @@
 ### 共通基盤メソッド (Core Infrastructure)
 
 - **`constructor()`**
+    - **必要要素**: `#flight-result-screen` を必須の航行結果画面ルートとして取得する。
+    - **依存**: `gameDataRepository` と、航行結果画面の HTML を生成する `FlightResultComponents` を使用する。
     - **内部挙動**:
         1. HTML ドキュメント内から各画面のコンテナ要素や、主要なボタン（開始ボタン、開閉ボタン等）を検索し、内部変数に保持する。
         2. **安全性**: 必要な要素が見つからない場合は、初期化エラー（Error）を投げ、不具合を即座に顕在化させる。
@@ -94,18 +96,19 @@
     - 航行結果表示画面（リザルト）へ遷移する。
     - **内部挙動**:
         1. これまで表示されていたビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
-        2. **ヘッダー・状態表示**: `viewData.status` / `viewData.title` / `viewData.themeClass` に応じ、見出しとテーマカラーを変更する。
-        3. **ヒーロー統計 (Hero Stats)**: `viewData.totalScore`, `viewData.totalCoins` を `ui-well` 内の強調表示エリアにセットする。
-        4. **アクションボタンの動的設定**:
+        2. `FlightResultComponents.generateHTML(viewData, gameDataRepository)` で画面 HTML を生成し、`#flight-result-screen` に反映する。
+        3. **ヘッダー・状態表示**: `viewData.status` / `viewData.title` / `viewData.themeClass` に応じ、見出しとテーマカラーを変更する。
+        4. **ヒーロー統計 (Hero Stats)**: `viewData.totalScore`, `viewData.totalCoins` を `ui-well` 内の強調表示エリアにセットする。
+        5. **アクションボタンの動的設定**:
             - **ラベル**: `viewData.actionLabel` を表示する。
             - **カラー**: `viewData.themeClass` に応じたクラスをボタンに付与する。
-        5. **明細リスト (Entries) 構築**: 
+        6. **明細リスト (Entries) 構築**:
             - `viewData.entries` をループし、**「ラベル」「スコア」「コイン」の 3 列構成**を持つ行要素を生成してコンテナへ追加する。
             - 値が存在しない項目（`score` や `coin` が省略されている場合）は、**空欄**として表示する。
-        6. **アイテムリスト (Item Report) 構築**: 
+        7. **アイテムリスト (Item Report) 構築**:
             - `viewData.itemReport` をループし、`UIComponents.generateCardHTML` を用いてカードを生成する。
             - 配送成功時（`match`）は、「DELIVERY BONUS」の見出しを伴う専用コンテナ（`.report-bonus-list`）内に獲得したボーナスアイテムを表示する。
-        7. **リプレイ状態表示**:
+        8. **リプレイ状態表示**:
             - `viewData.replay.recorded` / `pending` / `favorite` に基づき、記録済み表示と保護ボタンの状態を更新する。
 
 - **`showGameEndSequence(gameResult: GameResultSummary, gameOver: object): void`**
@@ -205,7 +208,7 @@
     - **内部挙動**: クリックごとにボタンのトグル状態（is-active）を切り替え、最新の状態を引数として `handler` を実行する。
 
 - **`setMapToggleHandler(handler: (showMap: boolean) => void): void`**
-    - リザルト画面の「マップ確認（VIEW MAP）ボタン」にハンドラを登録する。
+    - リザルト画面の「マップ確認」ボタンにハンドラを登録する。表示文言は UI resource `flightResult.actions.viewMap` を使用する。
     - **内部挙動**: リザルトパネルの表示/非表示をトグルし、現在の状態を引数として `handler` を実行する。
 
 - **`setFacilityActionHandler(handler: (action: string, context: object) => void): void`**

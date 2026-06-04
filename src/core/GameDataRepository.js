@@ -1,5 +1,7 @@
 import itemsData from '../assets/data/items.json';
-import contentData from '../assets/data/content.json';
+import storiesData from '../assets/data/content_stories.json';
+import achievementsData from '../assets/data/content_achievements.json';
+import uiData from '../assets/data/content_ui.json';
 import configData from '../assets/data/config.json';
 import packageData from '../../package.json';
 import { expandLanguageResource as defaultExpandLanguageResource } from '../../../GameWorksOAK/src/lib/core/i18n.js';
@@ -35,7 +37,11 @@ class GameDataRepository {
 
     async loadAllData() {
         this.items = itemsData;
-        this.content = contentData;
+        this.content = {
+            ...storiesData,
+            ...achievementsData,
+            ...uiData
+        };
         this.config = configData;
         this.loaded = true;
     }
@@ -118,6 +124,11 @@ class GameDataRepository {
     getAchievementDefinition(id) {
         this.#ensureLoaded();
         return this.expandLanguageResource(this.#requiredById(this.content.achievements, id, 'Achievement'));
+    }
+
+    getUiText(path) {
+        this.#ensureLoaded();
+        return this.expandLanguageResource(this.#requiredByPath(this.content.ui, path, 'UI text'));
     }
 
     getGameBalance() {
@@ -213,6 +224,14 @@ class GameDataRepository {
         const value = source?.[id];
         if (!value) {
             throw new Error(`[GameDataRepository] ${label} not found: ${id}`);
+        }
+        return value;
+    }
+
+    #requiredByPath(source, path, label) {
+        const value = path.split('.').reduce((current, key) => current?.[key], source);
+        if (value === undefined) {
+            throw new Error(`[GameDataRepository] ${label} not found: ${path}`);
         }
         return value;
     }

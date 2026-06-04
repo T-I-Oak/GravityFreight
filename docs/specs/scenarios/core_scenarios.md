@@ -550,7 +550,7 @@
             - ゲーム1プレイ単位の結果記録配列には、`Score` / `Sector` / `Collected` 各上位20件と、日時順の直近20件の和集合を保持する。
     - [ ] 10.1.2 [設計] 実績（解禁条件と称号）のリスト定義
         - **決定事項**:
-            - 実績定義は V2 の `content.json` にある `achievements` を採用する。
+            - 実績定義は V2 の `content_achievements.json` にある `achievements` を採用する。
             - 実績定義には、統計キー、表示ラベル、段階ごとの達成条件（goal）、称号（title）を含める。
             - 実績の解禁判定は `AchievementTracker` が担当し、記録画面は判定済みの達成状況と進捗を表示する。
     - [ ] 10.1.3 [UI] 統計・実績リストの表示レイアウト
@@ -561,7 +561,7 @@
             - 最高到達セクターは主要KPIには含めず、Personal Best Ranking の Sector 表示で確認できるようにする。
             - メイン領域にスコア、セクター、回収数などの推移グラフと Personal Best Ranking を表示する。
         - **Achievements タブ**:
-            - `content.json` の実績定義をもとに、実績カードを一覧表示する。
+            - `content_achievements.json` の実績定義をもとに、実績カードを一覧表示する。
             - 各カードには称号、対象統計、現在値、次の達成条件、達成済み/未達成状態を表示する。
         - **Replays タブ**:
             - `FlightRecorder` が保存した航行記録を一覧表示する。
