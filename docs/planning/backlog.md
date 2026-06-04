@@ -66,7 +66,7 @@
         - [x] StorySystem
     - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
         - [x] 航行終了フローの最小接続と航行結果 view data 生成
-        - [ ] 航行結果画面の DOM 実装
+        - [x] 航行結果画面の DOM 実装
         - [ ] 施設画面の実データ接続
         - [ ] Analytic Archive の実データ接続
         - [ ] リプレイ再生の実データ接続
@@ -77,7 +77,12 @@
     - [x] 共通 DataManager / i18n ライブラリとの接続
     - [x] 静的マスタデータのロード
     - [x] ユーザーデータの getSavedData / setSavedData 経由の読み書き
+    - [x] content 系データを用途別に分割する
+        - [x] `content_stories.json`
+        - [x] `content_achievements.json`
+        - [x] `content_ui.json`
     - [ ] content/data 系リソースの i18n 対応を棚卸しして実施する
+        - [x] 航行結果画面の UI ラベル、ボタン名、セクション名
         - [ ] ストーリー本文、タイトル、発見文
         - [ ] 実績ラベル、tier title
         - [ ] How To Play テキスト
@@ -120,6 +125,7 @@
 - [ ] 表示・入力基盤を実装する
     - [ ] AppOrchestrator
     - [ ] UIController
+        - [x] 航行結果画面の表示、結果確定、マップ切替、レコード保護の DOM イベント接続
     - [ ] WorldRenderer
     - [ ] CameraController
     - [ ] BackgroundManager
@@ -132,7 +138,7 @@
     - [ ] 建造・照準
     - [ ] 航行 HUD
     - [ ] タイトル画面、HUDに表示しているタイトルロゴを `logo.svg` にする
-    - [ ] 航行結果
+    - [x] 航行結果
     - [ ] 施設画面
     - [ ] Analytic Archive
     - [ ] リプレイ再生
