@@ -51,6 +51,11 @@ body {
     line-height: 1.5;
 }
 
+.hidden,
+[hidden] {
+    display: none !important;
+}
+
 /* --- 2. Interactive Foundations (Semantic) --- */
 .Button,
 .state-clickable {
