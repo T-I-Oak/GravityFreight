@@ -42,6 +42,7 @@
 
 - **`updateReadStatus(storyId: string): void`**
     - 指定されたストーリーIDを既読としてマークし、最新の状態を `GameDataRepository.setSavedStoryProgress(data)` を通じて永続化する。
+    - すでに既読の場合は保存を行わない。
 
 - **`unlockNextStep(branchType: string): void`**
     - 指定された系列（'T', 'R', 'B'）への配送成功に基づき、次のストーリーを解放する。
@@ -65,6 +66,20 @@
     - 本文の言語展開は共通 i18n ライブラリと `GameDataRepository` 側のデータロードに委譲し、`StorySystem` は言語切り替え処理を持たない。
     - **戻り値**: `{ id: string, title: string, discovery: string, body: string, type: string }` 形式。
         - `type`: ID の最後の文字（系列識別子）。
+
+- **`getReadCounts(): object`**
+    - 既読済みストーリー数を、実績判定用の集計値として返す。
+    - **戻り値**: `{ total: number, T: number, R: number, B: number }` 形式。
+        - `total`: 実在するストーリーIDのうち、既読済みの総数。
+        - `T` / `R` / `B`: `readMessageIds` のうち、ストーリーIDの先頭文字が対象系列に一致する件数。
+
+- **`getStoryProgressData(): StoryProgressData`**
+    - 現在の永続化対象データを返す。
+    - 呼び出し側が保存するための API ではなく、テストや一時確認で内部状態を直接参照しないための明示メソッドとする。
+
+- **`resetSession(): void`**
+    - セッション変数 `history` を `""` に戻す。
+    - タイトル画面へ戻るなど、現在プレイ中の配送履歴を破棄するタイミングで呼び出す。
 
 ## 3. 内部状態とデータ構造 (State & Data Structures)
 

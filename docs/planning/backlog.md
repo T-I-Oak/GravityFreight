@@ -62,7 +62,7 @@
         - [x] RankTracker
         - [ ] AchievementTracker
         - [ ] FlightRecorder
-        - [ ] StorySystem
+        - [x] StorySystem
     - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
 
 ### ドメイン別タスク
@@ -71,6 +71,11 @@
     - [x] 共通 DataManager / i18n ライブラリとの接続
     - [x] 静的マスタデータのロード
     - [x] ユーザーデータの getSavedData / setSavedData 経由の読み書き
+    - [ ] content/data 系リソースの i18n 対応を棚卸しして実施する
+        - [ ] ストーリー本文、タイトル、発見文
+        - [ ] 実績ラベル、tier title
+        - [ ] How To Play テキスト
+        - [ ] アイテム名、説明文、施設名など、その他表示用マスタデータ
 - [ ] エンティティ基盤を実装する
     - [x] Item
     - [x] StackedItem
@@ -95,7 +100,7 @@
     - [x] RankTracker
     - [ ] AchievementTracker
     - [ ] FlightRecorder
-    - [ ] StorySystem
+    - [x] StorySystem
 - [ ] 経済・施設処理を実装する
     - [ ] EconomySystem
         - [x] 抽選、査定、共通価格計算、Trading Post 在庫、ゲームオーバー判定

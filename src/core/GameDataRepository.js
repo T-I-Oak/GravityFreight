@@ -100,6 +100,11 @@ class GameDataRepository {
         return this.expandLanguageResource(this.#requiredById(this.content.stories, id, 'Story'));
     }
 
+    getStoryIds() {
+        this.#ensureLoaded();
+        return Object.keys(this.content.stories || {});
+    }
+
     getHowToPlayContent() {
         this.#ensureLoaded();
         return this.expandLanguageResource(this.content.howToPlay || []);

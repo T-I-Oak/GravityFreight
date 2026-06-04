@@ -69,6 +69,13 @@ describe('GameDataRepository', () => {
         expect(expandLanguageResource).toHaveBeenCalled();
     });
 
+    it('returns story ids without exposing story content data', async () => {
+        await repository.loadAllData();
+
+        expect(repository.getStoryIds()).toEqual(expect.arrayContaining(['T', 'TR', 'TRB']));
+        expect(repository.getStoryIds()).not.toContain('missing');
+    });
+
     it('returns app metadata from package version', async () => {
         await repository.loadAllData();
 
