@@ -137,7 +137,8 @@
             - `worldRenderer.playFinishAnimation(result)` を実行。
         4. **演出完了待機**: `await` により演出完了を待機する。
         5. **画面遷移**:
-            - `uiController.showResultScreen(settlement)` を呼び出す。
+            - `settlement`、リプレイ保存状態、実績通知、ストーリー状態から航行結果表示用 view data を生成する。
+            - `uiController.showResultScreen(viewData)` を呼び出す。
 
 - **`handleMailClick(index: number): void`**
     - 指定されたインデックス（0〜2）のメールボタンがクリックされた際の処理。

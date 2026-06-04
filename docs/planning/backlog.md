@@ -65,6 +65,11 @@
         - [x] FlightRecorder
         - [x] StorySystem
     - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
+        - [x] 航行終了フローの最小接続と航行結果 view data 生成
+        - [ ] 航行結果画面の DOM 実装
+        - [ ] 施設画面の実データ接続
+        - [ ] Analytic Archive の実データ接続
+        - [ ] リプレイ再生の実データ接続
 
 ### ドメイン別タスク
 - [x] データ基盤を実装する

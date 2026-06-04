@@ -26,175 +26,111 @@
 </head>
 
 <body>
-    <main id="flight-result-screen" class="theme-matte FlexCenter">
-        <section class="Panel home">
-
-            <!-- Header Section -->
-            <header class="panel-header SplitRow">
-                <h2 id="report-title" class="panel-title trading-post">SECTOR 1 COMPLETED</h2>
-                <div class="flight-report-status">
-                    <div id="badge-recorded" class="Badge state-recorded capsule"><span class="recorded-text">● RECORDED</span></div>
-                    <div id="btn-protect" class="Badge favorite outline state-inactive state-clickable capsule">☆ PROTECT RECORD</div>
-                </div>
-            </header>
-
-            <!-- Content Area -->
-            <div class="panel-body ColumnSet">
-                <!-- Left Column: Performance data -->
-                <section class="Column ScrollArea">
-                    <header class="section-header">
-                        <h3 class="section-title">FLIGHT PERFORMANCE DATA</h3>
-                    </header>
-
-                    <div class="flight-report-summary">
-                        <div class="Well">
-                            <div class="stat-group">
-                                <div class="SplitColumn hero">
-                                    <span class="stat-label">FLIGHT SCORE</span>
-                                    <span class="stat-value score">3,260</span>
-                                </div>
-                                <div class="SplitColumn hero">
-                                    <span class="stat-label">CREDITS EARNED</span>
-                                    <span class="stat-value coin">30</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="SplitRow data-row">
-                        <span class="report-data-label">Flight Duration Score</span>
-                        <span class="report-data-value score">+260</span>
-                    </div>
-                    <div class="SplitRow data-row">
-                        <span class="report-data-label">REPAIR DOCK Reward</span>
-                        <span class="report-data-value score">+3,000</span>
-                    </div>
-                    <div class="SplitRow data-row">
-                        <span class="report-data-label">REPAIR DOCK Reward Coin</span>
-                        <span class="report-data-value coin">+30</span>
-                    </div>
-                </section>
-
-                <!-- Right Column: Acquired assets -->
-                <section class="Column ScrollArea">
-                    <header class="section-header">
-                        <h3 class="section-title">COLLECTED SPACE ASSETS</h3>
-                    </header>
-
-                    <div class="item-list">
-                        <!-- Dynamic Story Section -->
-                        <div id="story-item-container"></div>
-
-                        <!-- Dynamic Items Section -->
-                        <div id="acquired-items-list">
-                            <!-- Items will be injected here -->
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Global Actions Section -->
-            <footer class="panel-footer">
-                <button class="Button button-large" id="btn-view-map">
-                    <span class="btn-main-label">VIEW MAP</span>
-                </button>
-                <button class="Button state-primary button-large trading-post" id="main-action-btn">
-                    <span class="btn-main-label">TO TRADING POST</span>
-                </button>
-            </footer>
-        </section>
-    </main>
+    <main id="flight-result-screen" class="theme-matte FlexCenter"></main>
 
     <!-- Interactive Mockup Controller & Dynamic Generation -->
     <script type="module">
         import { PARTS, createItemViewData, mockGameDataRepository } from './mock_data.js';
         import { UIComponents } from '../systems/ui/UIComponents.js';
 
-        // --- 1. Dynamic Item Generation ---
-        const storyContainer = document.getElementById('story-item-container');
-        const itemListContainer = document.getElementById('acquired-items-list');
-
-        // A. Story Item (Dynamically generated from ID, marked as NEW)
-        storyContainer.innerHTML = UIComponents.generateStoryCardHTML('T', mockGameDataRepository, true);
-
-        let html = '';
-        
-        // B. Chassis x2
-        const chassisBase = PARTS.chassis[0];
-        if (chassisBase) {
-            html += UIComponents.generateCardHTML(createItemViewData(chassisBase, {}, { count: 2 }));
-        }
-
-        // B. Encrypted Data (Delivered)
-        html += UIComponents.generateCardHTML(createItemViewData(PARTS.cargo[2]), { status: 'delivered' });
-
-        // Delivery Bonus Items (Sibling list with title)
-        const bonusItems = [PARTS.logic[2], PARTS.module[1], PARTS.booster[2]];
-        html += `<div class="report-bonus-list">`;
-        html += `<h4 class="report-bonus-title">DELIVERY BONUS</h4>`;
-        html += bonusItems.map(item => UIComponents.generateCardHTML(createItemViewData(item))).join('');
-        html += `</div>`;
-
-        // C. Prototype Capacitor (Unmatched)
-        html += UIComponents.generateCardHTML(createItemViewData(PARTS.cargo[1]), { status: 'unmatched' });
-
-        itemListContainer.innerHTML = html;
-
-        // --- 2. View State Controller ---
+        const screen = document.getElementById('flight-result-screen');
         const states = [
-            { title: 'SECTOR 1 COMPLETED',  btn: 'TO TRADING POST',    cls: 'trading-post' },
-            { title: 'SECTOR 1 COMPLETED',  btn: 'TO REPAIR DOCK',     cls: 'repair-dock'  },
-            { title: 'SECTOR 1 COMPLETED',  btn: 'TO BLACK MARKET',    cls: 'black-market' },
-            { title: 'ROCKET RECOVERED',    btn: 'BACK TO BASE',       cls: 'home'        },
-            { title: 'SHIP CRASHED',        btn: 'RETRY FLIGHT',       cls: 'home'        },
-            { title: 'LOST IN SPACE',       btn: 'RETRY FLIGHT',       cls: 'home'        }
+            {
+                title: 'SECTOR 1 COMPLETED',
+                actionLabel: 'TO TRADING POST',
+                themeClass: 'trading-post',
+                status: 'cleared',
+                replay: { recorded: true, favorite: false, pending: false }
+            },
+            {
+                title: 'SECTOR 1 COMPLETED',
+                actionLabel: 'TO REPAIR DOCK',
+                themeClass: 'repair-dock',
+                status: 'cleared',
+                replay: { recorded: true, favorite: false, pending: false }
+            },
+            {
+                title: 'SECTOR 1 COMPLETED',
+                actionLabel: 'TO BLACK MARKET',
+                themeClass: 'black-market',
+                status: 'cleared',
+                replay: { recorded: true, favorite: false, pending: false }
+            },
+            {
+                title: 'ROCKET RECOVERED',
+                actionLabel: 'BACK TO BASE',
+                themeClass: 'home',
+                status: 'returned',
+                replay: { recorded: true, favorite: false, pending: false }
+            },
+            {
+                title: 'SHIP CRASHED',
+                actionLabel: 'BACK TO BASE',
+                themeClass: 'home',
+                status: 'crashed',
+                replay: { recorded: false, favorite: false, pending: true }
+            },
+            {
+                title: 'LOST IN SPACE',
+                actionLabel: 'BACK TO BASE',
+                themeClass: 'home',
+                status: 'lost',
+                replay: { recorded: false, favorite: false, pending: true }
+            }
         ];
 
+        function createViewData(state) {
+            return {
+                ...state,
+                totalScore: 3260,
+                totalCoins: 30,
+                entries: [
+                    { label: 'Flight Duration Score', score: 260 },
+                    { label: 'REPAIR DOCK Reward', score: 3000 },
+                    { label: 'REPAIR DOCK Reward Coin', coin: 30 }
+                ],
+                storyCards: [{ id: 'T', type: 'T', isUnread: true }],
+                itemReport: [
+                    {
+                        type: 'other',
+                        item: createItemViewData(PARTS.chassis[0], {}, { count: 2 })
+                    },
+                    {
+                        type: 'delivery',
+                        status: 'delivered',
+                        item: createItemViewData(PARTS.cargo[2]),
+                        bonusItems: [
+                            createItemViewData(PARTS.logic[2]),
+                            createItemViewData(PARTS.module[1]),
+                            createItemViewData(PARTS.booster[2])
+                        ]
+                    },
+                    {
+                        type: 'delivery',
+                        status: 'unmatched',
+                        item: createItemViewData(PARTS.cargo[1])
+                    }
+                ]
+            };
+        }
+
         let currentState = 0;
-        const btn = document.getElementById('main-action-btn');
-        const title = document.getElementById('report-title');
+        function render() {
+            screen.innerHTML = UIComponents.generateFlightResultHTML(createViewData(states[currentState]), mockGameDataRepository);
+            screen.querySelector('.Button.state-primary').addEventListener('click', (event) => {
+                event.preventDefault();
+                currentState = (currentState + 1) % states.length;
+                render();
+            });
+            screen.querySelector('.Badge.favorite').addEventListener('click', () => {
+                states[currentState].replay.favorite = !states[currentState].replay.favorite;
+                states[currentState].replay.recorded = states[currentState].replay.recorded || states[currentState].replay.favorite;
+                states[currentState].replay.pending = states[currentState].replay.pending && !states[currentState].replay.favorite;
+                render();
+            });
+        }
 
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            currentState = (currentState + 1) % states.length;
-            const s = states[currentState];
-
-            title.textContent = s.title;
-            btn.querySelector('.btn-main-label').textContent = s.btn;
-
-            // Update classes for both Title and Button for color propagation
-            const colorClasses = ['repair-dock', 'trading-post', 'black-market', 'home'];
-            
-            title.classList.remove(...colorClasses);
-            title.classList.add(s.cls);
-
-            btn.classList.remove(...colorClasses);
-            btn.classList.add(s.cls);
-        });
-
-        const protectBtn = document.getElementById('btn-protect');
-        const recordedBadge = document.getElementById('badge-recorded');
-
-        protectBtn.addEventListener('click', () => {
-            const isActive = protectBtn.classList.contains('state-active');
-            
-            if (isActive) {
-                // To Inactive
-                protectBtn.classList.remove('state-active');
-                protectBtn.classList.add('state-inactive');
-                protectBtn.classList.add('outline');
-                protectBtn.textContent = '☆ PROTECT RECORD';
-            } else {
-                // To Active (Protected)
-                protectBtn.classList.remove('state-inactive');
-                protectBtn.classList.remove('outline');
-                protectBtn.classList.add('state-active');
-                protectBtn.textContent = '★ PROTECTED';
-                
-                // Ensure RECORDED badge is visible
-                recordedBadge.style.display = 'flex';
-            }
-        });
+        render();
     </script>
 </body>
 

@@ -90,21 +90,23 @@
         2. **発見演出**: `discovery` テキストを本文より先に、または強調して表示することで、配送アクションとの繋がりを明示する。
         3. モーダルを表示状態にする。
         4. モーダル内の「閉じる」ボタンに対して、モーダルを閉じるための内部ハンドラを（操作音付きで）自動登録する。
-- **`showResultScreen(result: SettlementResult): void`**
+- **`showResultScreen(viewData: FlightResultViewData): void`**
     - 航行結果表示画面（リザルト）へ遷移する。
     - **内部挙動**:
         1. これまで表示されていたビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
-        2. **ヘッダー・状態表示**: `result.status` に応じ、見出し（'CLEARED', 'CRASHED' 等）とテーマカラーを変更する。
-        3. **ヒーロー統計 (Hero Stats)**: `totalScore`, `totalCoins` を `ui-well` 内の強調表示エリアにセットする。
+        2. **ヘッダー・状態表示**: `viewData.status` / `viewData.title` / `viewData.themeClass` に応じ、見出しとテーマカラーを変更する。
+        3. **ヒーロー統計 (Hero Stats)**: `viewData.totalScore`, `viewData.totalCoins` を `ui-well` 内の強調表示エリアにセットする。
         4. **アクションボタンの動的設定**:
-            - **ラベル**: 到着先（`result.destination`）や状態に基づき、「TO TRADING POST」「BACK TO BASE」等にラベルを書き換える。
-            - **カラー**: 施設や状態に応じたクラス（`.is-trading-post`, `.is-home` 等）をボタンに付与する。
+            - **ラベル**: `viewData.actionLabel` を表示する。
+            - **カラー**: `viewData.themeClass` に応じたクラスをボタンに付与する。
         5. **明細リスト (Entries) 構築**: 
-            - `result.entries` をループし、**「ラベル」「スコア」「コイン」の 3 列構成**を持つ行要素を生成してコンテナへ追加する。
+            - `viewData.entries` をループし、**「ラベル」「スコア」「コイン」の 3 列構成**を持つ行要素を生成してコンテナへ追加する。
             - 値が存在しない項目（`score` や `coin` が省略されている場合）は、**空欄**として表示する。
         6. **アイテムリスト (Item Report) 構築**: 
-            - `result.itemReport` をループし、`UIComponents.generateCardHTML` を用いてカードを生成する。
+            - `viewData.itemReport` をループし、`UIComponents.generateCardHTML` を用いてカードを生成する。
             - 配送成功時（`match`）は、「DELIVERY BONUS」の見出しを伴う専用コンテナ（`.report-bonus-list`）内に獲得したボーナスアイテムを表示する。
+        7. **リプレイ状態表示**:
+            - `viewData.replay.recorded` / `pending` / `favorite` に基づき、記録済み表示と保護ボタンの状態を更新する。
 
 - **`showGameEndSequence(gameResult: GameResultSummary, gameOver: object): void`**
     - ゲーム終了（契約終了）時の最終画面を表示する。

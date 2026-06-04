@@ -387,6 +387,74 @@ describe('UIComponents.generateStoryModalHTML', () => {
     });
 });
 
+describe('UIComponents.generateFlightResultHTML', () => {
+    it('renders flight result summary, entries, items, and replay status', () => {
+        const item = {
+            id: 'cargo_safe',
+            uid: 'stack_1',
+            name: '安全貨物',
+            category: 'cargo',
+            description: '壊れにくい貨物。',
+            count: 2,
+            stats: {}
+        };
+        const bonus = {
+            id: 'boost_power',
+            uid: 'stack_2',
+            name: 'Power Booster',
+            category: 'booster',
+            stats: {}
+        };
+        const html = UIComponents.generateFlightResultHTML({
+            title: 'SECTOR 3 COMPLETED',
+            themeClass: 'trading-post',
+            totalScore: 3260,
+            totalCoins: 30,
+            actionLabel: 'TO TRADING POST',
+            replay: { recorded: true, favorite: false, pending: false },
+            entries: [
+                { label: 'Flight Duration', score: 260 },
+                { label: 'Trading Post Reward', score: 3000, coin: 30 }
+            ],
+            itemReport: [
+                { type: 'delivery', status: 'match', item, bonusItems: [bonus] }
+            ],
+            storyCards: [
+                { id: 'T', type: 'T', isUnread: true }
+            ]
+        }, storyRepository);
+
+        expect(html).toContain('SECTOR 3 COMPLETED');
+        expect(html).toContain('3,260');
+        expect(html).toContain('+3,000');
+        expect(html).toContain('+30');
+        expect(html).toContain('RECORDED');
+        expect(html).toContain('PROTECT RECORD');
+        expect(html).toContain('安全貨物');
+        expect(html).toContain('DELIVERY BONUS');
+        expect(html).toContain('Power Booster');
+        expect(html).toContain('母からの押し花');
+        expect(html).toContain('TO TRADING POST');
+    });
+
+    it('renders pending replay state for unsaved records', () => {
+        const html = UIComponents.generateFlightResultHTML({
+            title: 'LOST IN SPACE',
+            themeClass: 'home',
+            totalScore: 260,
+            totalCoins: 0,
+            actionLabel: 'BACK TO BASE',
+            replay: { recorded: false, favorite: false, pending: true },
+            entries: [],
+            itemReport: []
+        }, storyRepository);
+
+        expect(html).toContain('NOT RECORDED');
+        expect(html).toContain('☆ PROTECT RECORD');
+        expect(html).toContain('BACK TO BASE');
+    });
+});
+
 describe('UIComponents.generateAchievementGridHTML', () => {
     const mockAllAchievements = {
         stat_runs: { label: "フライト回数", tiers: [{ goal: 5, title: "T1" }] },

@@ -4,6 +4,10 @@
  */
 
 export class UIComponents {
+    static formatNumber(value) {
+        return new Intl.NumberFormat('en-US').format(value ?? 0);
+    }
+
     /**
      * Generates a complete item card HTML string.
      * @param {Object} item - ItemViewData
@@ -233,6 +237,123 @@ export class UIComponents {
                 </footer>
             </article>
         `;
+    }
+
+    static generateFlightResultHTML(viewData, gameDataRepository) {
+        const replay = viewData.replay || {};
+        const recordedLabel = replay.recorded ? '● RECORDED' : 'NOT RECORDED';
+        const protectLabel = replay.favorite ? '★ PROTECTED' : '☆ PROTECT RECORD';
+        const protectState = replay.favorite ? 'state-active' : 'state-inactive outline';
+        const entriesHTML = (viewData.entries || [])
+            .map(entry => this.generateFlightResultEntryHTML(entry))
+            .join('');
+        const storyHTML = (viewData.storyCards || [])
+            .map(story => this.generateStoryCardHTML(story.id, gameDataRepository, story.isUnread))
+            .join('');
+        const itemReportHTML = (viewData.itemReport || [])
+            .map(entry => this.generateFlightResultItemReportHTML(entry))
+            .join('');
+
+        return `
+            <section class="Panel home">
+                <header class="panel-header SplitRow">
+                    <h2 class="panel-title ${viewData.themeClass || 'home'}">${viewData.title}</h2>
+                    <div class="flight-report-status">
+                        <div class="Badge state-recorded capsule"><span class="recorded-text">${recordedLabel}</span></div>
+                        <div class="Badge favorite ${protectState} state-clickable capsule">${protectLabel}</div>
+                    </div>
+                </header>
+
+                <div class="panel-body ColumnSet">
+                    <section class="Column ScrollArea">
+                        <header class="section-header">
+                            <h3 class="section-title">FLIGHT PERFORMANCE DATA</h3>
+                        </header>
+
+                        <div class="flight-report-summary">
+                            <div class="Well">
+                                <div class="stat-group">
+                                    <div class="SplitColumn hero">
+                                        <span class="stat-label">FLIGHT SCORE</span>
+                                        <span class="stat-value score">${this.formatNumber(viewData.totalScore)}</span>
+                                    </div>
+                                    <div class="SplitColumn hero">
+                                        <span class="stat-label">CREDITS EARNED</span>
+                                        <span class="stat-value coin">${this.formatNumber(viewData.totalCoins)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${entriesHTML}
+                    </section>
+
+                    <section class="Column ScrollArea">
+                        <header class="section-header">
+                            <h3 class="section-title">COLLECTED SPACE ASSETS</h3>
+                        </header>
+
+                        <div class="item-list">
+                            <div class="story-item-container">${storyHTML}</div>
+                            <div class="acquired-items-list">${itemReportHTML}</div>
+                        </div>
+                    </section>
+                </div>
+
+                <footer class="panel-footer">
+                    <button class="Button button-large">
+                        <span class="btn-main-label">VIEW MAP</span>
+                    </button>
+                    <button class="Button state-primary button-large ${viewData.themeClass || 'home'}">
+                        <span class="btn-main-label">${viewData.actionLabel || 'CONTINUE'}</span>
+                    </button>
+                </footer>
+            </section>
+        `;
+    }
+
+    static generateFlightResultEntryHTML(entry) {
+        const score = entry.score === undefined ? '' : `+${this.formatNumber(entry.score)}`;
+        const coin = entry.coin === undefined ? '' : `+${this.formatNumber(entry.coin)}`;
+
+        return `
+            <div class="SplitRow data-row">
+                <span class="report-data-label">${entry.label}</span>
+                <span class="report-data-value score">${score}</span>
+                <span class="report-data-value coin">${coin}</span>
+            </div>
+        `;
+    }
+
+    static generateFlightResultItemReportHTML(entry) {
+        const itemViewData = this.normalizeResultItemViewData(entry.item);
+        const itemHTML = this.generateCardHTML(itemViewData, { status: entry.status });
+        const bonusHTML = (entry.bonusItems || [])
+            .map(item => this.generateCardHTML(this.normalizeResultItemViewData(item)))
+            .join('');
+
+        if (!bonusHTML) {
+            return itemHTML;
+        }
+
+        return `
+            ${itemHTML}
+            <div class="report-bonus-list">
+                <h4 class="report-bonus-title">DELIVERY BONUS</h4>
+                ${bonusHTML}
+            </div>
+        `;
+    }
+
+    static normalizeResultItemViewData(item) {
+        if (item?.stats) {
+            return item;
+        }
+        if (typeof item?.getViewData === 'function') {
+            return item.getViewData();
+        }
+
+        throw new Error('[UIComponents] flight result item view data is required.');
     }
 
     /**
