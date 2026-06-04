@@ -21,11 +21,12 @@
         2. `GameDataRepository.getSavedGameRecordData(migrationMap)` を呼び出す。
 
 ### 記録更新 (Record Update)
-- **`recordSectorStart(sessionState: SessionState): void`**
+- **`recordSectorStart(sessionState: SessionState): string[]`**
     - セクター開始時に、`reachedSector` に関する記録値を更新する。
     - プレイヤーがそのセクターへ入ったことを認識できるタイミングで呼び出す。
+    - **戻り値**: 実際に更新された `recordKey` のリスト。
 
-- **`recordFlightResult(result: FlightResultContext): void`**
+- **`recordFlightResult(result: FlightResultContext): string[]`**
     - 航行終了時の結果を、航行単位で確定する記録値へ反映する。
     - 発射回数、`completedSectors`、航行距離、航行終了時に確定するスコア・コイン・回収数を更新する。
     - **呼び出しタイミング**: 航行結果が確定した時点。
@@ -33,20 +34,29 @@
         1. `result` から更新対象の記録値を算出する。
         2. `values` の累計値・最大値を更新する。
         3. `GameDataRepository.setSavedGameRecordData(data)` で永続化する。
+        4. 実際に更新された `recordKey` のリストを返す。
 
-- **`recordGameResult(gameResult: GameResultSummary): void`**
+- **`recordGameResult(gameResult: GameResultSummary): string[]`**
     - 契約終了時に確定する契約回数などの記録値を反映する。
     - **呼び出しタイミング**: 契約終了が確定し、ゲームリザルトを表示する時点。
     - **内部挙動**:
         1. `gameResult` から更新対象の記録値を算出する。
         2. `values` の累計値・最大値を更新する。
         3. `GameDataRepository.setSavedGameRecordData(data)` で永続化する。
+        4. 実際に更新された `recordKey` のリストを返す。
 
-- **`recordCurrencyChange(context: object): void`**
+- **`recordTransaction(delta: TransactionDelta, context: object): string[]`**
+    - 施設取引など、`SessionState.applyTransaction()` の戻り値から記録値を更新する。
+    - `earnedCoins`、`spentCoins`、`acquiredItemCount`、現在所持コイン数に応じて `total_earned_coins`、`total_spent_coins`、`total_collected_item_count`、`max_coins` を更新する。
+    - **戻り値**: 実際に更新された `recordKey` のリスト。
+
+- **`recordCurrencyChange(context: object): string[]`**
     - コイン増減が確定した時点で、累積獲得コイン、累積消費コイン、最高所持コインなどの記録値を更新する。
+    - **戻り値**: 実際に更新された `recordKey` のリスト。
 
-- **`recordDeliverySuccess(context: object): void`**
+- **`recordDeliverySuccess(context: object): string[]`**
     - 配達成功が確定した時点で、累積配達数と 1契約内の最高配達数を更新する。
+    - **戻り値**: 実際に更新された `recordKey` のリスト。
 
 - **`getRecordValue(recordKey: string): number`**
     - 実績判定や表示で参照する単一の記録値を返す。

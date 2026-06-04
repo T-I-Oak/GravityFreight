@@ -58,6 +58,11 @@
         - [x] Black Market 複数アイテムガチャと確率エンチャント
         - [x] Repair Dock の修理、解体、強化
     - [ ] GameRecordTracker / RankTracker / AchievementTracker / FlightRecorder / StorySystem
+        - [x] GameRecordTracker
+        - [ ] RankTracker
+        - [ ] AchievementTracker
+        - [ ] FlightRecorder
+        - [ ] StorySystem
     - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
 
 ### ドメイン別タスク
@@ -86,7 +91,7 @@
     - [x] 航行終了判定
     - [x] アイテム回収判定
 - [ ] 記録・永続データ系を実装する
-    - [ ] GameRecordTracker
+    - [x] GameRecordTracker
     - [ ] RankTracker
     - [ ] AchievementTracker
     - [ ] FlightRecorder
