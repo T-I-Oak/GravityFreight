@@ -80,6 +80,19 @@
     - 航行結果画面を抜ける時点で、未保存の航行記録候補を破棄する。
     - 自動保存済み、または `savePendingRecordAsFavorite()` 済みの場合は何もしない。
 
+- **`getRecords(): FlightRecord[]`**
+    - 保存済み航行記録の一覧を表示用に返す。
+    - 戻り値は defensive copy とし、呼び出し側が内部状態を直接変更できないようにする。
+    - 表示順はスコア降順、同スコアの場合は記録日時が新しい順とする。
+
+- **`getPendingRecord(): FlightRecord | null`**
+    - 航行結果画面で、現在の航行記録候補が未保存状態で残っているかを確認するために使用する。
+    - 戻り値は defensive copy とする。
+
+- **`getFlightRecordIndex(): FlightRecordIndex`**
+    - 永続化対象の保存済み航行記録インデックスを返す。
+    - `pendingRecordDraft` / `pendingRecord` は含めない。
+
 ## 4. 保存ルール
 
 - リプレイ保存枠は最大 20 件とする。

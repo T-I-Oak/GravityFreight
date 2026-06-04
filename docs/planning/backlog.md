@@ -15,7 +15,8 @@
     - 警告: リプレイ関連データが 20件で 700KiB、または 1件平均 35KiB を超える場合は圧縮や保存項目削減を検討する
     - 見直し: リプレイ関連データが 20件で 800KiB、または 1件平均 40KiB を超える場合は snapshot 構造を見直す
     - 測定方法: localStorage で保存される文字列サイズを重視し、`JSON.stringify(data).length * 2` による UTF-16 相当 byte を基準値とする。参考値として `TextEncoder` による UTF-8 byte も併記する
-    - [ ] 20件保存時の `flight_record_index` サイズを確認する
+    - [x] 20件保存時の `flight_record_index` サイズを確認する
+        - v0.79: 代表的な `RocketSnapshot` / `SectorSnapshot` を含む 20件の実装テストで 600KiB 以内を確認
     - [ ] 圧縮の要否、圧縮後サイズ、復元コストを評価する
     - [ ] 共通 DataManager の保存方式で問題なく扱えるか確認する
 
@@ -61,7 +62,7 @@
         - [x] GameRecordTracker
         - [x] RankTracker
         - [x] AchievementTracker
-        - [ ] FlightRecorder
+        - [x] FlightRecorder
         - [x] StorySystem
     - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
 
@@ -99,7 +100,7 @@
     - [x] GameRecordTracker
     - [x] RankTracker
     - [x] AchievementTracker
-    - [ ] FlightRecorder
+    - [x] FlightRecorder
     - [x] StorySystem
 - [ ] 経済・施設処理を実装する
     - [ ] EconomySystem
