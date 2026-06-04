@@ -1,3 +1,5 @@
+import SectorProgressionController from './SectorProgressionController.js';
+
 const FACILITY_THEME_CLASSES = {
     TRADING_POST: 'trading-post',
     REPAIR_DOCK: 'repair-dock',
@@ -27,6 +29,8 @@ class GameController {
         this.currentFacilityType = null;
         this.currentFacilityViewData = null;
         this.currentTradingPostStock = null;
+        this.sectorProgressionController = infrastructure.sectorProgressionController
+            || new SectorProgressionController(infrastructure);
     }
 
     async handleNavigationEnd(result) {
@@ -73,7 +77,9 @@ class GameController {
             return;
         }
 
-        if (!this.checkGameOverAndStartEndSequence?.()) {
+        if (!this.checkGameOverAndStartEndSequence({
+            completedSectors: Math.max(0, this.sessionState.sectorNumber - 1)
+        })) {
             this.uiController.showBuildScreen?.();
         }
     }
@@ -96,8 +102,29 @@ class GameController {
         return delta;
     }
 
-    leaveFacility() {
-        throw new Error('[GameController] Facility departure is not connected yet.');
+    async leaveFacility() {
+        if (this.checkGameOverAndStartEndSequence({
+            completedSectors: this.sessionState.sectorNumber
+        })) {
+            return true;
+        }
+
+        await this.beginSectorTransition();
+        return false;
+    }
+
+    checkGameOverAndStartEndSequence(context = {}) {
+        return this.sectorProgressionController.checkGameOverAndStartEndSequence(context);
+    }
+
+    async beginSectorTransition(options = {}) {
+        this.currentFacilityType = null;
+        this.currentFacilityViewData = null;
+        this.currentTradingPostStock = null;
+        this.currentRocket = null;
+
+        this.currentSector = await this.sectorProgressionController.beginSectorTransition(options);
+        return this.currentSector;
     }
 
     #createFlightResultContext(settlement) {

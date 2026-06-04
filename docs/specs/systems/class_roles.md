@@ -24,9 +24,10 @@ graph TD
 
     %% Logic & System Layer
     Orchestrator --> GC["GameController (Game Flow/Logic)"]
+    GC --> SPC["SectorProgressionController"]
     GC --> SS["SessionState (Current Game State)"]
     SS --> IC["ItemContainer (Inventory)"]
-    GC --> SEC["Sector (Current Map)"]
+    SPC --> SEC["Sector (Current Map)"]
     SEC --> ES["EconomySystem (Lottery/Price)"]
 
     %% System Layer (Infrastructure)
@@ -188,9 +189,16 @@ graph TD
     - 役割: ゲーム進行・シーン管理。
     - 責務:
         - プレイ中（ワープ〜航行〜リザルト〜施設〜ゲーム終了）の一連の画面遷移とロジックの統括。
-        - SessionState のセクター番号更新、Sector の生成・破棄管理。
+        - 施設入場・施設取引・施設退出など、画面入力からゲーム進行処理への入口を管理する。
         - 航行中の物理計算、スコア計算、終了判定の実行。
-        - ゲームリザルト表示時点で記録値・実績・ランキング確定処理を呼び出す。
+        - セクター進行と契約終了判定は `SectorProgressionController` へ委譲する。
+- **SectorProgressionController**
+    - 生存期間: Game Lifecycle
+    - 役割: セクター進行・契約終了判定。
+    - 責務:
+        - 次セクター開始時の `SessionState` 更新、`Sector` 生成、HUD / Renderer 更新を実行する。
+        - 施設退出時および航行結果確定後のゲームオーバー判定を実行する。
+        - 契約終了時に記録値・実績・ランキング確定処理を呼び出し、ゲーム終了画面へ結果を渡す。
 - **StorySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 物語（Story）の選択・永続進捗管理。

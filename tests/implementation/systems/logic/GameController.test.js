@@ -132,6 +132,9 @@ function createController(settlement = createSettlement()) {
             };
         }),
         applySettlement: vi.fn(),
+        incrementSector: vi.fn(() => {
+            sessionState.sectorNumber += 1;
+        }),
         getGameResultSummary: vi.fn(() => ({
             totalScore: 3260,
             totalCoins: 30,
@@ -178,11 +181,21 @@ function createController(settlement = createSettlement()) {
             spentCoins: type === 'premium' ? 500 : 100,
             earnedCoins: 0,
             acquiredItems: [{ uid: `${type}_item` }]
-        }))
+        })),
+        checkGameOver: vi.fn(() => null)
     };
     const gameRecordTracker = {
         recordFlightResult: vi.fn(() => ['total_launches', 'total_score']),
-        recordTransaction: vi.fn(() => ['total_spent_coins'])
+        recordTransaction: vi.fn(() => ['total_spent_coins']),
+        recordSectorStart: vi.fn(() => ['max_reached_sector']),
+        recordGameResult: vi.fn(() => ['lifetime_contracts'])
+    };
+    const rankTracker = {
+        recordGameResult: vi.fn(() => ({
+            scoreRank: 1,
+            sectorRank: 1,
+            collectedRank: 1
+        }))
     };
     const achievementTracker = {
         evaluateAchievements: vi.fn(() => [{ achievementId: 'stat_launches', tier: 3, value: 20 }])
@@ -201,23 +214,34 @@ function createController(settlement = createSettlement()) {
         setFacilityActionHandler: vi.fn(),
         setFacilityDepartHandler: vi.fn(),
         updateFacilityCredits: vi.fn(),
+        updateHUDValue: vi.fn(),
+        setFlightMode: vi.fn(),
+        showGameEndSequence: vi.fn(),
         showBuildScreen: vi.fn()
     };
     const worldRenderer = {
         disableSonar: vi.fn(),
-        playFinishAnimation: vi.fn(() => Promise.resolve())
+        playFinishAnimation: vi.fn(() => Promise.resolve()),
+        setSector: vi.fn()
     };
+    const sectorFactory = vi.fn(({ sessionState, isAnomaly }) => ({
+        sectorNumber: sessionState.sectorNumber,
+        isAnomaly,
+        luckyDiscountRate: 0
+    }));
 
     const controller = new GameController({
         sessionState,
         economySystem,
         gameRecordTracker,
+        rankTracker,
         achievementTracker,
         flightRecorder,
         storySystem,
         uiController,
         worldRenderer,
-        gameDataRepository
+        gameDataRepository,
+        sectorFactory
     });
     controller.currentRocket = currentRocket;
     controller.currentSector = currentSector;
@@ -229,12 +253,14 @@ function createController(settlement = createSettlement()) {
         sessionState,
         economySystem,
         gameRecordTracker,
+        rankTracker,
         achievementTracker,
         flightRecorder,
         storySystem,
         uiController,
         worldRenderer,
-        gameDataRepository
+        gameDataRepository,
+        sectorFactory
     };
 }
 
@@ -461,5 +487,62 @@ describe('GameController', () => {
             earnedCoins: 0,
             acquiredItems: [expect.objectContaining({ uid: 'premium_item' })]
         });
+    });
+
+    it('leaves a facility and starts the next sector when the contract can continue', async () => {
+        context.controller.enterFacility('TRADING_POST');
+
+        const gameEnded = await context.controller.leaveFacility();
+
+        expect(gameEnded).toBe(false);
+        expect(context.economySystem.checkGameOver).toHaveBeenCalledWith(context.sessionState);
+        expect(context.sessionState.sectorNumber).toBe(4);
+        expect(context.sectorFactory).toHaveBeenCalledWith({
+            sessionState: context.sessionState,
+            isAnomaly: false
+        });
+        expect(context.controller.currentSector).toMatchObject({
+            sectorNumber: 4,
+            isAnomaly: false,
+            luckyDiscountRate: 0
+        });
+        expect(context.gameRecordTracker.recordSectorStart).toHaveBeenCalledWith(context.sessionState);
+        expect(context.achievementTracker.evaluateAchievements).toHaveBeenLastCalledWith({
+            source: 'game_record',
+            keys: ['max_reached_sector']
+        });
+        expect(context.worldRenderer.setSector).toHaveBeenCalledWith(context.controller.currentSector);
+        expect(context.uiController.updateHUDValue).toHaveBeenCalledWith('sector', 4);
+        expect(context.uiController.showBuildScreen).toHaveBeenCalled();
+        expect(context.uiController.setFlightMode).toHaveBeenCalledWith(false);
+    });
+
+    it('shows the game end sequence on facility departure when the contract cannot continue', async () => {
+        const gameOver = { reason: 'NO_PARTS_REMAINING', details: ['CHASSIS'] };
+        context.economySystem.checkGameOver.mockReturnValue(gameOver);
+        context.controller.enterFacility('REPAIR_DOCK');
+
+        const gameEnded = await context.controller.leaveFacility();
+
+        expect(gameEnded).toBe(true);
+        expect(context.sessionState.getGameResultSummary).toHaveBeenCalledWith({
+            completedSectors: 3
+        });
+        const gameResult = context.sessionState.getGameResultSummary.mock.results.at(-1).value;
+        expect(context.gameRecordTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
+        expect(context.rankTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
+        expect(context.achievementTracker.evaluateAchievements).toHaveBeenLastCalledWith({
+            source: 'game_record',
+            keys: ['lifetime_contracts']
+        });
+        expect(context.uiController.showGameEndSequence).toHaveBeenCalledWith(gameResult, gameOver, {
+            achievements: [{ achievementId: 'stat_launches', tier: 3, value: 20 }],
+            ranks: {
+                scoreRank: 1,
+                sectorRank: 1,
+                collectedRank: 1
+            }
+        });
+        expect(context.sectorFactory).not.toHaveBeenCalled();
     });
 });

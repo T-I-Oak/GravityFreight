@@ -70,9 +70,11 @@
         1. `checkGameOverAndStartEndSequence()` を実行する。
         2. ゲームオーバーでない場合は、`this.beginSectorTransition()` を実行。
         3. ※ 次セクター生成時に `Sector` インスタンスが新しくなるため、割引率は自動的に 0 にリセットされる。
+    - セクター進行と契約終了判定の具体処理は `SectorProgressionController` に委譲する。
 
 - **`checkGameOverAndStartEndSequence(): boolean`**
     - 航行結果確定後および施設退出時に共通利用するゲームオーバー判定フロー。
+    - 実処理は `SectorProgressionController.checkGameOverAndStartEndSequence()` へ委譲する。
     - **内部挙動**:
         1. `EconomySystem.checkGameOver(sessionState)` を実行する。
         2. 戻り値が `null` の場合は `false` を返す。
@@ -99,6 +101,7 @@
 
 - **`beginSectorTransition(): Promise<void>`**
     - セクター間の遷移（ワープ演出）シーケンスを統括する。
+    - セクター生成、セクター開始時記録、HUD / Renderer 更新は `SectorProgressionController.beginSectorTransition()` へ委譲する。
     1. **演出制御**: 背景・描画・音のワープ演出を開始。
         - ワープ演出の開始時点では、`currentSector` は前セクターのままとし、前セクターのマップへズームインして加速する演出を行う。
         - 演出途中で遠方から次セクターのマップが現れるタイミングで、新しい `Sector` を生成して `currentSector` を切り替える。
