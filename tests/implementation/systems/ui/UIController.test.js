@@ -53,7 +53,7 @@ describe('UIController', () => {
             <button id="start-game-btn"></button>
             <main id="flight-result-screen" hidden></main>
             <main id="facility-screen" hidden></main>
-            <header id="mission-hud" class="hidden">
+            <header id="mission-hud" class="state-hidden">
                 <span id="sector-display"></span>
                 <span id="score-display"></span>
                 <span id="coin-display"></span>
@@ -61,7 +61,7 @@ describe('UIController', () => {
                 <button id="mail-btn-1"></button>
                 <button id="mail-btn-2"></button>
             </header>
-            <section id="build-overlay" class="hidden"></section>
+            <section id="build-overlay" class="state-hidden"></section>
             <section id="launch-control"></section>
             <canvas id="gameCanvas"></canvas>
         `;
@@ -185,9 +185,9 @@ describe('UIController', () => {
         expect(document.querySelector('#coin-display').textContent).toBe('120');
         expect(document.querySelector('#title-screen').hidden).toBe(true);
         expect(document.querySelector('#mission-hud').hidden).toBe(false);
-        expect(document.querySelector('#mission-hud').classList.contains('hidden')).toBe(false);
+        expect(document.querySelector('#mission-hud').classList.contains('state-hidden')).toBe(false);
         expect(document.querySelector('#build-overlay').hidden).toBe(false);
-        expect(document.querySelector('#build-overlay').classList.contains('hidden')).toBe(false);
+        expect(document.querySelector('#build-overlay').classList.contains('state-hidden')).toBe(false);
     });
 
     it('updates HUD values and exposes the map canvas', () => {

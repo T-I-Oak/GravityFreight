@@ -57,7 +57,7 @@ class UIController {
         this.updateHUDValue('coin', sessionState.coins ?? 0);
         this.mailButtons.forEach(button => {
             button.disabled = true;
-            button.classList.remove('type-t', 'type-r', 'type-b', 'is-blinking');
+            button.classList.remove('type-t', 'type-r', 'type-b', 'state-animating');
             button.classList.add('gray');
         });
     }
@@ -70,8 +70,8 @@ class UIController {
     }
 
     setFlightMode(isFlight) {
-        this.buildPanel?.classList.toggle('is-locked', !!isFlight);
-        this.launchControl?.classList.toggle('is-locked', !!isFlight);
+        this.buildPanel?.classList.toggle('state-locked', !!isFlight);
+        this.launchControl?.classList.toggle('state-locked', !!isFlight);
     }
 
     getMapCanvas() {
@@ -174,14 +174,14 @@ class UIController {
     #hide(element) {
         if (element) {
             element.hidden = true;
-            element.classList.add('hidden');
+            element.classList.add('state-hidden');
         }
     }
 
     #show(element) {
         if (element) {
             element.hidden = false;
-            element.classList.remove('hidden');
+            element.classList.remove('state-hidden');
         }
     }
 

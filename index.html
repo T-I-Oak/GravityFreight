@@ -42,7 +42,7 @@
 
 <body>
     <!-- タイトル画面 -->
-    <div id="title-screen" data-title-bg="/GravityFreight/assets/tutorial/slide1.png">
+    <div id="title-screen" class="theme-neon" data-title-bg="/GravityFreight/assets/tutorial/slide1.png">
         <script>
             const titleScreen = document.getElementById('title-screen');
             if (titleScreen?.dataset.titleBg) {
@@ -54,9 +54,9 @@
             <h1 class="text-display">GRAVITY FREIGHT</h1>
             <span class="text-sub-display">ORBITAL ECHOES</span>
             <div class="menu-buttons">
-                <button id="start-game-btn" class="ui-button btn-neon">BEGIN CONTRACT</button>
-                <button id="how-to-play-btn" class="ui-button btn-neon is-secondary">HOW TO PLAY</button>
-                <button id="archive-btn" class="ui-button btn-neon is-secondary">RECORDS</button>
+                <button id="start-game-btn" class="Button button-large state-primary">BEGIN CONTRACT</button>
+                <button id="how-to-play-btn" class="Button button-large">HOW TO PLAY</button>
+                <button id="archive-btn" class="Button button-large">RECORDS</button>
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
@@ -71,7 +71,7 @@
     <div id="achievement-toast-container"></div>
 
     <!-- Replay HUD -->
-    <div id="replay-overlay" class="hidden">
+    <div id="replay-overlay" class="state-hidden">
         <div class="panel replay-panel">
             <div class="panel-header">
                 <h2>MISSION DATA</h2>
@@ -81,13 +81,13 @@
                 <div id="replay-config-list" class="replay-config-list"></div>
             </div>
             <div class="panel-footer">
-                <button id="exit-replay-btn" class="btn-neon btn-grad-orange">EXIT REPLAY</button>
+                <button id="exit-replay-btn" class="Button state-primary">EXIT REPLAY</button>
             </div>
         </div>
     </div>
 
     <!-- Archive Overlay (Ranking & Achievements) (v1.1) -->
-    <div id="archive-overlay" class="overlay-container hidden">
+    <div id="archive-overlay" class="overlay-container state-hidden">
         <div class="event-backdrop"></div>
         <div class="event-modal theme-archive">
             <div class="event-header">
@@ -115,7 +115,7 @@
 
 
     <!-- 操作説明パネル -->
-    <div id="how-to-play-overlay" class="overlay hidden">
+    <div id="how-to-play-overlay" class="overlay state-hidden">
         <div class="modal tutorial-modal">
             <div class="modal-header">
                 <h2>HOW TO PLAY</h2>
@@ -136,7 +136,7 @@
         </div>
     </div>
 
-    <div id="mission-hud" class="panel static hidden">
+    <div id="mission-hud" class="panel static state-hidden">
         <div class="panel-header">
             <h1 id="title">GRAVITY FREIGHT<span class="subtitle">ORBITAL ECHOES</span></h1>
             <div id="mail-status-group" class="mail-icons-group">
@@ -161,7 +161,7 @@
     <main id="flight-result-screen" class="theme-matte FlexCenter" hidden></main>
     <main id="facility-screen" class="theme-matte FlexCenter" hidden></main>
 
-    <div id="build-overlay" class="hidden">
+    <div id="build-overlay" class="state-hidden">
         <div class="panel" id="terminal-panel">
             <div class="panel-header">
                 <div class="tab-header">
@@ -191,7 +191,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="factory-tab" class="tab-content hidden">
+                <div id="factory-tab" class="tab-content state-hidden">
                     <div class="category chassis">
                         <h3>CHASSIS</h3>
                         <div id="chassis-list"></div>
@@ -206,7 +206,7 @@
                             <div class="slot-placeholder">Slot Empty (Requires Research)</div>
                         </div>
                     </div>
-                    <button id="build-btn" class="btn-neon btn-neon-sm btn-grad-green" disabled>
+                    <button id="build-btn" class="Button state-primary state-disabled" disabled>
                         <span class="btn-label">ASSEMBLE ROCKET</span>
                         <span class="btn-subtext">シャーシとロジックを選択すると建造できます</span>
                     </button>
@@ -215,20 +215,20 @@
         </div>
     </div>
 
-    <div id="launch-control" class="hidden">
-        <button id="launch-btn" class="btn-neon btn-neon-lg btn-grad-orange hidden bounce" disabled>
+    <div id="launch-control" class="state-hidden">
+        <button id="launch-btn" class="Button button-large state-primary state-hidden state-disabled launch" disabled>
             <span class="btn-label">LAUNCH ENGINE</span>
             <span class="btn-subtext">ロケットと発射台を選択すると発射できます</span>
         </button>
     </div>
-    <button id="back-to-result-btn" class="btn-neon btn-neon-lg btn-grad-green hidden bounce">BACK TO RESULT</button>
+    <button id="back-to-result-btn" class="Button button-large state-primary state-hidden home">BACK TO RESULT</button>
 
-    <div id="star-info-panel" class="panel hidden">
+    <div id="star-info-panel" class="panel state-hidden">
         <h2 id="star-info-title">STAR CORE</h2>
         <div id="star-info-list" class="category"></div>
     </div>
 
-    <div id="event-screen" class="overlay-container hidden">
+    <div id="event-screen" class="overlay-container state-hidden">
         <div class="event-backdrop"></div>
         <div class="event-modal">
             <div class="event-header">
@@ -250,14 +250,14 @@
         </div>
     </div>
 
-    <div id="sector-notification" class="sector-notif hidden"></div>
+    <div id="sector-notification" class="sector-notif state-hidden"></div>
     <div id="ui-layer"></div>
-    <div id="receipt-overlay" class="receipt-view hidden">
+    <div id="receipt-overlay" class="receipt-view state-hidden">
         <div class="receipt-paper" id="receipt-content-area"></div>
     </div>
 
     <!-- ストーリー表示モーダル (v0.15) -->
-    <div id="story-overlay" class="hidden">
+    <div id="story-overlay" class="state-hidden">
         <div class="story-modal">
             <div class="story-header">
                 <div class="story-branch-icon" id="story-branch-icon">T</div>
@@ -266,12 +266,12 @@
             <div id="story-discovery" class="story-discovery-msg">DISCOVERY MESSAGE</div>
             <div id="story-content" class="story-content-body">STORY CONTENT</div>
             <div class="story-footer">
-                <button id="close-story-btn" class="btn-neon btn-grad-cyan">CLOSE COMMUNICATION</button>
+                <button id="close-story-btn" class="Button state-primary">CLOSE COMMUNICATION</button>
             </div>
         </div>
     </div>
     <!-- 設定パネル -->
-    <div id="settings-overlay" class="hidden">
+    <div id="settings-overlay" class="state-hidden">
         <div class="panel settings-modal">
             <div class="panel-header">
                 <h2>SETTINGS</h2>
@@ -289,7 +289,7 @@
                 </div>
             </div>
             <div class="panel-footer">
-                <button id="settings-done-btn" class="btn-neon">DONE</button>
+                <button id="settings-done-btn" class="Button state-primary">DONE</button>
             </div>
         </div>
     </div>

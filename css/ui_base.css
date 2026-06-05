@@ -29,7 +29,7 @@
 }
 
 *:focus {
-    outline: none !important;
+    outline: none;
 }
 
 .ScrollArea {
@@ -51,9 +51,15 @@ body {
     line-height: 1.5;
 }
 
-.hidden,
-[hidden] {
-    display: none !important;
+.state-hidden.state-hidden,
+[hidden][hidden],
+#title-screen.state-hidden,
+#mission-hud.state-hidden,
+#build-overlay.state-hidden,
+#launch-control.state-hidden,
+#flight-result-screen[hidden],
+#facility-screen[hidden] {
+    display: none;
 }
 
 /* --- 2. Interactive Foundations (Semantic) --- */
