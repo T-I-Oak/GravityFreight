@@ -8,6 +8,11 @@
     display: flex; /* Root uses flex to align the inner container */
     align-items: center;
     justify-content: center;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
     background: #050510 var(--title-bg-image, none) no-repeat center center;
     background-size: cover;
 }
@@ -20,17 +25,27 @@
     align-items: center;
     justify-content: center;
     gap: 32px; /* Explicit gap between title-box and menu buttons */
+    z-index: var(--z-panel);
 }
 
 #title-screen .text-display.logo {
-    font-size: clamp(3rem, 12vw, 6rem);
+    font-size: clamp(3rem, 7vw, 6rem);
     max-width: 90vw;
     transition: font-size 0.2s ease;
+    font-weight: 950;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 #title-screen .text-sub-display.logo {
-    font-size: 1.8rem;
+    font-size: clamp(1rem, 2vw, 1.8rem);
     margin-top: 0.5rem;
+    font-weight: 950;
+    line-height: 1.2;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--color-theme-main);
 }
 
 .menu-buttons {

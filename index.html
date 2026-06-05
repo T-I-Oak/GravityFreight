@@ -50,18 +50,26 @@
             }
         </script>
         <canvas id="title-bg-canvas"></canvas>
-        <div class="title-container ui-title-box">
-            <h1 class="text-display">GRAVITY FREIGHT</h1>
-            <span class="text-sub-display">ORBITAL ECHOES</span>
+        <div class="title-content-wrapper FlexCenter">
+            <div class="TitleBox">
+                <h1 class="text-display logo">GRAVITY FREIGHT</h1>
+                <span class="text-sub-display logo">ORBITAL ECHOES</span>
+            </div>
             <div class="menu-buttons">
-                <button id="start-game-btn" class="Button button-large state-primary">BEGIN CONTRACT</button>
-                <button id="how-to-play-btn" class="Button button-large">HOW TO PLAY</button>
-                <button id="archive-btn" class="Button button-large">RECORDS</button>
+                <button id="start-game-btn" class="Button button-large state-primary state-clickable">
+                    <span class="btn-main-label">BEGIN CONTRACT</span>
+                </button>
+                <button id="how-to-play-btn" class="Button button-large state-clickable">
+                    <span class="btn-main-label">HOW TO PLAY</span>
+                </button>
+                <button id="archive-btn" class="Button button-large state-clickable">
+                    <span class="btn-main-label">RECORDS</span>
+                </button>
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
         <div id="title-settings-btn" class="settings-btn" title="SETTINGS">⚙</div>
-        <div class="title-footer">
+        <div class="title-footer screen-footer">
             <div id="version">v-.--.-</div>
             <span class="copyright">© T.I.OAK 2026</span>
         </div>
