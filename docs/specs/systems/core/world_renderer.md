@@ -12,11 +12,17 @@
 
 ## 2. インターフェース (Interface)
 
+### 実装段階 (Current Implementation Stage)
+
+- v0.84 時点では、本編実画面の最小起動導線を確認するため、`#gameCanvas` の Canvas 2D context を使って Sector の境界、出口、天体を描画する。
+- PIXI.js、CameraController、BackgroundManager、ソナー、航跡、航行終了演出は最終仕様として残し、後続タスクで段階的に接続する。
+- 現在の `initialize()` は `HTMLCanvasElement` を受け取り、`setSector()` 呼び出し時に静的な Sector 表示を更新する。
+
 ### プロパティ (Properties)
 - **`targetSector: Sector | null`**: 現在描画対象となっているセクターインスタンスへの参照。
 - **`warpScale: number`**: 演出用の追加倍率（初期値 1.0）。描画時に `camera.zoomLevel` に乗算される。
 - **`warpAlpha: number`**: 演出用の不透明度（初期値 1.0）。セクター内の全オブジェクトに適用される。
-- **`canvas: HTMLCanvasElement` (Read-only)**: PIXI レンダラーの `view` 要素。`UIController` 等がイベント登録のために使用する。
+- **`canvas: HTMLCanvasElement` (Read-only)**: 描画対象 Canvas。v0.84 時点では `#gameCanvas` を直接使用する。
 - **`camera: CameraController`**: 視界制御システムへの参照。
 - **`background: BackgroundManager`**: 背景描画システムへの参照。
 - **`sonarRange: number`**: 現在の回収可能範囲の最大半径。描画ループ内で最新のロケット状態（`rocketItem.pickupRange * rocketItem.pickupMultiplier`）を反映する。
@@ -24,6 +30,7 @@
 ### メソッド (Methods)
 - **`initialize(container: HTMLElement, camera: CameraController, background: BackgroundManager): void`**
     - PIXI.js の初期化と依存システムの紐付け、メインループの開始を行う。
+    - **v0.84 実装**: `initialize(canvas: HTMLCanvasElement)` として Canvas 2D context を初期化する。
     - **内部挙動**:
         1. 引数で渡された `camera` および `background` を内部変数に保持する。
         2. `PIXI.Application` インスタンスを生成する（透明度・アンチエイリアス等の基本設定を含む）。

@@ -81,6 +81,7 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 | `.state-disabled` | Draft | 操作不可 | ボタン、タブ、カード |
 | `.state-selected` | Draft | ユーザーが選択した対象 | ItemCard、リスト行 |
 | `.state-clickable` | Draft | クリック可能であることを示す | hover/active feedback の対象 |
+| `.state-hidden` | Draft | 非表示 | 画面、overlay、パネル、タブ |
 | `.state-primary` | Draft | 画面内の最優先操作 | Button で使用 |
 | `.state-compact` | Draft | 情報量を抑えた表示 | ItemCard、Badge |
 | `.state-mini` | Draft | 高密度の小型表示 | ItemCard、Badge、DurabilityGauge |

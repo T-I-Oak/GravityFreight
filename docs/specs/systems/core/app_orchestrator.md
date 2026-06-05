@@ -18,16 +18,16 @@
     1. 各マネージャー・コントローラーをインスタンス化する。
     2. 共通 `DataManager` を内部依存として持つ `GameDataRepository` をインスタンス化する。
     3. `gameDataRepository.loadAllData()` を実行し、静的なマスタデータをロードする。
-    4. 各システム（Sound, Camera, Background, Story, HowToPlay等）の `initialize()` を実行。
-    5. **描画エンジンの初期化**: `WorldRenderer.initialize(uiController.getMapContainer(), camera, background)` を実行。
-    6. **How To Play の配線**: `HowToPlayUI` に `GameDataRepository`, `UIComponents`, `HowToPlayDiagrams` を渡し、説明書本体の表示制御を委譲する。
-    7. **タイトル画面の配線**: `uiController` を通じて「開始」「記録」「説明書」「音量設定」のハンドラを登録する。説明書ボタンは `howToPlayUI.show()` へ接続する。
-    8. **初期画面表示**: `uiController.showTitleScreen()` を実行。
+    4. 永続データを持つ各システム（Story, Achievement, Rank, FlightRecord 等）の `initialize()` を実行。
+    5. **描画エンジンの初期化**: `WorldRenderer.initialize(uiController.getMapCanvas())` を実行。
+    6. **タイトル画面の配線**: `uiController` を通じて開始ハンドラを登録する。記録・説明書・設定は各画面実装時に接続する。
+    7. **初期画面表示**: `uiController.showTitleScreen()` を実行。
 
 - **`startGame(): void`**
     - ゲーム本編（プレイセッション）を開始する。
     1. `new GameController(infrastructure)` を実行（インフラ各層への参照を渡す）。
     2. `gameController.start()` を呼び出し、制御権を委譲する。
+    - **段階実装**: v0.84 時点では、タイトルからゲーム開始し、Session 初期化、最初の Sector 生成、HUD / Build 画面表示、Canvas への Sector 描画までを接続する。
 
 - **`returnToTitle(): void`**
     - ゲーム終了画面からタイトル画面へ戻る。

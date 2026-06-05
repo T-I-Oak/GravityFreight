@@ -33,14 +33,15 @@
     - ウィンドウのリサイズイベントが発生した際のコールバックを登録する（操作音なし）。
     - **内部挙動**: `window` の `resize` イベントを購読し、発生時に現在のウィンドウサイズを引数として `handler` を実行する。
 
-- **`getMapContainer(): HTMLElement`**
-    - マップ描画用のコンテナ要素（Canvas が Append される親要素）を取得する。
-    - **内部挙動**: `constructor` で取得済みの特定の DOM 要素（`.map-canvas-container` 等）を返す。
+- **`getMapCanvas(): HTMLCanvasElement`**
+    - マップ描画用 Canvas (`#gameCanvas`) を取得する。
+    - **内部挙動**: `constructor` で取得済みの DOM 要素を返し、`AppOrchestrator` が `WorldRenderer.initialize()` に渡す。
 
 ### 画面制御メソッド (Screen Control)
 
 - **`showTitleScreen(): void`**
     - タイトル画面を表示する。
+    - **内部挙動**: タイトル画面を表示し、HUD、ビルドパネル、航行結果画面、施設画面を非表示にする。
 - **`showSectorStartScreen(): void`**
     - セクター開始画面を表示する。
 - **`showRecordScreen(): void`**
@@ -50,13 +51,13 @@
     - **責務境界**: 説明書本体のページ描画、背景画像、ページ切り替え、説明用デモは `HowToPlayUI` が担当する。`UIController` は画面表示の入口または既存画面の非表示制御に留める。
 - **`showBuildScreen(): void`**
     - ビルドフェーズを開始する。
-    - **内部挙動**: 画面の切り替えと同時に `openBuildPanel()` および HUD 要素の表示状態（`.hide` クラスの除去等）を切り替え、初期状態で両方が表示された状態にする。
+    - **内部挙動**: タイトル、航行結果画面、施設画面を非表示にし、HUD とビルドパネルを表示する。
 - **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
     - セクター開始時のタイトル演出（「SECTOR X」）を画面中央に表示する。
 - **`setFlightMode(isFlight: boolean): void`**
     - 航行モード（発射後）の切り替えを行い、UI の操作権限を制御する。
     - **内部挙動**:
-        - `isFlight: true`: ビルドパネルおよび関連するボタン（ASSEMBLE, LAUNCH等）に対し、特定の CSS クラス（`.is-locked` 等）を付与し、クリックイベントやホバー演出を無効化する。
+        - `isFlight: true`: ビルドパネルおよび関連するボタン（ASSEMBLE, LAUNCH等）に対し、特定の CSS クラス（`.state-locked` 等）を付与し、クリックイベントやホバー演出を無効化する。
         - `isFlight: false`: ロックを解除し、再度インタラクティブな状態に戻す。
         - **注意**: HUD およびビルドパネルの表示・非表示はこのメソッドでは変更せず、そのまま維持する。
 - **`initHUD(sessionState: object): void`**
@@ -81,7 +82,7 @@
     - **内部挙動**:
         - **ボタン有効化**: `type` が存在すれば `disabled` を解除し、`gray` クラスを除去する。
         - **色の更新**: `type`（'T', 'R', 'B'）に基づき、`.type-t`, `.type-r`, `.type-b` クラスを切り替える。
-        - **明滅の更新**: `isUnread` が `true` の場合、明滅アニメーション用のクラス（`.is-blinking`）を付与し、既読になるまで継続させる。
+        - **明滅の更新**: `isUnread` が `true` の場合、明滅アニメーション用のクラス（`.state-animating`）を付与し、既読になるまで継続させる。
 - **`setMailHandler(handler: Function): void`**
     - メールアイコンがクリックされた際のハンドラを登録する。
     - **内部挙動**: 内部で保持するメールアイコン要素を引数として `setOperationHandler` を呼び出す。
@@ -143,7 +144,7 @@
 
 - **`openBuildPanel(): void`**
     - ビルドパネルを開く。
-    - **内部挙動**: パネル要素に特定の CSS クラス（`.is-open` 等）を付与し、アニメーションを実行する。
+    - **内部挙動**: パネル要素に特定の CSS クラス（`.state-active` 等）を付与し、アニメーションを実行する。
 - **`closeBuildPanel(): void`**
     - ビルドパネルを閉じる。
     - **内部挙動**: パネル要素から CSS クラスを除去し、アニメーションを実行する。
@@ -206,7 +207,7 @@
 
 - **`setProtectHandler(handler: (protected: boolean) => void): void`**
     - リザルト画面の「レコード保護（PROTECT）ボタン」にハンドラを登録する。
-    - **内部挙動**: クリックごとにボタンのトグル状態（is-active）を切り替え、最新の状態を引数として `handler` を実行する。
+    - **内部挙動**: クリックごとにボタンのトグル状態（`.state-active`）を切り替え、最新の状態を引数として `handler` を実行する。
 
 - **`setMapToggleHandler(handler: (showMap: boolean) => void): void`**
     - リザルト画面の「マップ確認」ボタンにハンドラを登録する。表示文言は UI resource `flightResult.actions.viewMap` を使用する。

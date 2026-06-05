@@ -127,19 +127,31 @@
     - [x] ゲームオーバー判定
 - [ ] 表示・入力基盤を実装する
     - [ ] AppOrchestrator
+        - [x] タイトルから本編を開始する最小導線
     - [ ] UIController
+        - [x] タイトル画面、HUD、ビルド画面の最小表示切替
         - [x] 航行結果画面の表示、結果確定、マップ切替、レコード保護の DOM イベント接続
     - [ ] WorldRenderer
+        - [x] 本編 `#gameCanvas` への Sector 静的描画
+        - [ ] CameraController / BackgroundManager / 航跡 / ソナー / 航行演出との接続
     - [ ] CameraController
     - [ ] BackgroundManager
     - [ ] SoundController
 - [ ] How To Play を実装する
     - [ ] HowToPlayUI
     - [ ] HowToPlayDiagrams
+    - [ ] 1ページ目画像の白い帯にある「軌道の残響(ORBITAL ECHOES)」テキストを削除する
+        - 画像は説明書本文で使うため、言語依存・説明過多な文字情報を画像内に持たせない
 - [ ] 画面別 UI を実装する
     - [ ] タイトル
+        - [x] BEGIN CONTRACT から本編起動
+        - [ ] バージョン・著作権表示の著作権部分にポータルへのリンクを追加する
+        - [ ] タイトル背景画像を削除し、β v1 と同様のロケットアニメーションを追加する
     - [ ] 建造・照準
+        - [x] 実画面でビルドパネルを表示
+        - [ ] inventory 表示、選択、組み立て、発射操作の接続
     - [ ] 航行 HUD
+        - [x] 実画面で初期値を表示
     - [ ] タイトル画面、HUDに表示しているタイトルロゴを `logo.svg` にする
     - [x] 航行結果
     - [ ] 施設画面

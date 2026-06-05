@@ -49,11 +49,21 @@ describe('UIController', () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <div id="title-screen"></div>
+            <button id="start-game-btn"></button>
             <main id="flight-result-screen" hidden></main>
             <main id="facility-screen" hidden></main>
-            <header id="play-hud"></header>
-            <section id="build-overlay"></section>
+            <header id="mission-hud" class="state-hidden">
+                <span id="sector-display"></span>
+                <span id="score-display"></span>
+                <span id="coin-display"></span>
+                <button id="mail-btn-0"></button>
+                <button id="mail-btn-1"></button>
+                <button id="mail-btn-2"></button>
+            </header>
+            <section id="build-overlay" class="state-hidden"></section>
             <section id="launch-control"></section>
+            <canvas id="gameCanvas"></canvas>
         `;
         repository = createRepository();
         soundController = { playSE: vi.fn() };
@@ -65,7 +75,7 @@ describe('UIController', () => {
         controller.showResultScreen(createViewData());
 
         expect(document.querySelector('#flight-result-screen').hidden).toBe(false);
-        expect(document.querySelector('#play-hud').hidden).toBe(true);
+        expect(document.querySelector('#mission-hud').hidden).toBe(true);
         expect(document.querySelector('#build-overlay').hidden).toBe(true);
         expect(document.querySelector('#launch-control').hidden).toBe(true);
         expect(document.querySelector('#flight-result-screen').textContent).toContain('SECTOR 3 COMPLETED');
@@ -156,5 +166,40 @@ describe('UIController', () => {
         expect(actionHandler).toHaveBeenCalledWith('buy', { uid: 'item_1' });
         expect(departHandler).toHaveBeenCalledTimes(1);
         expect(soundController.playSE).toHaveBeenCalledTimes(2);
+    });
+
+    it('registers title start operation and switches to the build screen', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const startHandler = vi.fn();
+        const sessionState = { sectorNumber: 0, totalScore: 0, coins: 120 };
+
+        controller.setStartHandler(startHandler);
+        document.querySelector('#start-game-btn').click();
+        controller.initHUD(sessionState);
+        controller.showBuildScreen();
+
+        expect(startHandler).toHaveBeenCalledTimes(1);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
+        expect(document.querySelector('#sector-display').textContent).toBe('0');
+        expect(document.querySelector('#score-display').textContent).toBe('0');
+        expect(document.querySelector('#coin-display').textContent).toBe('120');
+        expect(document.querySelector('#title-screen').hidden).toBe(true);
+        expect(document.querySelector('#mission-hud').hidden).toBe(false);
+        expect(document.querySelector('#mission-hud').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#build-overlay').hidden).toBe(false);
+        expect(document.querySelector('#build-overlay').classList.contains('state-hidden')).toBe(false);
+    });
+
+    it('updates HUD values and exposes the map canvas', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+
+        controller.updateHUDValue('sector', 3);
+        controller.updateHUDValue('score', 1234);
+        controller.updateHUDValue('coin', 80);
+
+        expect(controller.getMapCanvas()).toBe(document.querySelector('#gameCanvas'));
+        expect(document.querySelector('#sector-display').textContent).toBe('3');
+        expect(document.querySelector('#score-display').textContent).toBe('1,234');
+        expect(document.querySelector('#coin-display').textContent).toBe('80');
     });
 });
