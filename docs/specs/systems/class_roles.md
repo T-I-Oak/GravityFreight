@@ -24,6 +24,7 @@ graph TD
 
     %% Logic & System Layer
     Orchestrator --> GC["GameController (Game Flow/Logic)"]
+    GC --> BSP["BuildScreenPresenter"]
     GC --> SPC["SectorProgressionController"]
     GC --> SS["SessionState (Current Game State)"]
     SS --> IC["ItemContainer (Inventory)"]
@@ -192,6 +193,13 @@ graph TD
         - 施設入場・施設取引・施設退出など、画面入力からゲーム進行処理への入口を管理する。
         - 航行中の物理計算、スコア計算、終了判定の実行。
         - セクター進行と契約終了判定は `SectorProgressionController` へ委譲する。
+- **BuildScreenPresenter**
+    - 生存期間: Game Lifecycle
+    - 役割: ビルド画面表示用 view data 生成。
+    - 責務:
+        - `SessionState.inventory` と現在の選択状態から、ビルドパネルのカテゴリ別表示データを作成する。
+        - ビルド画面の空表示、発射ボタン文言、発射可能状態を表示用データとしてまとめる。
+        - DOM 更新や選択状態の変更は担当しない。
 - **SectorProgressionController**
     - 生存期間: Game Lifecycle
     - 役割: セクター進行・契約終了判定。

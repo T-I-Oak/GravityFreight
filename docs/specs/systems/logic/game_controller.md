@@ -5,10 +5,11 @@
 - **所属ドメイン**: Logic Domain
 - **生存期間**: Game Lifecycle
 - **役割**: ゲームプレイ進行の執行者。
-- **責務**: 
+- **責務**:
     - **ゲーム内遷移の統括**: ワープ演出、ビルド画面、航行画面、リザルト画面、および**各施設画面**の遷移制御。
     - **ゲーム内入力の処理**: ビルドパネル操作、Canvas 入力（パン・回転・AIM）、および**施設内取引ボタン**の処理。
     - **ロジックの実行**: セクター生成、パーツ消費、物理計算サービスの呼び出し、終了判定。
+    - **表示データ生成の委譲**: ビルド画面の inventory 表示データは `BuildScreenPresenter` へ委譲し、`GameController` は現在状態と選択状態を渡す。
 
 ## 2. インターフェース (Interface)
 
@@ -21,6 +22,7 @@
 
 - **`constructor(infrastructure: object)`**
     - `AppOrchestrator` から渡される共通基盤（UI, Renderer, Sound, Data, Services 等）への参照を保持する。
+    - `BuildScreenPresenter` を保持し、ビルド画面表示用 view data 生成に使用する。
 
 - **`start(): void`**
     - ゲームを開始する。
@@ -37,7 +39,7 @@
             - `settlement.status === 'cleared'` の場合：`enterFacility(settlement.destination)` を実行。
             - それ以外の場合：
                 - `checkGameOverAndStartEndSequence()` を実行する。
-                - ゲームオーバーでない場合は、`uiController.showBuildScreen()` を実行。
+                - ゲームオーバーでない場合は、最新 inventory から `BuildScreenPresenter.createViewData()` を実行し、`uiController.showBuildScreen(viewData)` を実行。
 
 - **`enterFacility(type: string): void`**
     - 指定された施設（Trading Post, Repair Dock, Black Market）へ入場する。
@@ -110,7 +112,7 @@
         - **`this.currentSector = new Sector(sessionState, isAnomaly)`** を実行して新マップを生成。
         - `SessionState.reachedSector` が更新された場合は、`GameRecordTracker.recordSectorStart(sessionState)` を呼び出し、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['max_reached_sector'] })` を呼び出す。
     3. **同期**: HUDの数値表示（セクター番号等）を最新状態に更新し、`worldRenderer` への新マップセット、セクタータイトル表示を行う。
-    4. **演出終了**: 各演出を停止し、完了後に `uiController.showBuildScreen()` を実行。`uiController.setFlightMode(false)` で操作を有効化する。
+    4. **演出終了**: 各演出を停止し、完了後に `BuildScreenPresenter.createViewData(sessionState, currentBuildSelection)` で表示データを生成し、`uiController.showBuildScreen(viewData)` を実行。`uiController.setFlightMode(false)` で操作を有効化する。
 
 - **`launchRocket(rocket: Rocket, angle: number): void`**
     - 航行シーケンスを開始する。

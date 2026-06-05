@@ -1,4 +1,5 @@
 import SectorProgressionController from './SectorProgressionController.js';
+import BuildScreenPresenter from './BuildScreenPresenter.js';
 
 const FACILITY_THEME_CLASSES = {
     TRADING_POST: 'trading-post',
@@ -26,6 +27,9 @@ class GameController {
         this.appOrchestrator = infrastructure.appOrchestrator;
         this.currentSector = null;
         this.currentRocket = null;
+        this.currentBuildSelection = {};
+        this.buildScreenPresenter = infrastructure.buildScreenPresenter
+            || new BuildScreenPresenter(this.gameDataRepository);
         this.repairDockDismantleCount = 0;
         this.currentFacilityType = null;
         this.currentFacilityViewData = null;
@@ -140,6 +144,9 @@ class GameController {
         this.currentRocket = null;
 
         this.currentSector = await this.sectorProgressionController.beginSectorTransition(options);
+        this.uiController.showBuildScreen?.(
+            this.buildScreenPresenter.createViewData(this.sessionState, this.currentBuildSelection)
+        );
         return this.currentSector;
     }
 

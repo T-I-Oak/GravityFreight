@@ -1,4 +1,6 @@
 import { DataManager } from '../../../GameWorksOAK/src/lib/core/dataManager.js';
+import { setAppVersion } from '../../../GameWorksOAK/src/lib/utils/env.js';
+import packageData from '../../package.json';
 import GameDataRepository from './GameDataRepository.js';
 import SessionState from '../systems/entities/SessionState.js';
 import AchievementTracker from '../systems/logic/AchievementTracker.js';
@@ -26,6 +28,7 @@ class AppOrchestrator {
     }
 
     async boot() {
+        setAppVersion(packageData.version);
         this.gameDataRepository = new GameDataRepository(this.commonDataManager, this.i18nAdapter);
         await this.gameDataRepository.loadAllData();
 

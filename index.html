@@ -40,7 +40,7 @@
 
 </head>
 
-<body>
+<body class="theme-neon">
     <!-- タイトル画面 -->
     <div id="title-screen" class="theme-neon" data-title-bg="/GravityFreight/assets/tutorial/slide1.png">
         <script>
@@ -144,91 +144,120 @@
         </div>
     </div>
 
-    <div id="mission-hud" class="panel static state-hidden">
-        <div class="panel-header">
-            <h1 id="title">GRAVITY FREIGHT<span class="subtitle">ORBITAL ECHOES</span></h1>
-            <div id="mail-status-group" class="mail-icons-group">
-                <button id="mail-btn-0" class="mail-icon-btn gray" disabled>
-                    <div class="mail-envelope"></div>
-                </button>
-                <button id="mail-btn-1" class="mail-icon-btn gray" disabled>
-                    <div class="mail-envelope"></div>
-                </button>
-                <button id="mail-btn-2" class="mail-icon-btn gray" disabled>
-                    <div class="mail-envelope"></div>
+    <main id="play-scene-container" class="theme-neon state-hidden">
+        <header id="play-hud" class="Panel color-theme-sub">
+            <div class="hud-logo-header">
+                <div class="TitleBox">
+                    <h1 id="title" class="text-display logo">GRAVITY FREIGHT</h1>
+                    <span class="text-sub-display logo">ORBITAL ECHOES</span>
+                </div>
+                <div id="mail-status-group" class="hud-messages">
+                    <button id="mail-btn-0" class="message-icon gray" disabled>
+                        <span class="Icon mail"></span>
+                    </button>
+                    <button id="mail-btn-1" class="message-icon gray" disabled>
+                        <span class="Icon mail"></span>
+                    </button>
+                    <button id="mail-btn-2" class="message-icon gray" disabled>
+                        <span class="Icon mail"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hud-stats">
+                <div class="SplitColumn">
+                    <span class="stat-label">SECTOR</span>
+                    <span id="sector-display" class="stat-value sector">1</span>
+                </div>
+                <div class="SplitColumn">
+                    <span class="stat-label">COIN</span>
+                    <span id="coin-display" class="stat-value coin">0</span>
+                </div>
+                <div class="SplitColumn">
+                    <span class="stat-label">SCORE</span>
+                    <span id="score-display" class="stat-value score">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="play-screen">
+            <canvas id="gameCanvas" class="play-viewport"></canvas>
+
+            <aside id="inventory-panel" class="Panel color-theme-sub">
+                <header class="panel-header SplitRow">
+                    <div class="TabGroup">
+                        <button class="Tab state-clickable state-active" data-tab="flight">FLIGHT</button>
+                        <button class="Tab state-clickable" data-tab="assembly">ASSEMBLY</button>
+                    </div>
+                    <div class="PanelToggle state-clickable" id="btn-toggle-panel">
+                        <span class="Icon chevron-down toggle-icon"></span>
+                    </div>
+                </header>
+
+                <div class="panel-body ScrollArea" id="panel-content">
+                    <div class="tab-content" id="tab-flight">
+                        <section class="section rocket" id="section-rocket">
+                            <header class="section-header">
+                                <h3 class="section-title">ROCKET</h3>
+                            </header>
+                            <div class="item-list" id="list-rocket"></div>
+                        </section>
+
+                        <section class="section launcher" id="section-launcher">
+                            <header class="section-header">
+                                <h3 class="section-title">LAUNCHER</h3>
+                            </header>
+                            <div class="item-list" id="list-launcher"></div>
+                        </section>
+
+                        <section class="section booster" id="section-booster">
+                            <header class="section-header">
+                                <h3 class="section-title">BOOSTER</h3>
+                            </header>
+                            <div class="item-list" id="list-booster"></div>
+                        </section>
+                    </div>
+
+                    <div id="tab-assembly" class="tab-content state-hidden">
+                        <section class="section chassis">
+                            <header class="section-header">
+                                <h3 class="section-title">CHASSIS</h3>
+                            </header>
+                            <div class="item-list" id="list-chassis"></div>
+                        </section>
+                        <section class="section logic">
+                            <header class="section-header">
+                                <h3 class="section-title">LOGIC</h3>
+                            </header>
+                            <div class="item-list" id="list-logic"></div>
+                        </section>
+                        <section class="section module">
+                            <header class="section-header">
+                                <h3 class="section-title">MODULES</h3>
+                            </header>
+                            <div class="item-list" id="list-module"></div>
+                        </section>
+
+                        <div class="assembly-actions">
+                            <button id="build-btn" class="Button state-primary button-large state-disabled state-notable assembly" disabled>
+                                <span class="btn-main-label">ASSEMBLE ROCKET</span>
+                                <span class="btn-sub-label">シャーシとロジックを選択すると建造できます</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div id="launch-control" class="action-dock">
+                <button id="launch-btn" class="Button state-primary button-large state-hidden state-disabled state-notable launch" disabled>
+                    <span class="btn-main-label">LAUNCH ENGINE</span>
+                    <span class="btn-sub-label">ロケットと発射台を選択すると発射できます</span>
                 </button>
             </div>
-        </div>
-        <div id="hud-metrics">
-            <div class="metric"><span class="label">SECTOR</span><span id="sector-display">1</span></div>
-            <div class="metric"><span class="label">SCORE</span><span id="score-display">0</span></div>
-            <div class="metric"><span class="label">COIN</span><span id="coin-display">0</span></div>
-        </div>
-    </div>
+        </main>
+    </main>
 
     <main id="flight-result-screen" class="theme-matte FlexCenter" hidden></main>
     <main id="facility-screen" class="theme-matte FlexCenter" hidden></main>
-
-    <div id="build-overlay" class="state-hidden">
-        <div class="panel" id="terminal-panel">
-            <div class="panel-header">
-                <div class="tab-header">
-                    <button class="tab-btn active" data-tab="flight">FLIGHT</button>
-                    <button class="tab-btn" data-tab="factory">ASSEMBLY</button>
-                </div>
-                <div id="panel-controls">
-                    <button class="collapse-btn" id="terminal-collapse-btn">
-                        <span class="icon-chevron"></span>
-                    </button>
-                </div>
-            </div>
-            <div id="panel-scroll-area">
-                <div id="flight-tab" class="tab-content">
-                    <div class="category rockets">
-                        <h3>ROCKET</h3>
-                        <div id="rocket-list"></div>
-                    </div>
-                    <div class="category launchers">
-                        <h3>LAUNCHER</h3>
-                        <div id="launcher-list"></div>
-                    </div>
-                    <div class="category boosters">
-                        <h3>BOOSTER</h3>
-                        <div id="acc-option-list" class="option-list">
-                            <div class="slot-placeholder">No Booster Equipped</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="factory-tab" class="tab-content state-hidden">
-                    <div class="category chassis">
-                        <h3>CHASSIS</h3>
-                        <div id="chassis-list"></div>
-                    </div>
-                    <div class="category logic">
-                        <h3>LOGIC</h3>
-                        <div id="logic-list"></div>
-                    </div>
-                    <div class="category modules">
-                        <h3>MODULE</h3>
-                        <div id="logic-option-list" class="option-list">
-                            <div class="slot-placeholder">Slot Empty (Requires Research)</div>
-                        </div>
-                    </div>
-                    <button id="build-btn" class="Button state-primary state-disabled" disabled>
-                        <span class="btn-label">ASSEMBLE ROCKET</span>
-                        <span class="btn-subtext">シャーシとロジックを選択すると建造できます</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="launch-control" class="state-hidden">
-        <button id="launch-btn" class="Button button-large state-primary state-hidden state-disabled launch" disabled>
-            <span class="btn-label">LAUNCH ENGINE</span>
-            <span class="btn-subtext">ロケットと発射台を選択すると発射できます</span>
-        </button>
-    </div>
     <button id="back-to-result-btn" class="Button button-large state-primary state-hidden home">BACK TO RESULT</button>
 
     <div id="star-info-panel" class="panel state-hidden">
@@ -301,7 +330,6 @@
             </div>
         </div>
     </div>
-    <canvas id="gameCanvas"></canvas>
     <script type="module" src="/src/main.js"></script>
 
 

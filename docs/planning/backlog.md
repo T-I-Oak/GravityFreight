@@ -134,8 +134,12 @@
     - [ ] WorldRenderer
         - [x] 本編 `#gameCanvas` への Sector 静的描画
         - [ ] CameraController / BackgroundManager / 航跡 / ソナー / 航行演出との接続
+        - [ ] 実プレイ画面のマップ表示完成度を上げる
+            - 現在は初期表示確認用の静的描画に留め、完成版のマップ視認性、演出、カメラ、情報密度は別タスクで対応する
     - [ ] CameraController
     - [ ] BackgroundManager
+        - [ ] 実プレイ画面の背景演出を完成版へ寄せる
+            - 現在はプレイ画面のレイアウト確認を優先し、背景表現の完成度は別タスクで対応する
     - [ ] SoundController
 - [ ] How To Play を実装する
     - [ ] HowToPlayUI
@@ -150,6 +154,10 @@
     - [ ] 建造・照準
         - [x] 実画面でビルドパネルを表示
         - [ ] inventory 表示、選択、組み立て、発射操作の接続
+            - [x] 実 inventory をビルドパネルに表示
+            - [ ] Rocket / Launcher / Booster の選択
+            - [ ] Chassis / Logic / Module から RocketItem を組み立て
+            - [ ] 発射操作
     - [ ] 航行 HUD
         - [x] 実画面で初期値を表示
     - [ ] タイトル画面、HUDに表示しているタイトルロゴを `logo.svg` にする

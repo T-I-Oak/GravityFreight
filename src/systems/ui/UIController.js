@@ -1,5 +1,6 @@
 import { FlightResultComponents } from './FlightResultComponents.js';
 import { FacilityComponents } from './FacilityComponents.js';
+import { UIComponents } from './UIComponents.js';
 
 class UIController {
     constructor(options = {}) {
@@ -8,6 +9,9 @@ class UIController {
         this.flightResultComponents = options.flightResultComponents || FlightResultComponents;
         this.facilityComponents = options.facilityComponents || FacilityComponents;
         this.soundController = options.soundController || null;
+        this.resultHandler = null;
+        this.mapToggleHandler = null;
+        this.protectHandler = null;
 
         if (!this.gameDataRepository) {
             throw new Error('[UIController] gameDataRepository is required.');
@@ -17,10 +21,20 @@ class UIController {
         this.startButton = this.document.querySelector('#start-game-btn');
         this.resultScreen = this.#requiredElement('#flight-result-screen');
         this.facilityScreen = this.#requiredElement('#facility-screen');
-        this.hud = this.document.querySelector('#play-hud, #mission-hud');
-        this.buildPanel = this.document.querySelector('#build-overlay, #terminal-panel');
+        this.playScene = this.document.querySelector('#play-scene-container');
+        this.hud = this.document.querySelector('#play-hud');
+        this.buildPanel = this.document.querySelector('#inventory-panel');
         this.launchControl = this.document.querySelector('#launch-control');
+        this.launchButton = this.document.querySelector('#launch-btn');
         this.mapCanvas = this.document.querySelector('#gameCanvas');
+        this.buildLists = {
+            rocket: this.document.querySelector('#list-rocket'),
+            launcher: this.document.querySelector('#list-launcher'),
+            booster: this.document.querySelector('#list-booster'),
+            chassis: this.document.querySelector('#list-chassis'),
+            logic: this.document.querySelector('#list-logic'),
+            module: this.document.querySelector('#list-module')
+        };
         this.hudValues = {
             sector: this.document.querySelector('#sector-display'),
             score: this.document.querySelector('#score-display'),
@@ -31,10 +45,13 @@ class UIController {
             this.document.querySelector('#mail-btn-1'),
             this.document.querySelector('#mail-btn-2')
         ].filter(Boolean);
+        this.#wireBuildTabs();
+        this.#wireBuildPanelToggle();
     }
 
     showTitleScreen() {
         this.#show(this.titleScreen);
+        this.#hide(this.playScene);
         this.#hide(this.resultScreen);
         this.#hide(this.facilityScreen);
         this.#hide(this.hud);
@@ -42,13 +59,19 @@ class UIController {
         this.#hide(this.launchControl);
     }
 
-    showBuildScreen() {
+    showBuildScreen(viewData = null) {
         this.#hide(this.titleScreen);
         this.#hide(this.resultScreen);
         this.#hide(this.facilityScreen);
+        this.#show(this.playScene);
         this.#show(this.hud);
         this.#show(this.buildPanel);
-        this.#hide(this.launchControl);
+        if (viewData) {
+            this.#renderBuildView(viewData);
+            this.#show(this.launchControl);
+        } else {
+            this.#hide(this.launchControl);
+        }
     }
 
     initHUD(sessionState) {
@@ -86,10 +109,12 @@ class UIController {
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
         this.#hide(this.launchControl);
+        this.#hide(this.playScene);
         this.#hide(this.titleScreen);
         this.#hide(this.facilityScreen);
         this.#show(this.resultScreen);
         this.resultScreen.innerHTML = this.flightResultComponents.generateHTML(viewData, this.gameDataRepository);
+        this.#wireResultHandlers();
     }
 
     showFacilityScreen(type, viewData) {
@@ -97,31 +122,25 @@ class UIController {
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
         this.#hide(this.launchControl);
+        this.#hide(this.playScene);
         this.#hide(this.titleScreen);
         this.#show(this.facilityScreen);
         this.facilityScreen.innerHTML = this.facilityComponents.generateHTML({ ...viewData, type });
     }
 
     setResultHandler(handler) {
-        this.setOperationHandler(this.#requiredResultElement('.flight-result-action-button'), handler);
+        this.resultHandler = handler;
+        this.#wireResultHandlers();
     }
 
     setMapToggleHandler(handler) {
-        let showMap = false;
-        this.setOperationHandler(this.#requiredResultElement('.flight-result-map-button'), () => {
-            showMap = !showMap;
-            this.resultScreen.querySelector('.Panel').hidden = showMap;
-            handler(showMap);
-        });
+        this.mapToggleHandler = handler;
+        this.#wireResultHandlers();
     }
 
     setProtectHandler(handler) {
-        this.setOperationHandler(this.#requiredResultElement('.Badge.favorite'), element => {
-            const isProtected = !element.classList.contains('state-active');
-            element.classList.toggle('state-active', isProtected);
-            element.classList.toggle('state-inactive', !isProtected);
-            handler(isProtected);
-        });
+        this.protectHandler = handler;
+        this.#wireResultHandlers();
     }
 
     setFacilityActionHandler(handler) {
@@ -140,6 +159,126 @@ class UIController {
         this.#requiredFacilityElement('.credits-value').textContent = `${this.#formatNumber(value)} c`;
     }
 
+    #renderBuildView(viewData) {
+        Object.entries(this.buildLists).forEach(([sectionId, container]) => {
+            if (!container) {
+                return;
+            }
+            const section = viewData.sections?.[sectionId];
+            container.innerHTML = this.#generateBuildSectionHTML(section, sectionId);
+        });
+
+        this.#updateLaunchButton(viewData.launch);
+    }
+
+    #generateBuildSectionHTML(section, sectionId) {
+        const entries = section?.entries ?? [];
+        if (entries.length === 0) {
+            return UIComponents.generatePlaceholderHTML(
+                section?.emptyText ?? 'NO ITEM',
+                section?.emptySubtext ?? '',
+                { category: sectionId }
+            );
+        }
+
+        return entries.map(entry => UIComponents.generateCardHTML(entry.itemViewData, {
+            isClickable: !entry.disabled,
+            isActive: !!entry.selected
+        })).join('');
+    }
+
+    #updateLaunchButton(launch = {}) {
+        if (!this.launchButton) {
+            return;
+        }
+
+        const ready = !!launch.ready;
+        this.launchButton.disabled = !ready;
+        this.launchButton.classList.remove('state-hidden');
+        this.launchButton.classList.toggle('state-disabled', !ready);
+        this.launchButton.classList.toggle('state-notable', !ready);
+        const label = this.launchButton.querySelector('.btn-main-label');
+        const subtext = this.launchButton.querySelector('.btn-sub-label');
+        if (label && launch.label) {
+            label.textContent = launch.label;
+        }
+        if (subtext && launch.subtext) {
+            subtext.textContent = launch.subtext;
+        }
+    }
+
+    #wireBuildTabs() {
+        this.buildPanel?.querySelectorAll('[data-tab]').forEach(tab => {
+            tab.addEventListener('click', event => {
+                const tabId = event.currentTarget.dataset.tab;
+                this.#activateBuildTab(tabId);
+            });
+        });
+    }
+
+    #activateBuildTab(tabId) {
+        this.buildPanel?.querySelectorAll('[data-tab]').forEach(tab => {
+            const isActive = tab.dataset.tab === tabId;
+            tab.classList.toggle('state-active', isActive);
+            tab.classList.toggle('active', isActive);
+        });
+
+        const targetMap = {
+            flight: 'tab-flight',
+            assembly: 'tab-assembly'
+        };
+
+        Object.entries(targetMap).forEach(([key, elementId]) => {
+            const element = this.document.querySelector(`#${elementId}`);
+            if (element) {
+                element.classList.toggle('state-hidden', key !== tabId);
+            }
+        });
+    }
+
+    #wireResultHandlers() {
+        if (this.resultHandler) {
+            this.#setResultOperationHandler('.flight-result-action-button', this.resultHandler);
+        }
+
+        if (this.mapToggleHandler) {
+            let showMap = false;
+            this.#setResultOperationHandler('.flight-result-map-button', () => {
+                showMap = !showMap;
+                this.resultScreen.querySelector('.Panel').hidden = showMap;
+                this.mapToggleHandler(showMap);
+            });
+        }
+
+        if (this.protectHandler) {
+            this.#setResultOperationHandler('.Badge.favorite', element => {
+                const isProtected = !element.classList.contains('state-active');
+                element.classList.toggle('state-active', isProtected);
+                element.classList.toggle('state-inactive', !isProtected);
+                this.protectHandler(isProtected);
+            });
+        }
+    }
+
+    #wireBuildPanelToggle() {
+        const toggle = this.document.querySelector('#btn-toggle-panel');
+        if (toggle) {
+            this.setOperationHandler(toggle, () => {
+                this.buildPanel?.classList.toggle('state-collapsed');
+            });
+        }
+    }
+
+    #setResultOperationHandler(selector, handler) {
+        const element = this.resultScreen.querySelector(selector);
+        if (!element || element.dataset.handlerReady === 'true') {
+            return;
+        }
+
+        element.dataset.handlerReady = 'true';
+        this.setOperationHandler(element, handler);
+    }
+
     setOperationHandler(element, handler, seId = 'click') {
         element.addEventListener('click', event => {
             this.soundController?.playSE?.(seId);
@@ -151,14 +290,6 @@ class UIController {
         const element = this.document.querySelector(selector);
         if (!element) {
             throw new Error(`[UIController] Required element not found: ${selector}`);
-        }
-        return element;
-    }
-
-    #requiredResultElement(selector) {
-        const element = this.resultScreen.querySelector(selector);
-        if (!element) {
-            throw new Error(`[UIController] Required result element not found: ${selector}`);
         }
         return element;
     }

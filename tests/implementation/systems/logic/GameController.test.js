@@ -23,6 +23,11 @@ describe('GameController', () => {
         });
         expect(context.worldRenderer.setSector).toHaveBeenCalledWith(context.controller.currentSector);
         expect(context.uiController.showBuildScreen).toHaveBeenCalled();
+        const buildViewData = context.uiController.showBuildScreen.mock.calls.at(-1)[0];
+        expect(buildViewData.sections.launcher.entries).toHaveLength(1);
+        expect(buildViewData.sections.chassis.entries).toHaveLength(1);
+        expect(buildViewData.sections.logic.entries).toHaveLength(1);
+        expect(buildViewData.launch.ready).toBe(false);
     });
 
     it('settles navigation end and shows a flight result view model', async () => {

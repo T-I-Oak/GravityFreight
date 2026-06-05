@@ -53,16 +53,32 @@ describe('UIController', () => {
             <button id="start-game-btn"></button>
             <main id="flight-result-screen" hidden></main>
             <main id="facility-screen" hidden></main>
-            <header id="mission-hud" class="state-hidden">
-                <span id="sector-display"></span>
-                <span id="score-display"></span>
-                <span id="coin-display"></span>
-                <button id="mail-btn-0"></button>
-                <button id="mail-btn-1"></button>
-                <button id="mail-btn-2"></button>
-            </header>
-            <section id="build-overlay" class="state-hidden"></section>
-            <section id="launch-control"></section>
+            <main id="play-scene-container" class="state-hidden">
+                <header id="play-hud" class="state-hidden">
+                    <span id="sector-display"></span>
+                    <span id="score-display"></span>
+                    <span id="coin-display"></span>
+                    <button id="mail-btn-0"></button>
+                    <button id="mail-btn-1"></button>
+                    <button id="mail-btn-2"></button>
+                </header>
+                <section id="inventory-panel" class="state-hidden">
+                    <button id="btn-toggle-panel"></button>
+                    <button class="Tab state-active" data-tab="flight"></button>
+                    <button class="Tab" data-tab="assembly"></button>
+                    <div id="tab-flight"></div>
+                    <div id="tab-assembly" class="state-hidden"></div>
+                    <div id="list-rocket"></div>
+                    <div id="list-launcher"></div>
+                    <div id="list-booster"></div>
+                    <div id="list-chassis"></div>
+                    <div id="list-logic"></div>
+                    <div id="list-module"></div>
+                </section>
+            </main>
+            <section id="launch-control">
+                <button id="launch-btn" disabled class="state-disabled"></button>
+            </section>
             <canvas id="gameCanvas"></canvas>
         `;
         repository = createRepository();
@@ -75,8 +91,8 @@ describe('UIController', () => {
         controller.showResultScreen(createViewData());
 
         expect(document.querySelector('#flight-result-screen').hidden).toBe(false);
-        expect(document.querySelector('#mission-hud').hidden).toBe(true);
-        expect(document.querySelector('#build-overlay').hidden).toBe(true);
+        expect(document.querySelector('#play-hud').hidden).toBe(true);
+        expect(document.querySelector('#inventory-panel').hidden).toBe(true);
         expect(document.querySelector('#launch-control').hidden).toBe(true);
         expect(document.querySelector('#flight-result-screen').textContent).toContain('SECTOR 3 COMPLETED');
         expect(document.querySelector('#flight-result-screen').textContent).toContain('Goal Bonus');
@@ -101,6 +117,19 @@ describe('UIController', () => {
         expect(resultHandler).toHaveBeenCalledTimes(1);
         expect(mapHandler).toHaveBeenCalledWith(true);
         expect(protectHandler).toHaveBeenCalledWith(true);
+    });
+
+    it('defers the result action handler until the result screen is rendered', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const resultHandler = vi.fn();
+
+        expect(() => controller.setResultHandler(resultHandler)).not.toThrow();
+
+        controller.showResultScreen(createViewData());
+        document.querySelector('.flight-result-action-button').click();
+
+        expect(resultHandler).toHaveBeenCalledTimes(1);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
     });
 
     it('throws when the result screen container is missing', () => {
@@ -184,10 +213,93 @@ describe('UIController', () => {
         expect(document.querySelector('#score-display').textContent).toBe('0');
         expect(document.querySelector('#coin-display').textContent).toBe('120');
         expect(document.querySelector('#title-screen').hidden).toBe(true);
-        expect(document.querySelector('#mission-hud').hidden).toBe(false);
-        expect(document.querySelector('#mission-hud').classList.contains('state-hidden')).toBe(false);
-        expect(document.querySelector('#build-overlay').hidden).toBe(false);
-        expect(document.querySelector('#build-overlay').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#play-scene-container').hidden).toBe(false);
+        expect(document.querySelector('#play-hud').hidden).toBe(false);
+        expect(document.querySelector('#play-hud').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#inventory-panel').hidden).toBe(false);
+        expect(document.querySelector('#inventory-panel').classList.contains('state-hidden')).toBe(false);
+    });
+
+    it('switches build tabs without changing game state', () => {
+        new UIController({ gameDataRepository: repository, soundController });
+
+        document.querySelector('[data-tab="assembly"]').click();
+
+        expect(document.querySelector('[data-tab="assembly"]').classList.contains('state-active')).toBe(true);
+        expect(document.querySelector('[data-tab="flight"]').classList.contains('state-active')).toBe(false);
+        expect(document.querySelector('#tab-assembly').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#tab-flight').classList.contains('state-hidden')).toBe(true);
+    });
+
+    it('toggles the build panel collapsed state without changing game state', () => {
+        new UIController({ gameDataRepository: repository, soundController });
+
+        document.querySelector('#btn-toggle-panel').click();
+
+        expect(document.querySelector('#inventory-panel').classList.contains('state-collapsed')).toBe(true);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
+    });
+
+    it('renders build inventory lists from view data and updates launch state', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+
+        controller.showBuildScreen({
+            sections: {
+                rocket: {
+                    entries: [],
+                    emptyText: 'NO ROCKET',
+                    emptySubtext: 'ASSEMBLE A ROCKET'
+                },
+                launcher: {
+                    entries: [
+                        {
+                            uid: 'launcher_1',
+                            itemViewData: {
+                                uid: 'launcher_1',
+                                id: 'pad_standard_d2',
+                                name: 'Standard Pad',
+                                category: 'launcher',
+                                stats: {}
+                            }
+                        }
+                    ],
+                    emptyText: 'NO LAUNCHER',
+                    emptySubtext: 'BUY A LAUNCHER'
+                },
+                booster: { entries: [], emptyText: 'NO BOOSTER', emptySubtext: 'OPTIONAL' },
+                chassis: {
+                    entries: [
+                        {
+                            uid: 'chassis_1',
+                            itemViewData: {
+                                uid: 'chassis_1',
+                                id: 'hull_light',
+                                name: 'Light Hull',
+                                category: 'chassis',
+                                stats: {}
+                            }
+                        }
+                    ],
+                    emptyText: 'NO CHASSIS',
+                    emptySubtext: 'BUY CHASSIS'
+                },
+                logic: { entries: [], emptyText: 'NO LOGIC', emptySubtext: 'BUY LOGIC' },
+                module: { entries: [], emptyText: 'NO MODULE', emptySubtext: 'OPTIONAL' }
+            },
+            launch: {
+                ready: false,
+                label: 'LAUNCH ENGINE',
+                subtext: 'ロケットと発射台を選択すると発射できます'
+            }
+        });
+
+        expect(document.querySelector('#list-rocket').textContent).toContain('NO ROCKET');
+        expect(document.querySelector('#list-launcher').textContent).toContain('Standard Pad');
+        expect(document.querySelector('#list-chassis').textContent).toContain('Light Hull');
+        expect(document.querySelector('#launch-control').hidden).toBe(false);
+        expect(document.querySelector('#launch-btn').disabled).toBe(true);
+        expect(document.querySelector('#launch-btn').classList.contains('state-disabled')).toBe(true);
+        expect(document.querySelector('#launch-btn').classList.contains('state-hidden')).toBe(false);
     });
 
     it('updates HUD values and exposes the map canvas', () => {

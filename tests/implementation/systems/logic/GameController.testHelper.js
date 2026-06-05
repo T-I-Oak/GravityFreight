@@ -65,7 +65,22 @@ export function createController(settlement = createSettlement()) {
             'facility.blackMarket.normalName': 'Standard Deal',
             'facility.blackMarket.normalDescription': 'Acquire items worth at least 100c.',
             'facility.blackMarket.premiumName': 'Premium Deal',
-            'facility.blackMarket.premiumDescription': 'Acquire items worth at least 500c.'
+            'facility.blackMarket.premiumDescription': 'Acquire items worth at least 500c.',
+            'build.empty.rocket.text': 'NO ROCKET EQUIPPED',
+            'build.empty.rocket.subtext': 'ASSEMBLE A ROCKET',
+            'build.empty.launcher.text': 'NO LAUNCHER',
+            'build.empty.launcher.subtext': 'ACQUIRE A LAUNCHER',
+            'build.empty.booster.text': 'NO BOOSTER EQUIPPED',
+            'build.empty.booster.subtext': 'BOOSTER IS OPTIONAL',
+            'build.empty.chassis.text': 'NO CHASSIS',
+            'build.empty.chassis.subtext': 'ACQUIRE CHASSIS',
+            'build.empty.logic.text': 'NO LOGIC',
+            'build.empty.logic.subtext': 'ACQUIRE LOGIC',
+            'build.empty.module.text': 'NO MODULE',
+            'build.empty.module.subtext': 'MODULE IS OPTIONAL',
+            'build.launch.label': 'LAUNCH ENGINE',
+            'build.launch.waitingSubtext': 'Select a rocket and launcher to begin launch prep.',
+            'build.launch.readySubtext': 'Confirm the launch angle to fire.'
         })[key])
     };
     const currentRocket = {
@@ -85,6 +100,28 @@ export function createController(settlement = createSettlement()) {
             id: 'mod_capacity',
             name: 'Capacity Module',
             category: 'module',
+            stats: {}
+        }))
+    };
+    const chassisItem = {
+        uid: 'chassis_item',
+        category: 'chassis',
+        getViewData: vi.fn(() => ({
+            uid: 'chassis_item',
+            id: 'hull_light',
+            name: 'Light Hull',
+            category: 'chassis',
+            stats: {}
+        }))
+    };
+    const logicItem = {
+        uid: 'logic_item',
+        category: 'logic',
+        getViewData: vi.fn(() => ({
+            uid: 'logic_item',
+            id: 'sensor_short',
+            name: 'Short Sensor',
+            category: 'logic',
             stats: {}
         }))
     };
@@ -111,6 +148,36 @@ export function createController(settlement = createSettlement()) {
         representative: damagedLauncher,
         items: [damagedLauncher]
     };
+    const chassisStack = {
+        uid: 'stack_chassis',
+        representative: chassisItem,
+        items: [chassisItem],
+        getViewData: vi.fn(() => ({
+            ...chassisItem.getViewData(),
+            uid: 'stack_chassis',
+            count: 1
+        }))
+    };
+    const logicStack = {
+        uid: 'stack_logic',
+        representative: logicItem,
+        items: [logicItem],
+        getViewData: vi.fn(() => ({
+            ...logicItem.getViewData(),
+            uid: 'stack_logic',
+            count: 1
+        }))
+    };
+    inventoryStack.getViewData = vi.fn(() => ({
+        ...sellItem.getViewData(),
+        uid: 'stack_sell',
+        count: 1
+    }));
+    launcherStack.getViewData = vi.fn(() => ({
+        ...damagedLauncher.getViewData(),
+        uid: 'stack_launcher',
+        count: 1
+    }));
     const sessionState = {
         sectorNumber: 3,
         coins: 120,
@@ -119,8 +186,13 @@ export function createController(settlement = createSettlement()) {
             sessionState.coins = 120;
         }),
         inventory: {
-            stacks: [inventoryStack, launcherStack],
-            getItemsByCategory: vi.fn(category => (category === 'launcher' ? [launcherStack] : []))
+            stacks: [inventoryStack, launcherStack, chassisStack, logicStack],
+            getItemsByCategory: vi.fn(category => ({
+                module: [inventoryStack],
+                launcher: [launcherStack],
+                chassis: [chassisStack],
+                logic: [logicStack]
+            }[category] ?? []))
         },
         applyTransaction: vi.fn(transaction => {
             const spentCoins = transaction.spentCoins ?? 0;

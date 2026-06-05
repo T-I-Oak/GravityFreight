@@ -152,6 +152,114 @@
         }
       }
     },
+    "build": {
+      "empty": {
+        "rocket": {
+          "text": {
+            "lang-store": {
+              "ja": "NO ROCKET EQUIPPED",
+              "en": "NO ROCKET EQUIPPED"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "ASSEMBLE A ROCKET",
+              "en": "ASSEMBLE A ROCKET"
+            }
+          }
+        },
+        "launcher": {
+          "text": {
+            "lang-store": {
+              "ja": "NO LAUNCHER",
+              "en": "NO LAUNCHER"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "ACQUIRE A LAUNCHER",
+              "en": "ACQUIRE A LAUNCHER"
+            }
+          }
+        },
+        "booster": {
+          "text": {
+            "lang-store": {
+              "ja": "NO BOOSTER EQUIPPED",
+              "en": "NO BOOSTER EQUIPPED"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "BOOSTER IS OPTIONAL",
+              "en": "BOOSTER IS OPTIONAL"
+            }
+          }
+        },
+        "chassis": {
+          "text": {
+            "lang-store": {
+              "ja": "NO CHASSIS",
+              "en": "NO CHASSIS"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "ACQUIRE CHASSIS",
+              "en": "ACQUIRE CHASSIS"
+            }
+          }
+        },
+        "logic": {
+          "text": {
+            "lang-store": {
+              "ja": "NO LOGIC",
+              "en": "NO LOGIC"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "ACQUIRE LOGIC",
+              "en": "ACQUIRE LOGIC"
+            }
+          }
+        },
+        "module": {
+          "text": {
+            "lang-store": {
+              "ja": "NO MODULE",
+              "en": "NO MODULE"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "MODULE IS OPTIONAL",
+              "en": "MODULE IS OPTIONAL"
+            }
+          }
+        }
+      },
+      "launch": {
+        "label": {
+          "lang-store": {
+            "ja": "LAUNCH ENGINE",
+            "en": "LAUNCH ENGINE"
+          }
+        },
+        "waitingSubtext": {
+          "lang-store": {
+            "ja": "ロケットと発射台を選択すると発射できます",
+            "en": "Select a rocket and launcher to begin launch prep."
+          }
+        },
+        "readySubtext": {
+          "lang-store": {
+            "ja": "発射角度を確認して発射できます",
+            "en": "Confirm the launch angle to fire."
+          }
+        }
+      }
+    },
     "facility": {
       "common": {
         "credits": {
