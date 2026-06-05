@@ -140,6 +140,8 @@
 - [ ] How To Play を実装する
     - [ ] HowToPlayUI
     - [ ] HowToPlayDiagrams
+    - [ ] 1ページ目画像の白い帯にある「軌道の残響(ORBITAL ECHOES)」テキストを削除する
+        - 画像は説明書本文で使うため、言語依存・説明過多な文字情報を画像内に持たせない
 - [ ] 画面別 UI を実装する
     - [ ] タイトル
         - [x] BEGIN CONTRACT から本編起動
