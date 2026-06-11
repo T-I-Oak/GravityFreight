@@ -9,6 +9,10 @@
     - 実装移行時に単純置換せず、責務に基づいて新 class 名を決める
 - [ ] 初版リリース前に `common_style.md` の移行期間中の対応節を削除する
     - リリース版ドキュメントには β v1 / 旧仕様の class 名を残さない
+- [ ] トップメニューの設定画面に追加する設定項目を仕様化する
+    - 現在の SE 音量設定に加えて、カメラリセットと言語切り替えを設定項目として追加する
+    - カメラリセットは CameraController の永続化済み状態を初期値に戻す操作として仕様化する
+    - 言語切り替えは共通 i18n ライブラリの責務・保存方式に従い、Gravity Freight 側では UI 導線と再描画範囲を仕様化する
 - [ ] FlightReplaySnapshots 完成後に保存データサイズを検証する
     - 目標: Gravity Freight の保存データ総量は 1MiB 以内を目安とする
     - 目標: リプレイ関連データは 20件保存時に 600KiB 以内、1件平均 30KiB 以内を目安とする
@@ -135,7 +139,7 @@
     - [ ] WorldRenderer
         - [x] 本編 `#gameCanvas` への Sector 静的描画
         - [ ] CameraController / BackgroundManager / 航跡 / ソナー / 航行演出との接続
-            - [x] CameraController / BackgroundManager を PIXI 描画へ接続
+            - [x] CameraController / BackgroundManager を Canvas 2D 描画へ接続
             - [ ] 航跡 / ソナー / 予測線 / 船体・貨物描画を接続
             - [ ] WorldRenderer の描画色を `css/design_tokens.css` の world / facility / category token から取得する
         - [ ] 実プレイ画面のマップ表示完成度を上げる
@@ -184,7 +188,7 @@
     - [ ] 永続データ migration
     - [ ] public/data/update_history.json が v0 中は `[]` のままであること
 - [ ] 依存関係の脆弱性警告を確認・解消する
-    - PIXI.js 追加後に `npm audit` で警告が出ているため、リリース前に影響範囲を確認する
+    - `npm audit` で警告が出ている場合は、リリース前に影響範囲を確認する
     - `npm audit fix` または依存バージョン更新を行う場合は、lockfile 変更、build サイズ、描画挙動への影響を確認する
     - 自動修正で破壊的な依存更新が必要になる場合は、対応方針を確認してから実施する
 - [ ] 要求仕様に対するテストを実施する

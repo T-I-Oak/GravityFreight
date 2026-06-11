@@ -75,18 +75,13 @@ class CameraController {
         };
     }
 
-    zoom(factor, anchor = null) {
-        const target = anchor ?? {
-            x: this.viewportSize.x / 2,
-            y: this.viewportSize.y / 2
-        };
-        const worldBefore = this.toWorld(target);
+    zoom(factor) {
+        const pivot = this.toScreen({ x: 0, y: 0 });
         this.zoomLevel = Math.max(MIN_ZOOM_LEVEL, Math.min(MAX_ZOOM_LEVEL, this.zoomLevel * factor));
-        const rotatedBefore = this.#rotate(worldBefore, this.rotation);
 
         this.position = {
-            x: rotatedBefore.x - (target.x - this.viewportSize.x / 2) / this.zoomLevel,
-            y: rotatedBefore.y - (target.y - this.viewportSize.y / 2) / this.zoomLevel
+            x: -(pivot.x - this.viewportSize.x / 2) / this.zoomLevel,
+            y: -(pivot.y - this.viewportSize.y / 2) / this.zoomLevel
         };
     }
 

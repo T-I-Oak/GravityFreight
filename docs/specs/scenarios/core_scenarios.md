@@ -32,14 +32,14 @@
 - [x] 0.4 [機能] 背景（Starfield）の生成と描画準備
     - [x] 0.4.1 [UI] 遠景の星々の初期配置（Starfieldの生成）
     - [x] 0.4.2 [機能] カメラ回転に応じた背景の連動描画
-    - [x] 0.4.3 [機能] WorldRenderer の初期化（PIXIアプリケーション生成と Canvas 配置）
+    - [x] 0.4.3 [機能] WorldRenderer の初期化（Canvas 2D context 取得と描画対象 Canvas 配置）
     - **決定事項**:
         - `BackgroundManager` を定義し、z軸（奥行き）を持つ星々を管理。
         - カメラの `rotation` に 100% 同期して回転する。
         - カメラの `position`（パン）に対して 20% の視差効果（Parallax）を適用して連動する。
         - **WorldRenderer 初期化**: `AppOrchestrator.boot()` 内で `WorldRenderer.initialize(container, camera, background)` を実行。
             - `container` は `UIController.getMapContainer()` から取得した DOM 要素。
-            - 内部で `PIXI.Application` を生成し、`container.appendChild(app.view)` で Canvas を配置。
+            - 内部で `canvas.getContext('2d')` を使用し、既存のゲーム Canvas を描画対象にする。
             - 初期化の最後に `handleResize()` を呼び出し、レンダラーおよび各コンポーネント（Camera, Background）の描画領域を確定させる。
     - [x] 0.4.4 [シナリオ] ワールドオブジェクトの描画構造
         - [x] 0.4.4.1 [UI] 描画レイヤーの重なり（背景/天体/出口/ロケット/エフェクト）

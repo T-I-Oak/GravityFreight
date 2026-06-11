@@ -76,38 +76,6 @@ class BackgroundManager {
         });
     }
 
-    renderPixi(graphics, view = {}) {
-        const width = view.width ?? 960;
-        const height = view.height ?? 720;
-        const projection = this.#createProjection(view);
-
-        graphics.clear();
-        graphics.rect(0, 0, width, height).fill(0x050510);
-
-        this.stars.forEach(star => {
-            const point = projection(star);
-            if (!point) {
-                return;
-            }
-
-            if (this.warpSpeed > NORMAL_WARP_SPEED) {
-                graphics
-                    .moveTo(point.oldX, point.oldY)
-                    .lineTo(point.x, point.y)
-                    .stroke({
-                        color: 0xffffff,
-                        alpha: point.alpha,
-                        width: Math.max(0.8, point.size * 0.4)
-                    });
-                return;
-            }
-
-            graphics
-                .circle(point.x, point.y, point.size * 0.45)
-                .fill({ color: 0xffffff, alpha: point.alpha });
-        });
-    }
-
     startWarpEffect(duration = 0) {
         this.#setWarpTarget(ACTIVE_WARP_SPEED, duration);
     }

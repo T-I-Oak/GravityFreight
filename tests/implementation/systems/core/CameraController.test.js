@@ -42,37 +42,41 @@ describe('CameraController', () => {
         expect(world.y).toBeCloseTo(-40);
     });
 
-    it('zooms around a screen anchor without moving the anchor world point', () => {
+    it('zooms around the current screen position of the world origin', () => {
         const camera = new CameraController(createRepository());
 
         camera.initialize();
         camera.handleResize(800, 600);
+        camera.position = { x: 100, y: -50 };
+        const originBefore = camera.toScreen({ x: 0, y: 0 });
         const anchor = { x: 500, y: 350 };
-        const before = camera.toWorld(anchor);
+        const anchorWorldBefore = camera.toWorld(anchor);
 
         camera.zoom(2, anchor);
-        const after = camera.toWorld(anchor);
+        const originAfter = camera.toScreen({ x: 0, y: 0 });
+        const anchorWorldAfter = camera.toWorld(anchor);
 
         expect(camera.zoomLevel).toBe(2);
-        expect(after.x).toBeCloseTo(before.x);
-        expect(after.y).toBeCloseTo(before.y);
+        expect(originAfter.x).toBeCloseTo(originBefore.x);
+        expect(originAfter.y).toBeCloseTo(originBefore.y);
+        expect(anchorWorldAfter.x).not.toBeCloseTo(anchorWorldBefore.x);
     });
 
-    it('zooms around a screen anchor without moving the anchor world point after rotation', () => {
+    it('zooms around the world origin after rotation', () => {
         const camera = new CameraController(createRepository());
 
         camera.initialize();
         camera.handleResize(800, 600);
         camera.position = { x: 80, y: -30 };
         camera.rotation = Math.PI / 4;
+        const originBefore = camera.toScreen({ x: 0, y: 0 });
         const anchor = { x: 520, y: 260 };
-        const before = camera.toWorld(anchor);
 
         camera.zoom(1.5, anchor);
-        const after = camera.toWorld(anchor);
+        const originAfter = camera.toScreen({ x: 0, y: 0 });
 
-        expect(after.x).toBeCloseTo(before.x);
-        expect(after.y).toBeCloseTo(before.y);
+        expect(originAfter.x).toBeCloseTo(originBefore.x);
+        expect(originAfter.y).toBeCloseTo(originBefore.y);
     });
 
     it('clamps zoom level to the supported map interaction range', () => {

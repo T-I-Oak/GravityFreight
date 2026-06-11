@@ -13,19 +13,6 @@ function createContext() {
     };
 }
 
-function createGraphics() {
-    const graphics = {
-        clear: vi.fn(() => graphics),
-        rect: vi.fn(() => graphics),
-        circle: vi.fn(() => graphics),
-        fill: vi.fn(() => graphics),
-        moveTo: vi.fn(() => graphics),
-        lineTo: vi.fn(() => graphics),
-        stroke: vi.fn(() => graphics)
-    };
-    return graphics;
-}
-
 describe('BackgroundManager', () => {
     it('generates deterministic star layers and renders them behind the map', () => {
         const manager = new BackgroundManager({ starCount: 8, seed: 7 });
@@ -40,21 +27,9 @@ describe('BackgroundManager', () => {
         expect(context.fillRect).toHaveBeenCalled();
     });
 
-    it('renders deterministic star layers to PIXI graphics', () => {
-        const manager = new BackgroundManager({ starCount: 8, seed: 7 });
-        const graphics = createGraphics();
-
-        manager.initialize({ width: 640, height: 480 });
-        manager.renderPixi(graphics, { width: 640, height: 480 });
-
-        expect(graphics.clear).toHaveBeenCalled();
-        expect(graphics.rect).toHaveBeenCalledWith(0, 0, 640, 480);
-        expect(graphics.fill).toHaveBeenCalled();
-    });
-
-    it('applies camera zoom and parallax offset to PIXI star projection', () => {
+    it('applies camera zoom and parallax offset to Canvas star projection', () => {
         const manager = new BackgroundManager({ starCount: 1, seed: 7 });
-        const graphics = createGraphics();
+        const context = createContext();
 
         manager.initialize({ width: 640, height: 480 });
         manager.stars = [{
@@ -66,7 +41,7 @@ describe('BackgroundManager', () => {
             pulseRate: 0,
             pulseOffset: 0
         }];
-        manager.renderPixi(graphics, {
+        manager.render(context, {
             width: 640,
             height: 480,
             zoomLevel: 2,
@@ -74,7 +49,7 @@ describe('BackgroundManager', () => {
             timestamp: 0
         });
 
-        expect(graphics.circle).toHaveBeenCalledWith(500, 240, expect.any(Number));
+        expect(context.arc).toHaveBeenCalledWith(500, 240, expect.any(Number), 0, Math.PI * 2);
     });
 
     it('draws streaks while warp speed is above the normal background speed', () => {
@@ -89,19 +64,6 @@ describe('BackgroundManager', () => {
         expect(context.moveTo).toHaveBeenCalled();
         expect(context.lineTo).toHaveBeenCalled();
         expect(context.stroke).toHaveBeenCalled();
-    });
-
-    it('draws PIXI streaks while warp speed is above the normal background speed', () => {
-        const manager = new BackgroundManager({ starCount: 4, seed: 3 });
-        const graphics = createGraphics();
-
-        manager.initialize({ width: 640, height: 480 });
-        manager.startWarpEffect();
-        manager.renderPixi(graphics, { width: 640, height: 480 });
-
-        expect(graphics.moveTo).toHaveBeenCalled();
-        expect(graphics.lineTo).toHaveBeenCalled();
-        expect(graphics.stroke).toHaveBeenCalled();
     });
 
     it('moves stars through depth over elapsed time', () => {

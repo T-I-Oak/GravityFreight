@@ -47,14 +47,6 @@
         - `warpSpeed` が一定値を超えている場合、星を Z 軸の手前方向へ移動させる。
         - 前フレームの座標と現在座標を結ぶライン（Streak）を描画し、速度感を演出する。
 
-- **`renderPixi(graphics: PIXI.Graphics, view: object): void`**
-    - PIXI `Graphics` と表示領域を受け取り、背景を描画する。
-    - `view.width` / `view.height` の範囲を背景色で塗り、生成済みの `stars` を奥行き投影して描画する。
-    - `view.rotation` で星の相対座標を回転し、`view.offset` を 20% の視差として適用する。
-    - `view.zoomLevel` を星の投影座標にも適用し、マップのズームと背景のズーム中心が分離しないようにする。
-    - `view.timestamp` により星の瞬きを計算する。
-    - `warpSpeed > 1` の場合は点ではなく短い光跡として描画する。
-
 - **`update(deltaSeconds: number): void`**
     - 前回描画からの経過秒数を受け取り、星の奥行き位置とワープ速度を更新する。
     - 通常時も星はゆっくり手前方向へ移動し、画面手前を通過した星は奥の深度へ再配置される。
