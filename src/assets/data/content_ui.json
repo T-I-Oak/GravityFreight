@@ -152,6 +152,134 @@
         }
       }
     },
+    "build": {
+      "empty": {
+        "rocket": {
+          "text": {
+            "lang-store": {
+              "ja": "待機中のロケットなし",
+              "en": "NO ROCKETS ON STANDBY"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "ここをクリックしてロケットを建造してください",
+              "en": "Click here to assemble a rocket."
+            }
+          }
+        },
+        "launcher": {
+          "text": {
+            "lang-store": {
+              "ja": "発射台なし",
+              "en": "NO LAUNCHER"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
+            }
+          }
+        },
+        "booster": {
+          "text": {
+            "lang-store": {
+              "ja": "ブースターなし",
+              "en": "NO BOOSTER"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
+            }
+          }
+        },
+        "chassis": {
+          "text": {
+            "lang-store": {
+              "ja": "シャーシなし",
+              "en": "NO CHASSIS"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
+            }
+          }
+        },
+        "logic": {
+          "text": {
+            "lang-store": {
+              "ja": "ロジックなし",
+              "en": "NO LOGIC"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
+            }
+          }
+        },
+        "module": {
+          "text": {
+            "lang-store": {
+              "ja": "モジュールなし",
+              "en": "NO MODULE"
+            }
+          },
+          "subtext": {
+            "lang-store": {
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
+            }
+          }
+        }
+      },
+      "assemble": {
+        "label": {
+          "lang-store": {
+            "ja": "ASSEMBLE ROCKET",
+            "en": "ASSEMBLE ROCKET"
+          }
+        },
+        "waitingSubtext": {
+          "lang-store": {
+            "ja": "シャーシとロジックを選択すると建造できます",
+            "en": "Select chassis and logic to assemble."
+          }
+        },
+        "readySubtext": {
+          "lang-store": {
+            "ja": "ロケットを建造できます",
+            "en": "Ready to assemble."
+          }
+        }
+      },
+      "launch": {
+        "label": {
+          "lang-store": {
+            "ja": "LAUNCH ENGINE",
+            "en": "LAUNCH ENGINE"
+          }
+        },
+        "waitingSubtext": {
+          "lang-store": {
+            "ja": "ロケットと発射台を選択すると発射できます",
+            "en": "Select a rocket and launcher to begin launch prep."
+          }
+        },
+        "readySubtext": {
+          "lang-store": {
+            "ja": "発射角度を確認して発射できます",
+            "en": "Confirm the launch angle to fire."
+          }
+        }
+      }
+    },
     "facility": {
       "common": {
         "credits": {

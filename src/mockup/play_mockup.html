@@ -69,48 +69,59 @@
             <div class="panel-body ScrollArea" id="panel-content">
                 <!-- Tab: FLIGHT -->
                 <div class="tab-content" id="tab-flight">
-                    <section class="section rocket" id="section-rocket">
-                        <header class="section-header">
-                            <h3 class="section-title">ROCKET</h3>
-                        </header>
-                        <div class="item-list" id="list-rocket"></div>
-                    </section>
+                    <div class="flight-scroll ScrollArea">
+                        <section class="section rocket" id="section-rocket">
+                            <header class="section-header">
+                                <h3 class="section-title">ROCKET</h3>
+                            </header>
+                            <div class="item-list" id="list-rocket"></div>
+                        </section>
 
-                    <section class="section launcher" id="section-launcher">
-                        <header class="section-header">
-                            <h3 class="section-title">LAUNCHER</h3>
-                        </header>
-                        <div class="item-list" id="list-launcher"></div>
-                    </section>
+                        <section class="section launcher" id="section-launcher">
+                            <header class="section-header">
+                                <h3 class="section-title">LAUNCHER</h3>
+                            </header>
+                            <div class="item-list" id="list-launcher"></div>
+                        </section>
 
-                    <section class="section booster" id="section-booster">
-                        <header class="section-header">
-                            <h3 class="section-title">BOOSTER</h3>
-                        </header>
-                        <div class="item-list" id="list-booster"></div>
-                    </section>
+                        <section class="section booster" id="section-booster">
+                            <header class="section-header">
+                                <h3 class="section-title">BOOSTER</h3>
+                            </header>
+                            <div class="item-list" id="list-booster"></div>
+                        </section>
+                    </div>
+
+                    <div id="launch-control" class="flight-actions">
+                        <button class="Button state-primary button-large state-disabled state-notable launch" id="demo-launch-btn">
+                            <span class="btn-main-label">LAUNCH ENGINE</span>
+                            <span class="btn-sub-label">ロケットと発射台を選択すると発射できます</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Tab: ASSEMBLY -->
-                <div id="tab-assembly" class="tab-content" style="display:none;">
-                    <section class="section chassis">
-                        <header class="section-header">
-                            <h3 class="section-title">CHASSIS</h3>
-                        </header>
-                        <div class="item-list" id="list-chassis"></div>
-                    </section>
-                    <section class="section logic">
-                        <header class="section-header">
-                            <h3 class="section-title">LOGIC</h3>
-                        </header>
-                        <div class="item-list" id="list-logic"></div>
-                    </section>
-                    <section class="section module">
-                        <header class="section-header">
-                            <h3 class="section-title">MODULES</h3>
-                        </header>
-                        <div class="item-list" id="list-module"></div>
-                    </section>
+                <div id="tab-assembly" class="tab-content state-hidden">
+                    <div class="assembly-scroll ScrollArea">
+                        <section class="section chassis">
+                            <header class="section-header">
+                                <h3 class="section-title">CHASSIS</h3>
+                            </header>
+                            <div class="item-list" id="list-chassis"></div>
+                        </section>
+                        <section class="section logic">
+                            <header class="section-header">
+                                <h3 class="section-title">LOGIC</h3>
+                            </header>
+                            <div class="item-list" id="list-logic"></div>
+                        </section>
+                        <section class="section module">
+                            <header class="section-header">
+                                <h3 class="section-title">MODULES</h3>
+                            </header>
+                            <div class="item-list" id="list-module"></div>
+                        </section>
+                    </div>
 
                     <div class="assembly-actions">
                         <button class="Button state-primary button-large state-disabled state-notable assembly" id="demo-assemble-btn">
@@ -122,13 +133,8 @@
             </div>
         </aside>
 
-        <!-- Right Bottom Action -->
-        <div class="action-dock">
-            <button class="Button state-primary button-large state-disabled state-notable launch" id="demo-launch-btn">
-                <span class="btn-main-label">LAUNCH ENGINE</span>
-                <span class="btn-sub-label">ロケットと発射台を選択すると発射できます</span>
-            </button>
-        </div>
+        <!-- Right Bottom Action: Reserved for result map return controls. -->
+        <div id="map-action-dock" class="action-dock"></div>
     </main>
 
     <footer class="screen-footer">
@@ -158,8 +164,8 @@
                     }
                 ],
                 launcher: [
-                    createItemViewData(ITEM_REGISTRY['pad_standard_d2'], { charges: 3, maxCharges: 5 }, { isActive: true }),
-                    createItemViewData(ITEM_REGISTRY['pad_precision_d2'], { charges: 2 }, { isActive: false })
+                    createItemViewData(ITEM_REGISTRY['pad_standard_d2'], { charges: 3, maxCharges: 5 }, { isSelected: true }),
+                    createItemViewData(ITEM_REGISTRY['pad_precision_d2'], { charges: 2 })
                 ],
                 booster: [
                     createItemViewData(ITEM_REGISTRY['opt_fuel'], {}, { count: 5 }),
@@ -168,10 +174,10 @@
             },
             assembly: {
                 chassis: [
-                    createItemViewData(ITEM_REGISTRY['hull_light'], {}, { isActive: true })
+                    createItemViewData(ITEM_REGISTRY['hull_light'], {}, { isSelected: true })
                 ],
                 logic: [
-                    createItemViewData(ITEM_REGISTRY['sensor_short'], {}, { isActive: true })
+                    createItemViewData(ITEM_REGISTRY['sensor_short'], {}, { isSelected: true })
                 ],
                 module: [
                     createItemViewData(ITEM_REGISTRY['mod_capacity']),
@@ -199,7 +205,7 @@
             items.forEach(item => {
                 const html = UIComponents.generateCardHTML(item, { 
                     isClickable: true,
-                    isActive: item.isActive 
+                    isSelected: item.isSelected
                 });
                 const div = document.createElement('div');
                 div.innerHTML = html;
@@ -237,7 +243,7 @@
                 tabs.forEach(t => t.classList.toggle('state-active', t === tab));
                 contents.forEach(c => {
                     const isActive = (c.id === `tab-${target}`);
-                    c.style.display = isActive ? 'block' : 'none';
+                    c.classList.toggle('state-hidden', !isActive);
                 });
             });
         });

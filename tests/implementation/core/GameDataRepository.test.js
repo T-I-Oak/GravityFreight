@@ -25,8 +25,18 @@ describe('GameDataRepository', () => {
 
         const setup = repository.getInitialSetup();
 
-        expect(setup.initialCoins).toBe(200);
-        expect(setup.initialInventory).toEqual(['hull_medium', 'sensor_normal', 'pad_standard_d2']);
+        expect(setup.initialCoins).toBe(0);
+        expect(setup.initialInventory).toEqual([
+            'hull_light',
+            'hull_medium',
+            'sensor_short',
+            'sensor_normal',
+            'pad_standard_d2',
+            'pad_precision_d2',
+            'mod_analyzer',
+            'opt_fuel',
+            'boost_power'
+        ]);
     });
 
     it('maps existing config data to MasterConfigData names', async () => {

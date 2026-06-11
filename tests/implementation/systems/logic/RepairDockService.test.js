@@ -32,6 +32,7 @@ afterEach(() => {
 
 describe('RepairDockService', () => {
     it('creates a repair transaction that repairs a launcher after payment succeeds', () => {
+        session.coins = 100;
         const launcher = new Item('pad_standard_d4', repository);
         launcher.consumeCharge(2);
         session.inventory.addItem(launcher);
@@ -59,6 +60,7 @@ describe('RepairDockService', () => {
     });
 
     it('creates a dismantle transaction that removes the rocket and returns enhanced parts after payment succeeds', () => {
+        session.coins = 100;
         const rocketItem = new RocketItem(
             new Item('hull_medium', repository),
             new Item('sensor_normal', repository),

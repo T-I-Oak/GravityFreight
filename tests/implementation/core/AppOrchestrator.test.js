@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AppOrchestrator from '../../../src/core/AppOrchestrator.js';
+import packageData from '../../../package.json';
+import { getAppVersion } from '../../../../GameWorksOAK/src/lib/utils/env.js';
 
 class FakeGameController {
     constructor(infrastructure) {
@@ -54,7 +56,12 @@ describe('AppOrchestrator', () => {
         await orchestrator.boot();
         await uiController.setStartHandler.mock.calls[0][0]();
 
-        expect(renderer.initialize).toHaveBeenCalledWith(uiController.getMapCanvas());
+        expect(getAppVersion()).toBe(packageData.version);
+        expect(renderer.initialize).toHaveBeenCalledWith(
+            uiController.getMapCanvas(),
+            orchestrator.systems.cameraController,
+            orchestrator.systems.backgroundManager
+        );
         expect(uiController.showTitleScreen).toHaveBeenCalled();
         expect(orchestrator.gameController).toBeInstanceOf(FakeGameController);
         expect(orchestrator.gameController.infrastructure.gameDataRepository).toBe(orchestrator.gameDataRepository);

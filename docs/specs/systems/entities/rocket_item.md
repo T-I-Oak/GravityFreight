@@ -55,6 +55,10 @@
 - **`calculateAppraisalValue(): number`**
     - `getCompositionParts()` が返す各 Item の `calculateAppraisalValue()` の合計を返す。
     - `launcher` と `booster` は `RocketItem` の構成外であるため含めない。
+- **`equals(other: Item): boolean`**
+    - `RocketItem` 同士の場合のみ比較対象とする。
+    - 同一判定は、集計性能ではなく `chassis`, `logic`, `modules` の構成 snapshot を基準に行う。
+    - 異なる素材個体または異なる構成パーツから組み立てられた `RocketItem` は、同じ集計性能であっても別 stack として扱う。
 - **`getViewData(): ItemViewData`**
     - UI 表示（アイテムカード）用のプレーンオブジェクトを生成して返す。
     - **マッピング**:

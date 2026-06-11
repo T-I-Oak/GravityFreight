@@ -11,13 +11,13 @@ export class UIComponents {
     /**
      * Generates a complete item card HTML string.
      * @param {Object} item - ItemViewData
-     * @param {Object} options - { isClickable, isEnhanced, isActive, isCompact, isMini, status }
+     * @param {Object} options - { isClickable, isEnhanced, isSelected, selectedCount, isCompact, isMini, status }
      */
     static generateCardHTML(item, options = {}) {
         // --- 1. Preparation (Contextual Data) ---
         const category = item.category ? item.category.toLowerCase() : '';
         const clickableClass = (options.isClickable || item.isClickable) ? 'state-clickable' : '';
-        const activeClass = options.isActive ? 'state-active' : '';
+        const selectedClass = options.isSelected ? 'state-selected' : '';
         const compactClass = options.isCompact ? 'state-compact' : '';
         const miniClass = options.isMini ? 'state-mini' : '';
         const categoryClass = category ? `${category}` : '';
@@ -45,7 +45,7 @@ export class UIComponents {
 
         // --- 3. Final Assembly (Isomorphic Frame) ---
         return `
-            <article class="ItemCard ${clickableClass} ${categoryClass} ${activeClass} ${compactClass} ${miniClass}"
+            <article class="ItemCard ${clickableClass} ${categoryClass} ${selectedClass} ${compactClass} ${miniClass}"
                      data-id="${item.id}"
                      data-uid="${instanceId}">
                 ${headerHTML}
@@ -69,9 +69,11 @@ export class UIComponents {
             html += this.generateHPGauge(item.charges, item.maxCharges, isDurableEnhanced, miniClass);
         }
 
-        // Stack Badge
         if (item.count > 1) {
-            html += `<div class="Badge item-count ${miniClass}">x${item.count}</div>`;
+            const countLabel = options.selectedCount > 0
+                ? `x${options.selectedCount}/${item.count}`
+                : `x${item.count}`;
+            html += `<div class="Badge item-count ${miniClass}">${countLabel}</div>`;
         }
 
         // Status Badge
@@ -193,7 +195,7 @@ export class UIComponents {
         const facilityClass = gameDataRepository.getFacilityDefinition(story.branch).className;
 
         return `
-            <article class="ItemCard story-card state-active state-clickable ${facilityClass}">
+            <article class="ItemCard story-card state-clickable ${facilityClass}">
                 <header class="item-card-header SplitRow">
                     <h3 class="item-card-title">${story.title}</h3>
                     <div class="item-card-header-right">
@@ -243,15 +245,16 @@ export class UIComponents {
      * Generates a placeholder card HTML string for empty slots.
      * @param {string} text - Main message (e.g., "NO ROCKET EQUIPPED")
      * @param {string} subtext - Guidance message (e.g., "CLICK TO BUILD")
-     * @param {Object} options - { category, isNotable, isClickable }
+     * @param {Object} options - { category, isNotable, isClickable, action }
      */
     static generatePlaceholderHTML(text, subtext, options = {}) {
         const category = options.category ? `${options.category}` : '';
         const notable = options.isNotable ? 'state-notable' : '';
         const clickable = options.isClickable ? 'state-clickable' : '';
+        const actionAttr = options.action ? `data-build-action="${options.action}"` : '';
 
         return `
-            <article class="ItemCard placeholder-card ${category} ${notable} ${clickable}">
+            <article class="ItemCard placeholder-card ${category} ${notable} ${clickable}" ${actionAttr}>
                 <div class="placeholder-text">${text}</div>
                 <div class="placeholder-subtext">${subtext}</div>
             </article>

@@ -50,6 +50,7 @@
 - **State**:
     - `.state-clickable`: ホバー・クリック時のフィードバックを有効化。
     - `.state-selected`: 選択中。カテゴリ色を背景や枠へ反映して強調する。
+        - 選択中カードの hover は、非選択カードの hover と区別できるように、選択状態の枠・背景・インジケーターを維持または強調する。
     - `.state-compact`: 説明文を省略し、名称と主要プロパティを優先する。
     - `.state-mini`: 高密度表示用。サイズは共通トークンで制御する。
     - `.state-enhanced`: 強化済みプロパティまたは耐久度を示す。
@@ -178,7 +179,8 @@
     - `itemViewData` (ItemViewData): `Item.getViewData()` / `RocketItem.getViewData()` などから取得した表示用データ。詳細は「5. データ構造定義」を参照。
     - `options` (Object): 
         - `isClickable` (bool): ユーザー操作（ホバーエフェクト等）を許可。
-        - `isActive` (bool): 選択状態（強調）として描画。
+        - `isSelected` (bool): 選択状態（`.state-selected`）として描画。
+        - `selectedCount` (number): 選択中の数量。スタック数が2以上かつ選択中の場合、`.item-count` Badge を `x{selectedCount}/{count}` 表記にする。
         - `isCompact` (bool): コンパクトバリエーションを適用（情報の省略）。
         - `isMini` (bool): ミニバリエーションを適用（サイズの縮小）。
         - `status` (string): `delivered` (配達済) や `unmatched` (不適合) など、この表示箇所に限った状態バッジを表示。`ItemViewData` 本体には含めない。

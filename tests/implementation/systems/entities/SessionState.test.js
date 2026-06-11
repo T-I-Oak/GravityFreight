@@ -28,11 +28,13 @@ describe('SessionState', () => {
         expect(session.totalFlightTicks).toBe(0);
         expect(session.collectedItemCount).toBe(0);
         expect(session.blackMarketVisits).toBe(0);
-        expect(session.coins).toBe(200);
+        expect(session.coins).toBe(0);
         expect(session.inventory).toBeInstanceOf(ItemContainer);
-        expect(session.inventory.getItemsByCategory('chassis')).toHaveLength(1);
-        expect(session.inventory.getItemsByCategory('logic')).toHaveLength(1);
-        expect(session.inventory.getItemsByCategory('launcher')).toHaveLength(1);
+        expect(session.inventory.getItemsByCategory('chassis')).toHaveLength(2);
+        expect(session.inventory.getItemsByCategory('logic')).toHaveLength(2);
+        expect(session.inventory.getItemsByCategory('launcher')).toHaveLength(2);
+        expect(session.inventory.getItemsByCategory('module')).toHaveLength(1);
+        expect(session.inventory.getItemsByCategory('booster')).toHaveLength(2);
     });
 
     it('increments reached sector and black market visit count', () => {
@@ -72,7 +74,7 @@ describe('SessionState', () => {
             }
         });
 
-        expect(session.coins).toBe(350);
+        expect(session.coins).toBe(150);
         expect(session.totalEarnedCoins).toBe(150);
         expect(session.totalScore).toBe(2400);
         expect(session.totalFlightTicks).toBe(720);
@@ -89,6 +91,7 @@ describe('SessionState', () => {
             new Item('coin_100', repository)
         ];
         session.initialize();
+        session.coins = 200;
 
         const delta = session.applyTransaction({
             spentCoins: 120,
@@ -99,7 +102,7 @@ describe('SessionState', () => {
         expect(session.coins).toBe(130);
         expect(session.totalEarnedCoins).toBe(50);
         expect(session.collectedItemCount).toBe(2);
-        expect(session.inventory.getItemsByCategory('module')).toHaveLength(1);
+        expect(session.inventory.getItemsByCategory('module')).toHaveLength(2);
         expect(session.inventory.getItemsByCategory('coin')).toHaveLength(1);
         expect(delta).toEqual({
             spentCoins: 120,
@@ -112,6 +115,7 @@ describe('SessionState', () => {
     it('rejects transactions that spend more coins than the session has without changing assets', () => {
         const session = new SessionState(repository);
         session.initialize();
+        session.coins = 200;
 
         expect(() => session.applyTransaction({
             spentCoins: 201,
@@ -122,7 +126,7 @@ describe('SessionState', () => {
         expect(session.coins).toBe(200);
         expect(session.totalEarnedCoins).toBe(0);
         expect(session.collectedItemCount).toBe(0);
-        expect(session.inventory.getItemsByCategory('module')).toHaveLength(0);
+        expect(session.inventory.getItemsByCategory('module')).toHaveLength(1);
     });
 
     it('removes transaction items and runs commit callback after validation', () => {
@@ -134,6 +138,7 @@ describe('SessionState', () => {
             earnedCoins: 20
         });
         session.initialize();
+        session.coins = 200;
         session.inventory.addItem(removedItem);
 
         const delta = session.applyTransaction({
@@ -163,6 +168,7 @@ describe('SessionState', () => {
         const missingItem = new Item('mod_capacity', repository);
         const onCommit = vi.fn();
         session.initialize();
+        session.coins = 200;
 
         expect(() => session.applyTransaction({
             spentCoins: 50,

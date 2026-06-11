@@ -9,6 +9,10 @@
     - 実装移行時に単純置換せず、責務に基づいて新 class 名を決める
 - [ ] 初版リリース前に `common_style.md` の移行期間中の対応節を削除する
     - リリース版ドキュメントには β v1 / 旧仕様の class 名を残さない
+- [ ] トップメニューの設定画面に追加する設定項目を仕様化する
+    - 現在の SE 音量設定に加えて、カメラリセットと言語切り替えを設定項目として追加する
+    - カメラリセットは CameraController の永続化済み状態を初期値に戻す操作として仕様化する
+    - 言語切り替えは共通 i18n ライブラリの責務・保存方式に従い、Gravity Freight 側では UI 導線と再描画範囲を仕様化する
 - [ ] FlightReplaySnapshots 完成後に保存データサイズを検証する
     - 目標: Gravity Freight の保存データ総量は 1MiB 以内を目安とする
     - 目標: リプレイ関連データは 20件保存時に 600KiB 以内、1件平均 30KiB 以内を目安とする
@@ -131,11 +135,24 @@
     - [ ] UIController
         - [x] タイトル画面、HUD、ビルド画面の最小表示切替
         - [x] 航行結果画面の表示、結果確定、マップ切替、レコード保護の DOM イベント接続
+        - [x] Canvas 入力の正規化とドラッグ継続（ポインタ、ホイール、2本指操作）
     - [ ] WorldRenderer
         - [x] 本編 `#gameCanvas` への Sector 静的描画
         - [ ] CameraController / BackgroundManager / 航跡 / ソナー / 航行演出との接続
+            - [x] CameraController / BackgroundManager を Canvas 2D 描画へ接続
+            - [ ] 航跡 / ソナー / 予測線 / 船体・貨物描画を接続
+            - [ ] WorldRenderer の描画色を `css/design_tokens.css` の world / facility / category token から取得する
+        - [ ] 実プレイ画面のマップ表示完成度を上げる
+            - 現在は初期表示確認用の静的描画に留め、完成版のマップ視認性、演出、カメラ、情報密度は別タスクで対応する
     - [ ] CameraController
+        - [x] パン、回転、ズーム、保存、座標変換の基礎実装
+        - [x] マウス/タッチ入力からのパン、回転、ズーム接続
     - [ ] BackgroundManager
+        - [ ] 実プレイ画面の背景演出を完成版へ寄せる
+            - [x] 奥行き付き星空、瞬き、カメラ回転、20% 視差を接続する
+            - [x] 星の Z 移動、深度ラップ、ワープ速度補間を接続する
+            - [ ] セクター遷移のワープ開始・終了シーケンスから `startWarpEffect(duration)` / `stopWarpEffect(duration)` を呼び出す
+            - [ ] 実ブラウザで v1 と比較して星密度、速度、光跡の見え方を調整する
     - [ ] SoundController
 - [ ] How To Play を実装する
     - [ ] HowToPlayUI
@@ -150,6 +167,10 @@
     - [ ] 建造・照準
         - [x] 実画面でビルドパネルを表示
         - [ ] inventory 表示、選択、組み立て、発射操作の接続
+            - [x] 実 inventory をビルドパネルに表示
+            - [ ] Rocket / Launcher / Booster の選択
+            - [ ] Chassis / Logic / Module から RocketItem を組み立て
+            - [ ] 発射操作
     - [ ] 航行 HUD
         - [x] 実画面で初期値を表示
     - [ ] タイトル画面、HUDに表示しているタイトルロゴを `logo.svg` にする
@@ -166,6 +187,10 @@
     - [ ] snapshot 再現
     - [ ] 永続データ migration
     - [ ] public/data/update_history.json が v0 中は `[]` のままであること
+- [ ] 依存関係の脆弱性警告を確認・解消する
+    - `npm audit` で警告が出ている場合は、リリース前に影響範囲を確認する
+    - `npm audit fix` または依存バージョン更新を行う場合は、lockfile 変更、build サイズ、描画挙動への影響を確認する
+    - 自動修正で破壊的な依存更新が必要になる場合は、対応方針を確認してから実施する
 - [ ] 要求仕様に対するテストを実施する
     - テストファイルは `tests/spec/` に配置し、命名規約 `[prefix]_[章番号]_[名称].test.js` に従う
     - [ ] `core_mechanics_01_terms.test.js`: core_mechanics.md 第1章: ゲーム概要・用語

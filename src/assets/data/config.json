@@ -49,7 +49,17 @@
     "BLACK_MARKET": { "id": "B", "type": "BLACK_MARKET", "name": "BLACK MARKET", "icon": "B", "className": "black-market", "rewardScore": 5000, "rewardCoins": 50, "bonusItemCount": 3 }
   },
   "initialSetup": {
-    "initialInventory": ["hull_medium", "sensor_normal", "pad_standard_d2"],
-    "initialCoins": 200
+    "initialInventory": [
+      "hull_light",
+      "hull_medium",
+      "sensor_short",
+      "sensor_normal",
+      "pad_standard_d2",
+      "pad_precision_d2",
+      "mod_analyzer",
+      "opt_fuel",
+      "boost_power"
+    ],
+    "initialCoins": 0
   }
 }

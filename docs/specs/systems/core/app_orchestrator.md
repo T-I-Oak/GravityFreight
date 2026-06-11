@@ -15,13 +15,14 @@
 
 - **`boot(): Promise<void>`**
     - アプリケーション起動の起点。
-    1. 各マネージャー・コントローラーをインスタンス化する。
-    2. 共通 `DataManager` を内部依存として持つ `GameDataRepository` をインスタンス化する。
-    3. `gameDataRepository.loadAllData()` を実行し、静的なマスタデータをロードする。
-    4. 永続データを持つ各システム（Story, Achievement, Rank, FlightRecord 等）の `initialize()` を実行。
-    5. **描画エンジンの初期化**: `WorldRenderer.initialize(uiController.getMapCanvas())` を実行。
-    6. **タイトル画面の配線**: `uiController` を通じて開始ハンドラを登録する。記録・説明書・設定は各画面実装時に接続する。
-    7. **初期画面表示**: `uiController.showTitleScreen()` を実行。
+    1. 共通 env utility の `setAppVersion(package.version)` を実行し、共通 `DataManager` が使用するメジャーバージョンを初期化する。
+    2. 各マネージャー・コントローラーをインスタンス化する。
+    3. 共通 `DataManager` を内部依存として持つ `GameDataRepository` をインスタンス化する。
+    4. `gameDataRepository.loadAllData()` を実行し、静的なマスタデータをロードする。
+    5. 永続データを持つ各システム（Story, Achievement, Rank, FlightRecord 等）の `initialize()` を実行。
+    6. **描画エンジンの初期化**: `WorldRenderer.initialize(uiController.getMapCanvas())` を実行。
+    7. **タイトル画面の配線**: `uiController` を通じて開始ハンドラを登録する。記録・説明書・設定は各画面実装時に接続する。
+    8. **初期画面表示**: `uiController.showTitleScreen()` を実行。
 
 - **`startGame(): void`**
     - ゲーム本編（プレイセッション）を開始する。

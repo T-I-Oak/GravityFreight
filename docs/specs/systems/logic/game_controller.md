@@ -5,10 +5,11 @@
 - **所属ドメイン**: Logic Domain
 - **生存期間**: Game Lifecycle
 - **役割**: ゲームプレイ進行の執行者。
-- **責務**: 
+- **責務**:
     - **ゲーム内遷移の統括**: ワープ演出、ビルド画面、航行画面、リザルト画面、および**各施設画面**の遷移制御。
     - **ゲーム内入力の処理**: ビルドパネル操作、Canvas 入力（パン・回転・AIM）、および**施設内取引ボタン**の処理。
     - **ロジックの実行**: セクター生成、パーツ消費、物理計算サービスの呼び出し、終了判定。
+    - **表示データ生成の委譲**: ビルド画面の inventory 表示データは `BuildScreenPresenter` へ委譲し、`GameController` は現在状態と選択状態を渡す。
 
 ## 2. インターフェース (Interface)
 
@@ -21,11 +22,12 @@
 
 - **`constructor(infrastructure: object)`**
     - `AppOrchestrator` から渡される共通基盤（UI, Renderer, Sound, Data, Services 等）への参照を保持する。
+    - `BuildScreenPresenter` を保持し、ビルド画面表示用 view data 生成に使用する。
 
 - **`start(): void`**
     - ゲームを開始する。
     1. **ステート初期化**: `sessionState.initialize()` を実行。
-    2. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを自身に紐付ける。
+    2. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを登録する。ビルドアイテム選択は `BuildFlowController.handleItemSelection()` へ、ローンチボタン操作は `launchSelectedRocket()` へ委譲する。
     3. **HUD初期化**: `uiController.initHUD(sessionState)` を実行し、初期値（Coins, Sector 等）の表示と、メールスロットのリセット（全ロック）を行う。
     4. **最初のセクターへ**: `this.beginSectorTransition()` を実行。
 
@@ -37,7 +39,7 @@
             - `settlement.status === 'cleared'` の場合：`enterFacility(settlement.destination)` を実行。
             - それ以外の場合：
                 - `checkGameOverAndStartEndSequence()` を実行する。
-                - ゲームオーバーでない場合は、`uiController.showBuildScreen()` を実行。
+                - ゲームオーバーでない場合は、最新 inventory から `BuildScreenPresenter.createViewData()` を実行し、`uiController.showBuildScreen(viewData)` を実行。
 
 - **`enterFacility(type: string): void`**
     - 指定された施設（Trading Post, Repair Dock, Black Market）へ入場する。
@@ -88,16 +90,24 @@
     - ゲーム終了画面のタイトル復帰操作を処理する。
     - **内部挙動**: `AppOrchestrator.returnToTitle()` へ制御を戻し、Game Lifecycle の終了を委譲する。
 
-- **`handleItemSelection(uid: string): void`**
-    - ビルド画面でのアイテム選択を処理する。
+- **ビルドアイテム選択**
+    - ビルド画面でのアイテム選択は `BuildFlowController.handleItemSelection(selection)` へ委譲する。
+    - `GameController` は選択状態を直接保持せず、ビルド画面の選択状態・再描画は `BuildFlowController` の責務とする。
 - **`assembleRocket(): void`**
-    - ビルド画面でのロケット組み上げを処理する。
+    - ビルド画面でのロケット組み上げ操作を `BuildFlowController.assembleRocket()` へ委譲する。
     - **内部挙動**:
-        1. 選択パーツのバリデーションを実行。
-        2. **`this.currentRocket = new Rocket(parts)`** を実行してインスタンスを生成。
-        3. UI 側のローンチボタンを有効化する。
-- **`handleCanvasInput(event: PointerEvent | WheelEvent): void`**
-    - Canvas 上での入力（パン、回転、AIM）を処理する。
+        1. `UIController.setBuildAssembleHandler()` で ASSEMBLE ボタン操作を登録する。
+        2. ボタン押下時に `BuildFlowController.assembleRocket()` を呼び出す。
+        3. `BuildFlowController` が選択パーツを inventory から取り出し、`RocketItem` を inventory へ追加してビルド画面を再描画する。
+- **`handleCanvasInput(event: CanvasInputEvent): void`**
+    - Canvas 上での入力（パン、回転、ズーム、AIM）を処理する。
+    - **内部挙動**:
+        1. `pointerdown` 時点で操作モードを確定する。Shift / Ctrl 押下時はパン、マップ領域外は回転、AIM 可能状態のマップ領域内は AIM、それ以外のマップ領域内はパンとする。
+        2. `pointermove` はドラッグ開始時に確定したモードを維持して処理する。UI パネル上や Canvas 外を通過しても、UIController から継続通知された入力を同じ操作として扱う。
+        3. パン、回転、ズームは `CameraController` へ委譲し、描画更新後に操作終了時またはホイール入力時にカメラ状態を保存する。
+        4. 2本指操作から通知される `pinch` は、中心点移動をパン、距離比をズームとして扱う。
+        5. AIM はポインタのスクリーン座標を `CameraController.toWorld()` でワールド座標へ変換し、母星中心からの角度を現在の発射角度として保持する。発射時はこの角度を `Rocket` 生成へ渡し、初期位置を母星表面に設定する。
+    - **責務境界**: ブラウザイベントの購読や2本指入力の正規化は `UIController`、座標変換・パン・回転・ズームの実計算は `CameraController`、描画更新は `WorldRenderer` の責務とする。
 
 - **`beginSectorTransition(): Promise<void>`**
     - セクター間の遷移（ワープ演出）シーケンスを統括する。
@@ -110,17 +120,28 @@
         - **`this.currentSector = new Sector(sessionState, isAnomaly)`** を実行して新マップを生成。
         - `SessionState.reachedSector` が更新された場合は、`GameRecordTracker.recordSectorStart(sessionState)` を呼び出し、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['max_reached_sector'] })` を呼び出す。
     3. **同期**: HUDの数値表示（セクター番号等）を最新状態に更新し、`worldRenderer` への新マップセット、セクタータイトル表示を行う。
-    4. **演出終了**: 各演出を停止し、完了後に `uiController.showBuildScreen()` を実行。`uiController.setFlightMode(false)` で操作を有効化する。
+    4. **演出終了**: 各演出を停止し、完了後に `BuildFlowController.showBuildScreen()` を実行。`uiController.setFlightMode(false)` で操作を有効化する。
 
 - **`launchRocket(rocket: Rocket, angle: number): void`**
     - 航行シーケンスを開始する。
     - **内部挙動**:
-        1. **パーツ消費**: 耐久度減算を含むアトミックな消費処理を実行。
+        1. **発射状態の確定**: `Rocket.getInitialVelocity()` で初速を算出し、`rocket.velocity` へ反映する。
         2. **発射時 snapshot 記録**: 発射角度、初速、発射構成、セクター状態が確定した直後に `FlightRecorder.captureLaunchSnapshot(rocket, currentSector)` を呼び出す。
         3. **UIモード遷移**: `uiController.setFlightMode(true)` を実行し、ビルドパネルをロックする。
         4. **描画開始**: `worldRenderer.startNavigation(rocket)` を実行。
         5. **ソナー開始**: `worldRenderer.enableSonar()` を実行し、波紋の生成を継続する（AIM状態から継続）。
         6. **ループ開始**: メインループでの `this.updateFlight()` の呼び出しを有効化。
+
+- **`launchSelectedRocket(): Rocket`**
+    - FLIGHT タブで選択済みの発射構成から `Rocket` を生成し、`launchRocket()` へ渡す。
+    - **内部挙動**:
+        1. `BuildFlowController.currentBuildSelection` から `rocket`, `launcher`, `booster` の stack uid を取得する。`rocket` と `launcher` が未選択のまま呼び出された場合は UI 状態とロジック状態の不整合としてエラーを投げる。
+        2. `sessionState.inventory.popItemByUid()` で選択中の RocketItem, Launcher, Booster を inventory から抽出する。
+        3. 抽出した構成で `Rocket` を生成する。発射角度は最新の AIM 操作で保持した角度を使用し、初期位置はその角度に対応する母星表面とする。
+        4. Launcher / Booster の耐久度を消費する。Booster が `preventsLauncherWear` を持つ場合は Launcher の耐久度消費を免除し、未消耗のまま inventory へ戻す。
+        5. 耐久度が残っている発射装備は inventory へ戻す。耐久度が 0 の発射装備は戻さない。
+        6. 発射構成の抽出後、`BuildFlowController.resetFlightSelection()` で FLIGHT タブの選択状態を解除し、`BuildFlowController.showBuildScreen()` で消費後の inventory と launch button 状態を再描画する。
+        7. `launchRocket(rocket)` を呼び出し、生成した `Rocket` を返す。
 
 - **`updateFlight(dt: number): void`**
     - 航行中の更新処理（メインループから毎フレーム呼び出し）。物理計算、状態更新、および成功・失敗の判定監視を行う。

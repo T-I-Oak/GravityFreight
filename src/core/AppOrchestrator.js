@@ -1,4 +1,6 @@
 import { DataManager } from '../../../GameWorksOAK/src/lib/core/dataManager.js';
+import { setAppVersion } from '../../../GameWorksOAK/src/lib/utils/env.js';
+import packageData from '../../package.json';
 import GameDataRepository from './GameDataRepository.js';
 import SessionState from '../systems/entities/SessionState.js';
 import AchievementTracker from '../systems/logic/AchievementTracker.js';
@@ -11,6 +13,8 @@ import RankTracker from '../systems/logic/RankTracker.js';
 import StorySystem from '../systems/logic/StorySystem.js';
 import TrajectoryPredictor from '../systems/logic/TrajectoryPredictor.js';
 import UIController from '../systems/ui/UIController.js';
+import BackgroundManager from '../systems/core/BackgroundManager.js';
+import CameraController from '../systems/core/CameraController.js';
 import WorldRenderer from '../systems/core/WorldRenderer.js';
 
 class AppOrchestrator {
@@ -26,6 +30,7 @@ class AppOrchestrator {
     }
 
     async boot() {
+        setAppVersion(packageData.version);
         this.gameDataRepository = new GameDataRepository(this.commonDataManager, this.i18nAdapter);
         await this.gameDataRepository.loadAllData();
 
@@ -35,7 +40,11 @@ class AppOrchestrator {
         this.systems = this.#createAppSystems();
         this.#initializePersistentSystems();
 
-        this.worldRenderer.initialize(this.uiController.getMapCanvas());
+        await this.worldRenderer.initialize(
+            this.uiController.getMapCanvas(),
+            this.systems.cameraController,
+            this.systems.backgroundManager
+        );
         this.uiController.setStartHandler(() => this.startGame());
         this.uiController.setRecordHandler?.(() => {});
         this.uiController.setManualHandler?.(() => {});
@@ -73,6 +82,8 @@ class AppOrchestrator {
         const flightRecorder = new FlightRecorder(this.gameDataRepository);
         const physicsEngine = new PhysicsEngine(this.gameDataRepository);
         const trajectoryPredictor = new TrajectoryPredictor(physicsEngine);
+        const cameraController = new CameraController(this.gameDataRepository);
+        const backgroundManager = new BackgroundManager();
 
         return {
             sessionState,
@@ -83,11 +94,14 @@ class AppOrchestrator {
             achievementTracker,
             flightRecorder,
             physicsEngine,
-            trajectoryPredictor
+            trajectoryPredictor,
+            cameraController,
+            backgroundManager
         };
     }
 
     #initializePersistentSystems() {
+        this.systems.cameraController.initialize();
         this.systems.gameRecordTracker.initialize();
         this.systems.rankTracker.initialize();
         this.systems.storySystem.initialize();

@@ -1,16 +1,8 @@
 import SectorProgressionController from './SectorProgressionController.js';
-
-const FACILITY_THEME_CLASSES = {
-    TRADING_POST: 'trading-post',
-    REPAIR_DOCK: 'repair-dock',
-    BLACK_MARKET: 'black-market'
-};
-
-const FACILITY_LABELS = {
-    TRADING_POST: 'TRADING POST',
-    REPAIR_DOCK: 'REPAIR DOCK',
-    BLACK_MARKET: 'BLACK MARKET'
-};
+import BuildScreenPresenter from './BuildScreenPresenter.js';
+import BuildFlowController from './BuildFlowController.js';
+import Rocket from '../entities/Rocket.js';
+import { FACILITY_LABELS, FACILITY_THEME_CLASSES } from './facilityViewConstants.js';
 
 class GameController {
     constructor(infrastructure = {}) {
@@ -23,9 +15,20 @@ class GameController {
         this.storySystem = infrastructure.storySystem;
         this.uiController = infrastructure.uiController;
         this.worldRenderer = infrastructure.worldRenderer;
+        this.cameraController = infrastructure.cameraController;
         this.appOrchestrator = infrastructure.appOrchestrator;
         this.currentSector = null;
         this.currentRocket = null;
+        this.currentLaunchAngle = 0;
+        this.mapInteraction = null;
+        this.buildScreenPresenter = infrastructure.buildScreenPresenter
+            || new BuildScreenPresenter(this.gameDataRepository);
+        this.buildFlowController = infrastructure.buildFlowController
+            || new BuildFlowController({
+                sessionState: this.sessionState,
+                uiController: this.uiController,
+                buildScreenPresenter: this.buildScreenPresenter
+            });
         this.repairDockDismantleCount = 0;
         this.currentFacilityType = null;
         this.currentFacilityViewData = null;
@@ -40,8 +43,65 @@ class GameController {
         this.uiController.initHUD(this.sessionState);
         this.uiController.setResultHandler?.(() => this.confirmSettlement(this.lastSettlement));
         this.uiController.setGameEndReturnHandler?.(() => this.returnToTitle());
+        this.uiController.setBuildItemSelectionHandler?.(
+            selection => this.buildFlowController.handleItemSelection(selection)
+        );
+        this.uiController.setBuildAssembleHandler?.(
+            () => this.buildFlowController.assembleRocket()
+        );
+        this.uiController.setLaunchHandler?.(() => this.launchSelectedRocket());
+        this.uiController.setCanvasInputHandler?.(event => this.handleCanvasInput(event));
 
         return this.beginSectorTransition();
+    }
+
+    handleCanvasInput(event) {
+        if (!this.cameraController || !event) {
+            return;
+        }
+
+        if (event.type === 'pointerdown') {
+            this.#beginMapInteraction(event);
+            return;
+        }
+
+        if (event.type === 'pointermove') {
+            this.#continueMapInteraction(event);
+            return;
+        }
+
+        if (event.type === 'pinch') {
+            this.#handlePinch(event);
+            return;
+        }
+
+        if (event.type === 'wheel') {
+            this.#handleWheel(event);
+            return;
+        }
+
+        if (event.type === 'pointerup') {
+            this.#endMapInteraction();
+        }
+    }
+
+    launchSelectedRocket() {
+        const rocket = this.#createRocketFromFlightSelection();
+        return this.launchRocket(rocket);
+    }
+
+    launchRocket(rocket) {
+        if (!rocket || !this.currentSector) {
+            throw new Error('[GameController] rocket and currentSector are required.');
+        }
+
+        rocket.velocity = rocket.getInitialVelocity();
+        this.currentRocket = rocket;
+        this.flightRecorder.captureLaunchSnapshot(rocket, this.currentSector);
+        this.uiController.setFlightMode(true);
+        this.worldRenderer?.startNavigation?.(rocket);
+        this.worldRenderer?.enableSonar?.();
+        return rocket;
     }
 
     async handleNavigationEnd(result) {
@@ -140,6 +200,7 @@ class GameController {
         this.currentRocket = null;
 
         this.currentSector = await this.sectorProgressionController.beginSectorTransition(options);
+        this.buildFlowController.showBuildScreen();
         return this.currentSector;
     }
 
@@ -487,6 +548,168 @@ class GameController {
             throw new Error(`[GameController] Inventory item not found: ${uid}`);
         }
         return item;
+    }
+
+    #createRocketFromFlightSelection() {
+        const selection = this.buildFlowController.currentBuildSelection;
+        if (!selection.rocket || !selection.launcher) {
+            throw new Error('[GameController] rocket and launcher selections are required.');
+        }
+
+        const rocketItem = this.#popSelectedStack(selection.rocket, 'rocket');
+        const launcher = this.#popSelectedStack(selection.launcher, 'launcher');
+        const booster = selection.booster
+            ? this.#popSelectedStack(selection.booster, 'booster')
+            : null;
+        const angle = this.currentLaunchAngle;
+        const rocket = new Rocket(
+            rocketItem,
+            launcher,
+            booster,
+            angle,
+            this.#getLaunchPosition(angle)
+        );
+
+        this.#consumeLaunchPart(launcher, !booster?.preventsLauncherWear);
+        this.#consumeLaunchPart(booster, true);
+        this.buildFlowController.resetFlightSelection();
+        this.buildFlowController.showBuildScreen();
+        return rocket;
+    }
+
+    #popSelectedStack(uid, category) {
+        const item = this.sessionState.inventory.popItemByUid(uid);
+        if (!item) {
+            throw new Error(`[GameController] selected ${category} is not available.`);
+        }
+        return item;
+    }
+
+    #consumeLaunchPart(item, shouldConsume) {
+        if (!item) {
+            return;
+        }
+
+        if (shouldConsume) {
+            item.consumeCharge?.(1);
+        }
+
+        if ((item.maxCharges ?? 0) === 0 || (item.charges ?? 0) > 0) {
+            this.sessionState.inventory.addItem(item);
+        }
+    }
+
+    #getLaunchPosition(angle) {
+        const home = this.currentSector?.bodies?.find(body => body.isHome) ?? {
+            position: { x: 0, y: 0 },
+            radius: 0
+        };
+
+        return {
+            x: home.position.x + Math.cos(angle) * home.radius,
+            y: home.position.y + Math.sin(angle) * home.radius
+        };
+    }
+
+    #beginMapInteraction(event) {
+        const mode = this.#resolveMapInteractionMode(event);
+        this.mapInteraction = {
+            mode,
+            lastPoint: { ...event.point }
+        };
+
+        if (mode === 'aim') {
+            this.#updateLaunchAngle(event.point);
+        }
+    }
+
+    #continueMapInteraction(event) {
+        if (!this.mapInteraction) {
+            return;
+        }
+
+        const delta = {
+            x: event.point.x - this.mapInteraction.lastPoint.x,
+            y: event.point.y - this.mapInteraction.lastPoint.y
+        };
+
+        if (this.mapInteraction.mode === 'aim') {
+            this.#updateLaunchAngle(event.point);
+        } else if (this.mapInteraction.mode === 'rotate') {
+            this.cameraController.rotate(this.mapInteraction.lastPoint, delta);
+            this.#renderCameraChange();
+        } else {
+            this.cameraController.pan(delta);
+            this.#renderCameraChange();
+        }
+
+        this.mapInteraction.lastPoint = { ...event.point };
+    }
+
+    #handlePinch(event) {
+        this.mapInteraction = {
+            mode: 'pinch',
+            lastPoint: { ...event.point }
+        };
+        this.cameraController.pan(event.delta);
+        if (Number.isFinite(event.scale) && Math.abs(event.scale - 1) > 0.01) {
+            this.cameraController.zoom(event.scale, event.point);
+        }
+        this.#renderCameraChange();
+    }
+
+    #handleWheel(event) {
+        const zoomSpeed = 0.001;
+        const factor = 1 - event.deltaY * zoomSpeed;
+        this.cameraController.zoom(Math.max(0.1, Math.min(2, factor)), event.point);
+        this.#renderCameraChange();
+        this.cameraController.save?.();
+    }
+
+    #endMapInteraction() {
+        if (this.mapInteraction?.mode !== 'aim') {
+            this.cameraController?.save?.();
+        }
+        this.mapInteraction = null;
+    }
+
+    #resolveMapInteractionMode(event) {
+        if (event.shiftKey || event.ctrlKey) {
+            return 'pan';
+        }
+
+        if (!this.cameraController.isInMapArea(event.point)) {
+            return 'rotate';
+        }
+
+        if (this.#canAim()) {
+            return 'aim';
+        }
+
+        return 'pan';
+    }
+
+    #canAim() {
+        const selection = this.buildFlowController.currentBuildSelection;
+        return !!(selection.rocket && selection.launcher && this.currentSector);
+    }
+
+    #updateLaunchAngle(screenPoint) {
+        const home = this.currentSector?.bodies?.find(body => body.isHome);
+        if (!home) {
+            return;
+        }
+
+        const worldPoint = this.cameraController.toWorld(screenPoint);
+        this.currentLaunchAngle = Math.atan2(
+            worldPoint.y - home.position.y,
+            worldPoint.x - home.position.x
+        );
+        this.worldRenderer?.render?.();
+    }
+
+    #renderCameraChange() {
+        this.worldRenderer?.render?.();
     }
 }
 
