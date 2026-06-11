@@ -43,6 +43,12 @@ function createViewData() {
     };
 }
 
+function createPointerEvent(type, init = {}) {
+    const event = new Event(type, { bubbles: true, cancelable: true });
+    Object.assign(event, init);
+    return event;
+}
+
 describe('UIController', () => {
     let repository;
     let soundController;
@@ -58,27 +64,37 @@ describe('UIController', () => {
                     <span id="sector-display"></span>
                     <span id="score-display"></span>
                     <span id="coin-display"></span>
-                    <button id="mail-btn-0"></button>
-                    <button id="mail-btn-1"></button>
-                    <button id="mail-btn-2"></button>
+                    <span id="mail-btn-0" class="Icon mail trading-post state-new state-clickable"></span>
+                    <span id="mail-btn-1" class="Icon mail repair-dock state-clickable"></span>
+                    <span id="mail-btn-2" class="Icon mail"></span>
                 </header>
                 <section id="inventory-panel" class="state-hidden">
                     <button id="btn-toggle-panel"></button>
                     <button class="Tab state-active" data-tab="flight"></button>
                     <button class="Tab" data-tab="assembly"></button>
-                    <div id="tab-flight"></div>
-                    <div id="tab-assembly" class="state-hidden"></div>
-                    <div id="list-rocket"></div>
-                    <div id="list-launcher"></div>
-                    <div id="list-booster"></div>
-                    <div id="list-chassis"></div>
-                    <div id="list-logic"></div>
-                    <div id="list-module"></div>
+                    <div id="tab-flight">
+                        <div class="flight-scroll">
+                            <div id="list-rocket" class="item-list"></div>
+                            <div id="list-launcher" class="item-list"></div>
+                            <div id="list-booster" class="item-list"></div>
+                        </div>
+                        <div id="launch-control">
+                            <button id="launch-btn" disabled class="state-disabled"></button>
+                        </div>
+                    </div>
+                    <div id="tab-assembly" class="state-hidden">
+                        <div class="assembly-scroll">
+                            <div id="list-chassis" class="item-list"></div>
+                            <div id="list-logic" class="item-list"></div>
+                            <div id="list-module" class="item-list"></div>
+                        </div>
+                    </div>
+                    <button id="build-btn" disabled class="state-disabled">
+                        <span class="btn-main-label"></span>
+                        <span class="btn-sub-label"></span>
+                    </button>
                 </section>
             </main>
-            <section id="launch-control">
-                <button id="launch-btn" disabled class="state-disabled"></button>
-            </section>
             <canvas id="gameCanvas"></canvas>
         `;
         repository = createRepository();
@@ -212,6 +228,9 @@ describe('UIController', () => {
         expect(document.querySelector('#sector-display').textContent).toBe('0');
         expect(document.querySelector('#score-display').textContent).toBe('0');
         expect(document.querySelector('#coin-display').textContent).toBe('120');
+        expect(document.querySelector('#mail-btn-0').classList.contains('state-disabled')).toBe(true);
+        expect(document.querySelector('#mail-btn-0').classList.contains('trading-post')).toBe(false);
+        expect(document.querySelector('#mail-btn-0').classList.contains('state-new')).toBe(false);
         expect(document.querySelector('#title-screen').hidden).toBe(true);
         expect(document.querySelector('#play-scene-container').hidden).toBe(false);
         expect(document.querySelector('#play-hud').hidden).toBe(false);
@@ -231,6 +250,32 @@ describe('UIController', () => {
         expect(document.querySelector('#tab-flight').classList.contains('state-hidden')).toBe(true);
     });
 
+    it('opens the assembly tab when the empty rocket placeholder is clicked', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+
+        controller.showBuildScreen({
+            sections: {
+                rocket: {
+                    entries: [],
+                    emptyText: '待機中のロケットなし',
+                    emptySubtext: 'ここをクリックしてロケットを建造してください',
+                    emptyAction: 'open-assembly',
+                    emptyNotable: true
+                }
+            },
+            launch: { ready: false },
+            assembly: { ready: false }
+        });
+
+        document.querySelector('#list-rocket .placeholder-card').click();
+
+        expect(document.querySelector('[data-tab="assembly"]').classList.contains('state-active')).toBe(true);
+        expect(document.querySelector('[data-tab="flight"]').classList.contains('state-active')).toBe(false);
+        expect(document.querySelector('#tab-assembly').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#tab-flight').classList.contains('state-hidden')).toBe(true);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
+    });
+
     it('toggles the build panel collapsed state without changing game state', () => {
         new UIController({ gameDataRepository: repository, soundController });
 
@@ -247,13 +292,14 @@ describe('UIController', () => {
             sections: {
                 rocket: {
                     entries: [],
-                    emptyText: 'NO ROCKET',
-                    emptySubtext: 'ASSEMBLE A ROCKET'
+                    emptyText: '待機中のロケットなし',
+                    emptySubtext: 'ここをクリックしてロケットを建造してください'
                 },
                 launcher: {
                     entries: [
                         {
                             uid: 'launcher_1',
+                            selected: true,
                             itemViewData: {
                                 uid: 'launcher_1',
                                 id: 'pad_standard_d2',
@@ -263,10 +309,10 @@ describe('UIController', () => {
                             }
                         }
                     ],
-                    emptyText: 'NO LAUNCHER',
-                    emptySubtext: 'BUY A LAUNCHER'
+                    emptyText: '発射台なし',
+                    emptySubtext: '購入または回収してください'
                 },
-                booster: { entries: [], emptyText: 'NO BOOSTER', emptySubtext: 'OPTIONAL' },
+                booster: { entries: [], emptyText: 'ブースターなし', emptySubtext: '購入または回収してください' },
                 chassis: {
                     entries: [
                         {
@@ -280,26 +326,159 @@ describe('UIController', () => {
                             }
                         }
                     ],
-                    emptyText: 'NO CHASSIS',
-                    emptySubtext: 'BUY CHASSIS'
+                    emptyText: 'シャーシなし',
+                    emptySubtext: '購入または回収してください'
                 },
-                logic: { entries: [], emptyText: 'NO LOGIC', emptySubtext: 'BUY LOGIC' },
-                module: { entries: [], emptyText: 'NO MODULE', emptySubtext: 'OPTIONAL' }
+                logic: { entries: [], emptyText: 'ロジックなし', emptySubtext: '購入または回収してください' },
+                module: {
+                    entries: [
+                        {
+                            uid: 'module_1',
+                            selected: true,
+                            selectedCount: 2,
+                            itemViewData: {
+                                uid: 'module_1',
+                                id: 'mod_insurance',
+                                name: 'Insurance',
+                                category: 'module',
+                                count: 2,
+                                stats: {}
+                            }
+                        }
+                    ],
+                    emptyText: 'モジュールなし',
+                    emptySubtext: '購入または回収してください'
+                }
             },
             launch: {
                 ready: false,
                 label: 'LAUNCH ENGINE',
                 subtext: 'ロケットと発射台を選択すると発射できます'
+            },
+            assembly: {
+                ready: true,
+                label: 'ASSEMBLE ROCKET',
+                subtext: 'シャーシとロジックを選択しています'
             }
         });
 
-        expect(document.querySelector('#list-rocket').textContent).toContain('NO ROCKET');
+        expect(document.querySelector('#list-rocket').textContent).toContain('待機中のロケットなし');
         expect(document.querySelector('#list-launcher').textContent).toContain('Standard Pad');
+        expect(document.querySelector('#list-launcher .ItemCard').classList.contains('state-selected')).toBe(true);
         expect(document.querySelector('#list-chassis').textContent).toContain('Light Hull');
+        expect(document.querySelector('#list-module').textContent).toContain('x2/2');
         expect(document.querySelector('#launch-control').hidden).toBe(false);
         expect(document.querySelector('#launch-btn').disabled).toBe(true);
         expect(document.querySelector('#launch-btn').classList.contains('state-disabled')).toBe(true);
         expect(document.querySelector('#launch-btn').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#build-btn').disabled).toBe(false);
+        expect(document.querySelector('#build-btn').classList.contains('state-disabled')).toBe(false);
+        expect(document.querySelector('#build-btn .btn-main-label').textContent).toBe('ASSEMBLE ROCKET');
+    });
+
+    it('registers the assemble handler on the build button', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const handler = vi.fn();
+
+        controller.showBuildScreen({
+            sections: {},
+            assembly: {
+                ready: true,
+                label: 'ASSEMBLE ROCKET',
+                subtext: 'Ready'
+            },
+            launch: { ready: false }
+        });
+        controller.setBuildAssembleHandler(handler);
+        document.querySelector('[data-tab="assembly"]').click();
+        document.querySelector('#build-btn').click();
+
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(document.querySelector('[data-tab="flight"]').classList.contains('state-active')).toBe(true);
+        expect(document.querySelector('#tab-flight').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#tab-assembly').classList.contains('state-hidden')).toBe(true);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
+    });
+
+    it('registers the launch handler on the launch button', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const handler = vi.fn();
+
+        controller.showBuildScreen({
+            sections: {},
+            assembly: { ready: false },
+            launch: {
+                ready: true,
+                label: 'LAUNCH ENGINE',
+                subtext: 'Ready'
+            }
+        });
+        controller.setLaunchHandler(handler);
+        document.querySelector('#launch-btn').click();
+
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
+    });
+
+    it('registers build item selection handlers with category and uid', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const handler = vi.fn();
+
+        controller.showBuildScreen({
+            sections: {
+                rocket: {
+                    entries: [
+                        {
+                            uid: 'rocket_1',
+                            itemViewData: {
+                                uid: 'rocket_1',
+                                id: 'rocket_basic',
+                                name: 'Basic Rocket',
+                                category: 'rocket',
+                                stats: {}
+                            }
+                        }
+                    ]
+                }
+            },
+            launch: { ready: false }
+        });
+        controller.setBuildItemSelectionHandler(handler);
+        document.querySelector('#list-rocket .ItemCard').click();
+
+        expect(handler).toHaveBeenCalledWith({ category: 'rocket', uid: 'rocket_1' });
+        expect(soundController.playSE).toHaveBeenCalledWith('select');
+    });
+
+    it('does not register selection handlers for non-clickable item cards', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const handler = vi.fn();
+
+        controller.showBuildScreen({
+            sections: {
+                launcher: {
+                    entries: [
+                        {
+                            uid: 'launcher_empty',
+                            disabled: true,
+                            itemViewData: {
+                                uid: 'launcher_empty',
+                                id: 'pad_standard_d2',
+                                name: 'Empty Launcher',
+                                category: 'launcher',
+                                stats: {}
+                            }
+                        }
+                    ]
+                }
+            },
+            launch: { ready: false }
+        });
+        controller.setBuildItemSelectionHandler(handler);
+        document.querySelector('#list-launcher .ItemCard').click();
+
+        expect(document.querySelector('#list-launcher .ItemCard').classList.contains('state-clickable')).toBe(false);
+        expect(handler).not.toHaveBeenCalled();
     });
 
     it('updates HUD values and exposes the map canvas', () => {
@@ -313,5 +492,91 @@ describe('UIController', () => {
         expect(document.querySelector('#sector-display').textContent).toBe('3');
         expect(document.querySelector('#score-display').textContent).toBe('1,234');
         expect(document.querySelector('#coin-display').textContent).toBe('80');
+    });
+
+    it('keeps map pointer input active while dragging outside the canvas', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const handler = vi.fn();
+        const canvas = document.querySelector('#gameCanvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        canvas.getBoundingClientRect = vi.fn(() => ({
+            left: 20,
+            top: 40,
+            width: 400,
+            height: 300
+        }));
+
+        controller.setCanvasInputHandler(handler);
+        canvas.dispatchEvent(createPointerEvent('pointerdown', {
+            pointerId: 1,
+            clientX: 100,
+            clientY: 120
+        }));
+        window.dispatchEvent(createPointerEvent('pointermove', {
+            pointerId: 1,
+            clientX: 180,
+            clientY: 220
+        }));
+        window.dispatchEvent(createPointerEvent('pointerup', {
+            pointerId: 1,
+            clientX: 180,
+            clientY: 220
+        }));
+
+        expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'pointerdown',
+            point: { x: 160, y: 160 }
+        }));
+        expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'pointermove',
+            point: { x: 320, y: 360 }
+        }));
+        expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'pointerup',
+            point: { x: 320, y: 360 }
+        }));
+    });
+
+    it('normalizes two pointer map gestures into pinch events', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const handler = vi.fn();
+        const canvas = document.querySelector('#gameCanvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        canvas.getBoundingClientRect = vi.fn(() => ({
+            left: 20,
+            top: 40,
+            width: 400,
+            height: 300
+        }));
+
+        controller.setCanvasInputHandler(handler);
+        canvas.dispatchEvent(createPointerEvent('pointerdown', {
+            pointerId: 1,
+            clientX: 100,
+            clientY: 100
+        }));
+        canvas.dispatchEvent(createPointerEvent('pointerdown', {
+            pointerId: 2,
+            clientX: 200,
+            clientY: 100
+        }));
+        window.dispatchEvent(createPointerEvent('pointermove', {
+            pointerId: 2,
+            clientX: 240,
+            clientY: 100
+        }));
+
+        expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'gesturestart',
+            point: { x: 260, y: 120 }
+        }));
+        expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'pinch',
+            point: { x: 300, y: 120 },
+            delta: { x: 40, y: 0 },
+            scale: 1.4
+        }));
     });
 });

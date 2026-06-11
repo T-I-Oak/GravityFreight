@@ -108,9 +108,24 @@
     --color-bg-card: rgba(20, 25, 40, 0.5);
 }
 
-.theme-neon .ItemCard.state-clickable:hover {
+.theme-neon .ItemCard.state-clickable:hover:not(.state-selected) {
     border-color: color-mix(in srgb, var(--current-color), #fff 60%);
     box-shadow: 0 0 6px color-mix(in srgb, var(--current-color), transparent 60%);
+    transform: translateY(-1px);
+}
+
+.theme-neon .ItemCard.state-selected {
+    border-color: color-mix(in srgb, var(--current-color), #fff 20%);
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--current-color), transparent 35%),
+        0 0 14px color-mix(in srgb, var(--current-color), transparent 62%);
+}
+
+.theme-neon .ItemCard.state-clickable.state-selected:hover {
+    border-color: #ffffff;
+    box-shadow:
+        inset 0 0 0 1px var(--current-color),
+        0 0 22px color-mix(in srgb, var(--current-color), transparent 45%);
     transform: translateY(-1px);
 }
 

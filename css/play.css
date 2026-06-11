@@ -39,6 +39,65 @@
     padding: var(--space-double);
 }
 
+#inventory-panel {
+    --panel-border-color: color-mix(in srgb, var(--current-color), transparent 60%);
+}
+
+#inventory-panel .panel-header {
+    border-bottom-color: var(--panel-border-color);
+}
+
+#inventory-panel .panel-body {
+    min-height: 0;
+    overflow: hidden;
+}
+
+#inventory-panel .tab-content {
+    min-height: 0;
+}
+
+#inventory-panel #tab-flight {
+    height: 100%;
+    flex-direction: column;
+    gap: var(--space-double);
+}
+
+#inventory-panel #tab-flight:not(.state-hidden) {
+    display: flex;
+}
+
+#inventory-panel #tab-assembly {
+    height: 100%;
+    flex-direction: column;
+    gap: var(--space-double);
+}
+
+#inventory-panel #tab-assembly:not(.state-hidden) {
+    display: flex;
+}
+
+#inventory-panel .flight-scroll,
+#inventory-panel .assembly-scroll {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+}
+
+#inventory-panel .flight-actions,
+#inventory-panel .assembly-actions {
+    flex: 0 0 auto;
+    margin: 0 calc(-1 * var(--space-double));
+    padding: var(--space-unit) var(--space-double) 0;
+    border-top: 1px solid var(--panel-border-color);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-bg-card), transparent 95%),
+        color-mix(in srgb, var(--color-bg-card), transparent 82%)
+    );
+}
+
 /* Logic: Grouped message indicators with defined spatial density */
 #play-hud .hud-messages {
     display: flex;
@@ -76,6 +135,7 @@
     width: 100%;
     height: 100%;
     z-index: var(--z-world);
+    touch-action: none;
 }
 
 /* --- 3. Sidebar (Inventory Panel) --- */
@@ -84,7 +144,7 @@
     top: var(--space-double);
     right: var(--space-double);
     width: 340px;
-    max-height: calc(100% - var(--space-double) - 108px);
+    max-height: calc(100% - (var(--space-double) * 2));
     display: flex;
     flex-direction: column;
     z-index: var(--z-panel);
@@ -97,9 +157,15 @@
     bottom: var(--space-double);
     right: var(--space-double);
     width: 340px;
+    min-height: 76px;
     display: flex;
     justify-content: center;
+    pointer-events: none;
     z-index: var(--z-panel);
+}
+
+#play-scene-container .action-dock .Button {
+    pointer-events: auto;
 }
 
 
@@ -130,7 +196,7 @@
 #play-screen .assembly.state-disabled.state-notable .btn-sub-label {
     color: var(--current-color);
     text-shadow: 0 0 12px var(--current-color);
-    animation: ui-guide-pulse 2s infinite ease-in-out;
+    animation: guide-pulse 2s infinite ease-in-out;
     opacity: 1;
 }
 

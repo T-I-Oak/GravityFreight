@@ -190,10 +190,10 @@
             });
             // --- 5. State Matrix Testing (Clickable x Active) ---
             const stateSamples = [
-                { id: 'st-1', isClickable: false, isActive: false, name: 'Normal (Non-Clickable)' },
-                { id: 'st-2', isClickable: true, isActive: false, name: 'Clickable (Normal)' },
-                { id: 'st-3', isClickable: false, isActive: true, name: 'Active (Non-Clickable)' },
-                { id: 'st-4', isClickable: true, isActive: true, name: 'Active (Clickable)' }
+                { id: 'st-1', isClickable: false, isSelected: false, name: 'Normal (Non-Clickable)' },
+                { id: 'st-2', isClickable: true, isSelected: false, name: 'Clickable (Normal)' },
+                { id: 'st-3', isClickable: false, isSelected: true, name: 'Selected (Non-Clickable)' },
+                { id: 'st-4', isClickable: true, isSelected: true, name: 'Selected (Clickable)' }
             ];
 
             const baseLogic = CATALOG.find(i => i.id === 'sensor_gravity');
@@ -208,7 +208,7 @@
                     const item = createItemViewData(baseLogic, { name: state.name });
                     const html = UIComponents.generateCardHTML(item, { 
                         isClickable: state.isClickable,
-                        isActive: state.isActive
+                        isSelected: state.isSelected
                     });
                     const div = document.createElement('div');
                     div.style.marginBottom = '12px';

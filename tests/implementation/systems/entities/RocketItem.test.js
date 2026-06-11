@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import Item from '../../../../src/systems/entities/Item.js';
+import ItemContainer from '../../../../src/systems/entities/ItemContainer.js';
 import ModuleStack from '../../../../src/systems/entities/ModuleStack.js';
 import RocketItem from '../../../../src/systems/entities/RocketItem.js';
 import GameDataRepository from '../../../../src/core/GameDataRepository.js';
@@ -73,6 +74,42 @@ describe('RocketItem', () => {
         expect(rocketItem.calculateAppraisalValue()).toBe(
             parts.reduce((total, item) => total + item.calculateAppraisalValue(), 0)
         );
+    });
+
+    it('compares equality by composition snapshots, not only aggregate stats', () => {
+        const first = new RocketItem(
+            new Item('hull_light', repository),
+            new Item('sensor_short', repository),
+            []
+        );
+        const sameComposition = RocketItem.fromSnapshot(first.createSnapshot(), repository);
+        const differentComposition = new RocketItem(
+            new Item('hull_light', repository),
+            new Item('sensor_normal', repository),
+            []
+        );
+
+        expect(first.equals(sameComposition)).toBe(true);
+        expect(first.equals(differentComposition)).toBe(false);
+    });
+
+    it('does not stack rockets assembled from different materials', () => {
+        const container = new ItemContainer();
+        const first = new RocketItem(
+            new Item('hull_light', repository),
+            new Item('sensor_short', repository),
+            []
+        );
+        const second = new RocketItem(
+            new Item('hull_light', repository),
+            new Item('sensor_normal', repository),
+            []
+        );
+
+        container.addItem(first);
+        container.addItem(second);
+
+        expect(container.stacks).toHaveLength(2);
     });
 
     it('does not expose aggregate stats as direct properties', () => {

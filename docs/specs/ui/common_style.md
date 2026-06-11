@@ -77,7 +77,7 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 
 | Class | Status | 用途 | 備考 |
 | :--- | :--- | :--- | :--- |
-| `.state-active` | Draft | 選択中、現在ページ、現在タブ | 操作対象の現在状態 |
+| `.state-active` | Draft | 現在ページ、現在タブ、点灯中ゲージなどの active 状態 | ItemCard のユーザー選択には使わない |
 | `.state-disabled` | Draft | 操作不可 | ボタン、タブ、カード |
 | `.state-selected` | Draft | ユーザーが選択した対象 | ItemCard、リスト行 |
 | `.state-clickable` | Draft | クリック可能であることを示す | hover/active feedback の対象 |

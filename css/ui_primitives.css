@@ -152,14 +152,7 @@
     letter-spacing: 0.05em;
 }
 
-/* --- 6. Message & Indicator Wrappers --- */
-.message-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* --- 7. Logo Specific Primitives (Cleaned) --- */
+/* --- 6. Logo Specific Primitives (Cleaned) --- */
 .logo.text-display {
     font-family: var(--font-num);
     font-size: 18px;
@@ -180,14 +173,14 @@
     text-transform: uppercase;
 }
 
-/* --- 8. Animation & State Primitives --- */
+/* --- 7. Animation & State Primitives --- */
 
 /* state-new: mail icon specific pulse animation (Unified with HUD neon-pulse rhythm) */
 .Icon.mail.state-new {
-    animation: ui-mail-pulse 1.5s infinite ease-in-out;
+    animation: mail-pulse 1.5s infinite ease-in-out;
 }
 
-@keyframes ui-mail-pulse {
+@keyframes mail-pulse {
     0%, 100% { 
         opacity: 0.8; 
         filter: brightness(1) drop-shadow(0 0 1px currentColor); 
@@ -198,8 +191,8 @@
     }
 }
 
-/* ui-guide-pulse: Guidance animation for placeholders and specific CTAs */
-@keyframes ui-guide-pulse {
+/* guide-pulse: Guidance animation for placeholders and specific CTAs */
+@keyframes guide-pulse {
     0%, 100% { 
         opacity: 0.6; 
         transform: scale(1);
@@ -221,7 +214,7 @@
     filter: brightness(1.2);
 }
 
-/* --- 9. Data Wells --- */
+/* --- 8. Data Wells --- */
 .Well {
     border-radius: var(--radius-standard);
     padding: var(--space-double);

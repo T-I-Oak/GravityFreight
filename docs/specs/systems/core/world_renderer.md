@@ -12,11 +12,13 @@
 
 ## 2. インターフェース (Interface)
 
-### 実装段階 (Current Implementation Stage)
+### 描画仕様
 
-- v0.84 時点では、本編実画面の最小起動導線を確認するため、`#gameCanvas` の Canvas 2D context を使って Sector の境界、出口、天体を描画する。
-- PIXI.js、CameraController、BackgroundManager、ソナー、航跡、航行終了演出は最終仕様として残し、後続タスクで段階的に接続する。
-- 現在の `initialize()` は `HTMLCanvasElement` を受け取り、`setSector()` 呼び出し時に静的な Sector 表示を更新する。
+- `#gameCanvas` に PIXI `Application` を接続し、ゲーム世界をレイヤー構造で描画する。
+- マップ座標は CameraController の投影を使用し、背景は BackgroundManager が管理する。
+- セクター境界、出口、天体、施設ラベル、船体、貨物、航跡、予測線、ソナー、航行終了演出を描画対象とする。
+- 天体 glow、アイテム保持リング、細い境界線、太い発光 exit arc、施設ラベルの天地補正を持つ。
+- `initialize()` は `HTMLCanvasElement`, `CameraController`, `BackgroundManager` を受け取り、PIXI 初期化を行うため `Promise<void>` を返す。`setSector()` 呼び出し時に Sector 表示を更新する。
 
 ### プロパティ (Properties)
 - **`targetSector: Sector | null`**: 現在描画対象となっているセクターインスタンスへの参照。
@@ -28,21 +30,20 @@
 - **`sonarRange: number`**: 現在の回収可能範囲の最大半径。描画ループ内で最新のロケット状態（`rocketItem.pickupRange * rocketItem.pickupMultiplier`）を反映する。
 
 ### メソッド (Methods)
-- **`initialize(container: HTMLElement, camera: CameraController, background: BackgroundManager): void`**
+- **`initialize(canvas: HTMLCanvasElement, camera: CameraController, background: BackgroundManager): Promise<void>`**
     - PIXI.js の初期化と依存システムの紐付け、メインループの開始を行う。
-    - **v0.84 実装**: `initialize(canvas: HTMLCanvasElement)` として Canvas 2D context を初期化する。
+    - 既存の `#gameCanvas` を PIXI `Application` の描画対象として使用し、背景・境界・出口・天体・ラベルの基本レイヤーを初期化する。
     - **内部挙動**:
         1. 引数で渡された `camera` および `background` を内部変数に保持する。
         2. `PIXI.Application` インスタンスを生成する（透明度・アンチエイリアス等の基本設定を含む）。
-        3. `container` のサイズに合わせてレンダラーのサイズを初期設定する。
-        4. `container.appendChild(app.view)` を実行し、Canvas を DOM に配置する。
-        5. PIXI の Ticker に `this.render` を登録し、メインループを開始する。
-        6. 初期化完了後、`this.handleResize(container.clientWidth, container.clientHeight)` を一度呼び出して各コンポーネントの描画領域を確定させる。
+        3. `canvas` の親要素または Canvas 自身のサイズに合わせてレンダラーのサイズを初期設定する。
+        4. `background`, `world`, `boundary`, `exits`, `bodies`, `labels` の最小レイヤーを生成し、`app.stage` に追加する。
+        5. 初期化完了後、`BackgroundManager.initialize(view)` を呼び出して背景描画領域を確定させる。
 
 - **`render(): void`**
     - メインの描画ループ。PIXI.js の Application Ticker から毎フレーム呼び出される。
-    1. `this.background.render(this.camera)` を呼び出し、背景を描画する。
-    2. `targetSector` が存在する場合、その中の全オブジェクトを `this.camera.getWorldToScreenMatrix()` を用いてスクリーン上に描画する。
+    1. `this.background.renderPixi(graphics, view)` を呼び出し、背景を描画する。
+    2. `targetSector` が存在する場合、その中の全オブジェクトを `CameraController.toScreen()` を用いてスクリーン上に描画する。
     3. 航行中または演出中、自律型オブジェクト（航跡、ソナー、貨物）の状態更新とフェード処理を実行する。
 
 - **`setSector(sector: Sector | null): void`**
@@ -98,9 +99,11 @@ PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描
 | :--- | :--- | :--- | :--- |
 | `backgroundContainer` | `stage` | 遠景（星々）の描画 | `BackgroundManager` が管理 |
 | `worldContainer` | `stage` | カメラ変換を受ける全オブジェクト | `CameraController` が変換を適用 |
+| ∟ `boundaryLayer` | `world` | セクター境界線 | 出口 arc の土台 |
+| ∟ `exitArcLayer` | `world` | 出口 arc | 施設別の色で描画 |
+| ∟ `celestialBodyLayer` | `world` | 天体（惑星・母星） | glow とアイテムリングを含む |
+| ∟ `labelLayer` | `world` | 施設ラベル | 天地補正を適用 |
 | ∟ `trajectoryLayer` | `world` | 予測軌道（軌道予測線） | エイミング中のみ表示 |
-| ∟ `celestialBodyLayer` | `world` | 天体（惑星・母星） |  |
-| ∟ `exitArcLayer` | `world` | 境界線（奥）および出口（手前） | セクター外縁の円弧群 |
 | ∟ `rocketTrailLayer` | `world` | ロケットの飛行軌跡 |  |
 | ∟ `freightLayer` | `world` | 荷物（Freight） | ロケットに追従する貨物アイコン |
 | ∟ `rocketLayer` | `world` | ロケット本体 |  |
@@ -108,7 +111,7 @@ PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描
 | ∟ `effectLayer` | `world` | 爆発等の演出 |  |
 
 - **描画順**: リストの下にあるものほど手前（前面）に描画される。
-- **座標系**: `worldContainer` 以下のレイヤーはすべてワールド座標系（単位: px）で配置される。
+- **座標系**: `worldContainer` 以下のレイヤーはすべてワールド座標系（単位: world px）で配置される。
 
 ## 4. 各オブジェクトの描画仕様 (Object Rendering Specifications)
 
@@ -122,22 +125,27 @@ PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描
 - ∟ `itemIndicator` (リング): 保持アイテムのカテゴリ色リング（最前面）。
 
 **ビジュアル要件**:
-- **色適用**: `isRepulsion` (斥力) なら `--color-star-repulsion`、`isHome` なら `--color-star-home`、それ以外は `--color-star-normal` を使用。
+- **色適用**: `isRepulsion` (斥力) なら world repulsive star 色、`isHome` なら home star 色、それ以外は normal star 色を使用。
+- **Glow**: 天体の背面に発光表現を置き、天体の種類ごとの色で周辺光を表現する。
 
 ### 4.2 出口 (ExitArc)
 出口ごとの `Container` 内に以下の要素を順に構築する。
-- ∟ `arcShape` (円弧): 境界線（900px）上に描画される太い円弧（最背面）。
-- ∟ `facilityLabel` (施設名): `PIXI.Text` によるラベル。天地補正（Readable Flip）を適用。
+- ∟ `arcShape` (円弧): 境界線（900 world px）上に描画される太い円弧（最背面）。
+- ∟ `facilityLabel` (施設名): 文字ごとの `PIXI.Text` による曲線ラベル。天地補正（Readable Flip）を適用。
 - ∟ `deliveryIcon` (アイコン): 3D風の段ボールマーカー（最前面）。
 
 **ビジュアル要件**:
 - **天地補正 (Readable Flip)**: 画面下半分に位置する場合、ラベルとアイコンの両方を 180 度反転させ、常にプレイヤーから見て天地が正しくなるように制御する。
+- **Arc 表現**: 発光用の太い半透明 stroke と、芯となる細い stroke の 2 重描画で表現する。施設ラベルは arc 外側へ配置する。
+- **施設名ラベル**: 施設名は単一の水平テキストではなく、文字ごとに exit arc 外側の円周上へ配置する。文字ごとの角度間隔はフォントサイズと文字間隔から算出し、ラベル全体が施設 arc の中心角を中心として並ぶようにする。
+- **ズーム追従**: 施設名ラベルのフォントサイズ、文字間隔、配置半径は `CameraController.zoomLevel` に完全追従し、ズーム時にマップと同じ倍率で拡大・縮小する。
+- **カメラ回転**: ExitArc の配置角度には `CameraController.rotation` を加算して描画し、天体や境界線と同じ回転状態に同期させる。
 - **エフェクト**: 
     - `StorySystem.isRead(currentPath + facilityID, true)` が `false`（＝そのルートの先に未読あり）の場合、配送アイコンを明滅させる。
 
 ### 4.3 セクター境界線 (Boundary Line)
 `exitArcLayer` の最背面に、セクター全体の広さを示すガイドとして描画される。
-- ∟ `boundaryShape`: 半径 900px の円。
+- ∟ `boundaryShape`: 半径 900 world px の円。
 
 **ビジュアル要件**:
 - 出口（円弧）の土台として機能するため、出口よりも細い実線で描画される。
@@ -167,15 +175,17 @@ PIXI.js の `app.stage` 以下に、以下の Container 階層を構築して描
 
 - **取得タイミング**: 初期化時、およびリサイズ（`handleResize`）時。
 - **変換処理**: CSS のカラー文字列（`#RRGGBB`）を取得し、PIXI が解釈可能な数値形式（`0xRRGGBB`）へ変換して保持する。
+- **色定義**: `css/design_tokens.css` の world / facility / category token から取得する。
 
 ## 6. カメラ行列の適用 (Camera Transformation)
 
-ワールド座標系（セクター内）からスクリーン座標系（Canvas表示）への投影は、`worldContainer` に対して一括で行う。
+ワールド座標系（セクター内）からスクリーン座標系（Canvas表示）への投影は、`CameraController` の変換結果を使用する。
 
 - **行列の更新タイミング**: `CameraController` が座標・ズームを計算した直後。
 - **適用フロー**:
-    1. `CameraController.getWorldToScreenMatrix()` により最新の表示用行列（`PIXI.Matrix`）を取得する。
-    2. `worldContainer.transform.setFromMatrix(matrix)` を実行し、全ワールドレイヤーを一括変換する。
+    1. 天体などワールド座標を持つオブジェクトは `CameraController.toScreen()` でスクリーン座標へ変換する。
+    2. 半径や stroke 幅など、距離に比例する値は `CameraController.zoomLevel` を乗算して描画する。
+    3. ExitArc のように角度で定義される要素は、描画時に `CameraController.rotation` を加算する。
 - **背景との同期**: 
-    - `backgroundContainer` は `worldContainer` の移動量に対し、一定の係数（Parallax係数）を乗算した値を適用し、視差効果を演出する。
+    - `BackgroundManager` へ `rotation`, `position`, `zoomLevel` を含む view 情報を渡し、背景の回転中心とズーム中心をマップと同期させる。
     - 詳細は `BackgroundManager.md` を参照。

@@ -24,6 +24,7 @@ graph TD
 
     %% Logic & System Layer
     Orchestrator --> GC["GameController (Game Flow/Logic)"]
+    GC --> BFC["BuildFlowController"]
     GC --> BSP["BuildScreenPresenter"]
     GC --> SPC["SectorProgressionController"]
     GC --> SS["SessionState (Current Game State)"]
@@ -193,6 +194,16 @@ graph TD
         - 施設入場・施設取引・施設退出など、画面入力からゲーム進行処理への入口を管理する。
         - 航行中の物理計算、スコア計算、終了判定の実行。
         - セクター進行と契約終了判定は `SectorProgressionController` へ委譲する。
+- **BuildFlowController**
+    - 生存期間: Game Lifecycle
+    - 役割: ビルド画面の選択状態と再描画の仲介。
+    - 責務:
+        - カテゴリ別の現在選択 stack uid を保持する。
+        - `module` カテゴリの複数・重複選択、スロット上限、あふれ時の自動解除を管理する。
+        - UI からの `{ category, uid }` 選択イベントを選択状態へ反映する。
+        - `BuildScreenPresenter` で最新 view data を生成し、`UIController.showBuildScreen()` へ渡す。
+        - ASSEMBLY タブの選択パーツから `RocketItem` を生成し、inventory へ追加する。
+        - 発射、航行開始、FLIGHT タブの発射構成消費は担当しない。
 - **BuildScreenPresenter**
     - 生存期間: Game Lifecycle
     - 役割: ビルド画面表示用 view data 生成。

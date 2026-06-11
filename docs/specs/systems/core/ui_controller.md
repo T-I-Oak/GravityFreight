@@ -54,7 +54,9 @@
     - **内部挙動**:
         1. タイトル、航行結果画面、施設画面を非表示にし、HUD とビルドパネルを表示する。
         2. `viewData` が渡された場合、`rocket`, `launcher`, `booster`, `chassis`, `logic`, `module` の各リストへ `UIComponents.generateCardHTML()` または空表示を反映する。
-        3. `viewData.launch` から発射ボタンの disabled 状態と文言を更新する。
+        3. `viewData.assembly` から ASSEMBLE ボタンの disabled 状態と文言を更新する。
+        4. `viewData.launch` から発射ボタンの disabled 状態と文言を更新する。
+        5. `rocket` の空表示に `emptyAction: 'open-assembly'` が設定されている場合、その placeholder はクリックで ASSEMBLY タブへ切り替える。
     - **責務境界**: inventory の抽出、選択可否、発射可能判定、UI 文言取得は `BuildScreenPresenter` の責務。`UIController` は渡された view data を DOM に反映する。
 - **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
     - セクター開始時のタイトル演出（「SECTOR X」）を画面中央に表示する。
@@ -68,7 +70,7 @@
     - 契約（ゲーム）開始時に HUD を初期化する。
     - **内部挙動**: 
         1. `sessionState` から初期値（Coins, Sector 等）を取得し、DOM に即座に反映する。
-        2. **メールスロットのリセット**: 全 3 スロットのメールアイコンを `gray` かつ `disabled` 状態にし、一切の明滅を停止させる。
+        2. **メールスロットのリセット**: 全 3 スロットのメールアイコンから施設 type クラス、`.state-new`、`.state-clickable` を除去し、`.state-disabled` に戻す。
 - **`updateHUDValue(key: string, value: number): void`**
     - 航行画面が表示されている間、HUD 内の特定の数値（スコア等）を更新する。
     - **内部挙動 (ロールカウンター演出)**:
@@ -84,9 +86,9 @@
 - **`updateMailStatus(index: number, type: string, isUnread: boolean): void`**
     - 指定されたインデックス（0〜2）のメールアイコンの状態（種類に応じた色、未読時の明滅演出）を更新する。
     - **内部挙動**:
-        - **ボタン有効化**: `type` が存在すれば `disabled` を解除し、`gray` クラスを除去する。
-        - **色の更新**: `type`（'T', 'R', 'B'）に基づき、`.type-t`, `.type-r`, `.type-b` クラスを切り替える。
-        - **明滅の更新**: `isUnread` が `true` の場合、明滅アニメーション用のクラス（`.state-animating`）を付与し、既読になるまで継続させる。
+        - **状態更新**: `type` が存在すれば `.state-disabled` を除去し、必要に応じて `.state-clickable` を付与する。
+        - **色の更新**: `type`（'T', 'R', 'B'）に基づき、施設 type クラス（例: `.trading-post`, `.repair-dock`, `.black-market`）を切り替える。
+        - **未読表示**: `isUnread` が `true` の場合、未読アニメーション用の `.state-new` を付与し、既読になるまで継続させる。
 - **`setMailHandler(handler: Function): void`**
     - メールアイコンがクリックされた際のハンドラを登録する。
     - **内部挙動**: 内部で保持するメールアイコン要素を引数として `setOperationHandler` を呼び出す。
@@ -193,17 +195,21 @@
             - `SoundController.playSE('select', sliderValue)` を実行する。
             - **重要**: `playSE` の第2引数に現在のスライダー値を渡すことで、グローバル音量を変更せずにプレビュー再生を行う。
 
-- **`setItemSelectionHandler(handler: (uid: string) => void): void`**
-    - ビルドパネル内のアイテム要素が選択された際のハンドラを登録する。
-    - **内部挙動**: 各アイテム要素（`.item-card` 等）に対し、`setSelectionHandler(element, 'uid', handler)` を呼び出す。
+- **`setBuildItemSelectionHandler(handler: ({ category: string, uid: string }) => void): void`**
+    - ビルドパネル内のアイテムカードが選択された際のハンドラを登録する。
+    - **内部挙動**:
+        1. `.item-list .ItemCard.state-clickable[data-uid]` を対象にクリックイベントを登録する。
+        2. カードが属する `#list-{category}` からカテゴリを取得する。
+        3. `handler({ category, uid })` を呼び出す。
+        4. ビルド画面が再描画された場合も、新しいカードへ再度ハンドラを登録する。
 
-- **`setAssembleHandler(handler: Function): void`**
+- **`setBuildAssembleHandler(handler: Function): void`**
     - ビルドパネルの「ASSEMBLE ボタン」にハンドラを登録する。
-    - **内部挙動**: ASSEMBLE ボタン要素を引数として `setOperationHandler` を呼び出す。
+    - **内部挙動**: ASSEMBLE ボタン要素を引数として `setOperationHandler` を呼び出す。ハンドラ実行後、FLIGHT タブへ戻す。
 
 - **`setLaunchHandler(handler: Function): void`**
     - ビルド画面の「LAUNCH ボタン」にハンドラを登録する。
-    - **内部挙動**: LAUNCH ボタン要素を引数として `setOperationHandler` を呼び出す。
+    - **内部挙動**: LAUNCH ボタン要素を対象に `setOperationHandler` を呼び出し、クリック時に登録済み handler を実行する。
 
 - **`setResultHandler(handler: Function): void`**
     - リザルト画面の「確定（OK / CONTINUE）ボタン」にハンドラを登録する。
@@ -230,7 +236,20 @@
     - 施設画面の「出発（DEPART）ボタン」にハンドラを登録する。
     - **内部挙動**: 出発ボタン要素を引数として `setOperationHandler` を呼び出す。
 
-- **`setCanvasInputHandler(handler: (event: PointerEvent | WheelEvent) => void): void`**
+- **`setCanvasInputHandler(handler: (event: CanvasInputEvent) => void): void`**
     - マップ描画領域（Canvas）に対する入力を中継する（操作音なし）。
-    - **内部挙動**: 描画コンテナに対するポインター/ホイールイベントを直接購読し、演出音を介さずに `handler` を実行する。
+    - **内部挙動**:
+        1. Canvas の `pointerdown` と `wheel`、および `window` の `pointermove` / `pointerup` / `pointercancel` を購読する。
+        2. ドラッグ開始後は Canvas 外やビルドパネル上へポインタが移動しても、対応する `pointerup` / `pointercancel` まで入力を継続する。
+        3. 単一ポインタは `pointerdown` / `pointermove` / `pointerup` として正規化し、Canvas 内部座標、修飾キー、pointerType を通知する。
+        4. 2本指操作は中心点、中心点移動量、距離比を持つ `pinch` イベントへ正規化する。2本指から1本指に戻った場合は、残ったポインタを新しい `pointerdown` として通知し直す。
+        5. `wheel` は Canvas 内部座標と `deltaY` を通知する。
+        6. 入力座標は `getBoundingClientRect()` と Canvas の `width` / `height` から、CSS px / client 座標を Canvas 内部座標へ変換してから通知する。
+    - **CanvasInputEvent**:
+        - `pointerdown`: `{ type, point, shiftKey, ctrlKey, pointerType }`
+        - `pointermove`: `{ type, point, pointerType }`
+        - `pointerup`: `{ type, point }`
+        - `pinch`: `{ type, point, delta, scale }`
+        - `wheel`: `{ type, point, deltaY }`
+    - **責務境界**: UIController はブラウザ入力の購読と正規化のみを担当する。パン、回転、ズーム、AIM の意味付けは `GameController` が担当する。
     - **注記**: 対象となる Canvas 要素の取得方法は、`WorldRenderer` の初期化仕様に準拠する。

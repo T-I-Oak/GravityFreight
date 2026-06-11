@@ -12,6 +12,12 @@ class UIController {
         this.resultHandler = null;
         this.mapToggleHandler = null;
         this.protectHandler = null;
+        this.buildItemSelectionHandler = null;
+        this.launchHandler = null;
+        this.canvasInputHandler = null;
+        this.activeMapPointers = new Map();
+        this.lastMapPinchDistance = 0;
+        this.lastMapPinchCenter = null;
 
         if (!this.gameDataRepository) {
             throw new Error('[UIController] gameDataRepository is required.');
@@ -24,6 +30,7 @@ class UIController {
         this.playScene = this.document.querySelector('#play-scene-container');
         this.hud = this.document.querySelector('#play-hud');
         this.buildPanel = this.document.querySelector('#inventory-panel');
+        this.buildButton = this.document.querySelector('#build-btn');
         this.launchControl = this.document.querySelector('#launch-control');
         this.launchButton = this.document.querySelector('#launch-btn');
         this.mapCanvas = this.document.querySelector('#gameCanvas');
@@ -79,9 +86,8 @@ class UIController {
         this.updateHUDValue('score', sessionState.totalScore ?? 0);
         this.updateHUDValue('coin', sessionState.coins ?? 0);
         this.mailButtons.forEach(button => {
-            button.disabled = true;
-            button.classList.remove('type-t', 'type-r', 'type-b', 'state-animating');
-            button.classList.add('gray');
+            button.classList.remove('trading-post', 'repair-dock', 'black-market', 'state-new', 'state-clickable');
+            button.classList.add('state-disabled');
         });
     }
 
@@ -155,6 +161,42 @@ class UIController {
         this.setOperationHandler(this.#requiredFacilityElement('.facility-depart-button'), handler);
     }
 
+    setBuildItemSelectionHandler(handler) {
+        this.buildItemSelectionHandler = handler;
+        this.#wireBuildItemSelectionHandlers();
+    }
+
+    setBuildAssembleHandler(handler) {
+        if (this.buildButton) {
+            this.setOperationHandler(this.buildButton, element => {
+                const result = handler(element);
+                this.#activateBuildTab('flight');
+                return result;
+            });
+        }
+    }
+
+    setLaunchHandler(handler) {
+        this.launchHandler = handler;
+        if (this.launchButton) {
+            this.setOperationHandler(this.launchButton, () => this.launchHandler());
+        }
+    }
+
+    setCanvasInputHandler(handler) {
+        this.canvasInputHandler = handler;
+        if (!this.mapCanvas || this.mapCanvas.dataset.inputHandlerReady === 'true') {
+            return;
+        }
+
+        this.mapCanvas.dataset.inputHandlerReady = 'true';
+        this.mapCanvas.addEventListener('pointerdown', event => this.#handleMapPointerDown(event), { passive: false });
+        this.document.defaultView?.addEventListener('pointermove', event => this.#handleMapPointerMove(event), { passive: false });
+        this.document.defaultView?.addEventListener('pointerup', event => this.#handleMapPointerUp(event), { passive: false });
+        this.document.defaultView?.addEventListener('pointercancel', event => this.#handleMapPointerUp(event), { passive: false });
+        this.mapCanvas.addEventListener('wheel', event => this.#handleMapWheel(event), { passive: false });
+    }
+
     updateFacilityCredits(value) {
         this.#requiredFacilityElement('.credits-value').textContent = `${this.#formatNumber(value)} c`;
     }
@@ -168,7 +210,10 @@ class UIController {
             container.innerHTML = this.#generateBuildSectionHTML(section, sectionId);
         });
 
+        this.#updateBuildButton(viewData.assembly);
         this.#updateLaunchButton(viewData.launch);
+        this.#wireBuildPlaceholderHandlers();
+        this.#wireBuildItemSelectionHandlers();
     }
 
     #generateBuildSectionHTML(section, sectionId) {
@@ -177,13 +222,19 @@ class UIController {
             return UIComponents.generatePlaceholderHTML(
                 section?.emptyText ?? 'NO ITEM',
                 section?.emptySubtext ?? '',
-                { category: sectionId }
+                {
+                    category: sectionId,
+                    isClickable: !!section?.emptyAction,
+                    isNotable: !!section?.emptyNotable,
+                    action: section?.emptyAction
+                }
             );
         }
 
         return entries.map(entry => UIComponents.generateCardHTML(entry.itemViewData, {
             isClickable: !entry.disabled,
-            isActive: !!entry.selected
+            isSelected: !!entry.selected,
+            selectedCount: entry.selectedCount
         })).join('');
     }
 
@@ -207,6 +258,25 @@ class UIController {
         }
     }
 
+    #updateBuildButton(assembly = {}) {
+        if (!this.buildButton) {
+            return;
+        }
+
+        const ready = !!assembly.ready;
+        this.buildButton.disabled = !ready;
+        this.buildButton.classList.toggle('state-disabled', !ready);
+        this.buildButton.classList.toggle('state-notable', !ready);
+        const label = this.buildButton.querySelector('.btn-main-label');
+        const subtext = this.buildButton.querySelector('.btn-sub-label');
+        if (label && assembly.label) {
+            label.textContent = assembly.label;
+        }
+        if (subtext && assembly.subtext) {
+            subtext.textContent = assembly.subtext;
+        }
+    }
+
     #wireBuildTabs() {
         this.buildPanel?.querySelectorAll('[data-tab]').forEach(tab => {
             tab.addEventListener('click', event => {
@@ -220,7 +290,6 @@ class UIController {
         this.buildPanel?.querySelectorAll('[data-tab]').forEach(tab => {
             const isActive = tab.dataset.tab === tabId;
             tab.classList.toggle('state-active', isActive);
-            tab.classList.toggle('active', isActive);
         });
 
         const targetMap = {
@@ -267,6 +336,47 @@ class UIController {
                 this.buildPanel?.classList.toggle('state-collapsed');
             });
         }
+    }
+
+    #wireBuildItemSelectionHandlers() {
+        if (!this.buildItemSelectionHandler || !this.buildPanel) {
+            return;
+        }
+
+        this.buildPanel.querySelectorAll('.item-list .ItemCard.state-clickable[data-uid]').forEach(card => {
+            if (card.dataset.selectionHandlerReady === 'true') {
+                return;
+            }
+
+            const list = card.closest('.item-list');
+            const category = list?.id?.replace(/^list-/, '');
+            if (!category) {
+                return;
+            }
+
+            card.dataset.selectionHandlerReady = 'true';
+            this.setOperationHandler(card, element => {
+                this.buildItemSelectionHandler({
+                    category,
+                    uid: element.dataset.uid
+                });
+            }, 'select');
+        });
+    }
+
+    #wireBuildPlaceholderHandlers() {
+        this.buildPanel?.querySelectorAll('.item-list .ItemCard[data-build-action]').forEach(card => {
+            if (card.dataset.actionHandlerReady === 'true') {
+                return;
+            }
+
+            card.dataset.actionHandlerReady = 'true';
+            this.setOperationHandler(card, element => {
+                if (element.dataset.buildAction === 'open-assembly') {
+                    this.#activateBuildTab('assembly');
+                }
+            });
+        });
     }
 
     #setResultOperationHandler(selector, handler) {
@@ -318,6 +428,141 @@ class UIController {
 
     #formatNumber(value) {
         return new Intl.NumberFormat('en-US').format(value ?? 0);
+    }
+
+    #handleMapPointerDown(event) {
+        if (!this.canvasInputHandler) {
+            return;
+        }
+
+        event.preventDefault();
+        this.mapCanvas.setPointerCapture?.(event.pointerId);
+        this.activeMapPointers.set(event.pointerId, this.#createPoint(event));
+
+        if (this.activeMapPointers.size === 1) {
+            this.canvasInputHandler({
+                type: 'pointerdown',
+                point: this.#createPoint(event),
+                shiftKey: !!event.shiftKey,
+                ctrlKey: !!event.ctrlKey,
+                pointerType: event.pointerType
+            });
+            return;
+        }
+
+        if (this.activeMapPointers.size >= 2) {
+            const [p1, p2] = [...this.activeMapPointers.values()].slice(0, 2);
+            this.lastMapPinchDistance = this.#distance(p1, p2);
+            this.lastMapPinchCenter = this.#midpoint(p1, p2);
+            this.canvasInputHandler({ type: 'gesturestart', point: this.lastMapPinchCenter });
+        }
+    }
+
+    #handleMapPointerMove(event) {
+        if (!this.canvasInputHandler || !this.activeMapPointers.has(event.pointerId)) {
+            return;
+        }
+
+        event.preventDefault();
+        this.activeMapPointers.set(event.pointerId, this.#createPoint(event));
+        const pointers = [...this.activeMapPointers.values()];
+
+        if (pointers.length >= 2) {
+            const [p1, p2] = pointers.slice(0, 2);
+            const center = this.#midpoint(p1, p2);
+            const distance = this.#distance(p1, p2);
+            const scale = this.lastMapPinchDistance > 0 ? distance / this.lastMapPinchDistance : 1;
+            const delta = this.lastMapPinchCenter
+                ? { x: center.x - this.lastMapPinchCenter.x, y: center.y - this.lastMapPinchCenter.y }
+                : { x: 0, y: 0 };
+
+            this.canvasInputHandler({
+                type: 'pinch',
+                point: center,
+                delta,
+                scale
+            });
+            this.lastMapPinchDistance = distance;
+            this.lastMapPinchCenter = center;
+            return;
+        }
+
+        this.canvasInputHandler({
+            type: 'pointermove',
+            point: this.#createPoint(event),
+            pointerType: event.pointerType
+        });
+    }
+
+    #handleMapPointerUp(event) {
+        if (!this.canvasInputHandler || !this.activeMapPointers.has(event.pointerId)) {
+            return;
+        }
+
+        event.preventDefault();
+        this.activeMapPointers.delete(event.pointerId);
+        this.mapCanvas.releasePointerCapture?.(event.pointerId);
+
+        if (this.activeMapPointers.size === 0) {
+            this.lastMapPinchDistance = 0;
+            this.lastMapPinchCenter = null;
+            this.canvasInputHandler({ type: 'pointerup', point: this.#createPoint(event) });
+            return;
+        }
+
+        if (this.activeMapPointers.size === 1) {
+            const [point] = [...this.activeMapPointers.values()];
+            this.lastMapPinchDistance = 0;
+            this.lastMapPinchCenter = null;
+            this.canvasInputHandler({
+                type: 'pointerdown',
+                point,
+                shiftKey: false,
+                ctrlKey: false,
+                pointerType: event.pointerType
+            });
+        }
+    }
+
+    #handleMapWheel(event) {
+        if (!this.canvasInputHandler) {
+            return;
+        }
+
+        event.preventDefault();
+        this.canvasInputHandler({
+            type: 'wheel',
+            point: this.#createPoint(event),
+            deltaY: event.deltaY
+        });
+    }
+
+    #createPoint(event) {
+        const rect = this.mapCanvas.getBoundingClientRect?.();
+        if (rect?.width && rect?.height) {
+            const scaleX = this.mapCanvas.width / rect.width;
+            const scaleY = this.mapCanvas.height / rect.height;
+            return {
+                x: (event.clientX - rect.left) * scaleX,
+                y: (event.clientY - rect.top) * scaleY
+            };
+        }
+
+        return {
+            x: event.clientX,
+            y: event.clientY
+        };
+    }
+
+    #distance(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    #midpoint(a, b) {
+        return {
+            x: (a.x + b.x) / 2,
+            y: (a.y + b.y) / 2
+        };
     }
 }
 

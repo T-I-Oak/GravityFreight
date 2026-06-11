@@ -31,18 +31,27 @@
     overflow: hidden;
 }
 
-/* Active/Selected State: Structural signaling and enhanced tint */
-.ItemCard.state-active {
+/* Selected State: Structural signaling and enhanced tint */
+.ItemCard.state-selected {
     background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-active, 80%));
     border-color: color-mix(in srgb, var(--current-color), #fff 40%);
+}
+
+.ItemCard.state-selected::before {
+    width: 7px;
+    box-shadow: 0 0 10px var(--current-color);
 }
 
 .ItemCard.state-clickable {
     cursor: pointer;
 }
 
-.ItemCard.state-clickable:hover {
+.ItemCard.state-clickable:hover:not(.state-selected) {
     filter: brightness(1.1);
+}
+
+.ItemCard.state-clickable.state-selected:hover {
+    filter: brightness(1.18) saturate(1.15);
 }
 
 /* Category indicator bar: Shared structure for all themes */
@@ -277,7 +286,16 @@
 }
 
 /* state-notable (Guidance): Adds color and pulse animation to the subtext only */
+.ItemCard.placeholder-card.state-notable {
+    opacity: 1;
+}
+
+.ItemCard.placeholder-card.state-notable .placeholder-text {
+    color: rgba(255, 255, 255, 0.88);
+}
+
 .ItemCard.placeholder-card.state-notable .placeholder-subtext {
     color: var(--current-color);
-    animation: ui-guide-pulse 2s infinite ease-in-out;
+    text-shadow: 0 0 12px var(--current-color);
+    animation: guide-pulse 2s infinite ease-in-out;
 }

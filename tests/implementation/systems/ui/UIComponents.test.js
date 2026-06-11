@@ -65,6 +65,11 @@ describe('UIComponents.generatePlaceholderHTML', () => {
         expect(html).toContain('state-clickable');
     });
 
+    it('should apply build action data attribute when action is provided', () => {
+        const html = UIComponents.generatePlaceholderHTML('T', 'S', { action: 'open-assembly' });
+        expect(html).toContain('data-build-action="open-assembly"');
+    });
+
     it('should apply category class when category is provided', () => {
         const html = UIComponents.generatePlaceholderHTML('T', 'S', { category: 'theme' });
         expect(html).toContain('theme');
@@ -191,6 +196,23 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         const html = UIComponents.generateCardHTML(mockItem, { status: 'DELIVERED' });
         expect(html).toContain('item-card-status state-delivered');
         expect(html).toContain('DELIVERED');
+    });
+
+    it('should apply state-selected for selected item cards', () => {
+        const html = UIComponents.generateCardHTML(mockItem, { isSelected: true });
+        expect(html).toContain('state-selected');
+        expect(html).not.toContain('ItemCard state-active');
+    });
+
+    it('should display selected stack count inside the stack badge', () => {
+        const html = UIComponents.generateCardHTML(
+            { ...mockItem, count: 2 },
+            { isSelected: true, selectedCount: 2 }
+        );
+
+        expect(html).toContain('Badge item-count');
+        expect(html).toContain('x2/2');
+        expect(html).not.toContain('selection-count');
     });
 
     it('should reject legacy flat item stats', () => {

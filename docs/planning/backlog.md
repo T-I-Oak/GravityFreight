@@ -131,15 +131,24 @@
     - [ ] UIController
         - [x] タイトル画面、HUD、ビルド画面の最小表示切替
         - [x] 航行結果画面の表示、結果確定、マップ切替、レコード保護の DOM イベント接続
+        - [x] Canvas 入力の正規化とドラッグ継続（ポインタ、ホイール、2本指操作）
     - [ ] WorldRenderer
         - [x] 本編 `#gameCanvas` への Sector 静的描画
         - [ ] CameraController / BackgroundManager / 航跡 / ソナー / 航行演出との接続
+            - [x] CameraController / BackgroundManager を PIXI 描画へ接続
+            - [ ] 航跡 / ソナー / 予測線 / 船体・貨物描画を接続
+            - [ ] WorldRenderer の描画色を `css/design_tokens.css` の world / facility / category token から取得する
         - [ ] 実プレイ画面のマップ表示完成度を上げる
             - 現在は初期表示確認用の静的描画に留め、完成版のマップ視認性、演出、カメラ、情報密度は別タスクで対応する
     - [ ] CameraController
+        - [x] パン、回転、ズーム、保存、座標変換の基礎実装
+        - [x] マウス/タッチ入力からのパン、回転、ズーム接続
     - [ ] BackgroundManager
         - [ ] 実プレイ画面の背景演出を完成版へ寄せる
-            - 現在はプレイ画面のレイアウト確認を優先し、背景表現の完成度は別タスクで対応する
+            - [x] 奥行き付き星空、瞬き、カメラ回転、20% 視差を接続する
+            - [x] 星の Z 移動、深度ラップ、ワープ速度補間を接続する
+            - [ ] セクター遷移のワープ開始・終了シーケンスから `startWarpEffect(duration)` / `stopWarpEffect(duration)` を呼び出す
+            - [ ] 実ブラウザで v1 と比較して星密度、速度、光跡の見え方を調整する
     - [ ] SoundController
 - [ ] How To Play を実装する
     - [ ] HowToPlayUI
@@ -174,6 +183,10 @@
     - [ ] snapshot 再現
     - [ ] 永続データ migration
     - [ ] public/data/update_history.json が v0 中は `[]` のままであること
+- [ ] 依存関係の脆弱性警告を確認・解消する
+    - PIXI.js 追加後に `npm audit` で警告が出ているため、リリース前に影響範囲を確認する
+    - `npm audit fix` または依存バージョン更新を行う場合は、lockfile 変更、build サイズ、描画挙動への影響を確認する
+    - 自動修正で破壊的な依存更新が必要になる場合は、対応方針を確認してから実施する
 - [ ] 要求仕様に対するテストを実施する
     - テストファイルは `tests/spec/` に配置し、命名規約 `[prefix]_[章番号]_[名称].test.js` に従う
     - [ ] `core_mechanics_01_terms.test.js`: core_mechanics.md 第1章: ゲーム概要・用語

@@ -14,9 +14,21 @@
     --color-bg-card: #14192d;
 }
 
-.theme-matte .ItemCard.state-clickable:hover {
+.theme-matte .ItemCard.state-clickable:hover:not(.state-selected) {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-matte .ItemCard.state-selected {
+    border-color: color-mix(in srgb, var(--current-color), #fff 10%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--current-color), transparent 30%);
+}
+
+.theme-matte .ItemCard.state-clickable.state-selected:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        inset 0 0 0 1px var(--current-color),
+        0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 /* Axis-D: Flavor Visualization (Category Color Borders) 

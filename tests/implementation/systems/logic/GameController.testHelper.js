@@ -66,18 +66,21 @@ export function createController(settlement = createSettlement()) {
             'facility.blackMarket.normalDescription': 'Acquire items worth at least 100c.',
             'facility.blackMarket.premiumName': 'Premium Deal',
             'facility.blackMarket.premiumDescription': 'Acquire items worth at least 500c.',
-            'build.empty.rocket.text': 'NO ROCKET EQUIPPED',
-            'build.empty.rocket.subtext': 'ASSEMBLE A ROCKET',
-            'build.empty.launcher.text': 'NO LAUNCHER',
-            'build.empty.launcher.subtext': 'ACQUIRE A LAUNCHER',
-            'build.empty.booster.text': 'NO BOOSTER EQUIPPED',
-            'build.empty.booster.subtext': 'BOOSTER IS OPTIONAL',
-            'build.empty.chassis.text': 'NO CHASSIS',
-            'build.empty.chassis.subtext': 'ACQUIRE CHASSIS',
-            'build.empty.logic.text': 'NO LOGIC',
-            'build.empty.logic.subtext': 'ACQUIRE LOGIC',
-            'build.empty.module.text': 'NO MODULE',
-            'build.empty.module.subtext': 'MODULE IS OPTIONAL',
+            'build.empty.rocket.text': '待機中のロケットなし',
+            'build.empty.rocket.subtext': 'ここをクリックしてロケットを建造してください',
+            'build.empty.launcher.text': '発射台なし',
+            'build.empty.launcher.subtext': '購入または回収してください',
+            'build.empty.booster.text': 'ブースターなし',
+            'build.empty.booster.subtext': '購入または回収してください',
+            'build.empty.chassis.text': 'シャーシなし',
+            'build.empty.chassis.subtext': '購入または回収してください',
+            'build.empty.logic.text': 'ロジックなし',
+            'build.empty.logic.subtext': '購入または回収してください',
+            'build.empty.module.text': 'モジュールなし',
+            'build.empty.module.subtext': '購入または回収してください',
+            'build.assemble.label': 'ASSEMBLE ROCKET',
+            'build.assemble.waitingSubtext': 'Select chassis and logic to assemble.',
+            'build.assemble.readySubtext': 'Ready to assemble.',
             'build.launch.label': 'LAUNCH ENGINE',
             'build.launch.waitingSubtext': 'Select a rocket and launcher to begin launch prep.',
             'build.launch.readySubtext': 'Confirm the launch angle to fire.'
@@ -91,7 +94,45 @@ export function createController(settlement = createSettlement()) {
             rocketItem: { id: 'rocket_item' }
         }))
     };
-    const currentSector = { luckyDiscountRate: 0 };
+    const currentSector = {
+        luckyDiscountRate: 0,
+        bodies: [
+            {
+                isHome: true,
+                radius: 40,
+                position: { x: 0, y: 0 }
+            }
+        ],
+        createSnapshot: vi.fn(() => ({
+            sectorNumber: 3,
+            bodies: [],
+            exits: []
+        }))
+    };
+    const rocketItem = {
+        uid: 'rocket_ready',
+        id: 'rocket_ready',
+        category: 'rocket',
+        getMass: vi.fn(() => 10),
+        getPower: vi.fn(() => 4),
+        getPowerMultiplier: vi.fn(() => 1),
+        getPrecision: vi.fn(() => 0),
+        getPickupRange: vi.fn(() => 0),
+        getPickupMultiplier: vi.fn(() => 1),
+        getGravityMultiplier: vi.fn(() => 1),
+        getArcMultiplier: vi.fn(() => 1),
+        getViewData: vi.fn(() => ({
+            uid: 'rocket_ready',
+            id: 'rocket_ready',
+            name: 'Ready Rocket',
+            category: 'rocket',
+            stats: {}
+        })),
+        createSnapshot: vi.fn(() => ({
+            uid: 'rocket_ready',
+            rocketItem: true
+        }))
+    };
     const sellItem = {
         uid: 'sell_item',
         category: 'module',
@@ -138,20 +179,92 @@ export function createController(settlement = createSettlement()) {
             stats: {}
         }))
     };
+    const readyLauncher = {
+        uid: 'launcher_ready',
+        category: 'launcher',
+        charges: 2,
+        maxCharges: 2,
+        power: 8,
+        powerMultiplier: 1,
+        consumeCharge: vi.fn(amount => {
+            readyLauncher.charges = Math.max(0, readyLauncher.charges - amount);
+            return readyLauncher.charges;
+        }),
+        getViewData: vi.fn(() => ({
+            uid: 'launcher_ready',
+            id: 'pad_standard_d2',
+            name: 'Standard Pad',
+            category: 'launcher',
+            stats: {}
+        })),
+        createSnapshot: vi.fn(() => ({
+            uid: 'launcher_ready',
+            id: 'pad_standard_d2',
+            charges: readyLauncher.charges,
+            enhancements: {}
+        }))
+    };
+    const boosterItem = {
+        uid: 'booster_ready',
+        category: 'booster',
+        charges: 1,
+        maxCharges: 1,
+        power: 0,
+        powerMultiplier: 1.2,
+        preventsLauncherWear: true,
+        consumeCharge: vi.fn(amount => {
+            boosterItem.charges = Math.max(0, boosterItem.charges - amount);
+            return boosterItem.charges;
+        }),
+        getViewData: vi.fn(() => ({
+            uid: 'booster_ready',
+            id: 'opt_fuel',
+            name: 'Fuel',
+            category: 'booster',
+            stats: {}
+        })),
+        createSnapshot: vi.fn(() => ({
+            uid: 'booster_ready',
+            id: 'opt_fuel',
+            charges: boosterItem.charges,
+            enhancements: {}
+        }))
+    };
     const inventoryStack = {
         uid: 'stack_sell',
         representative: sellItem,
-        items: [sellItem]
+        items: [sellItem],
+        count: 1
     };
     const launcherStack = {
         uid: 'stack_launcher',
         representative: damagedLauncher,
-        items: [damagedLauncher]
+        items: [damagedLauncher],
+        count: 1
+    };
+    const rocketStack = {
+        uid: 'stack_rocket_ready',
+        representative: rocketItem,
+        items: [rocketItem],
+        count: 1
+    };
+    const readyLauncherStack = {
+        uid: 'stack_launcher_ready',
+        representative: readyLauncher,
+        items: [readyLauncher],
+        count: 1
+    };
+    const boosterStack = {
+        uid: 'stack_booster_ready',
+        representative: boosterItem,
+        items: [boosterItem],
+        count: 1
     };
     const chassisStack = {
         uid: 'stack_chassis',
         representative: chassisItem,
         items: [chassisItem],
+        count: 1,
         getViewData: vi.fn(() => ({
             ...chassisItem.getViewData(),
             uid: 'stack_chassis',
@@ -162,6 +275,7 @@ export function createController(settlement = createSettlement()) {
         uid: 'stack_logic',
         representative: logicItem,
         items: [logicItem],
+        count: 1,
         getViewData: vi.fn(() => ({
             ...logicItem.getViewData(),
             uid: 'stack_logic',
@@ -178,6 +292,30 @@ export function createController(settlement = createSettlement()) {
         uid: 'stack_launcher',
         count: 1
     }));
+    rocketStack.getViewData = vi.fn(() => ({
+        ...rocketItem.getViewData(),
+        uid: 'stack_rocket_ready',
+        count: 1
+    }));
+    readyLauncherStack.getViewData = vi.fn(() => ({
+        ...readyLauncher.getViewData(),
+        uid: 'stack_launcher_ready',
+        count: 1
+    }));
+    boosterStack.getViewData = vi.fn(() => ({
+        ...boosterItem.getViewData(),
+        uid: 'stack_booster_ready',
+        count: 1
+    }));
+    const stacks = [
+        inventoryStack,
+        launcherStack,
+        rocketStack,
+        readyLauncherStack,
+        boosterStack,
+        chassisStack,
+        logicStack
+    ];
     const sessionState = {
         sectorNumber: 3,
         coins: 120,
@@ -186,13 +324,37 @@ export function createController(settlement = createSettlement()) {
             sessionState.coins = 120;
         }),
         inventory: {
-            stacks: [inventoryStack, launcherStack, chassisStack, logicStack],
-            getItemsByCategory: vi.fn(category => ({
-                module: [inventoryStack],
-                launcher: [launcherStack],
-                chassis: [chassisStack],
-                logic: [logicStack]
-            }[category] ?? []))
+            stacks,
+            getItemsByCategory: vi.fn(category => stacks
+                .filter(stack => stack.representative?.category === category)),
+            popItemByUid: vi.fn(uid => {
+                const stackIndex = stacks.findIndex(stack => stack.uid === uid);
+                if (stackIndex < 0) {
+                    return null;
+                }
+
+                const stack = stacks[stackIndex];
+                const item = stack.items.pop();
+                stack.count = stack.items.length;
+                if (stack.count === 0) {
+                    stacks.splice(stackIndex, 1);
+                }
+                return item ?? null;
+            }),
+            addItem: vi.fn(item => {
+                const stack = {
+                    uid: `stack_readded_${item.uid}`,
+                    representative: item,
+                    items: [item],
+                    count: 1,
+                    getViewData: vi.fn(() => ({
+                        ...item.getViewData(),
+                        uid: `stack_readded_${item.uid}`,
+                        count: 1
+                    }))
+                };
+                stacks.push(stack);
+            })
         },
         applyTransaction: vi.fn(transaction => {
             const spentCoins = transaction.spentCoins ?? 0;
@@ -277,6 +439,7 @@ export function createController(settlement = createSettlement()) {
         evaluateAchievements: vi.fn(() => [{ achievementId: 'stat_launches', tier: 3, value: 20 }])
     };
     const flightRecorder = {
+        captureLaunchSnapshot: vi.fn(),
         recordFlightResult: vi.fn(() => ({ id: 'flight_1', favorite: false })),
         getPendingRecord: vi.fn(() => null)
     };
@@ -293,21 +456,38 @@ export function createController(settlement = createSettlement()) {
         setFacilityDepartHandler: vi.fn(),
         setResultHandler: vi.fn(),
         setGameEndReturnHandler: vi.fn(),
+        setLaunchHandler: vi.fn(),
         updateFacilityCredits: vi.fn(),
         updateHUDValue: vi.fn(),
         setFlightMode: vi.fn(),
         showGameEndSequence: vi.fn(),
-        showBuildScreen: vi.fn()
+        showBuildScreen: vi.fn(),
+        setBuildItemSelectionHandler: vi.fn(),
+        setBuildAssembleHandler: vi.fn(),
+        setCanvasInputHandler: vi.fn()
+    };
+    const cameraController = {
+        isInMapArea: vi.fn(() => true),
+        pan: vi.fn(),
+        rotate: vi.fn(),
+        zoom: vi.fn(),
+        save: vi.fn(),
+        toWorld: vi.fn(point => ({ ...point }))
     };
     const worldRenderer = {
         disableSonar: vi.fn(),
+        enableSonar: vi.fn(),
         playFinishAnimation: vi.fn(() => Promise.resolve()),
-        setSector: vi.fn()
+        setSector: vi.fn(),
+        startNavigation: vi.fn(),
+        render: vi.fn()
     };
     const sectorFactory = vi.fn(({ sessionState, isAnomaly }) => ({
         sectorNumber: sessionState.sectorNumber,
         isAnomaly,
-        luckyDiscountRate: 0
+        luckyDiscountRate: 0,
+        bodies: currentSector.bodies,
+        createSnapshot: currentSector.createSnapshot
     }));
 
     const controller = new GameController({
@@ -320,6 +500,7 @@ export function createController(settlement = createSettlement()) {
         storySystem,
         uiController,
         worldRenderer,
+        cameraController,
         gameDataRepository,
         sectorFactory
     });
@@ -330,6 +511,9 @@ export function createController(settlement = createSettlement()) {
         controller,
         currentRocket,
         currentSector,
+        rocketItem,
+        readyLauncher,
+        boosterItem,
         sessionState,
         economySystem,
         gameRecordTracker,
@@ -339,6 +523,7 @@ export function createController(settlement = createSettlement()) {
         storySystem,
         uiController,
         worldRenderer,
+        cameraController,
         gameDataRepository,
         sectorFactory
     };

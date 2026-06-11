@@ -108,6 +108,14 @@ class RocketItem extends Item {
         return this._allParts();
     }
 
+    equals(otherItem) {
+        if (!(otherItem instanceof RocketItem)) {
+            return false;
+        }
+
+        return this.#createCompositionKey() === otherItem.#createCompositionKey();
+    }
+
     calculateAppraisalValue() {
         return this.getCompositionParts()
             .reduce((total, item) => total + item.calculateAppraisalValue(), 0);
@@ -177,6 +185,14 @@ class RocketItem extends Item {
     _getAggregatedStatValue(key) {
         const methodName = `get${key[0].toUpperCase()}${key.slice(1)}`;
         return this[methodName]();
+    }
+
+    #createCompositionKey() {
+        return JSON.stringify({
+            chassis: this.chassis.createSnapshot(),
+            logic: this.logic.createSnapshot(),
+            modules: this.modules.map(module => module.createSnapshot())
+        });
     }
 }
 

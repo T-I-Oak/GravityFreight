@@ -157,85 +157,105 @@
         "rocket": {
           "text": {
             "lang-store": {
-              "ja": "NO ROCKET EQUIPPED",
-              "en": "NO ROCKET EQUIPPED"
+              "ja": "待機中のロケットなし",
+              "en": "NO ROCKETS ON STANDBY"
             }
           },
           "subtext": {
             "lang-store": {
-              "ja": "ASSEMBLE A ROCKET",
-              "en": "ASSEMBLE A ROCKET"
+              "ja": "ここをクリックしてロケットを建造してください",
+              "en": "Click here to assemble a rocket."
             }
           }
         },
         "launcher": {
           "text": {
             "lang-store": {
-              "ja": "NO LAUNCHER",
+              "ja": "発射台なし",
               "en": "NO LAUNCHER"
             }
           },
           "subtext": {
             "lang-store": {
-              "ja": "ACQUIRE A LAUNCHER",
-              "en": "ACQUIRE A LAUNCHER"
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
             }
           }
         },
         "booster": {
           "text": {
             "lang-store": {
-              "ja": "NO BOOSTER EQUIPPED",
-              "en": "NO BOOSTER EQUIPPED"
+              "ja": "ブースターなし",
+              "en": "NO BOOSTER"
             }
           },
           "subtext": {
             "lang-store": {
-              "ja": "BOOSTER IS OPTIONAL",
-              "en": "BOOSTER IS OPTIONAL"
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
             }
           }
         },
         "chassis": {
           "text": {
             "lang-store": {
-              "ja": "NO CHASSIS",
+              "ja": "シャーシなし",
               "en": "NO CHASSIS"
             }
           },
           "subtext": {
             "lang-store": {
-              "ja": "ACQUIRE CHASSIS",
-              "en": "ACQUIRE CHASSIS"
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
             }
           }
         },
         "logic": {
           "text": {
             "lang-store": {
-              "ja": "NO LOGIC",
+              "ja": "ロジックなし",
               "en": "NO LOGIC"
             }
           },
           "subtext": {
             "lang-store": {
-              "ja": "ACQUIRE LOGIC",
-              "en": "ACQUIRE LOGIC"
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
             }
           }
         },
         "module": {
           "text": {
             "lang-store": {
-              "ja": "NO MODULE",
+              "ja": "モジュールなし",
               "en": "NO MODULE"
             }
           },
           "subtext": {
             "lang-store": {
-              "ja": "MODULE IS OPTIONAL",
-              "en": "MODULE IS OPTIONAL"
+              "ja": "購入または回収してください",
+              "en": "Purchase or recover one."
             }
+          }
+        }
+      },
+      "assemble": {
+        "label": {
+          "lang-store": {
+            "ja": "ASSEMBLE ROCKET",
+            "en": "ASSEMBLE ROCKET"
+          }
+        },
+        "waitingSubtext": {
+          "lang-store": {
+            "ja": "シャーシとロジックを選択すると建造できます",
+            "en": "Select chassis and logic to assemble."
+          }
+        },
+        "readySubtext": {
+          "lang-store": {
+            "ja": "ロケットを建造できます",
+            "en": "Ready to assemble."
           }
         }
       },
