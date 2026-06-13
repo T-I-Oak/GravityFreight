@@ -19,7 +19,8 @@
     - **依存**: `gameDataRepository` と、航行結果画面の HTML を生成する `FlightResultComponents` を使用する。
     - **内部挙動**:
         1. HTML ドキュメント内から各画面のコンテナ要素や、主要なボタン（開始ボタン、開閉ボタン等）を検索し、内部変数に保持する。
-        2. **安全性**: 必要な要素が見つからない場合は、初期化エラー（Error）を投げ、不具合を即座に顕在化させる。
+        2. Canvas 入力の正規化は `MapInputController` へ委譲する。
+        3. **安全性**: 必要な要素が見つからない場合は、初期化エラー（Error）を投げ、不具合を即座に顕在化させる。
 
 - **`setOperationHandler(element: HTMLElement, handler: Function, seId: string = 'click'): void`**
     - 指定された要素にクリックイベントを登録し、指定された操作音を再生した後にハンドラを実行する。
@@ -146,6 +147,13 @@
 - **`hideSettingsDialog(): void`**
     - 音量設定ダイアログを閉じる。
 
+- **`showStarInfo(body: CelestialBody, point: Vector2): void`**
+    - 天体ホバー時の保持アイテムポップアップを表示する。
+    - **内部挙動**: `StarInfoPanel.show(body, point, mapCanvas)` へ委譲する。
+- **`hideStarInfo(): void`**
+    - 天体ホバー表示を非表示にする。
+    - **内部挙動**: `StarInfoPanel.hide()` へ委譲する。
+
 ### ビルドパネル制御 (Build Panel Control)
 
 - **`openBuildPanel(): void`**
@@ -238,18 +246,6 @@
 
 - **`setCanvasInputHandler(handler: (event: CanvasInputEvent) => void): void`**
     - マップ描画領域（Canvas）に対する入力を中継する（操作音なし）。
-    - **内部挙動**:
-        1. Canvas の `pointerdown` と `wheel`、および `window` の `pointermove` / `pointerup` / `pointercancel` を購読する。
-        2. ドラッグ開始後は Canvas 外やビルドパネル上へポインタが移動しても、対応する `pointerup` / `pointercancel` まで入力を継続する。
-        3. 単一ポインタは `pointerdown` / `pointermove` / `pointerup` として正規化し、Canvas 内部座標、修飾キー、pointerType を通知する。
-        4. 2本指操作は中心点、中心点移動量、距離比を持つ `pinch` イベントへ正規化する。2本指から1本指に戻った場合は、残ったポインタを新しい `pointerdown` として通知し直す。
-        5. `wheel` は Canvas 内部座標と `deltaY` を通知する。
-        6. 入力座標は `getBoundingClientRect()` と Canvas の `width` / `height` から、CSS px / client 座標を Canvas 内部座標へ変換してから通知する。
-    - **CanvasInputEvent**:
-        - `pointerdown`: `{ type, point, shiftKey, ctrlKey, pointerType }`
-        - `pointermove`: `{ type, point, pointerType }`
-        - `pointerup`: `{ type, point }`
-        - `pinch`: `{ type, point, delta, scale }`
-        - `wheel`: `{ type, point, deltaY }`
-    - **責務境界**: UIController はブラウザ入力の購読と正規化のみを担当する。パン、回転、ズーム、AIM の意味付けは `GameController` が担当する。
+    - **内部挙動**: `MapInputController.setHandler(handler)` へ委譲する。
+    - **責務境界**: UIController は入力通知先の接続のみを担当する。ブラウザ入力の購読と正規化は `MapInputController`、パン、回転、ズーム、AIM、天体ホバーの意味付けは `GameController` が担当する。
     - **注記**: 対象となる Canvas 要素の取得方法は、`WorldRenderer` の初期化仕様に準拠する。

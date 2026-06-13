@@ -13,6 +13,7 @@ class GameController {
         this.achievementTracker = infrastructure.achievementTracker;
         this.flightRecorder = infrastructure.flightRecorder;
         this.storySystem = infrastructure.storySystem;
+        this.trajectoryPredictor = infrastructure.trajectoryPredictor;
         this.uiController = infrastructure.uiController;
         this.worldRenderer = infrastructure.worldRenderer;
         this.cameraController = infrastructure.cameraController;
@@ -43,9 +44,11 @@ class GameController {
         this.uiController.initHUD(this.sessionState);
         this.uiController.setResultHandler?.(() => this.confirmSettlement(this.lastSettlement));
         this.uiController.setGameEndReturnHandler?.(() => this.returnToTitle());
-        this.uiController.setBuildItemSelectionHandler?.(
-            selection => this.buildFlowController.handleItemSelection(selection)
-        );
+        this.uiController.setBuildItemSelectionHandler?.(selection => {
+            const viewData = this.buildFlowController.handleItemSelection(selection);
+            this.#refreshPredictionPath();
+            return viewData;
+        });
         this.uiController.setBuildAssembleHandler?.(
             () => this.buildFlowController.assembleRocket()
         );
@@ -80,6 +83,16 @@ class GameController {
             return;
         }
 
+        if (event.type === 'hover') {
+            this.#handleBodyHover(event);
+            return;
+        }
+
+        if (event.type === 'hoverleave') {
+            this.uiController.hideStarInfo?.();
+            return;
+        }
+
         if (event.type === 'pointerup') {
             this.#endMapInteraction();
         }
@@ -97,6 +110,8 @@ class GameController {
 
         rocket.velocity = rocket.getInitialVelocity();
         this.currentRocket = rocket;
+        this.worldRenderer?.clearPredictionPath?.();
+        this.worldRenderer?.clearAimRocket?.();
         this.flightRecorder.captureLaunchSnapshot(rocket, this.currentSector);
         this.uiController.setFlightMode(true);
         this.worldRenderer?.startNavigation?.(rocket);
@@ -198,6 +213,9 @@ class GameController {
         this.currentFacilityViewData = null;
         this.currentTradingPostStock = null;
         this.currentRocket = null;
+        this.worldRenderer?.clearPredictionPath?.();
+        this.worldRenderer?.clearAimRocket?.();
+        this.worldRenderer?.disableSonar?.();
 
         this.currentSector = await this.sectorProgressionController.beginSectorTransition(options);
         this.buildFlowController.showBuildScreen();
@@ -606,9 +624,18 @@ class GameController {
         };
 
         return {
-            x: home.position.x + Math.cos(angle) * home.radius,
-            y: home.position.y + Math.sin(angle) * home.radius
+            x: home.position.x + Math.cos(angle) * this.#getLaunchRadius(home),
+            y: home.position.y + Math.sin(angle) * this.#getLaunchRadius(home)
         };
+    }
+
+    #getLaunchRadius(home) {
+        const balance = this.gameDataRepository.getGameBalance();
+        const offset = balance.SHIP_START_OFFSET;
+        if (!Number.isFinite(offset)) {
+            throw new Error('[GameController] gameBalance.SHIP_START_OFFSET must be a finite number.');
+        }
+        return home.radius + offset;
     }
 
     #beginMapInteraction(event) {
@@ -666,6 +693,16 @@ class GameController {
         this.cameraController.save?.();
     }
 
+    #handleBodyHover(event) {
+        const body = this.#findHoveredBody(event.point);
+        if (body?.items?.length > 0) {
+            this.uiController.showStarInfo?.(body, event.displayPoint ?? event.point);
+            return;
+        }
+
+        this.uiController.hideStarInfo?.();
+    }
+
     #endMapInteraction() {
         if (this.mapInteraction?.mode !== 'aim') {
             this.cameraController?.save?.();
@@ -689,6 +726,24 @@ class GameController {
         return 'pan';
     }
 
+    #findHoveredBody(screenPoint) {
+        if (!this.currentSector || !this.cameraController) {
+            return null;
+        }
+
+        const worldPoint = this.cameraController.toWorld(screenPoint);
+        const hitMargin = this.gameDataRepository.getMapConstants().STAR_HIT_MARGIN;
+        const zoomLevel = this.cameraController.zoomLevel || 1;
+
+        return this.currentSector.bodies.findLast(body => {
+            const distance = Math.hypot(
+                worldPoint.x - body.position.x,
+                worldPoint.y - body.position.y
+            );
+            return distance <= body.radius + hitMargin / zoomLevel;
+        }) ?? null;
+    }
+
     #canAim() {
         const selection = this.buildFlowController.currentBuildSelection;
         return !!(selection.rocket && selection.launcher && this.currentSector);
@@ -705,11 +760,81 @@ class GameController {
             worldPoint.y - home.position.y,
             worldPoint.x - home.position.x
         );
-        this.worldRenderer?.render?.();
+        this.#refreshPredictionPath();
     }
 
     #renderCameraChange() {
         this.worldRenderer?.render?.();
+    }
+
+    #refreshPredictionPath() {
+        if (!this.#canAim() || !this.trajectoryPredictor) {
+            this.worldRenderer?.clearPredictionPath?.();
+            this.worldRenderer?.clearAimRocket?.();
+            this.worldRenderer?.disableSonar?.();
+            this.worldRenderer?.render?.();
+            return;
+        }
+
+        const previewRocket = this.#createPreviewRocketFromFlightSelection();
+        if (!previewRocket) {
+            this.worldRenderer?.clearPredictionPath?.();
+            this.worldRenderer?.clearAimRocket?.();
+            this.worldRenderer?.disableSonar?.();
+            this.worldRenderer?.render?.();
+            return;
+        }
+
+        previewRocket.velocity = previewRocket.getInitialVelocity();
+        const predictedRocket = this.trajectoryPredictor.predictPath(previewRocket, this.currentSector);
+        const predictionPath = this.#createPredictionPath(previewRocket, predictedRocket.actualTrail);
+
+        this.worldRenderer?.setAimRocket?.(previewRocket);
+        this.worldRenderer?.enableSonar?.();
+        this.worldRenderer?.setPredictionPath?.(predictionPath);
+    }
+
+    #createPredictionPath(previewRocket, predictedTrail) {
+        if (!Array.isArray(predictedTrail) || predictedTrail.length === 0) {
+            throw new Error('[GameController] AIM-ready prediction must return at least one trail point.');
+        }
+
+        const path = [
+            previewRocket.position,
+            ...predictedTrail
+        ];
+        return path;
+    }
+
+    #createPreviewRocketFromFlightSelection() {
+        const selection = this.buildFlowController.currentBuildSelection;
+        const rocketItem = this.#peekSelectedStack(selection.rocket, 'rocket');
+        const launcher = this.#peekSelectedStack(selection.launcher, 'launcher');
+        const booster = selection.booster
+            ? this.#peekSelectedStack(selection.booster, 'booster')
+            : null;
+
+        if (!rocketItem || !launcher) {
+            return null;
+        }
+
+        return new Rocket(
+            rocketItem,
+            launcher,
+            booster,
+            this.currentLaunchAngle,
+            this.#getLaunchPosition(this.currentLaunchAngle)
+        );
+    }
+
+    #peekSelectedStack(uid, category) {
+        if (!uid) {
+            return null;
+        }
+
+        const stack = this.sessionState.inventory.getItemsByCategory(category)
+            .find(candidate => candidate.uid === uid);
+        return stack?.items?.at(-1) ?? null;
     }
 }
 

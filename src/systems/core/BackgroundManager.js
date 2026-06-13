@@ -1,3 +1,5 @@
+import CanvasColorPalette from './CanvasColorPalette.js';
+
 const DEFAULT_STAR_COUNT = 400;
 const NORMAL_WARP_SPEED = 1;
 const ACTIVE_WARP_SPEED = 12;
@@ -14,6 +16,7 @@ class BackgroundManager {
         this.seed = options.seed ?? 1;
         this.seedState = this.seed;
         this.stars = [];
+        this.colorPalette = options.colorPalette || new CanvasColorPalette();
         this.warpSpeed = NORMAL_WARP_SPEED;
         this.targetWarpSpeed = NORMAL_WARP_SPEED;
         this.warpTransition = null;
@@ -50,7 +53,7 @@ class BackgroundManager {
         const height = view.height ?? context.canvas?.height ?? 720;
         const projection = this.#createProjection(view);
 
-        context.fillStyle = '#050510';
+        context.fillStyle = this.colorPalette.get('worldBg');
         context.fillRect(0, 0, width, height);
 
         this.stars.forEach(star => {
@@ -63,13 +66,13 @@ class BackgroundManager {
                 context.beginPath();
                 context.moveTo(point.oldX, point.oldY);
                 context.lineTo(point.x, point.y);
-                context.strokeStyle = `rgba(255, 255, 255, ${point.alpha})`;
+                context.strokeStyle = this.colorPalette.createStarParticleColor(point.alpha);
                 context.lineWidth = Math.max(0.8, point.size * 0.4);
                 context.stroke();
                 return;
             }
 
-            context.fillStyle = `rgba(255, 255, 255, ${point.alpha})`;
+            context.fillStyle = this.colorPalette.createStarParticleColor(point.alpha);
             context.beginPath();
             context.arc(point.x, point.y, point.size * 0.45, 0, Math.PI * 2);
             context.fill();

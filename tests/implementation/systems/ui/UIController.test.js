@@ -96,6 +96,10 @@ describe('UIController', () => {
                 </section>
             </main>
             <canvas id="gameCanvas"></canvas>
+            <div id="star-info-panel" class="Panel StarInfoPanel state-hidden" hidden>
+                <h2 id="star-info-title"></h2>
+                <div id="star-info-list"></div>
+            </div>
         `;
         repository = createRepository();
         soundController = { playSE: vi.fn() };
@@ -536,6 +540,102 @@ describe('UIController', () => {
             type: 'pointerup',
             point: { x: 320, y: 360 }
         }));
+    });
+
+    it('emits map hover input with canvas and display points', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const handler = vi.fn();
+        const canvas = document.querySelector('#gameCanvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        canvas.getBoundingClientRect = vi.fn(() => ({
+            left: 20,
+            top: 40,
+            width: 400,
+            height: 300
+        }));
+
+        controller.setCanvasInputHandler(handler);
+        canvas.dispatchEvent(createPointerEvent('pointermove', {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 120,
+            clientY: 190
+        }));
+        canvas.dispatchEvent(createPointerEvent('pointerleave', {
+            pointerId: 1,
+            pointerType: 'mouse',
+            clientX: 120,
+            clientY: 190
+        }));
+
+        expect(handler).toHaveBeenCalledWith({
+            type: 'hover',
+            point: { x: 200, y: 300 },
+            displayPoint: { x: 100, y: 150 },
+            pointerType: 'mouse'
+        });
+        expect(handler).toHaveBeenCalledWith({ type: 'hoverleave' });
+    });
+
+    it('renders and hides the star item info panel', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const item = {
+            id: 'coin_100',
+            uid: 'coin_1',
+            category: 'coin',
+            equals: vi.fn(candidate => candidate.id === 'coin_100'),
+            getViewData: vi.fn(() => ({
+                id: 'coin_100',
+                uid: 'coin_1',
+                name: '100c Coin',
+                category: 'coin',
+                stats: {}
+            }))
+        };
+
+        controller.showStarInfo({
+            isHome: true,
+            items: [item, item]
+        }, { x: 10, y: 20 }, document.querySelector('#gameCanvas'));
+
+        expect(document.querySelector('#star-info-panel').hidden).toBe(false);
+        expect(document.querySelector('#star-info-title').textContent).toBe('STAR CORE STORAGE');
+        expect(document.querySelector('#star-info-list').textContent).toContain('100c Coin');
+        expect(document.querySelector('#star-info-list').textContent).toContain('x2');
+        expect(document.querySelector('#star-info-list .ItemCard').classList.contains('state-compact')).toBe(false);
+
+        controller.hideStarInfo();
+
+        expect(document.querySelector('#star-info-panel').hidden).toBe(true);
+        expect(document.querySelector('#star-info-panel').classList.contains('state-hidden')).toBe(true);
+    });
+
+    it('uses compact star item cards only when many item groups are shown', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const items = ['coin', 'cargo', 'module', 'launcher'].map((category, index) => ({
+            id: `${category}_${index}`,
+            uid: `${category}_${index}`,
+            category,
+            equals: vi.fn(candidate => candidate.id === `${category}_${index}`),
+            getViewData: vi.fn(() => ({
+                id: `${category}_${index}`,
+                uid: `${category}_${index}`,
+                name: `${category} item`,
+                category,
+                stats: {}
+            }))
+        }));
+
+        controller.showStarInfo({
+            isHome: false,
+            items
+        }, { x: 10, y: 20 }, document.querySelector('#gameCanvas'));
+
+        document.querySelectorAll('#star-info-list .ItemCard').forEach(card => {
+            expect(card.classList.contains('state-compact')).toBe(true);
+            expect(card.classList.contains('state-mini')).toBe(false);
+        });
     });
 
     it('normalizes two pointer map gestures into pinch events', () => {

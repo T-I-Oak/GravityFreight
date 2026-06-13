@@ -27,6 +27,8 @@
     - 各 `Star` は `x, y, z`（ワールド相対座標と奥行き）、`size`（大きさ）、`alpha`、`pulseRate`、`pulseOffset` を持つ。
 - **`warpSpeed: number`**: 
     - 現在のワープ演出の速度係数。通常時は 1.0。
+- **`colorPalette: CanvasColorPalette`**:
+    - 背景色および星粒子色を `css/design_tokens.css` の token から解決する。
 
 ### メソッド (Methods)
 
@@ -36,7 +38,8 @@
 
 - **`render(context: CanvasRenderingContext2D, view: object): void`**
     - Canvas 2D context と表示領域を受け取り、背景を描画する。
-    - `view.width` / `view.height` の範囲を背景色で塗り、生成済みの `stars` を描画する。
+    - `view.width` / `view.height` の範囲を `--color-world-bg` で塗り、生成済みの `stars` を描画する。
+    - 星粒子の色は `--color-world-star-particle-rgb` を使用し、フレームごとの明度は alpha として合成する。
     - `warpSpeed > 1` の場合は点ではなく短い光跡として描画する。
     - **最終仕様**: `camera` の状態を参照し、背景を描画する。
     - **投影・同期ロジック**:

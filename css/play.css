@@ -168,6 +168,28 @@
     pointer-events: auto;
 }
 
+/* --- 5. Star hover item panel --- */
+.StarInfoPanel {
+    position: absolute;
+    z-index: calc(var(--z-panel) + 1);
+    width: min(280px, calc(100vw - 32px));
+    max-height: min(420px, calc(100vh - 32px));
+    padding: var(--space-double);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.StarInfoPanel .star-info-list {
+    display: grid;
+    gap: var(--space-unit);
+    max-height: 340px;
+    overflow: hidden auto;
+}
+
+.StarInfoPanel .ItemCard {
+    min-height: 0;
+}
+
 
 /* Large Action Buttons: Specialized branding for critical mission phases */
 #play-screen .launch { --current-color: var(--color-category-launchers); }
@@ -201,4 +223,4 @@
 }
 
 
-/* --- 5. Global Footer (Moved to ui_base.css) --- */
+/* --- 6. Global Footer (Moved to ui_base.css) --- */

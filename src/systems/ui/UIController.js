@@ -1,6 +1,8 @@
 import { FlightResultComponents } from './FlightResultComponents.js';
 import { FacilityComponents } from './FacilityComponents.js';
 import { UIComponents } from './UIComponents.js';
+import MapInputController from './MapInputController.js';
+import StarInfoPanel from './StarInfoPanel.js';
 
 class UIController {
     constructor(options = {}) {
@@ -8,6 +10,7 @@ class UIController {
         this.gameDataRepository = options.gameDataRepository;
         this.flightResultComponents = options.flightResultComponents || FlightResultComponents;
         this.facilityComponents = options.facilityComponents || FacilityComponents;
+        this.starInfoPanel = options.starInfoPanel || new StarInfoPanel({ document: this.document });
         this.soundController = options.soundController || null;
         this.resultHandler = null;
         this.mapToggleHandler = null;
@@ -15,9 +18,6 @@ class UIController {
         this.buildItemSelectionHandler = null;
         this.launchHandler = null;
         this.canvasInputHandler = null;
-        this.activeMapPointers = new Map();
-        this.lastMapPinchDistance = 0;
-        this.lastMapPinchCenter = null;
 
         if (!this.gameDataRepository) {
             throw new Error('[UIController] gameDataRepository is required.');
@@ -34,6 +34,10 @@ class UIController {
         this.launchControl = this.document.querySelector('#launch-control');
         this.launchButton = this.document.querySelector('#launch-btn');
         this.mapCanvas = this.document.querySelector('#gameCanvas');
+        this.mapInputController = options.mapInputController || new MapInputController({
+            document: this.document,
+            canvas: this.mapCanvas
+        });
         this.buildLists = {
             rocket: this.document.querySelector('#list-rocket'),
             launcher: this.document.querySelector('#list-launcher'),
@@ -57,6 +61,7 @@ class UIController {
     }
 
     showTitleScreen() {
+        this.hideStarInfo();
         this.#show(this.titleScreen);
         this.#hide(this.playScene);
         this.#hide(this.resultScreen);
@@ -112,6 +117,7 @@ class UIController {
     }
 
     showResultScreen(viewData) {
+        this.hideStarInfo();
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
         this.#hide(this.launchControl);
@@ -124,6 +130,7 @@ class UIController {
     }
 
     showFacilityScreen(type, viewData) {
+        this.hideStarInfo();
         this.#hide(this.resultScreen);
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
@@ -185,16 +192,15 @@ class UIController {
 
     setCanvasInputHandler(handler) {
         this.canvasInputHandler = handler;
-        if (!this.mapCanvas || this.mapCanvas.dataset.inputHandlerReady === 'true') {
-            return;
-        }
+        this.mapInputController.setHandler(handler);
+    }
 
-        this.mapCanvas.dataset.inputHandlerReady = 'true';
-        this.mapCanvas.addEventListener('pointerdown', event => this.#handleMapPointerDown(event), { passive: false });
-        this.document.defaultView?.addEventListener('pointermove', event => this.#handleMapPointerMove(event), { passive: false });
-        this.document.defaultView?.addEventListener('pointerup', event => this.#handleMapPointerUp(event), { passive: false });
-        this.document.defaultView?.addEventListener('pointercancel', event => this.#handleMapPointerUp(event), { passive: false });
-        this.mapCanvas.addEventListener('wheel', event => this.#handleMapWheel(event), { passive: false });
+    showStarInfo(body, point) {
+        this.starInfoPanel.show(body, point, this.mapCanvas);
+    }
+
+    hideStarInfo() {
+        this.starInfoPanel.hide();
     }
 
     updateFacilityCredits(value) {
@@ -428,141 +434,6 @@ class UIController {
 
     #formatNumber(value) {
         return new Intl.NumberFormat('en-US').format(value ?? 0);
-    }
-
-    #handleMapPointerDown(event) {
-        if (!this.canvasInputHandler) {
-            return;
-        }
-
-        event.preventDefault();
-        this.mapCanvas.setPointerCapture?.(event.pointerId);
-        this.activeMapPointers.set(event.pointerId, this.#createPoint(event));
-
-        if (this.activeMapPointers.size === 1) {
-            this.canvasInputHandler({
-                type: 'pointerdown',
-                point: this.#createPoint(event),
-                shiftKey: !!event.shiftKey,
-                ctrlKey: !!event.ctrlKey,
-                pointerType: event.pointerType
-            });
-            return;
-        }
-
-        if (this.activeMapPointers.size >= 2) {
-            const [p1, p2] = [...this.activeMapPointers.values()].slice(0, 2);
-            this.lastMapPinchDistance = this.#distance(p1, p2);
-            this.lastMapPinchCenter = this.#midpoint(p1, p2);
-            this.canvasInputHandler({ type: 'gesturestart', point: this.lastMapPinchCenter });
-        }
-    }
-
-    #handleMapPointerMove(event) {
-        if (!this.canvasInputHandler || !this.activeMapPointers.has(event.pointerId)) {
-            return;
-        }
-
-        event.preventDefault();
-        this.activeMapPointers.set(event.pointerId, this.#createPoint(event));
-        const pointers = [...this.activeMapPointers.values()];
-
-        if (pointers.length >= 2) {
-            const [p1, p2] = pointers.slice(0, 2);
-            const center = this.#midpoint(p1, p2);
-            const distance = this.#distance(p1, p2);
-            const scale = this.lastMapPinchDistance > 0 ? distance / this.lastMapPinchDistance : 1;
-            const delta = this.lastMapPinchCenter
-                ? { x: center.x - this.lastMapPinchCenter.x, y: center.y - this.lastMapPinchCenter.y }
-                : { x: 0, y: 0 };
-
-            this.canvasInputHandler({
-                type: 'pinch',
-                point: center,
-                delta,
-                scale
-            });
-            this.lastMapPinchDistance = distance;
-            this.lastMapPinchCenter = center;
-            return;
-        }
-
-        this.canvasInputHandler({
-            type: 'pointermove',
-            point: this.#createPoint(event),
-            pointerType: event.pointerType
-        });
-    }
-
-    #handleMapPointerUp(event) {
-        if (!this.canvasInputHandler || !this.activeMapPointers.has(event.pointerId)) {
-            return;
-        }
-
-        event.preventDefault();
-        this.activeMapPointers.delete(event.pointerId);
-        this.mapCanvas.releasePointerCapture?.(event.pointerId);
-
-        if (this.activeMapPointers.size === 0) {
-            this.lastMapPinchDistance = 0;
-            this.lastMapPinchCenter = null;
-            this.canvasInputHandler({ type: 'pointerup', point: this.#createPoint(event) });
-            return;
-        }
-
-        if (this.activeMapPointers.size === 1) {
-            const [point] = [...this.activeMapPointers.values()];
-            this.lastMapPinchDistance = 0;
-            this.lastMapPinchCenter = null;
-            this.canvasInputHandler({
-                type: 'pointerdown',
-                point,
-                shiftKey: false,
-                ctrlKey: false,
-                pointerType: event.pointerType
-            });
-        }
-    }
-
-    #handleMapWheel(event) {
-        if (!this.canvasInputHandler) {
-            return;
-        }
-
-        event.preventDefault();
-        this.canvasInputHandler({
-            type: 'wheel',
-            point: this.#createPoint(event),
-            deltaY: event.deltaY
-        });
-    }
-
-    #createPoint(event) {
-        const rect = this.mapCanvas.getBoundingClientRect?.();
-        if (rect?.width && rect?.height) {
-            const scaleX = this.mapCanvas.width / rect.width;
-            const scaleY = this.mapCanvas.height / rect.height;
-            return {
-                x: (event.clientX - rect.left) * scaleX,
-                y: (event.clientY - rect.top) * scaleY
-            };
-        }
-
-        return {
-            x: event.clientX,
-            y: event.clientY
-        };
-    }
-
-    #distance(a, b) {
-        return Math.hypot(a.x - b.x, a.y - b.y);
-    }
-
-    #midpoint(a, b) {
-        return {
-            x: (a.x + b.x) / 2,
-            y: (a.y + b.y) / 2
-        };
     }
 }
 

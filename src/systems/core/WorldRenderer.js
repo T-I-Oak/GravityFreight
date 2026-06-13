@@ -1,28 +1,8 @@
 import BackgroundManager from './BackgroundManager.js';
+import CanvasColorPalette from './CanvasColorPalette.js';
+import FlightVisualRenderer from './FlightVisualRenderer.js';
 
 const WORLD_VIEW_SCALE = 0.5;
-const MAP_COLORS = {
-    boundary: 'rgba(255, 255, 255, 0.24)',
-    homeStar: '#ff6600',
-    normalStar: '#ffcc00',
-    repulsiveStar: '#e100ff',
-    categories: {
-        CHASSIS: '#90a4ae',
-        LOGIC: '#4488ff',
-        LAUNCHERS: '#4caf50',
-        MODULES: '#9c27b0',
-        BOOSTERS: '#8d6e63',
-        ROCKETS: '#81ecec',
-        COIN: '#ffd700',
-        CARGO: '#00e5ff',
-        MARKET: '#ff4d4d'
-    },
-    facilities: {
-        TRADING_POST: '#00e676',
-        REPAIR_DOCK: '#2979ff',
-        BLACK_MARKET: '#ff1744'
-    }
-};
 
 const FACILITY_LABELS = {
     TRADING_POST: 'TRADING POST',
@@ -36,9 +16,15 @@ class WorldRenderer {
         this.context = null;
         this.targetSector = null;
         this.camera = options.camera || null;
-        this.backgroundManager = options.backgroundManager || new BackgroundManager();
+        this.colorPalette = options.colorPalette || new CanvasColorPalette();
+        this.backgroundManager = options.backgroundManager || new BackgroundManager({ colorPalette: this.colorPalette });
+        this.flightVisualRenderer = options.flightVisualRenderer || new FlightVisualRenderer();
         this.lastRenderTimestamp = null;
         this.animationFrameId = null;
+        this.navigationRocket = null;
+        this.aimRocket = null;
+        this.predictionPath = [];
+        this.sonarEnabled = false;
     }
 
     async initialize(canvas, camera = this.camera, backgroundManager = this.backgroundManager) {
@@ -65,11 +51,42 @@ class WorldRenderer {
         this.render();
     }
 
-    startNavigation() {}
+    startNavigation(rocket) {
+        this.navigationRocket = rocket || null;
+        this.render();
+    }
 
-    enableSonar() {}
+    setAimRocket(rocket) {
+        this.aimRocket = rocket || null;
+        this.render();
+    }
 
-    disableSonar() {}
+    clearAimRocket() {
+        this.aimRocket = null;
+        this.render();
+    }
+
+    setPredictionPath(points = []) {
+        this.predictionPath = Array.isArray(points)
+            ? points.map(point => ({ x: point.x, y: point.y }))
+            : [];
+        this.render();
+    }
+
+    clearPredictionPath() {
+        this.predictionPath = [];
+        this.render();
+    }
+
+    enableSonar() {
+        this.sonarEnabled = true;
+        this.render();
+    }
+
+    disableSonar() {
+        this.sonarEnabled = false;
+        this.render();
+    }
 
     playFinishAnimation() {
         return Promise.resolve();
@@ -88,15 +105,21 @@ class WorldRenderer {
         }
 
         this.#fitCanvas();
+        const colors = this.colorPalette.createWorldColors();
         this.backgroundManager.update?.(this.#consumeDeltaSeconds());
         this.backgroundManager.render(this.context, this.#getView());
         if (!this.targetSector) {
             return;
         }
 
-        this.#drawBoundary();
-        this.#drawExits();
-        this.#drawBodies();
+        this.#drawBoundary(colors);
+        this.#drawExits(colors);
+        this.#drawBodies(colors);
+        this.flightVisualRenderer.render(this.context, this.#createTransform(), this.#getView(), {
+            navigationRocket: this.navigationRocket || this.aimRocket,
+            predictionPath: this.predictionPath,
+            sonarEnabled: this.sonarEnabled
+        }, colors);
     }
 
     startWarpEffect() {
@@ -183,7 +206,7 @@ class WorldRenderer {
         };
     }
 
-    #drawBoundary() {
+    #drawBoundary(colors) {
         const exit = this.targetSector.exits[0];
         if (!exit) {
             return;
@@ -195,20 +218,20 @@ class WorldRenderer {
         this.context.save();
         this.context.beginPath();
         this.context.arc(center.x, center.y, transform.radius(exit.radius), 0, Math.PI * 2);
-        this.context.strokeStyle = MAP_COLORS.boundary;
+        this.context.strokeStyle = colors.boundary;
         this.context.lineWidth = Math.max(1, transform.scale);
         this.context.stroke();
         this.context.restore();
     }
 
-    #drawExits() {
+    #drawExits(colors) {
         const transform = this.#createTransform();
         const center = transform.toScreen({ x: 0, y: 0 });
 
         this.targetSector.exits.forEach(exit => {
             const start = (exit.angle - exit.width / 2) * Math.PI / 180 + transform.rotation;
             const end = (exit.angle + exit.width / 2) * Math.PI / 180 + transform.rotation;
-            const color = this.#facilityColor(exit.getFacilityType());
+            const color = this.#facilityColor(exit.getFacilityType(), colors);
 
             this.context.save();
             this.context.beginPath();
@@ -220,15 +243,15 @@ class WorldRenderer {
             this.context.stroke();
             this.context.restore();
 
-            this.#drawFacilityLabel(exit, transform, center);
+            this.#drawFacilityLabel(exit, transform, center, colors);
         });
     }
 
-    #drawFacilityLabel(exit, transform, center) {
+    #drawFacilityLabel(exit, transform, center, colors) {
         const type = exit.getFacilityType();
         const label = FACILITY_LABELS[type] || type;
         const angle = exit.angle * Math.PI / 180 + transform.rotation;
-        const color = this.#facilityColor(type);
+        const color = this.#facilityColor(type, colors);
         const textRadius = transform.radius(exit.radius + 45);
         const fontSize = 30 * transform.scale;
 
@@ -275,13 +298,13 @@ class WorldRenderer {
         this.context.restore();
     }
 
-    #drawBodies() {
+    #drawBodies(colors) {
         const transform = this.#createTransform();
 
         this.targetSector.bodies.forEach(body => {
             const position = transform.toScreen(body.position);
             const radius = Math.max(4, transform.radius(body.radius));
-            const color = this.#bodyColor(body);
+            const color = this.#bodyColor(body, colors);
 
             this.context.save();
             this.context.shadowBlur = 20 * transform.scale;
@@ -293,18 +316,18 @@ class WorldRenderer {
             this.context.restore();
 
             if (body.items.length > 0) {
-                this.#drawItemRings(body, position, radius, transform);
+                this.#drawItemRings(body, position, radius, transform, colors);
             }
         });
     }
 
-    #drawItemRings(body, position, radius, transform) {
+    #drawItemRings(body, position, radius, transform, colors) {
         const items = body.items || [];
         const angleStep = (Math.PI * 2) / items.length;
 
         items.forEach((item, index) => {
             const category = this.#resolveItemCategory(item);
-            const color = MAP_COLORS.categories[category];
+            const color = colors.categories[category];
             if (!color) {
                 return;
             }
@@ -323,14 +346,14 @@ class WorldRenderer {
         });
     }
 
-    #facilityColor(type) {
-        return MAP_COLORS.facilities[type] || '#ffffff';
+    #facilityColor(type, colors) {
+        return colors.facilities[type] || colors.rocket;
     }
 
-    #bodyColor(body) {
-        if (body.isHome) return MAP_COLORS.homeStar;
-        if (body.isRepulsion) return MAP_COLORS.repulsiveStar;
-        return MAP_COLORS.normalStar;
+    #bodyColor(body, colors) {
+        if (body.isHome) return colors.homeStar;
+        if (body.isRepulsion) return colors.repulsiveStar;
+        return colors.normalStar;
     }
 
     #resolveItemCategory(item) {

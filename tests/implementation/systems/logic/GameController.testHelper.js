@@ -28,6 +28,12 @@ export function createController(settlement = createSettlement()) {
             REPAIR_DOCK: { name: 'REPAIR DOCK', icon: 'R', className: 'repair-dock' },
             BLACK_MARKET: { name: 'BLACK MARKET', icon: 'B', className: 'black-market' }
         })[type]),
+        getGameBalance: vi.fn(() => ({
+            SHIP_START_OFFSET: 12
+        })),
+        getMapConstants: vi.fn(() => ({
+            STAR_HIT_MARGIN: 15
+        })),
         getUiText: vi.fn(key => ({
             'flightResult.titles.cleared': 'SECTOR {sector} COMPLETED',
             'flightResult.titles.returned': 'ROCKET RECOVERED',
@@ -116,7 +122,7 @@ export function createController(settlement = createSettlement()) {
         getMass: vi.fn(() => 10),
         getPower: vi.fn(() => 4),
         getPowerMultiplier: vi.fn(() => 1),
-        getPrecision: vi.fn(() => 0),
+        getPrecision: vi.fn(() => 100),
         getPickupRange: vi.fn(() => 0),
         getPickupMultiplier: vi.fn(() => 1),
         getGravityMultiplier: vi.fn(() => 1),
@@ -457,6 +463,8 @@ export function createController(settlement = createSettlement()) {
         setResultHandler: vi.fn(),
         setGameEndReturnHandler: vi.fn(),
         setLaunchHandler: vi.fn(),
+        showStarInfo: vi.fn(),
+        hideStarInfo: vi.fn(),
         updateFacilityCredits: vi.fn(),
         updateHUDValue: vi.fn(),
         setFlightMode: vi.fn(),
@@ -477,10 +485,22 @@ export function createController(settlement = createSettlement()) {
     const worldRenderer = {
         disableSonar: vi.fn(),
         enableSonar: vi.fn(),
+        clearAimRocket: vi.fn(),
+        clearPredictionPath: vi.fn(),
         playFinishAnimation: vi.fn(() => Promise.resolve()),
         setSector: vi.fn(),
+        setAimRocket: vi.fn(),
+        setPredictionPath: vi.fn(),
         startNavigation: vi.fn(),
         render: vi.fn()
+    };
+    const trajectoryPredictor = {
+        predictPath: vi.fn(() => ({
+            actualTrail: [
+                { x: 0, y: 0 },
+                { x: 12, y: 24 }
+            ]
+        }))
     };
     const sectorFactory = vi.fn(({ sessionState, isAnomaly }) => ({
         sectorNumber: sessionState.sectorNumber,
@@ -501,6 +521,7 @@ export function createController(settlement = createSettlement()) {
         uiController,
         worldRenderer,
         cameraController,
+        trajectoryPredictor,
         gameDataRepository,
         sectorFactory
     });
@@ -524,6 +545,7 @@ export function createController(settlement = createSettlement()) {
         uiController,
         worldRenderer,
         cameraController,
+        trajectoryPredictor,
         gameDataRepository,
         sectorFactory
     };
