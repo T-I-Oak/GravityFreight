@@ -55,10 +55,13 @@
    /* World & Entity Colors (Canvas)
        Authoritative colors for game world rendering. */
    --color-world-bg:             #050510;
+   --color-world-star-particle-rgb: 255, 255, 255;
    --color-world-home-star:      #ff6600;
    --color-world-normal-star:    #ffcc00;
    --color-world-repulsive-star: #e100ff;
    --color-world-scanner:        #00ffcc;
+   --color-world-rocket:         #ffffff;
+   --color-world-trail:          rgba(255, 255, 255, 0.52);
    --color-world-boundary:       rgba(255, 255, 255, 0.1);
    --color-world-prediction:     rgba(255, 255, 255, 0.6);
 

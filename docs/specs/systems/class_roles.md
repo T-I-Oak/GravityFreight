@@ -18,6 +18,8 @@ graph TD
 
     %% Control Layer
     Orchestrator --> UI["UIController (UI/Input)"]
+    UI --> MIC["MapInputController (Canvas Input)"]
+    UI --> SIP["StarInfoPanel (Hover Items)"]
     Orchestrator --> HTP["HowToPlayUI (Manual Screen)"]
     HTP --> HTD["HowToPlayDiagrams (Manual Demos)"]
     Orchestrator --> GDR["GameDataRepository (Data Access)"]
@@ -36,6 +38,9 @@ graph TD
     Orchestrator --> WR["WorldRenderer (Rendering)"]
     WR --> BM["BackgroundManager (Stars)"]
     WR --> CC["CameraController (View/Matrix)"]
+    WR --> FVR["FlightVisualRenderer (Flight Visuals)"]
+    WR --> CCP["CanvasColorPalette (CSS Token Colors)"]
+    BM --> CCP
     Orchestrator --> SC["SoundController (Audio)"]
 
     %% Global Services
@@ -271,6 +276,20 @@ graph TD
         - 画面遷移、ダイアログ表示の制御。
         - HUDの制御。
         - UI 操作イベントをアプリ側のハンドラへ中継する。
+- **MapInputController**
+    - 生存期間: App Lifecycle
+    - 役割: Canvas 入力イベント正規化。
+    - 責務:
+        - `#gameCanvas` と `window` の pointer / wheel event を購読する。
+        - Canvas 内部座標、表示座標、pinch scale などを `CanvasInputEvent` へ変換する。
+        - ドラッグ継続、2本指操作、hover / hoverleave の通知を管理する。
+- **StarInfoPanel**
+    - 生存期間: App Lifecycle
+    - 役割: 天体ホバー時の保持アイテム表示。
+    - 責務:
+        - `CelestialBody.items` を `ItemCard` として表示する。
+        - 同一性能の item を `StackedItem` の規則で集約して表示する。
+        - ポップアップ位置をポインタ表示座標に追従させる。
 - **HowToPlayUI**
     - 生存期間: App Lifecycle
     - 役割: 説明書画面コントローラー。
@@ -296,7 +315,15 @@ graph TD
 - **WorldRenderer**
     - 生存期間: App Lifecycle
     - 役割: ワールド（Canvas）描画エンジン。
-    - 責務: Canvas上における各要素（天体、ロケット、軌道等）の描画順序の制御、および描画ループの実行。
+    - 責務: Canvas上における各要素の描画順序の制御、背景・マップ・航行中ビジュアルの統合、および描画ループの実行。
+- **CanvasColorPalette**
+    - 生存期間: App Lifecycle
+    - 役割: Canvas 描画色の token 解決。
+    - 責務: `css/design_tokens.css` の `--color-*` を Canvas 2D 描画で使用できる色文字列へ変換し、描画クラスが固定色を保持しないようにする。
+- **FlightVisualRenderer**
+    - 生存期間: App Lifecycle
+    - 役割: 航行中・AIM中ビジュアル描画。
+    - 責務: `WorldRenderer` から渡された context / transform / view を使用し、予測線、航跡、保持アイテム、ロケット本体、ソナー波紋を描画する。
 - **CameraController**
     - 生存期間: App Lifecycle
     - 役割: 視界管理。

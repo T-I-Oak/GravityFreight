@@ -17,6 +17,7 @@
 
 - **`currentSector: Sector | null`**: 現在滞在しているセクターのデータインスタンス。
 - **`currentRocket: Rocket | null`**: 現在組み立て済み、または航行中のロケットインスタンス。
+- **`trajectoryPredictor: TrajectoryPredictor`**: AIM 中の予測軌道計算に使用するサービス。
 
 ### メソッド (Methods)
 
@@ -27,7 +28,7 @@
 - **`start(): void`**
     - ゲームを開始する。
     1. **ステート初期化**: `sessionState.initialize()` を実行。
-    2. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを登録する。ビルドアイテム選択は `BuildFlowController.handleItemSelection()` へ、ローンチボタン操作は `launchSelectedRocket()` へ委譲する。
+    2. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを登録する。ビルドアイテム選択は `BuildFlowController.handleItemSelection()` へ、ローンチボタン操作は `launchSelectedRocket()` へ委譲する。ビルドアイテム選択後は、AIM 可能状態であれば予測軌道を再計算する。
     3. **HUD初期化**: `uiController.initHUD(sessionState)` を実行し、初期値（Coins, Sector 等）の表示と、メールスロットのリセット（全ロック）を行う。
     4. **最初のセクターへ**: `this.beginSectorTransition()` を実行。
 
@@ -106,7 +107,10 @@
         2. `pointermove` はドラッグ開始時に確定したモードを維持して処理する。UI パネル上や Canvas 外を通過しても、UIController から継続通知された入力を同じ操作として扱う。
         3. パン、回転、ズームは `CameraController` へ委譲し、描画更新後に操作終了時またはホイール入力時にカメラ状態を保存する。
         4. 2本指操作から通知される `pinch` は、中心点移動をパン、距離比をズームとして扱う。
-        5. AIM はポインタのスクリーン座標を `CameraController.toWorld()` でワールド座標へ変換し、母星中心からの角度を現在の発射角度として保持する。発射時はこの角度を `Rocket` 生成へ渡し、初期位置を母星表面に設定する。
+        5. AIM はポインタのスクリーン座標を `CameraController.toWorld()` でワールド座標へ変換し、母星中心からの角度を現在の発射角度として保持する。発射時はこの角度を `Rocket` 生成へ渡し、初期位置を母星中心から `home.radius + gameBalance.SHIP_START_OFFSET` world px の位置に設定する。
+        6. AIM 可能状態では、選択中の RocketItem / Launcher / Booster を inventory から消費せずに参照し、プレビュー用 `Rocket` を生成する。`WorldRenderer.setAimRocket(previewRocket)` と `WorldRenderer.enableSonar()` を呼び出し、AIM 中のロケット本体とソナーを常時表示する。
+        7. `TrajectoryPredictor.predictPath(previewRocket, currentSector)` の結果から `actualTrail` を取り出し、発射位置を先頭に加えた座標列を `WorldRenderer.setPredictionPath()` へ渡す。AIM 可能状態の間、予測線は常に表示対象とする。AIM 可能状態で `actualTrail` が空になる場合は、予測計算またはパーツ性能定義の不整合として扱い、代替線で隠蔽しない。
+        8. `hover` は `CameraController.toWorld()` でワールド座標へ変換し、`CelestialBody` の半径に `mapConstants.STAR_HIT_MARGIN` を加味して対象天体を判定する。対象天体が item を保持している場合のみ `UIController.showStarInfo(body, displayPoint)` を呼び出し、それ以外は `UIController.hideStarInfo()` を呼び出す。`hoverleave` では必ず非表示にする。
     - **責務境界**: ブラウザイベントの購読や2本指入力の正規化は `UIController`、座標変換・パン・回転・ズームの実計算は `CameraController`、描画更新は `WorldRenderer` の責務とする。
 
 - **`beginSectorTransition(): Promise<void>`**
@@ -137,11 +141,12 @@
     - **内部挙動**:
         1. `BuildFlowController.currentBuildSelection` から `rocket`, `launcher`, `booster` の stack uid を取得する。`rocket` と `launcher` が未選択のまま呼び出された場合は UI 状態とロジック状態の不整合としてエラーを投げる。
         2. `sessionState.inventory.popItemByUid()` で選択中の RocketItem, Launcher, Booster を inventory から抽出する。
-        3. 抽出した構成で `Rocket` を生成する。発射角度は最新の AIM 操作で保持した角度を使用し、初期位置はその角度に対応する母星表面とする。
+        3. 抽出した構成で `Rocket` を生成する。発射角度は最新の AIM 操作で保持した角度を使用し、初期位置はその角度に対応する母星中心から `home.radius + gameBalance.SHIP_START_OFFSET` world px の位置とする。
         4. Launcher / Booster の耐久度を消費する。Booster が `preventsLauncherWear` を持つ場合は Launcher の耐久度消費を免除し、未消耗のまま inventory へ戻す。
         5. 耐久度が残っている発射装備は inventory へ戻す。耐久度が 0 の発射装備は戻さない。
-        6. 発射構成の抽出後、`BuildFlowController.resetFlightSelection()` で FLIGHT タブの選択状態を解除し、`BuildFlowController.showBuildScreen()` で消費後の inventory と launch button 状態を再描画する。
-        7. `launchRocket(rocket)` を呼び出し、生成した `Rocket` を返す。
+        6. 発射構成の抽出後、`BuildFlowController.resetFlightSelection()` で FLIGHT タブの選択状態を解除し、`WorldRenderer.clearAimRocket()` と `WorldRenderer.clearPredictionPath()` で AIM 中の表示を消去する。
+        7. `BuildFlowController.showBuildScreen()` で消費後の inventory と launch button 状態を再描画する。
+        8. `launchRocket(rocket)` を呼び出し、生成した `Rocket` を返す。
 
 - **`updateFlight(dt: number): void`**
     - 航行中の更新処理（メインループから毎フレーム呼び出し）。物理計算、状態更新、および成功・失敗の判定監視を行う。

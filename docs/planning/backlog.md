@@ -4,9 +4,6 @@
 - [ ] core_scenarios に記載されているシナリオで必要となるクラスのインターフェースを設計する
     - core_scenarios.md で進捗管理するため、Backlogには詳細の進捗は記載しない
     - 1回のセッションで設計するシナリオは1～2個程度とする
-- [x] UI コンポーネント仕様の旧 CSS class 命名を共通 Style Guide に合わせて整理する
-    - `.ui-*` / `.is-*` の各 class が、機能・質感・状態・種別のどれを担うか確認する
-    - 実装移行時に単純置換せず、責務に基づいて新 class 名を決める
 - [ ] 初版リリース前に `common_style.md` の移行期間中の対応節を削除する
     - リリース版ドキュメントには β v1 / 旧仕様の class 名を残さない
 - [ ] トップメニューの設定画面に追加する設定項目を仕様化する
@@ -19,8 +16,7 @@
     - 警告: リプレイ関連データが 20件で 700KiB、または 1件平均 35KiB を超える場合は圧縮や保存項目削減を検討する
     - 見直し: リプレイ関連データが 20件で 800KiB、または 1件平均 40KiB を超える場合は snapshot 構造を見直す
     - 測定方法: localStorage で保存される文字列サイズを重視し、`JSON.stringify(data).length * 2` による UTF-16 相当 byte を基準値とする。参考値として `TextEncoder` による UTF-8 byte も併記する
-    - [x] 20件保存時の `flight_record_index` サイズを確認する
-        - v0.79: 代表的な `RocketSnapshot` / `SectorSnapshot` を含む 20件の実装テストで 600KiB 以内を確認
+    - 参考: v0.79 の代表データ測定では、`RocketSnapshot` / `SectorSnapshot` を含む20件の実装テストで 600KiB 以内を確認
     - [ ] 圧縮の要否、圧縮後サイズ、復元コストを評価する
     - [ ] 共通 DataManager の保存方式で問題なく扱えるか確認する
 
@@ -32,127 +28,26 @@
     - 実装タスクごとに、対象が要求仕様テスト・実装テストのどちらを必要とするかを確認してから着手する
 
 ### 実装順マイルストーン
-- [x] M0: データ基盤とアイテム系エンティティを実装する
-    - [x] GameDataRepository / Item / StackedItem / ModuleStack / ItemContainer / RocketItem / Rocket
-    - [x] 要求仕様テストの入口を作る
-- [x] M1: ゲーム進行状態とワールド snapshot の土台を実装する
-    - [x] SessionState
-    - [x] Sector
-    - [x] CelestialBody
-    - [x] ExitArc
-    - [x] createSnapshot / fromSnapshot によるワールド再現
-    - [x] world snapshot の基礎サイズを測定する
-        - リプレイ20件保存時の最終判断ではなく、異常に大きい snapshot 構造を早期検知するための参考測定とする
-        - 保存件数削減で対応可能な規模か、件数を減らしても問題になりそうな規模かの感触を確認する
-        - 目安: 1 sector の world snapshot は 15KiB 以内を目標、25KiB 超で警告、40KiB 超で構造見直し候補とする
-        - v0.64 測定値: `Sector.createSnapshot()` の UTF-16 相当サイズは 2932 bytes（通常セクター、天体6件、出口3件、各天体に coin item 1件）
-- [x] M2: 最小航行シミュレーションを実装する
-    - [x] PhysicsEngine
-    - [x] 航行終了判定
-    - [x] アイテム回収判定
-    - [x] TrajectoryPredictor
-- [x] M3: ブラウザで最小航行を確認できる導線を作る
-    - [x] 既存 mock または dev 用導線で、生成済み sector と rocket を描画する
-    - [x] 固定条件または最小入力で発射し、ロケットの移動・衝突・出口・境界を確認できるようにする
-    - [x] この段階では施設、記録、リプレイ、実績、経済の完成を要求しない
 - [ ] M4: 航行終了後の記録・経済・施設導線を接続する
-    - [ ] EconomySystem / 施設報酬 / 施設取引 / ゲームオーバー判定
-        - [x] EconomySystem 基礎実装（抽選、査定、共通価格計算、Trading Post 在庫、ゲームオーバー判定）
-        - [x] SettlementResult 生成（施設報酬、配送、拾得コイン、保険、遺失物、割引率）
-        - [x] 施設取引用の共通資産反映メソッド
-        - [x] Black Market 複数アイテムガチャと確率エンチャント
-        - [x] Repair Dock の修理、解体、強化
-    - [ ] GameRecordTracker / RankTracker / AchievementTracker / FlightRecorder / StorySystem
-        - [x] GameRecordTracker
-        - [x] RankTracker
-        - [x] AchievementTracker
-        - [x] FlightRecorder
-        - [x] StorySystem
-    - [ ] 航行結果、施設画面、Analytic Archive、リプレイ再生を順次接続する
-        - [x] 航行終了フローの最小接続と航行結果 view data 生成
-        - [x] 航行結果画面の DOM 実装
-        - [ ] 施設画面の実データ接続
-            - [x] 施設入場時の表示データ生成と DOM 表示
-            - [x] 施設内取引アクションの資産反映
-            - [x] 施設出発アクションから次セクター開始への接続
-        - [ ] Analytic Archive の実データ接続
-        - [ ] リプレイ再生の実データ接続
+    - [ ] Analytic Archive の実データ接続
+    - [ ] リプレイ再生の実データ接続
 
 ### ドメイン別タスク
-- [x] データ基盤を実装する
-    - [x] GameDataRepository
-    - [x] 共通 DataManager / i18n ライブラリとの接続
-    - [x] 静的マスタデータのロード
-    - [x] ユーザーデータの getSavedData / setSavedData 経由の読み書き
-    - [x] content 系データを用途別に分割する
-        - [x] `content_stories.json`
-        - [x] `content_achievements.json`
-        - [x] `content_ui.json`
-    - [ ] content/data 系リソースの i18n 対応を棚卸しして実施する
-        - [x] 航行結果画面の UI ラベル、ボタン名、セクション名
-        - [ ] ストーリー本文、タイトル、発見文
-        - [ ] 実績ラベル、tier title
-        - [ ] How To Play テキスト
-        - [ ] アイテム名、説明文、施設名など、その他表示用マスタデータ
-- [ ] エンティティ基盤を実装する
-    - [x] Item
-    - [x] StackedItem
-    - [x] ModuleStack
-    - [x] ItemContainer
-    - [x] RocketItem
-    - [x] Rocket
-    - [x] SessionState
-- [ ] ワールド生成・再現クラスを実装する
-    - [x] Sector
-    - [x] CelestialBody
-    - [x] ExitArc
-    - [x] createSnapshot / fromSnapshot
-- [ ] 物理・航行ロジックを実装する
-    - [x] PhysicsEngine
-    - [x] TrajectoryPredictor
-    - [x] Rocket.useAvoidanceModule の具体挙動
-    - [x] 航行終了判定
-    - [x] アイテム回収判定
-- [ ] 記録・永続データ系を実装する
-    - [x] GameRecordTracker
-    - [x] RankTracker
-    - [x] AchievementTracker
-    - [x] FlightRecorder
-    - [x] StorySystem
-- [ ] 経済・施設処理を実装する
-    - [ ] EconomySystem
-        - [x] 抽選、査定、共通価格計算、Trading Post 在庫、ゲームオーバー判定
-        - [x] SettlementResult 生成
-        - [x] 施設取引用の共通資産反映メソッド
-        - [x] Black Market 複数アイテムガチャ
-        - [x] Repair Dock 修理、解体、強化
+- [ ] content/data 系リソースの i18n 対応を棚卸しして実施する
+    - [ ] ストーリー本文、タイトル、発見文
+    - [ ] 実績ラベル、tier title
+    - [ ] How To Play テキスト
+    - [ ] アイテム名、説明文、施設名など、その他表示用マスタデータ
+- [ ] 経済・施設処理の残仕様を確認する
     - [ ] 施設報酬
     - [ ] 施設取引
-    - [x] ゲームオーバー判定
 - [ ] 表示・入力基盤を実装する
-    - [ ] AppOrchestrator
-        - [x] タイトルから本編を開始する最小導線
-    - [ ] UIController
-        - [x] タイトル画面、HUD、ビルド画面の最小表示切替
-        - [x] 航行結果画面の表示、結果確定、マップ切替、レコード保護の DOM イベント接続
-        - [x] Canvas 入力の正規化とドラッグ継続（ポインタ、ホイール、2本指操作）
-    - [ ] WorldRenderer
-        - [x] 本編 `#gameCanvas` への Sector 静的描画
-        - [ ] CameraController / BackgroundManager / 航跡 / ソナー / 航行演出との接続
-            - [x] CameraController / BackgroundManager を Canvas 2D 描画へ接続
-            - [ ] 航跡 / ソナー / 予測線 / 船体・貨物描画を接続
-            - [ ] WorldRenderer の描画色を `css/design_tokens.css` の world / facility / category token から取得する
-        - [ ] 実プレイ画面のマップ表示完成度を上げる
-            - 現在は初期表示確認用の静的描画に留め、完成版のマップ視認性、演出、カメラ、情報密度は別タスクで対応する
-    - [ ] CameraController
-        - [x] パン、回転、ズーム、保存、座標変換の基礎実装
-        - [x] マウス/タッチ入力からのパン、回転、ズーム接続
-    - [ ] BackgroundManager
-        - [ ] 実プレイ画面の背景演出を完成版へ寄せる
-            - [x] 奥行き付き星空、瞬き、カメラ回転、20% 視差を接続する
-            - [x] 星の Z 移動、深度ラップ、ワープ速度補間を接続する
-            - [ ] セクター遷移のワープ開始・終了シーケンスから `startWarpEffect(duration)` / `stopWarpEffect(duration)` を呼び出す
-            - [ ] 実ブラウザで v1 と比較して星密度、速度、光跡の見え方を調整する
+    - [ ] GameController のファイルサイズと責務境界を見直し、施設処理、航行開始・予測線、航行結果処理などを適切なクラスへ分割する
+    - [ ] 実プレイ画面のマップ表示完成度を上げる
+        - 現在は初期表示確認用の静的描画に留め、完成版のマップ視認性、演出、カメラ、情報密度は別タスクで対応する
+    - [ ] BackgroundManager の実プレイ画面背景演出を完成版へ寄せる
+        - [ ] セクター遷移のワープ開始・終了シーケンスから `startWarpEffect(duration)` / `stopWarpEffect(duration)` を呼び出す
+        - [ ] 実ブラウザで v1 と比較して星密度、速度、光跡の見え方を調整する
     - [ ] SoundController
 - [ ] How To Play を実装する
     - [ ] HowToPlayUI
@@ -161,24 +56,14 @@
         - 画像は説明書本文で使うため、言語依存・説明過多な文字情報を画像内に持たせない
 - [ ] 画面別 UI を実装する
     - [ ] タイトル
-        - [x] BEGIN CONTRACT から本編起動
         - [ ] バージョン・著作権表示の著作権部分にポータルへのリンクを追加する
         - [ ] タイトル背景画像を削除し、β v1 と同様のロケットアニメーションを追加する
     - [ ] 建造・照準
-        - [x] 実画面でビルドパネルを表示
-        - [ ] inventory 表示、選択、組み立て、発射操作の接続
-            - [x] 実 inventory をビルドパネルに表示
-            - [ ] Rocket / Launcher / Booster の選択
-            - [ ] Chassis / Logic / Module から RocketItem を組み立て
-            - [ ] 発射操作
+        - [ ] Rocket / Launcher / Booster の選択
+        - [ ] Chassis / Logic / Module から RocketItem を組み立て
+        - [ ] 発射操作
     - [ ] 航行 HUD
-        - [x] 実画面で初期値を表示
     - [ ] タイトル画面、HUDに表示しているタイトルロゴを `logo.svg` にする
-    - [x] 航行結果
-    - [ ] 施設画面
-        - [x] 実データを使った入場時表示
-        - [x] 取引後の表示更新
-        - [x] 出発ボタンから次セクター開始への接続
     - [ ] Analytic Archive
     - [ ] リプレイ再生
     - [ ] 実績表示
@@ -194,17 +79,14 @@
 - [ ] 要求仕様に対するテストを実施する
     - テストファイルは `tests/spec/` に配置し、命名規約 `[prefix]_[章番号]_[名称].test.js` に従う
     - [ ] `core_mechanics_01_terms.test.js`: core_mechanics.md 第1章: ゲーム概要・用語
-    - [x] `core_mechanics_02_world_time.test.js`: core_mechanics.md 第2章: 世界構成・座標・時間
     - [ ] `core_mechanics_03_physics.test.js`: core_mechanics.md 第3章: 航行の物理法則
     - [ ] `core_mechanics_04_game_cycle.test.js`: core_mechanics.md 第4章: ゲームサイクルとミッション進行
     - [ ] `core_mechanics_05_return_bonus.test.js`: core_mechanics.md 第5章: 帰還ボーナス
     - [ ] `core_mechanics_06_replay.test.js`: core_mechanics.md 第6章: ベストショット・リプレイ
     - [ ] `core_mechanics_07_scoring.test.js`: core_mechanics.md 第7章: スコアシステム
     - [ ] `item_catalog_01_item_roles.test.js`: item_catalog.md 第1章: 構成アイテムの分類と役割
-    - [x] `item_catalog_02_spec_calculation.test.js`: item_catalog.md 第2章: 性能算定の規則
     - [ ] `item_catalog_03_item_master.test.js`: item_catalog.md 第3章: アイテム一覧管理表
     - [ ] `world_config_01_initial_setup.test.js`: world_config.md 第1章: 初期設定データ
     - [ ] `world_config_02_destinations_delivery.test.js`: world_config.md 第2章: 目的地と貨物配送
     - [ ] `world_config_03_collection_economy.test.js`: world_config.md 第3章: アイテム収集と経済システム
     - [ ] `world_config_04_post_mission_events.test.js`: world_config.md 第4章: ポストミッション・イベント
-

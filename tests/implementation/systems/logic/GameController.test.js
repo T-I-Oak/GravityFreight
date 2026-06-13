@@ -43,6 +43,26 @@ describe('GameController', () => {
         expect(context.controller.buildFlowController.currentBuildSelection.launcher).toBe('stack_launcher');
     });
 
+    it('enters AIM state as soon as rocket and launcher are selected', async () => {
+        await context.controller.start();
+        const handler = context.uiController.setBuildItemSelectionHandler.mock.calls.at(-1)[0];
+
+        handler({ category: 'rocket', uid: 'stack_rocket_ready' });
+        handler({ category: 'launcher', uid: 'stack_launcher_ready' });
+
+        expect(context.worldRenderer.setAimRocket).toHaveBeenCalledWith(expect.objectContaining({
+            rocketItem: context.rocketItem,
+            launcher: context.readyLauncher,
+            position: { x: 52, y: 0 }
+        }));
+        expect(context.worldRenderer.enableSonar).toHaveBeenCalled();
+        expect(context.worldRenderer.setPredictionPath).toHaveBeenCalledWith([
+            { x: 52, y: 0 },
+            { x: 0, y: 0 },
+            { x: 12, y: 24 }
+        ]);
+    });
+
     it('launches the selected rocket and captures the launch snapshot', async () => {
         await context.controller.start();
         context.controller.buildFlowController.currentBuildSelection = {
@@ -109,6 +129,54 @@ describe('GameController', () => {
         expect(context.cameraController.save).toHaveBeenCalledTimes(1);
     });
 
+    it('shows star item info when hovering over a body that holds items', async () => {
+        const item = {
+            id: 'coin_100',
+            uid: 'coin_1',
+            category: 'coin',
+            equals: vi.fn(candidate => candidate.id === 'coin_100'),
+            getViewData: vi.fn(() => ({
+                id: 'coin_100',
+                uid: 'coin_1',
+                name: '100c Coin',
+                category: 'coin',
+                stats: {}
+            }))
+        };
+        context.currentSector.bodies.push({
+            isHome: false,
+            radius: 20,
+            position: { x: 100, y: 0 },
+            items: [item]
+        });
+        context.cameraController.toWorld.mockReturnValue({ x: 100, y: 0 });
+        await context.controller.start();
+
+        context.controller.handleCanvasInput({
+            type: 'hover',
+            point: { x: 500, y: 240 },
+            displayPoint: { x: 250, y: 120 }
+        });
+
+        expect(context.uiController.showStarInfo).toHaveBeenCalledWith(
+            context.controller.currentSector.bodies.at(-1),
+            { x: 250, y: 120 }
+        );
+    });
+
+    it('hides star item info when hover leaves item-bearing bodies', async () => {
+        await context.controller.start();
+        context.cameraController.toWorld.mockReturnValue({ x: 400, y: 0 });
+
+        context.controller.handleCanvasInput({
+            type: 'hover',
+            point: { x: 500, y: 240 }
+        });
+        context.controller.handleCanvasInput({ type: 'hoverleave' });
+
+        expect(context.uiController.hideStarInfo).toHaveBeenCalledTimes(2);
+    });
+
     it('rotates the camera from pointer drags outside the map area', async () => {
         await context.controller.start();
         context.cameraController.isInMapArea.mockReturnValue(false);
@@ -154,7 +222,7 @@ describe('GameController', () => {
         expect(context.cameraController.save).toHaveBeenCalledTimes(1);
     });
 
-    it('updates launch angle from AIM input and launches from the home body surface', async () => {
+    it('updates launch angle from AIM input and launches from the configured home body offset', async () => {
         await context.controller.start();
         context.controller.buildFlowController.currentBuildSelection = {
             rocket: 'stack_rocket_ready',
@@ -169,8 +237,61 @@ describe('GameController', () => {
 
         expect(rocket.angle).toBeCloseTo(Math.PI / 2);
         expect(rocket.position.x).toBeCloseTo(0);
-        expect(rocket.position.y).toBeCloseTo(40);
-        expect(context.worldRenderer.render).toHaveBeenCalled();
+        expect(rocket.position.y).toBeCloseTo(52);
+        expect(context.worldRenderer.setPredictionPath).toHaveBeenCalled();
+    });
+
+    it('updates the predicted trajectory during AIM without consuming selected flight parts', async () => {
+        await context.controller.start();
+        context.controller.buildFlowController.currentBuildSelection = {
+            rocket: 'stack_rocket_ready',
+            launcher: 'stack_launcher_ready',
+            booster: 'stack_booster_ready'
+        };
+
+        context.controller.handleCanvasInput({
+            type: 'pointerdown',
+            point: { x: 40, y: 0 }
+        });
+
+        expect(context.trajectoryPredictor.predictPath).toHaveBeenCalledWith(
+            expect.objectContaining({
+                rocketItem: context.rocketItem,
+                launcher: context.readyLauncher,
+                booster: context.boosterItem,
+                position: { x: 52, y: 0 }
+            }),
+            context.controller.currentSector
+        );
+        expect(context.worldRenderer.setAimRocket).toHaveBeenCalledWith(expect.objectContaining({
+            rocketItem: context.rocketItem,
+            launcher: context.readyLauncher,
+            booster: context.boosterItem,
+            position: { x: 52, y: 0 }
+        }));
+        expect(context.worldRenderer.enableSonar).toHaveBeenCalled();
+        expect(context.worldRenderer.setPredictionPath).toHaveBeenCalledWith([
+            { x: 52, y: 0 },
+            { x: 0, y: 0 },
+            { x: 12, y: 24 }
+        ]);
+        expect(context.sessionState.inventory.popItemByUid).not.toHaveBeenCalledWith('stack_rocket_ready');
+        expect(context.sessionState.inventory.popItemByUid).not.toHaveBeenCalledWith('stack_launcher_ready');
+        expect(context.sessionState.inventory.popItemByUid).not.toHaveBeenCalledWith('stack_booster_ready');
+    });
+
+    it('rejects AIM prediction results that contain no trail points', async () => {
+        await context.controller.start();
+        context.trajectoryPredictor.predictPath.mockReturnValue({ actualTrail: [] });
+        context.controller.buildFlowController.currentBuildSelection = {
+            rocket: 'stack_rocket_ready',
+            launcher: 'stack_launcher_ready'
+        };
+
+        expect(() => context.controller.handleCanvasInput({
+            type: 'pointerdown',
+            point: { x: 40, y: 0 }
+        })).toThrow('[GameController] AIM-ready prediction must return at least one trail point.');
     });
 
     it('settles navigation end and shows a flight result view model', async () => {

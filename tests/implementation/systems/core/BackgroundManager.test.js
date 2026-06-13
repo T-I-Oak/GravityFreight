@@ -13,9 +13,19 @@ function createContext() {
     };
 }
 
+function createColorPalette() {
+    return {
+        get: vi.fn(name => ({
+            worldBg: 'token-world-bg'
+        })[name]),
+        createStarParticleColor: vi.fn(alpha => `token-star-rgba-${alpha}`)
+    };
+}
+
 describe('BackgroundManager', () => {
     it('generates deterministic star layers and renders them behind the map', () => {
-        const manager = new BackgroundManager({ starCount: 8, seed: 7 });
+        const colorPalette = createColorPalette();
+        const manager = new BackgroundManager({ starCount: 8, seed: 7, colorPalette });
         const context = createContext();
 
         manager.initialize({ width: 640, height: 480 });
@@ -24,11 +34,12 @@ describe('BackgroundManager', () => {
 
         expect(manager.stars).toHaveLength(8);
         expect(manager.stars).toEqual(firstStars);
+        expect(colorPalette.get).toHaveBeenCalledWith('worldBg');
         expect(context.fillRect).toHaveBeenCalled();
     });
 
     it('applies camera zoom and parallax offset to Canvas star projection', () => {
-        const manager = new BackgroundManager({ starCount: 1, seed: 7 });
+        const manager = new BackgroundManager({ starCount: 1, seed: 7, colorPalette: createColorPalette() });
         const context = createContext();
 
         manager.initialize({ width: 640, height: 480 });
@@ -53,7 +64,8 @@ describe('BackgroundManager', () => {
     });
 
     it('draws streaks while warp speed is above the normal background speed', () => {
-        const manager = new BackgroundManager({ starCount: 4, seed: 3 });
+        const colorPalette = createColorPalette();
+        const manager = new BackgroundManager({ starCount: 4, seed: 3, colorPalette });
         const context = createContext();
 
         manager.initialize({ width: 640, height: 480 });
@@ -61,13 +73,14 @@ describe('BackgroundManager', () => {
         manager.render(context, { width: 640, height: 480 });
 
         expect(manager.warpSpeed).toBeGreaterThan(1);
+        expect(colorPalette.createStarParticleColor).toHaveBeenCalled();
         expect(context.moveTo).toHaveBeenCalled();
         expect(context.lineTo).toHaveBeenCalled();
         expect(context.stroke).toHaveBeenCalled();
     });
 
     it('moves stars through depth over elapsed time', () => {
-        const manager = new BackgroundManager({ starCount: 4, seed: 3 });
+        const manager = new BackgroundManager({ starCount: 4, seed: 3, colorPalette: createColorPalette() });
 
         manager.initialize({ width: 640, height: 480 });
         const initialDepth = manager.stars[0].z;
@@ -77,7 +90,7 @@ describe('BackgroundManager', () => {
     });
 
     it('wraps stars back to deep space after passing the camera', () => {
-        const manager = new BackgroundManager({ starCount: 1, seed: 3 });
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette: createColorPalette() });
 
         manager.initialize({ width: 640, height: 480 });
         manager.stars[0].z = 0.1;
@@ -87,7 +100,7 @@ describe('BackgroundManager', () => {
     });
 
     it('interpolates warp speed when a duration is provided', () => {
-        const manager = new BackgroundManager({ starCount: 1, seed: 3 });
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette: createColorPalette() });
 
         manager.initialize({ width: 640, height: 480 });
         manager.startWarpEffect(1000);
@@ -101,7 +114,7 @@ describe('BackgroundManager', () => {
     });
 
     it('returns to normal speed when warp effect stops', () => {
-        const manager = new BackgroundManager({ starCount: 4, seed: 3 });
+        const manager = new BackgroundManager({ starCount: 4, seed: 3, colorPalette: createColorPalette() });
 
         manager.initialize({ width: 640, height: 480 });
         manager.startWarpEffect();
