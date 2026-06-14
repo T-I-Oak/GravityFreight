@@ -115,6 +115,7 @@
 
 - **`beginSectorTransition(): Promise<void>`**
     - セクター間の遷移（ワープ演出）シーケンスを統括する。
+    - ワープ演出の時間制御は `SectorTransitionAnimator` に委譲する。
     - セクター生成、セクター開始時記録、HUD / Renderer 更新は `SectorProgressionController.beginSectorTransition()` へ委譲する。
     1. **演出制御**: 背景・描画・音のワープ演出を開始。
         - ワープ演出の開始時点では、`currentSector` は前セクターのままとし、前セクターのマップへズームインして加速する演出を行う。

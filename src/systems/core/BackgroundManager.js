@@ -2,13 +2,15 @@ import CanvasColorPalette from './CanvasColorPalette.js';
 
 const DEFAULT_STAR_COUNT = 400;
 const NORMAL_WARP_SPEED = 1;
-const ACTIVE_WARP_SPEED = 12;
+const ACTIVE_WARP_SPEED = 100;
 const STAR_FIELD_RANGE = 2000;
 const STAR_MAX_DEPTH = 2000;
 const STAR_PROJECTION_SCALE = 200;
 const BASE_DEPTH_SPEED = 0.1;
 const STAR_WRAP_MIN_DEPTH = 1200;
 const STAR_WRAP_DEPTH_RANGE = 800;
+const MIN_STREAK_LENGTH = 1.2;
+const MAX_WARP_BRIGHTNESS_BOOST = 0.6;
 
 class BackgroundManager {
     constructor(options = {}) {
@@ -41,9 +43,12 @@ class BackgroundManager {
         const depthStep = BASE_DEPTH_SPEED * this.warpSpeed * (deltaSeconds * 60);
 
         this.stars.forEach(star => {
+            star.previousZ = star.z;
+            star.wrapped = false;
             star.z -= depthStep;
             if (star.z <= 0) {
                 this.#resetStarToDeepSpace(star);
+                star.wrapped = true;
             }
         });
     }
@@ -62,7 +67,7 @@ class BackgroundManager {
                 return;
             }
 
-            if (this.warpSpeed > NORMAL_WARP_SPEED) {
+            if (!point.wrapped && Math.abs(this.warpSpeed) > 1.1 && point.streakLength >= MIN_STREAK_LENGTH) {
                 context.beginPath();
                 context.moveTo(point.oldX, point.oldY);
                 context.lineTo(point.x, point.y);
@@ -72,10 +77,7 @@ class BackgroundManager {
                 return;
             }
 
-            context.fillStyle = this.colorPalette.createStarParticleColor(point.alpha);
-            context.beginPath();
-            context.arc(point.x, point.y, point.size * 0.45, 0, Math.PI * 2);
-            context.fill();
+            this.#drawStarPoint(context, point);
         });
     }
 
@@ -114,7 +116,9 @@ class BackgroundManager {
             size: this.#nextRandom() * 1.5 + 0.5,
             alpha: this.#nextRandom() * 0.7 + 0.3,
             pulseRate: 0.5 + this.#nextRandom() * 2.0,
-            pulseOffset: this.#nextRandom() * Math.PI * 2
+            pulseOffset: this.#nextRandom() * Math.PI * 2,
+            previousZ: null,
+            wrapped: false
         };
     }
 
@@ -160,6 +164,13 @@ class BackgroundManager {
         return from + (to - from) * progress;
     }
 
+    #drawStarPoint(context, point) {
+        context.fillStyle = this.colorPalette.createStarParticleColor(point.alpha);
+        context.beginPath();
+        context.arc(point.x, point.y, point.size * 0.45, 0, Math.PI * 2);
+        context.fill();
+    }
+
     #createProjection(view = {}) {
         const width = view.width ?? 960;
         const height = view.height ?? 720;
@@ -174,7 +185,8 @@ class BackgroundManager {
 
         return star => {
             const scale = STAR_PROJECTION_SCALE / Math.max(1, star.z);
-            const oldScale = STAR_PROJECTION_SCALE / Math.max(1, star.z + this.warpSpeed * 8);
+            const oldZ = star.previousZ ?? star.z;
+            const oldScale = STAR_PROJECTION_SCALE / Math.max(1, oldZ);
             const rx = star.x * cos - star.y * sin;
             const ry = star.x * sin + star.y * cos;
             const x = centerX + (rx * scale - offset.x * 0.2) * zoomLevel;
@@ -186,18 +198,29 @@ class BackgroundManager {
 
             const twinkle = 0.8 + 0.2 * Math.sin((timestamp / 1000) * star.pulseRate + star.pulseOffset);
             const depthBrightness = 0.15 + 0.85 * (1 - star.z / STAR_MAX_DEPTH);
-            const alpha = Math.min(1, depthBrightness * star.alpha * twinkle * (this.warpSpeed > NORMAL_WARP_SPEED ? 1.6 : 1));
+            const alpha = Math.min(1, depthBrightness * star.alpha * twinkle * this.#getWarpBrightnessMultiplier());
             const size = Math.max(0.8, Math.min(4, star.size * scale * 1.2));
+
+            const oldX = centerX + (rx * oldScale - offset.x * 0.2) * zoomLevel;
+            const oldY = centerY + (ry * oldScale - offset.y * 0.2) * zoomLevel;
 
             return {
                 x,
                 y,
-                oldX: centerX + (rx * oldScale - offset.x * 0.2) * zoomLevel,
-                oldY: centerY + (ry * oldScale - offset.y * 0.2) * zoomLevel,
+                oldX,
+                oldY,
                 alpha,
-                size
+                size,
+                streakLength: Math.hypot(x - oldX, y - oldY),
+                wrapped: star.wrapped
             };
         };
+    }
+
+    #getWarpBrightnessMultiplier() {
+        const warpAmount = Math.max(0, Math.abs(this.warpSpeed) - NORMAL_WARP_SPEED);
+        const progress = Math.min(1, warpAmount / (ACTIVE_WARP_SPEED - NORMAL_WARP_SPEED));
+        return 1 + MAX_WARP_BRIGHTNESS_BOOST * progress;
     }
 }
 

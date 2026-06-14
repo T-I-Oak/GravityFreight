@@ -43,8 +43,9 @@
 - **`showTitleScreen(): void`**
     - タイトル画面を表示する。
     - **内部挙動**: タイトル画面を表示し、HUD、ビルドパネル、航行結果画面、施設画面を非表示にする。
-- **`showSectorStartScreen(): void`**
-    - セクター開始画面を表示する。
+- **`showSectorTransitionScreen(): void`**
+    - セクター開始ワープ中のプレイ画面を表示する。
+    - **内部挙動**: タイトル、航行結果画面、施設画面を非表示にし、プレイ画面と HUD を表示する。セクター生成前またはワープ中は操作対象ではないため、ビルドパネルと発射ボタンは非表示にする。
 - **`showRecordScreen(): void`**
     - 記録画面を表示する。
 - **`showManualScreen(): void`**
@@ -60,7 +61,12 @@
         5. `rocket` の空表示に `emptyAction: 'open-assembly'` が設定されている場合、その placeholder はクリックで ASSEMBLY タブへ切り替える。
     - **責務境界**: inventory の抽出、選択可否、発射可能判定、UI 文言取得は `BuildScreenPresenter` の責務。`UIController` は渡された view data を DOM に反映する。
 - **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
-    - セクター開始時のタイトル演出（「SECTOR X」）を画面中央に表示する。
+    - セクター開始時の READY 通知を画面中央に表示する。
+    - **内部挙動**:
+        1. 通常セクターでは `SECTOR {sectorNumber} READY`、異常セクターでは `ANOMALY SECTOR {sectorNumber} READY` を英語固定で表示する。
+        2. `#sector-notification` に `state-active` を付与し、3.5秒の通知アニメーションを実行する。
+        3. 異常セクターでは `state-anomaly` を付与し、通常セクターと異なる発光色にする。
+        4. 表示終了後は `state-hidden` を戻し、`state-active` / `state-anomaly` を除去する。
 - **`setFlightMode(isFlight: boolean): void`**
     - 航行モード（発射後）の切り替えを行い、UI の操作権限を制御する。
     - **内部挙動**:

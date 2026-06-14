@@ -100,6 +100,7 @@ describe('UIController', () => {
                 <h2 id="star-info-title"></h2>
                 <div id="star-info-list"></div>
             </div>
+            <div id="sector-notification" class="sector-notif state-hidden"></div>
         `;
         repository = createRepository();
         soundController = { playSE: vi.fn() };
@@ -241,6 +242,49 @@ describe('UIController', () => {
         expect(document.querySelector('#play-hud').classList.contains('state-hidden')).toBe(false);
         expect(document.querySelector('#inventory-panel').hidden).toBe(false);
         expect(document.querySelector('#inventory-panel').classList.contains('state-hidden')).toBe(false);
+    });
+
+    it('switches to a sector transition screen before build controls are available', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+
+        controller.showSectorTransitionScreen();
+
+        expect(document.querySelector('#title-screen').hidden).toBe(true);
+        expect(document.querySelector('#flight-result-screen').hidden).toBe(true);
+        expect(document.querySelector('#facility-screen').hidden).toBe(true);
+        expect(document.querySelector('#play-scene-container').hidden).toBe(false);
+        expect(document.querySelector('#play-hud').hidden).toBe(false);
+        expect(document.querySelector('#inventory-panel').hidden).toBe(true);
+        expect(document.querySelector('#launch-control').hidden).toBe(true);
+    });
+
+    it('shows a sector ready notification in English', () => {
+        vi.useFakeTimers();
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const notification = document.querySelector('#sector-notification');
+
+        controller.showSectorTitle(4, false);
+
+        expect(notification.textContent).toBe('SECTOR 4 READY');
+        expect(notification.classList.contains('state-hidden')).toBe(false);
+        expect(notification.classList.contains('state-active')).toBe(true);
+        expect(notification.classList.contains('state-anomaly')).toBe(false);
+
+        vi.advanceTimersByTime(3500);
+
+        expect(notification.classList.contains('state-hidden')).toBe(true);
+        expect(notification.classList.contains('state-active')).toBe(false);
+        vi.useRealTimers();
+    });
+
+    it('shows anomaly sector ready notification with anomaly state', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const notification = document.querySelector('#sector-notification');
+
+        controller.showSectorTitle(5, true);
+
+        expect(notification.textContent).toBe('ANOMALY SECTOR 5 READY');
+        expect(notification.classList.contains('state-anomaly')).toBe(true);
     });
 
     it('switches build tabs without changing game state', () => {

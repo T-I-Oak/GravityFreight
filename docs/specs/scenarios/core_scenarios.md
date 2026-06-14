@@ -58,7 +58,7 @@
     - [x] 1.1.4 [機能] セクター番号を「0」にセット
     - [x] 1.1.5 [機能] GameController の初期化（セクター管理の開始）
     - [x] 1.1.6 [シナリオ] 「セクター開始画面」への遷移
-    - **決定事項**: `SessionState.initialize()`, `GameController.initialize()`, `AppOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorStartScreen()` を定義。
+    - **決定事項**: `SessionState.initialize()`, `GameController.initialize()`, `AppOrchestrator.startGame()`, `UIController.initHUD()`, `UIController.showSectorTransitionScreen()` を定義。
 - [x] 1.2 [機能] 記録画面の表示
     - **決定事項**: `UIController.showRecordScreen()`, `UIController.setRecordHandler()` を定義。
 - [x] 1.3 [機能] 説明書画面の表示
@@ -85,7 +85,7 @@
             - `BackgroundManager.startWarpEffect(duration)` を定義。星の z 移動により光跡を描画し高速感を演出する。
     - [x] 2.1.3 [シナリオ] マップの拡大・消失
         - **決定事項**:
-            - `WorldRenderer.startWarpEffect(duration)` を定義。Scale 1.0→20.0, Alpha 1.0→0.0 へと変化させ消失させる。
+            - `WorldRenderer.startWarpEffect(duration)` を定義。β v1 と同様に Scale 1.0→100.0, Alpha 1.0→0.0 へと変化させ消失させる。
     - [x] 2.1.4 [機能] 内部状態の維持（前セクター状態を保持）
     - [x] 2.1.5 [機能] セクター 1 開始時の特殊処理（マップなしの状態から開始）
     - [x] 2.1.6 [機能] ワープ音（ホワイトノイズ系SE）の再生開始
@@ -120,7 +120,7 @@
     - [x] 2.3.1 [シナリオ] 星の流れの減速
         - `BackgroundManager.stopWarpEffect(duration)` を呼び出し、光跡描画を終了させる。
     - [x] 2.3.2 [シナリオ] 新セクターのマップ接近・停止
-        - `WorldRenderer.stopWarpEffect(duration)` を実行し、遠方（Scale 0.05, Alpha 1.0）からマップを接近・出現させる。
+        - `WorldRenderer.stopWarpEffect(duration)` を実行し、遠方（Scale 0.01, Alpha 1.0）からマップを接近・出現させる。
     - [x] 2.3.3 [機能] ワープ音の停止
         - `SoundController.stopWarpEffect(fadeOutDuration)` を実行し、環境音をフェードアウトさせる。
     - [x] 2.3.4 [機能] ビルドフェーズへの遷移

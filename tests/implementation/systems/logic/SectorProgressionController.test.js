@@ -30,6 +30,7 @@ function createController() {
     };
     const uiController = {
         updateHUDValue: vi.fn(),
+        showSectorTitle: vi.fn(),
         showBuildScreen: vi.fn(),
         setFlightMode: vi.fn(),
         showGameEndSequence: vi.fn()
@@ -93,6 +94,7 @@ describe('SectorProgressionController', () => {
         });
         expect(context.worldRenderer.setSector).toHaveBeenCalledWith(sector);
         expect(context.uiController.updateHUDValue).toHaveBeenCalledWith('sector', 4);
+        expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(4, true);
         expect(context.uiController.showBuildScreen).toHaveBeenCalled();
         expect(context.uiController.setFlightMode).toHaveBeenCalledWith(false);
     });

@@ -1,4 +1,5 @@
 import SectorProgressionController from './SectorProgressionController.js';
+import SectorTransitionAnimator from './SectorTransitionAnimator.js';
 import BuildScreenPresenter from './BuildScreenPresenter.js';
 import BuildFlowController from './BuildFlowController.js';
 import Rocket from '../entities/Rocket.js';
@@ -36,6 +37,12 @@ class GameController {
         this.currentTradingPostStock = null;
         this.sectorProgressionController = infrastructure.sectorProgressionController
             || new SectorProgressionController(infrastructure);
+        this.sectorTransitionAnimator = infrastructure.sectorTransitionAnimator
+            || new SectorTransitionAnimator({
+                worldRenderer: this.worldRenderer,
+                wait: infrastructure.wait,
+                durations: infrastructure.sectorTransitionDurations
+            });
     }
 
     async start() {
@@ -216,8 +223,11 @@ class GameController {
         this.worldRenderer?.clearPredictionPath?.();
         this.worldRenderer?.clearAimRocket?.();
         this.worldRenderer?.disableSonar?.();
+        this.uiController.showSectorTransitionScreen?.();
 
-        this.currentSector = await this.sectorProgressionController.beginSectorTransition(options);
+        this.currentSector = await this.sectorTransitionAnimator.play(
+            () => this.sectorProgressionController.beginSectorTransition(options)
+        );
         this.buildFlowController.showBuildScreen();
         return this.currentSector;
     }

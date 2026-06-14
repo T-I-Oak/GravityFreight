@@ -46,7 +46,6 @@
     - [ ] 実プレイ画面のマップ表示完成度を上げる
         - 現在は初期表示確認用の静的描画に留め、完成版のマップ視認性、演出、カメラ、情報密度は別タスクで対応する
     - [ ] BackgroundManager の実プレイ画面背景演出を完成版へ寄せる
-        - [ ] セクター遷移のワープ開始・終了シーケンスから `startWarpEffect(duration)` / `stopWarpEffect(duration)` を呼び出す
         - [ ] 実ブラウザで v1 と比較して星密度、速度、光跡の見え方を調整する
     - [ ] SoundController
 - [ ] How To Play を実装する

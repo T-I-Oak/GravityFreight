@@ -468,6 +468,8 @@ export function createController(settlement = createSettlement()) {
         updateFacilityCredits: vi.fn(),
         updateHUDValue: vi.fn(),
         setFlightMode: vi.fn(),
+        showSectorTransitionScreen: vi.fn(),
+        showSectorTitle: vi.fn(),
         showGameEndSequence: vi.fn(),
         showBuildScreen: vi.fn(),
         setBuildItemSelectionHandler: vi.fn(),
@@ -491,6 +493,8 @@ export function createController(settlement = createSettlement()) {
         setSector: vi.fn(),
         setAimRocket: vi.fn(),
         setPredictionPath: vi.fn(),
+        startWarpEffect: vi.fn(),
+        stopWarpEffect: vi.fn(),
         startNavigation: vi.fn(),
         render: vi.fn()
     };
@@ -510,6 +514,12 @@ export function createController(settlement = createSettlement()) {
         createSnapshot: currentSector.createSnapshot
     }));
 
+    const wait = vi.fn(() => Promise.resolve());
+    const sectorTransitionDurations = {
+        warpOut: 0,
+        hold: 0,
+        warpIn: 0
+    };
     const controller = new GameController({
         sessionState,
         economySystem,
@@ -523,7 +533,9 @@ export function createController(settlement = createSettlement()) {
         cameraController,
         trajectoryPredictor,
         gameDataRepository,
-        sectorFactory
+        sectorFactory,
+        wait,
+        sectorTransitionDurations
     });
     controller.currentRocket = currentRocket;
     controller.currentSector = currentSector;
@@ -547,6 +559,8 @@ export function createController(settlement = createSettlement()) {
         cameraController,
         trajectoryPredictor,
         gameDataRepository,
-        sectorFactory
+        sectorFactory,
+        wait,
+        sectorTransitionDurations
     };
 }

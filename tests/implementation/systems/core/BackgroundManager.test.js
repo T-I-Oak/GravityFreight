@@ -70,6 +70,7 @@ describe('BackgroundManager', () => {
 
         manager.initialize({ width: 640, height: 480 });
         manager.startWarpEffect();
+        manager.update(0.016);
         manager.render(context, { width: 640, height: 480 });
 
         expect(manager.warpSpeed).toBeGreaterThan(1);
@@ -77,6 +78,78 @@ describe('BackgroundManager', () => {
         expect(context.moveTo).toHaveBeenCalled();
         expect(context.lineTo).toHaveBeenCalled();
         expect(context.stroke).toHaveBeenCalled();
+    });
+
+    it('draws warp streaks from the previous frame depth', () => {
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette: createColorPalette() });
+        const context = createContext();
+
+        manager.initialize({ width: 640, height: 480 });
+        manager.stars = [{
+            x: 100,
+            y: 0,
+            z: 200,
+            previousZ: 300,
+            size: 1,
+            alpha: 1,
+            pulseRate: 0,
+            pulseOffset: 0,
+            wrapped: false
+        }];
+        manager.startWarpEffect();
+        manager.render(context, { width: 640, height: 480, timestamp: 0 });
+
+        expect(context.moveTo.mock.calls[0][0]).toBeCloseTo(386.6666666666667);
+        expect(context.moveTo.mock.calls[0][1]).toBe(240);
+        expect(context.lineTo.mock.calls[0][0]).toBe(420);
+        expect(context.lineTo.mock.calls[0][1]).toBe(240);
+    });
+
+    it('does not draw streaks for stars that wrapped during warp movement', () => {
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette: createColorPalette() });
+        const context = createContext();
+
+        manager.initialize({ width: 640, height: 480 });
+        manager.stars = [{
+            x: 100,
+            y: 0,
+            z: 200,
+            previousZ: 300,
+            size: 1,
+            alpha: 1,
+            pulseRate: 0,
+            pulseOffset: 0,
+            wrapped: true
+        }];
+        manager.startWarpEffect();
+        manager.render(context, { width: 640, height: 480, timestamp: 0 });
+
+        expect(context.moveTo).not.toHaveBeenCalled();
+        expect(context.arc).toHaveBeenCalled();
+    });
+
+    it('keeps distant stars visible as points when warp streaks are too short', () => {
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette: createColorPalette() });
+        const context = createContext();
+
+        manager.initialize({ width: 640, height: 480 });
+        manager.stars = [{
+            x: 100,
+            y: 0,
+            z: 1900,
+            previousZ: 1901,
+            size: 1,
+            alpha: 1,
+            pulseRate: 0,
+            pulseOffset: 0,
+            wrapped: false
+        }];
+        manager.startWarpEffect();
+        manager.render(context, { width: 640, height: 480, timestamp: 0 });
+
+        expect(context.moveTo).not.toHaveBeenCalled();
+        expect(context.arc).toHaveBeenCalled();
+        expect(context.fill).toHaveBeenCalled();
     });
 
     it('moves stars through depth over elapsed time', () => {
@@ -107,10 +180,41 @@ describe('BackgroundManager', () => {
         manager.update(0.5);
 
         expect(manager.warpSpeed).toBeGreaterThan(1);
-        expect(manager.warpSpeed).toBeLessThan(12);
+        expect(manager.warpSpeed).toBeLessThan(100);
 
         manager.update(0.5);
-        expect(manager.warpSpeed).toBe(12);
+        expect(manager.warpSpeed).toBe(100);
+    });
+
+    it('smoothly returns star brightness to normal while warp speed slows down', () => {
+        const colorPalette = createColorPalette();
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette });
+        const context = createContext();
+
+        manager.initialize({ width: 640, height: 480 });
+        manager.stars = [{
+            x: 100,
+            y: 0,
+            z: 1900,
+            previousZ: 1901,
+            size: 1,
+            alpha: 1,
+            pulseRate: 0,
+            pulseOffset: 0,
+            wrapped: false
+        }];
+        manager.startWarpEffect();
+        manager.stopWarpEffect(1000);
+        manager.update(0.5);
+        manager.render(context, { width: 640, height: 480, timestamp: 0 });
+        const slowingAlpha = Number(colorPalette.createStarParticleColor.mock.calls.at(-1)[0]);
+
+        manager.update(0.5);
+        manager.render(context, { width: 640, height: 480, timestamp: 0 });
+        const normalAlpha = Number(colorPalette.createStarParticleColor.mock.calls.at(-1)[0]);
+
+        expect(slowingAlpha).toBeGreaterThan(normalAlpha);
+        expect(slowingAlpha).toBeLessThan(1);
     });
 
     it('returns to normal speed when warp effect stops', () => {
