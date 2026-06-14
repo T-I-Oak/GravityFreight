@@ -5,6 +5,8 @@ import FlightVisualRenderer from './FlightVisualRenderer.js';
 const WORLD_VIEW_SCALE = 0.5;
 const WARP_OUT_SCALE = 100;
 const WARP_IN_START_SCALE = 0.01;
+const FINISH_ANIMATION_DURATION = 2000;
+const SONAR_RIPPLE_DURATION = 2000;
 
 const FACILITY_LABELS = {
     TRADING_POST: 'TRADING POST',
@@ -26,7 +28,9 @@ class WorldRenderer {
         this.navigationRocket = null;
         this.aimRocket = null;
         this.predictionPath = [];
+        this.hideNavigationRocketBody = false;
         this.sonarEnabled = false;
+        this.sonarStopTimestamp = null;
         this.mapWarp = {
             scale: 1,
             alpha: 1,
@@ -60,6 +64,7 @@ class WorldRenderer {
 
     startNavigation(rocket) {
         this.navigationRocket = rocket || null;
+        this.hideNavigationRocketBody = false;
         this.render();
     }
 
@@ -87,16 +92,45 @@ class WorldRenderer {
 
     enableSonar() {
         this.sonarEnabled = true;
+        this.sonarStopTimestamp = null;
         this.render();
     }
 
     disableSonar() {
         this.sonarEnabled = false;
+        this.sonarStopTimestamp = this.#getView().timestamp;
         this.render();
     }
 
     playFinishAnimation() {
-        return Promise.resolve();
+        const rocket = this.navigationRocket;
+        if (!rocket) {
+            return Promise.resolve();
+        }
+
+        this.hideNavigationRocketBody = true;
+        const startTimestamp = this.#getView().timestamp;
+        return new Promise(resolve => {
+            const step = timestamp => {
+                const currentTimestamp = Number.isFinite(timestamp)
+                    ? timestamp
+                    : this.#getView().timestamp;
+                rocket.recordTrailPoint?.(rocket.position);
+                this.render();
+
+                if (currentTimestamp - startTimestamp >= FINISH_ANIMATION_DURATION) {
+                    this.navigationRocket = null;
+                    this.hideNavigationRocketBody = false;
+                    this.render();
+                    resolve();
+                    return;
+                }
+
+                this.#requestAnimationFrame(step);
+            };
+
+            this.#requestAnimationFrame(step);
+        });
     }
 
     handleResize() {
@@ -116,6 +150,7 @@ class WorldRenderer {
         const deltaSeconds = this.#consumeDeltaSeconds();
         this.backgroundManager.update?.(deltaSeconds);
         this.#updateMapWarp(deltaSeconds);
+        this.#expireStoppedSonar();
         this.backgroundManager.render(this.context, this.#getView());
         if (!this.targetSector) {
             return;
@@ -129,7 +164,9 @@ class WorldRenderer {
         this.flightVisualRenderer.render(this.context, this.#createTransform(), this.#getView(), {
             navigationRocket: this.navigationRocket || this.aimRocket,
             predictionPath: this.predictionPath,
-            sonarEnabled: this.sonarEnabled
+            hideRocketBody: this.hideNavigationRocketBody,
+            sonarEnabled: this.sonarEnabled,
+            sonarStopTimestamp: this.sonarStopTimestamp
         }, colors);
         this.context.restore();
     }
@@ -199,6 +236,14 @@ class WorldRenderer {
         }
 
         this.animationFrameId = globalThis.requestAnimationFrame(() => this.#renderFrame());
+    }
+
+    #requestAnimationFrame(callback) {
+        if (typeof globalThis.requestAnimationFrame === 'function') {
+            return globalThis.requestAnimationFrame(callback);
+        }
+
+        return globalThis.setTimeout(() => callback(this.#getView().timestamp), 16);
     }
 
     #renderFrame() {
@@ -288,6 +333,16 @@ class WorldRenderer {
 
     #lerp(from, to, progress) {
         return from + (to - from) * progress;
+    }
+
+    #expireStoppedSonar() {
+        if (this.sonarEnabled || !Number.isFinite(this.sonarStopTimestamp)) {
+            return;
+        }
+
+        if (this.#getView().timestamp - this.sonarStopTimestamp >= SONAR_RIPPLE_DURATION) {
+            this.sonarStopTimestamp = null;
+        }
     }
 
     #drawBoundary(colors) {

@@ -325,9 +325,11 @@ export function createController(settlement = createSettlement()) {
     const sessionState = {
         sectorNumber: 3,
         coins: 120,
+        returnBonus: 0,
         initialize: vi.fn(() => {
             sessionState.sectorNumber = 0;
             sessionState.coins = 120;
+            sessionState.returnBonus = 0;
         }),
         inventory: {
             stacks,
@@ -506,6 +508,10 @@ export function createController(settlement = createSettlement()) {
             ]
         }))
     };
+    const navigationLoopController = {
+        start: vi.fn(),
+        stop: vi.fn()
+    };
     const sectorFactory = vi.fn(({ sessionState, isAnomaly }) => ({
         sectorNumber: sessionState.sectorNumber,
         isAnomaly,
@@ -532,6 +538,7 @@ export function createController(settlement = createSettlement()) {
         worldRenderer,
         cameraController,
         trajectoryPredictor,
+        navigationLoopController,
         gameDataRepository,
         sectorFactory,
         wait,
@@ -558,6 +565,7 @@ export function createController(settlement = createSettlement()) {
         worldRenderer,
         cameraController,
         trajectoryPredictor,
+        navigationLoopController,
         gameDataRepository,
         sectorFactory,
         wait,

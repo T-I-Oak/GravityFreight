@@ -2,6 +2,7 @@ import SectorProgressionController from './SectorProgressionController.js';
 import SectorTransitionAnimator from './SectorTransitionAnimator.js';
 import BuildScreenPresenter from './BuildScreenPresenter.js';
 import BuildFlowController from './BuildFlowController.js';
+import NavigationLoopController from './NavigationLoopController.js';
 import Rocket from '../entities/Rocket.js';
 import { FACILITY_LABELS, FACILITY_THEME_CLASSES } from './facilityViewConstants.js';
 
@@ -15,6 +16,15 @@ class GameController {
         this.flightRecorder = infrastructure.flightRecorder;
         this.storySystem = infrastructure.storySystem;
         this.trajectoryPredictor = infrastructure.trajectoryPredictor;
+        this.navigationLoopController = infrastructure.navigationLoopController
+            || new NavigationLoopController({
+                physicsEngine: infrastructure.physicsEngine,
+                gameDataRepository: infrastructure.gameDataRepository,
+                uiController: infrastructure.uiController,
+                worldRenderer: infrastructure.worldRenderer,
+                requestFrame: infrastructure.requestFrame,
+                cancelFrame: infrastructure.cancelFrame
+            });
         this.uiController = infrastructure.uiController;
         this.worldRenderer = infrastructure.worldRenderer;
         this.cameraController = infrastructure.cameraController;
@@ -115,7 +125,7 @@ class GameController {
             throw new Error('[GameController] rocket and currentSector are required.');
         }
 
-        rocket.velocity = rocket.getInitialVelocity();
+        rocket.velocity = rocket.getInitialVelocity(this.sessionState.returnBonus);
         this.currentRocket = rocket;
         this.worldRenderer?.clearPredictionPath?.();
         this.worldRenderer?.clearAimRocket?.();
@@ -123,6 +133,11 @@ class GameController {
         this.uiController.setFlightMode(true);
         this.worldRenderer?.startNavigation?.(rocket);
         this.worldRenderer?.enableSonar?.();
+        this.navigationLoopController.start({
+            rocket,
+            sector: this.currentSector,
+            onNavigationEnd: result => this.handleNavigationEnd(result)
+        });
         return rocket;
     }
 
@@ -131,6 +146,7 @@ class GameController {
             throw new Error('[GameController] currentRocket and currentSector are required.');
         }
 
+        this.navigationLoopController.stop();
         const flightData = this.currentRocket.getFlightResult();
         const settlement = this.economySystem.calculateSettlement(result, flightData, this.sessionState);
         this.lastSettlement = settlement;
@@ -220,6 +236,7 @@ class GameController {
         this.currentFacilityViewData = null;
         this.currentTradingPostStock = null;
         this.currentRocket = null;
+        this.navigationLoopController.stop();
         this.worldRenderer?.clearPredictionPath?.();
         this.worldRenderer?.clearAimRocket?.();
         this.worldRenderer?.disableSonar?.();
@@ -228,6 +245,7 @@ class GameController {
         this.currentSector = await this.sectorTransitionAnimator.play(
             () => this.sectorProgressionController.beginSectorTransition(options)
         );
+        this.uiController.setFlightMode?.(false);
         this.buildFlowController.showBuildScreen();
         return this.currentSector;
     }
@@ -795,7 +813,7 @@ class GameController {
             return;
         }
 
-        previewRocket.velocity = previewRocket.getInitialVelocity();
+        previewRocket.velocity = previewRocket.getInitialVelocity(this.sessionState.returnBonus);
         const predictedRocket = this.trajectoryPredictor.predictPath(previewRocket, this.currentSector);
         const predictionPath = this.#createPredictionPath(previewRocket, predictedRocket.actualTrail);
 

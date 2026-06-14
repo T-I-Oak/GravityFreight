@@ -55,8 +55,6 @@ class SectorProgressionController {
         this.worldRenderer?.setSector?.(sector);
         this.uiController.updateHUDValue?.('sector', this.sessionState.sectorNumber);
         this.uiController.showSectorTitle?.(this.sessionState.sectorNumber, sector.isAnomaly);
-        this.uiController.showBuildScreen?.();
-        this.uiController.setFlightMode?.(false);
 
         return sector;
     }

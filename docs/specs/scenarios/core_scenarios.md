@@ -125,7 +125,7 @@
         - `SoundController.stopWarpEffect(fadeOutDuration)` を実行し、環境音をフェードアウトさせる。
     - [x] 2.3.4 [機能] ビルドフェーズへの遷移
         - 全演出完了後、`UIController.showBuildScreen()` を実行して第3章へ移行する。
-        - **決定事項**: `showBuildScreen()` 実行時、ビルドパネルおよび HUD（スコア、メールアイコン等）を同時に表示状態にする。
+        - **決定事項**: ワープ演出中はビルドパネルを表示しない。`showBuildScreen()` 実行時、ビルドパネルをオープン状態で表示し、HUD（スコア、メールアイコン等）も表示状態にする。
         - `WorldRenderer.stopWarpEffect()` は「遠方から接近する」演出のため、Alpha 1.0 のままで開始し、画面全体を星（母星等）が覆い尽くすのを防ぐ。
 
 ## 3 ビルドフェーズ

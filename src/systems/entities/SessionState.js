@@ -25,6 +25,7 @@ class SessionState {
 
     incrementSector() {
         this.sectorNumber += 1;
+        this.returnBonus = 0;
     }
 
     recordBlackMarketVisit() {
@@ -86,6 +87,10 @@ class SessionState {
         if (result.lostToTarget) {
             result.lostToTarget.target.addItems(result.lostToTarget.items);
         }
+
+        if (result.status === 'returned') {
+            this.returnBonus += this.gameDataRepository.getGameBalance().RETURN_BONUS_INCREMENT;
+        }
     }
 
     getGameResultSummary(context = {}) {
@@ -111,6 +116,7 @@ class SessionState {
         this.collectedItemCount = 0;
         this.coins = 0;
         this.blackMarketVisits = 0;
+        this.returnBonus = 0;
     }
 }
 

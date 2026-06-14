@@ -20,6 +20,7 @@
 - **`coins: number`**: 現在の所持金。
 - **`inventory: ItemContainer`**: プレイヤーのグローバルインベントリ（未装備アイテム等）。
 - **`blackMarketVisits: number`**: 闇市場（BLACK MARKET）への到達累計回数。
+- **`returnBonus: number`**: 現在セクター内で母星帰還によって蓄積された次回発射パワーボーナス。初期値は `0`。
 
 ### メソッド (Methods)
 
@@ -29,11 +30,12 @@
         1. `GameDataRepository.getInitialSetup()` を参照し、初期パラメータを取得。
         2. 取得した所持金を自身の `coins` にセット。
         3. セクター番号を `0` にセット。
-        4. 累計スコア、総獲得コイン、合計航行 Tick 数、総回収アイテム数、闇市場訪問回数を `0` にセット。
+        4. 累計スコア、総獲得コイン、合計航行 Tick 数、総回収アイテム数、闇市場訪問回数、帰還ボーナスを `0` にセット。
         5. 初期装備アイテムのインスタンスを生成し、`inventory` に追加。
 
 - **`incrementSector(): void`**
     - セクター番号を 1 インクリメントする。
+    - セクター移動時に `returnBonus` を `0` にリセットする。
 
 - **`recordBlackMarketVisit(): void`**
     - 闇市場訪問回数を 1 インクリメントする。
@@ -46,6 +48,7 @@
         3. **回収数**: `result.acquiredItems` から今回正式に獲得したアイテム数を集計し、`collectedItemCount` へ加算する。
         4. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
         5. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
+        6. **帰還ボーナス**: `result.status === 'returned'` の場合、`gameBalance.RETURN_BONUS_INCREMENT` を `returnBonus` に加算する。
 
 - **`applyTransaction(transaction: TransactionResult): TransactionDelta`**
     - 施設取引などの資産変化を現在の状態に適用する。

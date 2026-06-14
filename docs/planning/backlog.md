@@ -29,11 +29,11 @@
 
 ### 実装順マイルストーン
 - [ ] M3: 発射後の航行ループと終了判定を接続する
-    - [ ] `GameController.launchRocket()` 後に航行更新ループを開始する
-    - [ ] `PhysicsEngine.step()` の結果をもとにロケット・セクター状態を更新する
-    - [ ] 航行中 HUD のスコア等を更新する
-    - [ ] 星衝突、境界ロスト、exit arc 到達を検知して航行終了へ接続する
-    - [ ] 航行終了時に `GameController.handleNavigationEnd()` へ結果を渡す
+    - [x] `GameController.launchRocket()` 後に航行更新ループを開始する
+    - [x] `PhysicsEngine.step()` の結果をもとにロケット・セクター状態を更新する
+    - [x] 航行中 HUD のスコア等を更新する
+    - [x] 星衝突、境界ロスト、exit arc 到達を検知して航行終了へ接続する
+    - [x] 航行終了時に `GameController.handleNavigationEnd()` へ結果を渡す
 - [ ] M4: 航行終了後の記録・経済・施設導線を接続する
     - [ ] Analytic Archive の実データ接続
     - [ ] リプレイ再生の実データ接続

@@ -69,6 +69,31 @@ describe('Rocket', () => {
         expect(rocket.actualTrail).toEqual([{ x: 10, y: 20 }]);
     });
 
+    it('keeps real flight trail within the configured visible trail length', () => {
+        const { rocketItem, launcher } = createRocketParts();
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+
+        for (let index = 0; index < 90; index += 1) {
+            rocket.updateState({ x: index, y: 0 }, { x: 1, y: 0 });
+        }
+
+        expect(rocket.actualTrail).toHaveLength(80);
+        expect(rocket.actualTrail[0]).toEqual({ x: 10, y: 0 });
+        expect(rocket.actualTrail.at(-1)).toEqual({ x: 89, y: 0 });
+    });
+
+    it('does not trim ghost prediction trails by the visible trail length', () => {
+        const { rocketItem, launcher } = createRocketParts();
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+        rocket.setGhost();
+
+        for (let index = 0; index < 90; index += 1) {
+            rocket.updateState({ x: index, y: 0 }, { x: 1, y: 0 });
+        }
+
+        expect(rocket.actualTrail).toHaveLength(90);
+    });
+
     it('calculates initial velocity from launch power and multipliers', () => {
         const { rocketItem, launcher, booster } = createRocketParts();
         const rocket = new Rocket(rocketItem, launcher, booster, Math.PI / 2);
@@ -120,6 +145,36 @@ describe('Rocket', () => {
         );
     });
 
+    it('calculates gravity multiplier from launch configuration', () => {
+        const rocketItem = new RocketItem(
+            new Item('hull_medium', repository),
+            new Item('sensor_gravity', repository),
+            [new Item('mod_stabilizer', repository)]
+        );
+        const launcher = new Item('pad_standard_d2', repository);
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+
+        expect(rocket.getGravityMultiplier()).toBeCloseTo(0.72);
+    });
+
+    it('applies timed booster gravity multiplier only while its duration remains', () => {
+        const rocketItem = new RocketItem(
+            new Item('hull_medium', repository),
+            new Item('sensor_normal', repository),
+            []
+        );
+        const launcher = new Item('pad_standard_d2', repository);
+        const booster = new Item('boost_flash', repository);
+        booster.duration = 2;
+        const rocket = new Rocket(rocketItem, launcher, booster, 0);
+
+        expect(rocket.getGravityMultiplier()).toBeCloseTo(0.1);
+        rocket.advanceGravityEffectTick();
+        expect(rocket.getGravityMultiplier()).toBeCloseTo(0.1);
+        rocket.advanceGravityEffectTick();
+        expect(rocket.getGravityMultiplier()).toBeCloseTo(1);
+    });
+
     it('stores held items and exposes flight result data', () => {
         const { rocketItem, launcher } = createRocketParts();
         const rocket = new Rocket(rocketItem, launcher, null, 0);
@@ -169,7 +224,8 @@ describe('Rocket', () => {
             actualTrail: [{ x: 7, y: 8 }],
             ticks: 1,
             heldCargo: [cargo.createSnapshot()],
-            isGhost: true
+            isGhost: true,
+            gravityEffectTicksRemaining: 0
         });
         expect(restored.uid).toBe(rocket.uid);
         expect(restored.rocketItem.getMass()).toBe(rocketItem.getMass());

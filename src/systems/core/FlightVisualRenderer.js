@@ -3,8 +3,10 @@ class FlightVisualRenderer {
         this.#drawPredictionPath(context, transform, state.predictionPath, colors);
         this.#drawRocketTrail(context, transform, state.navigationRocket, colors);
         this.#drawHeldCargo(context, transform, state.navigationRocket, colors);
-        this.#drawRocket(context, transform, state.navigationRocket, colors);
-        this.#drawSonar(context, transform, view, state.navigationRocket, state.sonarEnabled, colors);
+        if (!state.hideRocketBody) {
+            this.#drawRocket(context, transform, state.navigationRocket, colors);
+        }
+        this.#drawSonar(context, transform, view, state.navigationRocket, state, colors);
     }
 
     #drawPredictionPath(context, transform, predictionPath = [], colors) {
@@ -37,22 +39,27 @@ class FlightVisualRenderer {
             return;
         }
 
-        const first = transform.toScreen(trail[0]);
-
         context.save();
-        context.beginPath();
-        context.moveTo(first.x, first.y);
-        trail.slice(1).forEach(point => {
-            const position = transform.toScreen(point);
-            context.lineTo(position.x, position.y);
-        });
-        context.strokeStyle = colors.trail;
         context.lineWidth = Math.max(1, 2 * transform.scale);
         context.lineCap = 'round';
         context.lineJoin = 'round';
         context.shadowBlur = 6 * transform.scale;
         context.shadowColor = colors.trail;
-        context.stroke();
+
+        for (let index = 1; index < trail.length; index += 1) {
+            const from = transform.toScreen(trail[index - 1]);
+            const to = transform.toScreen(trail[index]);
+
+            context.save();
+            context.globalAlpha = index / trail.length;
+            context.beginPath();
+            context.moveTo(from.x, from.y);
+            context.lineTo(to.x, to.y);
+            context.strokeStyle = colors.trail;
+            context.stroke();
+            context.restore();
+        }
+
         context.restore();
     }
 
@@ -63,11 +70,14 @@ class FlightVisualRenderer {
         }
 
         const trail = rocket?.actualTrail || [];
-        const anchorPoints = trail.length > 0 ? trail : [rocket.position];
+        if (trail.length < 5) {
+            return;
+        }
 
         cargo.forEach((item, index) => {
-            const trailIndex = Math.max(0, anchorPoints.length - 1 - (index + 1));
-            const position = transform.toScreen(anchorPoints[trailIndex]);
+            const gap = 8;
+            const trailIndex = Math.max(0, trail.length - 1 - (index + 1) * gap);
+            const position = transform.toScreen(trail[trailIndex]);
             const category = this.#resolveItemCategory(item);
             const color = colors.categories[category];
             if (!color) {
@@ -110,8 +120,8 @@ class FlightVisualRenderer {
         context.restore();
     }
 
-    #drawSonar(context, transform, view, rocket, sonarEnabled, colors) {
-        if (!sonarEnabled || !rocket?.position) {
+    #drawSonar(context, transform, view, rocket, state, colors) {
+        if (!rocket?.position) {
             return;
         }
 
@@ -121,9 +131,22 @@ class FlightVisualRenderer {
         }
 
         const position = transform.toScreen(rocket.position);
-        const phase = (view.timestamp % 2000) / 2000;
+        const duration = 2000;
+        const timestamp = view.timestamp;
+        const isStopping = !state.sonarEnabled && Number.isFinite(state.sonarStopTimestamp);
+        if (!state.sonarEnabled && !isStopping) {
+            return;
+        }
 
-        [phase, (phase + 0.5) % 1].forEach(progress => {
+        [0, 0.5].forEach(offset => {
+            const progress = ((timestamp + offset * duration) % duration) / duration;
+            if (isStopping) {
+                const stopProgress = ((state.sonarStopTimestamp + offset * duration) % duration) / duration;
+                if (progress < stopProgress) {
+                    return;
+                }
+            }
+
             const radius = transform.radius(range * progress);
             const alpha = (1 - progress) * 0.9;
             if (radius <= 0 || alpha <= 0) {

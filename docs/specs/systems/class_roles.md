@@ -29,6 +29,7 @@ graph TD
     GC --> BFC["BuildFlowController"]
     GC --> BSP["BuildScreenPresenter"]
     GC --> SPC["SectorProgressionController"]
+    GC --> NLC["NavigationLoopController"]
     GC --> SS["SessionState (Current Game State)"]
     SS --> IC["ItemContainer (Inventory)"]
     SPC --> SEC["Sector (Current Map)"]
@@ -54,6 +55,7 @@ graph TD
 
     %% Key Cross-domain relations (Dashed lines)
     TP -.->|Use| PE
+    NLC -.->|Use| PE
     UI -.->|Reference| CC
     WR -.->|Sync| CC
 ```
@@ -152,6 +154,14 @@ graph TD
         - 未来の航跡計算。
         - `Rocket` のクローンを作成し、`PhysicsEngine` を用いて指定ティック分ループ実行することでシミュレーションを行う。
         - **計算完了後の `Rocket` クローンを返す**。このクローンが持つ `actualTrail`（移動履歴）が、UI 上での「予測軌道」として利用される。
+- **NavigationLoopController**
+    - 生存期間: Game Lifecycle
+    - 役割: 航行更新ループの実行者。
+    - 責務:
+        - v1 と同じ固定 timestep accumulator 方式で `PhysicsEngine.step()` を呼び出し、航行中の Rocket / Sector 状態を更新する。
+        - 航行中 HUD のスコア表示と WorldRenderer の再描画タイミングを通知する。
+        - `PhysicsEngine.step()` が返す `collision` を監視し、航行終了 callback へ渡す。
+        - 航行結果の精算、記録、画面遷移は担当しない。
 - **EconomySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 経済・取引・抽選ロジックの外部窓口。
@@ -197,7 +207,7 @@ graph TD
     - 責務:
         - プレイ中（ワープ〜航行〜リザルト〜施設〜ゲーム終了）の一連の画面遷移とロジックの統括。
         - 施設入場・施設取引・施設退出など、画面入力からゲーム進行処理への入口を管理する。
-        - 航行中の物理計算、スコア計算、終了判定の実行。
+        - 航行開始時に `NavigationLoopController` を起動し、航行終了後の精算・画面遷移を実行する。
         - セクター進行と契約終了判定は `SectorProgressionController` へ委譲する。
 - **BuildFlowController**
     - 生存期間: Game Lifecycle

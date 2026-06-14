@@ -8,6 +8,7 @@ import EconomySystem from '../systems/logic/EconomySystem.js';
 import FlightRecorder from '../systems/logic/FlightRecorder.js';
 import GameController from '../systems/logic/GameController.js';
 import GameRecordTracker from '../systems/logic/GameRecordTracker.js';
+import NavigationLoopController from '../systems/logic/NavigationLoopController.js';
 import PhysicsEngine from '../systems/logic/PhysicsEngine.js';
 import RankTracker from '../systems/logic/RankTracker.js';
 import StorySystem from '../systems/logic/StorySystem.js';
@@ -81,6 +82,12 @@ class AppOrchestrator {
         );
         const flightRecorder = new FlightRecorder(this.gameDataRepository);
         const physicsEngine = new PhysicsEngine(this.gameDataRepository);
+        const navigationLoopController = new NavigationLoopController({
+            physicsEngine,
+            gameDataRepository: this.gameDataRepository,
+            uiController: this.uiController,
+            worldRenderer: this.worldRenderer
+        });
         const trajectoryPredictor = new TrajectoryPredictor(physicsEngine);
         const cameraController = new CameraController(this.gameDataRepository);
         const backgroundManager = new BackgroundManager();
@@ -94,6 +101,7 @@ class AppOrchestrator {
             achievementTracker,
             flightRecorder,
             physicsEngine,
+            navigationLoopController,
             trajectoryPredictor,
             cameraController,
             backgroundManager

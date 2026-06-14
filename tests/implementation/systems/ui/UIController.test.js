@@ -108,12 +108,14 @@ describe('UIController', () => {
 
     it('renders the flight result screen and hides active play UI', () => {
         const controller = new UIController({ gameDataRepository: repository, soundController });
+        document.querySelector('#inventory-panel').classList.remove('state-collapsed');
 
         controller.showResultScreen(createViewData());
 
         expect(document.querySelector('#flight-result-screen').hidden).toBe(false);
         expect(document.querySelector('#play-hud').hidden).toBe(true);
         expect(document.querySelector('#inventory-panel').hidden).toBe(true);
+        expect(document.querySelector('#inventory-panel').classList.contains('state-collapsed')).toBe(true);
         expect(document.querySelector('#launch-control').hidden).toBe(true);
         expect(document.querySelector('#flight-result-screen').textContent).toContain('SECTOR 3 COMPLETED');
         expect(document.querySelector('#flight-result-screen').textContent).toContain('Goal Bonus');
@@ -210,6 +212,7 @@ describe('UIController', () => {
 
         expect(document.querySelector('#facility-screen').hidden).toBe(false);
         expect(document.querySelector('#flight-result-screen').hidden).toBe(true);
+        expect(document.querySelector('#inventory-panel').classList.contains('state-collapsed')).toBe(true);
         expect(document.querySelector('#facility-screen').textContent).toContain('TRADING POST');
         expect(document.querySelector('#facility-screen').textContent).toContain('Long Sensor');
         expect(document.querySelector('#facility-screen').textContent).toContain('120 c');
@@ -222,6 +225,7 @@ describe('UIController', () => {
         const controller = new UIController({ gameDataRepository: repository, soundController });
         const startHandler = vi.fn();
         const sessionState = { sectorNumber: 0, totalScore: 0, coins: 120 };
+        document.querySelector('#inventory-panel').classList.add('state-collapsed');
 
         controller.setStartHandler(startHandler);
         document.querySelector('#start-game-btn').click();
@@ -242,6 +246,7 @@ describe('UIController', () => {
         expect(document.querySelector('#play-hud').classList.contains('state-hidden')).toBe(false);
         expect(document.querySelector('#inventory-panel').hidden).toBe(false);
         expect(document.querySelector('#inventory-panel').classList.contains('state-hidden')).toBe(false);
+        expect(document.querySelector('#inventory-panel').classList.contains('state-collapsed')).toBe(false);
     });
 
     it('switches to a sector transition screen before build controls are available', () => {

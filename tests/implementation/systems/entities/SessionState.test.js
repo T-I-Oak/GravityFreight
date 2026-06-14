@@ -28,6 +28,7 @@ describe('SessionState', () => {
         expect(session.totalFlightTicks).toBe(0);
         expect(session.collectedItemCount).toBe(0);
         expect(session.blackMarketVisits).toBe(0);
+        expect(session.returnBonus).toBe(0);
         expect(session.coins).toBe(0);
         expect(session.inventory).toBeInstanceOf(ItemContainer);
         expect(session.inventory.getItemsByCategory('chassis')).toHaveLength(2);
@@ -82,6 +83,20 @@ describe('SessionState', () => {
         expect(session.inventory.getItemsByCategory('coin')).toHaveLength(1);
         expect(session.inventory.getItemsByCategory('cargo')).toHaveLength(1);
         expect(target.addItems).toHaveBeenCalledWith(lostItems);
+    });
+
+    it('increases return bonus after home return and resets it on next sector', () => {
+        const session = new SessionState(repository);
+        session.initialize();
+
+        session.applySettlement({ status: 'returned' });
+        session.applySettlement({ status: 'returned' });
+
+        expect(session.returnBonus).toBeCloseTo(0.2);
+
+        session.incrementSector();
+
+        expect(session.returnBonus).toBe(0);
     });
 
     it('applies transaction asset changes in one place and returns record deltas', () => {

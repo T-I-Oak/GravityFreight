@@ -32,11 +32,20 @@ function createCanvas() {
         lineJoin: ''
     };
     let strokeStyle = '';
+    let globalAlpha = 1;
     Object.defineProperty(context, 'strokeStyle', {
         get: () => strokeStyle,
         set: value => {
             strokeStyle = value;
             context.strokeStyles.push(value);
+        }
+    });
+    context.globalAlphas = [];
+    Object.defineProperty(context, 'globalAlpha', {
+        get: () => globalAlpha,
+        set: value => {
+            globalAlpha = value;
+            context.globalAlphas.push(value);
         }
     });
     const canvas = {
@@ -404,6 +413,13 @@ describe('WorldRenderer', () => {
             angle: 0,
             actualTrail: [
                 { x: 0, y: 0 },
+                { x: 4, y: 8 },
+                { x: 8, y: 16 },
+                { x: 12, y: 24 },
+                { x: 16, y: 32 },
+                { x: 20, y: 40 },
+                { x: 24, y: 48 },
+                { x: 28, y: 56 },
                 { x: 10, y: 20 },
                 { x: 30, y: 40 }
             ],
@@ -422,10 +438,12 @@ describe('WorldRenderer', () => {
         expect(camera.toScreen).toHaveBeenCalledWith({ x: 30, y: 40 });
         expect(context.moveTo).toHaveBeenCalledWith(320, 240);
         expect(context.lineTo).toHaveBeenCalledWith(330, 260);
+        expect(context.globalAlphas).toContain(0.1);
+        expect(context.globalAlphas).toContain(0.9);
         expect(context.translate).toHaveBeenCalledWith(350, 280);
         expect(context.rotate).toHaveBeenCalledWith(Math.PI / 4);
         expect(context.arc).toHaveBeenCalledWith(350, 280, 80, 0, Math.PI * 2);
-        expect(context.arc).toHaveBeenCalledWith(330, 260, 8, 0, Math.PI * 2);
+        expect(context.arc).toHaveBeenCalledWith(324, 248, 8, 0, Math.PI * 2);
         expect(context.arc).toHaveBeenCalledWith(320, 240, 8, 0, Math.PI * 2);
     });
 
@@ -488,5 +506,214 @@ describe('WorldRenderer', () => {
 
         expect(context.translate).toHaveBeenCalledWith(360, 240);
         expect(context.arc).toHaveBeenCalledWith(360, 240, 40, 0, Math.PI * 2);
+    });
+
+    it('keeps existing sonar ripples after disabling sonar until they naturally finish', async () => {
+        vi.stubGlobal('performance', { now: vi.fn(() => 1000) });
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+        const rocket = {
+            position: { x: 40, y: 0 },
+            velocity: { x: 8, y: 0 },
+            angle: 0,
+            actualTrail: [],
+            heldCargo: [],
+            getCollectionRange: vi.fn(() => 80)
+        };
+
+        await renderer.initialize(canvas);
+        renderer.setSector({ exits: [], bodies: [] });
+        renderer.startNavigation(rocket);
+        renderer.enableSonar();
+        renderer.disableSonar();
+
+        vi.stubGlobal('performance', { now: vi.fn(() => 1500) });
+        renderer.render();
+
+        expect(context.arc).toHaveBeenCalledWith(360, 240, 60, 0, Math.PI * 2);
+    });
+
+    it('stops drawing sonar ripples after the disabled ripples have completed one cycle', async () => {
+        vi.stubGlobal('performance', { now: vi.fn(() => 1000) });
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+        const rocket = {
+            position: { x: 40, y: 0 },
+            velocity: { x: 8, y: 0 },
+            angle: 0,
+            actualTrail: [],
+            heldCargo: [],
+            getCollectionRange: vi.fn(() => 80)
+        };
+
+        await renderer.initialize(canvas);
+        renderer.setSector({ exits: [], bodies: [] });
+        renderer.startNavigation(rocket);
+        renderer.enableSonar();
+        renderer.disableSonar();
+        context.arc.mockClear();
+
+        vi.stubGlobal('performance', { now: vi.fn(() => 3100) });
+        renderer.render();
+
+        expect(context.arc).not.toHaveBeenCalledWith(360, 240, expect.any(Number), 0, Math.PI * 2);
+    });
+
+    it('continues finish animation with fixed rocket position until trail and cargo converge', async () => {
+        const frameCallbacks = [];
+        vi.stubGlobal('performance', { now: vi.fn(() => 0) });
+        vi.stubGlobal('requestAnimationFrame', vi.fn(callback => {
+            frameCallbacks.push(callback);
+            return frameCallbacks.length;
+        }));
+        const { canvas } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const renderer = createRenderer({ backgroundManager });
+        const rocket = {
+            position: { x: 30, y: 40 },
+            velocity: { x: 8, y: 0 },
+            angle: 0,
+            actualTrail: [
+                { x: 0, y: 0 },
+                { x: 10, y: 10 }
+            ],
+            heldCargo: [{ category: 'cargo' }],
+            getCollectionRange: vi.fn(() => 80),
+            recordTrailPoint: vi.fn(function recordTrailPoint(point) {
+                rocket.actualTrail.push({ ...point });
+            })
+        };
+
+        await renderer.initialize(canvas);
+        frameCallbacks.length = 0;
+        renderer.setSector({ exits: [], bodies: [] });
+        renderer.startNavigation(rocket);
+
+        const finish = renderer.playFinishAnimation();
+        frameCallbacks.shift()(0);
+        frameCallbacks.shift()(1000);
+        frameCallbacks.shift()(2000);
+        await finish;
+
+        expect(rocket.recordTrailPoint).toHaveBeenCalledWith({ x: 30, y: 40 });
+        expect(rocket.position).toEqual({ x: 30, y: 40 });
+        expect(backgroundManager.render.mock.calls.length).toBeGreaterThan(3);
+    });
+
+    it('hides the rocket body during finish animation while keeping trail and cargo rendering', async () => {
+        const frameCallbacks = [];
+        vi.stubGlobal('performance', { now: vi.fn(() => 0) });
+        vi.stubGlobal('requestAnimationFrame', vi.fn(callback => {
+            frameCallbacks.push(callback);
+            return frameCallbacks.length;
+        }));
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const renderer = createRenderer({ backgroundManager });
+        const rocket = {
+            position: { x: 30, y: 40 },
+            velocity: { x: 8, y: 0 },
+            angle: 0,
+            actualTrail: [
+                { x: 0, y: 0 },
+                { x: 10, y: 10 },
+                { x: 20, y: 20 },
+                { x: 30, y: 40 },
+                { x: 30, y: 40 }
+            ],
+            heldCargo: [{ category: 'cargo' }],
+            getCollectionRange: vi.fn(() => 80),
+            recordTrailPoint: vi.fn(function recordTrailPoint(point) {
+                rocket.actualTrail.push({ ...point });
+            })
+        };
+
+        await renderer.initialize(canvas);
+        frameCallbacks.length = 0;
+        renderer.setSector({ exits: [], bodies: [] });
+        renderer.startNavigation(rocket);
+        context.translate.mockClear();
+        context.lineTo.mockClear();
+        context.arc.mockClear();
+
+        const finish = renderer.playFinishAnimation({ type: 'boundary' });
+        frameCallbacks.shift()(0);
+
+        expect(context.translate).not.toHaveBeenCalledWith(350, 280);
+        expect(context.lineTo).toHaveBeenCalled();
+        expect(context.arc).toHaveBeenCalledWith(320, 240, 3, 0, Math.PI * 2);
+
+        frameCallbacks.shift()(2000);
+        await finish;
+    });
+
+    it('clears navigation visuals after finish animation so result map does not redisplay rocket or cargo', async () => {
+        const frameCallbacks = [];
+        vi.stubGlobal('performance', { now: vi.fn(() => 0) });
+        vi.stubGlobal('requestAnimationFrame', vi.fn(callback => {
+            frameCallbacks.push(callback);
+            return frameCallbacks.length;
+        }));
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const renderer = createRenderer({ backgroundManager });
+        const rocket = {
+            position: { x: 30, y: 40 },
+            velocity: { x: 8, y: 0 },
+            angle: 0,
+            actualTrail: [
+                { x: 0, y: 0 },
+                { x: 10, y: 10 },
+                { x: 20, y: 20 },
+                { x: 30, y: 40 },
+                { x: 30, y: 40 }
+            ],
+            heldCargo: [{ category: 'cargo' }],
+            getCollectionRange: vi.fn(() => 80),
+            recordTrailPoint: vi.fn(function recordTrailPoint(point) {
+                rocket.actualTrail.push({ ...point });
+            })
+        };
+
+        await renderer.initialize(canvas);
+        frameCallbacks.length = 0;
+        renderer.setSector({ exits: [], bodies: [] });
+        renderer.startNavigation(rocket);
+
+        const finish = renderer.playFinishAnimation({ type: 'boundary' });
+        frameCallbacks.shift()(0);
+        frameCallbacks.shift()(2000);
+        await finish;
+
+        context.translate.mockClear();
+        context.lineTo.mockClear();
+        context.arc.mockClear();
+        renderer.render();
+
+        expect(context.translate).not.toHaveBeenCalledWith(350, 280);
+        expect(context.lineTo).not.toHaveBeenCalled();
+        expect(context.arc).not.toHaveBeenCalledWith(320, 240, 3, 0, Math.PI * 2);
     });
 });
