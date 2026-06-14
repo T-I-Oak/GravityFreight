@@ -127,11 +127,48 @@ describe('WorldRenderer', () => {
         const renderer = createRenderer({ backgroundManager });
 
         await renderer.initialize(canvas);
+        renderer.startWarpEffect(1400);
+        renderer.stopWarpEffect(1400);
+
+        expect(backgroundManager.startWarpEffect).toHaveBeenCalledWith(1400);
+        expect(backgroundManager.stopWarpEffect).toHaveBeenCalledWith(1400);
+    });
+
+    it('applies map warp scale around the canvas center', async () => {
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [],
+            bodies: [
+                {
+                    position: { x: 10, y: 0 },
+                    radius: 5,
+                    isHome: true,
+                    isRepulsion: false,
+                    items: []
+                }
+            ]
+        });
         renderer.startWarpEffect();
+
+        expect(context.arc).toHaveBeenLastCalledWith(1320, 240, 500, 0, Math.PI * 2);
+
         renderer.stopWarpEffect();
 
-        expect(backgroundManager.startWarpEffect).toHaveBeenCalled();
-        expect(backgroundManager.stopWarpEffect).toHaveBeenCalled();
+        expect(context.arc).toHaveBeenLastCalledWith(330, 240, 5, 0, Math.PI * 2);
     });
 
     it('keeps rendering on requestAnimationFrame so the background can animate', async () => {

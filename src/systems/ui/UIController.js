@@ -34,6 +34,8 @@ class UIController {
         this.launchControl = this.document.querySelector('#launch-control');
         this.launchButton = this.document.querySelector('#launch-btn');
         this.mapCanvas = this.document.querySelector('#gameCanvas');
+        this.sectorNotification = this.document.querySelector('#sector-notification');
+        this.sectorNotificationTimer = null;
         this.mapInputController = options.mapInputController || new MapInputController({
             document: this.document,
             canvas: this.mapCanvas
@@ -84,6 +86,42 @@ class UIController {
         } else {
             this.#hide(this.launchControl);
         }
+    }
+
+    showSectorTransitionScreen() {
+        this.hideStarInfo();
+        this.#hide(this.titleScreen);
+        this.#hide(this.resultScreen);
+        this.#hide(this.facilityScreen);
+        this.#show(this.playScene);
+        this.#show(this.hud);
+        this.#hide(this.buildPanel);
+        this.#hide(this.launchControl);
+    }
+
+    showSectorTitle(sectorNumber, isAnomaly = false) {
+        if (!this.sectorNotification) {
+            return;
+        }
+
+        this.sectorNotification.textContent = isAnomaly
+            ? `ANOMALY SECTOR ${sectorNumber} READY`
+            : `SECTOR ${sectorNumber} READY`;
+        this.sectorNotification.classList.remove('state-hidden', 'state-active', 'state-anomaly');
+        if (isAnomaly) {
+            this.sectorNotification.classList.add('state-anomaly');
+        }
+
+        void this.sectorNotification.offsetWidth;
+        this.sectorNotification.classList.add('state-active');
+        if (this.sectorNotificationTimer) {
+            clearTimeout(this.sectorNotificationTimer);
+        }
+        this.sectorNotificationTimer = setTimeout(() => {
+            this.sectorNotification?.classList.add('state-hidden');
+            this.sectorNotification?.classList.remove('state-active', 'state-anomaly');
+            this.sectorNotificationTimer = null;
+        }, 3500);
     }
 
     initHUD(sessionState) {
@@ -435,6 +473,7 @@ class UIController {
     #formatNumber(value) {
         return new Intl.NumberFormat('en-US').format(value ?? 0);
     }
+
 }
 
 export default UIController;

@@ -190,6 +190,62 @@
     min-height: 0;
 }
 
+#sector-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 10000;
+    max-width: 95vw;
+    color: rgba(255, 255, 255, 0.95);
+    font-family: var(--font-num);
+    font-size: clamp(1.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    letter-spacing: clamp(0.2rem, 1.2vw, 0.8rem);
+    text-shadow:
+        0 0 10px rgba(0, 240, 255, 0.8),
+        0 0 20px rgba(0, 240, 255, 0.4),
+        0 0 40px rgba(0, 240, 255, 0.2);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+#sector-notification.state-active {
+    animation: sector-toast 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+#sector-notification.state-anomaly {
+    text-shadow:
+        0 0 10px rgba(225, 0, 255, 0.8),
+        0 0 20px rgba(225, 0, 255, 0.4),
+        0 0 40px rgba(225, 0, 255, 0.2);
+}
+
+@keyframes sector-toast {
+    0% {
+        opacity: 0;
+        filter: blur(15px);
+        transform: translate(-50%, -60%) scale(0.9);
+    }
+    15% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    85% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        filter: blur(5px);
+        transform: translate(-50%, -45%) scale(1.05);
+    }
+}
+
 
 /* Large Action Buttons: Specialized branding for critical mission phases */
 #play-screen .launch { --current-color: var(--color-category-launchers); }

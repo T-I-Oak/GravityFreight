@@ -3,6 +3,8 @@ import CanvasColorPalette from './CanvasColorPalette.js';
 import FlightVisualRenderer from './FlightVisualRenderer.js';
 
 const WORLD_VIEW_SCALE = 0.5;
+const WARP_OUT_SCALE = 100;
+const WARP_IN_START_SCALE = 0.01;
 
 const FACILITY_LABELS = {
     TRADING_POST: 'TRADING POST',
@@ -25,6 +27,11 @@ class WorldRenderer {
         this.aimRocket = null;
         this.predictionPath = [];
         this.sonarEnabled = false;
+        this.mapWarp = {
+            scale: 1,
+            alpha: 1,
+            transition: null
+        };
     }
 
     async initialize(canvas, camera = this.camera, backgroundManager = this.backgroundManager) {
@@ -106,12 +113,16 @@ class WorldRenderer {
 
         this.#fitCanvas();
         const colors = this.colorPalette.createWorldColors();
-        this.backgroundManager.update?.(this.#consumeDeltaSeconds());
+        const deltaSeconds = this.#consumeDeltaSeconds();
+        this.backgroundManager.update?.(deltaSeconds);
+        this.#updateMapWarp(deltaSeconds);
         this.backgroundManager.render(this.context, this.#getView());
         if (!this.targetSector) {
             return;
         }
 
+        this.context.save();
+        this.context.globalAlpha *= this.mapWarp.alpha;
         this.#drawBoundary(colors);
         this.#drawExits(colors);
         this.#drawBodies(colors);
@@ -120,15 +131,32 @@ class WorldRenderer {
             predictionPath: this.predictionPath,
             sonarEnabled: this.sonarEnabled
         }, colors);
+        this.context.restore();
     }
 
-    startWarpEffect() {
-        this.backgroundManager.startWarpEffect();
+    startWarpEffect(duration = 0) {
+        this.backgroundManager.startWarpEffect(duration);
+        this.#setMapWarpTransition({
+            fromScale: this.mapWarp.scale,
+            toScale: WARP_OUT_SCALE,
+            fromAlpha: this.mapWarp.alpha,
+            toAlpha: 0,
+            duration,
+            easing: progress => progress ** 3
+        });
         this.render();
     }
 
-    stopWarpEffect() {
-        this.backgroundManager.stopWarpEffect();
+    stopWarpEffect(duration = 0) {
+        this.backgroundManager.stopWarpEffect(duration);
+        this.#setMapWarpTransition({
+            fromScale: WARP_IN_START_SCALE,
+            toScale: 1,
+            fromAlpha: 1,
+            toAlpha: 1,
+            duration,
+            easing: progress => 1 - ((1 - progress) ** 3)
+        });
         this.render();
     }
 
@@ -180,17 +208,18 @@ class WorldRenderer {
     }
 
     #createTransform() {
+        const warpScale = this.mapWarp.scale;
         if (this.camera) {
             return {
-                scale: this.camera.zoomLevel,
+                scale: this.camera.zoomLevel * warpScale,
                 rotation: this.camera.rotation ?? 0,
-                toScreen: point => this.camera.toScreen(point),
-                radius: value => value * this.camera.zoomLevel
+                toScreen: point => this.#applyMapWarp(this.camera.toScreen(point)),
+                radius: value => value * this.camera.zoomLevel * warpScale
             };
         }
 
         return {
-            scale: WORLD_VIEW_SCALE,
+            scale: WORLD_VIEW_SCALE * warpScale,
             rotation: 0,
             centerX: this.canvas.width / 2,
             centerY: this.canvas.height / 2,
@@ -204,6 +233,61 @@ class WorldRenderer {
                 return value * this.scale;
             }
         };
+    }
+
+    #applyMapWarp(point) {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+
+        return {
+            x: centerX + (point.x - centerX) * this.mapWarp.scale,
+            y: centerY + (point.y - centerY) * this.mapWarp.scale
+        };
+    }
+
+    #setMapWarpTransition({ fromScale, toScale, fromAlpha, toAlpha, duration, easing }) {
+        if (!duration || duration <= 0) {
+            this.mapWarp.scale = toScale;
+            this.mapWarp.alpha = toAlpha;
+            this.mapWarp.transition = null;
+            return;
+        }
+
+        this.mapWarp.scale = fromScale;
+        this.mapWarp.alpha = fromAlpha;
+        this.mapWarp.transition = {
+            fromScale,
+            toScale,
+            fromAlpha,
+            toAlpha,
+            elapsed: 0,
+            duration: duration / 1000,
+            easing
+        };
+    }
+
+    #updateMapWarp(deltaSeconds) {
+        if (!this.mapWarp.transition || deltaSeconds <= 0) {
+            return;
+        }
+
+        const transition = this.mapWarp.transition;
+        transition.elapsed += deltaSeconds;
+        const progress = Math.min(1, transition.elapsed / transition.duration);
+        const eased = transition.easing(progress);
+
+        this.mapWarp.scale = this.#lerp(transition.fromScale, transition.toScale, eased);
+        this.mapWarp.alpha = this.#lerp(transition.fromAlpha, transition.toAlpha, eased);
+
+        if (progress >= 1) {
+            this.mapWarp.scale = transition.toScale;
+            this.mapWarp.alpha = transition.toAlpha;
+            this.mapWarp.transition = null;
+        }
+    }
+
+    #lerp(from, to, progress) {
+        return from + (to - from) * progress;
     }
 
     #drawBoundary(colors) {

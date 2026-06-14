@@ -20,11 +20,18 @@ describe('GameController', () => {
         expect(context.uiController.setBuildAssembleHandler).toHaveBeenCalled();
         expect(context.uiController.setLaunchHandler).toHaveBeenCalled();
         expect(context.uiController.setCanvasInputHandler).toHaveBeenCalled();
+        expect(context.uiController.showSectorTransitionScreen).toHaveBeenCalled();
+        expect(context.worldRenderer.startWarpEffect).toHaveBeenCalledWith(0);
         expect(context.sessionState.sectorNumber).toBe(1);
         expect(context.sectorFactory).toHaveBeenCalledWith({
             sessionState: context.sessionState,
             isAnomaly: false
         });
+        expect(context.worldRenderer.startWarpEffect.mock.invocationCallOrder[0])
+            .toBeLessThan(context.sectorFactory.mock.invocationCallOrder[0]);
+        expect(context.sectorFactory.mock.invocationCallOrder[0])
+            .toBeLessThan(context.worldRenderer.stopWarpEffect.mock.invocationCallOrder[0]);
+        expect(context.worldRenderer.stopWarpEffect).toHaveBeenCalledWith(0);
         expect(context.worldRenderer.setSector).toHaveBeenCalledWith(context.controller.currentSector);
         expect(context.uiController.showBuildScreen).toHaveBeenCalled();
         const buildViewData = context.uiController.showBuildScreen.mock.calls.at(-1)[0];
