@@ -109,8 +109,9 @@
         4. 2本指操作から通知される `pinch` は、中心点移動をパン、距離比をズームとして扱う。
         5. AIM はポインタのスクリーン座標を `CameraController.toWorld()` でワールド座標へ変換し、母星中心からの角度を現在の発射角度として保持する。発射時はこの角度を `Rocket` 生成へ渡し、初期位置を母星中心から `home.radius + gameBalance.SHIP_START_OFFSET` world px の位置に設定する。
         6. AIM 可能状態では、選択中の RocketItem / Launcher / Booster を inventory から消費せずに参照し、プレビュー用 `Rocket` を生成する。`WorldRenderer.setAimRocket(previewRocket)` と `WorldRenderer.enableSonar()` を呼び出し、AIM 中のロケット本体とソナーを常時表示する。
-        7. `TrajectoryPredictor.predictPath(previewRocket, currentSector)` の結果から `actualTrail` を取り出し、発射位置を先頭に加えた座標列を `WorldRenderer.setPredictionPath()` へ渡す。AIM 可能状態の間、予測線は常に表示対象とする。AIM 可能状態で `actualTrail` が空になる場合は、予測計算またはパーツ性能定義の不整合として扱い、代替線で隠蔽しない。
-        8. `hover` は `CameraController.toWorld()` でワールド座標へ変換し、`CelestialBody` の半径に `mapConstants.STAR_HIT_MARGIN` を加味して対象天体を判定する。対象天体が item を保持している場合のみ `UIController.showStarInfo(body, displayPoint)` を呼び出し、それ以外は `UIController.hideStarInfo()` を呼び出す。`hoverleave` では必ず非表示にする。
+        7. プレビュー用 `Rocket` の初速は `Rocket.getInitialVelocity(sessionState.returnBonus)` で算出し、同一セクター内の帰還ボーナスを AIM 予測へ反映する。
+        8. `TrajectoryPredictor.predictPath(previewRocket, currentSector)` の結果から `actualTrail` を取り出し、発射位置を先頭に加えた座標列を `WorldRenderer.setPredictionPath()` へ渡す。AIM 可能状態の間、予測線は常に表示対象とする。AIM 可能状態で `actualTrail` が空になる場合は、予測計算またはパーツ性能定義の不整合として扱い、代替線で隠蔽しない。
+        9. `hover` は `CameraController.toWorld()` でワールド座標へ変換し、`CelestialBody` の半径に `mapConstants.STAR_HIT_MARGIN` を加味して対象天体を判定する。対象天体が item を保持している場合のみ `UIController.showStarInfo(body, displayPoint)` を呼び出し、それ以外は `UIController.hideStarInfo()` を呼び出す。`hoverleave` では必ず非表示にする。
     - **責務境界**: ブラウザイベントの購読や2本指入力の正規化は `UIController`、座標変換・パン・回転・ズームの実計算は `CameraController`、描画更新は `WorldRenderer` の責務とする。
 
 - **`beginSectorTransition(): Promise<void>`**
@@ -125,17 +126,17 @@
         - **`this.currentSector = new Sector(sessionState, isAnomaly)`** を実行して新マップを生成。
         - `SessionState.reachedSector` が更新された場合は、`GameRecordTracker.recordSectorStart(sessionState)` を呼び出し、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['max_reached_sector'] })` を呼び出す。
     3. **同期**: HUDの数値表示（セクター番号等）を最新状態に更新し、`worldRenderer` への新マップセット、セクタータイトル表示を行う。
-    4. **演出終了**: 各演出を停止し、完了後に `BuildFlowController.showBuildScreen()` を実行。`uiController.setFlightMode(false)` で操作を有効化する。
+    4. **演出終了**: 各演出の完了後に `uiController.setFlightMode(false)` で操作ロックを解除し、`BuildFlowController.showBuildScreen()` を実行する。ビルドパネルはワープ演出中には表示せず、このタイミングで初めて表示する。
 
 - **`launchRocket(rocket: Rocket, angle: number): void`**
     - 航行シーケンスを開始する。
     - **内部挙動**:
-        1. **発射状態の確定**: `Rocket.getInitialVelocity()` で初速を算出し、`rocket.velocity` へ反映する。
+        1. **発射状態の確定**: `Rocket.getInitialVelocity(sessionState.returnBonus)` で初速を算出し、`rocket.velocity` へ反映する。これにより、同一セクター内の母星帰還で蓄積された発射パワーボーナスを実航行に適用する。
         2. **発射時 snapshot 記録**: 発射角度、初速、発射構成、セクター状態が確定した直後に `FlightRecorder.captureLaunchSnapshot(rocket, currentSector)` を呼び出す。
         3. **UIモード遷移**: `uiController.setFlightMode(true)` を実行し、ビルドパネルをロックする。
         4. **描画開始**: `worldRenderer.startNavigation(rocket)` を実行。
         5. **ソナー開始**: `worldRenderer.enableSonar()` を実行し、波紋の生成を継続する（AIM状態から継続）。
-        6. **ループ開始**: メインループでの `this.updateFlight()` の呼び出しを有効化。
+        6. **ループ開始**: `NavigationLoopController.start({ rocket, sector: currentSector, onNavigationEnd })` を呼び出し、航行更新ループを開始する。
 
 - **`launchSelectedRocket(): Rocket`**
     - FLIGHT タブで選択済みの発射構成から `Rocket` を生成し、`launchRocket()` へ渡す。
@@ -149,29 +150,27 @@
         7. `BuildFlowController.showBuildScreen()` で消費後の inventory と launch button 状態を再描画する。
         8. `launchRocket(rocket)` を呼び出し、生成した `Rocket` を返す。
 
-- **`updateFlight(dt: number): void`**
-    - 航行中の更新処理（メインループから毎フレーム呼び出し）。物理計算、状態更新、および成功・失敗の判定監視を行う。
-    - **内部挙動**:
-        1. **物理更新**: `PhysicsEngine.step(currentRocket, currentSector)` を実行し、結果オブジェクト（`stepResult`）を受け取る。
-        2. **HUD更新（毎フレーム）**: `stepResult.ticks` に基づき、`uiController.updateHUDValue` を通じてスコアを通知する。
-        3. **終了判定**: `stepResult.collision` が存在する場合、ループを停止し `handleNavigationEnd(stepResult.collision)` を呼び出す。
+- **航行更新ループ**
+    - 航行中の物理更新、HUD 更新、終了判定の監視は `NavigationLoopController` へ委譲する。
+    - `GameController` は航行開始時の状態確定と、`handleNavigationEnd()` による航行終了後の進行処理を担当する。
 
 - **`handleNavigationEnd(result: object): Promise<void>`**
     - 航行フェーズの終了処理（報酬計算、演出実行、画面遷移）を統括する。
     - **内部挙動**:
-        1. **成果データの確定**:
+        1. **ループ停止**: `NavigationLoopController.stop()` を呼び出し、航行更新ループを停止する。
+        2. **成果データの確定**:
             - `const flightData = currentRocket.getFlightResult()` を取得。
             - `const settlement = EconomySystem.calculateSettlement(result, flightData, sessionState)` を実行。
-        2. **状態反映（アトミック）**:
+        3. **状態反映（アトミック）**:
             - `sessionState.applySettlement(settlement)` を実行し、資産を確定させる。
             - **物語解放**: `settlement.unlockedBranchId` が存在する場合、その ID を用いて `StorySystem.unlockNextStep(id)` を実行する。
             - **リプレイ記録**: 航行単位のリプレイ記録は、この航行終了処理内で `FlightRecorder.recordFlightResult(resultContext)` を呼び出して確定する。`resultContext` には航行終了時メタ情報のみを含め、発射時 snapshot は `FlightRecorder` が保持している `pendingRecordDraft` を使用する。
             - **実績記録**: 航行終了時点で `GameRecordTracker.recordFlightResult(resultContext)` を必ず呼び出す。その後、航行終了時に更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
-        3. **演出開始**:
+        4. **演出開始**:
             - `worldRenderer.disableSonar()`。
             - `worldRenderer.playFinishAnimation(result)` を実行。
-        4. **演出完了待機**: `await` により演出完了を待機する。
-        5. **画面遷移**:
+        5. **演出完了待機**: `await` により演出完了を待機する。
+        6. **画面遷移**:
             - `settlement`、リプレイ保存状態、実績通知、ストーリー状態から航行結果表示用 view data を生成する。
             - 航行結果タイトルと遷移ボタン文言は `GameDataRepository.getUiText()` で UI resource から取得する。セクター番号や施設名が必要な文言は取得後に `{sector}` / `{facility}` を置換する。
             - `uiController.showResultScreen(viewData)` を呼び出す。

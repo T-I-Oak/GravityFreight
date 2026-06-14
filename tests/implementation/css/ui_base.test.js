@@ -8,6 +8,9 @@ describe('ui_base.css', () => {
         expect(css).toContain('.state-hidden.state-hidden,');
         expect(css).toContain('[hidden][hidden]');
         expect(css).toContain('#title-screen.state-hidden');
+        expect(css).toContain('#play-scene-container.state-hidden');
+        expect(css).toContain('#play-hud.state-hidden');
+        expect(css).toContain('#inventory-panel.state-hidden');
         expect(css).toContain('display: none;');
         expect(css).not.toContain('display: none !important;');
     });

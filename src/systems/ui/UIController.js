@@ -79,6 +79,7 @@ class UIController {
         this.#hide(this.facilityScreen);
         this.#show(this.playScene);
         this.#show(this.hud);
+        this.#openBuildPanel();
         this.#show(this.buildPanel);
         if (viewData) {
             this.#renderBuildView(viewData);
@@ -156,6 +157,7 @@ class UIController {
 
     showResultScreen(viewData) {
         this.hideStarInfo();
+        this.#closeBuildPanel();
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
         this.#hide(this.launchControl);
@@ -169,6 +171,7 @@ class UIController {
 
     showFacilityScreen(type, viewData) {
         this.hideStarInfo();
+        this.#closeBuildPanel();
         this.#hide(this.resultScreen);
         this.#hide(this.hud);
         this.#hide(this.buildPanel);
@@ -421,6 +424,14 @@ class UIController {
                 }
             });
         });
+    }
+
+    #openBuildPanel() {
+        this.buildPanel?.classList.remove('state-collapsed');
+    }
+
+    #closeBuildPanel() {
+        this.buildPanel?.classList.add('state-collapsed');
     }
 
     #setResultOperationHandler(selector, handler) {

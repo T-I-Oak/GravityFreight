@@ -32,8 +32,11 @@ describe('GameController', () => {
         expect(context.sectorFactory.mock.invocationCallOrder[0])
             .toBeLessThan(context.worldRenderer.stopWarpEffect.mock.invocationCallOrder[0]);
         expect(context.worldRenderer.stopWarpEffect).toHaveBeenCalledWith(0);
+        expect(context.worldRenderer.stopWarpEffect.mock.invocationCallOrder[0])
+            .toBeLessThan(context.uiController.showBuildScreen.mock.invocationCallOrder[0]);
         expect(context.worldRenderer.setSector).toHaveBeenCalledWith(context.controller.currentSector);
         expect(context.uiController.showBuildScreen).toHaveBeenCalled();
+        expect(context.uiController.setFlightMode).toHaveBeenCalledWith(false);
         const buildViewData = context.uiController.showBuildScreen.mock.calls.at(-1)[0];
         expect(buildViewData.sections.launcher.entries).toHaveLength(2);
         expect(buildViewData.sections.chassis.entries).toHaveLength(1);
@@ -77,6 +80,7 @@ describe('GameController', () => {
             launcher: 'stack_launcher_ready',
             booster: 'stack_booster_ready'
         };
+        context.sessionState.returnBonus = 0.3;
         const handler = context.uiController.setLaunchHandler.mock.calls.at(-1)[0];
 
         const rocket = handler();
@@ -84,6 +88,8 @@ describe('GameController', () => {
         expect(rocket.rocketItem).toBe(context.rocketItem);
         expect(rocket.launcher).toBe(context.readyLauncher);
         expect(rocket.booster).toBe(context.boosterItem);
+        expect(rocket.velocity.x).toBeCloseTo(18.72);
+        expect(rocket.velocity.y).toBeCloseTo(0);
         expect(context.controller.currentRocket).toBe(rocket);
         expect(context.readyLauncher.consumeCharge).not.toHaveBeenCalled();
         expect(context.sessionState.inventory.addItem).toHaveBeenCalledWith(context.readyLauncher);
@@ -96,6 +102,11 @@ describe('GameController', () => {
         expect(context.uiController.setFlightMode).toHaveBeenCalledWith(true);
         expect(context.worldRenderer.startNavigation).toHaveBeenCalledWith(rocket);
         expect(context.worldRenderer.enableSonar).toHaveBeenCalled();
+        expect(context.navigationLoopController.start).toHaveBeenCalledWith({
+            rocket,
+            sector: context.controller.currentSector,
+            onNavigationEnd: expect.any(Function)
+        });
         expect(context.controller.buildFlowController.currentBuildSelection.rocket).toBeUndefined();
         expect(context.controller.buildFlowController.currentBuildSelection.launcher).toBeUndefined();
         expect(context.controller.buildFlowController.currentBuildSelection.booster).toBeUndefined();
@@ -113,6 +124,7 @@ describe('GameController', () => {
         expect(context.flightRecorder.captureLaunchSnapshot).not.toHaveBeenCalled();
         expect(context.uiController.setFlightMode).not.toHaveBeenCalledWith(true);
         expect(context.worldRenderer.startNavigation).not.toHaveBeenCalled();
+        expect(context.navigationLoopController.start).not.toHaveBeenCalled();
     });
 
     it('pans the camera from map pointer drags inside the map area', async () => {
@@ -250,6 +262,7 @@ describe('GameController', () => {
 
     it('updates the predicted trajectory during AIM without consuming selected flight parts', async () => {
         await context.controller.start();
+        context.sessionState.returnBonus = 0.2;
         context.controller.buildFlowController.currentBuildSelection = {
             rocket: 'stack_rocket_ready',
             launcher: 'stack_launcher_ready',
@@ -266,7 +279,8 @@ describe('GameController', () => {
                 rocketItem: context.rocketItem,
                 launcher: context.readyLauncher,
                 booster: context.boosterItem,
-                position: { x: 52, y: 0 }
+                position: { x: 52, y: 0 },
+                velocity: expect.objectContaining({ x: expect.closeTo(17.28) })
             }),
             context.controller.currentSector
         );
@@ -307,6 +321,7 @@ describe('GameController', () => {
         const viewData = await context.controller.handleNavigationEnd(collision);
 
         expect(context.currentRocket.getFlightResult).toHaveBeenCalled();
+        expect(context.navigationLoopController.stop).toHaveBeenCalled();
         expect(context.economySystem.calculateSettlement).toHaveBeenCalledWith(
             collision,
             expect.objectContaining({ ticks: 260 }),

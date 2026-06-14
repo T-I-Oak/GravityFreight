@@ -41,6 +41,7 @@ class PhysicsEngine {
         const oldPos = copyVector(rocket.position);
         const oldVel = copyVector(rocket.velocity);
         const acceleration = this.#calculateAcceleration(rocket, sector);
+        rocket.advanceGravityEffectTick();
         const dt = this.#getTickSeconds();
         const newVel = addVectors(oldVel, scaleVector(acceleration, dt));
         const newPos = addVectors(oldPos, scaleVector(newVel, dt));
@@ -65,7 +66,7 @@ class PhysicsEngine {
     }
 
     #calculateAcceleration(rocket, sector) {
-        const gravityField = sector.bodies.reduce((total, body) => {
+        const gravityField = this.#getActiveBodies(rocket, sector).reduce((total, body) => {
             if (distanceSquared(body.position, rocket.position) < SINGULARITY_DISTANCE_SQUARED) {
                 return total;
             }
@@ -78,7 +79,10 @@ class PhysicsEngine {
         const referenceMass = balance.DEFAULT_SHIP_MASS ?? 10;
         const rocketMass = this.#getRocketMass(rocket, referenceMass);
         const sectorScale = 1 + (sector.sectorNumber - 1) * (balance.GRAVITY_SCALING_FACTOR ?? 0.02);
-        const accelerationScale = GRAVITY_G * (referenceMass / rocketMass) * sectorScale;
+        const accelerationScale = GRAVITY_G
+            * (referenceMass / rocketMass)
+            * sectorScale
+            * rocket.getGravityMultiplier();
 
         if (config.simulationTickSeconds === undefined) {
             throw new Error('[PhysicsEngine] simulationTickSeconds is required.');
@@ -88,7 +92,7 @@ class PhysicsEngine {
     }
 
     #detectCollision(rocket, sector, oldPos, newPos) {
-        for (const body of sector.bodies) {
+        for (const body of this.#getActiveBodies(rocket, sector)) {
             if (body.checkCollision(newPos, oldPos, rocket.radius ?? 0)) {
                 const avoidance = this.#tryAvoidance(rocket, 'body', body);
                 if (avoidance) {
@@ -194,6 +198,26 @@ class PhysicsEngine {
         }
 
         return 1;
+    }
+
+    #getActiveBodies(rocket, sector) {
+        if (!rocket.lastEvasionBody) {
+            return sector.bodies;
+        }
+
+        const safeDistance = this.gameDataRepository.getGameBalance().SAFE_DISTANCE_FROM_HOME;
+        const lastBody = rocket.lastEvasionBody;
+        const distance = Math.hypot(
+            rocket.position.x - lastBody.position.x,
+            rocket.position.y - lastBody.position.y
+        );
+
+        if (distance < lastBody.radius + safeDistance) {
+            return sector.bodies.filter(body => body !== lastBody);
+        }
+
+        rocket.lastEvasionBody = null;
+        return sector.bodies;
     }
 }
 

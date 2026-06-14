@@ -31,6 +31,8 @@ function createRocket(overrides = {}) {
         }),
         getCollectionRange: vi.fn(() => 10),
         getArcMultiplier: vi.fn(() => 1),
+        getGravityMultiplier: vi.fn(() => 1),
+        advanceGravityEffectTick: vi.fn(),
         addHeldItem: vi.fn(),
         useAvoidanceModule: vi.fn(() => null),
         ...overrides
@@ -78,6 +80,20 @@ describe('PhysicsEngine', () => {
         });
     });
 
+    it('applies rocket gravity multiplier to acceleration and advances timed gravity effects', () => {
+        const engine = new PhysicsEngine(repository);
+        const body = createBody();
+        const rocket = createRocket({
+            getGravityMultiplier: vi.fn(() => 0.5)
+        });
+        const sector = createSector({ bodies: [body] });
+
+        engine.step(rocket, sector);
+
+        expect(rocket.velocity.x).toBeCloseTo(0.0204);
+        expect(rocket.advanceGravityEffectTick).toHaveBeenCalledTimes(1);
+    });
+
     it('skips gravity vectors for singularity distances below 10px', () => {
         const engine = new PhysicsEngine(repository);
         const body = createBody({ position: { x: 5, y: 0 } });
@@ -88,6 +104,27 @@ describe('PhysicsEngine', () => {
 
         expect(body.getGravityFieldVector).not.toHaveBeenCalled();
         expect(rocket.velocity).toEqual({ x: 0, y: 0 });
+    });
+
+    it('temporarily ignores the last evasion body for gravity and collision until the rocket leaves its safe range', () => {
+        const engine = new PhysicsEngine(repository);
+        const body = createBody({
+            position: { x: 0, y: 0 },
+            radius: 20,
+            checkCollision: vi.fn(() => true)
+        });
+        const rocket = createRocket({
+            position: { x: 40, y: 0 },
+            lastEvasionBody: body
+        });
+        const sector = createSector({ bodies: [body] });
+
+        const result = engine.step(rocket, sector);
+
+        expect(body.getGravityFieldVector).not.toHaveBeenCalled();
+        expect(body.checkCollision).not.toHaveBeenCalled();
+        expect(result.collision).toBeNull();
+        expect(rocket.lastEvasionBody).toBe(body);
     });
 
     it('detects body collision before exits and boundaries', () => {

@@ -68,6 +68,8 @@ class Rocket {
         this.ticks = 0;
         this.heldCargo = [];
         this.isGhost = false;
+        this.gravityEffectTicksRemaining = this.#getInitialGravityEffectTicks();
+        this.lastEvasionBody = null;
     }
 
     setGhost() {
@@ -90,7 +92,8 @@ class Rocket {
             actualTrail: this.actualTrail.map(point => copyVector(point)),
             ticks: this.ticks,
             heldCargo: this.heldCargo.map(item => item.createSnapshot()),
-            isGhost: this.isGhost
+            isGhost: this.isGhost,
+            gravityEffectTicksRemaining: this.gravityEffectTicksRemaining
         };
     }
 
@@ -110,6 +113,7 @@ class Rocket {
         rocket.ticks = snapshot.ticks ?? 0;
         rocket.heldCargo = (snapshot.heldCargo || []).map(itemSnapshot => Item.fromSnapshot(itemSnapshot, gameDataRepository));
         rocket.isGhost = !!snapshot.isGhost;
+        rocket.gravityEffectTicksRemaining = snapshot.gravityEffectTicksRemaining ?? rocket.gravityEffectTicksRemaining;
 
         return rocket;
     }
@@ -117,9 +121,14 @@ class Rocket {
     updateState(pos, vel) {
         this.position = copyVector(pos);
         this.velocity = copyVector(vel);
-        this.actualTrail.push(copyVector(this.position));
+        this.recordTrailPoint(this.position);
         this.ticks += 1;
         return this.ticks;
+    }
+
+    recordTrailPoint(point = this.position) {
+        this.actualTrail.push(copyVector(point));
+        this.#trimTrail();
     }
 
     setRocketItem(item) {
@@ -161,6 +170,26 @@ class Rocket {
         return this.#multiplier('arcMultiplier');
     }
 
+    getGravityMultiplier() {
+        let multiplier = this.rocketItem.getGravityMultiplier()
+            * (this.launcher?.gravityMultiplier ?? 1);
+
+        if (this.booster?.gravityMultiplier !== undefined) {
+            const hasTimedEffect = Number.isFinite(this.booster.duration);
+            if (!hasTimedEffect || this.gravityEffectTicksRemaining > 0) {
+                multiplier *= this.booster.gravityMultiplier;
+            }
+        }
+
+        return multiplier;
+    }
+
+    advanceGravityEffectTick() {
+        if (this.gravityEffectTicksRemaining > 0) {
+            this.gravityEffectTicksRemaining -= 1;
+        }
+    }
+
     addHeldItem(item) {
         this.heldCargo.push(item);
     }
@@ -169,6 +198,7 @@ class Rocket {
         if (type === 'body') {
             if (this.#canUseAvoidance('breaker')) {
                 this.#consumeAvoidance('breaker');
+                this.lastEvasionBody = null;
                 return {
                     method: 'star_breaker',
                     destroyedTarget: target
@@ -178,6 +208,7 @@ class Rocket {
             if (this.#canUseAvoidance('cushion')) {
                 this.#consumeAvoidance('cushion');
                 this.velocity = reflectVector(this.velocity, this.#getBodyNormal(target));
+                this.lastEvasionBody = target;
                 return {
                     method: 'cushion',
                     destroyedTarget: null
@@ -188,6 +219,7 @@ class Rocket {
         if (type === 'boundary' && this.#canUseAvoidance('emergency')) {
             this.#consumeAvoidance('emergency');
             this.velocity = reflectVector(this.velocity, this.#getBoundaryNormal());
+            this.lastEvasionBody = null;
             return {
                 method: 'emergency',
                 destroyedTarget: null
@@ -269,6 +301,25 @@ class Rocket {
 
     #getReferenceMass() {
         return this.#getGameDataRepository()?.getGameBalance?.().DEFAULT_SHIP_MASS ?? 10;
+    }
+
+    #getInitialGravityEffectTicks() {
+        if (!Number.isFinite(this.booster?.duration) || this.booster?.gravityMultiplier === undefined) {
+            return 0;
+        }
+
+        return Math.max(0, Math.floor(this.booster.duration));
+    }
+
+    #trimTrail() {
+        if (this.isGhost) {
+            return;
+        }
+
+        const maxLength = this.#getGameDataRepository()?.getGameBalance?.().TRAIL_MAX_LENGTH ?? 80;
+        if (this.actualTrail.length > maxLength) {
+            this.actualTrail.splice(0, this.actualTrail.length - maxLength);
+        }
     }
 }
 

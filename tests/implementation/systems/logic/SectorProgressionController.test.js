@@ -95,8 +95,8 @@ describe('SectorProgressionController', () => {
         expect(context.worldRenderer.setSector).toHaveBeenCalledWith(sector);
         expect(context.uiController.updateHUDValue).toHaveBeenCalledWith('sector', 4);
         expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(4, true);
-        expect(context.uiController.showBuildScreen).toHaveBeenCalled();
-        expect(context.uiController.setFlightMode).toHaveBeenCalledWith(false);
+        expect(context.uiController.showBuildScreen).not.toHaveBeenCalled();
+        expect(context.uiController.setFlightMode).not.toHaveBeenCalled();
     });
 
     it('returns false when the session can continue', () => {

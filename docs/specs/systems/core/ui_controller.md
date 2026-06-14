@@ -55,10 +55,11 @@
     - ビルドフェーズを開始する。
     - **内部挙動**:
         1. タイトル、航行結果画面、施設画面を非表示にし、HUD とビルドパネルを表示する。
-        2. `viewData` が渡された場合、`rocket`, `launcher`, `booster`, `chassis`, `logic`, `module` の各リストへ `UIComponents.generateCardHTML()` または空表示を反映する。
-        3. `viewData.assembly` から ASSEMBLE ボタンの disabled 状態と文言を更新する。
-        4. `viewData.launch` から発射ボタンの disabled 状態と文言を更新する。
-        5. `rocket` の空表示に `emptyAction: 'open-assembly'` が設定されている場合、その placeholder はクリックで ASSEMBLY タブへ切り替える。
+        2. ビルド開始時はビルドパネルをオープン状態にし、以前の画面で付与された折りたたみ状態を解除する。
+        3. `viewData` が渡された場合、`rocket`, `launcher`, `booster`, `chassis`, `logic`, `module` の各リストへ `UIComponents.generateCardHTML()` または空表示を反映する。
+        4. `viewData.assembly` から ASSEMBLE ボタンの disabled 状態と文言を更新する。
+        5. `viewData.launch` から発射ボタンの disabled 状態と文言を更新する。
+        6. `rocket` の空表示に `emptyAction: 'open-assembly'` が設定されている場合、その placeholder はクリックで ASSEMBLY タブへ切り替える。
     - **責務境界**: inventory の抽出、選択可否、発射可能判定、UI 文言取得は `BuildScreenPresenter` の責務。`UIController` は渡された view data を DOM に反映する。
 - **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
     - セクター開始時の READY 通知を画面中央に表示する。
@@ -109,7 +110,7 @@
 - **`showResultScreen(viewData: FlightResultViewData): void`**
     - 航行結果表示画面（リザルト）へ遷移する。
     - **内部挙動**:
-        1. これまで表示されていたビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
+        1. これまで表示されていたビルドパネルを折りたたみ状態にしてからビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
         2. `FlightResultComponents.generateHTML(viewData, gameDataRepository)` で画面 HTML を生成し、`#flight-result-screen` に反映する。
         3. **ヘッダー・状態表示**: `viewData.status` / `viewData.title` / `viewData.themeClass` に応じ、見出しとテーマカラーを変更する。
         4. **ヒーロー統計 (Hero Stats)**: `viewData.totalScore`, `viewData.totalCoins` を `.Well` 内の強調表示エリアにセットする。
@@ -135,7 +136,7 @@
 - **`showFacilityScreen(type: string, data: object): void`**
     - 施設画面（交易所、整備工場、闇市場）を表示する。
     - **内部挙動**:
-        1. **画面切り替え**: 現在の画面を隠し、対象の施設用コンテナを表示する。
+        1. **画面切り替え**: ビルドパネルを折りたたみ状態にしてから現在の画面を隠し、対象の施設用コンテナを表示する。
         2. **HTML 生成**: `FacilityComponents.generateHTML(data)` で施設画面 HTML を生成し、`#facility-screen` に反映する。
         3. **ヘッダー構築**: `data.name` / `data.icon` / `data.description` / `data.themeClass` を用いて名称、アイコン、説明、施設テーマを表示する。
         4. **リスト構築**: `data.sections[].entries` をループし、`UIComponents.generateCardHTML` を用いて取引候補リストを構築する。

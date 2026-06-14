@@ -36,10 +36,11 @@
         2. `Sector` を生成する。`options.isAnomaly` が未指定の場合は `false` とする。
         3. `GameRecordTracker.recordSectorStart(sessionState)` を呼び出す。
         4. 更新キーがある場合、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
-        5. `WorldRenderer.setSector(sector)`、`UIController.updateHUDValue('sector', sectorNumber)`、`UIController.showSectorTitle(sectorNumber, sector.isAnomaly)`、`UIController.showBuildScreen()`、`UIController.setFlightMode(false)` を呼び出す。
+        5. `WorldRenderer.setSector(sector)`、`UIController.updateHUDValue('sector', sectorNumber)`、`UIController.showSectorTitle(sectorNumber, sector.isAnomaly)` を呼び出す。
         6. 生成した `Sector` を返す。
 
 ## 3. 備考
 
 - ワープ演出の時間制御とセクター切替タイミングは `SectorTransitionAnimator` が担当し、本クラスは切替タイミングで呼び出されるセクター開始処理だけを担当する。
+- ビルドパネルの表示開始と航行モード解除は、ワープ演出の完了後に `GameController.beginSectorTransition()` が行う。本クラスはワープ途中でビルド画面を表示しない。
 - 本クラスは、セクター進行と契約終了処理が GameController に集中しすぎることを防ぐための分割である。
