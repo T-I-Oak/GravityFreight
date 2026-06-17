@@ -5,7 +5,7 @@
    ========================================= */
 
 #title-screen {
-    display: flex; /* Root uses flex to align the inner container */
+    display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
@@ -13,39 +13,53 @@
     height: 100vh;
     min-height: 100vh;
     overflow: hidden;
-    background: #050510 var(--title-bg-image, none) no-repeat center center;
-    background-size: cover;
+    background: var(--color-world-bg);
 }
 
-/* Invisible container for title content */
+#title-bg-canvas,
+#title-fg-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#title-bg-canvas {
+    z-index: var(--z-world);
+}
+
+#title-fg-canvas {
+    z-index: var(--z-panel);
+    pointer-events: none;
+}
+
 .title-content-wrapper {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 32px; /* Explicit gap between title-box and menu buttons */
-    z-index: var(--z-panel);
+    gap: 32px;
+    z-index: var(--z-hud);
+    position: relative;
+    animation: title-idle-float 6s ease-in-out infinite;
 }
 
-#title-screen .text-display.logo {
-    font-size: clamp(3rem, 7vw, 6rem);
-    max-width: 90vw;
-    transition: font-size 0.2s ease;
-    font-weight: 950;
-    line-height: 1;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+.LogoImage {
+    display: block;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
 }
 
-#title-screen .text-sub-display.logo {
-    font-size: clamp(1rem, 2vw, 1.8rem);
-    margin-top: 0.5rem;
-    font-weight: 950;
-    line-height: 1.2;
-    letter-spacing: 0.45em;
-    text-transform: uppercase;
-    color: var(--color-theme-main);
+.title-logo {
+    width: min(980px, 82vw);
+}
+
+.hud-logo {
+    width: 220px;
+    max-width: 100%;
 }
 
 .menu-buttons {
@@ -77,11 +91,12 @@
     border: none;
     box-shadow: none;
     text-shadow: none; /* Override global neon text-shadow */
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.55);
     font-size: 32px;
     line-height: 1;
     transition: color var(--motion-fast), transform var(--motion-normal) ease;
     cursor: pointer;
+    z-index: var(--z-system);
 }
 
 #title-settings-btn:hover {
@@ -97,4 +112,30 @@
     transform: rotate(90deg) scale(0.9);
     filter: brightness(1.2);
     transition: transform 0.05s; /* Snappy feedback */
+}
+
+#title-screen .screen-footer {
+    bottom: 30px;
+    left: 40px;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    opacity: 1;
+}
+
+#title-screen .screen-footer #version,
+#title-screen .screen-footer .copyright,
+#title-screen .screen-footer .copyright *,
+#title-screen .screen-footer a {
+    color: inherit;
+    font: inherit;
+    font-weight: inherit;
+    opacity: 1;
+}
+
+@keyframes title-idle-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
 }

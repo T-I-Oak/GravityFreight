@@ -101,7 +101,12 @@ describe('GameDataRepository', () => {
 
         expect(repository.getAppMetadata()).toEqual({
             version: packageData.version,
-            copyright: expect.any(String)
+            copyright: {
+                holder: 'T.I.OAK',
+                year: '2026',
+                portal: 'GameWorks OAK',
+                portalUrl: 'https://t-i-oak.github.io/GameWorksOAK/'
+            }
         });
     });
 

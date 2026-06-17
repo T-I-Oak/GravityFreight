@@ -241,7 +241,7 @@ describe('GameController', () => {
         expect(context.cameraController.save).toHaveBeenCalledTimes(1);
     });
 
-    it('updates launch angle from AIM input and launches from the configured home body offset', async () => {
+    it('updates launch angle from AIM input and launches from the home launch offset', async () => {
         await context.controller.start();
         context.controller.buildFlowController.currentBuildSelection = {
             rocket: 'stack_rocket_ready',

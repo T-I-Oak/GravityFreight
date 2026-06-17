@@ -28,6 +28,8 @@
 - `heldCargo: Item[]`: 保持状態（Held State）の全アイテム（貨物・コイン・パーツ等）のリスト。
 - `isGhost: boolean`: 軌道予測用のシミュレーション個体であるかを示すフラグ（初期値 false）。
     - **ライフサイクル**: `TrajectoryPredictor` が実体をクローンした直後、`setGhost()` を介して `true` に設定される。
+- `isSafeToReturn: boolean`: 母星から一度安全距離外へ脱出し、母星への帰還衝突を判定してよい状態であるかを示すフラグ（初期値 false）。
+    - **ライフサイクル**: 発射直後は false。`PhysicsEngine` が母星中心から `home.radius + gameBalance.SAFE_DISTANCE_FROM_HOME` より外側へ出たことを検知した時点で true にする。
 - `gravityEffectTicksRemaining: number`: Booster などによる時限重力倍率効果の残り tick 数。
 - `lastEvasionBody: CelestialBody | null`: `cushion` による天体衝突回避直後、再吸着を防ぐため一時的に除外する天体への参照。保存対象ではない。
 
@@ -53,6 +55,7 @@
         - `ticks`
         - `heldCargo`: 各 `Item.createSnapshot()` の結果
         - `isGhost`
+        - `isSafeToReturn`
         - `gravityEffectTicksRemaining`
     - **保存しない値**:
         - `getInitialVelocity()` で再計算できる初速計算過程。
@@ -65,7 +68,7 @@
         1. `snapshot.rocketItem` を `RocketItem.fromSnapshot()` で復元する。
         2. `snapshot.launcher` を `Item.fromSnapshot()` で復元する。
         3. `snapshot.booster` が `null` でなければ `Item.fromSnapshot()` で復元する。
-        4. 復元した発射構成から `Rocket` を生成し、`uid`, `angle`, `position`, `velocity`, `ticks`, `actualTrail`, `heldCargo`, `isGhost` を復元する。
+        4. 復元した発射構成から `Rocket` を生成し、`uid`, `angle`, `position`, `velocity`, `ticks`, `actualTrail`, `heldCargo`, `isGhost`, `isSafeToReturn` を復元する。
         5. `heldCargo` は各 item snapshot を `Item.fromSnapshot()` へ渡して復元する。
         6. `gravityEffectTicksRemaining` が snapshot に含まれる場合は復元し、含まれない場合は発射構成から初期値を算出する。
         7. 復元できない snapshot はデータ整合性エラーとして例外を投げる。

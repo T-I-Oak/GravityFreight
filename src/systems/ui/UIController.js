@@ -1,7 +1,9 @@
 import { FlightResultComponents } from './FlightResultComponents.js';
 import { FacilityComponents } from './FacilityComponents.js';
 import { UIComponents } from './UIComponents.js';
+import AppMetadataView from './AppMetadataView.js';
 import MapInputController from './MapInputController.js';
+import SettingsDialogView from './SettingsDialogView.js';
 import StarInfoPanel from './StarInfoPanel.js';
 
 class UIController {
@@ -10,6 +12,8 @@ class UIController {
         this.gameDataRepository = options.gameDataRepository;
         this.flightResultComponents = options.flightResultComponents || FlightResultComponents;
         this.facilityComponents = options.facilityComponents || FacilityComponents;
+        this.appMetadataView = options.appMetadataView || new AppMetadataView({ document: this.document });
+        this.settingsDialogView = options.settingsDialogView || new SettingsDialogView({ document: this.document, operationBinder: (element, handler) => this.setOperationHandler(element, handler) });
         this.starInfoPanel = options.starInfoPanel || new StarInfoPanel({ document: this.document });
         this.soundController = options.soundController || null;
         this.resultHandler = null;
@@ -24,7 +28,6 @@ class UIController {
         }
 
         this.titleScreen = this.document.querySelector('#title-screen');
-        this.startButton = this.document.querySelector('#start-game-btn');
         this.resultScreen = this.#requiredElement('#flight-result-screen');
         this.facilityScreen = this.#requiredElement('#facility-screen');
         this.playScene = this.document.querySelector('#play-scene-container');
@@ -58,6 +61,7 @@ class UIController {
             this.document.querySelector('#mail-btn-1'),
             this.document.querySelector('#mail-btn-2')
         ].filter(Boolean);
+        this.settingsDialogView.initialize();
         this.#wireBuildTabs();
         this.#wireBuildPanelToggle();
     }
@@ -150,6 +154,10 @@ class UIController {
     getMapCanvas() {
         return this.mapCanvas;
     }
+
+    getTitleCanvases() { return { background: this.#requiredElement('#title-bg-canvas'), foreground: this.#requiredElement('#title-fg-canvas') }; }
+
+    setAppMetadata(metadata) { this.appMetadataView.setMetadata(metadata); }
 
     setStartHandler(handler) {
         this.setOperationHandler(this.#requiredElement('#start-game-btn'), handler);
@@ -481,9 +489,7 @@ class UIController {
         }
     }
 
-    #formatNumber(value) {
-        return new Intl.NumberFormat('en-US').format(value ?? 0);
-    }
+    #formatNumber(value) { return new Intl.NumberFormat('en-US').format(value ?? 0); }
 
 }
 

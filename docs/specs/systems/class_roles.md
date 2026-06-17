@@ -18,6 +18,8 @@ graph TD
 
     %% Control Layer
     Orchestrator --> UI["UIController (UI/Input)"]
+    UI --> AMV["AppMetadataView (App Metadata)"]
+    UI --> SDV["SettingsDialogView (Settings Dialog)"]
     UI --> MIC["MapInputController (Canvas Input)"]
     UI --> SIP["StarInfoPanel (Hover Items)"]
     Orchestrator --> HTP["HowToPlayUI (Manual Screen)"]
@@ -38,6 +40,8 @@ graph TD
     %% System Layer (Infrastructure)
     Orchestrator --> WR["WorldRenderer (Rendering)"]
     WR --> BM["BackgroundManager (Stars)"]
+    Orchestrator --> TSA["TitleScreenAnimator (Title Visuals)"]
+    TSA --> BM
     WR --> CC["CameraController (View/Matrix)"]
     WR --> FVR["FlightVisualRenderer (Flight Visuals)"]
     WR --> CCP["CanvasColorPalette (CSS Token Colors)"]
@@ -286,6 +290,14 @@ graph TD
         - 画面遷移、ダイアログ表示の制御。
         - HUDの制御。
         - UI 操作イベントをアプリ側のハンドラへ中継する。
+- **AppMetadataView**
+    - 生存期間: App Lifecycle
+    - 役割: アプリメタデータ表示。
+    - 責務: タイトル画面フッターのバージョン、コピーライト、ポータルリンクの DOM 表示を担当する。
+- **SettingsDialogView**
+    - 生存期間: App Lifecycle
+    - 役割: 設定ダイアログ表示。
+    - 責務: タイトル画面の設定ボタンから設定オーバーレイを開き、閉じる / DONE 操作で閉じる。操作音などの共通 UI フィードバックは `UIController.setOperationHandler()` から渡される binder に委譲する。
 - **MapInputController**
     - 生存期間: App Lifecycle
     - 役割: Canvas 入力イベント正規化。
@@ -317,7 +329,11 @@ graph TD
 - **BackgroundManager**
     - 生存期間: App Lifecycle
     - 役割: 遠景演出管理。
-    - 責務: Starfield の生成、ワープ演出の制御。
+    - 責務: Starfield の生成、ワープ演出の制御。タイトル画面と本編画面で共有される星背景状態を保持する。
+- **TitleScreenAnimator**
+    - 生存期間: App Lifecycle
+    - 役割: タイトル画面専用の Canvas 演出管理。
+    - 責務: 共有 `BackgroundManager` による星背景描画、タイトル用ロケット周回、航跡、貨物追従を描画する。ゲーム内 `Rocket` の物理・snapshot・航行結果責務は持たない。
 - **SoundController**
     - 生存期間: App Lifecycle
     - 役割: 音響演出管理。

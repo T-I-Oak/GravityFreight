@@ -658,11 +658,15 @@ class GameController {
     }
 
     #getLaunchRadius(home) {
-        const balance = this.gameDataRepository.getGameBalance();
-        const offset = balance.SHIP_START_OFFSET;
+        if (!Number.isFinite(home.radius)) {
+            throw new Error('[GameController] home body radius must be a finite number.');
+        }
+
+        const offset = this.gameDataRepository.getGameBalance().SHIP_START_OFFSET;
         if (!Number.isFinite(offset)) {
             throw new Error('[GameController] gameBalance.SHIP_START_OFFSET must be a finite number.');
         }
+
         return home.radius + offset;
     }
 

@@ -22,13 +22,13 @@
 
     <!-- 仕様 3. セマンティクス表に基づき画面ルートを main に定義 -->
     <main id="title-screen">
+        <canvas id="title-bg-canvas"></canvas>
 
         <!-- コンテンツを中央に寄せるための見えないコンテナ -->
         <div class="title-content-wrapper FlexCenter">
             <!-- ロゴエリア：特にカード構造ではないため div (TitleBox) で構成 -->
             <div class="TitleBox">
-                <h1 class="text-display logo">GRAVITY FREIGHT</h1>
-                <span class="text-sub-display logo">ORBITAL ECHOES</span>
+                <img class="LogoImage title-logo" src="../../assets/logo.svg" alt="GRAVITY FREIGHT ORBITAL ECHOES">
             </div>
 
             <!-- ボタンメニュー：コンテナとしての div を使用 -->
@@ -45,13 +45,15 @@
             </div>
         </div>
 
+        <canvas id="title-fg-canvas"></canvas>
+
         <!-- 設定指示器： div を使用 -->
         <div class="Button state-clickable" id="title-settings-btn">⚙</div>
 
         <!-- 仕様 3. バージョン等の「属性情報」として末尾に footer を配置 -->
         <footer class="screen-footer">
-            <span>v2.0.0</span>
-            <span>© T.I.OAK 2026</span>
+            <span>Ver 0.89.3</span>
+            <span>© T.I.OAK 2026 | <a href="https://t-i-oak.github.io/GameWorksOAK/">GameWorks OAK</a></span>
         </footer>
 
     </main>

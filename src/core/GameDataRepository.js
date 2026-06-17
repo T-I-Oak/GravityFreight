@@ -21,6 +21,13 @@ const ARC_FACILITY_WIDTHS = {
     BLACK_MARKET: 20
 };
 
+const APP_COPYRIGHT = {
+    holder: 'T.I.OAK',
+    year: '2026',
+    portal: 'GameWorks OAK',
+    portalUrl: 'https://t-i-oak.github.io/GameWorksOAK/'
+};
+
 class GameDataRepository {
     constructor(commonDataManager, i18nAdapter = {}) {
         if (!commonDataManager) {
@@ -154,7 +161,7 @@ class GameDataRepository {
     getAppMetadata() {
         return {
             version: packageData.version,
-            copyright: 'Copyright (c) GameWorks OAK'
+            copyright: { ...APP_COPYRIGHT }
         };
     }
 

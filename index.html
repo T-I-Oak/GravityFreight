@@ -42,18 +42,11 @@
 
 <body class="theme-neon">
     <!-- タイトル画面 -->
-    <div id="title-screen" class="theme-neon" data-title-bg="/GravityFreight/assets/tutorial/slide1.png">
-        <script>
-            const titleScreen = document.getElementById('title-screen');
-            if (titleScreen?.dataset.titleBg) {
-                titleScreen.style.setProperty('--title-bg-image', `url('${titleScreen.dataset.titleBg}')`);
-            }
-        </script>
+    <div id="title-screen" class="theme-neon">
         <canvas id="title-bg-canvas"></canvas>
         <div class="title-content-wrapper FlexCenter">
             <div class="TitleBox">
-                <h1 class="text-display logo">GRAVITY FREIGHT</h1>
-                <span class="text-sub-display logo">ORBITAL ECHOES</span>
+                <img class="LogoImage title-logo" src="/assets/logo.svg" alt="GRAVITY FREIGHT ORBITAL ECHOES">
             </div>
             <div class="menu-buttons">
                 <button id="start-game-btn" class="Button button-large state-primary state-clickable">
@@ -70,8 +63,8 @@
         <canvas id="title-fg-canvas"></canvas>
         <div id="title-settings-btn" class="settings-btn" title="SETTINGS">⚙</div>
         <div class="title-footer screen-footer">
-            <div id="version">v-.--.-</div>
-            <span class="copyright">© T.I.OAK 2026</span>
+            <div id="version">Ver -.--.-</div>
+            <span class="copyright"></span>
         </div>
     </div>
 
@@ -148,8 +141,7 @@
         <header id="play-hud" class="Panel color-theme-sub">
             <div class="hud-logo-header">
                 <div class="TitleBox">
-                    <h1 id="title" class="text-display logo">GRAVITY FREIGHT</h1>
-                    <span class="text-sub-display logo">ORBITAL ECHOES</span>
+                    <img id="title" class="LogoImage hud-logo" src="/assets/logo.svg" alt="GRAVITY FREIGHT ORBITAL ECHOES">
                 </div>
                 <div id="mail-status-group" class="hud-messages">
                     <span id="mail-btn-0" class="Icon mail state-disabled"></span>

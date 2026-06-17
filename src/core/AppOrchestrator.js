@@ -16,6 +16,7 @@ import TrajectoryPredictor from '../systems/logic/TrajectoryPredictor.js';
 import UIController from '../systems/ui/UIController.js';
 import BackgroundManager from '../systems/core/BackgroundManager.js';
 import CameraController from '../systems/core/CameraController.js';
+import TitleScreenAnimator from '../systems/core/TitleScreenAnimator.js';
 import WorldRenderer from '../systems/core/WorldRenderer.js';
 
 class AppOrchestrator {
@@ -24,6 +25,7 @@ class AppOrchestrator {
         this.i18nAdapter = options.i18nAdapter || {};
         this.uiController = options.uiController || null;
         this.worldRenderer = options.worldRenderer || new WorldRenderer();
+        this.titleScreenAnimator = options.titleScreenAnimator || new TitleScreenAnimator();
         this.gameControllerClass = options.gameControllerClass || GameController;
         this.gameDataRepository = null;
         this.gameController = null;
@@ -46,13 +48,22 @@ class AppOrchestrator {
             this.systems.cameraController,
             this.systems.backgroundManager
         );
+        this.worldRenderer.setRenderLoopActive?.(false);
+        this.titleScreenAnimator.initialize(
+            this.uiController.getTitleCanvases(),
+            this.systems.backgroundManager
+        );
+        this.uiController.setAppMetadata?.(this.gameDataRepository.getAppMetadata());
         this.uiController.setStartHandler(() => this.startGame());
         this.uiController.setRecordHandler?.(() => {});
         this.uiController.setManualHandler?.(() => {});
         this.uiController.showTitleScreen();
+        this.titleScreenAnimator.start();
     }
 
     async startGame() {
+        this.titleScreenAnimator.stop();
+        this.worldRenderer.setRenderLoopActive?.(true);
         this.gameController = new this.gameControllerClass({
             ...this.systems,
             uiController: this.uiController,
@@ -66,7 +77,9 @@ class AppOrchestrator {
 
     returnToTitle() {
         this.gameController = null;
+        this.worldRenderer.setRenderLoopActive?.(false);
         this.uiController.showTitleScreen();
+        this.titleScreenAnimator.start();
     }
 
     #createAppSystems() {
