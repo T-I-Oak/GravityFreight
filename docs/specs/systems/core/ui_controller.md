@@ -38,11 +38,17 @@
     - マップ描画用 Canvas (`#gameCanvas`) を取得する。
     - **内部挙動**: `constructor` で取得済みの DOM 要素を返し、`AppOrchestrator` が `WorldRenderer.initialize()` に渡す。
 
+- **`getTitleCanvases(): { background: HTMLCanvasElement, foreground: HTMLCanvasElement }`**
+    - タイトル画面演出用 Canvas (`#title-bg-canvas`, `#title-fg-canvas`) を取得する。
+    - **内部挙動**: `constructor` で取得済みの DOM 要素を返し、`AppOrchestrator` が `TitleScreenAnimator.initialize()` に渡す。
+    - **責務境界**: Canvas への描画、animation frame の制御、共有 `BackgroundManager` の更新は `TitleScreenAnimator` の責務であり、`UIController` は DOM 要素の提供に留める。
+
 ### 画面制御メソッド (Screen Control)
 
 - **`showTitleScreen(): void`**
     - タイトル画面を表示する。
     - **内部挙動**: タイトル画面を表示し、HUD、ビルドパネル、航行結果画面、施設画面を非表示にする。
+    - **表示要素**: タイトルロゴは `logo.svg` を使用する。背景画像は使用せず、星背景およびロケット周回演出は `TitleScreenAnimator` が Canvas へ描画する。
 - **`showSectorTransitionScreen(): void`**
     - セクター開始ワープ中のプレイ画面を表示する。
     - **内部挙動**: タイトル、航行結果画面、施設画面を非表示にし、プレイ画面と HUD を表示する。セクター生成前またはワープ中は操作対象ではないため、ビルドパネルと発射ボタンは非表示にする。
@@ -153,6 +159,9 @@
     - 音量設定ダイアログを表示する。
 - **`hideSettingsDialog(): void`**
     - 音量設定ダイアログを閉じる。
+    - **タイトル画面での内部挙動**:
+        - `#title-settings-btn` のクリックで `#settings-overlay` を表示する。
+        - `#close-settings-btn` および `#settings-done-btn` のクリックで `#settings-overlay` を非表示にする。
 
 - **`showStarInfo(body: CelestialBody, point: Vector2): void`**
     - 天体ホバー時の保持アイテムポップアップを表示する。

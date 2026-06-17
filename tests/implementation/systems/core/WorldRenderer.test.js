@@ -199,6 +199,29 @@ describe('WorldRenderer', () => {
         expect(globalThis.requestAnimationFrame).toHaveBeenCalledTimes(2);
     });
 
+    it('can pause and resume the render loop for title screen ownership of the shared background', async () => {
+        const { canvas } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const frameCallbacks = [];
+        vi.stubGlobal('requestAnimationFrame', vi.fn(callback => {
+            frameCallbacks.push(callback);
+            return frameCallbacks.length;
+        }));
+        vi.stubGlobal('cancelAnimationFrame', vi.fn());
+        const renderer = createRenderer({ backgroundManager });
+
+        await renderer.initialize(canvas);
+        renderer.setRenderLoopActive(false);
+        const renderCount = backgroundManager.render.mock.calls.length;
+        frameCallbacks.shift()();
+
+        expect(globalThis.cancelAnimationFrame).toHaveBeenCalledWith(1);
+        expect(backgroundManager.render.mock.calls.length).toBe(renderCount);
+
+        renderer.setRenderLoopActive(true);
+        expect(globalThis.requestAnimationFrame).toHaveBeenCalledTimes(2);
+    });
+
     it('uses CameraController projection when rendering map objects', async () => {
         const { canvas, context } = createCanvas();
         const backgroundManager = createBackgroundManager();

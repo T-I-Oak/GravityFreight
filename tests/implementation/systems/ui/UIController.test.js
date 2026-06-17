@@ -55,7 +55,17 @@ describe('UIController', () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
-            <div id="title-screen"></div>
+            <div id="title-screen">
+                <canvas id="title-bg-canvas"></canvas>
+                <canvas id="title-fg-canvas"></canvas>
+                <button id="title-settings-btn"></button>
+                <div id="version"></div>
+                <div class="copyright"></div>
+            </div>
+            <div id="settings-overlay" class="state-hidden" hidden>
+                <button id="close-settings-btn"></button>
+                <button id="settings-done-btn"></button>
+            </div>
             <button id="start-game-btn"></button>
             <main id="flight-result-screen" hidden></main>
             <main id="facility-screen" hidden></main>
@@ -534,7 +544,7 @@ describe('UIController', () => {
         expect(handler).not.toHaveBeenCalled();
     });
 
-    it('updates HUD values and exposes the map canvas', () => {
+    it('updates HUD values and exposes the map and title canvases', () => {
         const controller = new UIController({ gameDataRepository: repository, soundController });
 
         controller.updateHUDValue('sector', 3);
@@ -542,9 +552,51 @@ describe('UIController', () => {
         controller.updateHUDValue('coin', 80);
 
         expect(controller.getMapCanvas()).toBe(document.querySelector('#gameCanvas'));
+        expect(controller.getTitleCanvases()).toEqual({
+            background: document.querySelector('#title-bg-canvas'),
+            foreground: document.querySelector('#title-fg-canvas')
+        });
         expect(document.querySelector('#sector-display').textContent).toBe('3');
         expect(document.querySelector('#score-display').textContent).toBe('1,234');
         expect(document.querySelector('#coin-display').textContent).toBe('80');
+    });
+
+    it('opens and closes the title settings overlay from title controls', () => {
+        new UIController({ gameDataRepository: repository, soundController });
+        const overlay = document.querySelector('#settings-overlay');
+
+        document.querySelector('#title-settings-btn').click();
+
+        expect(overlay.hidden).toBe(false);
+        expect(overlay.classList.contains('state-hidden')).toBe(false);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
+
+        document.querySelector('#settings-done-btn').click();
+
+        expect(overlay.hidden).toBe(true);
+        expect(overlay.classList.contains('state-hidden')).toBe(true);
+    });
+
+    it('renders app metadata with a portal copyright link', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+
+        controller.setAppMetadata({
+            version: '0.89.0',
+            copyright: {
+                holder: 'T.I.OAK',
+                year: '2026',
+                portal: 'GameWorks OAK',
+                portalUrl: 'https://t-i-oak.github.io/GameWorksOAK/'
+            }
+        });
+
+        const link = document.querySelector('.copyright a');
+        expect(document.querySelector('#version').textContent).toBe('Ver 0.89.0');
+        expect(document.querySelector('.copyright').textContent).toContain('© T.I.OAK 2026');
+        expect(link.textContent).toBe('GameWorks OAK');
+        expect(link.href).toBe('https://t-i-oak.github.io/GameWorksOAK/');
+        expect(link.target).toBe('_blank');
+        expect(link.rel).toBe('noopener noreferrer');
     });
 
     it('keeps map pointer input active while dragging outside the canvas', () => {

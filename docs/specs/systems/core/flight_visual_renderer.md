@@ -63,7 +63,7 @@
 - `state.hideRocketBody === true` の場合は、ロケット本体だけを描画しない。航跡、保持アイテム、ソナーは通常通り描画対象とする。
 - 向きは速度ベクトルを優先し、速度がほぼ 0 の場合は `navigationRocket.angle` を使用する。
 - カメラ回転中も画面上の向きがマップと同期するよう、描画角度には `transform.rotation` を加算する。
-- `navigationRocket.position` は物理上の発射位置・現在位置として扱い、ロケット図形の中心として描画する。母星からの初期距離は `GameController` が `SHIP_START_OFFSET` を含めて決定する。
+- `navigationRocket.position` は物理上の発射位置・現在位置として扱い、航跡、ソナー、判定、およびロケット図形中心の基準点として維持する。母星からの初期距離は `GameController` が `home.radius + gameBalance.SHIP_START_OFFSET` world px として決定する。
 
 ### 3.5 ソナー波紋
 

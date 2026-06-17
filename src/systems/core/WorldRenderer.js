@@ -25,6 +25,7 @@ class WorldRenderer {
         this.flightVisualRenderer = options.flightVisualRenderer || new FlightVisualRenderer();
         this.lastRenderTimestamp = null;
         this.animationFrameId = null;
+        this.renderLoopActive = true;
         this.navigationRocket = null;
         this.aimRocket = null;
         this.predictionPath = [];
@@ -140,6 +141,25 @@ class WorldRenderer {
         this.render();
     }
 
+    setRenderLoopActive(isActive) {
+        const nextActive = !!isActive;
+        if (this.renderLoopActive === nextActive) {
+            return;
+        }
+
+        this.renderLoopActive = nextActive;
+        if (!nextActive) {
+            if (this.animationFrameId !== null && typeof globalThis.cancelAnimationFrame === 'function') {
+                globalThis.cancelAnimationFrame(this.animationFrameId);
+            }
+            this.animationFrameId = null;
+            return;
+        }
+
+        this.lastRenderTimestamp = null;
+        this.#startRenderLoop();
+    }
+
     render() {
         if (!this.canvas || !this.context) {
             return;
@@ -231,7 +251,7 @@ class WorldRenderer {
     }
 
     #startRenderLoop() {
-        if (this.animationFrameId !== null || typeof globalThis.requestAnimationFrame !== 'function') {
+        if (!this.renderLoopActive || this.animationFrameId !== null || typeof globalThis.requestAnimationFrame !== 'function') {
             return;
         }
 
@@ -247,6 +267,11 @@ class WorldRenderer {
     }
 
     #renderFrame() {
+        if (!this.renderLoopActive) {
+            this.animationFrameId = null;
+            return;
+        }
+
         this.animationFrameId = null;
         this.render();
         this.#startRenderLoop();

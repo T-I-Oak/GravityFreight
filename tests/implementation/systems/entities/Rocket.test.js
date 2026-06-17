@@ -55,6 +55,7 @@ describe('Rocket', () => {
         expect(rocket.ticks).toBe(0);
         expect(rocket.heldCargo).toEqual([]);
         expect(rocket.isGhost).toBe(false);
+        expect(rocket.isSafeToReturn).toBe(false);
     });
 
     it('updates physical state and records trail ticks', () => {
@@ -209,6 +210,7 @@ describe('Rocket', () => {
         rocket.updateState({ x: 7, y: 8 }, { x: 9, y: 10 });
         rocket.addHeldItem(cargo);
         rocket.setGhost();
+        rocket.isSafeToReturn = true;
 
         const snapshot = rocket.createSnapshot();
         const restored = Rocket.fromSnapshot(snapshot, repository);
@@ -225,6 +227,7 @@ describe('Rocket', () => {
             ticks: 1,
             heldCargo: [cargo.createSnapshot()],
             isGhost: true,
+            isSafeToReturn: true,
             gravityEffectTicksRemaining: 0
         });
         expect(restored.uid).toBe(rocket.uid);
@@ -235,6 +238,7 @@ describe('Rocket', () => {
         expect(restored.heldCargo[0].uid).toBe(cargo.uid);
         expect(restored.actualTrail).toEqual([{ x: 7, y: 8 }]);
         expect(restored.isGhost).toBe(true);
+        expect(restored.isSafeToReturn).toBe(true);
     });
 
     it('clones current state without sharing mutable arrays or child instances', () => {

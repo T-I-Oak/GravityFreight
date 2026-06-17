@@ -127,6 +127,58 @@ describe('PhysicsEngine', () => {
         expect(rocket.lastEvasionBody).toBe(body);
     });
 
+    it('applies home gravity but ignores home collision until the rocket escapes the home safe range', () => {
+        const engine = new PhysicsEngine(repository);
+        const home = createBody({
+            position: { x: 0, y: 0 },
+            radius: 25,
+            isHome: true,
+            getGravityFieldVector: vi.fn(() => ({ x: -10, y: 0 })),
+            checkCollision: vi.fn(() => true)
+        });
+        const rocket = createRocket({
+            position: { x: 25, y: 0 },
+            velocity: { x: 100, y: 0 },
+            rocketItem: { getMass: vi.fn(() => 10) },
+            isSafeToReturn: false
+        });
+        const sector = createSector({ sectorNumber: 1, bodies: [home] });
+
+        const result = engine.step(rocket, sector);
+
+        expect(home.getGravityFieldVector).toHaveBeenCalledWith({ x: 25, y: 0 });
+        expect(home.checkCollision).not.toHaveBeenCalled();
+        expect(result.collision).toBeNull();
+        expect(rocket.isSafeToReturn).toBe(false);
+    });
+
+    it('enables home return collision after the rocket leaves the home safe range', () => {
+        const engine = new PhysicsEngine(repository);
+        const home = createBody({
+            position: { x: 0, y: 0 },
+            radius: 25,
+            isHome: true,
+            checkCollision: vi.fn(() => true)
+        });
+        const rocket = createRocket({
+            position: { x: 56, y: 0 },
+            velocity: { x: 100, y: 0 },
+            rocketItem: { getMass: vi.fn(() => 10) },
+            isSafeToReturn: false
+        });
+        const sector = createSector({ sectorNumber: 1, bodies: [home] });
+
+        const result = engine.step(rocket, sector);
+
+        expect(rocket.isSafeToReturn).toBe(true);
+        expect(home.checkCollision).toHaveBeenCalled();
+        expect(result.collision).toEqual({
+            type: 'body',
+            target: home,
+            pos: rocket.position
+        });
+    });
+
     it('detects body collision before exits and boundaries', () => {
         const engine = new PhysicsEngine(repository);
         const hitBody = createBody({
@@ -144,6 +196,7 @@ describe('PhysicsEngine', () => {
 
         const result = engine.step(rocket, sector);
 
+        expect(hitBody.checkCollision).toHaveBeenCalledWith(rocket.position, { x: 0, y: 0 }, 3);
         expect(rocket.useAvoidanceModule).toHaveBeenCalledWith('body', hitBody);
         expect(exit.checkEntrance).not.toHaveBeenCalled();
         expect(result.collision).toEqual({

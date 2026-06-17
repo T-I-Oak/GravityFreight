@@ -40,6 +40,7 @@ class PhysicsEngine {
     step(rocket, sector) {
         const oldPos = copyVector(rocket.position);
         const oldVel = copyVector(rocket.velocity);
+        this.#updateHomeReturnSafety(rocket, sector);
         const acceleration = this.#calculateAcceleration(rocket, sector);
         rocket.advanceGravityEffectTick();
         const dt = this.#getTickSeconds();
@@ -92,8 +93,8 @@ class PhysicsEngine {
     }
 
     #detectCollision(rocket, sector, oldPos, newPos) {
-        for (const body of this.#getActiveBodies(rocket, sector)) {
-            if (body.checkCollision(newPos, oldPos, rocket.radius ?? 0)) {
+        for (const body of this.#getActiveBodies(rocket, sector, { excludeUnsafeHome: true })) {
+            if (body.checkCollision(newPos, oldPos, this.#getBodyCollisionRadius(rocket))) {
                 const avoidance = this.#tryAvoidance(rocket, 'body', body);
                 if (avoidance) {
                     return {
@@ -200,24 +201,78 @@ class PhysicsEngine {
         return 1;
     }
 
-    #getActiveBodies(rocket, sector) {
-        if (!rocket.lastEvasionBody) {
-            return sector.bodies;
+    #getBodyCollisionRadius(rocket) {
+        const rocketRadius = Number.isFinite(rocket.radius) && rocket.radius > 0
+            ? rocket.radius
+            : 2;
+        const margin = this.gameDataRepository.getGameBalance().COLLISION_MARGIN;
+        if (!Number.isFinite(margin)) {
+            throw new Error('[PhysicsEngine] gameBalance.COLLISION_MARGIN must be a finite number.');
         }
 
-        const safeDistance = this.gameDataRepository.getGameBalance().SAFE_DISTANCE_FROM_HOME;
-        const lastBody = rocket.lastEvasionBody;
+        return rocketRadius + margin;
+    }
+
+    #getActiveBodies(rocket, sector, options = {}) {
+        const home = this.#getHomeBody(sector);
+        const safeDistance = this.#getSafeDistanceFromHome();
+        const bodies = sector.bodies.filter(body => {
+            if (options.excludeUnsafeHome && body === home && !rocket.isSafeToReturn) {
+                return false;
+            }
+
+            if (body === rocket.lastEvasionBody) {
+                const distance = Math.hypot(
+                    rocket.position.x - body.position.x,
+                    rocket.position.y - body.position.y
+                );
+
+                if (distance < body.radius + safeDistance) {
+                    return false;
+                }
+
+                rocket.lastEvasionBody = null;
+            }
+
+            return true;
+        });
+
+        return bodies;
+    }
+
+    #updateHomeReturnSafety(rocket, sector) {
+        if (rocket.isSafeToReturn) {
+            return;
+        }
+
+        const home = this.#getHomeBody(sector);
+        if (!home) {
+            rocket.isSafeToReturn = true;
+            return;
+        }
+
+        const safeDistance = this.#getSafeDistanceFromHome();
         const distance = Math.hypot(
-            rocket.position.x - lastBody.position.x,
-            rocket.position.y - lastBody.position.y
+            rocket.position.x - home.position.x,
+            rocket.position.y - home.position.y
         );
 
-        if (distance < lastBody.radius + safeDistance) {
-            return sector.bodies.filter(body => body !== lastBody);
+        if (distance > home.radius + safeDistance) {
+            rocket.isSafeToReturn = true;
+        }
+    }
+
+    #getHomeBody(sector) {
+        return sector.bodies.find(body => body.isHome) ?? null;
+    }
+
+    #getSafeDistanceFromHome() {
+        const safeDistance = this.gameDataRepository.getGameBalance().SAFE_DISTANCE_FROM_HOME;
+        if (!Number.isFinite(safeDistance)) {
+            throw new Error('[PhysicsEngine] gameBalance.SAFE_DISTANCE_FROM_HOME must be a finite number.');
         }
 
-        rocket.lastEvasionBody = null;
-        return sector.bodies;
+        return safeDistance;
     }
 }
 

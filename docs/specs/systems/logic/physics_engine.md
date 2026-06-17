@@ -21,11 +21,16 @@
     - 1ティック分の物理更新と衝突・出口・境界判定を実行する。
     - **内部挙動**:
         1. セクター内の全天体（`sector.bodies`）からロケットにかかる重力場を合算する。
+            - 母星重力は発射直後から通常通り計算に含める。
+            - `rocket.isSafeToReturn === false` の間、母星は衝突判定から一時除外する。
+            - ロケットが母星中心から `home.radius + gameBalance.SAFE_DISTANCE_FROM_HOME` より外側へ出た時点で `rocket.isSafeToReturn` を `true` にし、以後は母星の衝突判定を通常通り有効化する。
             - `rocket.lastEvasionBody` が存在し、ロケットがその天体の `radius + gameBalance.SAFE_DISTANCE_FROM_HOME` 内にいる場合、その天体は重力計算から一時除外する。十分に離れた場合は `rocket.lastEvasionBody` を解除する。
         2. 合算した重力場から、ロケットに適用する最終加速度を算出する。
         3. 算出された加速度に基づき、ロケットの新しい位置（`newPos`）と速度（`newVel`）を仮計算する。
         4. **衝突・到達判定**: 更新前の位置（`oldPos`）と `newPos` を用い、以下の優先順位で判定する。
-            - **天体衝突**: `body.checkCollision(newPos, oldPos, rocket.radius)` が真。
+            - **天体衝突**: `body.checkCollision(newPos, oldPos, bodyCollisionRadius)` が真。
+                - `bodyCollisionRadius` は `rocket.radius` が正の有限値ならその値、未定義の場合は v1 と同じ `2` world px を船体半径として扱い、`gameBalance.COLLISION_MARGIN` を加算した値とする。
+                - `rocket.isSafeToReturn === false` の間、母星との衝突判定は一時除外する。
                 - `rocket.lastEvasionBody` が安全距離内にある場合、その天体との衝突判定は一時除外する。
                 - **回避試行**: 衝突時、`rocket.useAvoidanceModule('body', body)` を呼び出す。
                 - **継続処理**: 戻り値（`avoidance`）が `null` でない場合、衝突判定をキャンセルし航行を継続。

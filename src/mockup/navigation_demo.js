@@ -77,7 +77,7 @@ function createDemoRocket(repository, launchAngle = DEFAULT_LAUNCH_ANGLE) {
 function createLaunchPosition(repository, launchAngle) {
     const config = repository.getMasterConfig();
     const balance = repository.getGameBalance();
-    const launchRadius = config.homeStarRadius + (balance.SHIP_START_OFFSET ?? 0);
+    const launchRadius = config.homeStarRadius + balance.SHIP_START_OFFSET;
 
     return {
         x: Math.cos(launchAngle) * launchRadius,

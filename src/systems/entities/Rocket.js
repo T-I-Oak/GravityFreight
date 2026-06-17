@@ -68,6 +68,7 @@ class Rocket {
         this.ticks = 0;
         this.heldCargo = [];
         this.isGhost = false;
+        this.isSafeToReturn = false;
         this.gravityEffectTicksRemaining = this.#getInitialGravityEffectTicks();
         this.lastEvasionBody = null;
     }
@@ -93,6 +94,7 @@ class Rocket {
             ticks: this.ticks,
             heldCargo: this.heldCargo.map(item => item.createSnapshot()),
             isGhost: this.isGhost,
+            isSafeToReturn: this.isSafeToReturn,
             gravityEffectTicksRemaining: this.gravityEffectTicksRemaining
         };
     }
@@ -113,6 +115,7 @@ class Rocket {
         rocket.ticks = snapshot.ticks ?? 0;
         rocket.heldCargo = (snapshot.heldCargo || []).map(itemSnapshot => Item.fromSnapshot(itemSnapshot, gameDataRepository));
         rocket.isGhost = !!snapshot.isGhost;
+        rocket.isSafeToReturn = !!snapshot.isSafeToReturn;
         rocket.gravityEffectTicksRemaining = snapshot.gravityEffectTicksRemaining ?? rocket.gravityEffectTicksRemaining;
 
         return rocket;
