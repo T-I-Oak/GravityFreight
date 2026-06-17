@@ -40,7 +40,7 @@
 
 </head>
 
-<body class="theme-neon">
+<body>
     <!-- タイトル画面 -->
     <div id="title-screen" class="theme-neon">
         <canvas id="title-bg-canvas"></canvas>
@@ -72,7 +72,7 @@
     <div id="achievement-toast-container"></div>
 
     <!-- Replay HUD -->
-    <div id="replay-overlay" class="state-hidden">
+    <div id="replay-overlay" class="theme-neon state-hidden">
         <div class="panel replay-panel">
             <div class="panel-header">
                 <h2>MISSION DATA</h2>
@@ -87,32 +87,8 @@
         </div>
     </div>
 
-    <!-- Archive Overlay (Ranking & Achievements) (v1.1) -->
-    <div id="archive-overlay" class="overlay-container state-hidden">
-        <div class="event-backdrop"></div>
-        <div class="event-modal theme-archive">
-            <div class="event-header">
-                <div id="archive-icon" class="archive-symbol">✦</div>
-                <div class="event-title-group">
-                    <h2 id="archive-main-title">CENTRAL ARCHIVE</h2>
-                    <div class="archive-tabs-nav">
-                        <button class="archive-tab-btn active" data-tab="ranking">RANKING</button>
-                        <button class="archive-tab-btn" data-tab="achievements">ACHIEVEMENTS</button>
-                        <button class="archive-tab-btn" data-tab="replays">REPLAYS</button>
-                    </div>
-                </div>
-            </div>
-            <div class="archive-body" id="archive-content-root">
-                <div id="archive-list-container">
-                    <!-- Content will be rendered here -->
-                </div>
-            </div>
-            <div class="event-footer">
-                <div class="status-left"></div>
-                <button id="close-archive-btn" class="premium-button">CLOSE ARCHIVE</button>
-            </div>
-        </div>
-    </div>
+    <!-- Archive Overlay -->
+    <div id="archive-screen-overlay" class="theme-matte state-hidden" hidden></div>
 
 
     <!-- 操作説明パネル -->
@@ -286,7 +262,7 @@
     </div>
 
     <!-- ストーリー表示モーダル (v0.15) -->
-    <div id="story-overlay" class="state-hidden">
+    <div id="story-overlay" class="theme-neon state-hidden">
         <div class="story-modal">
             <div class="story-header">
                 <div class="story-branch-icon" id="story-branch-icon">T</div>
@@ -300,7 +276,7 @@
         </div>
     </div>
     <!-- 設定パネル -->
-    <div id="settings-overlay" class="state-hidden">
+    <div id="settings-overlay" class="theme-neon state-hidden">
         <div class="panel settings-modal">
             <div class="panel-header">
                 <h2>SETTINGS</h2>

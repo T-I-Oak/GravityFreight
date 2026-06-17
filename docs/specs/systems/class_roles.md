@@ -18,6 +18,7 @@ graph TD
 
     %% Control Layer
     Orchestrator --> UI["UIController (UI/Input)"]
+    UI --> ADV["ArchiveDialogView (Archive Dialog)"]
     UI --> AMV["AppMetadataView (App Metadata)"]
     UI --> SDV["SettingsDialogView (Settings Dialog)"]
     UI --> MIC["MapInputController (Canvas Input)"]
@@ -28,6 +29,7 @@ graph TD
 
     %% Logic & System Layer
     Orchestrator --> GC["GameController (Game Flow/Logic)"]
+    Orchestrator --> ASP["ArchiveScreenPresenter"]
     GC --> BFC["BuildFlowController"]
     GC --> BSP["BuildScreenPresenter"]
     GC --> SPC["SectorProgressionController"]
@@ -230,13 +232,20 @@ graph TD
         - `SessionState.inventory` と現在の選択状態から、ビルドパネルのカテゴリ別表示データを作成する。
         - ビルド画面の空表示、発射ボタン文言、発射可能状態を表示用データとしてまとめる。
         - DOM 更新や選択状態の変更は担当しない。
+- **ArchiveScreenPresenter**
+    - 生存期間: App Lifecycle
+    - 役割: Analytic Archive 表示用 view data 生成。
+    - 責務:
+        - `GameRecordTracker`, `RankTracker`, `AchievementTracker`, `FlightRecorder` の実データを読み取り、Archive 画面用の KPI、ランキング、リプレイ一覧、実績進捗へ変換する。
+        - DOM 生成、タブ切替、リプレイ再生開始、永続データ更新は担当しない。
 - **SectorProgressionController**
     - 生存期間: Game Lifecycle
     - 役割: セクター進行・契約終了判定。
     - 責務:
         - 次セクター開始時の `SessionState` 更新、`Sector` 生成、HUD / Renderer 更新を実行する。
         - 施設退出時および航行結果確定後のゲームオーバー判定を実行する。
-        - 契約終了時に記録値・実績・ランキング確定処理を呼び出し、ゲーム終了画面へ結果を渡す。
+        - 契約終了時に記録値・実績の確定処理を呼び出し、ゲーム終了画面へ結果を渡す。
+        - ランキング登録は正式なゲーム終了処理に接続するため、現時点のゲームオーバー判定からは呼び出さない。
 - **StorySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 物語（Story）の選択・永続進捗管理。
@@ -276,6 +285,7 @@ graph TD
     - 責務:
         - アプリ共通のインフラクラスの保持と初期化。
         - タイトル画面の管理と、ゲーム本編（GameController）の起動。
+        - Analytic Archive の表示データ生成と、選択されたリプレイ記録から `ReplayContext` を生成する入口を管理する。
 - **GameDataRepository**
     - 生存期間: App Lifecycle
     - 役割: GravityFreight のデータアクセス統合窓口。
@@ -298,6 +308,10 @@ graph TD
     - 生存期間: App Lifecycle
     - 役割: 設定ダイアログ表示。
     - 責務: タイトル画面の設定ボタンから設定オーバーレイを開き、閉じる / DONE 操作で閉じる。操作音などの共通 UI フィードバックは `UIController.setOperationHandler()` から渡される binder に委譲する。
+- **ArchiveDialogView**
+    - 生存期間: App Lifecycle
+    - 役割: Analytic Archive ダイアログ表示。
+    - 責務: タイトル画面の RECORDS ボタンから Archive overlay を開き、`ArchiveComponents` が生成した HTML を表示する。タブ切替、閉じる操作、リプレイ行選択、選択されたリプレイ記録 ID の通知を管理し、表示データ生成、リプレイ再生本体、永続データ更新は担当しない。
 - **MapInputController**
     - 生存期間: App Lifecycle
     - 役割: Canvas 入力イベント正規化。

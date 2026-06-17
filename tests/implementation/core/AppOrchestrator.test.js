@@ -25,6 +25,8 @@ function createUIControllerStub() {
     };
     return {
         showTitleScreen: vi.fn(),
+        showRecordScreen: vi.fn(),
+        setReplayStartHandler: vi.fn(),
         setStartHandler: vi.fn(),
         setRecordHandler: vi.fn(),
         setManualHandler: vi.fn(),
@@ -83,6 +85,7 @@ describe('AppOrchestrator', () => {
         expect(uiController.setAppMetadata).toHaveBeenCalledWith(expect.objectContaining({
             version: packageData.version
         }));
+        expect(uiController.setReplayStartHandler).toHaveBeenCalled();
         expect(uiController.showTitleScreen).toHaveBeenCalled();
         expect(titleScreenAnimator.start).toHaveBeenCalledTimes(1);
         expect(titleScreenAnimator.stop).toHaveBeenCalledTimes(1);
@@ -110,5 +113,56 @@ describe('AppOrchestrator', () => {
         expect(orchestrator.gameController).toBeNull();
         expect(uiController.showTitleScreen).toHaveBeenCalledTimes(2);
         expect(titleScreenAnimator.start).toHaveBeenCalledTimes(2);
+    });
+
+    it('opens the record screen with persistent archive data', async () => {
+        const orchestrator = new AppOrchestrator({
+            commonDataManager,
+            uiController,
+            worldRenderer: renderer,
+            titleScreenAnimator,
+            gameControllerClass: FakeGameController,
+            i18nAdapter: { expandLanguageResource: value => value }
+        });
+
+        await orchestrator.boot();
+        uiController.setRecordHandler.mock.calls[0][0]();
+
+        expect(uiController.showRecordScreen).toHaveBeenCalledWith(expect.objectContaining({
+            kpis: expect.objectContaining({
+                totalCompletedSectors: 0,
+                lifetimeContracts: 0,
+                totalCollectedItems: 0,
+                achievementRate: 0
+            }),
+            rankings: expect.objectContaining({
+                score: [],
+                sector: [],
+                collected: []
+            }),
+            replays: [],
+            achievements: expect.any(Array)
+        }));
+    });
+
+    it('creates a replay context from the selected archive replay id', async () => {
+        const orchestrator = new AppOrchestrator({
+            commonDataManager,
+            uiController,
+            worldRenderer: renderer,
+            titleScreenAnimator,
+            gameControllerClass: FakeGameController,
+            i18nAdapter: { expandLanguageResource: value => value }
+        });
+
+        await orchestrator.boot();
+        orchestrator.systems.flightRecorder = {
+            createReplayContext: vi.fn(() => ({ record: { id: 'flight_1' } }))
+        };
+        const context = uiController.setReplayStartHandler.mock.calls[0][0]('flight_1');
+
+        expect(orchestrator.systems.flightRecorder.createReplayContext).toHaveBeenCalledWith('flight_1');
+        expect(context.record.id).toBe('flight_1');
+        expect(orchestrator.replayContext).toBe(context);
     });
 });

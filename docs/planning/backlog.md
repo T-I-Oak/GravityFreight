@@ -29,8 +29,12 @@
 
 ### 実装順マイルストーン
 - [ ] M4: 航行終了後の記録・経済・施設導線を接続する
-    - [ ] Analytic Archive の実データ接続
-    - [ ] リプレイ再生の実データ接続
+    - [ ] 正式なゲーム終了処理にランキング登録を接続する
+        - 現時点の航行終了・施設退出・ゲームオーバー判定からは `RankTracker.recordGameResult()` を呼び出さない
+        - 登録タイミングはゲーム終了が確定し、1プレイ単位のゲームリザルトを保存できる時点とする
+    - [ ] リプレイ再生画面に `ReplayContext` を接続する
+        - Analytic Archive の Replays タブで選択した記録 ID から `FlightRecorder.createReplayContext(recordId)` を呼ぶ入口は接続済み
+        - 残りは `ReplayContext` を用いたマップ表示、物理再生ループ、再生終了後に Replays タブへ戻る導線の実装
 
 ### ドメイン別タスク
 - [ ] content/data 系リソースの i18n 対応を棚卸しして実施する
@@ -54,6 +58,8 @@
         - [ ] 実ブラウザで v1 と比較して星密度、速度、光跡の見え方を調整する
     - [ ] 数値表示用 class とカテゴリ class の責務を分離する
         - β v1 と同様に、所持金などの数値表示は `.num-coin` 等の数値専用 class を使い、ItemCard のカテゴリ `.coin` に数値用の発光やフォント指定が継承されないようにする
+    - [ ] `archive.css` の責務分割を行う
+        - Analytic Archive 固有のレイアウト、テーブル、実績カード表示が同一ファイルに集約されているため、ファイルサイズと責務境界を見直す
     - [ ] SoundController
 - [ ] How To Play を実装する
     - [ ] HowToPlayUI

@@ -104,7 +104,7 @@ describe('SectorProgressionController', () => {
         expect(context.uiController.showGameEndSequence).not.toHaveBeenCalled();
     });
 
-    it('records and shows the game end sequence when the session cannot continue', () => {
+    it('records game-end achievements without registering rankings before the final game-end flow exists', () => {
         const gameOver = { reason: 'NO_PARTS_REMAINING', details: ['LAUNCHER'] };
         context.economySystem.checkGameOver.mockReturnValue(gameOver);
 
@@ -116,10 +116,9 @@ describe('SectorProgressionController', () => {
         });
         const gameResult = context.sessionState.getGameResultSummary.mock.results.at(-1).value;
         expect(context.gameRecordTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
-        expect(context.rankTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
+        expect(context.rankTracker.recordGameResult).not.toHaveBeenCalled();
         expect(context.uiController.showGameEndSequence).toHaveBeenCalledWith(gameResult, gameOver, {
-            achievements: [{ achievementId: 'contract', tier: 1 }],
-            ranks: { scoreRank: 1 }
+            achievements: [{ achievementId: 'contract', tier: 1 }]
         });
     });
 });

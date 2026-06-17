@@ -1,5 +1,7 @@
 import { FlightResultComponents } from './FlightResultComponents.js';
 import { FacilityComponents } from './FacilityComponents.js';
+import { ArchiveComponents } from './ArchiveComponents.js';
+import ArchiveDialogView from './ArchiveDialogView.js';
 import { UIComponents } from './UIComponents.js';
 import AppMetadataView from './AppMetadataView.js';
 import MapInputController from './MapInputController.js';
@@ -12,6 +14,8 @@ class UIController {
         this.gameDataRepository = options.gameDataRepository;
         this.flightResultComponents = options.flightResultComponents || FlightResultComponents;
         this.facilityComponents = options.facilityComponents || FacilityComponents;
+        this.archiveComponents = options.archiveComponents || ArchiveComponents;
+        this.archiveDialogView = options.archiveDialogView || new ArchiveDialogView({ document: this.document, operationBinder: (element, handler) => this.setOperationHandler(element, handler) });
         this.appMetadataView = options.appMetadataView || new AppMetadataView({ document: this.document });
         this.settingsDialogView = options.settingsDialogView || new SettingsDialogView({ document: this.document, operationBinder: (element, handler) => this.setOperationHandler(element, handler) });
         this.starInfoPanel = options.starInfoPanel || new StarInfoPanel({ document: this.document });
@@ -62,6 +66,7 @@ class UIController {
             this.document.querySelector('#mail-btn-2')
         ].filter(Boolean);
         this.settingsDialogView.initialize();
+        this.archiveDialogView.initialize();
         this.#wireBuildTabs();
         this.#wireBuildPanelToggle();
     }
@@ -151,18 +156,13 @@ class UIController {
         this.launchControl?.classList.toggle('state-locked', !!isFlight);
     }
 
-    getMapCanvas() {
-        return this.mapCanvas;
-    }
-
+    getMapCanvas() { return this.mapCanvas; }
     getTitleCanvases() { return { background: this.#requiredElement('#title-bg-canvas'), foreground: this.#requiredElement('#title-fg-canvas') }; }
-
     setAppMetadata(metadata) { this.appMetadataView.setMetadata(metadata); }
-
-    setStartHandler(handler) {
-        this.setOperationHandler(this.#requiredElement('#start-game-btn'), handler);
-    }
-
+    setStartHandler(handler) { this.setOperationHandler(this.#requiredElement('#start-game-btn'), handler); }
+    setRecordHandler(handler) { this.archiveDialogView.setOpenHandler(handler); }
+    showRecordScreen(viewData) { this.archiveDialogView.show(viewData, this.archiveComponents); }
+    setReplayStartHandler(handler) { this.archiveDialogView.setReplayStartHandler(handler); }
     showResultScreen(viewData) {
         this.hideStarInfo();
         this.#closeBuildPanel();

@@ -84,8 +84,8 @@
         3. ゲームオーバー結果が返った場合は、ゲームリザルト表示用の `GameResultSummary` を `sessionState.getGameResultSummary()` で取得する。
         4. `GameRecordTracker.recordGameResult(gameResult)` を呼び出し、契約完了回数など契約終了時にのみ確定する記録値を更新する。
         5. `AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['lifetime_contracts'] })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
-        6. `RankTracker.recordGameResult(gameResult)` を呼び出し、ランキング表示用レコードを更新する。
-        7. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
+        6. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
+    - ランキング登録は、ゲーム終了処理が正式に接続された段階で、その終了確定タイミングから行う。現時点のゲームオーバー判定フローでは `RankTracker.recordGameResult()` を呼び出さない。
 
 - **`returnToTitle(): void`**
     - ゲーム終了画面のタイトル復帰操作を処理する。

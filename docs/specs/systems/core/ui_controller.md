@@ -54,6 +54,10 @@
     - **内部挙動**: タイトル、航行結果画面、施設画面を非表示にし、プレイ画面と HUD を表示する。セクター生成前またはワープ中は操作対象ではないため、ビルドパネルと発射ボタンは非表示にする。
 - **`showRecordScreen(): void`**
     - 記録画面を表示する。
+    - **内部挙動**:
+        1. `ArchiveDialogView.show(viewData, ArchiveComponents)` へ委譲する。
+        2. `ArchiveComponents` が生成した HTML を Archive overlay に表示する。
+    - **責務境界**: Archive 表示用 view data の生成は `ArchiveScreenPresenter` が担当する。`UIController` は表示先と共通操作配線の入口だけを持つ。
 - **`showManualScreen(): void`**
     - 説明書（マニュアル）画面を表示する。
     - **責務境界**: 説明書本体のページ描画、背景画像、ページ切り替え、説明用デモは `HowToPlayUI` が担当する。`UIController` は画面表示の入口または既存画面の非表示制御に留める。
@@ -194,7 +198,11 @@
     - **内部挙動**: 内部で保持する開始ボタン要素を引数として `setOperationHandler` を呼び出す。
 - **`setRecordHandler(handler: Function): void`**
     - タイトル画面の「記録ボタン」にハンドラを登録する。
-    - **内部挙動**: 内部で保持する記録ボタン要素を引数として `setOperationHandler` を呼び出す。
+    - **内部挙動**: `ArchiveDialogView.setOpenHandler(handler)` へ委譲し、内部で `setOperationHandler` を通じて操作音付きクリックとして登録する。
+- **`setReplayStartHandler(handler: (recordId: string) => void): void`**
+    - Archive Replays タブの「PLAY REPLAY」操作にハンドラを登録する。
+    - **内部挙動**: `ArchiveDialogView.setReplayStartHandler(handler)` へ委譲する。
+    - **責務境界**: `UIController` は選択された replay record id の通知だけを中継し、リプレイ snapshot の復元や再生画面遷移は担当しない。
 - **`setManualHandler(handler: Function): void`**
     - タイトル画面の「説明書ボタン」にハンドラを登録する。
     - **内部挙動**: 内部で保持する説明書ボタン要素を引数として `setOperationHandler` を呼び出す。登録されるハンドラは `AppOrchestrator` 経由で `HowToPlayUI.show()` へ接続される。

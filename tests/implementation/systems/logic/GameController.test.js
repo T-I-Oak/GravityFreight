@@ -575,18 +575,13 @@ describe('GameController', () => {
         });
         const gameResult = context.sessionState.getGameResultSummary.mock.results.at(-1).value;
         expect(context.gameRecordTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
-        expect(context.rankTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
+        expect(context.rankTracker.recordGameResult).not.toHaveBeenCalled();
         expect(context.achievementTracker.evaluateAchievements).toHaveBeenLastCalledWith({
             source: 'game_record',
             keys: ['lifetime_contracts']
         });
         expect(context.uiController.showGameEndSequence).toHaveBeenCalledWith(gameResult, gameOver, {
-            achievements: [{ achievementId: 'stat_launches', tier: 3, value: 20 }],
-            ranks: {
-                scoreRank: 1,
-                sectorRank: 1,
-                collectedRank: 1
-            }
+            achievements: [{ achievementId: 'stat_launches', tier: 3, value: 20 }]
         });
         expect(context.sectorFactory).not.toHaveBeenCalled();
     });

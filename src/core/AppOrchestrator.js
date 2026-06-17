@@ -4,6 +4,7 @@ import packageData from '../../package.json';
 import GameDataRepository from './GameDataRepository.js';
 import SessionState from '../systems/entities/SessionState.js';
 import AchievementTracker from '../systems/logic/AchievementTracker.js';
+import ArchiveScreenPresenter from '../systems/logic/ArchiveScreenPresenter.js';
 import EconomySystem from '../systems/logic/EconomySystem.js';
 import FlightRecorder from '../systems/logic/FlightRecorder.js';
 import GameController from '../systems/logic/GameController.js';
@@ -29,6 +30,7 @@ class AppOrchestrator {
         this.gameControllerClass = options.gameControllerClass || GameController;
         this.gameDataRepository = null;
         this.gameController = null;
+        this.replayContext = null;
         this.systems = null;
     }
 
@@ -55,7 +57,8 @@ class AppOrchestrator {
         );
         this.uiController.setAppMetadata?.(this.gameDataRepository.getAppMetadata());
         this.uiController.setStartHandler(() => this.startGame());
-        this.uiController.setRecordHandler?.(() => {});
+        this.uiController.setRecordHandler?.(() => this.showRecordScreen());
+        this.uiController.setReplayStartHandler?.(recordId => this.startReplay(recordId));
         this.uiController.setManualHandler?.(() => {});
         this.uiController.showTitleScreen();
         this.titleScreenAnimator.start();
@@ -80,6 +83,22 @@ class AppOrchestrator {
         this.worldRenderer.setRenderLoopActive?.(false);
         this.uiController.showTitleScreen();
         this.titleScreenAnimator.start();
+    }
+
+    showRecordScreen() {
+        const presenter = new ArchiveScreenPresenter({
+            gameRecordTracker: this.systems.gameRecordTracker,
+            rankTracker: this.systems.rankTracker,
+            achievementTracker: this.systems.achievementTracker,
+            flightRecorder: this.systems.flightRecorder,
+            gameDataRepository: this.gameDataRepository
+        });
+        this.uiController.showRecordScreen(presenter.createViewData());
+    }
+
+    startReplay(recordId) {
+        this.replayContext = this.systems.flightRecorder.createReplayContext(recordId);
+        return this.replayContext;
     }
 
     #createAppSystems() {

@@ -7,7 +7,7 @@
 - **役割**: セクター進行と契約終了判定の実行者。
 - **責務**:
     - 施設退出後、次セクター開始に必要な session 更新、Sector 生成、HUD / Renderer 更新を実行する。
-    - 航行結果確定後または施設退出時のゲームオーバー判定を実行し、契約終了時の記録・ランキング・実績・終了画面表示をまとめる。
+    - 航行結果確定後または施設退出時のゲームオーバー判定を実行し、契約終了時の記録・実績・終了画面表示をまとめる。
     - GameController から呼び出され、画面入力や施設取引そのものは扱わない。
 
 ## 2. インターフェース (Interface)
@@ -15,7 +15,7 @@
 ### メソッド (Methods)
 
 - **`constructor(infrastructure: object)`**
-    - `sessionState`, `economySystem`, `gameRecordTracker`, `rankTracker`, `achievementTracker`, `uiController`, `worldRenderer`, `gameDataRepository` を保持する。
+    - `sessionState`, `economySystem`, `gameRecordTracker`, `achievementTracker`, `uiController`, `worldRenderer`, `gameDataRepository` を保持する。
     - テスト用に `sectorFactory` を受け取れる。未指定時は `new Sector(sessionState, isAnomaly, gameDataRepository, economySystem)` を使用する。
 
 - **`checkGameOverAndStartEndSequence(context: object): boolean`**
@@ -25,9 +25,9 @@
         1. `SessionState.getGameResultSummary({ completedSectors })` で契約結果を取得する。
         2. `GameRecordTracker.recordGameResult(gameResult)` を呼び出す。
         3. 更新キーがある場合、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
-        4. `RankTracker.recordGameResult(gameResult)` を呼び出す。
-        5. `UIController.showGameEndSequence(gameResult, gameOver, { achievements, ranks })` を呼び出す。
-        6. `true` を返す。
+        4. `UIController.showGameEndSequence(gameResult, gameOver, { achievements })` を呼び出す。
+        5. `true` を返す。
+    - ランキング登録は、ゲーム終了処理が正式に接続された段階で、その終了確定タイミングから `RankTracker` へ委譲する。本クラスの現在のゲームオーバー判定からは登録しない。
 
 - **`beginSectorTransition(options: object): Promise<Sector>`**
     - 次セクターを開始する。

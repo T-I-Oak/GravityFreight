@@ -66,6 +66,10 @@ describe('UIController', () => {
                 <button id="close-settings-btn"></button>
                 <button id="settings-done-btn"></button>
             </div>
+            <button id="archive-btn"></button>
+            <div id="archive-screen-overlay" hidden class="theme-matte state-hidden">
+                <div id="archive-screen-root"></div>
+            </div>
             <button id="start-game-btn"></button>
             <main id="flight-result-screen" hidden></main>
             <main id="facility-screen" hidden></main>
@@ -257,6 +261,32 @@ describe('UIController', () => {
         expect(document.querySelector('#inventory-panel').hidden).toBe(false);
         expect(document.querySelector('#inventory-panel').classList.contains('state-hidden')).toBe(false);
         expect(document.querySelector('#inventory-panel').classList.contains('state-collapsed')).toBe(false);
+    });
+
+    it('opens the analytic archive from title records data', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const recordHandler = vi.fn(() => controller.showRecordScreen({
+            kpis: {
+                totalCompletedSectors: 3,
+                lifetimeContracts: 1,
+                totalCollectedItems: 8,
+                achievementRate: 20
+            },
+            rankings: { score: [], sector: [], collected: [] },
+            recentResults: [],
+            replays: [],
+            achievements: []
+        }));
+
+        controller.setRecordHandler(recordHandler);
+        document.querySelector('#archive-btn').click();
+
+        expect(recordHandler).toHaveBeenCalledTimes(1);
+        expect(soundController.playSE).toHaveBeenCalledWith('click');
+        expect(document.querySelector('#archive-screen-overlay').hidden).toBe(false);
+        expect(document.querySelector('#archive-screen-root').textContent).toContain('ANALYTIC ARCHIVE');
+        expect(document.querySelector('#archive-screen-root').textContent).toContain('MAX SECTOR');
+        expect(document.querySelector('#archive-screen-overlay').classList.contains('theme-matte')).toBe(true);
     });
 
     it('switches to a sector transition screen before build controls are available', () => {
