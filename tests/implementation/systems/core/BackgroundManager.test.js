@@ -186,6 +186,47 @@ describe('BackgroundManager', () => {
         expect(manager.warpSpeed).toBe(100);
     });
 
+    it('moves stars toward deeper space during reverse warp', () => {
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette: createColorPalette() });
+
+        manager.initialize({ width: 640, height: 480 });
+        const initialDepth = manager.stars[0].z;
+        manager.startReverseWarpEffect();
+        manager.update(0.5);
+
+        expect(manager.warpSpeed).toBe(-100);
+        expect(manager.stars[0].z).toBeCloseTo(initialDepth + 300, 6);
+    });
+
+    it('draws reverse warp streaks and replenishes stars that move beyond deep space', () => {
+        const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette: createColorPalette() });
+        const context = createContext();
+
+        manager.initialize({ width: 640, height: 480 });
+        manager.stars = [{
+            x: 100,
+            y: 0,
+            z: 200,
+            previousZ: 100,
+            size: 1,
+            alpha: 1,
+            pulseRate: 0,
+            pulseOffset: 0,
+            wrapped: false
+        }];
+        manager.startReverseWarpEffect();
+        manager.render(context, { width: 640, height: 480, timestamp: 0 });
+
+        expect(context.moveTo).toHaveBeenCalled();
+        expect(context.lineTo).toHaveBeenCalled();
+
+        manager.stars[0].z = 1990;
+        manager.update(0.5);
+
+        expect(manager.stars[0].z).toBeLessThan(500);
+        expect(manager.stars[0].wrapped).toBe(true);
+    });
+
     it('smoothly returns star brightness to normal while warp speed slows down', () => {
         const colorPalette = createColorPalette();
         const manager = new BackgroundManager({ starCount: 1, seed: 3, colorPalette });

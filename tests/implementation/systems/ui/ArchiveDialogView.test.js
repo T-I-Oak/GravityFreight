@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ArchiveDialogView from '../../../../src/systems/ui/ArchiveDialogView.js';
 import { ArchiveComponents } from '../../../../src/systems/ui/ArchiveComponents.js';
+import ReplayProtectFlow from '../../../../src/systems/ui/ReplayProtectFlow.js';
 
 describe('ArchiveDialogView', () => {
     let operationBinder;
@@ -11,9 +12,36 @@ describe('ArchiveDialogView', () => {
             <div id="archive-screen-overlay" hidden class="theme-matte state-hidden"></div>
         `;
         operationBinder = vi.fn((element, handler) => {
-            element.addEventListener('click', () => handler(element));
+            element.addEventListener('click', event => handler(element, event));
         });
     });
+
+    function createReplayProtectFlow(handler, recordsProvider) {
+        const flow = new ReplayProtectFlow({
+            document,
+            operationBinder,
+            gameDataRepository: {
+                getUiText: vi.fn(key => ({
+                    'flightResult.favoriteLimit.title': 'PROTECT LIMIT REACHED',
+                    'flightResult.favoriteLimit.message': 'Select a protected replay to unprotect.',
+                    'flightResult.favoriteLimit.archiveMessage': 'Release another protected record first.',
+                    'flightResult.favoriteLimit.count': '{count}/{max} protected',
+                    'flightResult.favoriteLimit.sector': 'SECTOR',
+                    'flightResult.favoriteLimit.score': 'SCORE',
+                    'flightResult.favoriteLimit.protectColumn': 'PROTECT',
+                    'flightResult.favoriteLimit.noColumn': 'NO.',
+                    'flightResult.favoriteLimit.dateColumn': 'DATE TIME',
+                    'flightResult.favoriteLimit.currentRecord': 'CURRENT',
+                    'flightResult.favoriteLimit.currentDate': 'CURRENT FLIGHT',
+                    'flightResult.favoriteLimit.ok': 'OK',
+                    'flightResult.favoriteLimit.cancel': 'CANCEL'
+                })[key])
+            }
+        });
+        flow.setCommitHandler(handler);
+        flow.setRecordsProvider(recordsProvider);
+        return flow;
+    }
 
     it('binds the title records button and renders archive HTML', () => {
         const view = new ArchiveDialogView({ document, operationBinder });
@@ -107,5 +135,69 @@ describe('ArchiveDialogView', () => {
         playButton.click();
 
         expect(replayStartHandler).toHaveBeenCalledWith('flight_2');
+    });
+
+    it('toggles replay favorite state without selecting the replay row', () => {
+        const records = [
+            { id: 'flight_1', no: '01', favorite: true, reachedSector: 4, score: 7000, createdAt: '2026.06.17 11:00' },
+            { id: 'flight_2', no: '02', favorite: false, reachedSector: 2, score: 3000, createdAt: '2026.06.17 12:00' }
+        ];
+        const favoriteHandler = vi.fn(request => ({ id: request.recordId, favorite: request.favorite }));
+        const view = new ArchiveDialogView({
+            document,
+            operationBinder,
+            replayProtectFlow: createReplayProtectFlow(favoriteHandler, () => records)
+        });
+
+        view.show({
+            kpis: {},
+            rankings: {},
+            recentResults: [],
+            replays: records,
+            achievements: []
+        }, ArchiveComponents);
+
+        document.querySelector('[data-replay-favorite="flight_2"]').click();
+
+        expect(favoriteHandler).toHaveBeenCalledWith(expect.objectContaining({
+            source: 'archive',
+            recordId: 'flight_2',
+            favorite: true
+        }));
+        expect(document.querySelector('[data-replay-favorite="flight_2"]').classList.contains('state-active')).toBe(true);
+        expect(document.querySelector('[data-replay-id="flight_2"]').classList.contains('state-active')).toBe(false);
+    });
+
+    it('keeps the sixth archive protect operation off and shows an inline limit message', () => {
+        const records = [
+            { id: 'flight_1', no: '01', favorite: true, reachedSector: 4, score: 7000, createdAt: '2026.06.17 11:00' },
+            { id: 'flight_2', no: '02', favorite: true, reachedSector: 3, score: 6000, createdAt: '2026.06.17 12:00' },
+            { id: 'flight_3', no: '03', favorite: true, reachedSector: 2, score: 5000, createdAt: '2026.06.17 13:00' },
+            { id: 'flight_4', no: '04', favorite: true, reachedSector: 2, score: 4000, createdAt: '2026.06.17 14:00' },
+            { id: 'flight_5', no: '05', favorite: true, reachedSector: 1, score: 3000, createdAt: '2026.06.17 15:00' },
+            { id: 'flight_6', no: '06', favorite: false, reachedSector: 1, score: 2000, createdAt: '2026.06.17 16:00' }
+        ];
+        const favoriteHandler = vi.fn(request => ({ id: request.recordId, favorite: request.favorite }));
+        const view = new ArchiveDialogView({
+            document,
+            operationBinder,
+            replayProtectFlow: createReplayProtectFlow(favoriteHandler, () => records)
+        });
+
+        view.show({
+            kpis: {},
+            rankings: {},
+            recentResults: [],
+            replays: records,
+            achievements: []
+        }, ArchiveComponents);
+
+        document.querySelector('[data-replay-favorite="flight_6"]').click();
+
+        expect(document.querySelector('[data-replay-favorite="flight_6"]').classList.contains('state-active')).toBe(false);
+        expect(document.querySelector('.replay-protect-modal')).toBeNull();
+        expect(document.querySelector('.archive-protect-toast').textContent).toContain('Release another protected record first.');
+        expect(document.querySelector('.archive-protect-toast').classList.contains('state-active')).toBe(true);
+        expect(favoriteHandler).not.toHaveBeenCalled();
     });
 });

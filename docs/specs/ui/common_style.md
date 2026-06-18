@@ -107,7 +107,9 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 | `.state-mini` | Draft | 高密度の小型表示 | ItemCard、Badge、DurabilityGauge |
 | `.state-new` | Draft | 新着、未読、未確認 | Story、通知、実績 |
 | `.state-locked` | Draft | 未解除、使用不可 | 実績、機能、記録 |
+| `.state-readonly` | Draft | 表示のみで内容操作不可 | ビルドパネルのマップ確認・施設滞在表示 |
 | `.state-recorded` | Draft | 記録済み、保存済み | 航行結果、リプレイ |
+| `.state-not-recorded` | Draft | 記録対象外、未保存 | 航行結果、リプレイ |
 | `.state-enhanced` | Draft | 強化済み | アイテム性能、耐久度 |
 | `.state-delivered` | Draft | 配送条件を満たした | 航行結果、貨物表示 |
 | `.state-unmatched` | Draft | 配送条件を満たしていない | 航行結果、貨物表示 |

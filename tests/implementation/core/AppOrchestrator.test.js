@@ -27,6 +27,8 @@ function createUIControllerStub() {
         showTitleScreen: vi.fn(),
         showRecordScreen: vi.fn(),
         setReplayStartHandler: vi.fn(),
+        setReplayProtectHandler: vi.fn(),
+        setReplayProtectRecordsProvider: vi.fn(),
         setStartHandler: vi.fn(),
         setRecordHandler: vi.fn(),
         setManualHandler: vi.fn(),
@@ -86,6 +88,8 @@ describe('AppOrchestrator', () => {
             version: packageData.version
         }));
         expect(uiController.setReplayStartHandler).toHaveBeenCalled();
+        expect(uiController.setReplayProtectHandler).toHaveBeenCalled();
+        expect(uiController.setReplayProtectRecordsProvider).toHaveBeenCalled();
         expect(uiController.showTitleScreen).toHaveBeenCalled();
         expect(titleScreenAnimator.start).toHaveBeenCalledTimes(1);
         expect(titleScreenAnimator.stop).toHaveBeenCalledTimes(1);
@@ -164,5 +168,56 @@ describe('AppOrchestrator', () => {
         expect(orchestrator.systems.flightRecorder.createReplayContext).toHaveBeenCalledWith('flight_1');
         expect(context.record.id).toBe('flight_1');
         expect(orchestrator.replayContext).toBe(context);
+    });
+
+    it('updates replay protect state from the shared replay protect flow', async () => {
+        const orchestrator = new AppOrchestrator({
+            commonDataManager,
+            uiController,
+            worldRenderer: renderer,
+            titleScreenAnimator,
+            gameControllerClass: FakeGameController,
+            i18nAdapter: { expandLanguageResource: value => value }
+        });
+
+        await orchestrator.boot();
+        orchestrator.systems.flightRecorder = {
+            setFavorite: vi.fn(() => ({ id: 'flight_1', favorite: true }))
+        };
+        const updated = uiController.setReplayProtectHandler.mock.calls[0][0]({
+            source: 'archive',
+            recordId: 'flight_1',
+            favorite: true
+        });
+
+        expect(orchestrator.systems.flightRecorder.setFavorite).toHaveBeenCalledWith('flight_1', true);
+        expect(updated).toEqual({ id: 'flight_1', favorite: true });
+    });
+
+    it('routes result replay protect changes to the active game controller', async () => {
+        const orchestrator = new AppOrchestrator({
+            commonDataManager,
+            uiController,
+            worldRenderer: renderer,
+            titleScreenAnimator,
+            gameControllerClass: FakeGameController,
+            i18nAdapter: { expandLanguageResource: value => value }
+        });
+
+        await orchestrator.boot();
+        await orchestrator.startGame();
+        orchestrator.gameController.handleResultProtect = vi.fn(() => ({ id: 'flight_current', favorite: true }));
+
+        const updated = uiController.setReplayProtectHandler.mock.calls[0][0]({
+            source: 'result',
+            recordId: 'flight_current',
+            favorite: true,
+            replaceRecordId: 'flight_old'
+        });
+
+        expect(orchestrator.gameController.handleResultProtect).toHaveBeenCalledWith(true, {
+            replaceRecordId: 'flight_old'
+        });
+        expect(updated).toEqual({ id: 'flight_current', favorite: true });
     });
 });

@@ -61,7 +61,8 @@ body {
 #build-overlay.state-hidden,
 #launch-control.state-hidden,
 #flight-result-screen[hidden],
-#facility-screen[hidden] {
+#facility-screen[hidden],
+#game-result-scene-container[hidden] {
     display: none;
 }
 

@@ -193,7 +193,7 @@
                                 <table class="ArchiveTable table-header">
                                     <thead>
                                         <tr>
-                                            <th class="col-fav">FAV</th>
+                                            <th class="col-fav">PROTECT</th>
                                             <th class="col-no">NO.</th>
                                             <th class="col-sector sector">SECTOR</th>
                                             <th class="col-score score">SCORE</th>
@@ -207,35 +207,35 @@
                                     <table class="ArchiveTable table-body" id="replay-table">
                                         <tbody>
                                             <tr class="state-inactive">
-                                                <td class="col-fav"><i class="favorite-star state-active" title="Unfavorite">★</i></td>
+                                                <td class="col-fav"><i class="favorite-star state-active" title="Unprotect">★</i></td>
                                                 <td class="col-no">01</td>
                                                 <td class="col-sector sector">5</td>
                                                 <td class="col-score score">24,800</td>
                                                 <td class="col-date">2026.04.18 14:22</td>
                                             </tr>
                                             <tr class="state-inactive">
-                                                <td class="col-fav"><i class="favorite-star state-inactive" title="Favorite">★</i></td>
+                                                <td class="col-fav"><i class="favorite-star state-inactive" title="Protect">★</i></td>
                                                 <td class="col-no">02</td>
                                                 <td class="col-sector sector">4</td>
                                                 <td class="col-score score">18,410</td>
                                                 <td class="col-date">2026.04.17 09:15</td>
                                             </tr>
                                             <tr class="state-inactive">
-                                                <td class="col-fav"><i class="favorite-star state-active" title="Unfavorite">★</i></td>
+                                                <td class="col-fav"><i class="favorite-star state-active" title="Unprotect">★</i></td>
                                                 <td class="col-no">03</td>
                                                 <td class="col-sector sector">4</td>
                                                 <td class="col-score score">17,200</td>
                                                 <td class="col-date">2026.04.16 23:40</td>
                                             </tr>
                                             <tr class="state-inactive">
-                                                <td class="col-fav"><i class="favorite-star state-inactive" title="Favorite">★</i></td>
+                                                <td class="col-fav"><i class="favorite-star state-inactive" title="Protect">★</i></td>
                                                 <td class="col-no">04</td>
                                                 <td class="col-sector sector">3</td>
                                                 <td class="col-score score">12,900</td>
                                                 <td class="col-date">2026.04.15 11:30</td>
                                             </tr>
                                             <tr class="state-inactive">
-                                                <td class="col-fav"><i class="favorite-star state-inactive" title="Favorite">★</i></td>
+                                                <td class="col-fav"><i class="favorite-star state-inactive" title="Protect">★</i></td>
                                                 <td class="col-no">05</td>
                                                 <td class="col-sector sector">3</td>
                                                 <td class="col-score score">11,400</td>
@@ -370,7 +370,7 @@
                 playBtn.classList.remove('state-disabled');
             });
 
-            // Favorite Toggle
+            // Protect Toggle
             const star = row.querySelector('.favorite-star');
             star.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevent row selection when clicking star
@@ -378,11 +378,11 @@
                 if (isActive) {
                     star.classList.remove('state-active');
                     star.classList.add('state-inactive');
-                    star.title = "Favorite";
+                    star.title = "Protect";
                 } else {
                     star.classList.remove('state-inactive');
                     star.classList.add('state-active');
-                    star.title = "Unfavorite";
+                    star.title = "Unprotect";
                 }
             });
         });

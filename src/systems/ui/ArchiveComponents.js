@@ -61,7 +61,7 @@ function createReplayRows(rows = []) {
     }
     return rows.map(row => `
         <tr class="state-inactive state-clickable" data-replay-id="${escapeHtml(row.id)}">
-            <td class="col-fav"><i class="favorite-star ${row.favorite ? 'state-active' : 'state-inactive'}">★</i></td>
+            <td class="col-fav"><i class="favorite-star state-clickable ${row.favorite ? 'state-active' : 'state-inactive'}" data-replay-favorite="${escapeHtml(row.id)}">★</i></td>
             <td class="col-no">${escapeHtml(row.no)}</td>
             <td class="col-sector sector">${formatNumber(row.reachedSector)}</td>
             <td class="col-score score">${formatNumber(row.score)}</td>
@@ -230,7 +230,7 @@ export const ArchiveComponents = {
                 </header>
                 <div class="Well ScrollArea">
                     <table class="ArchiveTable table-header">
-                        <thead><tr><th class="col-fav">FAV</th><th class="col-no">NO.</th><th class="col-sector sector">SECTOR</th><th class="col-score score">SCORE</th><th class="col-date">DATE TIME</th></tr></thead>
+                        <thead><tr><th class="col-fav">PROTECT</th><th class="col-no">NO.</th><th class="col-sector sector">SECTOR</th><th class="col-score score">SCORE</th><th class="col-date">DATE TIME</th></tr></thead>
                     </table>
                     <div class="archive-table-scroll-area"><table class="ArchiveTable table-body"><tbody>${createReplayRows(rows)}</tbody></table></div>
                 </div>

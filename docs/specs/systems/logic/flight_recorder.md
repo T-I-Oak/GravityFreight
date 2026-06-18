@@ -67,9 +67,10 @@
         4. UI 表示用メタ情報と復元済みインスタンスを `ReplayContext` として返す。
     - **エラー処理**: 対象記録が存在しない、または snapshot を復元できない場合は、データ整合性エラーとして例外を投げる。
 
-- **`setFavorite(recordId: string, favorite: boolean): void`**
+- **`setFavorite(recordId: string, favorite: boolean): FlightRecord`**
     - 指定された航行記録のお気に入り状態を更新する。
     - お気に入り上限は 5 件とし、上限到達時の置き換え判断は UI 側の確認ダイアログを経由する。
+    - 更新後の `FlightRecord` を defensive copy として返す。
 
 - **`savePendingRecordAsFavorite(): FlightRecord`**
     - 航行結果画面で、未保存の航行記録候補をお気に入りとして保存する。

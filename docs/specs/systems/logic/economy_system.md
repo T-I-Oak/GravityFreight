@@ -62,23 +62,31 @@
             - **Goal Bonus**: 施設到達報酬。Label は UI resource `flightResult.entries.goalBonus` を使用し、Score/Coin は到達施設の `rewardScore` / `rewardCoins`。
             - **拾得コイン**: Label は UI resource `flightResult.entries.collectedCoins` を使用し、Coin: `totalCollected`（Score は省略）
         2. **アイテム・配送結果の集計とレポート作成**:
-            - `flightData.heldCargo` を精査し、貨物・コイン・パーツ等を分類して `itemReport` を構築する。
+            - `flightData.heldCargo` を精査し、貨物・コイン・パーツ等を分類して、航行結果画面の回収リストに表示する `itemReport` を構築する。
+            - `itemReport` は正式に回収・配送結果として提示するものだけを含める。大破・遭難で失われる、または天体へ移動するだけのアイテムは `COLLECTED SPACE ASSETS` に表示しない。
             - **スタック集約ルール**: アイテムを一つずつ取り出し、既存の各 `StackedItem` に対して `add(item)` を実行する。`true` が返れば集約完了とし、すべてのスタックが `false` を返した場合のみ新規スタックを生成する。
             - **一致配送（Match）**:
-                - 同一の貨物を集約した `ItemReportEntry (type: 'delivery', status: 'match')` を作成する（`StackedItem` の集約ルールを適用）。
+                - `Cargo` のうち `deliveryGoalId` を持つものだけを配送対象として扱う。
+                - 同一の配送対象貨物を集約した `ItemReportEntry (type: 'delivery', status: 'match')` を作成する（`StackedItem` の集約ルールを適用）。
                 - そのグループに属する全貨物から発生した **全ボーナスアイテム** を、`session.sectorNumber` を参照した `drawLottery()` で抽選し、`StackedItem` のルールに従って集約し、`bonusItems` に格納する。
                 - ボーナス実体のうち、コインは `totalCoins` に加算し、パーツ類は `acquiredItems` に追加する。
                 - `entries` に UI resource `flightResult.entries.deliveryBonus` の Label で、Score/Coin: 配送成功報酬 + ボーナスコインを追加する。
                 - **物語解放**: `unlockedBranchId` に対象施設のブランチ ID を設定する。
             - **不一致配送（Unmatched）**:
-                - `ItemReportEntry (type: 'delivery', status: 'unmatched')` を作成。
+                - `deliveryGoalId` を持つ配送対象貨物が到達施設と一致しない場合、`ItemReportEntry (type: 'delivery', status: 'unmatched')` を作成。
                 - 不一致配送報酬は UI resource `flightResult.entries.deliveryBonus` の明細へ加算する。配送成功報酬がある場合は同じ明細に合算する。
+            - **特殊 Cargo**:
+                - `cargo_lucky` のように `Cargo` カテゴリだが `deliveryGoalId` を持たないアイテムは、配送対象ではない。
+                - 施設到達時の航行結果アイテム表示では `ItemReportEntry (type: 'other')` として扱い、`status: 'unmatched'` を付与しない。
+                - `cargo_lucky` は配送報酬を発生させず、割引率の集計だけに使う。
             - **その他回収物（Other）**:
-                - 配送以外で拾った全アイテムに対し、`StackedItem` のルールに従って集計・スタック化を行う。
+                - `cleared` または `returned` で正式に回収される Cargo 以外のアイテム、および特殊 Cargo に対し、`StackedItem` のルールに従って集計・スタック化を行う。
                 - 各スタックに対し `ItemReportEntry (type: 'other')` を作成する。
-                - パーツ（Chassis, Logic, Module, Booster）のみを `acquiredItems` に追加する。
+                - コインは `totalCoins` へ加算し、inventory に入るアイテムは `acquiredItems` に追加する。
+            - **大破・遭難**:
+                - `crashed` / `lost` では保持アイテムは正式回収されないため、`itemReport` には追加しない。
         3. **アイテムの移動判定**:
-            - **帰還（Returned）**: `Cargo` 種別のアイテムを母星（`collision.target`）の `lostToTarget` に格納。
+            - **帰還（Returned）**: `Cargo` 種別のアイテムのみを母星（`collision.target`）の `lostToTarget` に格納し、Cargo 以外は回収扱いにする。
             - **大破（Crashed）**: `heldCargo` および生存した `RocketItem` 内の構成パーツ（chassis / logic / modules、50% 判定）を衝突天体の `lostToTarget` に格納。
         4. **保険金の算定と明細追加**:
             - `status` が `'crashed'` または `'lost'` の場合のみ実行。
@@ -142,7 +150,7 @@
 - **`luckyDiscountRate: number`**: ゴール時に運んだ「幸運の導き」による割引率（0.0～0.5）。
 - **`flightTicks: number`**: 今回の航行で経過した Tick 数。ゲームリザルトの合計航行時間に加算される。
 - **`entries: SettlementEntry[]`**: 報酬の明細リスト（一行にスコアとコインを併記）。
-- **`itemReport: ItemReportEntry[]`**: UI 表示用の構造化されたアイテムリスト（配送とそのボーナスの紐付け等）。
+- **`itemReport: ItemReportEntry[]`**: 航行結果画面の回収リストに表示する構造化されたアイテムリスト。正式回収・配送結果として提示するものだけを含み、大破・遭難で失われるものは含めない。
 - **`acquiredItems: Item[]`**: インベントリへ正式に追加されるアイテムの実体リスト（ボーナスアイテム + 回収パーツ）。
 - **`lostToTarget: { target: object, items: Item[] } | null`**: クラッシュまたは母星帰還時、特定の天体に移動（蓄積）したアイテムリスト。
 

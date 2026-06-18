@@ -89,6 +89,48 @@ describe('SettlementCalculator', () => {
         ]);
     });
 
+    it('reports lucky cargo without unmatched delivery status because it is not a delivery item', () => {
+        const calculator = new SettlementCalculator(repository, lotteryService);
+        lotteryService.drawLottery.mockReturnValue([]);
+
+        const settlement = calculator.calculate({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        }, {
+            ticks: 12,
+            heldCargo: [
+                new Item('cargo_lucky', repository)
+            ],
+            rocketItem: createRocketItem()
+        }, session);
+
+        expect(settlement.luckyDiscountRate).toBe(0.1);
+        expect(settlement.itemReport).toHaveLength(1);
+        expect(settlement.itemReport[0].type).toBe('other');
+        expect(settlement.itemReport[0].status).toBeUndefined();
+    });
+
+    it('does not create unmatched delivery rewards for cargo without a delivery destination', () => {
+        const calculator = new SettlementCalculator(repository, lotteryService);
+        lotteryService.drawLottery.mockReturnValue([]);
+
+        const settlement = calculator.calculate({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        }, {
+            ticks: 12,
+            heldCargo: [
+                new Item('cargo_lucky', repository)
+            ],
+            rocketItem: createRocketItem()
+        }, session);
+
+        expect(settlement.entries).toEqual([
+            { label: 'Flight Duration Score', score: 12 },
+            { label: 'Goal Bonus', score: 2000, coin: 20 }
+        ]);
+    });
+
     it('uses repository UI text resources for settlement entry labels', () => {
         const calculator = new SettlementCalculator({
             getFacilityDefinition: () => ({

@@ -23,7 +23,7 @@
     5. 永続データを持つ各システム（Story, Achievement, Rank, FlightRecord 等）の `initialize()` を実行。
     6. **描画エンジンの初期化**: `WorldRenderer.initialize(uiController.getMapCanvas(), cameraController, backgroundManager)` を実行。
     7. **タイトル演出の初期化**: `TitleScreenAnimator.initialize(uiController.getTitleCanvases(), backgroundManager)` を実行する。`WorldRenderer` と `TitleScreenAnimator` には同一の `BackgroundManager` インスタンスを渡す。
-    8. **タイトル画面の配線**: `uiController` を通じて開始ハンドラ、記録画面ハンドラ、リプレイ開始ハンドラを登録する。記録画面ハンドラは `showRecordScreen()` へ、リプレイ開始ハンドラは `startReplay(recordId)` へ接続する。
+    8. **タイトル画面の配線**: `uiController` を通じて開始ハンドラ、記録画面ハンドラ、リプレイ開始ハンドラ、リプレイ保護共通フローの handler / records provider を登録する。記録画面ハンドラは `showRecordScreen()` へ、リプレイ開始ハンドラは `startReplay(recordId)` へ、リプレイ保護 handler は `setReplayProtect(request)` へ接続する。
     9. **初期画面表示**: `uiController.showTitleScreen()` と `TitleScreenAnimator.start()` を実行。
 
 - **`startGame(): void`**
@@ -54,3 +54,11 @@
         1. `FlightRecorder.createReplayContext(recordId)` を呼び出す。
         2. 返却された `ReplayContext` を保持して返す。
     - **責務境界**: このメソッドはリプレイ再生用データの復元入口であり、物理再生ループ、再生画面への遷移、終了後の戻り導線はリプレイ再生実装側で扱う。
+
+- **`setReplayProtect(request: ReplayProtectRequest): FlightRecord | null`**
+    - 航行結果画面または Analytic Archive の Replays タブで変更された保護状態を永続データへ反映する。
+    - **内部挙動**:
+        1. `request.source === 'result'` の場合は、現在の `GameController.handleResultProtect(request.favorite, { replaceRecordId })` を呼び出す。
+        2. それ以外の場合は、`FlightRecorder.setFavorite(request.recordId, request.favorite)` を呼び出す。
+        3. 更新後のリプレイ記録を返す。
+    - **責務境界**: 5件上限、解除候補選択、キャンセル処理は `ReplayProtectFlow` が担当する。`AppOrchestrator` は永続更新先の振り分けだけを担当する。

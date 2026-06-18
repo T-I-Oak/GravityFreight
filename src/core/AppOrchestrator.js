@@ -59,6 +59,8 @@ class AppOrchestrator {
         this.uiController.setStartHandler(() => this.startGame());
         this.uiController.setRecordHandler?.(() => this.showRecordScreen());
         this.uiController.setReplayStartHandler?.(recordId => this.startReplay(recordId));
+        this.uiController.setReplayProtectHandler?.(request => this.setReplayProtect(request));
+        this.uiController.setReplayProtectRecordsProvider?.(() => this.systems.flightRecorder.getRecords());
         this.uiController.setManualHandler?.(() => {});
         this.uiController.showTitleScreen();
         this.titleScreenAnimator.start();
@@ -99,6 +101,16 @@ class AppOrchestrator {
     startReplay(recordId) {
         this.replayContext = this.systems.flightRecorder.createReplayContext(recordId);
         return this.replayContext;
+    }
+
+    setReplayProtect(request) {
+        if (request.source === 'result') {
+            return this.gameController?.handleResultProtect(request.favorite, {
+                replaceRecordId: request.replaceRecordId
+            }) ?? null;
+        }
+
+        return this.systems.flightRecorder.setFavorite(request.recordId, request.favorite);
     }
 
     #createAppSystems() {

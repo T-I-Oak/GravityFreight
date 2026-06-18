@@ -16,6 +16,8 @@
 
 /* --- Container: Overlay/Main in Print Style --- */
 main.theme-printing {
+    position: fixed;
+    inset: 0;
     background: rgba(0, 0, 0, 0.85);
     display: flex;
     flex-direction: column;
@@ -23,6 +25,15 @@ main.theme-printing {
     justify-content: flex-end; /* 垂直方向下部 (レシートは画面下部から排出) */
     padding-bottom: 5vh;
     z-index: 6000;
+}
+
+#game-result-scene-container.theme-printing {
+    background: transparent;
+    pointer-events: none;
+}
+
+#game-result-scene-container.theme-printing .Panel.receipt {
+    pointer-events: auto;
 }
 
 /* 衝撃揺れのアニメーション (Old game_result.css:11) */
@@ -130,10 +141,19 @@ main.theme-printing.impact {
     margin: 10px 0 2px 0;
 }
 
-.theme-printing .section.hero .SplitRow {
+.theme-printing .SplitRow.data-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: baseline;
+    padding: 8px 0;
+}
+
+.theme-printing .section.hero .SplitRow.data-row {
     font-size: 24px;
     font-weight: 600;
     margin-top: 15px;
+    white-space: nowrap;
 }
 
 .theme-printing .section-subtitle {

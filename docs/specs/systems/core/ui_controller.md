@@ -9,22 +9,23 @@
     - 画面遷移、ダイアログ表示の制御、HUDの制御。
     - UI操作に伴うフィードバック音（決定音等）の再生制御。
     - **DOM イベントの仲介**: HTML 要素のイベント（click等）を購読し、演出を付与した上でシステム側のコールバックを実行する。
+    - ビルドパネル表示は `BuildPanelView`、航行結果画面表示は `FlightResultScreenView`、記録画面表示は `ArchiveDialogView` へ委譲する。
 
 ## 2. インターフェース (Interface)
 
 ### 共通基盤メソッド (Core Infrastructure)
 
 - **`constructor()`**
-    - **必要要素**: `#flight-result-screen` を必須の航行結果画面ルートとして取得する。
-    - **依存**: `gameDataRepository` と、航行結果画面の HTML を生成する `FlightResultComponents` を使用する。
+    - **依存**: `gameDataRepository`, `BuildPanelView`, `FlightResultScreenView`, `ArchiveDialogView`, `ReplayProtectFlow`, `SettingsDialogView`, `StarInfoPanel` を使用する。
     - **内部挙動**:
         1. HTML ドキュメント内から各画面のコンテナ要素や、主要なボタン（開始ボタン、開閉ボタン等）を検索し、内部変数に保持する。
         2. Canvas 入力の正規化は `MapInputController` へ委譲する。
-        3. **安全性**: 必要な要素が見つからない場合は、初期化エラー（Error）を投げ、不具合を即座に顕在化させる。
+        3. ビルドパネル固有の DOM 取得・イベント登録は `BuildPanelView`、航行結果画面固有の DOM 取得・イベント登録は `FlightResultScreenView`、replay protect 共通フローは `ReplayProtectFlow` へ委譲する。
+        4. **安全性**: 必要な要素が見つからない場合は、初期化エラー（Error）を投げ、不具合を即座に顕在化させる。
 
 - **`setOperationHandler(element: HTMLElement, handler: Function, seId: string = 'click'): void`**
     - 指定された要素にクリックイベントを登録し、指定された操作音を再生した後にハンドラを実行する。
-    - **内部挙動**: `addEventListener('click', ...)` を実行し、クリック時に `SoundController.playSE(seId)` を再生してから `handler()` を呼び出す。
+    - **内部挙動**: `addEventListener('click', ...)` を実行し、クリック時に `SoundController.playSE(seId)` を再生してから `handler(element, event)` を呼び出す。
 
 - **`setSelectionHandler(element: HTMLElement, dataKey: string, handler: (value: string) => void, seId: string = 'select'): void`**
     - データ属性（`data-XXX`）の取得を伴うクリックイベントを登録する（アイテム選択用）。
@@ -65,12 +66,8 @@
     - ビルドフェーズを開始する。
     - **内部挙動**:
         1. タイトル、航行結果画面、施設画面を非表示にし、HUD とビルドパネルを表示する。
-        2. ビルド開始時はビルドパネルをオープン状態にし、以前の画面で付与された折りたたみ状態を解除する。
-        3. `viewData` が渡された場合、`rocket`, `launcher`, `booster`, `chassis`, `logic`, `module` の各リストへ `UIComponents.generateCardHTML()` または空表示を反映する。
-        4. `viewData.assembly` から ASSEMBLE ボタンの disabled 状態と文言を更新する。
-        5. `viewData.launch` から発射ボタンの disabled 状態と文言を更新する。
-        6. `rocket` の空表示に `emptyAction: 'open-assembly'` が設定されている場合、その placeholder はクリックで ASSEMBLY タブへ切り替える。
-    - **責務境界**: inventory の抽出、選択可否、発射可能判定、UI 文言取得は `BuildScreenPresenter` の責務。`UIController` は渡された view data を DOM に反映する。
+        2. `BuildPanelView.show(viewData)` を呼び出し、ビルドパネル固有の DOM 反映を委譲する。
+    - **責務境界**: inventory の抽出、選択可否、発射可能判定、UI 文言取得は `BuildScreenPresenter` の責務。ビルドパネル内の DOM 反映は `BuildPanelView` の責務。`UIController` は画面全体の表示切替を担当する。
 - **`showSectorTitle(sectorNumber: number, isAnomaly: boolean): void`**
     - セクター開始時の READY 通知を画面中央に表示する。
     - **内部挙動**:
@@ -80,10 +77,8 @@
         4. 表示終了後は `state-hidden` を戻し、`state-active` / `state-anomaly` を除去する。
 - **`setFlightMode(isFlight: boolean): void`**
     - 航行モード（発射後）の切り替えを行い、UI の操作権限を制御する。
-    - **内部挙動**:
-        - `isFlight: true`: ビルドパネルおよび関連するボタン（ASSEMBLE, LAUNCH等）に対し、特定の CSS クラス（`.state-locked` 等）を付与し、クリックイベントやホバー演出を無効化する。
-        - `isFlight: false`: ロックを解除し、再度インタラクティブな状態に戻す。
-        - **注意**: HUD およびビルドパネルの表示・非表示はこのメソッドでは変更せず、そのまま維持する。
+    - **内部挙動**: `BuildPanelView.setFlightMode(isFlight)` へ委譲する。
+    - **注意**: HUD およびビルドパネルの表示・非表示はこのメソッドでは変更せず、そのまま維持する。
 - **`initHUD(sessionState: object): void`**
     - 契約（ゲーム）開始時に HUD を初期化する。
     - **内部挙動**: 
@@ -121,27 +116,20 @@
     - 航行結果表示画面（リザルト）へ遷移する。
     - **内部挙動**:
         1. これまで表示されていたビルドパネルを折りたたみ状態にしてからビルドパネルおよび HUD を隠し、リザルト画面のコンテナを表示する。
-        2. `FlightResultComponents.generateHTML(viewData, gameDataRepository)` で画面 HTML を生成し、`#flight-result-screen` に反映する。
-        3. **ヘッダー・状態表示**: `viewData.status` / `viewData.title` / `viewData.themeClass` に応じ、見出しとテーマカラーを変更する。
-        4. **ヒーロー統計 (Hero Stats)**: `viewData.totalScore`, `viewData.totalCoins` を `.Well` 内の強調表示エリアにセットする。
-        5. **アクションボタンの動的設定**:
-            - **ラベル**: `viewData.actionLabel` を表示する。
-            - **カラー**: `viewData.themeClass` に応じたクラスをボタンに付与する。
-        6. **明細リスト (Entries) 構築**:
-            - `viewData.entries` をループし、**「ラベル」「スコア」「コイン」の 3 列構成**を持つ行要素を生成してコンテナへ追加する。
-            - 値が存在しない項目（`score` や `coin` が省略されている場合）は、**空欄**として表示する。
-        7. **アイテムリスト (Item Report) 構築**:
-            - `viewData.itemReport` をループし、`UIComponents.generateCardHTML` を用いてカードを生成する。
-            - 配送成功時（`match`）は、「DELIVERY BONUS」の見出しを伴う専用コンテナ（`.report-bonus-list`）内に獲得したボーナスアイテムを表示する。
-        8. **リプレイ状態表示**:
-            - `viewData.replay.recorded` / `pending` / `favorite` に基づき、記録済み表示と保護ボタンの状態を更新する。
+        2. `FlightResultScreenView.show(viewData)` を呼び出し、航行結果画面固有の HTML 生成・操作接続を委譲する。
+    - **責務境界**: 航行結果 view data の内容解釈と DOM 生成は `FlightResultComponents` / `FlightResultScreenView` の責務。`UIController` は画面全体の表示切替を担当する。
 
 - **`showGameEndSequence(gameResult: GameResultSummary, gameOver: object): void`**
     - ゲーム終了（契約終了）時の最終画面を表示する。
     - **内部挙動**:
-        1. **ゲームオーバー背景**: ゲームオーバー画面を背景として表示し、`gameOver.reason` および **`gameOver.details`（「シャーシ不足」等の具体的な項目リスト）** をメッセージとして表示する。
-        2. **ゲームリザルトオーバーレイ**: `gameResult` の累計スコア、総獲得コイン、踏破セクター数、合計航行 Tick 数をまとめたリザルトパネルを前面に表示する。
-        3. タイトルへ戻るボタンを表示する。
+        1. **ゲームオーバー背景**: `WorldRenderer` が現在セクターのマップを維持したまま逆方向ワープを行うため、UI はプレイシーンを背景として表示状態に保つ。
+        2. **ゲームリザルトオーバーレイ**: 逆方向ワープ開始から短い遅延を置いて、レシート形式の最終評価パネルを前面に表示する。外側を暗い印刷オーバーレイで覆わず、逆ワープ中の星背景の上に紙面だけを重ねる。
+        3. レシートには `SECTORS COMPLETED`、`TOTAL COLLECTED`、`FINAL SCORE` を表示し、それぞれに ranking と grade の詳細行を表示する。
+        4. ranking は `gameResult.rankings` の `sectorRank`、`collectedRank`、`scoreRank` を使用する。ランク外または未取得の場合は `OUT OF TOP 20` と表示する。
+        5. grade は `gameBalance.GRADE_STEPS` を使用し、セクター数、回収数、スコアの各評価値と、それらを合成した総合評価を算出する。総合 grade はスタンプに表示する。
+        6. `gameOver.reason` および `gameOver.details` は終了条件の制御情報であり、スコア ranking / grade の代替としてレシート本文に表示しない。
+        7. タイトルへ戻るボタンとして `END CONTRACT` を表示する。
+        8. `END CONTRACT` 押下時は、登録済みのゲーム終了復帰 handler を呼び出す。handler 側で退場ワープの減速と `AppOrchestrator.returnToTitle()` を実行する。
 
 - **`showFacilityScreen(type: string, data: object): void`**
     - 施設画面（交易所、整備工場、闇市場）を表示する。
@@ -203,6 +191,14 @@
     - Archive Replays タブの「PLAY REPLAY」操作にハンドラを登録する。
     - **内部挙動**: `ArchiveDialogView.setReplayStartHandler(handler)` へ委譲する。
     - **責務境界**: `UIController` は選択された replay record id の通知だけを中継し、リプレイ snapshot の復元や再生画面遷移は担当しない。
+- **`setReplayProtectHandler(handler: (request) => object): void`**
+    - 航行結果画面と Archive Replays タブの protect 操作に共通で使う永続更新 handler を登録する。
+    - **内部挙動**: `ReplayProtectFlow.setCommitHandler(handler)` へ委譲する。
+    - **責務境界**: `UIController` は handler 登録を中継し、保護上限や永続保存は担当しない。
+
+- **`setReplayProtectRecordsProvider(provider: () => FlightRecord[]): void`**
+    - replay protect の5件上限判定と置き換え候補表示に使う record 一覧 provider を登録する。
+    - **内部挙動**: `ReplayProtectFlow.setRecordsProvider(provider)` へ委譲する。
 - **`setManualHandler(handler: Function): void`**
     - タイトル画面の「説明書ボタン」にハンドラを登録する。
     - **内部挙動**: 内部で保持する説明書ボタン要素を引数として `setOperationHandler` を呼び出す。登録されるハンドラは `AppOrchestrator` 経由で `HowToPlayUI.show()` へ接続される。
@@ -229,36 +225,33 @@
 
 - **`setBuildItemSelectionHandler(handler: ({ category: string, uid: string }) => void): void`**
     - ビルドパネル内のアイテムカードが選択された際のハンドラを登録する。
-    - **内部挙動**:
-        1. `.item-list .ItemCard.state-clickable[data-uid]` を対象にクリックイベントを登録する。
-        2. カードが属する `#list-{category}` からカテゴリを取得する。
-        3. `handler({ category, uid })` を呼び出す。
-        4. ビルド画面が再描画された場合も、新しいカードへ再度ハンドラを登録する。
+    - **内部挙動**: `BuildPanelView.setItemSelectionHandler(handler)` へ委譲する。
 
 - **`setBuildAssembleHandler(handler: Function): void`**
     - ビルドパネルの「ASSEMBLE ボタン」にハンドラを登録する。
-    - **内部挙動**: ASSEMBLE ボタン要素を引数として `setOperationHandler` を呼び出す。ハンドラ実行後、FLIGHT タブへ戻す。
+    - **内部挙動**: `BuildPanelView.setAssembleHandler(handler)` へ委譲する。
 
 - **`setLaunchHandler(handler: Function): void`**
     - ビルド画面の「LAUNCH ボタン」にハンドラを登録する。
-    - **内部挙動**: LAUNCH ボタン要素を対象に `setOperationHandler` を呼び出し、クリック時に登録済み handler を実行する。
+    - **内部挙動**: `BuildPanelView.setLaunchHandler(handler)` へ委譲する。
 
 - **`setResultHandler(handler: Function): void`**
     - リザルト画面の「確定（OK / CONTINUE）ボタン」にハンドラを登録する。
-    - **内部挙動**: ハンドラを保持し、`showResultScreen()` がリザルト画面 DOM を生成した後に次へ進むためのボタンへ `setOperationHandler` を適用する。
+    - **内部挙動**: `FlightResultScreenView.setResultHandler(handler)` へ委譲する。
     - **注意**: `GameController.start()` 時点ではリザルト画面 DOM が未生成のため、描画前の呼び出しで例外を投げてはならない。
 
 - **`setGameEndReturnHandler(handler: Function): void`**
     - ゲームリザルト画面の「タイトルへ戻る」ボタンにハンドラを登録する。
-    - **内部挙動**: ゲーム終了画面内のタイトル復帰ボタン要素を引数として `setOperationHandler` を呼び出す。
-
-- **`setProtectHandler(handler: (protected: boolean) => void): void`**
-    - リザルト画面の「レコード保護（PROTECT）ボタン」にハンドラを登録する。
-    - **内部挙動**: ハンドラを保持し、`showResultScreen()` がリザルト画面 DOM を生成した後に対象ボタンへ接続する。クリックごとにボタンのトグル状態（`.state-active`）を切り替え、最新の状態を引数として `handler` を実行する。
+    - **内部挙動**: ゲーム終了画面内の `END CONTRACT` ボタン要素を引数として `setOperationHandler` を呼び出す。
 
 - **`setMapToggleHandler(handler: (showMap: boolean) => void): void`**
     - リザルト画面の「マップ確認」ボタンにハンドラを登録する。表示文言は UI resource `flightResult.actions.viewMap` を使用する。
-    - **内部挙動**: ハンドラを保持し、`showResultScreen()` がリザルト画面 DOM を生成した後に対象ボタンへ接続する。クリック時にリザルトパネルの表示/非表示をトグルし、現在の状態を引数として `handler` を実行する。
+    - **内部挙動**: `FlightResultScreenView.setMapToggleHandler(handler)` へ委譲する。
+    - **VIEW MAP 表示状態**:
+        1. リザルト画面を非表示にし、プレイシーン、HUD、ビルドパネルを表示する。
+        2. ビルドパネルは `BuildPanelView.showReadOnly()` で表示し、item selection は無効、パネル開閉は有効とする。
+        3. `#map-action-dock` の戻りボタンでリザルト画面へ戻る。
+    - **責務境界**: `FlightResultScreenView` はリザルト画面内の表示切替と戻りボタン生成を担当する。HUD とビルドパネルの表示状態は `UIController`、マップの再描画やゲーム状態の変更は `GameController` が担当する。
 
 - **`setFacilityActionHandler(handler: (action: string, context: object) => void): void`**
     - 施設画面内の各アクションボタン（Buy, Sell, Repair 等）にハンドラを登録する。

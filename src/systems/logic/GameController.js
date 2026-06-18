@@ -33,6 +33,7 @@ class GameController {
         this.currentRocket = null;
         this.currentLaunchAngle = 0;
         this.mapInteraction = null;
+        this.lastReplayRecord = null;
         this.buildScreenPresenter = infrastructure.buildScreenPresenter
             || new BuildScreenPresenter(this.gameDataRepository);
         this.buildFlowController = infrastructure.buildFlowController
@@ -60,6 +61,7 @@ class GameController {
         this.storySystem.resetSession?.();
         this.uiController.initHUD(this.sessionState);
         this.uiController.setResultHandler?.(() => this.confirmSettlement(this.lastSettlement));
+        this.uiController.setMapToggleHandler?.(showMap => this.handleResultMapToggle(showMap));
         this.uiController.setGameEndReturnHandler?.(() => this.returnToTitle());
         this.uiController.setBuildItemSelectionHandler?.(selection => {
             const viewData = this.buildFlowController.handleItemSelection(selection);
@@ -158,6 +160,7 @@ class GameController {
 
         const resultContext = this.#createFlightResultContext(settlement);
         const replayRecord = this.flightRecorder.recordFlightResult(resultContext);
+        this.lastReplayRecord = replayRecord;
         const updatedRecordKeys = this.gameRecordTracker.recordFlightResult({
             completedSectors: settlement.status === 'cleared' ? 1 : 0,
             distance: result.distance ?? flightData.distance ?? 0,
@@ -223,8 +226,38 @@ class GameController {
         return false;
     }
 
-    returnToTitle() {
+    async returnToTitle() {
+        await this.worldRenderer?.stopGameEndExitAnimation?.();
         this.appOrchestrator?.returnToTitle?.();
+    }
+
+    handleResultMapToggle(showMap) {
+        if (showMap) {
+            this.worldRenderer?.render?.();
+        }
+    }
+
+    handleResultProtect(favorite, options = {}) {
+        if (options.replaceRecordId) {
+            this.flightRecorder.setFavorite(options.replaceRecordId, false);
+        }
+
+        if (this.lastReplayRecord?.id) {
+            const updatedRecord = this.flightRecorder.setFavorite(this.lastReplayRecord.id, favorite);
+            this.lastReplayRecord = {
+                ...this.lastReplayRecord,
+                ...(updatedRecord ?? {}),
+                favorite: updatedRecord?.favorite ?? favorite
+            };
+            return this.lastReplayRecord;
+        }
+
+        if (favorite && this.flightRecorder.getPendingRecord?.()) {
+            this.lastReplayRecord = this.flightRecorder.savePendingRecordAsFavorite();
+            return this.lastReplayRecord;
+        }
+
+        return null;
     }
 
     checkGameOverAndStartEndSequence(context = {}) {
@@ -274,9 +307,13 @@ class GameController {
             entries: settlement.entries || [],
             itemReport: settlement.itemReport || [],
             replay: {
+                id: replayRecord?.id ?? pendingRecord?.id ?? null,
                 recorded: !!replayRecord,
                 favorite: !!replayRecord?.favorite,
-                pending: !replayRecord && !!pendingRecord
+                pending: !replayRecord && !!pendingRecord,
+                score: settlement.totalScore,
+                reachedSector: this.sessionState.sectorNumber,
+                createdAt: replayRecord?.createdAt ?? pendingRecord?.createdAt ?? null
             },
             achievements,
             storyStatus,

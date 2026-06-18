@@ -146,10 +146,11 @@ describe('EconomySystem', () => {
         });
     });
 
-    it('settles a cleared delivery with delivery bonus, collected coins, coin bonus, and lucky discount', () => {
+    it('settles a cleared delivery with delivery bonus, collected coins, recovered parts, coin bonus, and lucky discount', () => {
         const cargo = new Item('cargo_safe', repository);
         const lucky = new Item('cargo_lucky', repository);
         const collectedCoin = new Item('coin_100', repository);
+        const collectedPart = new Item('mod_capacity', repository);
         const bonusCoin = new Item('coin_200', repository);
         vi.spyOn(economySystem, 'drawLottery').mockReturnValue([bonusCoin]);
 
@@ -158,7 +159,7 @@ describe('EconomySystem', () => {
             target: { getFacilityType: () => 'TRADING_POST' }
         }, {
             ticks: 12,
-            heldCargo: [cargo, lucky, collectedCoin],
+            heldCargo: [cargo, lucky, collectedCoin, collectedPart],
             rocketItem: new RocketItem(
                 new Item('hull_medium', repository),
                 new Item('sensor_normal', repository),
@@ -173,7 +174,7 @@ describe('EconomySystem', () => {
         expect(settlement.totalCoins).toBe(420);
         expect(settlement.luckyDiscountRate).toBe(0.1);
         expect(settlement.flightTicks).toBe(12);
-        expect(settlement.acquiredItems).toEqual([]);
+        expect(settlement.acquiredItems.map(item => item.uid)).toEqual([collectedPart.uid]);
         expect(settlement.lostToTarget).toBeNull();
         expect(settlement.entries).toEqual([
             { label: 'Flight Duration Score', score: 12 },
@@ -181,12 +182,51 @@ describe('EconomySystem', () => {
             { label: 'Delivery Bonus', score: 1500, coin: 300 },
             { label: 'Collected Coins', coin: 100 }
         ]);
-        expect(settlement.itemReport).toHaveLength(3);
+        expect(settlement.itemReport).toHaveLength(4);
         expect(settlement.itemReport[0].type).toBe('delivery');
         expect(settlement.itemReport[0].status).toBe('match');
         expect(settlement.itemReport[0].bonusItems[0].id).toBe('coin_200');
-        expect(settlement.itemReport[1].status).toBe('unmatched');
+        expect(settlement.itemReport[1].type).toBe('other');
+        expect(settlement.itemReport[1].status).toBeUndefined();
         expect(settlement.itemReport[2].type).toBe('other');
+        expect(settlement.itemReport[3].type).toBe('other');
+    });
+
+    it('settles home return by recovering coins and parts while placing cargo on the home star', () => {
+        const target = { isHome: true, addItems: vi.fn() };
+        const cargo = new Item('cargo_safe', repository);
+        const collectedCoin = new Item('coin_100', repository);
+        const collectedPart = new Item('mod_capacity', repository);
+
+        const settlement = economySystem.calculateSettlement({
+            type: 'body',
+            target
+        }, {
+            ticks: 18,
+            heldCargo: [cargo, collectedCoin, collectedPart],
+            rocketItem: new RocketItem(
+                new Item('hull_medium', repository),
+                new Item('sensor_normal', repository),
+                []
+            )
+        }, session);
+
+        expect(settlement.status).toBe('returned');
+        expect(settlement.destination).toBeNull();
+        expect(settlement.totalScore).toBe(18);
+        expect(settlement.totalCoins).toBe(100);
+        expect(settlement.entries).toEqual([
+            { label: 'Flight Duration Score', score: 18 },
+            { label: 'Collected Coins', coin: 100 }
+        ]);
+        expect(settlement.acquiredItems.map(item => item.uid)).toEqual([collectedPart.uid]);
+        expect(settlement.lostToTarget).toEqual({
+            target,
+            items: [cargo]
+        });
+        expect(settlement.itemReport).toHaveLength(2);
+        expect(settlement.itemReport[0].type).toBe('other');
+        expect(settlement.itemReport[1].type).toBe('other');
     });
 
     it('settles crash by placing held items and surviving rocket parts on the target and paying insurance', () => {
@@ -226,6 +266,7 @@ describe('EconomySystem', () => {
             rocketItem.modules[0].items[0].uid
         ]);
         expect(settlement.acquiredItems).toEqual([]);
+        expect(settlement.itemReport).toEqual([]);
     });
 
     it('groups same delivery cargo and draws bonus items for every delivered cargo', () => {

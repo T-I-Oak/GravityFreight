@@ -75,17 +75,18 @@ describe('FlightResultComponents.generateHTML', () => {
         }, repository);
 
         expect(html).toContain('SECTOR 3 COMPLETED');
-        expect(html).toContain('3,260');
-        expect(html).toContain('+3,000');
-        expect(html).toContain('+30');
+        expect(html).toContain('data-count-to="3260"');
+        expect(html).toContain('data-count-to="3000"');
+        expect(html).toContain('data-count-to="30"');
         expect(html).toContain('<span class="report-data-label">Goal Bonus</span>');
         expect(html).toContain('<span class="report-data-label">Delivery Bonus</span>');
-        expect(html).toContain('<span class="report-data-value score">+3,000</span>');
-        expect(html).toContain('<span class="report-data-value coin">+30</span>');
-        expect(html).toContain('<span class="report-data-value coin">+310</span>');
+        expect(html).toContain('<span class="report-data-value score"><span data-count-to="3000" data-count-prefix="+">+0</span></span>');
+        expect(html).toContain('<span class="report-data-value coin"><span data-count-to="30" data-count-prefix="+">+0</span></span>');
+        expect(html).toContain('<span class="report-data-value coin"><span data-count-to="310" data-count-prefix="+">+0</span></span>');
         expect(html).toContain('<span class="report-data-label">Collected Coins</span>');
         expect(html).toContain('<span class="report-data-label">Insurance Payout</span>');
         expect(html).toContain('RECORDED');
+        expect(html).toContain('state-recorded');
         expect(html).toContain('PROTECT RECORD');
         expect(html).toContain('通商物資');
         expect(html).toContain('DELIVERY BONUS');
@@ -107,6 +108,7 @@ describe('FlightResultComponents.generateHTML', () => {
         }, repository);
 
         expect(html).toContain('NOT RECORDED');
+        expect(html).toContain('state-not-recorded');
         expect(html).toContain('PROTECT RECORD');
         expect(html).toContain('BACK TO BASE');
     });

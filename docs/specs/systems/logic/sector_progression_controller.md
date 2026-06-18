@@ -15,7 +15,7 @@
 ### メソッド (Methods)
 
 - **`constructor(infrastructure: object)`**
-    - `sessionState`, `economySystem`, `gameRecordTracker`, `achievementTracker`, `uiController`, `worldRenderer`, `gameDataRepository` を保持する。
+    - `sessionState`, `economySystem`, `gameRecordTracker`, `rankTracker`, `achievementTracker`, `uiController`, `worldRenderer`, `gameDataRepository` を保持する。
     - テスト用に `sectorFactory` を受け取れる。未指定時は `new Sector(sessionState, isAnomaly, gameDataRepository, economySystem)` を使用する。
 
 - **`checkGameOverAndStartEndSequence(context: object): boolean`**
@@ -24,10 +24,12 @@
     - ゲームオーバーの場合:
         1. `SessionState.getGameResultSummary({ completedSectors })` で契約結果を取得する。
         2. `GameRecordTracker.recordGameResult(gameResult)` を呼び出す。
-        3. 更新キーがある場合、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
-        4. `UIController.showGameEndSequence(gameResult, gameOver, { achievements })` を呼び出す。
-        5. `true` を返す。
-    - ランキング登録は、ゲーム終了処理が正式に接続された段階で、その終了確定タイミングから `RankTracker` へ委譲する。本クラスの現在のゲームオーバー判定からは登録しない。
+        3. `RankTracker.recordGameResult(gameResult)` を呼び出し、戻り値の `scoreRank`、`sectorRank`、`collectedRank` を `gameResult.rankings` として保持する。
+        4. 更新キーがある場合、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
+        5. `WorldRenderer.playGameEndExitAnimation()` を呼び出し、現在セクターのマップを背景に逆方向ワープを開始する。
+        6. `UIController.showGameEndSequence(gameResult, gameOver, { achievements })` を呼び出す。
+        7. `true` を返す。
+    - ランキング登録は、ゲームオーバー判定が成立し、ゲーム終了画面へ遷移する確定タイミングでのみ行う。航行終了後または施設退出後でも、契約が継続する場合は登録しない。
 
 - **`beginSectorTransition(options: object): Promise<Sector>`**
     - 次セクターを開始する。

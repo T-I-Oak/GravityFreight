@@ -21,8 +21,22 @@ function createRepository() {
             'flightResult.stats.score': 'FLIGHT SCORE',
             'flightResult.stats.credits': 'CREDITS EARNED',
             'flightResult.actions.viewMap': 'VIEW MAP',
+            'flightResult.actions.backToResult': 'BACK TO RESULT',
             'flightResult.actions.continue': 'CONTINUE',
-            'flightResult.bonusTitle': 'DELIVERY BONUS'
+            'flightResult.bonusTitle': 'DELIVERY BONUS',
+            'flightResult.favoriteLimit.title': 'PROTECT LIMIT REACHED',
+            'flightResult.favoriteLimit.message': 'Select a protected replay to unprotect.',
+            'flightResult.favoriteLimit.archiveMessage': 'Release another protected record first.',
+            'flightResult.favoriteLimit.count': '{count}/{max} protected',
+            'flightResult.favoriteLimit.sector': 'SECTOR',
+            'flightResult.favoriteLimit.score': 'SCORE',
+            'flightResult.favoriteLimit.protectColumn': 'PROTECT',
+            'flightResult.favoriteLimit.noColumn': 'NO.',
+            'flightResult.favoriteLimit.dateColumn': 'DATE TIME',
+            'flightResult.favoriteLimit.currentRecord': 'CURRENT',
+            'flightResult.favoriteLimit.currentDate': 'CURRENT FLIGHT',
+            'flightResult.favoriteLimit.ok': 'OK',
+            'flightResult.favoriteLimit.cancel': 'CANCEL'
         })[key])
     };
 }
@@ -34,7 +48,7 @@ function createViewData() {
         totalScore: 3260,
         totalCoins: 30,
         actionLabel: 'TO TRADING POST',
-        replay: { recorded: true, favorite: false, pending: false },
+        replay: { id: 'flight_current', recorded: true, favorite: false, pending: false },
         entries: [
             { label: 'Goal Bonus', score: 3000, coin: 30 }
         ],
@@ -73,6 +87,7 @@ describe('UIController', () => {
             <button id="start-game-btn"></button>
             <main id="flight-result-screen" hidden></main>
             <main id="facility-screen" hidden></main>
+            <main id="game-result-scene-container" class="theme-printing state-hidden" hidden></main>
             <main id="play-scene-container" class="state-hidden">
                 <header id="play-hud" class="state-hidden">
                     <span id="sector-display"></span>
@@ -108,6 +123,7 @@ describe('UIController', () => {
                         <span class="btn-sub-label"></span>
                     </button>
                 </section>
+                <div id="map-action-dock" class="action-dock"></div>
             </main>
             <canvas id="gameCanvas"></canvas>
             <div id="star-info-panel" class="Panel StarInfoPanel state-hidden" hidden>
@@ -135,16 +151,64 @@ describe('UIController', () => {
         expect(document.querySelector('#flight-result-screen').textContent).toContain('Goal Bonus');
     });
 
+    it('animates flight result scores and coins from zero to final values', () => {
+        const frames = [];
+        const requestFrame = vi.fn(callback => {
+            frames.push(callback);
+            return frames.length;
+        });
+        const cancelFrame = vi.fn();
+        const controller = new UIController({
+            gameDataRepository: repository,
+            soundController,
+            requestFrame,
+            cancelFrame,
+            flightResultCountDurationMs: 1000
+        });
+
+        controller.showResultScreen(createViewData());
+
+        expect(document.querySelector('.stat-value.score').textContent).toBe('0');
+        expect(document.querySelector('.stat-value.coin').textContent).toBe('0');
+        expect(document.querySelector('.report-data-value.score').textContent).toBe('+0');
+        expect(document.querySelector('.report-data-value.coin').textContent).toBe('+0');
+
+        frames.shift()(0);
+        frames.shift()(1000);
+
+        expect(document.querySelector('.stat-value.score').textContent).toBe('3,260');
+        expect(document.querySelector('.stat-value.coin').textContent).toBe('30');
+        expect(document.querySelector('.report-data-value.score').textContent).toBe('+3,000');
+        expect(document.querySelector('.report-data-value.coin').textContent).toBe('+30');
+    });
+
+    it('stops the flight result count animation when leaving the result screen', () => {
+        const requestFrame = vi.fn(() => 42);
+        const cancelFrame = vi.fn();
+        const controller = new UIController({
+            gameDataRepository: repository,
+            soundController,
+            requestFrame,
+            cancelFrame
+        });
+
+        controller.showResultScreen(createViewData());
+        controller.showBuildScreen();
+
+        expect(cancelFrame).toHaveBeenCalledWith(42);
+    });
+
     it('registers result, map toggle, and protect handlers on rendered controls', () => {
         const controller = new UIController({ gameDataRepository: repository, soundController });
         const resultHandler = vi.fn();
         const mapHandler = vi.fn();
-        const protectHandler = vi.fn();
+        const protectHandler = vi.fn(request => ({ id: request.recordId, favorite: request.favorite }));
 
         controller.showResultScreen(createViewData());
         controller.setResultHandler(resultHandler);
         controller.setMapToggleHandler(mapHandler);
-        controller.setProtectHandler(protectHandler);
+        controller.setReplayProtectHandler(protectHandler);
+        controller.setReplayProtectRecordsProvider(() => []);
 
         document.querySelector('.flight-result-action-button').click();
         document.querySelector('.flight-result-map-button').click();
@@ -153,7 +217,201 @@ describe('UIController', () => {
         expect(soundController.playSE).toHaveBeenCalledTimes(3);
         expect(resultHandler).toHaveBeenCalledTimes(1);
         expect(mapHandler).toHaveBeenCalledWith(true);
-        expect(protectHandler).toHaveBeenCalledWith(true);
+        expect(document.querySelector('#flight-result-screen').hidden).toBe(true);
+        expect(document.querySelector('#play-scene-container').hidden).toBe(false);
+        expect(document.querySelector('#play-hud').hidden).toBe(false);
+        expect(document.querySelector('#inventory-panel').hidden).toBe(false);
+        expect(document.querySelector('#inventory-panel').classList.contains('state-readonly')).toBe(true);
+        expect(document.querySelector('#map-action-dock').textContent).toContain('BACK TO RESULT');
+        expect(protectHandler).toHaveBeenCalledWith(expect.objectContaining({
+            source: 'result',
+            recordId: 'flight_current',
+            favorite: true
+        }));
+    });
+
+    it('marks a pending result replay as recorded when protect saves it', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const protectHandler = vi.fn(request => ({ id: request.recordId, favorite: request.favorite, success: true }));
+        const viewData = createViewData();
+        viewData.replay = { id: 'flight_pending', recorded: false, favorite: false, pending: true };
+
+        controller.showResultScreen(viewData);
+        controller.setReplayProtectHandler(protectHandler);
+        controller.setReplayProtectRecordsProvider(() => []);
+
+        document.querySelector('.Badge.favorite').click();
+
+        expect(document.querySelector('[data-replay-recorded-status]').textContent).toBe('RECORDED');
+        expect(document.querySelector('[data-replay-recorded-status]').classList.contains('state-recorded')).toBe(true);
+        expect(document.querySelector('[data-replay-recorded-status]').classList.contains('state-not-recorded')).toBe(false);
+        expect(document.querySelector('.Badge.favorite').textContent).toBe('PROTECTED');
+        expect(document.querySelector('.Badge.favorite').classList.contains('state-active')).toBe(true);
+        expect(viewData.replay.recorded).toBe(true);
+        expect(viewData.replay.pending).toBe(false);
+    });
+
+    it('edits protected replays in a table when result protect reaches the limit', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const protectHandler = vi.fn(request => ({ id: request.recordId, favorite: request.favorite }));
+        controller.setReplayProtectRecordsProvider(() => [
+            { id: 'flight_1', no: '01', score: 1200, reachedSector: 2, favorite: true },
+            { id: 'flight_2', no: '02', score: 900, reachedSector: 1, favorite: true },
+            { id: 'flight_3', no: '03', score: 800, reachedSector: 1, favorite: true },
+            { id: 'flight_4', no: '04', score: 700, reachedSector: 1, favorite: true },
+            { id: 'flight_5', no: '05', score: 600, reachedSector: 1, favorite: true },
+            { id: 'flight_6', no: '06', score: 500, reachedSector: 1, favorite: false }
+        ]);
+        controller.setReplayProtectHandler(protectHandler);
+
+        controller.showResultScreen(createViewData());
+        document.querySelector('.Badge.favorite').click();
+
+        expect(document.querySelector('.Badge.favorite').classList.contains('state-active')).toBe(false);
+        expect(document.querySelector('.replay-protect-modal')).not.toBeNull();
+        expect(document.querySelector('.flight-result-favorite-dialog').textContent).toContain('PROTECT LIMIT REACHED');
+        expect(document.querySelector('.flight-result-favorite-dialog').textContent).toContain('CURRENT FLIGHT');
+        expect(document.querySelector('.flight-result-favorite-dialog').textContent).toContain('6/5 protected');
+        expect(document.querySelector('.replay-protect-ok').disabled).toBe(true);
+        expect(document.querySelector('.flight-result-favorite-dialog').textContent).not.toContain('flight_1');
+        expect(document.querySelector('[data-replay-protect-row="flight_6"]')).not.toBeNull();
+        expect(document.querySelector('[data-replay-protect-row="flight_6"]').classList.contains('state-inactive')).toBe(true);
+        expect(document.querySelector('[data-replay-protect-row="flight_current"]').classList.contains('state-current')).toBe(true);
+        expect(document.querySelector('[data-replay-protect-row="flight_current"] .col-no').textContent).toBe('CURRENT');
+        expect(document.querySelector('[data-replay-protect-row="flight_1"] .col-no').textContent).toBe('01');
+        expect(document.querySelector('.flight-result-favorite-cancel').classList.contains('button-large')).toBe(true);
+        expect(protectHandler).not.toHaveBeenCalled();
+
+        document.querySelector('[data-replay-protect-toggle="flight_1"]').click();
+
+        expect(document.querySelector('.flight-result-favorite-dialog').textContent).toContain('5/5 protected');
+        expect(document.querySelector('.replay-protect-ok').disabled).toBe(false);
+
+        document.querySelector('.replay-protect-ok').click();
+
+        expect(protectHandler).toHaveBeenNthCalledWith(1, expect.objectContaining({
+            source: 'record',
+            recordId: 'flight_1',
+            favorite: false
+        }));
+        expect(protectHandler).toHaveBeenNthCalledWith(2, expect.objectContaining({
+            source: 'result',
+            recordId: 'flight_current',
+            favorite: true,
+            replaceRecordId: 'flight_1'
+        }));
+        expect(document.querySelector('.Badge.favorite').classList.contains('state-active')).toBe(true);
+        expect(document.querySelector('.flight-result-favorite-dialog')).toBeNull();
+        expect(document.querySelector('.replay-protect-modal')).toBeNull();
+    });
+
+    it('keeps build panel toggling available but item selection disabled in result map view', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const selectionHandler = vi.fn();
+
+        controller.showBuildScreen({
+            sections: {
+                rocket: {
+                    entries: [
+                        {
+                            uid: 'rocket_1',
+                            itemViewData: {
+                                uid: 'rocket_1',
+                                id: 'rocket_basic',
+                                name: 'Basic Rocket',
+                                category: 'rocket',
+                                stats: {}
+                            }
+                        }
+                    ]
+                }
+            },
+            launch: {
+                ready: false,
+                label: 'LAUNCH ENGINE',
+                subtext: 'Ready'
+            }
+        });
+        controller.setBuildItemSelectionHandler(selectionHandler);
+        controller.showResultScreen(createViewData());
+        controller.setMapToggleHandler(vi.fn());
+
+        document.querySelector('.flight-result-map-button').click();
+        document.querySelector('#list-rocket .ItemCard').click();
+        document.querySelector('#btn-toggle-panel').click();
+
+        expect(selectionHandler).not.toHaveBeenCalled();
+        expect(document.querySelector('#inventory-panel').classList.contains('state-collapsed')).toBe(false);
+    });
+
+    it('returns from result map view to the rendered flight result screen', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const mapHandler = vi.fn();
+
+        controller.showResultScreen(createViewData());
+        controller.setMapToggleHandler(mapHandler);
+        document.querySelector('.flight-result-map-button').click();
+        document.querySelector('.flight-result-return-button').click();
+
+        expect(mapHandler).toHaveBeenNthCalledWith(1, true);
+        expect(mapHandler).toHaveBeenNthCalledWith(2, false);
+        expect(document.querySelector('#flight-result-screen').hidden).toBe(false);
+        expect(document.querySelector('#play-scene-container').hidden).toBe(true);
+        expect(document.querySelector('#play-hud').hidden).toBe(true);
+        expect(document.querySelector('#inventory-panel').hidden).toBe(true);
+        expect(document.querySelector('#map-action-dock').innerHTML).toBe('');
+        expect(document.querySelector('#flight-result-screen').textContent).toContain('SECTOR 3 COMPLETED');
+    });
+
+    it('shows the game-end receipt over the play scene and routes END CONTRACT', () => {
+        vi.useFakeTimers();
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+        const returnHandler = vi.fn();
+
+        try {
+            controller.setGameEndReturnHandler(returnHandler);
+            controller.showGameEndSequence({
+                totalScore: 3200,
+                totalCoins: 90,
+                completedSectors: 3,
+                collectedItemCount: 4,
+                rankings: {
+                    scoreRank: 1,
+                    sectorRank: 2,
+                    collectedRank: 3
+                },
+                createdAt: '2026-06-18T10:00:00.000Z'
+            }, {
+                reason: 'NO_PARTS_REMAINING',
+                details: ['LAUNCHER']
+            });
+
+            expect(document.querySelector('#game-result-scene-container').hidden).toBe(true);
+            expect(document.querySelector('#play-scene-container').hidden).toBe(false);
+            expect(document.querySelector('#play-hud').hidden).toBe(true);
+            expect(document.querySelector('#game-result-scene-container').textContent).toContain('TERMINAL REPORT');
+
+            vi.advanceTimersByTime(2400);
+
+            expect(document.querySelector('#game-result-scene-container').hidden).toBe(false);
+            expect(document.querySelector('#game-result-scene-container').classList.contains('state-active')).toBe(true);
+            expect(document.querySelector('#game-result-scene-container').textContent).toContain('FINAL SCORE');
+            expect(document.querySelector('#game-result-scene-container').textContent).toContain('3,200 PTS');
+            expect(document.querySelector('#game-result-scene-container').textContent).toContain('SECTOR RANKING 2nd');
+            expect(document.querySelector('#game-result-scene-container').textContent).toContain('COLLECTION RANKING 3rd');
+            expect(document.querySelector('#game-result-scene-container').textContent).toContain('SCORE RANKING 1st');
+            expect(document.querySelector('#game-result-scene-container').textContent).toContain('GRADE');
+            expect(document.querySelector('#game-result-scene-container').textContent).not.toContain('NO PARTS REMAINING');
+            expect(document.querySelector('#game-result-scene-container').textContent).not.toContain('LAUNCHER');
+
+            document.querySelector('.game-end-return-button').click();
+
+            expect(returnHandler).toHaveBeenCalledTimes(1);
+            expect(soundController.playSE).toHaveBeenCalledWith('click');
+        } finally {
+            vi.clearAllTimers();
+            vi.useRealTimers();
+        }
     });
 
     it('defers the result action handler until the result screen is rendered', () => {
@@ -173,7 +431,7 @@ describe('UIController', () => {
         document.body.innerHTML = '';
 
         expect(() => new UIController({ gameDataRepository: repository })).toThrow(
-            '[UIController] Required element not found: #flight-result-screen'
+            '[FlightResultScreenView] Required element not found: #flight-result-screen'
         );
     });
 

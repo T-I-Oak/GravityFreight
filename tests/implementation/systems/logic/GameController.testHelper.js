@@ -449,7 +449,12 @@ export function createController(settlement = createSettlement()) {
     const flightRecorder = {
         captureLaunchSnapshot: vi.fn(),
         recordFlightResult: vi.fn(() => ({ id: 'flight_1', favorite: false })),
-        getPendingRecord: vi.fn(() => null)
+        getPendingRecord: vi.fn(() => null),
+        getRecords: vi.fn(() => [
+            { id: 'flight_old', no: '01', score: 1000, reachedSector: 1, favorite: true }
+        ]),
+        setFavorite: vi.fn((id, favorite) => ({ id, favorite })),
+        savePendingRecordAsFavorite: vi.fn(() => ({ id: 'pending_1', favorite: true }))
     };
     const storySystem = {
         resetSession: vi.fn(),
@@ -463,6 +468,7 @@ export function createController(settlement = createSettlement()) {
         setFacilityActionHandler: vi.fn(),
         setFacilityDepartHandler: vi.fn(),
         setResultHandler: vi.fn(),
+        setMapToggleHandler: vi.fn(),
         setGameEndReturnHandler: vi.fn(),
         setLaunchHandler: vi.fn(),
         showStarInfo: vi.fn(),
@@ -492,6 +498,8 @@ export function createController(settlement = createSettlement()) {
         clearAimRocket: vi.fn(),
         clearPredictionPath: vi.fn(),
         playFinishAnimation: vi.fn(() => Promise.resolve()),
+        playGameEndExitAnimation: vi.fn(() => Promise.resolve()),
+        stopGameEndExitAnimation: vi.fn(() => Promise.resolve()),
         setSector: vi.fn(),
         setAimRocket: vi.fn(),
         setPredictionPath: vi.fn(),
@@ -526,6 +534,9 @@ export function createController(settlement = createSettlement()) {
         hold: 0,
         warpIn: 0
     };
+    const appOrchestrator = {
+        returnToTitle: vi.fn()
+    };
     const controller = new GameController({
         sessionState,
         economySystem,
@@ -540,6 +551,7 @@ export function createController(settlement = createSettlement()) {
         trajectoryPredictor,
         navigationLoopController,
         gameDataRepository,
+        appOrchestrator,
         sectorFactory,
         wait,
         sectorTransitionDurations
@@ -563,6 +575,7 @@ export function createController(settlement = createSettlement()) {
         storySystem,
         uiController,
         worldRenderer,
+        appOrchestrator,
         cameraController,
         trajectoryPredictor,
         navigationLoopController,

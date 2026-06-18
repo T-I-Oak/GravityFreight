@@ -28,7 +28,7 @@
 - **`start(): void`**
     - ゲームを開始する。
     1. **ステート初期化**: `sessionState.initialize()` を実行。
-    2. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを登録する。ビルドアイテム選択は `BuildFlowController.handleItemSelection()` へ、ローンチボタン操作は `launchSelectedRocket()` へ委譲する。ビルドアイテム選択後は、AIM 可能状態であれば予測軌道を再計算する。
+    2. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、航行結果のマップ確認、航行結果のリプレイ保護、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを登録する。ビルドアイテム選択は `BuildFlowController.handleItemSelection()` へ、ローンチボタン操作は `launchSelectedRocket()` へ委譲する。ビルドアイテム選択後は、AIM 可能状態であれば予測軌道を再計算する。
     3. **HUD初期化**: `uiController.initHUD(sessionState)` を実行し、初期値（Coins, Sector 等）の表示と、メールスロットのリセット（全ロック）を行う。
     4. **最初のセクターへ**: `this.beginSectorTransition()` を実行。
 
@@ -83,13 +83,36 @@
         2. 戻り値が `null` の場合は `false` を返す。
         3. ゲームオーバー結果が返った場合は、ゲームリザルト表示用の `GameResultSummary` を `sessionState.getGameResultSummary()` で取得する。
         4. `GameRecordTracker.recordGameResult(gameResult)` を呼び出し、契約完了回数など契約終了時にのみ確定する記録値を更新する。
-        5. `AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['lifetime_contracts'] })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
-        6. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
-    - ランキング登録は、ゲーム終了処理が正式に接続された段階で、その終了確定タイミングから行う。現時点のゲームオーバー判定フローでは `RankTracker.recordGameResult()` を呼び出さない。
+        5. `RankTracker.recordGameResult(gameResult)` を呼び出し、ゲーム1プレイ単位のランキング・推移記録へ反映する。
+        6. `AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['lifetime_contracts'] })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
+        7. `worldRenderer.playGameEndExitAnimation()` で現在セクターから離脱する逆方向ワープを開始する。
+        8. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
+    - ランキング登録はゲーム終了画面へ遷移する確定タイミングでのみ行い、契約が継続する航行終了・施設退出では行わない。
 
 - **`returnToTitle(): void`**
     - ゲーム終了画面のタイトル復帰操作を処理する。
-    - **内部挙動**: `AppOrchestrator.returnToTitle()` へ制御を戻し、Game Lifecycle の終了を委譲する。
+    - **内部挙動**: ゲームオーバー退場ワープを減速させてから `AppOrchestrator.returnToTitle()` へ制御を戻し、Game Lifecycle の終了を委譲する。
+
+- **`handleResultMapToggle(showMap: boolean): void`**
+    - 航行結果画面の `VIEW MAP` 表示状態変更を受け取る。
+    - **内部挙動**:
+        - `showMap === true` のとき、`WorldRenderer.render()` を呼び出して最終航行状態のマップを再描画する。
+        - `showMap === false` のとき、ゲーム状態は変更しない。
+    - **責務境界**: 結果画面と戻りボタンの表示切替は `UIController` が担当し、`GameController` はマップ描画要求だけを担当する。
+
+- **`getFavoriteReplayRecords(): FlightRecord[]`**
+    - 航行結果画面の replay 保護上限ダイアログに表示する候補を返す。
+    - `FlightRecorder.getRecords()` から `favorite === true` の記録だけを抽出する。
+    - **責務境界**: 候補表示の DOM 生成は `FlightResultScreenView`、保護状態の永続管理は `FlightRecorder` が担当する。
+
+- **`handleResultProtect(favorite: boolean, options?: { replaceRecordId?: string }): FlightRecord | null`**
+    - 航行結果画面のリプレイ保護状態変更を受け取る。
+    - **内部挙動**:
+        1. `options.replaceRecordId` が指定された場合は、先に `FlightRecorder.setFavorite(replaceRecordId, false)` を呼び出して既存の protected replay を解除する。
+        2. 航行記録が自動保存済みの場合は、直近の `FlightRecord.id` を指定して `FlightRecorder.setFavorite(id, favorite)` を呼び出す。
+        3. 航行記録が自動保存されず pending 状態であり、`favorite === true` の場合は `FlightRecorder.savePendingRecordAsFavorite()` を呼び出す。
+        4. 保存済みまたは保存された `FlightRecord` を `lastReplayRecord` として保持する。
+    - **責務境界**: お気に入り上限や pending 記録の永続化判断は `FlightRecorder` の責務。`GameController` は航行結果画面操作と `FlightRecorder` の該当 API を接続する。
 
 - **ビルドアイテム選択**
     - ビルド画面でのアイテム選択は `BuildFlowController.handleItemSelection(selection)` へ委譲する。

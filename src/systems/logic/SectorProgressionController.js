@@ -6,6 +6,7 @@ class SectorProgressionController {
         this.sessionState = infrastructure.sessionState;
         this.economySystem = infrastructure.economySystem;
         this.gameRecordTracker = infrastructure.gameRecordTracker;
+        this.rankTracker = infrastructure.rankTracker;
         this.achievementTracker = infrastructure.achievementTracker;
         this.uiController = infrastructure.uiController;
         this.worldRenderer = infrastructure.worldRenderer;
@@ -24,10 +25,13 @@ class SectorProgressionController {
             completedSectors: context.completedSectors ?? this.sessionState.sectorNumber
         });
         const updatedRecordKeys = this.gameRecordTracker.recordGameResult(gameResult);
+        const rankings = this.rankTracker.recordGameResult(gameResult);
+        gameResult.rankings = rankings;
         const achievements = updatedRecordKeys.length > 0
             ? this.achievementTracker.evaluateAchievements({ source: 'game_record', keys: updatedRecordKeys })
             : [];
 
+        this.worldRenderer?.playGameEndExitAnimation?.();
         this.uiController.showGameEndSequence?.(gameResult, gameOver, {
             achievements
         });

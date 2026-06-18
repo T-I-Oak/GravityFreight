@@ -66,6 +66,7 @@ function createBackgroundManager() {
         update: vi.fn(),
         handleResize: vi.fn(),
         startWarpEffect: vi.fn(),
+        startReverseWarpEffect: vi.fn(),
         stopWarpEffect: vi.fn()
     };
 }
@@ -141,6 +142,58 @@ describe('WorldRenderer', () => {
 
         expect(backgroundManager.startWarpEffect).toHaveBeenCalledWith(1400);
         expect(backgroundManager.stopWarpEffect).toHaveBeenCalledWith(1400);
+    });
+
+    it('runs the game-end exit warp as a reverse map zoom and slows it for title return', async () => {
+        const { canvas } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const renderer = createRenderer({ backgroundManager });
+
+        await renderer.initialize(canvas);
+        await renderer.playGameEndExitAnimation();
+        expect(backgroundManager.startReverseWarpEffect).toHaveBeenCalledWith(3200);
+        expect(backgroundManager.startWarpEffect).not.toHaveBeenCalled();
+        expect(renderer.mapWarp.scale).toBeGreaterThan(0.9);
+        expect(renderer.mapWarp.transition).toEqual(expect.objectContaining({
+            fromScale: 1,
+            toScale: 0.01
+        }));
+        expect(renderer.mapWarp.alpha).toBe(1);
+
+        await renderer.stopGameEndExitAnimation();
+        expect(backgroundManager.stopWarpEffect).toHaveBeenCalledWith(1600);
+        expect(renderer.mapWarp.transition).toEqual(expect.objectContaining({
+            toScale: 1
+        }));
+        expect(renderer.mapWarp.alpha).toBe(1);
+    });
+
+    it('fades the map after the game-end exit zoom has moved it away', async () => {
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const renderer = createRenderer({ backgroundManager });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [],
+            bodies: [
+                {
+                    position: { x: 0, y: 0 },
+                    radius: 40,
+                    isHome: true,
+                    isRepulsion: false,
+                    items: []
+                }
+            ]
+        });
+
+        await renderer.playGameEndExitAnimation();
+        renderer.mapWarp.scale = 0.04;
+        renderer.mapWarp.transition = null;
+        context.globalAlphas.length = 0;
+        renderer.render();
+
+        expect(context.globalAlphas).toContain(0);
     });
 
     it('applies map warp scale around the canvas center', async () => {

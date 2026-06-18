@@ -10,6 +10,7 @@ export class FlightResultComponents {
         const recordedLabel = replay.recorded
             ? gameDataRepository.getUiText('flightResult.replay.recorded')
             : gameDataRepository.getUiText('flightResult.replay.notRecorded');
+        const recordedState = replay.recorded ? 'state-recorded' : 'state-not-recorded';
         const protectLabel = replay.favorite
             ? gameDataRepository.getUiText('flightResult.replay.protected')
             : gameDataRepository.getUiText('flightResult.replay.protectRecord');
@@ -35,7 +36,7 @@ export class FlightResultComponents {
                 <header class="panel-header SplitRow">
                     <h2 class="panel-title ${viewData.themeClass || 'home'}">${viewData.title}</h2>
                     <div class="flight-report-status">
-                        <div class="Badge state-recorded capsule"><span class="recorded-text">${recordedLabel}</span></div>
+                        <div class="Badge ${recordedState} capsule" data-replay-recorded-status><span class="recorded-text">${recordedLabel}</span></div>
                         <div class="Badge favorite ${protectState} state-clickable capsule">${protectLabel}</div>
                     </div>
                 </header>
@@ -51,11 +52,11 @@ export class FlightResultComponents {
                                 <div class="stat-group">
                                     <div class="SplitColumn hero">
                                         <span class="stat-label">${scoreLabel}</span>
-                                        <span class="stat-value score">${UIComponents.formatNumber(viewData.totalScore)}</span>
+                                        <span class="stat-value score" data-count-to="${viewData.totalScore ?? 0}">0</span>
                                     </div>
                                     <div class="SplitColumn hero">
                                         <span class="stat-label">${creditsLabel}</span>
-                                        <span class="stat-value coin">${UIComponents.formatNumber(viewData.totalCoins)}</span>
+                                        <span class="stat-value coin" data-count-to="${viewData.totalCoins ?? 0}">0</span>
                                     </div>
                                 </div>
                             </div>
@@ -89,8 +90,12 @@ export class FlightResultComponents {
     }
 
     static generateEntryHTML(entry) {
-        const score = entry.score === undefined ? '' : `+${UIComponents.formatNumber(entry.score)}`;
-        const coin = entry.coin === undefined ? '' : `+${UIComponents.formatNumber(entry.coin)}`;
+        const score = entry.score === undefined
+            ? ''
+            : `<span data-count-to="${entry.score}" data-count-prefix="+">+0</span>`;
+        const coin = entry.coin === undefined
+            ? ''
+            : `<span data-count-to="${entry.coin}" data-count-prefix="+">+0</span>`;
 
         return `
             <div class="SplitRow data-row">

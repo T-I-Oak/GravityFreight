@@ -5,6 +5,11 @@ import FlightVisualRenderer from './FlightVisualRenderer.js';
 const WORLD_VIEW_SCALE = 0.5;
 const WARP_OUT_SCALE = 100;
 const WARP_IN_START_SCALE = 0.01;
+const GAME_END_EXIT_SCALE = 0.01;
+const GAME_END_EXIT_DURATION = 3200;
+const GAME_END_RETURN_DURATION = 1600;
+const GAME_END_FADE_START_SCALE = 0.35;
+const GAME_END_FADE_END_SCALE = 0.08;
 const FINISH_ANIMATION_DURATION = 2000;
 const SONAR_RIPPLE_DURATION = 2000;
 
@@ -35,7 +40,8 @@ class WorldRenderer {
         this.mapWarp = {
             scale: 1,
             alpha: 1,
-            transition: null
+            transition: null,
+            fadeMode: null
         };
     }
 
@@ -177,7 +183,7 @@ class WorldRenderer {
         }
 
         this.context.save();
-        this.context.globalAlpha *= this.mapWarp.alpha;
+        this.context.globalAlpha *= this.#getMapWarpAlpha();
         this.#drawBoundary(colors);
         this.#drawExits(colors);
         this.#drawBodies(colors);
@@ -193,6 +199,7 @@ class WorldRenderer {
 
     startWarpEffect(duration = 0) {
         this.backgroundManager.startWarpEffect(duration);
+        this.mapWarp.fadeMode = null;
         this.#setMapWarpTransition({
             fromScale: this.mapWarp.scale,
             toScale: WARP_OUT_SCALE,
@@ -206,6 +213,7 @@ class WorldRenderer {
 
     stopWarpEffect(duration = 0) {
         this.backgroundManager.stopWarpEffect(duration);
+        this.mapWarp.fadeMode = null;
         this.#setMapWarpTransition({
             fromScale: WARP_IN_START_SCALE,
             toScale: 1,
@@ -215,6 +223,36 @@ class WorldRenderer {
             easing: progress => 1 - ((1 - progress) ** 3)
         });
         this.render();
+    }
+
+    playGameEndExitAnimation(duration = GAME_END_EXIT_DURATION) {
+        this.backgroundManager.startReverseWarpEffect(duration);
+        this.mapWarp.fadeMode = 'gameEndExit';
+        this.#setMapWarpTransition({
+            fromScale: this.mapWarp.scale,
+            toScale: GAME_END_EXIT_SCALE,
+            fromAlpha: this.mapWarp.alpha,
+            toAlpha: 1,
+            duration,
+            easing: progress => 1 - ((1 - progress) ** 3)
+        });
+        this.render();
+        return Promise.resolve();
+    }
+
+    stopGameEndExitAnimation(duration = GAME_END_RETURN_DURATION) {
+        this.backgroundManager.stopWarpEffect(duration);
+        this.mapWarp.fadeMode = null;
+        this.#setMapWarpTransition({
+            fromScale: this.mapWarp.scale,
+            toScale: 1,
+            fromAlpha: this.mapWarp.alpha,
+            toAlpha: 1,
+            duration,
+            easing: progress => 1 - ((1 - progress) ** 3)
+        });
+        this.render();
+        return Promise.resolve();
     }
 
     #fitCanvas() {
@@ -354,6 +392,23 @@ class WorldRenderer {
             this.mapWarp.alpha = transition.toAlpha;
             this.mapWarp.transition = null;
         }
+    }
+
+    #getMapWarpAlpha() {
+        if (this.mapWarp.fadeMode !== 'gameEndExit') {
+            return this.mapWarp.alpha;
+        }
+
+        if (this.mapWarp.scale >= GAME_END_FADE_START_SCALE) {
+            return this.mapWarp.alpha;
+        }
+        if (this.mapWarp.scale <= GAME_END_FADE_END_SCALE) {
+            return 0;
+        }
+
+        const progress = (this.mapWarp.scale - GAME_END_FADE_END_SCALE)
+            / (GAME_END_FADE_START_SCALE - GAME_END_FADE_END_SCALE);
+        return this.mapWarp.alpha * progress;
     }
 
     #lerp(from, to, progress) {

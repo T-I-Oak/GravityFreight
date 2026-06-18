@@ -57,6 +57,12 @@
             "ja": "VIEW MAP",
             "en": "VIEW MAP"
           }
+        },
+        "backToResult": {
+          "lang-store": {
+            "ja": "BACK TO RESULT",
+            "en": "BACK TO RESULT"
+          }
         }
       },
       "sections": {
@@ -145,10 +151,148 @@
           }
         }
       },
+      "favoriteLimit": {
+        "title": {
+          "lang-store": {
+            "ja": "PROTECT LIMIT REACHED",
+            "en": "PROTECT LIMIT REACHED"
+          }
+        },
+        "message": {
+          "lang-store": {
+            "ja": "保護する航行記録を5件以内で選んでください。",
+            "en": "Select up to 5 flight records to protect."
+          }
+        },
+        "archiveMessage": {
+          "lang-store": {
+            "ja": "保護できる航行記録は5件までです。先に他の保護を解除してください。",
+            "en": "Up to 5 flight records can be protected. Release another protected record first."
+          }
+        },
+        "count": {
+          "lang-store": {
+            "ja": "{count}/{max} protected",
+            "en": "{count}/{max} protected"
+          }
+        },
+        "sector": {
+          "lang-store": {
+            "ja": "SECTOR",
+            "en": "SECTOR"
+          }
+        },
+        "score": {
+          "lang-store": {
+            "ja": "SCORE",
+            "en": "SCORE"
+          }
+        },
+        "protectColumn": {
+          "lang-store": {
+            "ja": "PROTECT",
+            "en": "PROTECT"
+          }
+        },
+        "noColumn": {
+          "lang-store": {
+            "ja": "NO.",
+            "en": "NO."
+          }
+        },
+        "dateColumn": {
+          "lang-store": {
+            "ja": "DATE TIME",
+            "en": "DATE TIME"
+          }
+        },
+        "currentRecord": {
+          "lang-store": {
+            "ja": "CURRENT",
+            "en": "CURRENT"
+          }
+        },
+        "currentDate": {
+          "lang-store": {
+            "ja": "CURRENT FLIGHT",
+            "en": "CURRENT FLIGHT"
+          }
+        },
+        "ok": {
+          "lang-store": {
+            "ja": "OK",
+            "en": "OK"
+          }
+        },
+        "cancel": {
+          "lang-store": {
+            "ja": "CANCEL",
+            "en": "CANCEL"
+          }
+        }
+      },
       "bonusTitle": {
         "lang-store": {
           "ja": "DELIVERY BONUS",
           "en": "DELIVERY BONUS"
+        }
+      }
+    },
+    "gameEnd": {
+      "title": {
+        "lang-store": {
+          "ja": "TERMINAL REPORT",
+          "en": "TERMINAL REPORT"
+        }
+      },
+      "subtitle": {
+        "lang-store": {
+          "ja": "GRAVITY FREIGHT CO. - FINAL EVALUATION",
+          "en": "GRAVITY FREIGHT CO. - FINAL EVALUATION"
+        }
+      },
+      "completedSectors": {
+        "lang-store": {
+          "ja": "SECTORS COMPLETED",
+          "en": "SECTORS COMPLETED"
+        }
+      },
+      "collectedItems": {
+        "lang-store": {
+          "ja": "TOTAL COLLECTED",
+          "en": "TOTAL COLLECTED"
+        }
+      },
+      "totalCoins": {
+        "lang-store": {
+          "ja": "TOTAL CREDITS",
+          "en": "TOTAL CREDITS"
+        }
+      },
+      "finalScore": {
+        "lang-store": {
+          "ja": "FINAL SCORE",
+          "en": "FINAL SCORE"
+        }
+      },
+      "authStatus": {
+        "lang-store": {
+          "ja": "OFFICIAL PERFORMANCE LOG GRANTED",
+          "en": "OFFICIAL PERFORMANCE LOG GRANTED"
+        }
+      },
+      "endContract": {
+        "lang-store": {
+          "ja": "END CONTRACT",
+          "en": "END CONTRACT"
+        }
+      },
+      "reasons": {
+        "NO_PARTS_REMAINING": {
+          "lang-store": {
+            "ja": "NO PARTS REMAINING",
+            "en": "NO PARTS REMAINING"
+          }
         }
       }
     },

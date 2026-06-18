@@ -23,7 +23,7 @@ function createController() {
         recordGameResult: vi.fn(() => ['lifetime_contracts'])
     };
     const rankTracker = {
-        recordGameResult: vi.fn(() => ({ scoreRank: 1 }))
+        recordGameResult: vi.fn(() => ({ scoreRank: 1, sectorRank: 2, collectedRank: 3 }))
     };
     const achievementTracker = {
         evaluateAchievements: vi.fn(() => [{ achievementId: 'contract', tier: 1 }])
@@ -36,7 +36,8 @@ function createController() {
         showGameEndSequence: vi.fn()
     };
     const worldRenderer = {
-        setSector: vi.fn()
+        setSector: vi.fn(),
+        playGameEndExitAnimation: vi.fn()
     };
     const sectorFactory = vi.fn(({ sessionState: currentSession, isAnomaly }) => ({
         sectorNumber: currentSession.sectorNumber,
@@ -104,7 +105,7 @@ describe('SectorProgressionController', () => {
         expect(context.uiController.showGameEndSequence).not.toHaveBeenCalled();
     });
 
-    it('records game-end achievements without registering rankings before the final game-end flow exists', () => {
+    it('records game-end achievements and rankings when the final game-end flow starts', () => {
         const gameOver = { reason: 'NO_PARTS_REMAINING', details: ['LAUNCHER'] };
         context.economySystem.checkGameOver.mockReturnValue(gameOver);
 
@@ -116,7 +117,9 @@ describe('SectorProgressionController', () => {
         });
         const gameResult = context.sessionState.getGameResultSummary.mock.results.at(-1).value;
         expect(context.gameRecordTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
-        expect(context.rankTracker.recordGameResult).not.toHaveBeenCalled();
+        expect(context.rankTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
+        expect(gameResult.rankings).toEqual({ scoreRank: 1, sectorRank: 2, collectedRank: 3 });
+        expect(context.worldRenderer.playGameEndExitAnimation).toHaveBeenCalledTimes(1);
         expect(context.uiController.showGameEndSequence).toHaveBeenCalledWith(gameResult, gameOver, {
             achievements: [{ achievementId: 'contract', tier: 1 }]
         });

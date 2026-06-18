@@ -9,6 +9,8 @@ const STAR_PROJECTION_SCALE = 200;
 const BASE_DEPTH_SPEED = 0.1;
 const STAR_WRAP_MIN_DEPTH = 1200;
 const STAR_WRAP_DEPTH_RANGE = 800;
+const STAR_REVERSE_WRAP_MIN_DEPTH = 80;
+const STAR_REVERSE_WRAP_DEPTH_RANGE = 320;
 const MIN_STREAK_LENGTH = 1.2;
 const MAX_WARP_BRIGHTNESS_BOOST = 0.6;
 
@@ -50,6 +52,10 @@ class BackgroundManager {
                 this.#resetStarToDeepSpace(star);
                 star.wrapped = true;
             }
+            if (this.warpSpeed < 0 && star.z > STAR_MAX_DEPTH) {
+                this.#resetStarToNearSpace(star);
+                star.wrapped = true;
+            }
         });
     }
 
@@ -83,6 +89,10 @@ class BackgroundManager {
 
     startWarpEffect(duration = 0) {
         this.#setWarpTarget(ACTIVE_WARP_SPEED, duration);
+    }
+
+    startReverseWarpEffect(duration = 0) {
+        this.#setWarpTarget(-ACTIVE_WARP_SPEED, duration);
     }
 
     stopWarpEffect(duration = 0) {
@@ -126,6 +136,13 @@ class BackgroundManager {
         const nextStar = this.#createStar();
         Object.assign(star, nextStar, {
             z: STAR_WRAP_MIN_DEPTH + this.#nextRandom() * STAR_WRAP_DEPTH_RANGE
+        });
+    }
+
+    #resetStarToNearSpace(star) {
+        const nextStar = this.#createStar();
+        Object.assign(star, nextStar, {
+            z: STAR_REVERSE_WRAP_MIN_DEPTH + this.#nextRandom() * STAR_REVERSE_WRAP_DEPTH_RANGE
         });
     }
 
@@ -197,7 +214,8 @@ class BackgroundManager {
             }
 
             const twinkle = 0.8 + 0.2 * Math.sin((timestamp / 1000) * star.pulseRate + star.pulseOffset);
-            const depthBrightness = 0.15 + 0.85 * (1 - star.z / STAR_MAX_DEPTH);
+            const depthRate = Math.max(0, Math.min(1, 1 - star.z / STAR_MAX_DEPTH));
+            const depthBrightness = 0.15 + 0.85 * depthRate;
             const alpha = Math.min(1, depthBrightness * star.alpha * twinkle * this.#getWarpBrightnessMultiplier());
             const size = Math.max(0.8, Math.min(4, star.size * scale * 1.2));
 

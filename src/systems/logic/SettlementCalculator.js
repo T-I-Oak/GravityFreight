@@ -40,7 +40,8 @@ class SettlementCalculator {
             });
         }
 
-        const collectedCoin = status === 'cleared'
+        const isRecoveryResult = status === 'cleared' || status === 'returned';
+        const collectedCoin = isRecoveryResult
             ? this.#sumCoinValues(heldItems.filter(item => item.category === 'coin'))
             : 0;
         if (collectedCoin > 0) {
@@ -53,20 +54,18 @@ class SettlementCalculator {
             totalCoins += deliveryResult.coins;
             unlockedBranchId = deliveryResult.unlockedBranchId;
             entries.push(...deliveryResult.entries);
-        } else {
-            this.#appendGroupedItemReports(
-                itemReport,
-                'delivery',
-                heldItems.filter(item => item.category === 'cargo'),
-                'unmatched'
-            );
         }
 
-        this.#appendGroupedItemReports(
-            itemReport,
-            'other',
-            heldItems.filter(item => item.category !== 'cargo')
-        );
+        if (isRecoveryResult) {
+            this.#appendGroupedItemReports(
+                itemReport,
+                'other',
+                heldItems.filter(item => item.category !== 'cargo' || (status === 'cleared' && this.#isSpecialCargo(item)))
+            );
+            heldItems
+                .filter(item => this.#isInventoryRewardItem(item))
+                .forEach(item => acquiredItems.push(item));
+        }
 
         if (collectedCoin > 0) {
             entries.push({
@@ -122,7 +121,7 @@ class SettlementCalculator {
             unlockedBranchId: null
         };
 
-        this.#groupItems(heldItems.filter(item => item.category === 'cargo'))
+        this.#groupItems(heldItems.filter(item => this.#isDeliveryCargo(item)))
             .forEach(cargoGroup => {
                 const cargo = cargoGroup[0];
                 const isMatch = cargo.deliveryGoalId === destination;
@@ -189,6 +188,18 @@ class SettlementCalculator {
 
     #sumCoinValues(items) {
         return items.reduce((total, item) => total + (item.score || 0), 0);
+    }
+
+    #isInventoryRewardItem(item) {
+        return INVENTORY_REWARD_CATEGORIES.includes(item.category);
+    }
+
+    #isDeliveryCargo(item) {
+        return item.category === 'cargo' && Boolean(item.deliveryGoalId);
+    }
+
+    #isSpecialCargo(item) {
+        return item.category === 'cargo' && !item.deliveryGoalId;
     }
 
     #createGroupedItemReportEntry(type, items, status) {

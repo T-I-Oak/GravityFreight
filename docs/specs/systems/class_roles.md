@@ -18,6 +18,8 @@ graph TD
 
     %% Control Layer
     Orchestrator --> UI["UIController (UI/Input)"]
+    UI --> BPV["BuildPanelView (Build Panel)"]
+    UI --> FRSV["FlightResultScreenView (Flight Result)"]
     UI --> ADV["ArchiveDialogView (Archive Dialog)"]
     UI --> AMV["AppMetadataView (App Metadata)"]
     UI --> SDV["SettingsDialogView (Settings Dialog)"]
@@ -214,6 +216,7 @@ graph TD
         - プレイ中（ワープ〜航行〜リザルト〜施設〜ゲーム終了）の一連の画面遷移とロジックの統括。
         - 施設入場・施設取引・施設退出など、画面入力からゲーム進行処理への入口を管理する。
         - 航行開始時に `NavigationLoopController` を起動し、航行終了後の精算・画面遷移を実行する。
+        - 航行結果画面の replay 保護操作を `FlightRecorder` へ接続し、上限時の置き換えでは既存 protected replay の解除後に現在の航行結果を保護する。
         - セクター進行と契約終了判定は `SectorProgressionController` へ委譲する。
 - **BuildFlowController**
     - 生存期間: Game Lifecycle
@@ -245,7 +248,7 @@ graph TD
         - 次セクター開始時の `SessionState` 更新、`Sector` 生成、HUD / Renderer 更新を実行する。
         - 施設退出時および航行結果確定後のゲームオーバー判定を実行する。
         - 契約終了時に記録値・実績の確定処理を呼び出し、ゲーム終了画面へ結果を渡す。
-        - ランキング登録は正式なゲーム終了処理に接続するため、現時点のゲームオーバー判定からは呼び出さない。
+        - 契約終了が確定した場合のみ、ゲーム1プレイ単位のランキング登録を `RankTracker` へ委譲する。
 - **StorySystem**
     - 生存期間: App Lifecycle (Service)
     - 役割: 物語（Story）の選択・永続進捗管理。
@@ -300,6 +303,23 @@ graph TD
         - 画面遷移、ダイアログ表示の制御。
         - HUDの制御。
         - UI 操作イベントをアプリ側のハンドラへ中継する。
+        - ビルドパネル、航行結果画面、記録画面などの画面固有表示は専門 view クラスへ委譲する。
+- **BuildPanelView**
+    - 生存期間: App Lifecycle
+    - 役割: ビルドパネル表示。
+    - 責務:
+        - FLIGHT / ASSEMBLY タブ、item list、placeholder、ASSEMBLE / LAUNCH ボタンの DOM 表示を担当する。
+        - ビルドパネル内の操作を `UIController` の operation binder 経由で外部ハンドラへ中継する。
+        - 航行結果のマップ確認や施設滞在中に、item selection を通知しない read-only 表示を提供する。
+- **FlightResultScreenView**
+    - 生存期間: App Lifecycle
+    - 役割: 航行結果画面表示。
+    - 責務:
+        - `FlightResultComponents` で生成した航行結果 HTML を表示する。
+        - スコア、コイン、明細値を 0 から最終値へ加算アニメーションする。
+        - 確定、VIEW MAP、リプレイ保護操作を外部ハンドラへ中継する。
+        - replay 保護上限時に既存 protected replay の置き換え候補を表示し、選択結果を外部ハンドラへ中継する。
+        - VIEW MAP 中のリザルト画面非表示、プレイシーン表示、戻りボタン表示を担当する。
 - **AppMetadataView**
     - 生存期間: App Lifecycle
     - 役割: アプリメタデータ表示。
@@ -311,7 +331,7 @@ graph TD
 - **ArchiveDialogView**
     - 生存期間: App Lifecycle
     - 役割: Analytic Archive ダイアログ表示。
-    - 責務: タイトル画面の RECORDS ボタンから Archive overlay を開き、`ArchiveComponents` が生成した HTML を表示する。タブ切替、閉じる操作、リプレイ行選択、選択されたリプレイ記録 ID の通知を管理し、表示データ生成、リプレイ再生本体、永続データ更新は担当しない。
+    - 責務: タイトル画面の RECORDS ボタンから Archive overlay を開き、`ArchiveComponents` が生成した HTML を表示する。タブ切替、閉じる操作、リプレイ行選択、選択されたリプレイ記録 ID の通知、リプレイ保護状態変更の通知を管理し、表示データ生成、リプレイ再生本体、永続データ更新は担当しない。
 - **MapInputController**
     - 生存期間: App Lifecycle
     - 役割: Canvas 入力イベント正規化。

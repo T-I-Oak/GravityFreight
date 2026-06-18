@@ -3,7 +3,6 @@ import Rocket from '../entities/Rocket.js';
 import Sector from '../world/Sector.js';
 
 const MAX_RECORDS = 20;
-const MAX_FAVORITES = 5;
 const VALID_RESULT_TYPES = new Set(['cleared', 'returned', 'crashed', 'lost']);
 
 function copyData(value) {
@@ -87,22 +86,15 @@ class FlightRecorder {
             throw new Error(`[FlightRecorder] Record not found: ${recordId}`);
         }
 
-        if (favorite && !record.favorite && this.#favoriteCount() >= MAX_FAVORITES) {
-            throw new Error('[FlightRecorder] Favorite limit reached.');
-        }
-
         record.favorite = !!favorite;
         this.#save();
+        return copyData(record);
     }
 
     savePendingRecordAsFavorite() {
         if (!this.pendingRecord) {
             throw new Error('[FlightRecorder] Pending record not found.');
         }
-        if (this.#favoriteCount() >= MAX_FAVORITES) {
-            throw new Error('[FlightRecorder] Favorite limit reached.');
-        }
-
         this.pendingRecord.favorite = true;
         const record = this.pendingRecord;
         this.#addRecord(record);
@@ -228,10 +220,6 @@ class FlightRecorder {
             }
             ids.add(record.id);
         }
-    }
-
-    #favoriteCount() {
-        return this.records.filter(record => record.favorite).length;
     }
 
     #save() {

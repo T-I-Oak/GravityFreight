@@ -98,6 +98,10 @@
     );
 }
 
+#inventory-panel.state-readonly .item-list .ItemCard {
+    pointer-events: none;
+}
+
 /* Logic: Grouped message indicators with defined spatial density */
 #play-hud .hud-messages {
     display: flex;

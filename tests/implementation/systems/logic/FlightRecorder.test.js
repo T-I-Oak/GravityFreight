@@ -173,7 +173,7 @@ describe('FlightRecorder', () => {
         expect(repository.setSavedFlightRecordIndex).toHaveBeenCalledTimes(1);
     });
 
-    it('updates favorite state with the favorite count limit', () => {
+    it('updates favorite state without applying the UI protect flow limit', () => {
         const records = Array.from({ length: 6 }, (_, index) => createRecord({
             id: `record_${index}`,
             score: 100 + index,
@@ -181,11 +181,9 @@ describe('FlightRecorder', () => {
         }));
         ({ recorder } = createRecorder({ records }));
 
-        expect(() => recorder.setFavorite('record_5', true)).toThrow('[FlightRecorder] Favorite limit reached.');
+        const protectedRecord = recorder.setFavorite('record_5', true);
 
-        recorder.setFavorite('record_0', false);
-        recorder.setFavorite('record_5', true);
-
+        expect(protectedRecord).toMatchObject({ id: 'record_5', favorite: true });
         expect(recorder.getRecords().find(record => record.id === 'record_5').favorite).toBe(true);
     });
 
