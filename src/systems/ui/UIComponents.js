@@ -39,7 +39,7 @@ export class UIComponents {
             : '';
 
         const footerHTML = this.generateFooterHTML(viewModel, options);
-        const detailsHTML = (category === 'rocket' && Array.isArray(viewModel.modules))
+        const detailsHTML = (category === 'rocket' && Array.isArray(viewModel.modules) && viewModel.modules.length > 0)
             ? this.generateRocketDetailsHTML(viewModel.modules)
             : '';
 
@@ -169,6 +169,10 @@ export class UIComponents {
      * @param {Array} modules - Array of item objects
      */
     static generateRocketDetailsHTML(modules) {
+        if (!Array.isArray(modules) || modules.length === 0) {
+            return '';
+        }
+
         let cards = '';
         modules.forEach(mod => {
             // Generate each module as a compact mini card

@@ -85,6 +85,22 @@ describe('SessionState', () => {
         expect(target.addItems).toHaveBeenCalledWith(lostItems);
     });
 
+    it('returns recovered launch equipment to inventory without increasing collected item count', () => {
+        const session = new SessionState(repository);
+        const recoveredItem = new Item('hull_light', repository);
+        session.initialize();
+
+        session.applySettlement({
+            totalCoins: 0,
+            totalScore: 100,
+            acquiredItems: [],
+            recoveredItems: [recoveredItem]
+        });
+
+        expect(session.inventory.hasItem(recoveredItem)).toBe(true);
+        expect(session.collectedItemCount).toBe(0);
+    });
+
     it('increases return bonus after home return and resets it on next sector', () => {
         const session = new SessionState(repository);
         session.initialize();

@@ -220,8 +220,6 @@
 /* --- 4. Rocket & Module Specifics --- */
 .rocket-details {
     margin-top: 6px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-    padding-top: 4px;
     display: flex;
     flex-direction: column;
     gap: 2px;

@@ -21,6 +21,8 @@
     - `body.isHome === true` の場合はタイトルを `STAR CORE STORAGE`、それ以外は `STAR ITEMS` とする。
     - item 表示は `UIComponents.generateCardHTML()` を使用し、既存の `ItemCard` 表現と一致させる。
     - 集約後の item が 3種類以下の場合は通常カードで表示し、4種類以上の場合のみ compact 表示に切り替える。
+    - パネル本体の背景は透明とし、背後のマップを隠さない。可読性は内部の `ItemCard` 背景で確保する。
+    - 透明背景は `.theme-* .Panel` の偶発的な適用有無に依存せず、`StarInfoPanel` 専用スタイルとして明示する。
     - `point` は Canvas 内部座標ではなく表示用 CSS px 座標として扱う。
     - ポップアップが画面端からはみ出す場合は、ポインタの左側または上側へ折り返す。
 

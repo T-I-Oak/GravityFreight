@@ -296,6 +296,24 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         expect(html).toContain('Module Stack');
         expect(html).toContain('x2');
     });
+
+    it('should not render rocket details when RocketItem has no modules', () => {
+        const rocketViewData = {
+            id: 'rocket',
+            uid: 'rocket_001',
+            name: 'ロケット',
+            category: 'rocket',
+            stats: {
+                mass: { value: 12, enhanceCount: 0 },
+                slots: { value: 4, enhanceCount: 0 }
+            },
+            modules: []
+        };
+
+        const html = UIComponents.generateCardHTML(rocketViewData);
+
+        expect(html).not.toContain('rocket-details');
+    });
 });
 
 describe('UIComponents.generateCardHTML (Variations)', () => {
@@ -365,6 +383,11 @@ describe('UIComponents.generateRocketDetailsHTML', () => {
         expect(html).toContain('state-mini');
         expect(html).toContain('モジュールA');
         expect(html).toContain('モジュールB');
+    });
+
+    it('should not generate rocket details for an empty module list', () => {
+        const html = UIComponents.generateRocketDetailsHTML([]);
+        expect(html).toBe('');
     });
 });
 

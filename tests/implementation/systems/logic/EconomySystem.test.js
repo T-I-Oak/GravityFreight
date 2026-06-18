@@ -134,6 +134,18 @@ describe('EconomySystem', () => {
         expect(economySystem.checkGameOver(session)).toBeNull();
     });
 
+    it('returns null when the session has an assembled rocket and a usable launcher', () => {
+        session.inventory = new ItemContainer();
+        session.inventory.addItem(new RocketItem(
+            new Item('hull_medium', repository),
+            new Item('sensor_normal', repository),
+            []
+        ));
+        session.inventory.addItem(new Item('pad_standard_d2', repository));
+
+        expect(economySystem.checkGameOver(session)).toBeNull();
+    });
+
     it('reports missing required categories and ignores depleted launchers', () => {
         const launcher = new Item('pad_standard_d2', repository);
         launcher.consumeCharge(2);

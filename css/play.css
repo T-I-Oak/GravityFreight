@@ -179,6 +179,9 @@
     width: min(280px, calc(100vw - 32px));
     max-height: min(420px, calc(100vh - 32px));
     padding: var(--space-double);
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
     pointer-events: none;
     overflow: hidden;
 }

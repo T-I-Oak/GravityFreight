@@ -167,6 +167,26 @@ describe('GameController result and facility flow', () => {
         });
     });
 
+    it('does not count recovered launch equipment as collected items in flight records', async () => {
+        const recoveredRocket = { id: 'recovered_rocket' };
+        const { controller, gameRecordTracker, rocketItem } = createController(createSettlement({
+            status: 'returned',
+            destination: null,
+            unlockedBranchId: null,
+            totalScore: 260,
+            totalCoins: 100,
+            acquiredItems: [],
+            recoveredItems: [recoveredRocket]
+        }));
+
+        await controller.handleNavigationEnd({ type: 'body' });
+
+        expect(recoveredRocket).not.toBe(rocketItem);
+        expect(gameRecordTracker.recordFlightResult).toHaveBeenCalledWith(expect.objectContaining({
+            collectedItemCount: 0
+        }));
+    });
+
     it('requires current rocket and sector before navigation end', async () => {
         context.controller.currentRocket = null;
 

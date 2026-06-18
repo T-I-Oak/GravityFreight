@@ -20,6 +20,7 @@ class SettlementCalculator {
         const entries = [];
         const itemReport = [];
         const acquiredItems = [];
+        const recoveredItems = this.#createRecoveredItems(status, flightData.rocketItem);
 
         let totalScore = flightData.ticks || 0;
         let totalCoins = 0;
@@ -95,6 +96,7 @@ class SettlementCalculator {
             entries,
             itemReport,
             acquiredItems,
+            recoveredItems,
             lostToTarget
         };
     }
@@ -272,6 +274,14 @@ class SettlementCalculator {
                 ...rocketItem.getCompositionParts().filter(() => Math.random() < 0.5)
             ]
         };
+    }
+
+    #createRecoveredItems(status, rocketItem) {
+        if ((status === 'cleared' || status === 'returned') && rocketItem) {
+            return [rocketItem];
+        }
+
+        return [];
     }
 
     #calculateInsurancePayout(status, rocketItem) {

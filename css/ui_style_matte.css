@@ -115,11 +115,6 @@
 
 /* Enhanced visuals unified in base */
 
-/* Composite Elements: Rocket Detail area divider */
-.theme-matte .rocket-details {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .theme-matte .module-name {
     color: rgba(255, 255, 255, 0.5);
 }

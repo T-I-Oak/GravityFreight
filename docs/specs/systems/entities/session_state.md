@@ -47,8 +47,9 @@
         2. **航行時間**: `totalFlightTicks += result.flightTicks` を実行。
         3. **回収数**: `result.acquiredItems` から今回正式に獲得したアイテム数を集計し、`collectedItemCount` へ加算する。
         4. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
-        5. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
-        6. **帰還ボーナス**: `result.status === 'returned'` の場合、`gameBalance.RETURN_BONUS_INCREMENT` を `returnBonus` に加算する。
+        5. **回収装備追加**: `result.recoveredItems` の各アイテムを `inventory` へ追加する。ただし発射前から所有していた装備の復帰であるため、`collectedItemCount` には加算しない。
+        6. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
+        7. **帰還ボーナス**: `result.status === 'returned'` の場合、`gameBalance.RETURN_BONUS_INCREMENT` を `returnBonus` に加算する。
 
 - **`applyTransaction(transaction: TransactionResult): TransactionDelta`**
     - 施設取引などの資産変化を現在の状態に適用する。

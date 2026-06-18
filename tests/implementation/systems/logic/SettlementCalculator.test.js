@@ -42,6 +42,7 @@ describe('SettlementCalculator', () => {
     it('settles a cleared delivery using the provided lottery service', () => {
         const calculator = new SettlementCalculator(repository, lotteryService);
         const bonusCoin = new Item('coin_200', repository);
+        const rocketItem = createRocketItem();
         lotteryService.drawLottery.mockReturnValue([bonusCoin]);
 
         const settlement = calculator.calculate({
@@ -53,7 +54,7 @@ describe('SettlementCalculator', () => {
                 new Item('cargo_safe', repository),
                 new Item('coin_100', repository)
             ],
-            rocketItem: createRocketItem()
+            rocketItem
         }, session);
 
         expect(lotteryService.drawLottery).toHaveBeenCalledWith(session, 1, {
@@ -63,6 +64,26 @@ describe('SettlementCalculator', () => {
         expect(settlement.status).toBe('cleared');
         expect(settlement.totalScore).toBe(3512);
         expect(settlement.totalCoins).toBe(420);
+        expect(settlement.recoveredItems).toEqual([rocketItem]);
+        expect(settlement.acquiredItems).not.toContain(rocketItem);
+    });
+
+    it('recovers the launched rocket on return without counting it as a collected item', () => {
+        const calculator = new SettlementCalculator(repository, lotteryService);
+        const rocketItem = createRocketItem();
+
+        const settlement = calculator.calculate({
+            type: 'body',
+            target: { isHome: true, addItems: vi.fn() }
+        }, {
+            ticks: 20,
+            heldCargo: [],
+            rocketItem
+        }, session);
+
+        expect(settlement.status).toBe('returned');
+        expect(settlement.recoveredItems).toEqual([rocketItem]);
+        expect(settlement.acquiredItems).toEqual([]);
     });
 
     it('combines matched and unmatched delivery rewards into one delivery bonus entry', () => {
@@ -183,5 +204,6 @@ describe('SettlementCalculator', () => {
             { label: 'Flight Duration Score', score: 20 },
             { label: 'Insurance Payout', coin: 60 }
         ]);
+        expect(settlement.recoveredItems).toEqual([]);
     });
 });

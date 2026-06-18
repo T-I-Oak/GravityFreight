@@ -7,7 +7,7 @@
 - **役割**: 経済・取引・抽選ロジックの外部窓口。
 - **責務**:
     - **アイテム出現抽選**: `world_config.md` の定義に基づき、指定されたコンテキスト（セクター配置、拠点ボーナス等）に応じたアイテムの重み付け抽選（Lottery）の実行。
-    - **航行結果の精算**: `SettlementCalculator` へ委譲し、報酬、獲得アイテム、遺失物、割引率を含む `SettlementResult` を生成する。
+    - **航行結果の精算**: `SettlementCalculator` へ委譲し、報酬、獲得アイテム、回収装備、遺失物、割引率を含む `SettlementResult` を生成する。
     - **施設取引ルール**: 共通価格は `PricingService`、交易所在庫は `TradingPostService` へ委譲する。
     - **ゲームオーバー判定**: 航行結果確定後および施設退出時に共通利用する詰み状態判定を提供する。
     - **Facade**: GameController や Sector など外部利用者は、原則として個別サービスではなく `EconomySystem` を呼び出す。
@@ -86,6 +86,7 @@
             - **大破・遭難**:
                 - `crashed` / `lost` では保持アイテムは正式回収されないため、`itemReport` には追加しない。
         3. **アイテムの移動判定**:
+            - **成功/帰還（Cleared/Returned）**: 発射時に inventory から抽出された `RocketItem` は `recoveredItems` に追加し、航行終了後に inventory へ戻す。これは新規獲得アイテムではないため、回収数には加算しない。
             - **帰還（Returned）**: `Cargo` 種別のアイテムのみを母星（`collision.target`）の `lostToTarget` に格納し、Cargo 以外は回収扱いにする。
             - **大破（Crashed）**: `heldCargo` および生存した `RocketItem` 内の構成パーツ（chassis / logic / modules、50% 判定）を衝突天体の `lostToTarget` に格納。
         4. **保険金の算定と明細追加**:
@@ -133,9 +134,9 @@
     - ゲームオーバー（詰み状態）か判定し、理由を返す。
     - **利用箇所**: 航行結果確定後と施設退出時の両方から呼び出される共通判定ロジックとする。
     - **戻り値**: 継続可能な場合は `null`。詰んでいる場合は `{ reason: 'NO_PARTS_REMAINING', details: string[] }`。
-    - **判定条件**: 以下のカテゴリごとに、インベントリ内の「使用可能な在庫」を確認する。
-        - **`CHASSIS`**: 在庫が 0 個なら `details` に追加。
-        - **`LOGIC`**: 在庫が 0 個なら `details` に追加。
+    - **判定条件**: 次の発射準備が可能かを、インベントリ内の「使用可能な在庫」から確認する。
+        - **ロケット本体**: `rocket` カテゴリの `RocketItem` が 1 個以上あれば発射可能なロケット本体があるとみなす。`rocket` がない場合は、`chassis` と `logic` がそれぞれ 1 個以上あれば組み立て可能とみなす。
+        - **`CHASSIS` / `LOGIC`**: `rocket` がなく、かつ組み立てに必要な在庫が不足している場合だけ `details` に追加。
         - **`LAUNCHER`**: 耐久度 1 以上の在庫が 0 個なら `details` に追加。
 
 ### データ構造定義 (Data Structures)
@@ -151,7 +152,8 @@
 - **`flightTicks: number`**: 今回の航行で経過した Tick 数。ゲームリザルトの合計航行時間に加算される。
 - **`entries: SettlementEntry[]`**: 報酬の明細リスト（一行にスコアとコインを併記）。
 - **`itemReport: ItemReportEntry[]`**: 航行結果画面の回収リストに表示する構造化されたアイテムリスト。正式回収・配送結果として提示するものだけを含み、大破・遭難で失われるものは含めない。
-- **`acquiredItems: Item[]`**: インベントリへ正式に追加されるアイテムの実体リスト（ボーナスアイテム + 回収パーツ）。
+- **`acquiredItems: Item[]`**: インベントリへ正式に追加され、今回の回収数にも加算されるアイテムの実体リスト（ボーナスアイテム + 航行中に回収したパーツ）。
+- **`recoveredItems: Item[]`**: 発射時に inventory から抽出され、成功または母星帰還によって戻る装備の実体リスト。主に `RocketItem` を含み、回収数には加算しない。
 - **`lostToTarget: { target: object, items: Item[] } | null`**: クラッシュまたは母星帰還時、特定の天体に移動（蓄積）したアイテムリスト。
 
 ### `SettlementEntry`

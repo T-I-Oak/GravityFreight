@@ -76,6 +76,7 @@ class SessionState {
         const totalScore = result.totalScore ?? 0;
         const flightTicks = result.flightTicks ?? 0;
         const acquiredItems = result.acquiredItems ?? [];
+        const recoveredItems = result.recoveredItems ?? [];
 
         this.coins += totalCoins;
         this.totalEarnedCoins += totalCoins;
@@ -83,6 +84,7 @@ class SessionState {
         this.totalFlightTicks += flightTicks;
         this.collectedItemCount += acquiredItems.length;
         acquiredItems.forEach(item => this.inventory.addItem(item));
+        recoveredItems.forEach(item => this.inventory.addItem(item));
 
         if (result.lostToTarget) {
             result.lostToTarget.target.addItems(result.lostToTarget.items);

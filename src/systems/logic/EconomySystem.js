@@ -81,9 +81,16 @@ class EconomySystem {
     }
 
     checkGameOver(session) {
-        const details = REQUIRED_GAME_PARTS
-            .filter(part => !this.#hasUsableInventoryPart(session, part.category))
-            .map(part => part.detail);
+        const details = [];
+        if (!this.#hasLaunchableRocketBase(session)) {
+            details.push(...REQUIRED_GAME_PARTS
+                .filter(part => part.category !== 'launcher')
+                .filter(part => !this.#hasUsableInventoryPart(session, part.category))
+                .map(part => part.detail));
+        }
+        if (!this.#hasUsableInventoryPart(session, 'launcher')) {
+            details.push('LAUNCHER');
+        }
 
         if (details.length === 0) {
             return null;
@@ -93,6 +100,15 @@ class EconomySystem {
             reason: 'NO_PARTS_REMAINING',
             details
         };
+    }
+
+    #hasLaunchableRocketBase(session) {
+        if (this.#hasUsableInventoryPart(session, 'rocket')) {
+            return true;
+        }
+
+        return this.#hasUsableInventoryPart(session, 'chassis')
+            && this.#hasUsableInventoryPart(session, 'logic');
     }
 
     #createLotteryPool(session, options) {
