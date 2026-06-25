@@ -23,33 +23,35 @@
 
 
 
-  <link rel="stylesheet" crossorigin href="/GravityFreight/assets/main-D7xROZd0.css">
+  <script type="module" crossorigin src="/GravityFreight/assets/main-DtjbZtfj.js"></script>
+  <link rel="stylesheet" crossorigin href="/GravityFreight/assets/main-Bu31VoPp.css">
 </head>
 
 <body>
     <!-- タイトル画面 -->
-    <div id="title-screen" data-title-bg="/GravityFreight/assets/tutorial/slide1.png">
-        <script>
-            const titleScreen = document.getElementById('title-screen');
-            if (titleScreen?.dataset.titleBg) {
-                titleScreen.style.setProperty('--title-bg-image', `url('${titleScreen.dataset.titleBg}')`);
-            }
-        </script>
+    <div id="title-screen" class="theme-neon">
         <canvas id="title-bg-canvas"></canvas>
-        <div class="title-container ui-title-box">
-            <h1 class="text-display">GRAVITY FREIGHT</h1>
-            <span class="text-sub-display">ORBITAL ECHOES</span>
+        <div class="title-content-wrapper FlexCenter">
+            <div class="TitleBox">
+                <img class="LogoImage title-logo" src="/GravityFreight/assets/logo.svg" alt="GRAVITY FREIGHT ORBITAL ECHOES">
+            </div>
             <div class="menu-buttons">
-                <button id="start-game-btn" class="ui-button btn-neon">BEGIN CONTRACT</button>
-                <button id="how-to-play-btn" class="ui-button btn-neon is-secondary">HOW TO PLAY</button>
-                <button id="archive-btn" class="ui-button btn-neon is-secondary">RECORDS</button>
+                <button id="start-game-btn" class="Button button-large state-primary state-clickable">
+                    <span class="btn-main-label">BEGIN CONTRACT</span>
+                </button>
+                <button id="how-to-play-btn" class="Button button-large state-clickable">
+                    <span class="btn-main-label">HOW TO PLAY</span>
+                </button>
+                <button id="archive-btn" class="Button button-large state-clickable">
+                    <span class="btn-main-label">RECORDS</span>
+                </button>
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
         <div id="title-settings-btn" class="settings-btn" title="SETTINGS">⚙</div>
-        <div class="title-footer">
-            <div id="version">v-.--.-</div>
-            <span class="copyright">© T.I.OAK 2026</span>
+        <div class="title-footer screen-footer">
+            <div id="version">Ver -.--.-</div>
+            <span class="copyright"></span>
         </div>
     </div>
 
@@ -57,7 +59,7 @@
     <div id="achievement-toast-container"></div>
 
     <!-- Replay HUD -->
-    <div id="replay-overlay" class="hidden">
+    <div id="replay-overlay" class="theme-neon state-hidden">
         <div class="panel replay-panel">
             <div class="panel-header">
                 <h2>MISSION DATA</h2>
@@ -67,41 +69,17 @@
                 <div id="replay-config-list" class="replay-config-list"></div>
             </div>
             <div class="panel-footer">
-                <button id="exit-replay-btn" class="btn-neon btn-grad-orange">EXIT REPLAY</button>
+                <button id="exit-replay-btn" class="Button state-primary">EXIT REPLAY</button>
             </div>
         </div>
     </div>
 
-    <!-- Archive Overlay (Ranking & Achievements) (v1.1) -->
-    <div id="archive-overlay" class="overlay-container hidden">
-        <div class="event-backdrop"></div>
-        <div class="event-modal theme-archive">
-            <div class="event-header">
-                <div id="archive-icon" class="archive-symbol">✦</div>
-                <div class="event-title-group">
-                    <h2 id="archive-main-title">CENTRAL ARCHIVE</h2>
-                    <div class="archive-tabs-nav">
-                        <button class="archive-tab-btn active" data-tab="ranking">RANKING</button>
-                        <button class="archive-tab-btn" data-tab="achievements">ACHIEVEMENTS</button>
-                        <button class="archive-tab-btn" data-tab="replays">REPLAYS</button>
-                    </div>
-                </div>
-            </div>
-            <div class="archive-body" id="archive-content-root">
-                <div id="archive-list-container">
-                    <!-- Content will be rendered here -->
-                </div>
-            </div>
-            <div class="event-footer">
-                <div class="status-left"></div>
-                <button id="close-archive-btn" class="premium-button">CLOSE ARCHIVE</button>
-            </div>
-        </div>
-    </div>
+    <!-- Archive Overlay -->
+    <div id="archive-screen-overlay" class="theme-matte state-hidden" hidden></div>
 
 
     <!-- 操作説明パネル -->
-    <div id="how-to-play-overlay" class="overlay hidden">
+    <div id="how-to-play-overlay" class="overlay state-hidden">
         <div class="modal tutorial-modal">
             <div class="modal-header">
                 <h2>HOW TO PLAY</h2>
@@ -122,99 +100,129 @@
         </div>
     </div>
 
-    <div id="mission-hud" class="panel static hidden">
-        <div class="panel-header">
-            <h1 id="title">GRAVITY FREIGHT<span class="subtitle">ORBITAL ECHOES</span></h1>
-            <div id="mail-status-group" class="mail-icons-group">
-                <button id="mail-btn-0" class="mail-icon-btn gray" disabled>
-                    <div class="mail-envelope"></div>
-                </button>
-                <button id="mail-btn-1" class="mail-icon-btn gray" disabled>
-                    <div class="mail-envelope"></div>
-                </button>
-                <button id="mail-btn-2" class="mail-icon-btn gray" disabled>
-                    <div class="mail-envelope"></div>
-                </button>
+    <main id="play-scene-container" class="theme-neon state-hidden">
+        <header id="play-hud" class="Panel color-theme-sub">
+            <div class="hud-logo-header">
+                <div class="TitleBox">
+                    <img id="title" class="LogoImage hud-logo" src="/GravityFreight/assets/logo.svg" alt="GRAVITY FREIGHT ORBITAL ECHOES">
+                </div>
+                <div id="mail-status-group" class="hud-messages">
+                    <span id="mail-btn-0" class="Icon mail state-disabled"></span>
+                    <span id="mail-btn-1" class="Icon mail state-disabled"></span>
+                    <span id="mail-btn-2" class="Icon mail state-disabled"></span>
+                </div>
             </div>
-        </div>
-        <div id="hud-metrics">
-            <div class="metric"><span class="label">SECTOR</span><span id="sector-display">1</span></div>
-            <div class="metric"><span class="label">SCORE</span><span id="score-display">0</span></div>
-            <div class="metric"><span class="label">COIN</span><span id="coin-display">0</span></div>
-        </div>
-    </div>
+            <div class="hud-stats">
+                <div class="SplitColumn">
+                    <span class="stat-label">SECTOR</span>
+                    <span id="sector-display" class="stat-value sector">1</span>
+                </div>
+                <div class="SplitColumn">
+                    <span class="stat-label">COIN</span>
+                    <span id="coin-display" class="stat-value num-coin">0</span>
+                </div>
+                <div class="SplitColumn">
+                    <span class="stat-label">SCORE</span>
+                    <span id="score-display" class="stat-value score">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="play-screen">
+            <canvas id="gameCanvas" class="play-viewport"></canvas>
+
+            <aside id="inventory-panel" class="Panel color-theme-sub">
+                <header class="panel-header SplitRow">
+                    <div class="TabGroup">
+                        <button class="Tab state-clickable state-active" data-tab="flight">FLIGHT</button>
+                        <button class="Tab state-clickable" data-tab="assembly">ASSEMBLY</button>
+                    </div>
+                    <div class="PanelToggle state-clickable" id="btn-toggle-panel">
+                        <span class="Icon chevron-down toggle-icon"></span>
+                    </div>
+                </header>
+
+                <div class="panel-body ScrollArea" id="panel-content">
+                    <div class="tab-content" id="tab-flight">
+                        <div class="flight-scroll ScrollArea">
+                            <section class="section rocket" id="section-rocket">
+                                <header class="section-header">
+                                    <h3 class="section-title">ROCKET</h3>
+                                </header>
+                                <div class="item-list" id="list-rocket"></div>
+                            </section>
+
+                            <section class="section launcher" id="section-launcher">
+                                <header class="section-header">
+                                    <h3 class="section-title">LAUNCHER</h3>
+                                </header>
+                                <div class="item-list" id="list-launcher"></div>
+                            </section>
+
+                            <section class="section booster" id="section-booster">
+                                <header class="section-header">
+                                    <h3 class="section-title">BOOSTER</h3>
+                                </header>
+                                <div class="item-list" id="list-booster"></div>
+                            </section>
+                        </div>
+
+                        <div id="launch-control" class="flight-actions">
+                            <div id="launch-return-bonus" class="launch-return-bonus state-hidden" hidden></div>
+                            <button id="launch-btn" class="Button state-primary button-large state-hidden state-disabled state-notable launch" disabled>
+                                <span class="btn-main-label">LAUNCH ENGINE</span>
+                                <span class="btn-sub-label">ロケットと発射台を選択すると発射できます</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-assembly" class="tab-content state-hidden">
+                        <div class="assembly-scroll ScrollArea">
+                            <section class="section chassis">
+                                <header class="section-header">
+                                    <h3 class="section-title">CHASSIS</h3>
+                                </header>
+                                <div class="item-list" id="list-chassis"></div>
+                            </section>
+                            <section class="section logic">
+                                <header class="section-header">
+                                    <h3 class="section-title">LOGIC</h3>
+                                </header>
+                                <div class="item-list" id="list-logic"></div>
+                            </section>
+                            <section class="section module">
+                                <header class="section-header">
+                                    <h3 class="section-title">MODULES</h3>
+                                </header>
+                                <div class="item-list" id="list-module"></div>
+                            </section>
+                        </div>
+
+                        <div class="assembly-actions">
+                            <button id="build-btn" class="Button state-primary button-large state-disabled state-notable assembly" disabled>
+                                <span class="btn-main-label">ASSEMBLE ROCKET</span>
+                                <span class="btn-sub-label">シャーシとロジックを選択すると建造できます</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div id="map-action-dock" class="action-dock"></div>
+        </main>
+    </main>
 
     <main id="flight-result-screen" class="theme-matte FlexCenter" hidden></main>
     <main id="facility-screen" class="theme-matte FlexCenter" hidden></main>
+    <main id="game-result-scene-container" class="theme-printing FlexCenter state-hidden" hidden></main>
+    <button id="back-to-result-btn" class="Button button-large state-primary state-hidden home">BACK TO RESULT</button>
 
-    <div id="build-overlay" class="hidden">
-        <div class="panel" id="terminal-panel">
-            <div class="panel-header">
-                <div class="tab-header">
-                    <button class="tab-btn active" data-tab="flight">FLIGHT</button>
-                    <button class="tab-btn" data-tab="factory">ASSEMBLY</button>
-                </div>
-                <div id="panel-controls">
-                    <button class="collapse-btn" id="terminal-collapse-btn">
-                        <span class="icon-chevron"></span>
-                    </button>
-                </div>
-            </div>
-            <div id="panel-scroll-area">
-                <div id="flight-tab" class="tab-content">
-                    <div class="category rockets">
-                        <h3>ROCKET</h3>
-                        <div id="rocket-list"></div>
-                    </div>
-                    <div class="category launchers">
-                        <h3>LAUNCHER</h3>
-                        <div id="launcher-list"></div>
-                    </div>
-                    <div class="category boosters">
-                        <h3>BOOSTER</h3>
-                        <div id="acc-option-list" class="option-list">
-                            <div class="slot-placeholder">No Booster Equipped</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="factory-tab" class="tab-content hidden">
-                    <div class="category chassis">
-                        <h3>CHASSIS</h3>
-                        <div id="chassis-list"></div>
-                    </div>
-                    <div class="category logic">
-                        <h3>LOGIC</h3>
-                        <div id="logic-list"></div>
-                    </div>
-                    <div class="category modules">
-                        <h3>MODULE</h3>
-                        <div id="logic-option-list" class="option-list">
-                            <div class="slot-placeholder">Slot Empty (Requires Research)</div>
-                        </div>
-                    </div>
-                    <button id="build-btn" class="btn-neon btn-neon-sm btn-grad-green" disabled>
-                        <span class="btn-label">ASSEMBLE ROCKET</span>
-                        <span class="btn-subtext">シャーシとロジックを選択すると建造できます</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="launch-control" class="hidden">
-        <button id="launch-btn" class="btn-neon btn-neon-lg btn-grad-orange hidden bounce" disabled>
-            <span class="btn-label">LAUNCH ENGINE</span>
-            <span class="btn-subtext">ロケットと発射台を選択すると発射できます</span>
-        </button>
-    </div>
-    <button id="back-to-result-btn" class="btn-neon btn-neon-lg btn-grad-green hidden bounce">BACK TO RESULT</button>
-
-    <div id="star-info-panel" class="panel hidden">
+    <div id="star-info-panel" class="Panel StarInfoPanel state-hidden" hidden>
         <h2 id="star-info-title">STAR CORE</h2>
-        <div id="star-info-list" class="category"></div>
+        <div id="star-info-list" class="star-info-list"></div>
     </div>
 
-    <div id="event-screen" class="overlay-container hidden">
+    <div id="event-screen" class="overlay-container state-hidden">
         <div class="event-backdrop"></div>
         <div class="event-modal">
             <div class="event-header">
@@ -236,14 +244,14 @@
         </div>
     </div>
 
-    <div id="sector-notification" class="sector-notif hidden"></div>
+    <div id="sector-notification" class="sector-notif state-hidden"></div>
     <div id="ui-layer"></div>
-    <div id="receipt-overlay" class="receipt-view hidden">
+    <div id="receipt-overlay" class="receipt-view state-hidden">
         <div class="receipt-paper" id="receipt-content-area"></div>
     </div>
 
     <!-- ストーリー表示モーダル (v0.15) -->
-    <div id="story-overlay" class="hidden">
+    <div id="story-overlay" class="theme-neon state-hidden">
         <div class="story-modal">
             <div class="story-header">
                 <div class="story-branch-icon" id="story-branch-icon">T</div>
@@ -252,12 +260,12 @@
             <div id="story-discovery" class="story-discovery-msg">DISCOVERY MESSAGE</div>
             <div id="story-content" class="story-content-body">STORY CONTENT</div>
             <div class="story-footer">
-                <button id="close-story-btn" class="btn-neon btn-grad-cyan">CLOSE COMMUNICATION</button>
+                <button id="close-story-btn" class="Button state-primary">CLOSE COMMUNICATION</button>
             </div>
         </div>
     </div>
     <!-- 設定パネル -->
-    <div id="settings-overlay" class="hidden">
+    <div id="settings-overlay" class="theme-neon state-hidden">
         <div class="panel settings-modal">
             <div class="panel-header">
                 <h2>SETTINGS</h2>
@@ -275,12 +283,10 @@
                 </div>
             </div>
             <div class="panel-footer">
-                <button id="settings-done-btn" class="btn-neon">DONE</button>
+                <button id="settings-done-btn" class="Button state-primary">DONE</button>
             </div>
         </div>
     </div>
-    <canvas id="gameCanvas"></canvas>
-    <!-- <script type="module" src="GravityFreight/src/main.js"></script> -->
 
 
 

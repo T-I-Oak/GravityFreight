@@ -55,10 +55,13 @@
    /* World & Entity Colors (Canvas)
        Authoritative colors for game world rendering. */
    --color-world-bg:             #050510;
+   --color-world-star-particle-rgb: 255, 255, 255;
    --color-world-home-star:      #ff6600;
    --color-world-normal-star:    #ffcc00;
    --color-world-repulsive-star: #e100ff;
    --color-world-scanner:        #00ffcc;
+   --color-world-rocket:         #ffffff;
+   --color-world-trail:          rgba(255, 255, 255, 0.52);
    --color-world-boundary:       rgba(255, 255, 255, 0.1);
    --color-world-prediction:     rgba(255, 255, 255, 0.6);
 
@@ -119,7 +122,8 @@
    /* Snappy interaction feedback */
    --motion-normal: 300ms;
    /* Standard transition timing */
-}/* =========================================
+}
+/* =========================================
    Gravity Freight V2: Base Capabilities
    Layer: Base / Capability (A-Axis)
    Managing Global Resets and Interactive Foundations
@@ -150,7 +154,7 @@
 }
 
 *:focus {
-    outline: none !important;
+    outline: none;
 }
 
 .ScrollArea {
@@ -170,6 +174,21 @@ body {
     font-family: var(--font-main);
     font-size: var(--text-size-main);
     line-height: 1.5;
+}
+
+.state-hidden.state-hidden,
+[hidden][hidden],
+#title-screen.state-hidden,
+#play-scene-container.state-hidden,
+#play-hud.state-hidden,
+#inventory-panel.state-hidden,
+#mission-hud.state-hidden,
+#build-overlay.state-hidden,
+#launch-control.state-hidden,
+#flight-result-screen[hidden],
+#facility-screen[hidden],
+#game-result-scene-container[hidden] {
+    display: none;
 }
 
 /* --- 2. Interactive Foundations (Semantic) --- */
@@ -260,6 +279,17 @@ body {
     z-index: var(--z-hud);
     pointer-events: none;
 }
+
+.screen-footer a {
+    color: inherit;
+    pointer-events: auto;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.screen-footer a:hover {
+    color: var(--color-theme-main);
+}
 /* =========================================
    Gravity Freight V2: Layout & Structure
    Layer: Base / Capability (A-Axis)
@@ -305,7 +335,7 @@ main {
 }
 
 .Panel.state-collapsed {
-    height: 32px !important;
+    height: 32px;
     overflow: visible;
 }
 
@@ -593,13 +623,13 @@ main {
 }
 
 /* --- 4. Numerical Branding --- */
-.sector, .coin, .score, .contract, .item-count {
+.sector, .num-coin, .score, .contract, .item-count {
     font-family: var(--font-num);
     font-weight: 900;
 }
 
 .sector { color: var(--color-num-sector); }
-.coin { color: var(--color-num-coin); }
+.num-coin { color: var(--color-num-coin); }
 .score { color: var(--color-num-score); }
 .contract { color: var(--color-num-contract); }
 .item-count { color: var(--color-num-item-count); }
@@ -613,14 +643,7 @@ main {
     letter-spacing: 0.05em;
 }
 
-/* --- 6. Message & Indicator Wrappers --- */
-.message-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* --- 7. Logo Specific Primitives (Cleaned) --- */
+/* --- 6. Logo Specific Primitives (Cleaned) --- */
 .logo.text-display {
     font-family: var(--font-num);
     font-size: 18px;
@@ -641,14 +664,14 @@ main {
     text-transform: uppercase;
 }
 
-/* --- 8. Animation & State Primitives --- */
+/* --- 7. Animation & State Primitives --- */
 
 /* state-new: mail icon specific pulse animation (Unified with HUD neon-pulse rhythm) */
 .Icon.mail.state-new {
-    animation: ui-mail-pulse 1.5s infinite ease-in-out;
+    animation: mail-pulse 1.5s infinite ease-in-out;
 }
 
-@keyframes ui-mail-pulse {
+@keyframes mail-pulse {
     0%, 100% { 
         opacity: 0.8; 
         filter: brightness(1) drop-shadow(0 0 1px currentColor); 
@@ -659,8 +682,8 @@ main {
     }
 }
 
-/* ui-guide-pulse: Guidance animation for placeholders and specific CTAs */
-@keyframes ui-guide-pulse {
+/* guide-pulse: Guidance animation for placeholders and specific CTAs */
+@keyframes guide-pulse {
     0%, 100% { 
         opacity: 0.6; 
         transform: scale(1);
@@ -682,7 +705,7 @@ main {
     filter: brightness(1.2);
 }
 
-/* --- 9. Data Wells --- */
+/* --- 8. Data Wells --- */
 .Well {
     border-radius: var(--radius-standard);
     padding: var(--space-double);
@@ -722,18 +745,27 @@ main {
     overflow: hidden;
 }
 
-/* Active/Selected State: Structural signaling and enhanced tint */
-.ItemCard.state-active {
+/* Selected State: Structural signaling and enhanced tint */
+.ItemCard.state-selected {
     background-color: color-mix(in srgb, var(--current-color), var(--color-bg-card) var(--opacity-card-active, 80%));
     border-color: color-mix(in srgb, var(--current-color), #fff 40%);
+}
+
+.ItemCard.state-selected::before {
+    width: 7px;
+    box-shadow: 0 0 10px var(--current-color);
 }
 
 .ItemCard.state-clickable {
     cursor: pointer;
 }
 
-.ItemCard.state-clickable:hover {
+.ItemCard.state-clickable:hover:not(.state-selected) {
     filter: brightness(1.1);
+}
+
+.ItemCard.state-clickable.state-selected:hover {
+    filter: brightness(1.18) saturate(1.15);
 }
 
 /* Category indicator bar: Shared structure for all themes */
@@ -902,8 +934,6 @@ main {
 /* --- 4. Rocket & Module Specifics --- */
 .rocket-details {
     margin-top: 6px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-    padding-top: 4px;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -968,9 +998,30 @@ main {
 }
 
 /* state-notable (Guidance): Adds color and pulse animation to the subtext only */
+.ItemCard.placeholder-card.state-notable {
+    opacity: 1;
+}
+
+.ItemCard.placeholder-card.state-notable .placeholder-text {
+    color: rgba(255, 255, 255, 0.88);
+}
+
 .ItemCard.placeholder-card.state-notable .placeholder-subtext {
     color: var(--current-color);
-    animation: ui-guide-pulse 2s infinite ease-in-out;
+    text-shadow: 0 0 12px var(--current-color);
+    animation: guide-pulse 2s infinite ease-in-out;
+}
+
+@keyframes item-list-stagger-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 /* =========================================
    Gravity Freight V2: Facility Badge
@@ -1080,7 +1131,7 @@ main {
     text-shadow: 0 0 8px var(--color-num-sector);
 }
 
-.theme-neon .coin {
+.theme-neon .num-coin {
     text-shadow: 0 0 8px var(--color-num-coin);
 }
 
@@ -1123,9 +1174,24 @@ main {
     --color-bg-card: rgba(20, 25, 40, 0.5);
 }
 
-.theme-neon .ItemCard.state-clickable:hover {
+.theme-neon .ItemCard.state-clickable:hover:not(.state-selected) {
     border-color: color-mix(in srgb, var(--current-color), #fff 60%);
     box-shadow: 0 0 6px color-mix(in srgb, var(--current-color), transparent 60%);
+    transform: translateY(-1px);
+}
+
+.theme-neon .ItemCard.state-selected {
+    border-color: color-mix(in srgb, var(--current-color), #fff 20%);
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--current-color), transparent 35%),
+        0 0 14px color-mix(in srgb, var(--current-color), transparent 62%);
+}
+
+.theme-neon .ItemCard.state-clickable.state-selected:hover {
+    border-color: #ffffff;
+    box-shadow:
+        inset 0 0 0 1px var(--current-color),
+        0 0 22px color-mix(in srgb, var(--current-color), transparent 45%);
     transform: translateY(-1px);
 }
 
@@ -1154,13 +1220,6 @@ main {
     font-size: 11px;
     font-weight: 800;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-}
-
-/* Rocket Module List: Specific nested information for complex assemblies */
-.theme-neon .rocket-details {
-    margin-top: 8px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-    padding-top: 6px;
 }
 
 .theme-neon .module-row {
@@ -1322,9 +1381,21 @@ main {
     --color-bg-card: #14192d;
 }
 
-.theme-matte .ItemCard.state-clickable:hover {
+.theme-matte .ItemCard.state-clickable:hover:not(.state-selected) {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-matte .ItemCard.state-selected {
+    border-color: color-mix(in srgb, var(--current-color), #fff 10%);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--current-color), transparent 30%);
+}
+
+.theme-matte .ItemCard.state-clickable.state-selected:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        inset 0 0 0 1px var(--current-color),
+        0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 /* Axis-D: Flavor Visualization (Category Color Borders) 
@@ -1353,7 +1424,7 @@ main {
 }
 
 .theme-matte .Badge.state-inactive {
-    background: transparent !important;
+    background: transparent;
     border-color: color-mix(in srgb, var(--current-color), transparent 60%);
     color: var(--current-color);
 }
@@ -1411,11 +1482,6 @@ main {
 
 /* Enhanced visuals unified in base */
 
-/* Composite Elements: Rocket Detail area divider */
-.theme-matte .rocket-details {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .theme-matte .module-name {
     color: rgba(255, 255, 255, 0.5);
 }
@@ -1460,7 +1526,7 @@ main {
 
 /* 3. Disabled & Inactive States */
 .theme-matte .Button.state-inactive {
-    background: transparent !important;
+    background: transparent;
 }
 
 .theme-matte .Button.state-disabled {
@@ -1475,7 +1541,8 @@ main {
 .theme-matte .state-clickable:active:not(.state-disabled) {
     transform: perspective(1px) scale(0.97);
     filter: brightness(0.9);
-}/* =========================================
+}
+/* =========================================
    Gravity Freight V2: Printing Style Layer
    Layer: Style / Expression (C-Axis)
    Managing Paper & Ink textures and Receipt animations
@@ -1493,13 +1560,24 @@ main {
 
 /* --- Container: Overlay/Main in Print Style --- */
 main.theme-printing {
+    position: fixed;
+    inset: 0;
     background: rgba(0, 0, 0, 0.85);
     display: flex;
     flex-direction: column;
     align-items: center;    /* 水平方向中央 */
     justify-content: flex-end; /* 垂直方向下部 (レシートは画面下部から排出) */
     padding-bottom: 5vh;
-    z-index: 6000;
+    z-index: calc(var(--z-system) + 200);
+}
+
+#game-result-scene-container.theme-printing {
+    background: transparent;
+    pointer-events: none;
+}
+
+#game-result-scene-container.theme-printing .Panel.receipt {
+    pointer-events: auto;
 }
 
 /* 衝撃揺れのアニメーション (Old game_result.css:11) */
@@ -1607,10 +1685,19 @@ main.theme-printing.impact {
     margin: 10px 0 2px 0;
 }
 
-.theme-printing .section.hero .SplitRow {
+.theme-printing .SplitRow.data-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: baseline;
+    padding: 8px 0;
+}
+
+.theme-printing .section.hero .SplitRow.data-row {
     font-size: 24px;
     font-weight: 600;
     margin-top: 15px;
+    white-space: nowrap;
 }
 
 .theme-printing .section-subtitle {
@@ -1644,7 +1731,7 @@ main.theme-printing.impact {
 
 .theme-printing .score,
 .theme-printing .sector,
-.theme-printing .coin,
+.theme-printing .num-coin,
 .theme-printing .item-count {
     color: var(--print-ink);
     text-shadow: none;
@@ -1707,7 +1794,7 @@ main.theme-printing.impact {
     border-color: currentColor;
     width: max-content;
     align-items: stretch;
-    z-index: 100;
+    z-index: 10;
     --stamp-rot: -5deg;
     --stamp-x: 0px;
     --stamp-y: 0px;
@@ -1809,32 +1896,61 @@ main.theme-printing.impact {
    ========================================= */
 
 #title-screen {
-    display: flex; /* Root uses flex to align the inner container */
+    display: flex;
     align-items: center;
     justify-content: center;
-    background: #050510 var(--title-bg-image, none) no-repeat center center;
-    background-size: cover;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    background: var(--color-world-bg);
 }
 
-/* Invisible container for title content */
+#title-bg-canvas,
+#title-fg-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#title-bg-canvas {
+    z-index: var(--z-world);
+}
+
+#title-fg-canvas {
+    z-index: var(--z-panel);
+    pointer-events: none;
+}
+
 .title-content-wrapper {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 32px; /* Explicit gap between title-box and menu buttons */
+    gap: 32px;
+    z-index: var(--z-hud);
+    position: relative;
+    animation: title-idle-float 6s ease-in-out infinite;
 }
 
-#title-screen .text-display.logo {
-    font-size: clamp(3rem, 12vw, 6rem);
-    max-width: 90vw;
-    transition: font-size 0.2s ease;
+.LogoImage {
+    display: block;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
 }
 
-#title-screen .text-sub-display.logo {
-    font-size: 1.8rem;
-    margin-top: 0.5rem;
+.title-logo {
+    width: min(980px, 82vw);
+}
+
+.hud-logo {
+    width: 220px;
+    max-width: 100%;
 }
 
 .menu-buttons {
@@ -1866,11 +1982,12 @@ main.theme-printing.impact {
     border: none;
     box-shadow: none;
     text-shadow: none; /* Override global neon text-shadow */
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.55);
     font-size: 32px;
     line-height: 1;
     transition: color var(--motion-fast), transform var(--motion-normal) ease;
     cursor: pointer;
+    z-index: var(--z-system);
 }
 
 #title-settings-btn:hover {
@@ -1886,6 +2003,32 @@ main.theme-printing.impact {
     transform: rotate(90deg) scale(0.9);
     filter: brightness(1.2);
     transition: transform 0.05s; /* Snappy feedback */
+}
+
+#title-screen .screen-footer {
+    bottom: 30px;
+    left: 40px;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    opacity: 1;
+}
+
+#title-screen .screen-footer #version,
+#title-screen .screen-footer .copyright,
+#title-screen .screen-footer .copyright *,
+#title-screen .screen-footer a {
+    color: inherit;
+    font: inherit;
+    font-weight: inherit;
+    opacity: 1;
+}
+
+@keyframes title-idle-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
 }
 /* =========================================
    Gravity Freight V2: Play Scene Layout
@@ -1928,6 +2071,80 @@ main.theme-printing.impact {
     padding: var(--space-double);
 }
 
+#inventory-panel {
+    --panel-border-color: color-mix(in srgb, var(--current-color), transparent 60%);
+}
+
+#inventory-panel .panel-header {
+    border-bottom-color: var(--panel-border-color);
+}
+
+#inventory-panel .panel-body {
+    min-height: 0;
+    overflow: hidden;
+}
+
+#inventory-panel .tab-content {
+    min-height: 0;
+}
+
+#inventory-panel #tab-flight {
+    height: 100%;
+    flex-direction: column;
+    gap: var(--space-double);
+}
+
+#inventory-panel #tab-flight:not(.state-hidden) {
+    display: flex;
+}
+
+#inventory-panel #tab-assembly {
+    height: 100%;
+    flex-direction: column;
+    gap: var(--space-double);
+}
+
+#inventory-panel #tab-assembly:not(.state-hidden) {
+    display: flex;
+}
+
+#inventory-panel .flight-scroll,
+#inventory-panel .assembly-scroll {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+}
+
+#inventory-panel .flight-actions,
+#inventory-panel .assembly-actions {
+    flex: 0 0 auto;
+    margin: 0 calc(-1 * var(--space-double));
+    padding: var(--space-unit) var(--space-double) 0;
+    border-top: 1px solid var(--panel-border-color);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-bg-card), transparent 95%),
+        color-mix(in srgb, var(--color-bg-card), transparent 82%)
+    );
+}
+
+#inventory-panel .launch-return-bonus {
+    color: var(--color-category-launchers);
+    font-size: 11px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--color-category-launchers);
+    text-transform: uppercase;
+}
+
+#inventory-panel.state-readonly .item-list .ItemCard {
+    pointer-events: none;
+}
+
 /* Logic: Grouped message indicators with defined spatial density */
 #play-hud .hud-messages {
     display: flex;
@@ -1965,6 +2182,7 @@ main.theme-printing.impact {
     width: 100%;
     height: 100%;
     z-index: var(--z-world);
+    touch-action: none;
 }
 
 /* --- 3. Sidebar (Inventory Panel) --- */
@@ -1973,7 +2191,7 @@ main.theme-printing.impact {
     top: var(--space-double);
     right: var(--space-double);
     width: 340px;
-    max-height: calc(100% - var(--space-double) - 108px);
+    max-height: calc(100% - (var(--space-double) * 2));
     display: flex;
     flex-direction: column;
     z-index: var(--z-panel);
@@ -1986,9 +2204,96 @@ main.theme-printing.impact {
     bottom: var(--space-double);
     right: var(--space-double);
     width: 340px;
+    min-height: 76px;
     display: flex;
     justify-content: center;
+    pointer-events: none;
     z-index: var(--z-panel);
+}
+
+#play-scene-container .action-dock .Button {
+    pointer-events: auto;
+}
+
+/* --- 5. Star hover item panel --- */
+.StarInfoPanel {
+    position: absolute;
+    z-index: calc(var(--z-panel) + 1);
+    width: min(280px, calc(100vw - 32px));
+    max-height: min(420px, calc(100vh - 32px));
+    padding: var(--space-double);
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.StarInfoPanel .star-info-list {
+    display: grid;
+    gap: var(--space-unit);
+    max-height: 340px;
+    overflow: hidden auto;
+}
+
+.StarInfoPanel .ItemCard {
+    min-height: 0;
+}
+
+#sector-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: calc(var(--z-system) + 200);
+    max-width: 95vw;
+    color: rgba(255, 255, 255, 0.95);
+    font-family: var(--font-num);
+    font-size: clamp(1.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    letter-spacing: clamp(0.2rem, 1.2vw, 0.8rem);
+    text-shadow:
+        0 0 10px rgba(0, 240, 255, 0.8),
+        0 0 20px rgba(0, 240, 255, 0.4),
+        0 0 40px rgba(0, 240, 255, 0.2);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+#sector-notification.state-active {
+    animation: sector-toast 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+#sector-notification.state-anomaly {
+    text-shadow:
+        0 0 10px rgba(225, 0, 255, 0.8),
+        0 0 20px rgba(225, 0, 255, 0.4),
+        0 0 40px rgba(225, 0, 255, 0.2);
+}
+
+@keyframes sector-toast {
+    0% {
+        opacity: 0;
+        filter: blur(15px);
+        transform: translate(-50%, -60%) scale(0.9);
+    }
+    15% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    85% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        filter: blur(5px);
+        transform: translate(-50%, -45%) scale(1.05);
+    }
 }
 
 
@@ -2019,18 +2324,22 @@ main.theme-printing.impact {
 #play-screen .assembly.state-disabled.state-notable .btn-sub-label {
     color: var(--current-color);
     text-shadow: 0 0 12px var(--current-color);
-    animation: ui-guide-pulse 2s infinite ease-in-out;
+    animation: guide-pulse 2s infinite ease-in-out;
     opacity: 1;
 }
 
 
-/* --- 5. Global Footer (Moved to ui_base.css) --- */
+/* --- 6. Global Footer (Moved to ui_base.css) --- */
 /* =========================================
    Gravity Freight V2: Flight Result Screen
    Layer: Context / View (Specific)
    ========================================= */
 
-#flight-result-screen .Panel {
+#flight-result-screen {
+    position: relative;
+}
+
+#flight-result-screen > .Panel {
     width: 70vw;
     height: 85vh;
     max-width: 640px;
@@ -2042,7 +2351,7 @@ main.theme-printing.impact {
 }
 
 @media screen and (max-width: 600px) {
-    #flight-result-screen .Panel {
+    #flight-result-screen > .Panel {
         width: 95vw;
         height: 90vh;
     }
@@ -2087,6 +2396,12 @@ main.theme-printing.impact {
     border: none;
 }
 
+.Badge.state-not-recorded {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.64);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
 .Badge.state-recorded .recorded-text {
     animation: flight-recorded-pulse 2s ease-in-out infinite;
 }
@@ -2122,7 +2437,7 @@ main.theme-printing.impact {
     justify-self: end;
 }
 
-.SplitRow.data-row .report-data-value.coin {
+.SplitRow.data-row .report-data-value.num-coin {
     justify-self: end;
 }
 
@@ -2159,6 +2474,173 @@ main.theme-printing.impact {
 
 /* Optional: Make bonus cards slightly smaller or more subtle if needed, 
    but for now keep standard cards */
+
+#flight-result-screen .acquired-items-list.state-staggered-list .state-staggered-item {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: item-list-stagger-in 260ms ease-out forwards;
+    animation-delay: calc(var(--item-appear-index, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #flight-result-screen .acquired-items-list.state-staggered-list .state-staggered-item {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
+}
+
+#flight-result-screen .replay-protect-modal {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+}
+
+#flight-result-screen .flight-result-favorite-dialog {
+    --current-color: #bb86fc;
+    position: relative;
+    width: min(880px, calc(100vw - var(--space-double) * 4));
+    height: min(78vh, 620px);
+    max-width: min(880px, calc(100vw - var(--space-double) * 4));
+    max-height: min(78vh, 620px);
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: var(--space-double);
+    margin: 0;
+    padding: calc(var(--space-double) * 1.5);
+    background: color-mix(in srgb, var(--current-color), #404040 90%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--current-color), transparent 74%),
+        0 24px 80px rgba(0, 0, 0, 0.72);
+}
+
+#flight-result-screen .flight-result-favorite-dialog h2 {
+    margin: 0;
+    color: var(--current-color);
+    font-size: 18px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+}
+
+#flight-result-screen .flight-result-favorite-message {
+    margin: 0;
+    opacity: 0.75;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#flight-result-screen .flight-result-favorite-options {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    padding: 0;
+    width: 100%;
+}
+
+#flight-result-screen .flight-result-favorite-options .archive-table-scroll-area {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+#flight-result-screen .replay-protect-count {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+#flight-result-screen .replay-protect-count.state-invalid {
+    color: var(--color-ui-favorite);
+}
+
+#flight-result-screen .replay-protect-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#flight-result-screen .replay-protect-table.table-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#flight-result-screen .replay-protect-table th,
+#flight-result-screen .replay-protect-table td {
+    padding: var(--space-unit) var(--space-double);
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#flight-result-screen .replay-protect-table th {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 10px;
+    font-weight: 900;
+}
+
+#flight-result-screen .replay-protect-table .col-fav {
+    width: 84px;
+}
+
+#flight-result-screen .replay-protect-table .col-no {
+    width: 96px;
+}
+
+#flight-result-screen .replay-protect-table .col-sector {
+    width: 16%;
+}
+
+#flight-result-screen .replay-protect-table .col-score {
+    width: 20%;
+}
+
+#flight-result-screen .replay-protect-table .col-date {
+    width: auto;
+}
+
+#flight-result-screen .replay-protect-table th.score {
+    color: var(--color-num-score);
+}
+
+#flight-result-screen .replay-protect-table th.sector {
+    color: var(--color-num-sector);
+}
+
+#flight-result-screen .replay-protect-row.state-current {
+    background: color-mix(in srgb, var(--color-theme-main), transparent 92%);
+}
+
+#flight-result-screen .replay-protect-row.state-current td:first-child {
+    border-left: 2px solid var(--color-theme-main);
+}
+
+#flight-result-screen .replay-protect-table .favorite-star {
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+#flight-result-screen .replay-protect-table .favorite-star.state-active {
+    color: var(--color-ui-favorite);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--color-ui-favorite), transparent 70%);
+}
+
+#flight-result-screen .replay-protect-table .favorite-star.state-inactive {
+    color: rgba(255, 255, 255, 0.18);
+}
+
+#flight-result-screen .replay-protect-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-unit);
+}
 /* =========================================
    Gravity Freight V2: Facility Screen
    Layer: Context / View (Specific)
@@ -2248,12 +2730,13 @@ main.theme-printing.impact {
 /* discount: Simplified Discount Label */
 #facility-screen .Badge.discount {
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
     gap: 1px;
     background: #444;
     color: #fff;
     font-size: 8px;
     font-weight: 900;
+    line-height: 1;
     padding: 1px 4px;
     white-space: nowrap;
 
@@ -2342,6 +2825,10 @@ main.theme-printing.impact {
     line-height: 1.4;
 }
 
+#facility-screen .Column .section-header:not(:first-child) {
+    margin-top: var(--space-double);
+}
+
 #facility-screen .trade-item-area {
     flex: 1;
     min-width: 0; /* 防止 flex 項目溢出 */
@@ -2382,6 +2869,21 @@ main.theme-printing.impact {
     font-size: 11px;
     line-height: 24px;
     min-height: auto;
+}
+
+#facility-screen .item-list.state-staggered-list .state-staggered-item {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: item-list-stagger-in 260ms ease-out forwards;
+    animation-delay: calc(var(--item-appear-index, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #facility-screen .item-list.state-staggered-list .state-staggered-item {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
 }
 
 #facility-screen .Badge.discount .sticker-num {
@@ -2430,7 +2932,12 @@ main.theme-printing.impact {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: calc(var(--z-system) + 100);
+}
+
+#archive-screen-overlay[hidden],
+#archive-screen-overlay.state-hidden {
+    display: none;
 }
 
 #archive-screen.Panel {
@@ -2837,10 +3344,26 @@ main.theme-printing.impact {
     padding: 0; /* スクロールバーを端に寄せるために 0 に戻す */
 }
 
+#archive-screen .archive-ranking-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#archive-screen .archive-ranking-panel[hidden] {
+    display: none;
+}
+
 #archive-screen .archive-table-scroll-area {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    scrollbar-gutter: stable;
+}
+
+#archive-screen .archive-table-header-area {
+    padding-right: 12px;
 }
 
 #archive-screen .ArchiveTable {
@@ -2890,7 +3413,6 @@ main.theme-printing.impact {
 
 /* 選択中のカラム（軸）の強調 */
 #archive-screen .ArchiveTable .state-active-column {
-    /* ウェイトは num-* 側の定義を尊重するため削除 */
     opacity: 1;
 }
 
@@ -2900,6 +3422,11 @@ main.theme-printing.impact {
 
 #archive-screen .ArchiveTable td.state-active-column {
     font-size: 1em;
+}
+
+#archive-screen .ArchiveTable.table-header th.state-active,
+#archive-screen .ArchiveTable.table-body td.state-active {
+    background: color-mix(in srgb, currentColor 12%, transparent);
 }
 
 /* Analytics Tab Column Layout */
@@ -2935,6 +3462,143 @@ main.theme-printing.impact {
     text-shadow: 0 0 8px color-mix(in srgb, var(--color-ui-favorite), transparent 70%);
 }
 
+#archive-screen-overlay .archive-protect-toast {
+    position: fixed;
+    left: 50%;
+    top: calc(var(--space-double) * 2);
+    z-index: calc(var(--z-system) + 400);
+    margin: 0;
+    padding: var(--space-unit) var(--space-double);
+    transform: translateX(-50%);
+    border: 1px solid color-mix(in srgb, var(--color-ui-favorite), transparent 40%);
+    border-radius: var(--radius-standard);
+    background: rgba(18, 16, 24, 0.92);
+    color: var(--color-ui-favorite);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--color-ui-favorite), transparent 75%);
+    font-size: 12px;
+    font-weight: 900;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--motion-fast), transform var(--motion-fast);
+}
+
+#archive-screen-overlay .archive-protect-toast.state-active {
+    opacity: 1;
+    transform: translateX(-50%) translateY(4px);
+}
+
+#archive-screen-overlay .archive-protect-toast.state-exit {
+    opacity: 0;
+}
+
+#archive-screen-overlay .replay-protect-modal {
+    --current-color: #bb86fc;
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+}
+
+#archive-screen-overlay .archive-favorite-dialog {
+    --current-color: #bb86fc;
+    position: relative;
+    width: min(720px, calc(100vw - var(--space-double) * 4));
+    max-height: min(72vh, 560px);
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: var(--space-double);
+    padding: calc(var(--space-double) * 1.5);
+    background: color-mix(in srgb, var(--current-color), #404040 90%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--current-color), transparent 74%),
+        0 24px 80px rgba(0, 0, 0, 0.72);
+}
+
+#archive-screen-overlay .archive-favorite-dialog h2 {
+    margin: 0;
+    color: var(--current-color);
+    font-size: 18px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+}
+
+#archive-screen-overlay .archive-favorite-message {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#archive-screen-overlay .archive-favorite-options {
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 2px;
+}
+
+#archive-screen-overlay .replay-protect-count {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+#archive-screen-overlay .replay-protect-count.state-invalid {
+    color: var(--color-ui-favorite);
+}
+
+#archive-screen-overlay .replay-protect-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#archive-screen-overlay .replay-protect-table th,
+#archive-screen-overlay .replay-protect-table td {
+    padding: var(--space-unit);
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#archive-screen-overlay .replay-protect-table th {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 10px;
+    font-weight: 900;
+}
+
+#archive-screen-overlay .replay-protect-row.state-current {
+    background: color-mix(in srgb, var(--current-color), transparent 86%);
+}
+
+#archive-screen-overlay .replay-protect-row.state-active td:first-child {
+    box-shadow: inset 4px 0 0 var(--color-ui-favorite);
+}
+
+#archive-screen-overlay .replay-protect-table .favorite-star {
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+#archive-screen-overlay .replay-protect-table .favorite-star.state-active {
+    color: var(--color-ui-favorite);
+}
+
+#archive-screen-overlay .replay-protect-table .favorite-star.state-inactive {
+    color: rgba(255, 255, 255, 0.18);
+}
+
+#archive-screen-overlay .replay-protect-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-unit);
+}
+
 #archive-screen .ArchiveTable td {
     padding: var(--space-unit) var(--space-double);
     overflow: hidden;
@@ -2944,6 +3608,18 @@ main.theme-printing.impact {
 
 #archive-screen .ArchiveTable tr.state-active {
     background: rgba(255, 255, 255, 0.03);
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active {
+    background: transparent;
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td {
+    background: color-mix(in srgb, var(--color-theme-main), transparent 82%);
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td:first-child {
+    box-shadow: inset 4px 0 0 var(--color-theme-main);
 }
 
 /* モバイル・1カラム時のレスポンシブ対応 */
