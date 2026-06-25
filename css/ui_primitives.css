@@ -132,13 +132,13 @@
 }
 
 /* --- 4. Numerical Branding --- */
-.sector, .coin, .score, .contract, .item-count {
+.sector, .num-coin, .score, .contract, .item-count {
     font-family: var(--font-num);
     font-weight: 900;
 }
 
 .sector { color: var(--color-num-sector); }
-.coin { color: var(--color-num-coin); }
+.num-coin { color: var(--color-num-coin); }
 .score { color: var(--color-num-score); }
 .contract { color: var(--color-num-contract); }
 .item-count { color: var(--color-num-item-count); }

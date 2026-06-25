@@ -421,6 +421,12 @@
             "ja": "発射角度を確認して発射できます",
             "en": "Confirm the launch angle to fire."
           }
+        },
+        "returnBonusText": {
+          "lang-store": {
+            "ja": "RETURN BONUS POWER x{multiplier}",
+            "en": "RETURN BONUS POWER x{multiplier}"
+          }
         }
       }
     },

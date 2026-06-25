@@ -71,7 +71,7 @@ describe('EconomySystem', () => {
         const launcher = new Item('pad_standard_d4', repository);
         launcher.consumeCharge(3);
 
-        expect(economySystem.calculateRepairCost(launcher, 0.2)).toBe(24);
+        expect(economySystem.calculateRepairCost(launcher, 0.2)).toBe(8);
         expect(economySystem.calculateDismantleCost(0, 0.2)).toBe(40);
         expect(economySystem.calculateDismantleCost(2, 0.2)).toBe(120);
     });

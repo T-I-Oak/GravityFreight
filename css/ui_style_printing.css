@@ -24,7 +24,7 @@ main.theme-printing {
     align-items: center;    /* 水平方向中央 */
     justify-content: flex-end; /* 垂直方向下部 (レシートは画面下部から排出) */
     padding-bottom: 5vh;
-    z-index: 6000;
+    z-index: calc(var(--z-system) + 200);
 }
 
 #game-result-scene-container.theme-printing {
@@ -187,7 +187,7 @@ main.theme-printing.impact {
 
 .theme-printing .score,
 .theme-printing .sector,
-.theme-printing .coin,
+.theme-printing .num-coin,
 .theme-printing .item-count {
     color: var(--print-ink);
     text-shadow: none;
@@ -250,7 +250,7 @@ main.theme-printing.impact {
     border-color: currentColor;
     width: max-content;
     align-items: stretch;
-    z-index: 100;
+    z-index: 10;
     --stamp-rot: -5deg;
     --stamp-x: 0px;
     --stamp-y: 0px;

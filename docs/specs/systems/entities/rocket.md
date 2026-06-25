@@ -91,15 +91,19 @@
         - `M_ref` は `GameDataRepository.getGameBalance().DEFAULT_SHIP_MASS` を使用する。取得できない場合は `10` を既定値とする。
         - β v1 と同様に、重いロケットほど初速が下がる。
         - 現時点の item catalog に定義されている booster は `powerMultiplier` による補正を持つ。今後 `power` を持つ booster が追加された場合も、この式に従って加算値と倍率を集計する。
+        - 基準速は小数第4位までのロジック用精度に正規化してから、角度方向の速度ベクトルへ変換する。
     - **呼び出し**: 航行開始直前に `GameController` が実行し自身の `velocity` にセットするほか、`PhysicsEngine` が予測線の初速として参照する。
 - `getCollectionRange(): number`
     - 現在の回収可能範囲（半径）を計算して返す。
+    - 戻り値は小数第4位までのロジック用精度に正規化する。
 - `getArcMultiplier(): number`
     - 現在の構成（RocketItem, Launcher, Booster）から、出口判定に適用する開口幅倍率を算出して返す。
+    - 戻り値は小数第4位までのロジック用精度に正規化する。
 - `getGravityMultiplier(): number`
     - 現在の構成（RocketItem, Launcher, Booster）から、重力加速度に適用する倍率を算出して返す。
     - RocketItem と Launcher の `gravityMultiplier` は常時倍率として乗算する。
     - Booster が `gravityMultiplier` を持つ場合、`duration` が未定義なら常時倍率として扱い、`duration` が有限値なら `gravityEffectTicksRemaining > 0` の間だけ乗算する。
+    - 戻り値は小数第4位までのロジック用精度に正規化する。
 - `advanceGravityEffectTick(): void`
     - 時限重力効果の残り tick 数を 1 減らす。
     - `PhysicsEngine` が 1 tick の加速度計算後に呼び出す。
@@ -129,6 +133,7 @@
 - `getPrecision(): number`
     - 現在の構成（RocketItem, Launcher, Booster）から、シミュレーションすべき最大ティック数（予測線の長さ）を算出して返す。
     - **計算の根拠**: 各パーツの `precision` および `precisionMultiplier` を集計して算出する。
+    - 戻り値は小数第4位までのロジック用精度に正規化する。
 
 ## 3. データ構造定義 (Data Structures)
 

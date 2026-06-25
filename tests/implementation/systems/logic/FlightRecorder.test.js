@@ -265,7 +265,12 @@ describe('FlightRecorder', () => {
             });
         }
 
-        const utf16Bytes = JSON.stringify(recorder.getFlightRecordIndex()).length * 2;
+        const serialized = JSON.stringify(recorder.getFlightRecordIndex());
+        const utf16Bytes = serialized.length * 2;
+        const utf8Bytes = new TextEncoder().encode(serialized).length;
+
         expect(utf16Bytes).toBeLessThanOrEqual(600 * 1024);
+        expect(utf8Bytes).toBeLessThanOrEqual(utf16Bytes);
+        expect(JSON.parse(serialized)).toEqual(recorder.getFlightRecordIndex());
     });
 });

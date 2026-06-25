@@ -135,12 +135,13 @@ describe('SessionState', () => {
         expect(session.collectedItemCount).toBe(2);
         expect(session.inventory.getItemsByCategory('module')).toHaveLength(2);
         expect(session.inventory.getItemsByCategory('coin')).toHaveLength(1);
-        expect(delta).toEqual({
+        expect(delta).toMatchObject({
             spentCoins: 120,
             earnedCoins: 50,
             acquiredItemCount: 2,
             removedItemCount: 0
         });
+        expect(delta.acquiredItems).toEqual(acquiredItems);
     });
 
     it('rejects transactions that spend more coins than the session has without changing assets', () => {
@@ -186,12 +187,14 @@ describe('SessionState', () => {
         expect(session.collectedItemCount).toBe(1);
         expect(session.inventory.hasItem(removedItem)).toBe(false);
         expect(session.inventory.hasItem(acquiredItem)).toBe(true);
-        expect(delta).toEqual({
+        expect(delta).toMatchObject({
             spentCoins: 50,
             earnedCoins: 20,
             acquiredItemCount: 1,
             removedItemCount: 1
         });
+        expect(delta.acquiredItems).toEqual([acquiredItem]);
+        expect(delta.removedItems).toEqual([removedItem]);
     });
 
     it('rejects transactions when required items are missing before running callbacks', () => {

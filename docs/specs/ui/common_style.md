@@ -136,7 +136,7 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 | Class | Status | 用途 | 備考 |
 | :--- | :--- | :--- | :--- |
 | `.score` | Draft | スコア値またはスコア関連表示 | 数値表記は3桁区切り |
-| `.coin` | Draft | コイン値またはコイン関連表示 | 単位表示と併用 |
+| `.num-coin` | Draft | コイン数値表示 | 単位表示と併用。アイテムカテゴリの `.coin` とは分離する |
 | `.sector` | Draft | 到達セクター、踏破セクター表示 | reached/completed の意味差に注意 |
 | `.item-count` | Draft | 回収数、所持数、スタック数 | Badge での短縮表示を含む |
 | `.rank` | Draft | ランク表示 | RankTracker の結果表示 |
@@ -165,6 +165,7 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 | `.launcher` | Draft | ランチャーカテゴリ |
 | `.module` | Draft | モジュールカテゴリ |
 | `.booster` | Draft | ブースターカテゴリ |
+| `.coin` | Draft | コインカテゴリ |
 | `.cargo` | Draft | 貨物カテゴリ |
 | `.rocket` | Draft | ロケットカテゴリ |
 

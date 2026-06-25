@@ -80,4 +80,14 @@ describe('ModuleStack', () => {
         expect(restored.charges).toBe(stack.charges);
         expect(restored.maxCharges).toBe(stack.maxCharges);
     });
+
+    it('normalizes aggregated multiplier stats to four decimal places for replay stability', () => {
+        const stack = new ModuleStack(new Item('mod_analyzer', repository));
+        stack.add(new Item('mod_analyzer', repository));
+        stack.add(new Item('mod_analyzer', repository));
+        stack.add(new Item('mod_analyzer', repository));
+        stack.add(new Item('mod_analyzer', repository));
+
+        expect(stack.getViewData().stats.precisionMultiplier.value).toBe(2.4883);
+    });
 });

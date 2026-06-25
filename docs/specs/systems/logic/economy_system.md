@@ -110,6 +110,7 @@
     - **計算**: `Math.floor(originalPrice * (1.0 - finalDiscount))`
 - **`calculateRepairCost(launcher: Item, luckyDiscount: number): number`**
     - 基本価格（耐久 1 回復 = 10c）に対し、`calculateFinalPrice` を適用する。
+    - 1 回の修理操作で回復する耐久度は 1 であるため、不足耐久数を掛けない。
 - **`calculateDismantleCost(countInSession: number, luckyDiscount: number): number`**
     - 基本価格 `50 * (countInSession + 1)` に対し、`calculateFinalPrice` を適用する。
 - **`drawBlackMarketGacha(type: 'normal' | 'premium', session: SessionState, luckyDiscount: number): TransactionResult`**

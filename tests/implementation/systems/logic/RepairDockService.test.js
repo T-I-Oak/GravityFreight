@@ -43,7 +43,7 @@ describe('RepairDockService', () => {
         expect(transaction.spentCoins).toBe(8);
         expect(transaction.requiredItems).toEqual([launcher]);
         expect(launcher.charges).toBe(3);
-        expect(delta).toEqual({
+        expect(delta).toMatchObject({
             spentCoins: 8,
             earnedCoins: 0,
             acquiredItemCount: 0,
@@ -81,12 +81,13 @@ describe('RepairDockService', () => {
         expect(session.inventory.hasItem(rocketItem)).toBe(false);
         expect(parts.every(part => session.inventory.hasItem(part))).toBe(true);
         expect(parts.every(part => part.enhancementCount === 1)).toBe(true);
-        expect(delta).toEqual({
+        expect(delta).toMatchObject({
             spentCoins: 80,
             earnedCoins: 0,
             acquiredItemCount: 4,
             removedItemCount: 1
         });
+        expect(delta.acquiredItems).toEqual(parts);
     });
 
     it('rejects dismantle transactions for non rocket items', () => {

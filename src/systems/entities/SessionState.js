@@ -67,7 +67,9 @@ class SessionState {
             spentCoins,
             earnedCoins,
             acquiredItemCount: acquiredItems.length,
-            removedItemCount: removedItemResults.length
+            removedItemCount: removedItemResults.length,
+            acquiredItems,
+            removedItems: removedItemResults
         };
     }
 

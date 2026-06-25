@@ -14,6 +14,7 @@ describe('GameController', () => {
         expect(context.sessionState.initialize).toHaveBeenCalled();
         expect(context.storySystem.resetSession).toHaveBeenCalled();
         expect(context.uiController.initHUD).toHaveBeenCalledWith(context.sessionState);
+        expect(context.worldRenderer.clearSector).toHaveBeenCalled();
         expect(context.uiController.setResultHandler).toHaveBeenCalled();
         expect(context.uiController.setMapToggleHandler).toHaveBeenCalled();
         expect(context.uiController.setGameEndReturnHandler).toHaveBeenCalled();
@@ -133,6 +134,60 @@ describe('GameController', () => {
         expect(refreshedBuildView.launch.ready).toBe(false);
         expect(refreshedBuildView.sections.rocket.entries).toEqual([]);
         expect(refreshedBuildView.sections.launcher.entries).toHaveLength(2);
+    });
+
+    it('consumes a one-shot booster without wearing the launcher when it prevents launcher wear', async () => {
+        const powerBlade = {
+            uid: 'booster_power_blade',
+            category: 'booster',
+            charges: 0,
+            maxCharges: 0,
+            power: 0,
+            powerMultiplier: 1.3,
+            preventsLauncherWear: true,
+            consumeCharge: vi.fn(amount => {
+                powerBlade.charges = Math.max(0, powerBlade.charges - amount);
+                return powerBlade.charges;
+            }),
+            getViewData: vi.fn(() => ({
+                uid: 'booster_power_blade',
+                id: 'boost_power',
+                name: '高出力パワーブレード',
+                category: 'booster',
+                stats: {}
+            })),
+            createSnapshot: vi.fn(() => ({
+                uid: 'booster_power_blade',
+                id: 'boost_power',
+                charges: powerBlade.charges,
+                enhancements: {}
+            }))
+        };
+        context.sessionState.inventory.stacks.push({
+            uid: 'stack_power_blade',
+            representative: powerBlade,
+            items: [powerBlade],
+            count: 1,
+            getViewData: vi.fn(() => ({
+                ...powerBlade.getViewData(),
+                uid: 'stack_power_blade',
+                count: 1
+            }))
+        });
+        await context.controller.start();
+        context.controller.buildFlowController.currentBuildSelection = {
+            rocket: 'stack_rocket_ready',
+            launcher: 'stack_launcher_ready',
+            booster: 'stack_power_blade'
+        };
+
+        const rocket = context.controller.launchSelectedRocket();
+
+        expect(rocket.booster).toBe(powerBlade);
+        expect(context.readyLauncher.consumeCharge).not.toHaveBeenCalled();
+        expect(context.sessionState.inventory.addItem).toHaveBeenCalledWith(context.readyLauncher);
+        expect(context.sessionState.inventory.addItem).not.toHaveBeenCalledWith(powerBlade);
+        expect(context.sessionState.inventory.stacks.some(stack => stack.representative === powerBlade)).toBe(false);
     });
 
     it('exposes inconsistent launch operations while required flight parts are not selected', async () => {

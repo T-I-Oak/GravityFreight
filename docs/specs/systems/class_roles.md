@@ -327,7 +327,7 @@ graph TD
 - **SettingsDialogView**
     - 生存期間: App Lifecycle
     - 役割: 設定ダイアログ表示。
-    - 責務: タイトル画面の設定ボタンから設定オーバーレイを開き、閉じる / DONE 操作で閉じる。操作音などの共通 UI フィードバックは `UIController.setOperationHandler()` から渡される binder に委譲する。
+    - 責務: タイトル画面またはゲーム中 UI から設定オーバーレイを開き、閉じる / DONE 操作で閉じる。SE 音量、カメラリセット、言語切り替えの UI イベントを接続する。設定値の保存や適用は `SoundController`、`CameraController`、共通 i18n ライブラリへ委譲する。操作音などの共通 UI フィードバックは `UIController.setOperationHandler()` から渡される binder に委譲する。
 - **ArchiveDialogView**
     - 生存期間: App Lifecycle
     - 役割: Analytic Archive ダイアログ表示。

@@ -81,8 +81,8 @@ describe('FlightResultComponents.generateHTML', () => {
         expect(html).toContain('<span class="report-data-label">Goal Bonus</span>');
         expect(html).toContain('<span class="report-data-label">Delivery Bonus</span>');
         expect(html).toContain('<span class="report-data-value score"><span data-count-to="3000" data-count-prefix="+">+0</span></span>');
-        expect(html).toContain('<span class="report-data-value coin"><span data-count-to="30" data-count-prefix="+">+0</span></span>');
-        expect(html).toContain('<span class="report-data-value coin"><span data-count-to="310" data-count-prefix="+">+0</span></span>');
+        expect(html).toContain('<span class="report-data-value num-coin"><span data-count-to="30" data-count-prefix="+">+0</span></span>');
+        expect(html).toContain('<span class="report-data-value num-coin"><span data-count-to="310" data-count-prefix="+">+0</span></span>');
         expect(html).toContain('<span class="report-data-label">Collected Coins</span>');
         expect(html).toContain('<span class="report-data-label">Insurance Payout</span>');
         expect(html).toContain('RECORDED');
@@ -91,6 +91,8 @@ describe('FlightResultComponents.generateHTML', () => {
         expect(html).toContain('通商物資');
         expect(html).toContain('DELIVERY BONUS');
         expect(html).toContain('Power Booster');
+        expect(html).toContain('acquired-items-list state-staggered-list');
+        expect(html).toContain('class="acquired-item-report state-staggered-item" style="--item-appear-index: 0;"');
         expect(html).toContain('母からの押し花');
         expect(html).toContain('TO TRADING POST');
     });

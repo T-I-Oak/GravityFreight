@@ -22,6 +22,7 @@
 - **Aggregated Stats**
     - 集計値は保持プロパティや getter として公開せず、明示的なメソッドで取得する。
     - `RocketItem` は `Item` を継承するが、`mass`, `slots`, `precisionMultiplier` などの派生値を直接プロパティとして読ませない。
+    - multiplier 系の集計値は、リプレイ再現性のため小数第4位までのロジック用精度に正規化して返す。
 
 ### メソッド (Methods)
 
@@ -42,13 +43,13 @@
 - **`getCharges(): number` / `getMaxCharges(): number`**
     - 全構成パーツの現在耐久度・最大耐久度の合計（Σ）を返す。
 - **`getPrecisionMultiplier(): number`**
-    - 全構成パーツの `precisionMultiplier` の乗算結果（Π）を返す。
+    - 全構成パーツの `precisionMultiplier` の乗算結果（Π）を小数第4位まで正規化して返す。
 - **`getPickupMultiplier(): number`**
-    - 全構成パーツの `pickupMultiplier` の乗算結果（Π）を返す。
+    - 全構成パーツの `pickupMultiplier` の乗算結果（Π）を小数第4位まで正規化して返す。
 - **`getGravityMultiplier(): number`**
-    - 全構成パーツの `gravityMultiplier` の乗算結果（Π）を返す。
+    - 全構成パーツの `gravityMultiplier` の乗算結果（Π）を小数第4位まで正規化して返す。
 - **`getPowerMultiplier(): number` / `getArcMultiplier(): number`**
-    - 全構成パーツの該当 multiplier の乗算結果（Π）を返す。
+    - 全構成パーツの該当 multiplier の乗算結果（Π）を小数第4位まで正規化して返す。
 - **`getCompositionParts(): Item[]`**
     - `RocketItem` を構成する実体パーツ（chassis / logic / modules 内の item）を配列で返す。
     - 返却対象は保険金計算および crashed 時の 50% 生存判定に使用する。

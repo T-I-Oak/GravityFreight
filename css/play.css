@@ -98,6 +98,17 @@
     );
 }
 
+#inventory-panel .launch-return-bonus {
+    color: var(--color-category-launchers);
+    font-size: 11px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--color-category-launchers);
+    text-transform: uppercase;
+}
+
 #inventory-panel.state-readonly .item-list .ItemCard {
     pointer-events: none;
 }
@@ -201,7 +212,7 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    z-index: 10000;
+    z-index: calc(var(--z-system) + 200);
     max-width: 95vw;
     color: rgba(255, 255, 255, 0.95);
     font-family: var(--font-num);

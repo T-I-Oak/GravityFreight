@@ -49,6 +49,7 @@
             - **Physical (Σ)**: `mass`, `charges`, `maxCharges`
             - **Capability (Σ)**: `precision`, `pickupRange`, `power`, `slots`
             - **Multipliers (Π)**: `precisionMultiplier`, `pickupMultiplier`, `gravityMultiplier`, `powerMultiplier`, `arcMultiplier`
+        - multiplier 系の集計値は、リプレイ再現性のため小数第4位までのロジック用精度に正規化する。
 
 - **`createSnapshot(): object`**
     - ロケット内部のモジュールスタック状態をシリアライズ可能な形式で抽出する。

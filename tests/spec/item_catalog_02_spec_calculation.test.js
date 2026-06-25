@@ -3,6 +3,7 @@ import GameDataRepository from '../../src/core/GameDataRepository.js';
 import Item from '../../src/systems/entities/Item.js';
 import Rocket from '../../src/systems/entities/Rocket.js';
 import RocketItem from '../../src/systems/entities/RocketItem.js';
+import { normalizeLogicNumber } from '../../src/core/utils/numeric.js';
 
 let repository;
 
@@ -25,7 +26,7 @@ function sum(items, key) {
 }
 
 function multiply(items, key) {
-    return items.reduce((total, current) => total * (current[key] ?? 1), 1);
+    return normalizeLogicNumber(items.reduce((total, current) => total * (current[key] ?? 1), 1));
 }
 
 describe('item_catalog.md chapter 2: spec calculation rules', () => {
@@ -86,19 +87,22 @@ describe('item_catalog.md chapter 2: spec calculation rules', () => {
         const rocket = new Rocket(rocketItem, launcher, booster, Math.PI / 2);
         const launchItems = [rocketItem, launcher, booster];
 
-        const expectedPower = (rocketItem.getPower() + launcher.power + (booster.power ?? 0))
-            * rocketItem.getPowerMultiplier()
+        const expectedPowerMultiplier = normalizeLogicNumber(rocketItem.getPowerMultiplier()
             * launcher.powerMultiplier
-            * booster.powerMultiplier
-            * Math.sqrt(repository.getGameBalance().DEFAULT_SHIP_MASS / rocketItem.getMass());
-        const expectedPrecision = (rocketItem.getPrecision() + launcher.precision + (booster.precision ?? 0))
-            * rocketItem.getPrecisionMultiplier()
+            * booster.powerMultiplier);
+        const expectedPrecisionMultiplier = normalizeLogicNumber(rocketItem.getPrecisionMultiplier()
             * launcher.precisionMultiplier
-            * booster.precisionMultiplier;
-        const expectedPickupRange = (rocketItem.getPickupRange() + launcher.pickupRange + (booster.pickupRange ?? 0))
-            * rocketItem.getPickupMultiplier()
+            * booster.precisionMultiplier);
+        const expectedPickupMultiplier = normalizeLogicNumber(rocketItem.getPickupMultiplier()
             * launcher.pickupMultiplier
-            * booster.pickupMultiplier;
+            * booster.pickupMultiplier);
+        const expectedPower = normalizeLogicNumber((rocketItem.getPower() + launcher.power + (booster.power ?? 0))
+            * expectedPowerMultiplier
+            * Math.sqrt(repository.getGameBalance().DEFAULT_SHIP_MASS / rocketItem.getMass()));
+        const expectedPrecision = normalizeLogicNumber((rocketItem.getPrecision() + launcher.precision + (booster.precision ?? 0))
+            * expectedPrecisionMultiplier);
+        const expectedPickupRange = normalizeLogicNumber((rocketItem.getPickupRange() + launcher.pickupRange + (booster.pickupRange ?? 0))
+            * expectedPickupMultiplier);
 
         expect(launchItems).toHaveLength(3);
         expect(rocket.getInitialVelocity().x).toBeCloseTo(0, 10);

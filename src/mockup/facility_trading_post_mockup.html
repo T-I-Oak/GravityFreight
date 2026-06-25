@@ -69,7 +69,7 @@
             <footer class="panel-footer">
                 <div class="player-credits">
                     <span class="credits-label">CREDITS:</span>
-                    <span class="credits-value coin" id="player-credits-value">420 c</span>
+                    <span class="credits-value num-coin" id="player-credits-value">420 c</span>
                 </div>
                 <button class="Button state-primary button-large trading-post" id="depart-station">
                     <span class="btn-main-label">TO NEXT SECTOR</span>
@@ -101,7 +101,7 @@
             group.className = 'trade-action-group';
             
             const price = document.createElement('div');
-            price.className = 'trade-price coin';
+            price.className = 'trade-price num-coin';
             price.textContent = `${options.price} c`;
             group.appendChild(price);
 

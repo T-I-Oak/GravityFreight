@@ -142,7 +142,8 @@
         6. **所持金反映**: `data.coins` を表示エリアにセットする。
 
 - **`updateFacilityCredits(value: number): void`**
-    - 施設画面内の所持金表示を即座に更新する。
+    - 施設画面内の所持金表示を、現在表示値から指定値へカウントアップ/カウントダウンして更新する。
+    - 航行結果画面の得点・コイン表示と同様に `requestAnimationFrame` で補間し、最終フレームで指定値に揃える。
 
 - **`addFacilityAcquiredItem(item: Item): void`**
     - 整備工場や闇市場で新しく獲得したアイテムを、画面右側の「獲得リスト」に追加表示する。

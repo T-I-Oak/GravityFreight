@@ -192,9 +192,11 @@ export const ArchiveComponents = {
 
     createRankingTable(rows, activeCategory = 'score') {
         return `
-            <table class="ArchiveTable table-header">
-                <thead><tr><th class="col-rank">RANK</th><th class="col-score score ${activeColumnClass('score', activeCategory)}">FINAL SCORE</th><th class="col-sector sector ${activeColumnClass('sector', activeCategory)}">SECTORS</th><th class="col-count item-count ${activeColumnClass('collected', activeCategory)}">ITEM COLLECTED</th><th class="col-date">DATE TIME</th></tr></thead>
-            </table>
+            <div class="archive-table-header-area">
+                <table class="ArchiveTable table-header">
+                    <thead><tr><th class="col-rank">RANK</th><th class="col-score score ${activeColumnClass('score', activeCategory)}">FINAL SCORE</th><th class="col-sector sector ${activeColumnClass('sector', activeCategory)}">SECTORS</th><th class="col-count item-count ${activeColumnClass('collected', activeCategory)}">ITEM COLLECTED</th><th class="col-date">DATE TIME</th></tr></thead>
+                </table>
+            </div>
             <div class="archive-table-scroll-area"><table class="ArchiveTable table-body"><tbody>${createRankingRows(rows, activeCategory)}</tbody></table></div>
         `;
     },
@@ -229,9 +231,11 @@ export const ArchiveComponents = {
                     </div>
                 </header>
                 <div class="Well ScrollArea">
-                    <table class="ArchiveTable table-header">
-                        <thead><tr><th class="col-fav">PROTECT</th><th class="col-no">NO.</th><th class="col-sector sector">SECTOR</th><th class="col-score score">SCORE</th><th class="col-date">DATE TIME</th></tr></thead>
-                    </table>
+                    <div class="archive-table-header-area">
+                        <table class="ArchiveTable table-header">
+                            <thead><tr><th class="col-fav">PROTECT</th><th class="col-no">NO.</th><th class="col-sector sector">SECTOR</th><th class="col-score score">SCORE</th><th class="col-date">DATE TIME</th></tr></thead>
+                        </table>
+                    </div>
                     <div class="archive-table-scroll-area"><table class="ArchiveTable table-body"><tbody>${createReplayRows(rows)}</tbody></table></div>
                 </div>
             </section>

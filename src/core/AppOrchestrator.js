@@ -17,6 +17,7 @@ import TrajectoryPredictor from '../systems/logic/TrajectoryPredictor.js';
 import UIController from '../systems/ui/UIController.js';
 import BackgroundManager from '../systems/core/BackgroundManager.js';
 import CameraController from '../systems/core/CameraController.js';
+import SoundController from '../systems/core/SoundController.js';
 import TitleScreenAnimator from '../systems/core/TitleScreenAnimator.js';
 import WorldRenderer from '../systems/core/WorldRenderer.js';
 
@@ -27,6 +28,7 @@ class AppOrchestrator {
         this.uiController = options.uiController || null;
         this.worldRenderer = options.worldRenderer || new WorldRenderer();
         this.titleScreenAnimator = options.titleScreenAnimator || new TitleScreenAnimator();
+        this.soundController = options.soundController || null;
         this.gameControllerClass = options.gameControllerClass || GameController;
         this.gameDataRepository = null;
         this.gameController = null;
@@ -38,9 +40,11 @@ class AppOrchestrator {
         setAppVersion(packageData.version);
         this.gameDataRepository = new GameDataRepository(this.commonDataManager, this.i18nAdapter);
         await this.gameDataRepository.loadAllData();
+        this.soundController = this.soundController || new SoundController(this.gameDataRepository);
 
         this.uiController = this.uiController || new UIController({
-            gameDataRepository: this.gameDataRepository
+            gameDataRepository: this.gameDataRepository,
+            soundController: this.soundController
         });
         this.systems = this.#createAppSystems();
         this.#initializePersistentSystems();
@@ -148,12 +152,14 @@ class AppOrchestrator {
             navigationLoopController,
             trajectoryPredictor,
             cameraController,
+            soundController: this.soundController,
             backgroundManager
         };
     }
 
     #initializePersistentSystems() {
         this.systems.cameraController.initialize();
+        this.systems.soundController.initialize();
         this.systems.gameRecordTracker.initialize();
         this.systems.rankTracker.initialize();
         this.systems.storySystem.initialize();

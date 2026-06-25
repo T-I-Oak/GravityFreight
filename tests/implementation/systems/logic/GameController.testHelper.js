@@ -89,7 +89,8 @@ export function createController(settlement = createSettlement()) {
             'build.assemble.readySubtext': 'Ready to assemble.',
             'build.launch.label': 'LAUNCH ENGINE',
             'build.launch.waitingSubtext': 'Select a rocket and launcher to begin launch prep.',
-            'build.launch.readySubtext': 'Confirm the launch angle to fire.'
+            'build.launch.readySubtext': 'Confirm the launch angle to fire.',
+            'build.launch.returnBonusText': 'RETURN BONUS POWER x{multiplier}'
         })[key])
     };
     const currentRocket = {
@@ -374,7 +375,9 @@ export function createController(settlement = createSettlement()) {
                 spentCoins,
                 earnedCoins,
                 acquiredItemCount,
-                removedItemCount
+                removedItemCount,
+                acquiredItems: transaction.acquiredItems ?? [],
+                removedItems: transaction.removedItems ?? []
             };
         }),
         applySettlement: vi.fn(),
@@ -458,7 +461,7 @@ export function createController(settlement = createSettlement()) {
     };
     const storySystem = {
         resetSession: vi.fn(),
-        unlockNextStep: vi.fn(),
+        unlockNextStep: vi.fn(branchId => branchId),
         getStoryStatus: vi.fn(() => [{ id: 'T', type: 'T', isUnread: true }])
     };
     const uiController = {
@@ -475,6 +478,7 @@ export function createController(settlement = createSettlement()) {
         hideStarInfo: vi.fn(),
         updateFacilityCredits: vi.fn(),
         updateHUDValue: vi.fn(),
+        updateMailStatus: vi.fn(),
         setFlightMode: vi.fn(),
         showSectorTransitionScreen: vi.fn(),
         showSectorTitle: vi.fn(),
@@ -501,6 +505,7 @@ export function createController(settlement = createSettlement()) {
         playGameEndExitAnimation: vi.fn(() => Promise.resolve()),
         stopGameEndExitAnimation: vi.fn(() => Promise.resolve()),
         setSector: vi.fn(),
+        clearSector: vi.fn(),
         setAimRocket: vi.fn(),
         setPredictionPath: vi.fn(),
         startWarpEffect: vi.fn(),

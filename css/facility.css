@@ -87,12 +87,13 @@
 /* discount: Simplified Discount Label */
 #facility-screen .Badge.discount {
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
     gap: 1px;
     background: #444;
     color: #fff;
     font-size: 8px;
     font-weight: 900;
+    line-height: 1;
     padding: 1px 4px;
     white-space: nowrap;
 
@@ -181,6 +182,10 @@
     line-height: 1.4;
 }
 
+#facility-screen .Column .section-header:not(:first-child) {
+    margin-top: var(--space-double);
+}
+
 #facility-screen .trade-item-area {
     flex: 1;
     min-width: 0; /* 防止 flex 項目溢出 */
@@ -221,6 +226,21 @@
     font-size: 11px;
     line-height: 24px;
     min-height: auto;
+}
+
+#facility-screen .item-list.state-staggered-list .state-staggered-item {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: item-list-stagger-in 260ms ease-out forwards;
+    animation-delay: calc(var(--item-appear-index, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #facility-screen .item-list.state-staggered-list .state-staggered-item {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
 }
 
 #facility-screen .Badge.discount .sticker-num {

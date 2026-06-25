@@ -28,7 +28,7 @@ export class FlightResultComponents {
             .map(story => UIComponents.generateStoryCardHTML(story.id, gameDataRepository, story.isUnread))
             .join('');
         const itemReportHTML = (viewData.itemReport || [])
-            .map(entry => this.generateItemReportHTML(entry, gameDataRepository))
+            .map((entry, index) => this.generateItemReportHTML(entry, gameDataRepository, index))
             .join('');
 
         return `
@@ -56,7 +56,7 @@ export class FlightResultComponents {
                                     </div>
                                     <div class="SplitColumn hero">
                                         <span class="stat-label">${creditsLabel}</span>
-                                        <span class="stat-value coin" data-count-to="${viewData.totalCoins ?? 0}">0</span>
+                                        <span class="stat-value num-coin" data-count-to="${viewData.totalCoins ?? 0}">0</span>
                                     </div>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@ export class FlightResultComponents {
 
                         <div class="item-list">
                             <div class="story-item-container">${storyHTML}</div>
-                            <div class="acquired-items-list">${itemReportHTML}</div>
+                            <div class="acquired-items-list state-staggered-list">${itemReportHTML}</div>
                         </div>
                     </section>
                 </div>
@@ -101,12 +101,12 @@ export class FlightResultComponents {
             <div class="SplitRow data-row">
                 <span class="report-data-label">${entry.label}</span>
                 <span class="report-data-value score">${score}</span>
-                <span class="report-data-value coin">${coin}</span>
+                <span class="report-data-value num-coin">${coin}</span>
             </div>
         `;
     }
 
-    static generateItemReportHTML(entry, gameDataRepository) {
+    static generateItemReportHTML(entry, gameDataRepository, index = 0) {
         const itemViewData = this.normalizeResultItemViewData(entry.item);
         const itemHTML = UIComponents.generateCardHTML(itemViewData, { status: entry.status });
         const bonusTitle = gameDataRepository.getUiText('flightResult.bonusTitle');
@@ -115,14 +115,16 @@ export class FlightResultComponents {
             .join('');
 
         if (!bonusHTML) {
-            return itemHTML;
+            return `<div class="acquired-item-report state-staggered-item" style="--item-appear-index: ${index};">${itemHTML}</div>`;
         }
 
         return `
+            <div class="acquired-item-report state-staggered-item" style="--item-appear-index: ${index};">
             ${itemHTML}
             <div class="report-bonus-list">
                 <h4 class="report-bonus-title">${bonusTitle}</h4>
                 ${bonusHTML}
+            </div>
             </div>
         `;
     }

@@ -37,7 +37,7 @@
     { "id": "opt_fuel", "category": "booster", "name": "高反応燃料", "powerMultiplier": 1.2, "preventsLauncherWear": true, "maxCharges": 1, "rarity": "common", "description": "燃料を代用しつつ射出パワーを強化する、1回分の高反応燃料カートリッジ。" },
     { "id": "opt_fuel_pack", "category": "booster", "name": "高反応燃料パック", "powerMultiplier": 1.2, "preventsLauncherWear": true, "maxCharges": 2, "rarity": "uncommon", "description": "燃料を代用しつつ射出パワーを強化する、大容量の高反応燃料カートリッジ。" },
     { "id": "boost_flash", "category": "booster", "name": "閃光推進剤", "gravityMultiplier": 0.1, "duration": 100, "rarity": "rare", "description": "一定時間、星の重力をほぼ無効化して直進性能を向上させる高反応添加剤。" },
-    { "id": "boost_power", "category": "booster", "name": "高出力パワーブレード", "powerMultiplier": 1.3, "rarity": "common", "description": "エンジンの燃焼効率を一時的に高め、射出パワーを強化する高出力添加剤。" },
+    { "id": "boost_power", "category": "booster", "name": "高出力パワーブレード", "powerMultiplier": 1.3, "preventsLauncherWear": true, "rarity": "common", "description": "エンジンの燃焼効率を一時的に高め、射出パワーを強化する高出力添加剤。" },
     { "id": "boost_magnet", "category": "booster", "name": "マグネティック・パルス", "rarity": "rare", "description": "航行時間とともに回収範囲を拡大し続ける、1回限りの磁気パルス発生装置。" },
     { "id": "boost_expander", "category": "booster", "name": "アーク・エクスパンダー", "arcMultiplier": 2.0, "rarity": "rare", "description": "出口（アーク）の有効半径を2倍に拡大させる、1回限りの磁気干渉装置。" }
   ],

@@ -38,11 +38,12 @@
   "badge": {
     "content": {
       "lang-store": {
-        "ja": "6月公開予定",
-        "en": "Coming in June"
+        "ja": "鋭意作成中！",
+        "en": "In active development!"
       }
     },
-    "type": "info"
+    "type": "info",
+    "featuredUntil": "2026-06-30"
   },
   "button": {
     "content": {

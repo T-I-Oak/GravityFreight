@@ -62,6 +62,20 @@ describe('RocketItem', () => {
         expect(rocketItem.getGravityMultiplier()).toBe(parts.reduce((total, item) => total * item.gravityMultiplier, 1));
     });
 
+    it('normalizes aggregated multiplier stats to four decimal places for replay stability', () => {
+        const rocketItem = new RocketItem(
+            new Item('hull_light_plus', repository),
+            new Item('sensor_normal', repository),
+            [
+                new Item('mod_analyzer', repository),
+                new Item('mod_analyzer', repository),
+                new Item('mod_analyzer', repository)
+            ]
+        );
+
+        expect(rocketItem.getPrecisionMultiplier()).toBe(2.4883);
+    });
+
     it('exposes composition parts and calculates appraisal as the sum of those parts', () => {
         const rocketItem = createRocketItem();
         const parts = [

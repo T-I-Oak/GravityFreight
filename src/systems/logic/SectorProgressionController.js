@@ -40,9 +40,10 @@ class SectorProgressionController {
 
     async beginSectorTransition(options = {}) {
         this.sessionState.incrementSector();
+        const isAnomaly = options.isAnomaly ?? (this.sessionState.sectorNumber % 5 === 0);
         const sector = this.sectorFactory({
             sessionState: this.sessionState,
-            isAnomaly: options.isAnomaly ?? false
+            isAnomaly
         });
 
         const updatedRecordKeys = this.gameRecordTracker.recordSectorStart(this.sessionState);

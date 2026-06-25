@@ -468,6 +468,93 @@ describe('WorldRenderer', () => {
             .toBeGreaterThan(1);
     });
 
+    it('draws a cargo icon on the matching exit arc when delivery cargo is on the map', async () => {
+        vi.stubGlobal('performance', { now: vi.fn(() => 0) });
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [
+                {
+                    angle: 0,
+                    width: 60,
+                    radius: 900,
+                    getFacilityType: () => 'TRADING_POST'
+                }
+            ],
+            bodies: [
+                {
+                    position: { x: 0, y: 0 },
+                    radius: 40,
+                    isHome: true,
+                    isRepulsion: false,
+                    items: [
+                        { category: 'cargo', deliveryGoalId: 'TRADING_POST' },
+                        { category: 'cargo' }
+                    ]
+                }
+            ]
+        });
+
+        expect(context.strokeStyles).toContain('token-facility-trading-post');
+        expect(context.translate).toHaveBeenCalledWith(1305, 240);
+        expect(context.globalAlphas).toContain(0.5);
+        expect(context.moveTo).toHaveBeenCalledWith(15, -13.5);
+        expect(context.lineTo).toHaveBeenCalledWith(-15, -9);
+        expect(context.lineTo).toHaveBeenCalledWith(30, 13.5);
+    });
+
+    it('does not draw an exit cargo icon for cargo targeting another facility', async () => {
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [
+                {
+                    angle: 0,
+                    width: 60,
+                    radius: 900,
+                    getFacilityType: () => 'TRADING_POST'
+                }
+            ],
+            bodies: [
+                {
+                    position: { x: 0, y: 0 },
+                    radius: 40,
+                    isHome: true,
+                    isRepulsion: false,
+                    items: [{ category: 'cargo', deliveryGoalId: 'REPAIR_DOCK' }]
+                }
+            ]
+        });
+
+        expect(context.translate).not.toHaveBeenCalledWith(1186, 240);
+    });
+
     it('renders navigation rocket, trail, cargo, and sonar using camera projection', async () => {
         vi.stubGlobal('performance', { now: vi.fn(() => 1000) });
         const { canvas, context } = createCanvas();

@@ -22,6 +22,7 @@ describe('GameController result and facility flow', () => {
         );
         expect(context.sessionState.applySettlement).toHaveBeenCalledWith(expect.objectContaining({ status: 'cleared' }));
         expect(context.storySystem.unlockNextStep).toHaveBeenCalledWith('T');
+        expect(context.uiController.updateMailStatus).toHaveBeenCalledWith(0, 'T', true);
         expect(context.flightRecorder.recordFlightResult).toHaveBeenCalledWith({
             resultType: 'cleared',
             score: 3260,
@@ -59,6 +60,28 @@ describe('GameController result and facility flow', () => {
             storyStatus: [{ id: 'T', type: 'T', isUnread: true }],
             storyCards: [{ id: 'T', type: 'T', isUnread: true }]
         });
+    });
+
+    it('shows only the story unlocked by the current flight in the flight result', async () => {
+        context.storySystem.unlockNextStep.mockReturnValue('TR');
+        context.storySystem.getStoryStatus.mockReturnValue([
+            { id: 'T', type: 'T', isUnread: true },
+            { id: 'TR', type: 'R', isUnread: true }
+        ]);
+
+        const viewData = await context.controller.handleNavigationEnd({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        });
+
+        expect(context.uiController.updateMailStatus).toHaveBeenCalledWith(1, 'R', true);
+        expect(viewData.storyStatus).toEqual([
+            { id: 'T', type: 'T', isUnread: true },
+            { id: 'TR', type: 'R', isUnread: true }
+        ]);
+        expect(viewData.storyCards).toEqual([
+            { id: 'TR', type: 'R', isUnread: true }
+        ]);
     });
 
     it('keeps rejected replay records as pending in the result view', async () => {
@@ -250,6 +273,35 @@ describe('GameController result and facility flow', () => {
         expect(context.uiController.showGameEndSequence).not.toHaveBeenCalled();
     });
 
+    it('rebuilds the build view from recovered inventory after confirming a returned rocket', async () => {
+        context.sessionState.inventory.popItemByUid('stack_rocket_ready');
+        context.sessionState.applySettlement.mockImplementation(result => {
+            result.recoveredItems?.forEach(item => context.sessionState.inventory.addItem(item));
+        });
+        const settlement = createSettlement({
+            status: 'returned',
+            destination: null,
+            unlockedBranchId: null,
+            acquiredItems: [],
+            recoveredItems: [context.rocketItem]
+        });
+        context.economySystem.calculateSettlement.mockReturnValue(settlement);
+
+        await context.controller.handleNavigationEnd({ type: 'body' });
+        context.controller.confirmSettlement(settlement);
+
+        const buildViewData = context.uiController.showBuildScreen.mock.calls.at(-1)[0];
+        expect(buildViewData.sections.rocket.entries).toEqual([
+            expect.objectContaining({
+                uid: 'stack_readded_rocket_ready',
+                itemViewData: expect.objectContaining({
+                    id: 'rocket_ready',
+                    uid: 'stack_readded_rocket_ready'
+                })
+            })
+        ]);
+    });
+
     it('applies Trading Post buy transactions and refreshes the facility view', () => {
         context.currentSector.luckyDiscountRate = 0.2;
         context.controller.enterFacility('TRADING_POST');
@@ -277,11 +329,18 @@ describe('GameController result and facility flow', () => {
         expect(context.uiController.updateFacilityCredits).toHaveBeenCalledWith(80);
 
         const refreshedView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
+        expect(refreshedView.coins).toBe(120);
         expect(refreshedView.sections[0].entries).toEqual([]);
+        expect(context.uiController.showFacilityScreen.mock.invocationCallOrder.at(-1))
+            .toBeLessThan(context.uiController.updateFacilityCredits.mock.invocationCallOrder.at(-1));
     });
 
     it('applies Trading Post sell transactions from an inventory stack', () => {
         context.controller.enterFacility('TRADING_POST');
+
+        const initialView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
+        const sellEntry = initialView.sections[1].entries.find(entry => entry.uid === 'stack_sell');
+        expect(sellEntry.disabled).toBe(false);
 
         const delta = context.controller.handleFacilityAction('sell', { uid: 'stack_sell' });
 
@@ -294,6 +353,9 @@ describe('GameController result and facility flow', () => {
             currentCoins: 160
         });
         expect(context.uiController.updateFacilityCredits).toHaveBeenCalledWith(160);
+        expect(context.uiController.updateHUDValue).toHaveBeenCalledWith('coin', 160);
+        const refreshedView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
+        expect(refreshedView.coins).toBe(120);
     });
 
     it('delegates Repair Dock repair and dismantle transactions', () => {
@@ -310,6 +372,13 @@ describe('GameController result and facility flow', () => {
         context.controller.currentRocket = { rocketItem };
         context.currentSector.luckyDiscountRate = 0.2;
         context.controller.enterFacility('REPAIR_DOCK');
+        const initialView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
+        const repairEntries = initialView.sections[0].sections[0].entries;
+
+        expect(repairEntries).toEqual([
+            expect.objectContaining({ uid: 'launcher_damaged', disabled: false }),
+            expect.objectContaining({ uid: 'launcher_ready', disabled: true })
+        ]);
 
         context.controller.handleFacilityAction('repair', { uid: 'launcher_damaged' });
         context.controller.handleFacilityAction('dismantle', { uid: 'rocket_item' });
@@ -320,7 +389,14 @@ describe('GameController result and facility flow', () => {
         );
         expect(context.economySystem.createDismantleTransaction).toHaveBeenCalledWith(rocketItem, 0, 0.2);
         const refreshedView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
-        expect(refreshedView.sections[1].entries).toEqual([]);
+        expect(refreshedView.sections).toHaveLength(2);
+        expect(refreshedView.sections[0].sections).toHaveLength(2);
+        expect(refreshedView.sections[0].sections[1].entries).toEqual([]);
+        expect(refreshedView.sections[1].entries).toHaveLength(1);
+        expect(refreshedView.sections[1].entries[0]).toMatchObject({
+            uid: 'enhanced_part',
+            hideAction: true
+        });
     });
 
     it('delegates Black Market premium transactions', () => {
@@ -339,6 +415,15 @@ describe('GameController result and facility flow', () => {
             earnedCoins: 0,
             acquiredItems: [expect.objectContaining({ uid: 'premium_item' })]
         });
+        const refreshedView = context.uiController.showFacilityScreen.mock.calls.at(-1)[1];
+        expect(refreshedView.sections[0].entries.every(entry => entry.disabled)).toBe(true);
+        expect(refreshedView.sections[1].entries).toHaveLength(1);
+        expect(refreshedView.sections[1].entries[0]).toMatchObject({
+            uid: 'premium_item',
+            hideAction: true
+        });
+        expect(() => context.controller.handleFacilityAction('buy_normal', { uid: 'black_market_normal' }))
+            .toThrow('[GameController] Black Market purchase is limited to once per facility stay.');
     });
 
     it('leaves a facility and starts the next sector when the contract can continue', async () => {

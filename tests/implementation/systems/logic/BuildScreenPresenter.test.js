@@ -21,7 +21,8 @@ function createRepository() {
             'build.assemble.readySubtext': 'Ready to assemble.',
             'build.launch.label': 'LAUNCH ENGINE',
             'build.launch.waitingSubtext': 'Select a rocket and launcher to begin launch prep.',
-            'build.launch.readySubtext': 'Confirm the launch angle to fire.'
+            'build.launch.readySubtext': 'Confirm the launch angle to fire.',
+            'build.launch.returnBonusText': 'RETURN BONUS POWER x{multiplier}'
         })[key])
     };
 }
@@ -65,6 +66,7 @@ describe('BuildScreenPresenter', () => {
         });
         const rocketStack = createStack('rocket_basic', 'rocket', { name: 'Basic Rocket' });
         const sessionState = {
+            returnBonus: 0,
             inventory: {
                 getItemsByCategory: vi.fn(category => ({
                     rocket: [rocketStack],
@@ -92,12 +94,62 @@ describe('BuildScreenPresenter', () => {
         expect(viewData.launch).toEqual({
             ready: true,
             label: 'LAUNCH ENGINE',
-            subtext: 'Confirm the launch angle to fire.'
+            subtext: 'Confirm the launch angle to fire.',
+            bonusText: ''
         });
         expect(viewData.assembly).toEqual({
             ready: false,
             label: 'ASSEMBLE ROCKET',
             subtext: 'Select chassis and logic to assemble.'
+        });
+    });
+
+    it('shows current return bonus multiplier on the launch button', () => {
+        const repository = createRepository();
+        const rocketStack = createStack('rocket_basic', 'rocket');
+        const launcherStack = createStack('launcher_ready', 'launcher', {
+            charges: 2,
+            maxCharges: 2
+        });
+        const sessionState = {
+            returnBonus: 0.2,
+            inventory: {
+                getItemsByCategory: vi.fn(category => ({
+                    rocket: [rocketStack],
+                    launcher: [launcherStack]
+                }[category] ?? []))
+            }
+        };
+
+        const viewData = new BuildScreenPresenter(repository).createViewData(sessionState, {
+            rocket: rocketStack.uid,
+            launcher: launcherStack.uid
+        });
+
+        expect(viewData.launch).toMatchObject({
+            ready: true,
+            label: 'LAUNCH ENGINE',
+            subtext: 'Confirm the launch angle to fire.',
+            bonusText: 'RETURN BONUS POWER x1.2'
+        });
+    });
+
+    it('shows return bonus even while launch equipment is not selected yet', () => {
+        const repository = createRepository();
+        const sessionState = {
+            returnBonus: 0.1,
+            inventory: {
+                getItemsByCategory: vi.fn(() => [])
+            }
+        };
+
+        const viewData = new BuildScreenPresenter(repository).createViewData(sessionState, {});
+
+        expect(viewData.launch).toMatchObject({
+            ready: false,
+            label: 'LAUNCH ENGINE',
+            subtext: 'Select a rocket and launcher to begin launch prep.',
+            bonusText: 'RETURN BONUS POWER x1.1'
         });
     });
 

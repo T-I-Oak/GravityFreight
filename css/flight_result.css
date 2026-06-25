@@ -105,7 +105,7 @@
     justify-self: end;
 }
 
-.SplitRow.data-row .report-data-value.coin {
+.SplitRow.data-row .report-data-value.num-coin {
     justify-self: end;
 }
 
@@ -142,6 +142,21 @@
 
 /* Optional: Make bonus cards slightly smaller or more subtle if needed, 
    but for now keep standard cards */
+
+#flight-result-screen .acquired-items-list.state-staggered-list .state-staggered-item {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: item-list-stagger-in 260ms ease-out forwards;
+    animation-delay: calc(var(--item-appear-index, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #flight-result-screen .acquired-items-list.state-staggered-list .state-staggered-item {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
+}
 
 #flight-result-screen .replay-protect-modal {
     position: fixed;

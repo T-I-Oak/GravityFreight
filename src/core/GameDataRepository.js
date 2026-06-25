@@ -85,17 +85,17 @@ class GameDataRepository {
         if (!item) {
             throw new Error(`[GameDataRepository] Item not found: ${id}`);
         }
-        return item;
+        return this.expandLanguageResource(item);
     }
 
     getItemDefinitionsByCategory(category) {
         this.#ensureLoaded();
-        return this.items[category] || [];
+        return this.expandLanguageResource(this.items[category] || []);
     }
 
     getAllItemDefinitions() {
         this.#ensureLoaded();
-        return Object.values(this.items).flat();
+        return this.expandLanguageResource(Object.values(this.items).flat());
     }
 
     getFacilityDefinition(idOrType) {
@@ -105,7 +105,7 @@ class GameDataRepository {
         if (!facility) {
             throw new Error(`[GameDataRepository] Facility not found: ${idOrType}`);
         }
-        return facility;
+        return this.expandLanguageResource(facility);
     }
 
     getStoryContent(id) {

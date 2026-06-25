@@ -119,6 +119,16 @@ describe('GameDataRepository', () => {
         expect(repository.getItemDefinitionsByCategory('missing_category')).toEqual([]);
     });
 
+    it('returns i18n-expanded item master data', async () => {
+        expandLanguageResource.mockImplementation(value => ({ expanded: value }));
+        await repository.loadAllData();
+
+        expect(repository.getItemDefinition('hull_light')).toHaveProperty('expanded');
+        expect(repository.getItemDefinitionsByCategory('chassis')).toHaveProperty('expanded');
+        expect(repository.getAllItemDefinitions()).toHaveProperty('expanded');
+        expect(expandLanguageResource).toHaveBeenCalled();
+    });
+
     it('provides facility definitions by short id or facility type', async () => {
         await repository.loadAllData();
 
@@ -133,6 +143,14 @@ describe('GameDataRepository', () => {
             className: 'repair-dock'
         });
         expect(() => repository.getFacilityDefinition('missing')).toThrow('[GameDataRepository] Facility not found: missing');
+    });
+
+    it('returns i18n-expanded facility definitions', async () => {
+        expandLanguageResource.mockImplementation(value => ({ expanded: value }));
+        await repository.loadAllData();
+
+        expect(repository.getFacilityDefinition('TRADING_POST')).toHaveProperty('expanded');
+        expect(expandLanguageResource).toHaveBeenCalled();
     });
 
     it('provides individual and full achievement definitions', async () => {

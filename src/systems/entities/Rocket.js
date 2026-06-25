@@ -1,6 +1,7 @@
 import IDGenerator from '../../core/utils/IDGenerator.js';
 import Item from './Item.js';
 import RocketItem from './RocketItem.js';
+import { normalizeLogicNumber } from '../../core/utils/numeric.js';
 
 const ZERO_VECTOR = { x: 0, y: 0 };
 
@@ -154,10 +155,10 @@ class Rocket {
         const referenceMass = this.#getReferenceMass();
         const rocketMass = Math.max(this.rocketItem?.getMass?.() ?? referenceMass, Number.EPSILON);
         const massFactor = Math.sqrt(referenceMass / rocketMass);
-        const speed = this.#additive('power')
+        const speed = normalizeLogicNumber(this.#additive('power')
             * this.#multiplier('powerMultiplier')
             * (1.0 + powerBonus)
-            * massFactor;
+            * massFactor);
 
         return {
             x: Math.cos(this.angle) * speed,
@@ -166,11 +167,11 @@ class Rocket {
     }
 
     getCollectionRange() {
-        return this.#additive('pickupRange') * this.#multiplier('pickupMultiplier');
+        return normalizeLogicNumber(this.#additive('pickupRange') * this.#multiplier('pickupMultiplier'));
     }
 
     getArcMultiplier() {
-        return this.#multiplier('arcMultiplier');
+        return normalizeLogicNumber(this.#multiplier('arcMultiplier'));
     }
 
     getGravityMultiplier() {
@@ -184,7 +185,7 @@ class Rocket {
             }
         }
 
-        return multiplier;
+        return normalizeLogicNumber(multiplier);
     }
 
     advanceGravityEffectTick() {
@@ -241,17 +242,17 @@ class Rocket {
     }
 
     getPrecision() {
-        return this.#additive('precision') * this.#multiplier('precisionMultiplier');
+        return normalizeLogicNumber(this.#additive('precision') * this.#multiplier('precisionMultiplier'));
     }
 
     #additive(key) {
         const rocketValue = this.#rocketStat(key);
-        return rocketValue + (this.launcher?.[key] ?? 0) + (this.booster?.[key] ?? 0);
+        return normalizeLogicNumber(rocketValue + (this.launcher?.[key] ?? 0) + (this.booster?.[key] ?? 0));
     }
 
     #multiplier(key) {
         const rocketValue = this.#rocketStat(key);
-        return rocketValue * (this.launcher?.[key] ?? 1) * (this.booster?.[key] ?? 1);
+        return normalizeLogicNumber(rocketValue * (this.launcher?.[key] ?? 1) * (this.booster?.[key] ?? 1));
     }
 
     #rocketStat(key) {

@@ -13,10 +13,19 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout GravityFreight 🛎️
         uses: actions/checkout@v4
+        with:
+          path: GravityFreight
+
+      - name: Checkout GameWorksOAK common library 🛎️
+        uses: actions/checkout@v4
+        with:
+          repository: T-I-Oak/GameWorksOAK
+          path: GameWorksOAK
 
       - name: Install and Build 🔧
+        working-directory: GravityFreight
         run: |
           npm install
           npm run build
@@ -25,4 +34,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages # 公開用のブランチ
-          folder: dist    # Vite のビルド出力フォルダ
+          folder: GravityFreight/dist # Vite のビルド出力フォルダ

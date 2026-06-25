@@ -63,7 +63,7 @@
         5. `coins = coins - spentCoins + earnedCoins` を実行。
         6. `totalEarnedCoins += earnedCoins` を実行。
         7. `acquiredItems` の各アイテムを `inventory` へ追加し、`collectedItemCount` を加算する。
-        8. 記録・実績更新に使える `TransactionDelta` を返す。
+        8. 記録・実績更新、および施設画面の獲得/削除表示に使える `TransactionDelta` を返す。
 
 - **`getGameResultSummary(context: { completedSectors: number }): GameResultSummary`**
     - ゲームリザルト画面およびゲーム1プレイ結果記録に渡す最終集計値を返す。
@@ -114,6 +114,8 @@
   spentCoins: number,
   earnedCoins: number,
   acquiredItemCount: number,
-  removedItemCount: number
+  removedItemCount: number,
+  acquiredItems: Item[],
+  removedItems: Item[]
 }
 ```

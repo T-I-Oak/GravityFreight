@@ -1,6 +1,7 @@
 import Item from './Item.js';
 import ModuleStack from './ModuleStack.js';
 import IDGenerator from '../../core/utils/IDGenerator.js';
+import { normalizeLogicNumber } from '../../core/utils/numeric.js';
 
 const ADDITIVE_STATS = ['mass', 'charges', 'maxCharges', 'precision', 'pickupRange', 'power', 'slots'];
 const MULTIPLIER_STATS = ['precisionMultiplier', 'pickupMultiplier', 'gravityMultiplier', 'powerMultiplier', 'arcMultiplier'];
@@ -175,7 +176,7 @@ class RocketItem extends Item {
     }
 
     _multiply(key) {
-        return this._allParts().reduce((total, item) => total * (item[key] ?? 1), 1);
+        return normalizeLogicNumber(this._allParts().reduce((total, item) => total * (item[key] ?? 1), 1));
     }
 
     _sumEnhancements(key) {

@@ -52,6 +52,10 @@ class UIController {
             operationBinder: (element, handler, seId) => this.setOperationHandler(element, handler, seId)
         });
         this.soundController = options.soundController || null;
+        this.requestFrame = options.requestFrame || globalThis.requestAnimationFrame?.bind(globalThis);
+        this.cancelFrame = options.cancelFrame || globalThis.cancelAnimationFrame?.bind(globalThis);
+        this.facilityCreditCountDurationMs = options.facilityCreditCountDurationMs ?? 900;
+        this.facilityCreditAnimationFrameId = null;
         this.canvasInputHandler = null;
 
         this.titleScreen = this.document.querySelector('#title-screen');
@@ -197,6 +201,7 @@ class UIController {
 
     showFacilityScreen(type, viewData) {
         this.hideStarInfo();
+        this.#cancelFacilityCreditAnimation();
         this.flightResultScreenView.clearMapActionDock();
         this.buildPanelView.close();
         this.flightResultScreenView.hide();
@@ -258,7 +263,48 @@ class UIController {
     }
 
     updateFacilityCredits(value) {
-        this.#requiredFacilityElement('.credits-value').textContent = `${this.#formatNumber(value)} c`;
+        const creditsValue = this.#requiredFacilityElement('.credits-value');
+        const previousValue = Number(creditsValue.dataset.facilityCreditsValue ?? 0);
+        this.#cancelFacilityCreditAnimation();
+
+        if (!this.requestFrame || this.facilityCreditCountDurationMs <= 0 || previousValue === value) {
+            this.#renderFacilityCredits(creditsValue, value);
+            return;
+        }
+
+        let startTime = null;
+        const step = timestamp => {
+            startTime ??= timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(1, elapsed / this.facilityCreditCountDurationMs);
+            const currentValue = Math.round(previousValue + ((value - previousValue) * this.#easeOutCubic(progress)));
+            this.#renderFacilityCredits(creditsValue, currentValue);
+
+            if (progress < 1) {
+                this.facilityCreditAnimationFrameId = this.requestFrame(step);
+            } else {
+                this.#renderFacilityCredits(creditsValue, value);
+                this.facilityCreditAnimationFrameId = null;
+            }
+        };
+
+        this.facilityCreditAnimationFrameId = this.requestFrame(step);
+    }
+
+    #renderFacilityCredits(element, value) {
+        element.textContent = `${this.#formatNumber(value)} c`;
+        element.dataset.facilityCreditsValue = String(value);
+    }
+
+    #cancelFacilityCreditAnimation() {
+        if (this.facilityCreditAnimationFrameId !== null && this.cancelFrame) {
+            this.cancelFrame(this.facilityCreditAnimationFrameId);
+        }
+        this.facilityCreditAnimationFrameId = null;
+    }
+
+    #easeOutCubic(value) {
+        return 1 - ((1 - value) ** 3);
     }
 
     setOperationHandler(element, handler, seId = 'click') {

@@ -23,7 +23,7 @@ class BuildScreenPresenter {
                 this.#createSection(sessionState, category, selection)
             ])),
             assembly: this.#createAssemblyState(selection),
-            launch: this.#createLaunchState(selection)
+            launch: this.#createLaunchState(sessionState, selection)
         };
     }
 
@@ -79,16 +79,28 @@ class BuildScreenPresenter {
             && item.charges <= 0;
     }
 
-    #createLaunchState(selection) {
+    #createLaunchState(sessionState, selection) {
         const ready = !!(selection.rocket && selection.launcher);
+        const returnBonus = sessionState?.returnBonus ?? 0;
 
         return {
             ready,
             label: this.#getText('build.launch.label'),
             subtext: this.#getText(ready
                 ? 'build.launch.readySubtext'
-                : 'build.launch.waitingSubtext')
+                : 'build.launch.waitingSubtext'),
+            bonusText: this.#createReturnBonusText(returnBonus)
         };
+    }
+
+    #createReturnBonusText(returnBonus) {
+        if (returnBonus > 0) {
+            return this.#formatText(this.#getText('build.launch.returnBonusText'), {
+                multiplier: (1 + returnBonus).toFixed(1)
+            });
+        }
+
+        return '';
     }
 
     #createAssemblyState(selection) {
@@ -105,6 +117,13 @@ class BuildScreenPresenter {
 
     #getText(path) {
         return this.gameDataRepository.getUiText(path);
+    }
+
+    #formatText(template, values) {
+        return Object.entries(values).reduce(
+            (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+            template
+        );
     }
 }
 

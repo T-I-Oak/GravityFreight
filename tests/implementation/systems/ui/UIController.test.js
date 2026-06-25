@@ -108,6 +108,7 @@ describe('UIController', () => {
                             <div id="list-booster" class="item-list"></div>
                         </div>
                         <div id="launch-control">
+                            <div id="launch-return-bonus" class="launch-return-bonus state-hidden" hidden></div>
                             <button id="launch-btn" disabled class="state-disabled"></button>
                         </div>
                     </div>
@@ -169,17 +170,17 @@ describe('UIController', () => {
         controller.showResultScreen(createViewData());
 
         expect(document.querySelector('.stat-value.score').textContent).toBe('0');
-        expect(document.querySelector('.stat-value.coin').textContent).toBe('0');
+        expect(document.querySelector('.stat-value.num-coin').textContent).toBe('0');
         expect(document.querySelector('.report-data-value.score').textContent).toBe('+0');
-        expect(document.querySelector('.report-data-value.coin').textContent).toBe('+0');
+        expect(document.querySelector('.report-data-value.num-coin').textContent).toBe('+0');
 
         frames.shift()(0);
         frames.shift()(1000);
 
         expect(document.querySelector('.stat-value.score').textContent).toBe('3,260');
-        expect(document.querySelector('.stat-value.coin').textContent).toBe('30');
+        expect(document.querySelector('.stat-value.num-coin').textContent).toBe('30');
         expect(document.querySelector('.report-data-value.score').textContent).toBe('+3,000');
-        expect(document.querySelector('.report-data-value.coin').textContent).toBe('+30');
+        expect(document.querySelector('.report-data-value.num-coin').textContent).toBe('+30');
     });
 
     it('stops the flight result count animation when leaving the result screen', () => {
@@ -493,6 +494,48 @@ describe('UIController', () => {
         expect(soundController.playSE).toHaveBeenCalledTimes(2);
     });
 
+    it('counts facility credits up and down when credits change', () => {
+        const frames = [];
+        const requestFrame = vi.fn(callback => {
+            frames.push(callback);
+            return frames.length;
+        });
+        const controller = new UIController({
+            gameDataRepository: repository,
+            soundController,
+            requestFrame,
+            facilityCreditCountDurationMs: 900
+        });
+
+        controller.showFacilityScreen('TRADING_POST', {
+            name: 'TRADING POST',
+            icon: 'T',
+            themeClass: 'trading-post',
+            description: 'Trading post description',
+            coins: 120,
+            creditsLabel: 'CREDITS:',
+            departLabel: 'TO NEXT SECTOR',
+            sections: []
+        });
+
+        controller.updateFacilityCredits(80);
+
+        expect(document.querySelector('.credits-value').textContent).toBe('120 c');
+        frames.shift()(0);
+        frames.shift()(900);
+
+        expect(document.querySelector('.credits-value').textContent).toBe('80 c');
+        expect(document.querySelector('.credits-value').dataset.facilityCreditsValue).toBe('80');
+
+        controller.updateFacilityCredits(160);
+
+        frames.shift()(0);
+        frames.shift()(900);
+
+        expect(document.querySelector('.credits-value').textContent).toBe('160 c');
+        expect(document.querySelector('.credits-value').dataset.facilityCreditsValue).toBe('160');
+    });
+
     it('registers title start operation and switches to the build screen', () => {
         const controller = new UIController({ gameDataRepository: repository, soundController });
         const startHandler = vi.fn();
@@ -704,7 +747,8 @@ describe('UIController', () => {
             launch: {
                 ready: false,
                 label: 'LAUNCH ENGINE',
-                subtext: 'ロケットと発射台を選択すると発射できます'
+                subtext: 'ロケットと発射台を選択すると発射できます',
+                bonusText: 'RETURN BONUS POWER x1.2'
             },
             assembly: {
                 ready: true,
@@ -719,12 +763,27 @@ describe('UIController', () => {
         expect(document.querySelector('#list-chassis').textContent).toContain('Light Hull');
         expect(document.querySelector('#list-module').textContent).toContain('x2/2');
         expect(document.querySelector('#launch-control').hidden).toBe(false);
+        expect(document.querySelector('#launch-return-bonus').hidden).toBe(false);
+        expect(document.querySelector('#launch-return-bonus').textContent).toBe('RETURN BONUS POWER x1.2');
         expect(document.querySelector('#launch-btn').disabled).toBe(true);
         expect(document.querySelector('#launch-btn').classList.contains('state-disabled')).toBe(true);
         expect(document.querySelector('#launch-btn').classList.contains('state-hidden')).toBe(false);
         expect(document.querySelector('#build-btn').disabled).toBe(false);
         expect(document.querySelector('#build-btn').classList.contains('state-disabled')).toBe(false);
         expect(document.querySelector('#build-btn .btn-main-label').textContent).toBe('ASSEMBLE ROCKET');
+
+        controller.showBuildScreen({
+            sections: {},
+            launch: {
+                ready: true,
+                label: 'LAUNCH ENGINE',
+                subtext: 'Ready',
+                bonusText: ''
+            },
+            assembly: { ready: false }
+        });
+
+        expect(document.querySelector('#launch-return-bonus').hidden).toBe(true);
     });
 
     it('registers the assemble handler on the build button', () => {

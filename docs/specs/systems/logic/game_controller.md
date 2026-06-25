@@ -28,9 +28,10 @@
 - **`start(): void`**
     - ゲームを開始する。
     1. **ステート初期化**: `sessionState.initialize()` を実行。
-    2. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、航行結果のマップ確認、航行結果のリプレイ保護、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを登録する。ビルドアイテム選択は `BuildFlowController.handleItemSelection()` へ、ローンチボタン操作は `launchSelectedRocket()` へ委譲する。ビルドアイテム選択後は、AIM 可能状態であれば予測軌道を再計算する。
-    3. **HUD初期化**: `uiController.initHUD(sessionState)` を実行し、初期値（Coins, Sector 等）の表示と、メールスロットのリセット（全ロック）を行う。
-    4. **最初のセクターへ**: `this.beginSectorTransition()` を実行。
+    2. **前回表示の破棄**: `currentSector` と初回セクター遷移フラグをリセットし、`WorldRenderer.clearSector()` で前回ゲームのマップを消す。
+    3. **ゲーム内ハンドラ登録**: `uiController` を介して、ビルドパネル操作、アセンブル、ローンチ、Canvas 入力、航行結果のマップ確認、航行結果のリプレイ保護、施設操作、ゲーム終了画面のタイトル復帰、および**メールアイコン押下**のハンドラを登録する。ビルドアイテム選択は `BuildFlowController.handleItemSelection()` へ、ローンチボタン操作は `launchSelectedRocket()` へ委譲する。ビルドアイテム選択後は、AIM 可能状態であれば予測軌道を再計算する。
+    4. **HUD初期化**: `uiController.initHUD(sessionState)` を実行し、初期値（Coins, Sector 等）の表示と、メールスロットのリセット（全ロック）を行う。
+    5. **最初のセクターへ**: `this.beginSectorTransition()` を実行。
 
 - **`confirmSettlement(settlement: SettlementResult): void`**
     - リザルト画面で「確定（OK）」が押された際の挙動を制御する。
@@ -48,24 +49,28 @@
         1. **データ準備**:
             - 交易所の場合、`EconomySystem.generateTradingPostStock(sessionState)` を実行。
             - Trading Post は、販売在庫と inventory 内の売却候補を表示用データへ変換する。
-            - Repair Dock は、破損 launcher の修理候補と、現在の RocketItem の分解候補を表示用データへ変換する。
+        - Repair Dock は、所持している全 launcher の修理候補と、現在の RocketItem の分解候補を表示用データへ変換する。最大耐久度まで回復済みの launcher は disabled とする。
             - Black Market は、100c / 500c 取引メニューを表示用データへ変換する。
+            - 施設入場時に、その滞在中の獲得アイテム表示と Black Market 購入済み状態をリセットする。
             - 施設画面の説明、セクション名、ボタン名、空表示文言は `GameDataRepository.getUiText()` で UI resource から取得する。
         2. **表示制御**: `uiController.showFacilityScreen(type, data)` を実行。
         3. **ハンドラ登録**: `uiController` を通じて、施設内ボタン（Buy, Sell, Repair 等）と `handleFacilityAction` を紐付ける。
     - Trading Post の販売在庫は入場時に生成し、取引後の再表示では同じ在庫状態を使用する。
+    - Repair Dock の表示データは、左カラムに `repair` と `dismantle`、右カラムに `received` を配置する2カラム構造とする。
 
 - **`handleFacilityAction(action: string, context: object): void`**
     - 施設内での具体的な操作を処理する。
     - **内部挙動**:
         - Trading Post の `buy`: 入場時に生成した販売在庫から対象 item を取得し、購入価格と取得 item を含む `TransactionResult` を作成する。取引成功後は販売在庫から対象 item を除外する。
-        - Trading Post の `sell`: inventory stack から売却対象 item を取得し、査定額と削除 item を含む `TransactionResult` を作成する。
+        - Trading Post の `sell`: inventory stack から売却対象 item を取得し、査定額と削除 item を含む `TransactionResult` を作成する。売却は所持金不足と無関係に操作可能とする。
         - Repair Dock の `repair`: 指定された launcher を取得し、`EconomySystem.createRepairTransaction()` が返す `TransactionResult` を使用する。
         - Repair Dock の `dismantle`: 現在の RocketItem を対象に `EconomySystem.createDismantleTransaction()` が返す `TransactionResult` を使用する。取引成功後は **`this.currentRocket = null`** を実行し、同一滞在中の解体回数を更新する。
-        - Black Market の `buy_normal` / `buy_premium`: `EconomySystem.drawBlackMarketGacha()` が返す `TransactionResult` を使用する。
+        - Black Market の `buy_normal` / `buy_premium`: `EconomySystem.drawBlackMarketGacha()` が返す `TransactionResult` を使用する。同一施設滞在中の購入は1回までとし、購入後は両メニューを disabled にする。
         - 作成した `TransactionResult` は `sessionState.applyTransaction(transaction)` へ渡す。支払い、item 追加・削除、施設固有の `onCommit` callback 実行は `SessionState` 側で一括反映する。
         - `applyTransaction()` が返す `TransactionDelta` を `GameRecordTracker` へ反映し、更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
-        - 取引後は施設画面の coin 表示を更新し、同じ施設の表示データを再生成して画面を更新する。
+        - 取引後は `TransactionDelta.acquiredItems` をその施設滞在中の獲得アイテム表示へ追加し、同じ施設の表示データを再生成して画面を更新する。
+        - 施設画面の再生成時、フッターの coin 表示は取引前の値で描画し、その後 `UIController.updateFacilityCredits()` に取引後の値を渡してカウントアップ/カウントダウンさせる。再生成後の操作判定に使う `currentFacilityViewData` は取引後の値を保持する。
+        - HUD の coin 表示は取引後の `SessionState.coins` を即時反映する。
 
 - **`leaveFacility(): void`**
     - 施設を出発し、次セクターへ向かう。
@@ -143,6 +148,7 @@
     - セクター生成、セクター開始時記録、HUD / Renderer 更新は `SectorProgressionController.beginSectorTransition()` へ委譲する。
     1. **演出制御**: 背景・描画・音のワープ演出を開始。
         - ワープ演出の開始時点では、`currentSector` は前セクターのままとし、前セクターのマップへズームインして加速する演出を行う。
+        - 新規ゲームの最初のワープでは前回ゲームの `currentSector` を引き継がず、開始時点でマップを表示しない。
         - 演出途中で遠方から次セクターのマップが現れるタイミングで、新しい `Sector` を生成して `currentSector` を切り替える。
     2. **ロジック更新**: 
         - 次セクター生成時に `sessionState.sectorNumber` を更新。
@@ -167,8 +173,8 @@
         1. `BuildFlowController.currentBuildSelection` から `rocket`, `launcher`, `booster` の stack uid を取得する。`rocket` と `launcher` が未選択のまま呼び出された場合は UI 状態とロジック状態の不整合としてエラーを投げる。
         2. `sessionState.inventory.popItemByUid()` で選択中の RocketItem, Launcher, Booster を inventory から抽出する。
         3. 抽出した構成で `Rocket` を生成する。発射角度は最新の AIM 操作で保持した角度を使用し、初期位置はその角度に対応する母星中心から `home.radius + gameBalance.SHIP_START_OFFSET` world px の位置とする。
-        4. Launcher / Booster の耐久度を消費する。Booster が `preventsLauncherWear` を持つ場合は Launcher の耐久度消費を免除し、未消耗のまま inventory へ戻す。
-        5. 耐久度が残っている発射装備は inventory へ戻す。耐久度が 0 の発射装備は戻さない。
+        4. Launcher / Booster の使用状態を反映する。Booster が `preventsLauncherWear` を持つ場合は Launcher の耐久度消費を免除し、Launcher は inventory へ戻す。
+        5. `maxCharges > 0` の発射装備は耐久度を減算し、耐久度が残っている場合のみ inventory へ戻す。`maxCharges` を持たない Booster は1回限りの消耗品として扱い、使用後は inventory へ戻さない。
         6. 発射構成の抽出後、`BuildFlowController.resetFlightSelection()` で FLIGHT タブの選択状態を解除し、`WorldRenderer.clearAimRocket()` と `WorldRenderer.clearPredictionPath()` で AIM 中の表示を消去する。
         7. `BuildFlowController.showBuildScreen()` で消費後の inventory と launch button 状態を再描画する。
         8. `launchRocket(rocket)` を呼び出し、生成した `Rocket` を返す。

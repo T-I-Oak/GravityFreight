@@ -69,6 +69,11 @@ class WorldRenderer {
         this.render();
     }
 
+    clearSector() {
+        this.targetSector = null;
+        this.render();
+    }
+
     startNavigation(rocket) {
         this.navigationRocket = rocket || null;
         this.hideNavigationRocketBody = false;
@@ -463,7 +468,68 @@ class WorldRenderer {
             this.context.restore();
 
             this.#drawFacilityLabel(exit, transform, center, colors);
+            if (this.#hasDeliveryCargoForExit(exit)) {
+                this.#drawDeliveryCargoIcon(exit, transform, center, colors);
+            }
         });
+    }
+
+    #drawDeliveryCargoIcon(exit, transform, center, colors) {
+        const angle = exit.angle * Math.PI / 180 + transform.rotation;
+        const iconRadius = transform.radius(exit.radius + 85);
+        const x = center.x + Math.cos(angle) * iconRadius;
+        const y = center.y + Math.sin(angle) * iconRadius;
+        const color = this.#facilityColor(exit.getFacilityType(), colors);
+        const alpha = 0.5 + 0.5 * Math.sin(this.#getView().timestamp / 333);
+        const normalized = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const isBottom = normalized > 0 && normalized < Math.PI;
+        const scale = transform.scale;
+        const widthLeft = -15 * scale;
+        const heightLeft = -9 * scale;
+        const widthRight = 30 * scale;
+        const heightRight = -4.5 * scale;
+        const height = 18 * scale;
+
+        this.context.save();
+        this.context.globalAlpha *= alpha;
+        this.context.translate(x, y);
+        this.context.rotate(isBottom ? angle - Math.PI / 2 : angle + Math.PI / 2);
+        this.context.translate(-2 * scale, 2 * scale);
+        this.context.strokeStyle = color;
+        this.context.lineWidth = Math.max(1, 2.5 * scale);
+        this.context.shadowBlur = 10 * scale;
+        this.context.shadowColor = color;
+
+        this.context.beginPath();
+        this.context.moveTo(widthLeft + widthRight, heightLeft + heightRight);
+        this.context.lineTo(widthLeft, heightLeft);
+        this.context.lineTo(widthLeft, heightLeft + height);
+        this.context.lineTo(0, height);
+        this.context.lineTo(widthRight, heightRight + height);
+        this.context.lineTo(widthRight, heightRight);
+        this.context.closePath();
+        this.context.stroke();
+
+        this.context.beginPath();
+        this.context.moveTo(0, 0);
+        this.context.lineTo(widthLeft, heightLeft);
+        this.context.stroke();
+
+        this.context.beginPath();
+        this.context.moveTo(0, 0);
+        this.context.lineTo(widthRight, heightRight);
+        this.context.stroke();
+
+        this.context.beginPath();
+        this.context.moveTo(0, 0);
+        this.context.lineTo(0, height);
+        this.context.stroke();
+
+        this.context.beginPath();
+        this.context.moveTo(widthLeft / 2, heightLeft / 2);
+        this.context.lineTo(widthLeft / 2 + widthRight, heightLeft / 2 + heightRight);
+        this.context.stroke();
+        this.context.restore();
     }
 
     #drawFacilityLabel(exit, transform, center, colors) {
@@ -583,6 +649,20 @@ class WorldRenderer {
             return item.getViewData().category;
         }
         return null;
+    }
+
+    #hasDeliveryCargoForExit(exit) {
+        const facilityType = exit.getFacilityType();
+        return this.targetSector.bodies.some(body => (
+            (body.items || []).some(item => this.#isDeliveryCargoForFacility(item, facilityType))
+        ));
+    }
+
+    #isDeliveryCargoForFacility(item, facilityType) {
+        const viewData = item?.getViewData?.();
+        const category = item?.category ?? viewData?.category;
+        const deliveryGoalId = item?.deliveryGoalId ?? viewData?.deliveryGoalId;
+        return category === 'cargo' && deliveryGoalId === facilityType;
     }
 }
 

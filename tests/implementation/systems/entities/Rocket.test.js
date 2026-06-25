@@ -129,6 +129,22 @@ describe('Rocket', () => {
         );
     });
 
+    it('normalizes derived flight values to four decimal places for replay stability', () => {
+        const rocketItem = new RocketItem(
+            new Item('hull_light_plus', repository),
+            new Item('sensor_normal', repository),
+            [
+                new Item('mod_analyzer', repository),
+                new Item('mod_analyzer', repository),
+                new Item('mod_analyzer', repository)
+            ]
+        );
+        const launcher = new Item('pad_precision_d2', repository);
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+
+        expect(rocket.getPrecision()).toBe(298.6);
+    });
+
     it('calculates arc multiplier from launch configuration', () => {
         const rocketItem = new RocketItem(
             new Item('hull_medium', repository),

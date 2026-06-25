@@ -100,6 +100,19 @@ describe('SectorProgressionController', () => {
         expect(context.uiController.setFlightMode).not.toHaveBeenCalled();
     });
 
+    it('marks every fifth sector as anomaly when no explicit anomaly option is provided', async () => {
+        context.sessionState.sectorNumber = 4;
+
+        const sector = await context.controller.beginSectorTransition();
+
+        expect(context.sectorFactory).toHaveBeenCalledWith({
+            sessionState: context.sessionState,
+            isAnomaly: true
+        });
+        expect(sector.isAnomaly).toBe(true);
+        expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(5, true);
+    });
+
     it('returns false when the session can continue', () => {
         expect(context.controller.checkGameOverAndStartEndSequence({ completedSectors: 3 })).toBe(false);
         expect(context.uiController.showGameEndSequence).not.toHaveBeenCalled();

@@ -1,5 +1,6 @@
 import Item from './Item.js';
 import IDGenerator from '../../core/utils/IDGenerator.js';
+import { normalizeLogicNumber } from '../../core/utils/numeric.js';
 
 const ADDITIVE_STATS = ['mass', 'charges', 'maxCharges', 'precision', 'pickupRange', 'power', 'slots'];
 const MULTIPLIER_STATS = ['precisionMultiplier', 'pickupMultiplier', 'gravityMultiplier', 'powerMultiplier', 'arcMultiplier'];
@@ -55,7 +56,7 @@ class ModuleStack extends Item {
 
         MULTIPLIER_STATS.forEach(key => {
             stats[key] = {
-                value: this.items.reduce((total, item) => total * (item[key] ?? 1), 1),
+                value: normalizeLogicNumber(this.items.reduce((total, item) => total * (item[key] ?? 1), 1)),
                 enhanceCount: this.items.reduce((total, item) => total + (item.enhancement[key] || 0), 0)
             };
         });

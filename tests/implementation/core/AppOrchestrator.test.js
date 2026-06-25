@@ -45,6 +45,7 @@ describe('AppOrchestrator', () => {
     let uiController;
     let renderer;
     let titleScreenAnimator;
+    let soundController;
 
     beforeEach(() => {
         commonDataManager = createCommonDataManagerStub();
@@ -59,6 +60,9 @@ describe('AppOrchestrator', () => {
             start: vi.fn(),
             stop: vi.fn()
         };
+        soundController = {
+            initialize: vi.fn()
+        };
     });
 
     it('boots shared app systems and wires title start to a game controller', async () => {
@@ -67,6 +71,7 @@ describe('AppOrchestrator', () => {
             uiController,
             worldRenderer: renderer,
             titleScreenAnimator,
+            soundController,
             gameControllerClass: FakeGameController,
             i18nAdapter: { expandLanguageResource: value => value }
         });
@@ -90,6 +95,7 @@ describe('AppOrchestrator', () => {
         expect(uiController.setReplayStartHandler).toHaveBeenCalled();
         expect(uiController.setReplayProtectHandler).toHaveBeenCalled();
         expect(uiController.setReplayProtectRecordsProvider).toHaveBeenCalled();
+        expect(soundController.initialize).toHaveBeenCalled();
         expect(uiController.showTitleScreen).toHaveBeenCalled();
         expect(titleScreenAnimator.start).toHaveBeenCalledTimes(1);
         expect(titleScreenAnimator.stop).toHaveBeenCalledTimes(1);

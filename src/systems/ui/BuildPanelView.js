@@ -10,6 +10,7 @@ class BuildPanelView {
         this.buildButton = this.document.querySelector('#build-btn');
         this.launchControl = this.document.querySelector('#launch-control');
         this.launchButton = this.document.querySelector('#launch-btn');
+        this.launchBonus = this.document.querySelector('#launch-return-bonus');
         this.lists = {
             rocket: this.document.querySelector('#list-rocket'),
             launcher: this.document.querySelector('#list-launcher'),
@@ -134,6 +135,17 @@ class BuildPanelView {
         this.launchButton.classList.toggle('state-disabled', !ready);
         this.launchButton.classList.toggle('state-notable', !ready);
         this.#setButtonText(this.launchButton, launch);
+        this.#updateLaunchBonus(launch.bonusText);
+    }
+
+    #updateLaunchBonus(bonusText = '') {
+        if (!this.launchBonus) {
+            return;
+        }
+
+        this.launchBonus.textContent = bonusText;
+        this.launchBonus.hidden = !bonusText;
+        this.launchBonus.classList.toggle('state-hidden', !bonusText);
     }
 
     #updateBuildButton(assembly = {}) {

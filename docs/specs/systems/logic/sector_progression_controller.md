@@ -35,7 +35,7 @@
     - 次セクターを開始する。
     - **内部挙動**:
         1. `SessionState.incrementSector()` を呼び出す。
-        2. `Sector` を生成する。`options.isAnomaly` が未指定の場合は `false` とする。
+        2. `Sector` を生成する。`options.isAnomaly` が未指定の場合は、インクリメント後のセクター番号が5の倍数なら `true`、それ以外は `false` とする。
         3. `GameRecordTracker.recordSectorStart(sessionState)` を呼び出す。
         4. 更新キーがある場合、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
         5. `WorldRenderer.setSector(sector)`、`UIController.updateHUDValue('sector', sectorNumber)`、`UIController.showSectorTitle(sectorNumber, sector.isAnomaly)` を呼び出す。

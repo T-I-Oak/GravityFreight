@@ -5,8 +5,7 @@ class PricingService {
     }
 
     calculateRepairCost(launcher, luckyDiscount) {
-        const missingCharges = Math.max(0, launcher.maxCharges - launcher.charges);
-        return this.calculateFinalPrice(missingCharges * 10, luckyDiscount);
+        return this.calculateFinalPrice(10, luckyDiscount);
     }
 
     calculateDismantleCost(countInSession, luckyDiscount) {

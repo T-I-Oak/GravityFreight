@@ -10,14 +10,19 @@ describe('PricingService', () => {
         expect(pricingService.calculateFinalPrice(99, 0.1, 0)).toBe(89);
     });
 
-    it('calculates repair and dismantle costs through the shared discount rule', () => {
+    it('calculates one-step repair and dismantle costs through the shared discount rule', () => {
         const pricingService = new PricingService();
-        const launcher = {
+        const damagedLauncher = {
             charges: 1,
             maxCharges: 4
         };
+        const fullLauncher = {
+            charges: 4,
+            maxCharges: 4
+        };
 
-        expect(pricingService.calculateRepairCost(launcher, 0.2)).toBe(24);
+        expect(pricingService.calculateRepairCost(damagedLauncher, 0.2)).toBe(8);
+        expect(pricingService.calculateRepairCost(fullLauncher, 0.2)).toBe(8);
         expect(pricingService.calculateDismantleCost(0, 0.2)).toBe(40);
         expect(pricingService.calculateDismantleCost(2, 0.2)).toBe(120);
     });

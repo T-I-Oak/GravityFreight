@@ -65,7 +65,7 @@
     text-shadow: 0 0 8px var(--color-num-sector);
 }
 
-.theme-neon .coin {
+.theme-neon .num-coin {
     text-shadow: 0 0 8px var(--color-num-coin);
 }
 

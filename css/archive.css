@@ -13,7 +13,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: calc(var(--z-system) + 100);
 }
 
 #archive-screen-overlay[hidden],
@@ -440,6 +440,11 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    scrollbar-gutter: stable;
+}
+
+#archive-screen .archive-table-header-area {
+    padding-right: 12px;
 }
 
 #archive-screen .ArchiveTable {

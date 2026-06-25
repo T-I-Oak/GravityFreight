@@ -24,6 +24,13 @@ function expectSameClasses(actualDocument, mockDocument, selector, options = {})
 }
 
 describe('play screen markup', () => {
+    it('uses the shared logo asset on the title screen and HUD', () => {
+        const actualDocument = loadDocument('index.html');
+
+        expect(actualDocument.querySelector('#title-screen .LogoImage.title-logo')?.getAttribute('src')).toBe('/assets/logo.svg');
+        expect(actualDocument.querySelector('#play-hud .LogoImage.hud-logo')?.getAttribute('src')).toBe('/assets/logo.svg');
+    });
+
     it('keeps production play-screen classes aligned with the mockup', () => {
         const actualDocument = loadDocument('index.html');
         const mockDocument = loadDocument('src/mockup/play_mockup.html');
@@ -68,6 +75,9 @@ describe('play screen markup', () => {
         expectSameClasses(actualDocument, mockDocument, '#play-screen .launch', {
             ignore: ['state-hidden']
         });
+
+        expect(actualDocument.querySelector('#coin-display')?.classList.contains('num-coin')).toBe(true);
+        expect(actualDocument.querySelector('#coin-display')?.classList.contains('coin')).toBe(false);
 
         actualDocument.querySelectorAll('#play-hud .hud-messages .Icon').forEach((icon, index) => {
             const mockIcon = mockDocument.querySelectorAll('#play-hud .hud-messages .Icon')[index];

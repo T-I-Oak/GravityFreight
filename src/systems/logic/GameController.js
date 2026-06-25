@@ -32,6 +32,7 @@ class GameController {
         this.currentSector = null;
         this.currentRocket = null;
         this.currentLaunchAngle = 0;
+        this.isFirstSectorTransition = true;
         this.mapInteraction = null;
         this.lastReplayRecord = null;
         this.buildScreenPresenter = infrastructure.buildScreenPresenter
@@ -46,6 +47,8 @@ class GameController {
         this.currentFacilityType = null;
         this.currentFacilityViewData = null;
         this.currentTradingPostStock = null;
+        this.currentFacilityAcquiredItems = [];
+        this.blackMarketPurchaseMade = false;
         this.sectorProgressionController = infrastructure.sectorProgressionController
             || new SectorProgressionController(infrastructure);
         this.sectorTransitionAnimator = infrastructure.sectorTransitionAnimator
@@ -58,6 +61,9 @@ class GameController {
 
     async start() {
         this.sessionState.initialize();
+        this.currentSector = null;
+        this.isFirstSectorTransition = true;
+        this.worldRenderer?.clearSector?.();
         this.storySystem.resetSession?.();
         this.uiController.initHUD(this.sessionState);
         this.uiController.setResultHandler?.(() => this.confirmSettlement(this.lastSettlement));
@@ -154,8 +160,10 @@ class GameController {
         this.lastSettlement = settlement;
         this.sessionState.applySettlement(settlement);
 
+        let unlockedStoryId = null;
         if (settlement.unlockedBranchId) {
-            this.storySystem.unlockNextStep(settlement.unlockedBranchId);
+            unlockedStoryId = this.storySystem.unlockNextStep(settlement.unlockedBranchId);
+            this.#updateMailHud(unlockedStoryId);
         }
 
         const resultContext = this.#createFlightResultContext(settlement);
@@ -175,7 +183,7 @@ class GameController {
         this.worldRenderer?.disableSonar?.();
         await this.worldRenderer?.playFinishAnimation?.(result);
 
-        const viewData = this.#createFlightResultViewData(settlement, replayRecord, achievements);
+        const viewData = this.#createFlightResultViewData(settlement, replayRecord, achievements, unlockedStoryId);
         this.uiController.showResultScreen(viewData);
         return viewData;
     }
@@ -193,7 +201,7 @@ class GameController {
         if (!this.checkGameOverAndStartEndSequence({
             completedSectors: Math.max(0, this.sessionState.sectorNumber - 1)
         })) {
-            this.uiController.showBuildScreen?.();
+            this.buildFlowController.showBuildScreen();
         }
     }
 
@@ -202,6 +210,8 @@ class GameController {
         this.currentTradingPostStock = type === 'TRADING_POST'
             ? this.economySystem.generateTradingPostStock(this.sessionState)
             : null;
+        this.currentFacilityAcquiredItems = [];
+        this.blackMarketPurchaseMade = false;
         const viewData = this.#createFacilityViewData(type);
         this.#showFacilityView(type, viewData);
         return viewData;
@@ -209,9 +219,10 @@ class GameController {
 
     handleFacilityAction(action, context) {
         const transaction = this.#createFacilityTransaction(action, context);
+        const previousCoins = this.sessionState.coins;
         const delta = this.sessionState.applyTransaction(transaction);
 
-        this.#afterFacilityTransaction(action, context, delta);
+        this.#afterFacilityTransaction(action, context, delta, previousCoins);
         return delta;
     }
 
@@ -274,10 +285,14 @@ class GameController {
         this.worldRenderer?.clearAimRocket?.();
         this.worldRenderer?.disableSonar?.();
         this.uiController.showSectorTransitionScreen?.();
+        if (this.isFirstSectorTransition) {
+            this.worldRenderer?.clearSector?.();
+        }
 
         this.currentSector = await this.sectorTransitionAnimator.play(
             () => this.sectorProgressionController.beginSectorTransition(options)
         );
+        this.isFirstSectorTransition = false;
         this.uiController.setFlightMode?.(false);
         this.buildFlowController.showBuildScreen();
         return this.currentSector;
@@ -293,9 +308,10 @@ class GameController {
         };
     }
 
-    #createFlightResultViewData(settlement, replayRecord, achievements) {
+    #createFlightResultViewData(settlement, replayRecord, achievements, unlockedStoryId = null) {
         const pendingRecord = this.flightRecorder.getPendingRecord();
         const storyStatus = this.storySystem.getStoryStatus();
+        const storyCards = storyStatus.filter(story => story.id === unlockedStoryId);
 
         return {
             title: this.#getTitle(settlement),
@@ -317,8 +333,23 @@ class GameController {
             },
             achievements,
             storyStatus,
-            storyCards: storyStatus
+            storyCards
         };
+    }
+
+    #updateMailHud(storyId) {
+        if (!storyId) {
+            return;
+        }
+
+        const storyStatus = this.storySystem.getStoryStatus();
+        const index = storyStatus.findIndex(story => story.id === storyId);
+        const story = storyStatus[index];
+        if (!story) {
+            return;
+        }
+
+        this.uiController.updateMailStatus?.(index, story.type, story.isUnread);
     }
 
     #getThemeClass(settlement) {
@@ -408,7 +439,9 @@ class GameController {
                 actionLabel: this.gameDataRepository.getUiText('facility.actions.sell'),
                 item: stack.representative,
                 price: this.economySystem.calculateAppraisalValue(stack.representative),
-                uid: stack.uid
+                uid: stack.uid,
+                disabled: false,
+                buttonClass: 'color-theme-sub'
             }));
 
         return [
@@ -420,12 +453,12 @@ class GameController {
     #createRepairDockSections(luckyDiscount) {
         const repairEntries = this.sessionState.inventory.getItemsByCategory('launcher')
             .flatMap(stack => stack.items)
-            .filter(item => item.charges < item.maxCharges)
             .map(item => this.#createTradeEntry({
                 action: 'repair',
                 actionLabel: this.gameDataRepository.getUiText('facility.actions.repair'),
                 item,
-                price: this.economySystem.calculateRepairCost(item, luckyDiscount)
+                price: this.economySystem.calculateRepairCost(item, luckyDiscount),
+                disabled: item.charges >= item.maxCharges
             }));
         const rocketItem = this.currentRocket?.rocketItem;
         const dismantleEntries = rocketItem ? [
@@ -437,10 +470,16 @@ class GameController {
             })
         ] : [];
 
+        const repairSection = this.#createFacilitySection('repair', 'repairDockRepair', repairEntries);
+        const dismantleSection = this.#createFacilitySection('dismantle', 'repairDockDismantle', dismantleEntries);
+        const receivedSection = this.#createFacilitySection('received', 'repairDockReceived', this.#createAcquiredFacilityEntries());
+
         return [
-            this.#createFacilitySection('repair', 'repairDockRepair', repairEntries),
-            this.#createFacilitySection('dismantle', 'repairDockDismantle', dismantleEntries),
-            this.#createFacilitySection('received', 'repairDockReceived', [])
+            {
+                id: 'maintenance',
+                sections: [repairSection, dismantleSection]
+            },
+            receivedSection
         ];
     }
 
@@ -468,11 +507,11 @@ class GameController {
 
         return [
             this.#createFacilitySection('black-market', 'blackMarketStock', entries),
-            this.#createFacilitySection('acquired', 'blackMarketAcquired', [])
+            this.#createFacilitySection('acquired', 'blackMarketAcquired', this.#createAcquiredFacilityEntries())
         ];
     }
 
-    #createTradeEntry({ action, actionLabel, item, price, uid = item.uid, discountRate = 0 }) {
+    #createTradeEntry({ action, actionLabel, item, price, uid = item.uid, discountRate = 0, disabled = this.sessionState.coins < price, buttonClass = '' }) {
         return {
             action,
             actionLabel,
@@ -481,7 +520,8 @@ class GameController {
             itemViewData: item.getViewData(),
             price,
             discountPercent: Math.round(Math.min(0.5, discountRate) * 100),
-            disabled: this.sessionState.coins < price
+            disabled,
+            buttonClass
         };
     }
 
@@ -500,8 +540,22 @@ class GameController {
             },
             price,
             discountPercent: 0,
-            disabled: this.sessionState.coins < price
+            disabled: this.sessionState.coins < price || this.blackMarketPurchaseMade
         };
+    }
+
+    #createAcquiredFacilityEntries() {
+        return this.currentFacilityAcquiredItems.map(item => ({
+            action: 'received',
+            actionLabel: '',
+            uid: item.uid,
+            item,
+            itemViewData: item.getViewData?.() ?? item,
+            price: 0,
+            discountPercent: 0,
+            disabled: true,
+            hideAction: true
+        }));
     }
 
     #createFacilitySection(id, resourceKey, entries) {
@@ -526,16 +580,19 @@ class GameController {
         return this.gameDataRepository.getUiText(`facility.${group}.${key}`);
     }
 
-    #showFacilityView(type, viewData) {
+    #showFacilityView(type, viewData, options = {}) {
         this.currentFacilityViewData = viewData;
-        this.uiController.showFacilityScreen(type, viewData);
+        const displayViewData = options.displayCoins === undefined
+            ? viewData
+            : { ...viewData, coins: options.displayCoins };
+        this.uiController.showFacilityScreen(type, displayViewData);
         this.uiController.setFacilityActionHandler?.((action, context) => this.handleFacilityAction(action, context));
         this.uiController.setFacilityDepartHandler?.(() => this.leaveFacility());
     }
 
-    #refreshFacilityView() {
+    #refreshFacilityView(options = {}) {
         const viewData = this.#createFacilityViewData(this.currentFacilityType);
-        this.#showFacilityView(this.currentFacilityType, viewData);
+        this.#showFacilityView(this.currentFacilityType, viewData, options);
     }
 
     #createFacilityTransaction(action, context = {}) {
@@ -578,17 +635,23 @@ class GameController {
         }
 
         if (this.currentFacilityType === 'BLACK_MARKET' && action === 'buy_normal') {
+            if (this.blackMarketPurchaseMade) {
+                throw new Error('[GameController] Black Market purchase is limited to once per facility stay.');
+            }
             return this.economySystem.drawBlackMarketGacha('normal', this.sessionState, this.currentSector?.luckyDiscountRate ?? 0);
         }
 
         if (this.currentFacilityType === 'BLACK_MARKET' && action === 'buy_premium') {
+            if (this.blackMarketPurchaseMade) {
+                throw new Error('[GameController] Black Market purchase is limited to once per facility stay.');
+            }
             return this.economySystem.drawBlackMarketGacha('premium', this.sessionState, this.currentSector?.luckyDiscountRate ?? 0);
         }
 
         throw new Error(`[GameController] Unknown facility action: ${action}`);
     }
 
-    #afterFacilityTransaction(action, context, delta) {
+    #afterFacilityTransaction(action, context, delta, previousCoins) {
         if (this.currentFacilityType === 'TRADING_POST' && action === 'buy') {
             this.currentTradingPostStock = this.currentTradingPostStock
                 .filter(stock => stock.item.uid !== context.uid);
@@ -597,6 +660,12 @@ class GameController {
         if (this.currentFacilityType === 'REPAIR_DOCK' && action === 'dismantle') {
             this.currentRocket = null;
             this.repairDockDismantleCount += 1;
+        }
+        if (this.currentFacilityType === 'BLACK_MARKET' && action.startsWith('buy_')) {
+            this.blackMarketPurchaseMade = true;
+        }
+        if (delta.acquiredItems?.length > 0) {
+            this.currentFacilityAcquiredItems.push(...delta.acquiredItems);
         }
 
         const updatedKeys = this.gameRecordTracker.recordTransaction(delta, {
@@ -609,18 +678,25 @@ class GameController {
             });
         }
 
+        this.uiController.updateHUDValue?.('coin', this.sessionState.coins);
+        this.#refreshFacilityView({ displayCoins: previousCoins });
         this.uiController.updateFacilityCredits?.(this.sessionState.coins);
-        this.#refreshFacilityView();
     }
 
     #findFacilityEntry(action, uid) {
-        const entry = this.currentFacilityViewData?.sections
+        const entry = this.#flattenFacilitySections(this.currentFacilityViewData?.sections ?? [])
             .flatMap(section => section.entries)
             .find(candidate => candidate.action === action && candidate.uid === uid);
         if (!entry) {
             throw new Error(`[GameController] Facility entry not found: ${action} (${uid})`);
         }
         return entry;
+    }
+
+    #flattenFacilitySections(sections) {
+        return sections.flatMap(section => section.sections
+            ? this.#flattenFacilitySections(section.sections)
+            : [section]);
     }
 
     #findInventoryItemByUid(uid) {
@@ -673,11 +749,15 @@ class GameController {
             return;
         }
 
+        const maxCharges = item.maxCharges ?? 0;
         if (shouldConsume) {
+            if (maxCharges === 0) {
+                return;
+            }
             item.consumeCharge?.(1);
         }
 
-        if ((item.maxCharges ?? 0) === 0 || (item.charges ?? 0) > 0) {
+        if (maxCharges === 0 || (item.charges ?? 0) > 0) {
             this.sessionState.inventory.addItem(item);
         }
     }
