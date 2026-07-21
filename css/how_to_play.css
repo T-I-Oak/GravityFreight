@@ -284,17 +284,3 @@
     font-size: 13px;
     font-weight: 900;
 }
-
-@media (max-width: 800px) {
-    .how-to-play-slide-content.wide,
-    .how-to-play-text-side,
-    .how-to-play-diagram-side {
-        overflow-y: auto;
-    }
-
-    .how-to-play-split-layout {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-}

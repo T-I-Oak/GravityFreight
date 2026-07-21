@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Outfit:wght@400;700;900&family=Inter:wght@400;700;900&family=UnifrakturMaguntia&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/design_tokens.css">
     <link rel="stylesheet" href="css/ui_base.css">
@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="css/ui_style_printing.css">
     <link rel="stylesheet" href="css/title.css">
     <link rel="stylesheet" href="css/play.css">
+    <link rel="stylesheet" href="css/play_overlay.css">
     <link rel="stylesheet" href="css/replay.css">
     <link rel="stylesheet" href="css/flight_result.css">
     <link rel="stylesheet" href="css/facility.css">
@@ -36,6 +37,7 @@
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/tutorial.css">
     <link rel="stylesheet" href="css/how_to_play.css">
+    <link rel="stylesheet" href="css/how_to_play_responsive.css">
     <link rel="stylesheet" href="css/how_to_play_diagrams.css">
     <link rel="stylesheet" href="css/how_to_play_controls.css">
 
@@ -73,7 +75,7 @@
             </div>
         </div>
         <canvas id="title-fg-canvas"></canvas>
-        <div id="title-settings-btn" class="settings-btn" title="SETTINGS">⚙</div>
+        <div id="title-settings-btn" class="settings-btn" title="SETTINGS" aria-label="SETTINGS" role="button"><span class="icon-symbol" aria-hidden="true">settings</span></div>
         <div class="title-footer screen-footer">
             <div id="version">Ver -.--.-</div>
             <span class="copyright"></span>
@@ -165,7 +167,7 @@
                         <button id="tab-button-assembly" class="Tab state-clickable" data-tab="assembly">ASSEMBLY</button>
                     </div>
                     <div class="panel-header-actions">
-                        <button id="build-settings-btn" class="settings-inline-btn state-clickable" type="button" title="SETTINGS" aria-label="SETTINGS">⚙</button>
+                        <button id="build-settings-btn" class="settings-inline-btn state-clickable" type="button" title="SETTINGS" aria-label="SETTINGS"><span class="icon-symbol" aria-hidden="true">settings</span></button>
                         <div class="PanelToggle state-clickable" id="btn-toggle-panel">
                             <span class="Icon chevron-down toggle-icon"></span>
                         </div>

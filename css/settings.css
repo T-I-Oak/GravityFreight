@@ -17,6 +17,7 @@
 .settings-modal {
     width: min(520px, calc(100vw - 48px));
     max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
 }
 
 .settings-modal .panel-header,

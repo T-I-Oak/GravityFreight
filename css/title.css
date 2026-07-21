@@ -11,7 +11,9 @@
     position: relative;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
     background: var(--color-world-bg);
 }
@@ -77,13 +79,15 @@
     width: 100%;
 }
 
-/* Specific position for the settings gear on the title screen */
+/* Specific position for the settings control on the title screen */
 #title-settings-btn {
     position: absolute;
     top: var(--space-double);
     right: var(--space-double);
-    width: auto;
-    height: auto;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
     padding: 0;
     
     /* Subtle minimalist style */

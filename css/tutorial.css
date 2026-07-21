@@ -8,15 +8,22 @@
 #tutorial-mask-canvas {
     position: fixed;
     inset: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     z-index: var(--z-system);
     pointer-events: auto;
 }
 
-#tutorial-mask-canvas.hidden,
 #tutorial-tooltip.hidden {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#tutorial-mask-canvas.hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .TutorialTooltip {

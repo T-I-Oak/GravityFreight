@@ -115,6 +115,20 @@
 #archive-screen #tab-replays .col-score  { width: 25%; }
 #archive-screen #tab-replays .col-date   { width: 55%; }
 
+#btn-play-replay {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#btn-play-replay .button-play-icon {
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid currentColor;
+}
+
 #archive-screen .ArchiveTable td {
     padding: var(--space-unit) var(--space-double);
     overflow: hidden;

@@ -24,6 +24,14 @@ describe('archive.css', () => {
         expect(css).toContain('display: none;');
     });
 
+    it('uses dynamic viewport height for the fixed archive overlay on mobile Safari', () => {
+        const css = readArchiveCss();
+
+        expect(css).toContain('#archive-screen-overlay');
+        expect(css).toContain('height: 100vh;');
+        expect(css).toContain('height: 100dvh;');
+    });
+
     it('hides inactive ranking tables inside the single ranking well', () => {
         const css = readArchiveCss();
 

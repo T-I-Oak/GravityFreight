@@ -11,6 +11,15 @@ describe('title.css', () => {
         expect(css).toContain('50% { transform: translateY(-12px); }');
     });
 
+    it('uses dynamic viewport height so mobile Safari browser chrome does not hide the title controls', () => {
+        const css = readFileSync('css/title.css', 'utf-8');
+
+        expect(css).toContain('height: 100vh;');
+        expect(css).toContain('height: 100dvh;');
+        expect(css).toContain('min-height: 100vh;');
+        expect(css).toContain('min-height: 100dvh;');
+    });
+
     it('keeps the title settings button above title canvases', () => {
         const css = readFileSync('css/title.css', 'utf-8');
 

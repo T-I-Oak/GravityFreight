@@ -302,7 +302,7 @@ export const ArchiveComponents = {
                 <header class="section-header SplitRow">
                     <div class="SplitColumn"><h3 class="section-title">FLIGHT HISTORY LOGS</h3></div>
                     <div class="TabGroup">
-                        <button id="btn-play-replay" class="Button favorite state-active state-disabled" disabled>▶ REPLAY</button>
+                        <button id="btn-play-replay" class="Button favorite state-active state-disabled" disabled><span class="button-play-icon" aria-hidden="true"></span><span>REPLAY</span></button>
                     </div>
                 </header>
                 <div class="Well ScrollArea">

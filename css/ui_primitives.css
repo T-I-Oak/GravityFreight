@@ -4,7 +4,21 @@
    Managing Atoms: Badges, Icons, and Gauges
    ========================================= */
 
-/* --- 1. Badge System --- */
+/* --- 1. Icon System --- */
+.icon-symbol {
+    display: inline-block;
+    font-family: "Material Symbols Rounded";
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    direction: ltr;
+    font-feature-settings: "liga";
+}
+
+/* --- 2. Badge System --- */
 .Badge {
     display: inline-flex;
     align-items: center;
@@ -55,7 +69,7 @@
     min-width: 18px;
 }
 
-/* --- 2. Durability Gauge System --- */
+/* --- 3. Durability Gauge System --- */
 .DurabilityGauge {
     --gauge-gap: 3px;
     --gauge-padding: 2px;

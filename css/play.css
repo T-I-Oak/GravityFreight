@@ -61,13 +61,19 @@
     width: 24px;
     height: 24px;
     margin: 4px 0 4px 4px;
+    padding: 0;
     border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
     border-radius: var(--radius-standard);
     background: rgba(255, 255, 255, 0.05);
+    box-sizing: border-box;
     color: color-mix(in srgb, var(--color-theme-sub), transparent 40%);
     font-size: 14px;
     line-height: 1;
     transition: all 0.2s ease;
+}
+
+#inventory-panel .settings-inline-btn .icon-symbol {
+    font-size: 18px;
 }
 
 #inventory-panel .settings-inline-btn:hover {
@@ -212,134 +218,6 @@
 #play-scene-container .action-dock .Button {
     pointer-events: auto;
 }
-
-/* --- 5. Star hover item panel --- */
-.StarInfoPanel {
-    position: absolute;
-    z-index: calc(var(--z-panel) + 1);
-    width: min(280px, calc(100vw - 32px));
-    max-height: min(420px, calc(100vh - 32px));
-    padding: var(--space-double);
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.StarInfoPanel .star-info-list {
-    display: grid;
-    gap: var(--space-unit);
-    max-height: 340px;
-    overflow: hidden auto;
-}
-
-.StarInfoPanel .ItemCard {
-    min-height: 0;
-}
-
-.StarInfoPanel .star-info-message {
-    margin: 0;
-    padding: var(--space-double);
-    background: rgba(8, 12, 18, 0.86);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: var(--radius-standard);
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-#sector-notification {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    z-index: calc(var(--z-system) + 200);
-    max-width: 95vw;
-    color: rgba(255, 255, 255, 0.95);
-    font-family: var(--font-num);
-    font-size: clamp(1.2rem, 5vw, 3.5rem);
-    font-weight: 900;
-    text-align: center;
-    text-transform: uppercase;
-    white-space: nowrap;
-    letter-spacing: clamp(0.2rem, 1.2vw, 0.8rem);
-    text-shadow:
-        0 0 10px rgba(0, 240, 255, 0.8),
-        0 0 20px rgba(0, 240, 255, 0.4),
-        0 0 40px rgba(0, 240, 255, 0.2);
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-}
-
-#sector-notification.state-active {
-    animation: sector-toast 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-#sector-notification.state-anomaly {
-    text-shadow:
-        0 0 10px rgba(225, 0, 255, 0.8),
-        0 0 20px rgba(225, 0, 255, 0.4),
-        0 0 40px rgba(225, 0, 255, 0.2);
-}
-
-#achievement-toast-container {
-    position: fixed;
-    top: var(--space-double);
-    left: 50%;
-    z-index: calc(var(--z-system) + 400);
-    display: grid;
-    width: min(360px, calc(100vw - var(--space-double) * 2));
-    gap: var(--space-unit);
-    pointer-events: none;
-    transform: translateX(-50%);
-}
-
-.AchievementToast {
-    --current-color: var(--color-num-achievement);
-    padding: var(--space-double);
-    border: 1px solid color-mix(in srgb, var(--current-color), transparent 55%);
-    border-radius: var(--radius-standard);
-    background: rgba(18, 16, 24, 0.92);
-    color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--current-color), transparent 75%);
-    opacity: 0;
-    transform: translateY(-8px);
-    transition: opacity var(--motion-fast), transform var(--motion-fast);
-}
-
-.AchievementToast.state-active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.AchievementToast.state-exit {
-    opacity: 0;
-    transform: translateY(-8px);
-}
-
-@keyframes sector-toast {
-    0% {
-        opacity: 0;
-        filter: blur(15px);
-        transform: translate(-50%, -60%) scale(0.9);
-    }
-    15% {
-        opacity: 1;
-        filter: blur(0);
-        transform: translate(-50%, -50%) scale(1);
-    }
-    85% {
-        opacity: 1;
-        filter: blur(0);
-        transform: translate(-50%, -50%) scale(1);
-    }
-    100% {
-        opacity: 0;
-        filter: blur(5px);
-        transform: translate(-50%, -45%) scale(1.05);
-    }
-}
-
 
 /* Large Action Buttons: Specialized branding for critical mission phases */
 #play-screen .launch { --current-color: var(--color-category-launchers); }

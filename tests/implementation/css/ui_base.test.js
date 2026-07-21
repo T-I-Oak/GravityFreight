@@ -2,6 +2,16 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'fs';
 
 describe('ui_base.css', () => {
+    it('uses dynamic viewport height for mobile Safari chrome instead of only fixed 100vh', () => {
+        const baseCss = readFileSync('css/ui_base.css', 'utf-8');
+        const layoutCss = readFileSync('css/ui_layout.css', 'utf-8');
+
+        expect(baseCss).toContain('height: 100vh;');
+        expect(baseCss).toContain('height: 100dvh;');
+        expect(layoutCss).toContain('height: 100vh;');
+        expect(layoutCss).toContain('height: 100dvh;');
+    });
+
     it('keeps hidden state elements hidden without important overrides', () => {
         const css = readFileSync('css/ui_base.css', 'utf-8');
 

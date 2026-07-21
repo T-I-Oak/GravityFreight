@@ -1,0 +1,18 @@
+@media (max-width: 800px) {
+    .how-to-play-slide-content.wide {
+        overflow-y: auto;
+    }
+
+    .how-to-play-split-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-height: auto;
+    }
+
+    .how-to-play-text-side,
+    .how-to-play-diagram-side {
+        height: auto;
+        overflow: visible;
+    }
+}
