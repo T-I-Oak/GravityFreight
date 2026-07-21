@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TutorialFlowController from '../../../../src/systems/logic/TutorialFlowController.js';
+import TutorialCameraFocusController from '../../../../src/systems/logic/TutorialCameraFocusController.js';
 
 class FakeTutorialManager {
     static instances = [];
@@ -55,6 +56,13 @@ describe('TutorialFlowController', () => {
             focusPage: vi.fn(),
             endScenario: vi.fn()
         };
+    }
+
+    async function flushAsyncTutorialWork() {
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+        await new Promise(resolve => setTimeout(resolve, 0));
     }
 
     it('loads opaque tutorial state and passes callbacks to the common manager', () => {
@@ -413,5 +421,78 @@ describe('TutorialFlowController', () => {
 
         expect(cameraFocusController.setWorldBoundsResolver).toHaveBeenCalledWith(focusResolver);
         expect(cameraFocusController.setMapInteractionController).toHaveBeenCalledWith(mapInteractionController);
+    });
+
+    it('does not relock map input when the first-run build tutorial resumes into DOM-only guidance', async () => {
+        document.body.innerHTML = `
+            <canvas id="tutorial-mask-canvas" class="TutorialMask hidden"></canvas>
+            <section id="tutorial-tooltip" class="Panel TutorialTooltip hidden">
+                <h2 id="tutorial-title"></h2>
+                <p id="tutorial-message"></p>
+                <span class="tooltip-arrow"></span>
+                <button id="tutorial-next-btn"></button>
+            </section>
+            <button id="tab-button-assembly"></button>
+        `;
+        document.getElementById('tab-button-assembly').getBoundingClientRect = () => ({
+            left: 10,
+            top: 20,
+            width: 120,
+            height: 30,
+            right: 130,
+            bottom: 50
+        });
+        document.getElementById('tutorial-mask-canvas').getContext = () => ({
+            beginPath: vi.fn(),
+            arc: vi.fn(),
+            clearRect: vi.fn(),
+            closePath: vi.fn(),
+            createRadialGradient: () => ({ addColorStop: vi.fn() }),
+            ellipse: vi.fn(),
+            fill: vi.fn(),
+            fillRect: vi.fn(),
+            lineTo: vi.fn(),
+            moveTo: vi.fn(),
+            quadraticCurveTo: vi.fn(),
+            restore: vi.fn(),
+            save: vi.fn(),
+            scale: vi.fn(),
+            stroke: vi.fn(),
+            translate: vi.fn()
+        });
+        const cameraController = {
+            getState: vi.fn(() => ({
+                position: { x: 0, y: 0 },
+                rotation: 0,
+                zoomLevel: 1
+            })),
+            calculateFocusState: vi.fn(() => ({
+                position: { x: 12, y: 16 },
+                rotation: 0,
+                zoomLevel: 1.5
+            })),
+            applyState: vi.fn()
+        };
+        const mapInteractionController = { setInputLocked: vi.fn() };
+        const cameraFocusController = new TutorialCameraFocusController({
+            cameraController,
+            mapInteractionController,
+            worldRenderer: { render: vi.fn() },
+            transitionDurationMs: 0
+        });
+        const controller = new TutorialFlowController({
+            gameDataRepository: repository,
+            document: documentRef,
+            cameraFocusController
+        });
+        controller.initialize();
+        controller.setCanvasTargetResolver(() => ({ left: 0, top: 0, width: 80, height: 80 }));
+        controller.setCanvasFocusBoundsResolver(() => ({ left: -40, top: -40, width: 80, height: 80 }));
+        expect(controller.checkTrigger('buildScreen', { currentScene: 'build' })).toBe(true);
+        await flushAsyncTutorialWork();
+        await controller.manager.advanceScenarioAsync();
+        await flushAsyncTutorialWork();
+        expect(controller.manager.getCurrentStep().id).toBe('build-assembly-tab');
+        expect(mapInteractionController.setInputLocked.mock.calls.map(([locked]) => locked)).toEqual([true, false]);
     });
 });

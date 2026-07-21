@@ -38,7 +38,6 @@ class TutorialCameraFocusController {
 
     beginScenario() {
         this.scenarioActive = true;
-        this.mapInteractionController?.setInputLocked?.(true);
     }
 
     async focusPage(context = {}) {
@@ -57,9 +56,7 @@ class TutorialCameraFocusController {
             this.savedCameraState = this.cameraController.getState();
         }
 
-        if (!this.scenarioActive) {
-            this.mapInteractionController?.setInputLocked?.(true);
-        }
+        this.mapInteractionController?.setInputLocked?.(true);
         const focusBounds = this.#mergeBounds(
             canvasHighlights.map(highlight => this.#resolveBounds(highlight))
         );

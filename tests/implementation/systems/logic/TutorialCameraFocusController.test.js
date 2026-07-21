@@ -37,6 +37,24 @@ describe('TutorialCameraFocusController', () => {
         };
     }
 
+    it('does not lock map input just because a tutorial scenario starts', () => {
+        const context = createContext();
+
+        context.controller.beginScenario();
+
+        expect(context.mapInteractionController.setInputLocked).not.toHaveBeenCalled();
+    });
+
+    it('does not lock map input for DOM-only tutorial pages', async () => {
+        const context = createContext();
+
+        context.controller.beginScenario();
+        const focused = await context.controller.focusPage({ highlights: [{ elementId: 'assembly-inventory-list' }] });
+
+        expect(focused).toBe(false);
+        expect(context.mapInteractionController.setInputLocked).not.toHaveBeenCalled();
+    });
+
     it('focuses merged world bounds and locks map input for canvas tutorial pages', async () => {
         const context = createContext();
 
