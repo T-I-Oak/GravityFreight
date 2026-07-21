@@ -23,8 +23,8 @@
 
 
 
-  <script type="module" crossorigin src="/GravityFreight/assets/main-DtjbZtfj.js"></script>
-  <link rel="stylesheet" crossorigin href="/GravityFreight/assets/main-Bu31VoPp.css">
+  <script type="module" crossorigin src="/GravityFreight/assets/main-CGn1o8eu.js"></script>
+  <link rel="stylesheet" crossorigin href="/GravityFreight/assets/main-Q39mOUIv.css">
 </head>
 
 <body>
@@ -59,19 +59,21 @@
     <div id="achievement-toast-container"></div>
 
     <!-- Replay HUD -->
-    <div id="replay-overlay" class="theme-neon state-hidden">
-        <div class="panel replay-panel">
+    <div id="replay-overlay" class="theme-neon ReplayOverlay state-hidden" hidden>
+        <aside class="Panel ReplayLoadoutPanel color-theme-sub">
             <div class="panel-header">
-                <h2>MISSION DATA</h2>
-                <div class="replay-badge">STATUS: ARCHIVED</div>
+                <h2>REPLAY LOADOUT</h2>
             </div>
-            <div class="panel-content">
+            <div class="panel-body">
                 <div id="replay-config-list" class="replay-config-list"></div>
             </div>
-            <div class="panel-footer">
-                <button id="exit-replay-btn" class="Button state-primary">EXIT REPLAY</button>
+            <div class="panel-footer replay-actions">
+                <button id="exit-replay-btn" class="Button button-large state-primary replay-exit">
+                    <span class="btn-main-label">EXIT REPLAY</span>
+                    <span class="btn-sub-label">RETURN TO ARCHIVE</span>
+                </button>
             </div>
-        </div>
+        </aside>
     </div>
 
     <!-- Archive Overlay -->
@@ -79,23 +81,23 @@
 
 
     <!-- 操作説明パネル -->
-    <div id="how-to-play-overlay" class="overlay state-hidden">
-        <div class="modal tutorial-modal">
-            <div class="modal-header">
+    <div id="how-to-play-overlay" class="theme-neon how-to-play-screen state-hidden" hidden>
+        <div class="Panel HowToPlaySlider">
+            <div class="panel-header">
                 <h2>HOW TO PLAY</h2>
             </div>
-            <div class="tutorial-slider">
-                <div class="tutorial-slides" id="tutorial-slides">
-                    <!-- Dynamic content rendered by TutorialUI.js -->
+            <div class="panel-body">
+                <div class="how-to-play-slides" id="how-to-play-slides">
+                    <!-- Dynamic content rendered by HowToPlayUI.js -->
                 </div>
             </div>
-            <div class="tutorial-nav">
-                <div class="nav-controls">
-                    <button class="nav-btn prev" id="prev-tutorial-btn">&lt; BACK</button>
-                    <div class="tutorial-dots" id="tutorial-dots"></div>
-                    <button class="nav-btn next" id="next-tutorial-btn">NEXT &gt;</button>
+            <div class="panel-footer how-to-play-nav">
+                <div class="how-to-play-nav-controls">
+                    <button class="Button" id="how-to-play-prev-btn" data-how-to-play-action="prev">&lt; BACK</button>
+                    <div class="how-to-play-dots" id="how-to-play-dots"></div>
+                    <button class="Button" id="how-to-play-next-btn" data-how-to-play-action="next">NEXT &gt;</button>
                 </div>
-                <button class="nav-btn close-action highlight" id="tutorial-close-btn-bottom">CLOSE</button>
+                <button class="Button button-large state-primary" id="how-to-play-close-btn" data-how-to-play-action="close">CLOSE</button>
             </div>
         </div>
     </div>
@@ -134,17 +136,20 @@
             <aside id="inventory-panel" class="Panel color-theme-sub">
                 <header class="panel-header SplitRow">
                     <div class="TabGroup">
-                        <button class="Tab state-clickable state-active" data-tab="flight">FLIGHT</button>
-                        <button class="Tab state-clickable" data-tab="assembly">ASSEMBLY</button>
+                        <button id="tab-button-flight" class="Tab state-clickable state-active" data-tab="flight">FLIGHT</button>
+                        <button id="tab-button-assembly" class="Tab state-clickable" data-tab="assembly">ASSEMBLY</button>
                     </div>
-                    <div class="PanelToggle state-clickable" id="btn-toggle-panel">
-                        <span class="Icon chevron-down toggle-icon"></span>
+                    <div class="panel-header-actions">
+                        <button id="build-settings-btn" class="settings-inline-btn state-clickable" type="button" title="SETTINGS" aria-label="SETTINGS">⚙</button>
+                        <div class="PanelToggle state-clickable" id="btn-toggle-panel">
+                            <span class="Icon chevron-down toggle-icon"></span>
+                        </div>
                     </div>
                 </header>
 
                 <div class="panel-body ScrollArea" id="panel-content">
                     <div class="tab-content" id="tab-flight">
-                        <div class="flight-scroll ScrollArea">
+                        <div id="flight-inventory-list" class="flight-scroll ScrollArea">
                             <section class="section rocket" id="section-rocket">
                                 <header class="section-header">
                                     <h3 class="section-title">ROCKET</h3>
@@ -177,7 +182,7 @@
                     </div>
 
                     <div id="tab-assembly" class="tab-content state-hidden">
-                        <div class="assembly-scroll ScrollArea">
+                        <div id="assembly-inventory-list" class="assembly-scroll ScrollArea">
                             <section class="section chassis">
                                 <header class="section-header">
                                     <h3 class="section-title">CHASSIS</h3>
@@ -250,28 +255,35 @@
         <div class="receipt-paper" id="receipt-content-area"></div>
     </div>
 
-    <!-- ストーリー表示モーダル (v0.15) -->
-    <div id="story-overlay" class="theme-neon state-hidden">
-        <div class="story-modal">
-            <div class="story-header">
-                <div class="story-branch-icon" id="story-branch-icon">T</div>
-                <h2 id="story-title">STORY TITLE</h2>
+    <div id="story-overlay" class="theme-neon state-hidden FlexCenter" hidden></div>
+    <canvas id="tutorial-mask-canvas" class="TutorialMask hidden"></canvas>
+    <div id="tutorial-tooltip" class="Panel TutorialTooltip hidden">
+        <div class="tooltip-arrow"></div>
+        <h2 id="tutorial-title"></h2>
+        <p id="tutorial-message"></p>
+        <button id="tutorial-next-btn" class="Button state-primary button-large">OK</button>
+    </div>
+    <div id="share-confirm-overlay" class="theme-neon ShareConfirmOverlay state-hidden" hidden>
+        <div class="Panel ShareConfirmDialog">
+            <div class="panel-header">
+                <h2>RESULT COPIED!</h2>
             </div>
-            <div id="story-discovery" class="story-discovery-msg">DISCOVERY MESSAGE</div>
-            <div id="story-content" class="story-content-body">STORY CONTENT</div>
-            <div class="story-footer">
-                <button id="close-story-btn" class="Button state-primary">CLOSE COMMUNICATION</button>
+            <div class="panel-body">
+                <p>結果画像をクリップボードにコピーしました。<br>Xを開いて貼り付け（Ctrl+V）しますか？</p>
+            </div>
+            <div class="panel-footer">
+                <button id="share-confirm-x-btn" class="Button state-primary button-large">OPEN X</button>
+                <button id="share-confirm-close-btn" class="Button button-large">CLOSE</button>
             </div>
         </div>
     </div>
     <!-- 設定パネル -->
-    <div id="settings-overlay" class="theme-neon state-hidden">
-        <div class="panel settings-modal">
+    <div id="settings-overlay" class="theme-neon state-hidden" hidden>
+        <div class="Panel settings-modal">
             <div class="panel-header">
                 <h2>SETTINGS</h2>
-                <button id="close-settings-btn" class="close-btn">×</button>
             </div>
-            <div class="panel-content">
+            <div class="panel-body">
                 <div class="settings-section">
                     <div class="setting-item">
                         <div class="setting-info">
@@ -279,6 +291,27 @@
                             <span id="volume-value-display" class="setting-value">50%</span>
                         </div>
                         <input type="range" id="se-volume-slider" min="0" max="100" value="50" class="premium-slider">
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-name">CAMERA</span>
+                            <span class="setting-value">RESET VIEW</span>
+                        </div>
+                        <button id="camera-reset-btn" class="Button button-large state-clickable">RESET CAMERA</button>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-name">TUTORIAL</span>
+                            <span class="setting-value">RESET GUIDE</span>
+                        </div>
+                        <button id="tutorial-reset-btn" class="Button button-large state-clickable">RESET TUTORIAL</button>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-name">LANGUAGE</span>
+                            <span class="setting-value">DISPLAY</span>
+                        </div>
+                        <select id="language-select" class="settings-select"></select>
                     </div>
                 </div>
             </div>

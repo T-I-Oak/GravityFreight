@@ -863,6 +863,34 @@ main {
     flex-shrink: 0;
 }
 
+.item-card-delivery-badge {
+    width: 16px;
+    height: 14px;
+    flex: 0 0 16px;
+    color: var(--current-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.95;
+}
+
+.item-card-delivery-badge .delivery-cargo-icon {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.item-card-delivery-badge.state-mini {
+    width: 12px;
+    height: 11px;
+    flex-basis: 12px;
+}
+
 .item-card-description {
     margin: 0 0 2px 0;
     font-size: 11px;
@@ -1353,6 +1381,10 @@ main {
     color: var(--color-facility-repair-dock);
 }
 
+#play-hud .hud-messages .Icon.black-market {
+    color: var(--color-facility-black-market);
+}
+
 #play-hud .hud-messages .Icon.state-disabled {
     color: rgba(255, 255, 255, 0.15);
 }
@@ -1566,14 +1598,16 @@ main.theme-printing {
     display: flex;
     flex-direction: column;
     align-items: center;    /* 水平方向中央 */
-    justify-content: flex-end; /* 垂直方向下部 (レシートは画面下部から排出) */
-    padding-bottom: 5vh;
+    justify-content: flex-start;
+    padding: 5vh 0;
     z-index: calc(var(--z-system) + 200);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
 }
 
 #game-result-scene-container.theme-printing {
     background: transparent;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 #game-result-scene-container.theme-printing .Panel.receipt {
@@ -1607,9 +1641,16 @@ main.theme-printing.impact {
 
     width: 460px;
     max-width: 95vw;
-    max-height: 90vh;
+    max-height: none;
+    display: block;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
     margin: 0 auto;
     scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
     will-change: transform;
     
     /* Animation Initial State */
@@ -1621,6 +1662,14 @@ main.theme-printing.impact {
         100% 100%, 0% 100%
     );
     border: none;
+}
+
+.theme-printing .Panel.receipt .panel-header,
+.theme-printing .Panel.receipt .panel-body,
+.theme-printing .Panel.receipt .panel-footer {
+    display: block;
+    flex: none;
+    min-height: 0;
 }
 
 .theme-printing.state-active .Panel.receipt {
@@ -1770,6 +1819,33 @@ main.theme-printing.impact {
     transform: scale(0.98);
 }
 
+.theme-printing .receipt-actions {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.theme-printing .receipt-actions .Button {
+    margin: 0;
+}
+
+.theme-printing .game-end-return-button {
+    flex: 1 1 220px;
+}
+
+.theme-printing .game-end-share-button {
+    flex: 0 0 112px;
+    width: 112px;
+    color: var(--print-paper);
+    background: var(--print-ink-dim);
+}
+
+.theme-printing .game-end-share-button:hover:not(:disabled) {
+    background: #222222;
+}
+
 /* --- Stamp Zone & Official Seal --- */
 .theme-printing .receipt-stamp-zone {
     height: 146px;
@@ -1871,6 +1947,8 @@ main.theme-printing.impact {
 
 /* Footer Metadata */
 .theme-printing .panel-footer {
+    display: block;
+    flex: none;
     text-align: center;
     font-size: 10px;
     margin-top: 5px; 
@@ -1888,6 +1966,15 @@ main.theme-printing.impact {
 }
 .theme-printing *::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.15);
+}
+
+main.theme-printing::-webkit-scrollbar {
+    width: 8px;
+}
+
+#game-result-scene-container.theme-printing::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-pill);
 }
 /* =========================================
    Gravity Freight V2: Title Screen Layout
@@ -2077,6 +2164,36 @@ main.theme-printing.impact {
 
 #inventory-panel .panel-header {
     border-bottom-color: var(--panel-border-color);
+    gap: 14px;
+}
+
+#inventory-panel .panel-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+}
+
+#inventory-panel .settings-inline-btn {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin: 4px 0 4px 4px;
+    border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    border-radius: var(--radius-standard);
+    background: rgba(255, 255, 255, 0.05);
+    color: color-mix(in srgb, var(--color-theme-sub), transparent 40%);
+    font-size: 14px;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+#inventory-panel .settings-inline-btn:hover {
+    border-color: var(--color-theme-sub);
+    background: color-mix(in srgb, var(--color-theme-sub), transparent 80%);
+    color: #ffffff;
+    box-shadow: 0 0 15px var(--color-theme-sub);
 }
 
 #inventory-panel .panel-body {
@@ -2240,6 +2357,17 @@ main.theme-printing.impact {
     min-height: 0;
 }
 
+.StarInfoPanel .star-info-message {
+    margin: 0;
+    padding: var(--space-double);
+    background: rgba(8, 12, 18, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-standard);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 #sector-notification {
     position: fixed;
     top: 50%;
@@ -2271,6 +2399,41 @@ main.theme-printing.impact {
         0 0 10px rgba(225, 0, 255, 0.8),
         0 0 20px rgba(225, 0, 255, 0.4),
         0 0 40px rgba(225, 0, 255, 0.2);
+}
+
+#achievement-toast-container {
+    position: fixed;
+    top: var(--space-double);
+    left: 50%;
+    z-index: calc(var(--z-system) + 400);
+    display: grid;
+    width: min(360px, calc(100vw - var(--space-double) * 2));
+    gap: var(--space-unit);
+    pointer-events: none;
+    transform: translateX(-50%);
+}
+
+.AchievementToast {
+    --current-color: var(--color-num-achievement);
+    padding: var(--space-double);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 55%);
+    border-radius: var(--radius-standard);
+    background: rgba(18, 16, 24, 0.92);
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--current-color), transparent 75%);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity var(--motion-fast), transform var(--motion-fast);
+}
+
+.AchievementToast.state-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.AchievementToast.state-exit {
+    opacity: 0;
+    transform: translateY(-8px);
 }
 
 @keyframes sector-toast {
@@ -2330,6 +2493,116 @@ main.theme-printing.impact {
 
 
 /* --- 6. Global Footer (Moved to ui_base.css) --- */
+/* =========================================
+   Gravity Freight V2: Replay Screen
+   Layer: Context / Individual
+   Focus: Archived flight playback controls
+   ========================================= */
+
+.ReplayOverlay {
+    position: fixed;
+    top: var(--space-double);
+    right: var(--space-double);
+    z-index: var(--z-panel);
+    width: 340px;
+    max-height: calc(100vh - var(--space-double) * 2);
+    pointer-events: none;
+}
+
+.ReplayOverlay.state-hidden,
+.ReplayOverlay[hidden] {
+    display: none;
+}
+
+.ReplayLoadoutPanel {
+    --panel-border-color: color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    padding: 0;
+    border-color: var(--panel-border-color);
+    pointer-events: auto;
+}
+
+.ReplayLoadoutPanel .panel-header {
+    padding: var(--space-unit) var(--space-double);
+    border-bottom-color: var(--panel-border-color);
+}
+
+.ReplayLoadoutPanel h2 {
+    margin: 0;
+    color: var(--color-theme-sub);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.ReplayLoadoutPanel .panel-body {
+    min-height: 0;
+    padding: var(--space-double);
+    overflow: hidden auto;
+}
+
+.replay-config-list {
+    display: grid;
+    gap: var(--space-double);
+}
+
+.replay-loadout-section {
+    display: grid;
+    gap: var(--space-unit);
+}
+
+.replay-loadout-section .section-title {
+    margin: 0;
+    color: var(--current-color, var(--color-theme-main));
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.replay-loadout-section.rocket { --current-color: var(--color-category-rockets); }
+.replay-loadout-section.launcher { --current-color: var(--color-category-launchers); }
+.replay-loadout-section.booster { --current-color: var(--color-category-boosters); }
+
+.replay-loadout-items {
+    display: grid;
+    gap: var(--space-unit);
+}
+
+.replay-loadout-items .ItemCard {
+    pointer-events: none;
+}
+
+.replay-empty {
+    margin: 0;
+    padding: var(--space-double);
+    border: 1px dashed color-mix(in srgb, var(--current-color), transparent 70%);
+    border-radius: var(--radius-standard);
+    color: color-mix(in srgb, var(--current-color), transparent 40%);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.ReplayLoadoutPanel .replay-actions {
+    border-top: 1px solid var(--panel-border-color);
+    padding: var(--space-unit) var(--space-double) var(--space-double);
+    background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-bg-card), transparent 82%),
+        color-mix(in srgb, var(--color-bg-card), transparent 95%)
+    );
+}
+
+.ReplayLoadoutPanel .replay-exit {
+    --current-color: var(--color-theme-sub);
+    width: 100%;
+    min-height: 74px;
+    border-width: 3px;
+}
 /* =========================================
    Gravity Freight V2: Flight Result Screen
    Layer: Context / View (Specific)
@@ -2510,7 +2783,7 @@ main.theme-printing.impact {
     max-width: min(880px, calc(100vw - var(--space-double) * 4));
     max-height: min(78vh, 620px);
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto;
     gap: var(--space-double);
     margin: 0;
     padding: calc(var(--space-double) * 1.5);
@@ -2605,6 +2878,37 @@ main.theme-printing.impact {
     width: auto;
 }
 
+#flight-result-screen .replay-protect-table .date-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+    width: 100%;
+    min-width: 0;
+}
+
+#flight-result-screen .replay-protect-table .date-cell .date-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#flight-result-screen .replay-protect-table .date-cell .Badge.state-new {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+#flight-result-screen .replay-protect-table .Badge.state-new {
+    background: var(--color-theme-main);
+    color: rgba(0, 0, 0, 0.9);
+    font-size: 8px;
+    font-weight: 950;
+    padding: 1px 4px;
+    vertical-align: middle;
+    animation: none;
+}
+
 #flight-result-screen .replay-protect-table th.score {
     color: var(--color-num-score);
 }
@@ -2641,10 +2945,69 @@ main.theme-printing.impact {
     justify-content: flex-end;
     gap: var(--space-unit);
 }
+
+.ShareConfirmOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+}
+
+.ShareConfirmOverlay.state-hidden,
+.ShareConfirmOverlay[hidden] {
+    display: none;
+}
+
+.ShareConfirmDialog {
+    width: min(420px, calc(100vw - var(--space-double) * 2));
+    padding: calc(var(--space-double) * 1.25);
+    gap: var(--space-double);
+    text-align: center;
+}
+
+.ShareConfirmDialog .panel-header,
+.ShareConfirmDialog .panel-body,
+.ShareConfirmDialog .panel-footer {
+    padding: 0;
+}
+
+.ShareConfirmDialog h2 {
+    margin: 0;
+    color: var(--color-theme-main);
+    font-size: 18px;
+    font-weight: 950;
+    letter-spacing: 0.12em;
+}
+
+.ShareConfirmDialog p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.7;
+}
+
+.ShareConfirmDialog .panel-footer {
+    display: flex;
+    gap: var(--space-unit);
+    justify-content: center;
+}
 /* =========================================
    Gravity Freight V2: Facility Screen
    Layer: Context / View (Specific)
    ========================================= */
+
+#facility-screen {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-panel) - 10);
+    pointer-events: none;
+}
 
 #facility-screen .Panel {
     width: 85vw;
@@ -2657,6 +3020,7 @@ main.theme-printing.impact {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    pointer-events: auto;
 }
 
 #facility-screen .panel-header {
@@ -2825,8 +3189,21 @@ main.theme-printing.impact {
     line-height: 1.4;
 }
 
+#facility-screen .section-header.category-header {
+    margin-bottom: 4px;
+}
+
+#facility-screen .section-header.category-header .section-title {
+    color: var(--current-color);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 60%);
+}
+
 #facility-screen .Column .section-header:not(:first-child) {
     margin-top: var(--space-double);
+}
+
+#facility-screen .Column .section-header.category-header:not(:first-child) {
+    margin-top: 0;
 }
 
 #facility-screen .trade-item-area {
@@ -2917,6 +3294,8 @@ main.theme-printing.impact {
     0%, 100% { transform: rotate(20deg) scale(1); filter: brightness(1); }
     50% { transform: rotate(20deg) scale(1.05); filter: brightness(1.2); }
 }
+/* Gravity Freight V2: Analytic Archive Screen compatibility marker. */
+/* Archive styles are split into archive_*.css and linked directly by HTML. */
 /* =========================================
    Gravity Freight V2: Analytic Archive Screen
    Layer: Context / View (Specific)
@@ -3014,7 +3393,14 @@ main.theme-printing.impact {
 #archive-screen .TabGroup {
     flex: none;
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-unit);
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+#archive-screen .panel-header > .TabGroup {
+    flex: 0 1 auto;
 }
 
 /* 2カラム構成の定義 */
@@ -3042,7 +3428,8 @@ main.theme-printing.impact {
 
 #archive-screen #tab-analytics,
 #archive-screen #tab-replays,
-#archive-screen #tab-achievements {
+#archive-screen #tab-achievements,
+#archive-screen #tab-story {
     display: none;
     flex: 1;
     min-height: 0;
@@ -3069,11 +3456,46 @@ main.theme-printing.impact {
     gap: var(--space-unit);
 }
 
+#archive-screen #tab-story {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-unit);
+}
+
+#archive-screen .archive-story-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: var(--space-unit);
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: var(--space-unit);
+}
+
+#archive-screen .archive-story-grid .archive-story-card {
+    min-height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    justify-content: center;
+}
+
+#archive-screen .archive-story-grid .archive-story-card.state-disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+#archive-screen .archive-story-grid .archive-story-card.state-disabled .Icon.mail {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+#archive-screen .archive-story-grid .archive-story-card .item-card-header {
+    align-items: center;
+}
 /* --- Achievement Tab Content --- */
 
 #archive-screen .achievement-showcase {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-content: start; /* 行全体を上寄せ */
     align-items: start;   /* アイテムを上寄せ（縦に伸ばさない） */
     gap: 12px;
@@ -3087,6 +3509,7 @@ main.theme-printing.impact {
 
 /* 印刷スタイルの局所適用: アチーブメントカード */
 .theme-printing .AchievementCard {
+    width: 100%;
     height: auto; /* 強制的な伸長を防止 */
     background: var(--print-paper, #dcdcdc);
     color: var(--print-ink, #1a1a1a);
@@ -3095,7 +3518,7 @@ main.theme-printing.impact {
     position: relative;
     overflow: hidden;
     box-shadow: 2px 4px 8px rgba(0,0,0,0.5);
-    min-width: 300px;
+    min-width: 0;
     min-height: 85px;
     display: flex;
     flex-direction: column;
@@ -3374,7 +3797,6 @@ main.theme-printing.impact {
 
 /* 特別な行の状態 */
 #archive-screen .ArchiveTable tr.state-new {
-    /* theme-main (Mint) の微細な透過。color-mix を用いてテーマ色に依存させる */
     background: color-mix(in srgb, var(--color-theme-main), transparent 92%);
     position: relative;
 }
@@ -3384,7 +3806,8 @@ main.theme-printing.impact {
 }
 
 /* NEW バッジの装飾 */
-#archive-screen .Badge.state-new {
+#archive-screen .Badge.state-new,
+#archive-screen-overlay .Badge.state-new {
     background: var(--color-theme-main);
     color: rgba(0, 0, 0, 0.9);
     font-weight: 950;
@@ -3443,6 +3866,52 @@ main.theme-printing.impact {
 #archive-screen #tab-replays .col-score  { width: 25%; }
 #archive-screen #tab-replays .col-date   { width: 55%; }
 
+#archive-screen .ArchiveTable td {
+    padding: var(--space-unit) var(--space-double);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#archive-screen .ArchiveTable .date-cell,
+#archive-screen-overlay .replay-protect-table .date-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+    width: 100%;
+    min-width: 0;
+}
+
+#archive-screen .ArchiveTable .date-cell .date-label,
+#archive-screen-overlay .replay-protect-table .date-cell .date-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#archive-screen .ArchiveTable .date-cell .Badge.state-new,
+#archive-screen-overlay .replay-protect-table .date-cell .Badge.state-new {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+#archive-screen .ArchiveTable tr.state-active {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active {
+    background: transparent;
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td {
+    background: color-mix(in srgb, var(--color-theme-main), transparent 82%);
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td:first-child {
+    box-shadow: inset 4px 0 0 var(--color-theme-main);
+}
 /* Favorite (Star) Icon Styles */
 #archive-screen .favorite-star {
     cursor: pointer;
@@ -3598,32 +4067,19 @@ main.theme-printing.impact {
     justify-content: flex-end;
     gap: var(--space-unit);
 }
-
-#archive-screen .ArchiveTable td {
-    padding: var(--space-unit) var(--space-double);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-#archive-screen .ArchiveTable tr.state-active {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active {
-    background: transparent;
-}
-
-#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td {
-    background: color-mix(in srgb, var(--color-theme-main), transparent 82%);
-}
-
-#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td:first-child {
-    box-shadow: inset 4px 0 0 var(--color-theme-main);
-}
-
 /* モバイル・1カラム時のレスポンシブ対応 */
 @media screen and (max-width: 800px) {
+    #archive-screen .panel-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: var(--space-unit);
+    }
+
+    #archive-screen .panel-header > .TabGroup {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
     #archive-screen .Column.aside {
         flex: none;
         width: 100%;
@@ -3658,6 +4114,10 @@ main.theme-printing.impact {
         height: 160px; /* モバイルでの視認性を確保するための固定高 */
     }
 
+    #archive-screen .achievement-showcase {
+        grid-template-columns: 1fr;
+    }
+
     #archive-screen .kpi-container {
         flex-direction: row;
         flex-wrap: wrap;
@@ -3683,9 +4143,17 @@ main.theme-printing.impact {
    Focus: Narrative immersion and message delivery
    ========================================= */
 
+#story-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 300);
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.55);
+}
+
 .Panel.story-card {
     width: 90vw;
-    max-width: 480px;
+    max-width: 520px;
     height: auto;
     max-height: 90vh;
     
@@ -3756,4 +4224,709 @@ main.theme-printing.impact {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+#settings-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.55);
+}
+
+#settings-overlay.state-hidden,
+#settings-overlay[hidden] {
+    display: none;
+}
+
+.settings-modal {
+    width: min(520px, calc(100vw - 48px));
+    max-height: calc(100vh - 48px);
+}
+
+.settings-modal .panel-header,
+.settings-modal .panel-body,
+.settings-modal .panel-footer {
+    padding: var(--space-double);
+}
+
+.settings-modal .panel-header {
+    display: flex;
+    justify-content: center;
+}
+
+.settings-modal .panel-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-double);
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-unit);
+}
+
+.setting-info {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-double);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+}
+
+.setting-name {
+    color: var(--current-color);
+}
+
+.setting-value {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.premium-slider,
+.settings-select {
+    width: 100%;
+}
+
+.settings-modal .panel-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.settings-modal #settings-done-btn {
+    min-width: 160px;
+}
+
+.settings-select {
+    min-height: 42px;
+    padding: 0 var(--space-double);
+    color: #ffffff;
+    background: rgba(3, 9, 14, 0.92);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 45%);
+    font: inherit;
+    font-weight: 800;
+}
+
+.settings-select option {
+    color: #ffffff;
+    background: #03090e;
+}
+:root {
+    --tutorial-mask-color: rgba(0, 0, 0, 0.68);
+    --tutorial-highlight-stroke: color-mix(in srgb, var(--color-theme-main), transparent 8%);
+    --tutorial-highlight-shadow: color-mix(in srgb, var(--color-theme-main), transparent 10%);
+    --tutorial-highlight-shadow-blur: 16;
+}
+
+#tutorial-mask-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: var(--z-system);
+    pointer-events: auto;
+}
+
+#tutorial-mask-canvas.hidden,
+#tutorial-tooltip.hidden {
+    display: none;
+}
+
+.TutorialTooltip {
+    position: fixed;
+    z-index: calc(var(--z-system) + 1);
+    width: min(320px, calc(100vw - 32px));
+    padding: 16px;
+    border: 1px solid var(--color-theme-main);
+    border-radius: 8px;
+    background: rgba(5, 8, 18, 0.94);
+    color: var(--color-text-base);
+    box-shadow: 0 0 18px rgba(0, 255, 204, 0.22);
+    overflow: visible;
+}
+
+.TutorialTooltip > :not(.tooltip-arrow) {
+    position: relative;
+    z-index: 1;
+}
+
+.TutorialTooltip h2 {
+    margin: 0 0 8px;
+    color: var(--color-theme-main);
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0;
+}
+
+.TutorialTooltip p {
+    margin: 0 0 12px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.TutorialTooltip .Button {
+    width: 100%;
+}
+
+.tooltip-arrow {
+    position: absolute;
+    left: calc(50% - 8px);
+    width: 16px;
+    height: 16px;
+    background: rgba(5, 8, 18, 0.94);
+    border-color: var(--color-theme-main);
+    border-style: solid;
+    transform: rotate(45deg);
+    z-index: 0;
+}
+
+.tooltip-arrow.arrow-up {
+    top: -8px;
+    border-width: 1px 0 0 1px;
+}
+
+.tooltip-arrow.arrow-down {
+    bottom: -8px;
+    border-width: 0 1px 1px 0;
+}
+:root {
+    --how-play-bg: rgba(5, 12, 20, 0.95);
+    --how-play-accent: #00ffcc;
+    --how-play-border: rgba(0, 255, 204, 0.3);
+    --how-play-text: #e0f0f5;
+}
+#how-to-play-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.7);
+}
+#how-to-play-overlay.state-hidden,
+#how-to-play-overlay[hidden] {
+    display: none;
+}
+.HowToPlaySlider {
+    width: 850px;
+    max-width: 95vw;
+    height: 800px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--how-play-text);
+    background: var(--how-play-bg);
+    border: 1px solid var(--how-play-border);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+}
+
+.HowToPlaySlider .panel-header {
+    display: block;
+    padding: 18px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.HowToPlaySlider .panel-header h2 {
+    margin: 0;
+    color: var(--how-play-accent);
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+    text-align: center;
+}
+
+.HowToPlaySlider .panel-body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.how-to-play-slides {
+    display: flex;
+    height: 100%;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.how-to-play-slide {
+    position: relative;
+    z-index: 0;
+    min-width: 100%;
+    height: 100%;
+    padding: 0 40px 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.how-to-play-slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.6;
+    filter: brightness(1.1);
+}
+
+.how-to-play-slide.bg-slide1::before { background-image: url("/GravityFreight/assets/tutorial/slide1.png"); }
+.how-to-play-slide.bg-slide2::before { background-image: url("/GravityFreight/assets/tutorial/slide2.png"); }
+.how-to-play-slide.bg-slide3::before { background-image: url("/GravityFreight/assets/tutorial/slide3.png"); }
+.how-to-play-slide.bg-slide4::before { background-image: url("/GravityFreight/assets/tutorial/slide4.png"); }
+.how-to-play-slide.bg-slide5::before { background-image: url("/GravityFreight/assets/tutorial/slide5.png"); }
+.how-to-play-slide.bg-slide6::before { background-image: url("/GravityFreight/assets/tutorial/slide6.png"); }
+.how-to-play-slide.bg-slide7::before { background-image: url("/GravityFreight/assets/tutorial/slide7.png"); }
+
+.how-to-play-slide > h3 {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 24px 0 16px;
+    border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 800;
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.how-to-play-slide.state-active > h3 {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.how-to-play-slide-content {
+    flex: 1;
+    min-height: 0;
+    padding-top: 20px;
+    padding-right: 15px;
+    overflow-y: auto;
+}
+
+.how-to-play-slide-content.wide {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.how-to-play-split-layout {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 30px;
+}
+
+.how-to-play-text-side,
+.how-to-play-diagram-side {
+    height: 100%;
+    padding-right: 15px;
+    overflow-y: auto;
+}
+
+.how-to-play-info-block,
+.how-to-play-tip-box {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out, backdrop-filter 0.6s ease-out;
+}
+
+.how-to-play-slide.state-active .how-to-play-info-block,
+.how-to-play-slide.state-active .how-to-play-tip-box {
+    opacity: 1;
+    transform: translateY(0);
+    backdrop-filter: blur(6px);
+}
+
+.how-to-play-info-block {
+    margin-bottom: 15px;
+    border: 1px solid rgba(0, 255, 204, 0.25);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.42);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.how-to-play-block-header {
+    padding: 8px 15px;
+    color: var(--how-play-accent);
+    background: rgba(0, 255, 204, 0.08);
+    border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+
+.how-to-play-block-body {
+    padding: 20px 24px;
+}
+
+.how-to-play-block-body.has-no-header {
+    padding-top: 25px;
+}
+
+#how-to-play-overlay p,
+.how-to-play-list-desc {
+    margin: 0 0 10px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+.how-to-play-flavor {
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.8;
+}
+
+.how-to-play-flavor .warning {
+    display: block;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    color: #ffaa44;
+    font-weight: 800;
+}
+
+#how-to-play-overlay ul,
+#how-to-play-overlay ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#how-to-play-overlay li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+#how-to-play-overlay ul li::before {
+    content: "";
+    width: 0;
+    height: 0;
+    margin-top: 5px;
+    margin-right: 15px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid var(--how-play-accent);
+    flex-shrink: 0;
+}
+
+#how-to-play-overlay ol {
+    counter-reset: how-play-counter;
+}
+
+#how-to-play-overlay ol li {
+    counter-increment: how-play-counter;
+}
+
+#how-to-play-overlay ol li::before {
+    content: counter(how-play-counter, decimal-leading-zero) ".";
+    margin-right: 15px;
+    color: var(--how-play-accent);
+    font-weight: 900;
+    line-height: 1.4;
+}
+
+.how-to-play-list-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.how-to-play-list-title {
+    margin-bottom: 4px;
+    color: var(--how-play-accent);
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.how-to-play-tip-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-top: 10px;
+    padding: 15px 18px;
+    border: 1px solid rgba(0, 255, 204, 0.15);
+    border-left: 4px solid var(--how-play-accent);
+    border-radius: 12px;
+    background: rgba(0, 255, 204, 0.05);
+}
+
+.how-to-play-tip-box::before {
+    content: "i";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    flex-shrink: 0;
+    color: #000;
+    background: var(--how-play-accent);
+    border-radius: 2px;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+@media (max-width: 800px) {
+    .how-to-play-slide-content.wide,
+    .how-to-play-text-side,
+    .how-to-play-diagram-side {
+        overflow-y: auto;
+    }
+
+    .how-to-play-split-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+.how-to-play-block-body.is-build-panel-demo {
+    padding: 0;
+}
+
+.how-to-play-build-panel {
+    --panel-border-color: color-mix(in srgb, var(--current-color), transparent 60%);
+    width: 100%;
+    max-height: 560px;
+    background: rgba(10, 20, 40, 0.4);
+}
+
+.how-to-play-build-panel .panel-body {
+    min-height: 0;
+    padding: var(--space-double);
+    overflow: hidden;
+}
+
+.how-to-play-build-panel .assembly-scroll {
+    min-height: 0;
+    max-height: 430px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 2px;
+}
+
+.how-to-play-build-panel .section-header {
+    margin: 12px 0 6px;
+}
+
+.how-to-play-build-panel .section:first-child .section-header {
+    margin-top: 0;
+}
+
+.how-to-play-build-panel .assembly-actions {
+    flex: 0 0 auto;
+    padding: var(--space-unit) var(--space-double) var(--space-double);
+    border-top: 1px solid var(--panel-border-color);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-bg-card), transparent 95%),
+        color-mix(in srgb, var(--color-bg-card), transparent 82%)
+    );
+}
+
+.how-to-play-build-panel .assembly {
+    --current-color: var(--color-theme-main);
+}
+
+.how-to-play-build-panel .launch {
+    --current-color: var(--color-category-launchers);
+}
+
+.how-to-play-build-panel .Button.button-large {
+    width: 100%;
+    height: 76px;
+    border-width: 3px;
+}
+
+.how-to-play-build-panel .assembly.state-disabled,
+.how-to-play-build-panel .launch.state-disabled {
+    filter: none;
+    opacity: 1;
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.how-to-play-build-panel .assembly.state-disabled.state-notable .btn-sub-label,
+.how-to-play-build-panel .launch.state-disabled.state-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+.how-to-play-build-panel .Button.state-pressed {
+    transform: translateY(3px) scale(0.99);
+    filter: brightness(1.2);
+}
+
+.how-to-play-build-panel .ItemCard.state-pressed {
+    transform: translateY(3px);
+    filter: brightness(1.16);
+}
+
+.how-to-play-launch-sequence {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-unit);
+    padding: var(--space-double);
+    background: rgba(10, 20, 40, 0.4);
+}
+
+.how-to-play-launch-equipment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-unit);
+}
+
+.how-to-play-launch-sequence .section-header {
+    margin: 0 0 4px;
+}
+
+.how-to-play-launch-sequence .item-list {
+    gap: var(--space-unit);
+}
+
+.how-to-play-launch-sequence .launch {
+    --current-color: var(--color-category-launchers);
+}
+
+.how-to-play-launch-sequence .Button.button-large {
+    width: 100%;
+    height: 76px;
+    border-width: 3px;
+}
+
+.how-to-play-launch-sequence .launch.state-disabled {
+    filter: none;
+    opacity: 1;
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.how-to-play-launch-sequence .launch.state-disabled.state-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+.how-to-play-launch-sequence .Button.state-pressed {
+    transform: translateY(3px) scale(0.99);
+    filter: brightness(1.2);
+}
+
+.how-to-play-launch-sequence .ItemCard.state-pressed {
+    transform: translateY(3px);
+    filter: brightness(1.16);
+}
+
+.how-to-play-demo-card {
+    pointer-events: none;
+}
+
+.how-to-play-canvas {
+    display: block;
+    width: 100%;
+    height: 140px;
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+#how-to-play-launch-canvas {
+    height: 88px;
+}
+
+.how-to-play-demo-button {
+    width: 100%;
+}
+.how-to-play-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-height: 60px;
+    padding: 12px 25px;
+    background: rgba(0, 0, 0, 0.45);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.how-to-play-nav::before {
+    content: "";
+    display: block;
+    width: 90px;
+}
+
+.how-to-play-nav-controls {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.how-to-play-dots {
+    display: flex;
+    gap: 12px;
+}
+
+.how-to-play-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.how-to-play-dot.state-active {
+    background: var(--how-play-accent);
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
+    transform: scale(1.3);
+}
+
+.status-trading-post { color: var(--color-facility-trading-post); font-weight: 800; }
+.status-repair-dock { color: var(--color-facility-repair-dock); font-weight: 800; }
+.status-black-market { color: var(--color-facility-black-market); font-weight: 800; }
+.status-rockets { color: var(--color-category-rockets); font-weight: 800; }
+.status-chassis { color: var(--color-category-chassis); font-weight: 800; }
+.status-logic { color: var(--color-category-logic); font-weight: 800; }
+.status-launchers { color: var(--color-category-launchers); font-weight: 800; }
+.status-modules { color: var(--color-category-module); font-weight: 800; }
+.status-boosters { color: var(--color-category-boosters); font-weight: 800; }
+
+@media (max-width: 700px) {
+    .how-to-play-nav::before,
+    .how-to-play-dots {
+        display: none;
+    }
+
+    .how-to-play-nav-controls {
+        justify-content: flex-start;
+        gap: 10px;
+    }
 }
