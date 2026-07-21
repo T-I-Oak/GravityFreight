@@ -5,6 +5,13 @@ const DEFAULT_HIGHLIGHT = {
     padding: { x: 8, y: 6 },
     radius: 12
 };
+const CANVAS_CIRCLE_HIGHLIGHT = {
+    shape: 'circle'
+};
+const EXIT_ARC_HIGHLIGHT = {
+    shape: 'circle',
+    padding: 72
+};
 
 const SCENARIO_DEFINITIONS = [
     {
@@ -83,41 +90,41 @@ const SCENARIO_DEFINITIONS = [
             {
                 messageKey: 'tutorial.messages.aimSectorClear',
                 highlight: [
-                    { targetType: 'exit-arc' },
-                    { targetType: 'hover-star' },
-                    { targetType: 'home-star' }
+                    { targetType: 'exit-arc', ...EXIT_ARC_HIGHLIGHT },
+                    { targetType: 'hover-star', ...CANVAS_CIRCLE_HIGHLIGHT },
+                    { targetType: 'home-star', ...CANVAS_CIRCLE_HIGHLIGHT }
                 ]
             },
             {
                 messageKey: 'tutorial.messages.aimStarItems',
                 highlight: [
-                    { targetType: 'hover-star' },
-                    { targetType: 'home-star' },
-                    { targetType: 'exit-arc' }
+                    { targetType: 'hover-star', ...CANVAS_CIRCLE_HIGHLIGHT },
+                    { targetType: 'home-star', ...CANVAS_CIRCLE_HIGHLIGHT },
+                    { targetType: 'exit-arc', ...EXIT_ARC_HIGHLIGHT }
                 ]
             },
             {
                 messageKey: 'tutorial.messages.aimExitArc',
                 highlight: [
-                    { targetType: 'exit-arc' },
-                    { targetType: 'hover-star' },
-                    { targetType: 'home-star' }
+                    { targetType: 'exit-arc', ...EXIT_ARC_HIGHLIGHT },
+                    { targetType: 'hover-star', ...CANVAS_CIRCLE_HIGHLIGHT },
+                    { targetType: 'home-star', ...CANVAS_CIRCLE_HIGHLIGHT }
                 ]
             },
             {
                 messageKey: 'tutorial.messages.aimDanger',
                 highlight: [
-                    { targetType: 'hover-star' },
-                    { targetType: 'home-star' },
-                    { targetType: 'exit-arc' }
+                    { targetType: 'hover-star', ...CANVAS_CIRCLE_HIGHLIGHT },
+                    { targetType: 'home-star', ...CANVAS_CIRCLE_HIGHLIGHT },
+                    { targetType: 'exit-arc', ...EXIT_ARC_HIGHLIGHT }
                 ]
             },
             {
                 messageKey: 'tutorial.messages.aimReturnHome',
                 highlight: [
-                    { targetType: 'home-star' },
-                    { targetType: 'exit-arc' },
-                    { targetType: 'hover-star' }
+                    { targetType: 'home-star', ...CANVAS_CIRCLE_HIGHLIGHT },
+                    { targetType: 'exit-arc', ...EXIT_ARC_HIGHLIGHT },
+                    { targetType: 'hover-star', ...CANVAS_CIRCLE_HIGHLIGHT }
                 ]
             },
             {

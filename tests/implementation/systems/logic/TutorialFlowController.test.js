@@ -127,11 +127,13 @@ describe('TutorialFlowController', () => {
         expect(aimScenario.pages[1]).toMatchObject({
             message: 'text:tutorial.messages.aimSectorClear',
             highlight: [
-                { targetType: 'exit-arc' },
-                { targetType: 'hover-star' },
-                { targetType: 'home-star' }
+                { targetType: 'exit-arc', shape: 'circle', padding: 72 },
+                { targetType: 'hover-star', shape: 'circle' },
+                { targetType: 'home-star', shape: 'circle' }
             ]
         });
+        expect(aimScenario.pages.slice(1, 6).flatMap(page => page.highlight).every(highlight => highlight.shape === 'circle')).toBe(true);
+        expect(aimScenario.pages.slice(1, 6).every(page => page.highlight.find(highlight => highlight.targetType === 'exit-arc').padding === 72)).toBe(true);
         expect(aimScenario.pages[6]).toMatchObject({
             message: 'text:tutorial.messages.aimLaunch',
             highlight: [{ elementId: 'launch-btn' }]
