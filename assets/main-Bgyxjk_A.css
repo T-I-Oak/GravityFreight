@@ -168,6 +168,7 @@ body {
     padding: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: var(--color-bg-base);
     color: var(--color-text-base);
@@ -300,6 +301,7 @@ body {
 main {
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     position: relative;
     overflow: hidden;
 }
@@ -495,7 +497,21 @@ main {
    Managing Atoms: Badges, Icons, and Gauges
    ========================================= */
 
-/* --- 1. Badge System --- */
+/* --- 1. Icon System --- */
+.icon-symbol {
+    display: inline-block;
+    font-family: "Material Symbols Rounded";
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    direction: ltr;
+    font-feature-settings: "liga";
+}
+
+/* --- 2. Badge System --- */
 .Badge {
     display: inline-flex;
     align-items: center;
@@ -546,7 +562,7 @@ main {
     min-width: 18px;
 }
 
-/* --- 2. Durability Gauge System --- */
+/* --- 3. Durability Gauge System --- */
 .DurabilityGauge {
     --gauge-gap: 3px;
     --gauge-padding: 2px;
@@ -1989,7 +2005,9 @@ main.theme-printing::-webkit-scrollbar {
     position: relative;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
     background: var(--color-world-bg);
 }
@@ -2055,13 +2073,15 @@ main.theme-printing::-webkit-scrollbar {
     width: 100%;
 }
 
-/* Specific position for the settings gear on the title screen */
+/* Specific position for the settings control on the title screen */
 #title-settings-btn {
     position: absolute;
     top: var(--space-double);
     right: var(--space-double);
-    width: auto;
-    height: auto;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
     padding: 0;
     
     /* Subtle minimalist style */
@@ -2180,13 +2200,19 @@ main.theme-printing::-webkit-scrollbar {
     width: 24px;
     height: 24px;
     margin: 4px 0 4px 4px;
+    padding: 0;
     border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
     border-radius: var(--radius-standard);
     background: rgba(255, 255, 255, 0.05);
+    box-sizing: border-box;
     color: color-mix(in srgb, var(--color-theme-sub), transparent 40%);
     font-size: 14px;
     line-height: 1;
     transition: all 0.2s ease;
+}
+
+#inventory-panel .settings-inline-btn .icon-symbol {
+    font-size: 18px;
 }
 
 #inventory-panel .settings-inline-btn:hover {
@@ -2332,12 +2358,46 @@ main.theme-printing::-webkit-scrollbar {
     pointer-events: auto;
 }
 
-/* --- 5. Star hover item panel --- */
+/* Large Action Buttons: Specialized branding for critical mission phases */
+#play-screen .launch { --current-color: var(--color-category-launchers); }
+#play-screen .assembly { --current-color: var(--color-theme-main); }
+
+/* Play scene specific overrides for large action buttons */
+#play-screen .Button.button-large {
+    height: 76px;
+    border-width: 3px;
+    width: 100%;
+}
+
+/* Mission-Specific Disabled Logic */
+#play-screen .launch.state-disabled,
+#play-screen .assembly.state-disabled {
+    filter: none; /* Override global neon grayscale */
+    opacity: 1;    /* Override global neon opacity to allow bright children */
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* 6. DISABLED + NOTABLE (Guide Awareness Pulse) */
+#play-screen .launch.state-disabled.state-notable .btn-sub-label,
+#play-screen .assembly.state-disabled.state-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+
+/* --- 6. Global Footer (Moved to ui_base.css) --- */
+/* --- Star hover item panel --- */
 .StarInfoPanel {
     position: absolute;
     z-index: calc(var(--z-panel) + 1);
     width: min(280px, calc(100vw - 32px));
     max-height: min(420px, calc(100vh - 32px));
+    max-height: min(420px, calc(100dvh - 32px));
     padding: var(--space-double);
     background: transparent;
     border-color: transparent;
@@ -2368,6 +2428,7 @@ main.theme-printing::-webkit-scrollbar {
     line-height: 1.5;
 }
 
+/* --- Sector and achievement overlays --- */
 #sector-notification {
     position: fixed;
     top: 50%;
@@ -2458,41 +2519,6 @@ main.theme-printing::-webkit-scrollbar {
         transform: translate(-50%, -45%) scale(1.05);
     }
 }
-
-
-/* Large Action Buttons: Specialized branding for critical mission phases */
-#play-screen .launch { --current-color: var(--color-category-launchers); }
-#play-screen .assembly { --current-color: var(--color-theme-main); }
-
-/* Play scene specific overrides for large action buttons */
-#play-screen .Button.button-large {
-    height: 76px;
-    border-width: 3px;
-    width: 100%;
-}
-
-/* Mission-Specific Disabled Logic */
-#play-screen .launch.state-disabled,
-#play-screen .assembly.state-disabled {
-    filter: none; /* Override global neon grayscale */
-    opacity: 1;    /* Override global neon opacity to allow bright children */
-    cursor: not-allowed;
-    background: color-mix(in srgb, var(--current-color), transparent 96%);
-    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
-    color: rgba(255, 255, 255, 0.2);
-}
-
-/* 6. DISABLED + NOTABLE (Guide Awareness Pulse) */
-#play-screen .launch.state-disabled.state-notable .btn-sub-label,
-#play-screen .assembly.state-disabled.state-notable .btn-sub-label {
-    color: var(--current-color);
-    text-shadow: 0 0 12px var(--current-color);
-    animation: guide-pulse 2s infinite ease-in-out;
-    opacity: 1;
-}
-
-
-/* --- 6. Global Footer (Moved to ui_base.css) --- */
 /* =========================================
    Gravity Freight V2: Replay Screen
    Layer: Context / Individual
@@ -2506,6 +2532,7 @@ main.theme-printing::-webkit-scrollbar {
     z-index: var(--z-panel);
     width: 340px;
     max-height: calc(100vh - var(--space-double) * 2);
+    max-height: calc(100dvh - var(--space-double) * 2);
     pointer-events: none;
 }
 
@@ -3307,6 +3334,7 @@ main.theme-printing::-webkit-scrollbar {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.85);
     display: flex;
     align-items: center;
@@ -3866,6 +3894,20 @@ main.theme-printing::-webkit-scrollbar {
 #archive-screen #tab-replays .col-score  { width: 25%; }
 #archive-screen #tab-replays .col-date   { width: 55%; }
 
+#btn-play-replay {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#btn-play-replay .button-play-icon {
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid currentColor;
+}
+
 #archive-screen .ArchiveTable td {
     padding: var(--space-unit) var(--space-double);
     overflow: hidden;
@@ -4244,6 +4286,7 @@ main.theme-printing::-webkit-scrollbar {
 .settings-modal {
     width: min(520px, calc(100vw - 48px));
     max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
 }
 
 .settings-modal .panel-header,
@@ -4331,15 +4374,22 @@ main.theme-printing::-webkit-scrollbar {
 #tutorial-mask-canvas {
     position: fixed;
     inset: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     z-index: var(--z-system);
     pointer-events: auto;
 }
 
-#tutorial-mask-canvas.hidden,
 #tutorial-tooltip.hidden {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#tutorial-mask-canvas.hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .TutorialTooltip {
@@ -4685,11 +4735,8 @@ main.theme-printing::-webkit-scrollbar {
     font-size: 13px;
     font-weight: 900;
 }
-
 @media (max-width: 800px) {
-    .how-to-play-slide-content.wide,
-    .how-to-play-text-side,
-    .how-to-play-diagram-side {
+    .how-to-play-slide-content.wide {
         overflow-y: auto;
     }
 
@@ -4697,6 +4744,13 @@ main.theme-printing::-webkit-scrollbar {
         display: flex;
         flex-direction: column;
         gap: 20px;
+        min-height: auto;
+    }
+
+    .how-to-play-text-side,
+    .how-to-play-diagram-side {
+        height: auto;
+        overflow: visible;
     }
 }
 .how-to-play-block-body.is-build-panel-demo {
