@@ -23,7 +23,7 @@
 - `angle: number`: 射出角度（ラジアン）。
 - `position: Vector2`: 現在のワールド座標。
 - `velocity: Vector2`: 現在の速度ベクトル。
-- `actualTrail: Vector2[]`: 航行履歴（座標の配列）。
+- `actualTrail: Vector2[]`: 発射時点からの航行履歴（座標の配列）。表示時の尾の長さは描画側で制御し、共有画像やリザルト用データでは全履歴を利用できるよう保持する。
 - `ticks: number`: 航行開始からの経過ティック累計（基本スコア）。
 - `heldCargo: Item[]`: 保持状態（Held State）の全アイテム（貨物・コイン・パーツ等）のリスト。
 - `isGhost: boolean`: 軌道予測用のシミュレーション個体であるかを示すフラグ（初期値 false）。
@@ -76,7 +76,8 @@
 - `updateState(pos: Vector2, vel: Vector2): number`
     - 自身の `position`, `velocity` を更新する。
     - 同時に `actualTrail` へ現在の座標を追加し、`ticks` をインクリメントする。
-    - 実航行の `actualTrail` は `gameBalance.TRAIL_MAX_LENGTH` を上限とし、古い点から削除する。軌道予測用の `isGhost` ロケットは、予測線の長さを保持するためこの上限を適用しない。
+    - `actualTrail` は発射時点からの全航跡として保持し、古い点は削除しない。
+    - 航行画面で表示する航跡の長さは、描画側が `gameBalance.TRAIL_MAX_LENGTH` 相当の末尾範囲を使って制御する。
     - **戻り値**: インクリメント後の `ticks` を返す。
 - `recordTrailPoint(point: Vector2 = position): void`
     - 物理位置や `ticks` を変更せず、描画用の航跡点だけを追加する。

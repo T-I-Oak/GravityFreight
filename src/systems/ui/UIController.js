@@ -1,6 +1,7 @@
 import { FacilityComponents } from './FacilityComponents.js';
 import { ArchiveComponents } from './ArchiveComponents.js';
 import ArchiveDialogView from './ArchiveDialogView.js';
+import AchievementToastView from './AchievementToastView.js';
 import AppMetadataView from './AppMetadataView.js';
 import MapInputController from './MapInputController.js';
 import SettingsDialogView from './SettingsDialogView.js';
@@ -8,7 +9,18 @@ import StarInfoPanel from './StarInfoPanel.js';
 import BuildPanelView from './BuildPanelView.js';
 import FlightResultScreenView from './FlightResultScreenView.js';
 import ReplayProtectFlow from './ReplayProtectFlow.js';
+import ReplayScreenView from './ReplayScreenView.js';
 import GameEndScreenView from './GameEndScreenView.js';
+import HowToPlayDiagrams from './HowToPlayDiagrams.js';
+import HowToPlayUI from './HowToPlayUI.js';
+import ShareImageRenderer from './ShareImageRenderer.js';
+import ShareService from './ShareService.js';
+import FacilityCreditCounter from './FacilityCreditCounter.js';
+import HudView from './HudView.js';
+import StoryModalView from './StoryModalView.js';
+import UIOperationBinder from './UIOperationBinder.js';
+import UIShareCoordinator from './UIShareCoordinator.js';
+import { UIComponents } from './UIComponents.js';
 
 class UIController {
     constructor(options = {}) {
@@ -25,6 +37,7 @@ class UIController {
             gameDataRepository: this.gameDataRepository,
             operationBinder: (element, handler, seId) => this.setOperationHandler(element, handler, seId)
         });
+        this.replayScreenView = options.replayScreenView || new ReplayScreenView({ document: this.document });
         this.archiveDialogView = options.archiveDialogView || new ArchiveDialogView({
             document: this.document,
             operationBinder: (element, handler) => this.setOperationHandler(element, handler),
@@ -32,7 +45,25 @@ class UIController {
         });
         this.appMetadataView = options.appMetadataView || new AppMetadataView({ document: this.document });
         this.settingsDialogView = options.settingsDialogView || new SettingsDialogView({ document: this.document, operationBinder: (element, handler) => this.setOperationHandler(element, handler) });
+        this.howToPlayDiagrams = options.howToPlayDiagrams || new HowToPlayDiagrams({
+            gameDataRepository: this.gameDataRepository,
+            uiComponents: UIComponents,
+            requestFrame: options.requestFrame,
+            cancelFrame: options.cancelFrame
+        });
+        this.howToPlayUI = options.howToPlayUI || new HowToPlayUI({
+            rootElement: this.document.querySelector('#how-to-play-overlay'),
+            gameDataRepository: this.gameDataRepository,
+            uiComponents: UIComponents,
+            diagrams: this.howToPlayDiagrams,
+            operationBinder: (element, handler, seId) => this.setOperationHandler(element, handler, seId)
+        });
         this.starInfoPanel = options.starInfoPanel || new StarInfoPanel({ document: this.document });
+        this.shareService = options.shareService || new ShareService();
+        this.shareImageRenderer = options.shareImageRenderer || new ShareImageRenderer({ documentRef: this.document });
+        this.operationBinder = options.operationBinder || new UIOperationBinder({
+            getSoundController: () => this.soundController
+        });
         this.buildPanelView = options.buildPanelView || new BuildPanelView({ document: this.document, operationBinder: (element, handler, seId) => this.setOperationHandler(element, handler, seId) });
         this.flightResultScreenView = options.flightResultScreenView || new FlightResultScreenView({
             document: this.document,
@@ -49,23 +80,34 @@ class UIController {
         this.gameEndScreenView = options.gameEndScreenView || new GameEndScreenView({
             document: this.document,
             gameDataRepository: this.gameDataRepository,
-            operationBinder: (element, handler, seId) => this.setOperationHandler(element, handler, seId)
+            operationBinder: (element, handler, seId) => this.setOperationHandler(element, handler, seId),
+            playSE: seId => this.soundController?.playSE?.(seId)
         });
         this.soundController = options.soundController || null;
-        this.requestFrame = options.requestFrame || globalThis.requestAnimationFrame?.bind(globalThis);
-        this.cancelFrame = options.cancelFrame || globalThis.cancelAnimationFrame?.bind(globalThis);
-        this.facilityCreditCountDurationMs = options.facilityCreditCountDurationMs ?? 900;
-        this.facilityCreditAnimationFrameId = null;
         this.canvasInputHandler = null;
 
         this.titleScreen = this.document.querySelector('#title-screen');
         this.resultScreen = this.flightResultScreenView.resultScreen;
         this.facilityScreen = this.#requiredElement('#facility-screen');
         this.playScene = this.document.querySelector('#play-scene-container');
+        this.replayOverlay = this.document.querySelector('#replay-overlay');
         this.hud = this.document.querySelector('#play-hud');
         this.mapCanvas = this.document.querySelector('#gameCanvas');
+        this.shareCoordinator = options.shareCoordinator || new UIShareCoordinator({
+            shareImageRenderer: this.shareImageRenderer,
+            shareService: this.shareService,
+            gameDataRepository: this.gameDataRepository,
+            mapCanvas: this.mapCanvas
+        });
+        this.facilityCreditCounter = options.facilityCreditCounter || new FacilityCreditCounter({
+            requestFrame: options.requestFrame,
+            cancelFrame: options.cancelFrame,
+            durationMs: options.facilityCreditCountDurationMs,
+            formatNumber: value => this.#formatNumber(value)
+        });
         this.sectorNotification = this.document.querySelector('#sector-notification');
         this.sectorNotificationTimer = null;
+        this.currentDeliveryCargoInfo = null;
         this.mapInputController = options.mapInputController || new MapInputController({
             document: this.document,
             canvas: this.mapCanvas
@@ -80,13 +122,35 @@ class UIController {
             this.document.querySelector('#mail-btn-1'),
             this.document.querySelector('#mail-btn-2')
         ].filter(Boolean);
+        this.hudView = options.hudView || new HudView({
+            valueElements: this.hudValues,
+            mailButtons: this.mailButtons,
+            operationBinder: this.operationBinder,
+            formatNumber: value => this.#formatNumber(value)
+        });
+        this.achievementToastView = options.achievementToastView || new AchievementToastView({
+            document: this.document,
+            gameDataRepository: this.gameDataRepository,
+            archiveComponents: this.archiveComponents,
+            durationMs: options.achievementToastDurationMs,
+            formatNumber: value => this.#formatNumber(value)
+        });
+        this.storyModalView = options.storyModalView || new StoryModalView({
+            document: this.document,
+            gameDataRepository: this.gameDataRepository,
+            operationBinder: (element, handler) => this.setOperationHandler(element, handler)
+        });
         this.settingsDialogView.initialize();
+        this.howToPlayUI.initialize();
         this.archiveDialogView.initialize();
         this.buildPanelView.initialize();
+        this.flightResultScreenView.setShareHandler(viewData => this.shareCoordinator.shareFlightResult(viewData));
+        this.gameEndScreenView.setShareHandler(payload => this.shareCoordinator.shareGameEnd(payload));
     }
 
     showTitleScreen() {
         this.hideStarInfo();
+        this.#hide(this.replayOverlay);
         this.flightResultScreenView.clearMapActionDock();
         this.gameEndScreenView.hide();
         this.#show(this.titleScreen);
@@ -98,6 +162,7 @@ class UIController {
     }
 
     showBuildScreen(viewData = null) {
+        this.#hide(this.replayOverlay);
         this.flightResultScreenView.clearMapActionDock();
         this.gameEndScreenView.hide();
         this.#hide(this.titleScreen);
@@ -105,11 +170,13 @@ class UIController {
         this.#hide(this.facilityScreen);
         this.#show(this.playScene);
         this.#show(this.hud);
+        this.buildPanelView.setFlightMode(false);
         this.buildPanelView.show(viewData);
     }
 
     showSectorTransitionScreen() {
         this.hideStarInfo();
+        this.#hide(this.replayOverlay);
         this.flightResultScreenView.clearMapActionDock();
         this.gameEndScreenView.hide();
         this.#hide(this.titleScreen);
@@ -120,12 +187,14 @@ class UIController {
         this.buildPanelView.hide();
     }
 
-    showSectorTitle(sectorNumber, isAnomaly = false) {
+    showSectorTitle(sectorNumber, isAnomaly = false, options = {}) {
         if (!this.sectorNotification) {
             return;
         }
 
-        this.sectorNotification.textContent = isAnomaly
+        this.sectorNotification.textContent = options.type === 'home'
+            ? `HOME SECTOR ${sectorNumber} READY`
+            : isAnomaly
             ? `ANOMALY SECTOR ${sectorNumber} READY`
             : `SECTOR ${sectorNumber} READY`;
         this.sectorNotification.classList.remove('state-hidden', 'state-active', 'state-anomaly');
@@ -146,37 +215,82 @@ class UIController {
     }
 
     initHUD(sessionState) {
-        this.updateHUDValue('sector', sessionState.sectorNumber);
-        this.updateHUDValue('score', sessionState.totalScore ?? 0);
-        this.updateHUDValue('coin', sessionState.coins ?? 0);
-        this.mailButtons.forEach(button => {
-            button.classList.remove('trading-post', 'repair-dock', 'black-market', 'state-new', 'state-clickable');
-            button.classList.add('state-disabled');
-        });
+        this.hudView.initialize(sessionState);
     }
 
     updateHUDValue(key, value) {
-        const element = this.hudValues[key];
-        if (element) {
-            element.textContent = this.#formatNumber(value);
-        }
+        this.hudView.updateValue(key, value);
+    }
+
+    updateMailStatus(index, type, isUnread = false) {
+        this.hudView.updateMailStatus(index, type, isUnread);
+    }
+
+    setMailHandler(handler) {
+        this.hudView.setMailHandler(handler);
+    }
+
+    showStoryModal(storyId) {
+        this.storyModalView.show(storyId);
+    }
+
+    showAchievementToasts(events = []) {
+        this.achievementToastView.show(events);
     }
 
     setFlightMode(isFlight) {
         this.buildPanelView.setFlightMode(isFlight);
     }
 
+    playFlightEndSE(status) {
+        const seId = {
+            cleared: 'flight-exit',
+            returned: 'flight-return',
+            crashed: 'flight-crash',
+            lost: 'flight-lost'
+        }[status];
+        if (seId) {
+            this.soundController?.playSE?.(seId);
+        }
+    }
+
     getMapCanvas() { return this.mapCanvas; }
     getTitleCanvases() { return { background: this.#requiredElement('#title-bg-canvas'), foreground: this.#requiredElement('#title-fg-canvas') }; }
     setAppMetadata(metadata) { this.appMetadataView.setMetadata(metadata); }
+    configureSettings(config) { this.settingsDialogView.configure(config); }
     setStartHandler(handler) { this.setOperationHandler(this.#requiredElement('#start-game-btn'), handler); }
+    setManualHandler(handler) { this.setOperationHandler(this.#requiredElement('#how-to-play-btn'), handler); }
+    showManualScreen() { this.howToPlayUI.show(); }
+    refreshManualLanguage() { this.howToPlayUI.refreshLanguage(); }
     setRecordHandler(handler) { this.archiveDialogView.setOpenHandler(handler); }
-    showRecordScreen(viewData) { this.archiveDialogView.show(viewData, this.archiveComponents); }
+    showRecordScreen(viewData, options = {}) { this.archiveDialogView.show(viewData, this.archiveComponents, options); }
+    hideRecordScreen() { this.archiveDialogView.hide(); }
+    getRecordScreenState() { return this.archiveDialogView.getState?.() ?? { visible: false, activeTab: null }; }
     setReplayStartHandler(handler) { this.archiveDialogView.setReplayStartHandler(handler); }
+    setArchiveStoryHandler(handler) { this.archiveDialogView.setStoryOpenHandler(handler); }
     setReplayProtectHandler(handler) { this.replayProtectFlow.setCommitHandler(handler); }
     setReplayProtectRecordsProvider(provider) { this.replayProtectFlow.setRecordsProvider(provider); }
+    setReplayExitHandler(handler) { this.setOperationHandler(this.#requiredElement('#exit-replay-btn'), handler); }
+    showReplayScreen(record = {}, buildViewData = null) {
+        this.hideRecordScreen();
+        this.hideStarInfo();
+        this.flightResultScreenView.clearMapActionDock();
+        this.gameEndScreenView.hide();
+        this.flightResultScreenView.hide();
+        this.#hide(this.titleScreen);
+        this.#hide(this.facilityScreen);
+        this.#show(this.playScene);
+        this.#show(this.hud);
+        this.buildPanelView.hide();
+        this.replayScreenView.show(buildViewData, record);
+    }
+    hideReplayScreen() {
+        this.replayScreenView.hide();
+        this.buildPanelView.hide();
+    }
     showResultScreen(viewData) {
         this.hideStarInfo();
+        this.#hide(this.replayOverlay);
         this.gameEndScreenView.hide();
         this.buildPanelView.close();
         this.#hide(this.hud);
@@ -185,6 +299,10 @@ class UIController {
         this.#hide(this.titleScreen);
         this.#hide(this.facilityScreen);
         this.flightResultScreenView.show(viewData);
+    }
+
+    setResultStoryHandler(handler) {
+        this.flightResultScreenView.setStoryHandler(handler);
     }
 
     showGameEndSequence(gameResult, gameOver, options = {}) {
@@ -199,15 +317,18 @@ class UIController {
         this.gameEndScreenView.show(gameResult, gameOver, options);
     }
 
-    showFacilityScreen(type, viewData) {
+    showFacilityScreen(type, viewData, buildViewData = null, options = {}) {
         this.hideStarInfo();
-        this.#cancelFacilityCreditAnimation();
+        this.facilityCreditCounter.cancel();
         this.flightResultScreenView.clearMapActionDock();
-        this.buildPanelView.close();
+        const collapseBuildPanel = options.collapseBuildPanel !== false;
+        if (collapseBuildPanel) {
+            this.buildPanelView.close();
+        }
         this.flightResultScreenView.hide();
         this.#hide(this.hud);
-        this.buildPanelView.hide();
-        this.#hide(this.playScene);
+        this.#show(this.playScene);
+        this.buildPanelView.showReadOnly(buildViewData, { collapse: collapseBuildPanel });
         this.#hide(this.titleScreen);
         this.#show(this.facilityScreen);
         this.facilityScreen.innerHTML = this.facilityComponents.generateHTML({ ...viewData, type });
@@ -228,8 +349,10 @@ class UIController {
     setFacilityActionHandler(handler) {
         this.facilityScreen.querySelectorAll('.facility-action-button').forEach(button => {
             this.setOperationHandler(button, element => {
-                handler(element.dataset.action, { uid: element.dataset.uid });
-            });
+                this.operationBinder.runLocked(element, () => {
+                    handler(element.dataset.action, { uid: element.dataset.uid });
+                });
+            }, this.operationBinder.getFacilityActionSE(button.dataset.action));
         });
     }
 
@@ -249,69 +372,69 @@ class UIController {
         this.buildPanelView.setLaunchHandler(handler);
     }
 
+    setBuildTabChangeHandler(handler) {
+        this.buildPanelView.setTabChangeHandler(handler);
+    }
+
     setCanvasInputHandler(handler) {
         this.canvasInputHandler = handler;
         this.mapInputController.setHandler(handler);
     }
 
     showStarInfo(body, point) {
+        this.currentDeliveryCargoInfo = null;
         this.starInfoPanel.show(body, point, this.mapCanvas);
     }
 
+    showDeliveryCargoInfo({ facilityType, itemId }, point) {
+        this.currentDeliveryCargoInfo = { facilityType, itemId, point };
+        const facility = this.gameDataRepository.getFacilityDefinition(facilityType);
+        const item = this.gameDataRepository.getItemDefinition(itemId);
+        this.starInfoPanel.showMessage({
+            key: `delivery:${facilityType}:${itemId}`,
+            title: this.gameDataRepository.getUiText('map.deliveryCargo.title'),
+            body: this.#formatText(
+                this.gameDataRepository.getUiText('map.deliveryCargo.body'),
+                {
+                    itemName: item.name,
+                    facilityName: facility.name
+                }
+            )
+        }, point, this.mapCanvas);
+    }
+
     hideStarInfo() {
+        this.currentDeliveryCargoInfo = null;
         this.starInfoPanel.hide();
+    }
+
+    refreshLanguageDependentUI() {
+        this.storyModalView.refreshLanguage();
+        this.achievementToastView.refresh();
+
+        if (this.currentDeliveryCargoInfo) {
+            const { facilityType, itemId, point } = this.currentDeliveryCargoInfo;
+            this.showDeliveryCargoInfo({ facilityType, itemId }, point);
+            return;
+        }
+
+        this.starInfoPanel.refreshCurrent?.();
+    }
+
+    #formatText(template, values) {
+        return Object.entries(values).reduce(
+            (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+            template
+        );
     }
 
     updateFacilityCredits(value) {
         const creditsValue = this.#requiredFacilityElement('.credits-value');
-        const previousValue = Number(creditsValue.dataset.facilityCreditsValue ?? 0);
-        this.#cancelFacilityCreditAnimation();
-
-        if (!this.requestFrame || this.facilityCreditCountDurationMs <= 0 || previousValue === value) {
-            this.#renderFacilityCredits(creditsValue, value);
-            return;
-        }
-
-        let startTime = null;
-        const step = timestamp => {
-            startTime ??= timestamp;
-            const elapsed = timestamp - startTime;
-            const progress = Math.min(1, elapsed / this.facilityCreditCountDurationMs);
-            const currentValue = Math.round(previousValue + ((value - previousValue) * this.#easeOutCubic(progress)));
-            this.#renderFacilityCredits(creditsValue, currentValue);
-
-            if (progress < 1) {
-                this.facilityCreditAnimationFrameId = this.requestFrame(step);
-            } else {
-                this.#renderFacilityCredits(creditsValue, value);
-                this.facilityCreditAnimationFrameId = null;
-            }
-        };
-
-        this.facilityCreditAnimationFrameId = this.requestFrame(step);
-    }
-
-    #renderFacilityCredits(element, value) {
-        element.textContent = `${this.#formatNumber(value)} c`;
-        element.dataset.facilityCreditsValue = String(value);
-    }
-
-    #cancelFacilityCreditAnimation() {
-        if (this.facilityCreditAnimationFrameId !== null && this.cancelFrame) {
-            this.cancelFrame(this.facilityCreditAnimationFrameId);
-        }
-        this.facilityCreditAnimationFrameId = null;
-    }
-
-    #easeOutCubic(value) {
-        return 1 - ((1 - value) ** 3);
+        this.facilityCreditCounter.update(creditsValue, value);
     }
 
     setOperationHandler(element, handler, seId = 'click') {
-        element.addEventListener('click', event => {
-            this.soundController?.playSE?.(seId);
-            handler(event.currentTarget, event);
-        });
+        this.operationBinder.bind(element, handler, seId);
     }
 
     #showResultMapView() {

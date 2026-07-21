@@ -71,6 +71,18 @@ describe('ArchiveDialogView', () => {
         expect(document.querySelector('#archive-screen-overlay').classList.contains('state-hidden')).toBe(true);
     });
 
+    it('exposes hide so replay playback can close the archive overlay', () => {
+        const view = new ArchiveDialogView({ document, operationBinder });
+
+        view.show({ kpis: {}, rankings: {}, replays: [], achievements: [] }, {
+            generateHTML: () => '<article id="archive-screen"></article>'
+        });
+        view.hide();
+
+        expect(document.querySelector('#archive-screen-overlay').hidden).toBe(true);
+        expect(document.querySelector('#archive-screen-overlay').classList.contains('state-hidden')).toBe(true);
+    });
+
     it('switches personal best ranking panels', () => {
         const view = new ArchiveDialogView({ document, operationBinder });
 
@@ -105,6 +117,45 @@ describe('ArchiveDialogView', () => {
         expect(document.querySelector('.legend.score').classList.contains('state-active')).toBe(false);
         expect(document.querySelector('.legend.sector').classList.contains('state-active')).toBe(true);
         expect(document.querySelector('[data-ranking-panel="sector"]').textContent).toContain('2,000');
+    });
+
+    it('can open with the Replays tab active', () => {
+        const view = new ArchiveDialogView({ document, operationBinder });
+
+        view.show({
+            kpis: {},
+            rankings: {},
+            recentResults: [],
+            replays: [
+                { id: 'flight_1', no: '01', favorite: true, reachedSector: 4, score: 7000, createdAt: '2026.06.17 11:00' }
+            ],
+            achievements: []
+        }, ArchiveComponents, { activeTab: 'replays' });
+
+        expect(document.querySelector('[data-tab="replays"]').classList.contains('state-active')).toBe(true);
+        expect(document.querySelector('[data-tab="analytics"]').classList.contains('state-inactive')).toBe(true);
+        expect(document.querySelector('#tab-replays').style.display).toBe('grid');
+        expect(document.querySelector('#tab-analytics').style.display).toBe('none');
+    });
+
+    it('exposes the visible archive tab for language refresh', () => {
+        const view = new ArchiveDialogView({ document, operationBinder });
+
+        view.initialize();
+        expect(view.getState()).toEqual({ visible: false, activeTab: null });
+
+        view.show({
+            kpis: {},
+            rankings: {},
+            recentResults: [],
+            replays: [],
+            achievements: []
+        }, ArchiveComponents, { activeTab: 'replays' });
+
+        expect(view.getState()).toEqual({ visible: true, activeTab: 'replays' });
+
+        document.querySelector('[data-tab="achievements"]').click();
+        expect(view.getState()).toEqual({ visible: true, activeTab: 'achievements' });
     });
 
     it('selects a replay row and starts replay from the selected record id', () => {

@@ -70,8 +70,16 @@
 - **`getReadCounts(): object`**
     - 既読済みストーリー数を、実績判定用の集計値として返す。
     - **戻り値**: `{ total: number, T: number, R: number, B: number }` 形式。
-        - `total`: 実在するストーリーIDのうち、既読済みの総数。
-        - `T` / `R` / `B`: `readMessageIds` のうち、ストーリーIDの先頭文字が対象系列に一致する件数。
+        - `total`: 実在するストーリーIDのうち、既読済みの総数。通常ストーリーに加えて、特殊ストーリー `HOME25` も含める。
+        - `T` / `R` / `B`: `readMessageIds` のうち、通常ストーリーID（`T` / `R` / `B` の1〜3文字）の先頭文字が対象系統に一致する件数。`HOME25` は系統別件数には含めない。
+
+- **`getAllStoryStatus(): Array<object>`**
+    - 記録画面の Story タブ表示用に、全ストーリーの表示状態を返す。
+    - `content_stories.json` に存在する全ストーリーIDを対象とし、通常39話と特殊ストーリー `HOME25` を合わせた40話を返す。
+    - **戻り値**: `[{ id: string, type: string, title: string, isRead: boolean }, ...]` 形式。
+        - `type`: ストーリーの `branch`。Story Modal と同じ表示カテゴリ定義を解決するために使用する。実績の T/R/B 系統集計とは別概念とする。
+        - `title`: 現在言語のストーリータイトル。未読時の秘匿表示（`???`）は表示用 view data 生成側で行う。
+        - `isRead`: 既読状態。
 
 - **`getStoryProgressData(): StoryProgressData`**
     - 現在の永続化対象データを返す。

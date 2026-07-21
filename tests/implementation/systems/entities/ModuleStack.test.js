@@ -48,7 +48,7 @@ describe('ModuleStack', () => {
         const beforeCharges = stack.charges;
 
         expect(stack.consumeCharge()).toBe(true);
-        expect(item1.charges).toBe(0);
+        expect(item1.charges).toBe(1);
         expect(stack.count).toBe(beforeCount);
         expect(stack.charges).toBe(beforeCharges - 1);
     });
@@ -57,6 +57,7 @@ describe('ModuleStack', () => {
         const item = new Item('mod_star_breaker', repository);
         const stack = new ModuleStack(item);
 
+        stack.consumeCharge();
         stack.consumeCharge();
         stack.consumeCharge();
 

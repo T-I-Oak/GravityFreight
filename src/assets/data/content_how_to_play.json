@@ -1,0 +1,527 @@
+{
+  "howToPlay": [
+    {
+      "id": "mission",
+      "title": {
+        "lang-store": {
+          "ja": "MISSION: 重力に抗い、残響を届けろ",
+          "en": "MISSION: Carry the echo through gravity"
+        }
+      },
+      "type": "full-text",
+      "bgClass": "bg-slide1",
+      "content": {
+        "layout": "full",
+        "blocks": [
+          {
+            "type": "info",
+            "flavor": {
+              "lang-store": {
+                "ja": "あなたは「Gravity Freight Co.」の作業ユニットとして、星々に取り残された荷物（Freight）を回収し、出口（アーク）へ届ける任務に就きました。\n宇宙を漂う荷物には、かつてそこで交わされた微かな『軌道の残響（ORBITAL ECHOES）』が記録されています。\n\n限られた資源でロケットを組み上げ、過酷な銀河を突破してください。\n<p class=\"warning\">ロケットや発射台が底をつけば、あなたの契約（任務）は強制終了となります。</p>",
+                "en": "You are a work unit for Gravity Freight Co., assigned to recover freight left among the stars and deliver it to an exit arc.\nThe drifting freight stores faint orbital echoes from what once happened there.\n\nBuild rockets from limited resources and break through the harsh galaxy.\n<p class=\"warning\">If you run out of rockets or launchers, your contract ends.</p>"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "core_loop",
+      "title": {
+        "lang-store": {
+          "ja": "CORE LOOP (基本の流れ)",
+          "en": "CORE LOOP"
+        }
+      },
+      "type": "full-text",
+      "bgClass": "bg-slide2",
+      "content": {
+        "layout": "full",
+        "blocks": [
+          {
+            "type": "info",
+            "intro": {
+              "lang-store": {
+                "ja": "建造したロケットで荷物を運び、出口（アーク）を目指すことがあなたの任務です。",
+                "en": "Your mission is to carry freight with assembled rockets and reach the exit arc."
+              }
+            },
+            "list": {
+              "type": "ol",
+              "items": [
+                {
+                  "title": "ASSEMBLE",
+                  "text": {
+                    "lang-store": {
+                      "ja": "収集したパーツを組み合わせて<span class=\"status-rockets\">ロケット</span>を建造します。",
+                      "en": "Combine collected parts to assemble a <span class=\"status-rockets\">rocket</span>."
+                    }
+                  }
+                },
+                {
+                  "title": "LAUNCH",
+                  "text": {
+                    "lang-store": {
+                      "ja": "建造した<span class=\"status-rockets\">ロケット</span>と<span class=\"status-boosters\">ブースター</span>を選択し、宇宙へ発射します。",
+                      "en": "Choose an assembled <span class=\"status-rockets\">rocket</span> and optional <span class=\"status-boosters\">booster</span>, then launch."
+                    }
+                  }
+                },
+                {
+                  "title": "NAVIGATION",
+                  "text": {
+                    "lang-store": {
+                      "ja": "星々の重力を利用して自動航行し、荷物を回収しながら出口（アーク）を目指します。",
+                      "en": "Use stellar gravity during automatic flight, collect freight, and head for the exit arc."
+                    }
+                  }
+                },
+                {
+                  "title": "DELIVERY / RETURN",
+                  "text": {
+                    "lang-store": {
+                      "ja": "到達した出口（アーク）に応じた施設での取引、あるいは母星への帰還によって次なる航走に備えます。",
+                      "en": "Trade at the reached facility, or return to the home star, and prepare for the next flight."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "tip",
+            "text": {
+              "lang-store": {
+                "ja": "このサイクルを繰り返しながらロケットを強化し、より過酷な銀河の深部へと進んでください。",
+                "en": "Repeat this cycle, improve your rockets, and push deeper into harsher sectors."
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "assemble",
+      "title": {
+        "lang-store": {
+          "ja": "01. ASSEMBLE (建造)",
+          "en": "01. ASSEMBLE"
+        }
+      },
+      "type": "full-text",
+      "bgClass": "bg-slide3",
+      "demo": "assemble",
+      "content": {
+        "layout": "split",
+        "left": [
+          {
+            "type": "info",
+            "intro": {
+              "lang-store": {
+                "ja": "はじめにロケットを建造します。",
+                "en": "Start by assembling a rocket."
+              }
+            },
+            "list": {
+              "type": "ol",
+              "className": "number-list",
+              "items": [
+                {
+                  "text": {
+                    "lang-store": {
+                      "ja": "<strong>ASSEMBLY</strong> タブを選択します。",
+                      "en": "Select the <strong>ASSEMBLY</strong> tab."
+                    }
+                  }
+                },
+                {
+                  "text": {
+                    "lang-store": {
+                      "ja": "<strong><span class=\"status-chassis\">シャーシ</span></strong>、<strong><span class=\"status-logic\">ロジック</span></strong>を選択します。また、シャーシなどが持つスロットの数だけ<strong><span class=\"status-modules\">モジュール</span></strong>を搭載することができます。",
+                      "en": "Choose a <strong><span class=\"status-chassis\">chassis</span></strong> and <strong><span class=\"status-logic\">logic</span></strong>. You can also mount <strong><span class=\"status-modules\">modules</span></strong> up to the available slots."
+                    }
+                  }
+                },
+                {
+                  "text": {
+                    "lang-store": {
+                      "ja": "<strong>ASSEMBLE ROCKET</strong> ボタンを押して<span class=\"status-rockets\">ロケット</span>を建造します。",
+                      "en": "Press <strong>ASSEMBLE ROCKET</strong> to build the <span class=\"status-rockets\">rocket</span>."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "tip",
+            "text": {
+              "lang-store": {
+                "ja": "パーツの組み合わせにより重量、予測精度、回収範囲が変化します。特定のパーツが特定の役割を担いますが、全体の構成によって最終的な能力が決まります。",
+                "en": "Part combinations change mass, prediction precision, and pickup range. Each part has a role, but final performance comes from the whole build."
+              }
+            }
+          }
+        ],
+        "right": [
+          {
+            "type": "info",
+            "id": "how-to-play-assemble-diagram",
+            "title": {
+              "lang-store": {
+                "ja": "ロケットの構築",
+                "en": "Rocket Assembly"
+              }
+            },
+            "cards": [
+              { "registerId": "hull_light" },
+              { "registerId": "sensor_short" },
+              { "registerId": "mod_analyzer" }
+            ],
+            "button": {
+              "text": "ASSEMBLE ROCKET",
+              "subtext": {
+                "lang-store": {
+                  "ja": "シャーシとロジックを選択すると建造できます",
+                  "en": "Available after choosing chassis and logic"
+                }
+              },
+              "className": "state-primary state-disabled state-notable assembly"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "launch",
+      "title": {
+        "lang-store": {
+          "ja": "02. LAUNCH (発射)",
+          "en": "02. LAUNCH"
+        }
+      },
+      "type": "full-text",
+      "bgClass": "bg-slide4",
+      "demo": "launch",
+      "content": {
+        "layout": "split",
+        "left": [
+          {
+            "type": "info",
+            "intro": {
+              "lang-store": {
+                "ja": "発射台を使って建造したロケットを発射します。",
+                "en": "Launch the assembled rocket from a launcher."
+              }
+            },
+            "list": {
+              "type": "ol",
+              "className": "number-list",
+              "items": [
+                {
+                  "text": {
+                    "lang-store": {
+                      "ja": "<strong>FLIGHT</strong> タブから、建造済みの <strong><span class=\"status-rockets\">ロケット</span></strong> と <strong><span class=\"status-launchers\">発射台</span></strong> を選択します。このとき航行をサポートする <strong><span class=\"status-boosters\">ブースター</span></strong> を1つ選択することができます。",
+                      "en": "On the <strong>FLIGHT</strong> tab, choose an assembled <strong><span class=\"status-rockets\">rocket</span></strong> and <strong><span class=\"status-launchers\">launcher</span></strong>. You may also choose one <strong><span class=\"status-boosters\">booster</span></strong>."
+                    }
+                  }
+                },
+                {
+                  "text": {
+                    "lang-store": {
+                      "ja": "<span class=\"status-rockets\">ロケット</span>と<span class=\"status-launchers\">発射台</span>を選択すると母星にロケットが表示されます。タップして <strong>発射方向</strong> を決定します。",
+                      "en": "After selecting a <span class=\"status-rockets\">rocket</span> and <span class=\"status-launchers\">launcher</span>, the rocket appears on the home star. Tap to choose the <strong>launch direction</strong>."
+                    }
+                  }
+                },
+                {
+                  "text": {
+                    "lang-store": {
+                      "ja": "<strong>LAUNCH ENGINE</strong> ボタンをタップして<span class=\"status-rockets\">ロケット</span>を発射します（使用した<span class=\"status-boosters\">ブースター</span>は消費されます）。",
+                      "en": "Tap <strong>LAUNCH ENGINE</strong> to launch the <span class=\"status-rockets\">rocket</span>. The selected <span class=\"status-boosters\">booster</span> is consumed."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "tip",
+            "text": {
+              "lang-store": {
+                "ja": "<span class=\"status-launchers\">発射台</span>は使用回数制限に達すると消失します。<span class=\"status-launchers\">発射台</span>がすべてなくなるか、発射する<span class=\"status-rockets\">ロケット</span>が準備できない場合は任務終了（ゲームオーバー）となります。",
+                "en": "<span class=\"status-launchers\">Launchers</span> disappear when their use limit is reached. If all launchers are gone, or no launchable <span class=\"status-rockets\">rocket</span> is ready, the contract ends."
+              }
+            }
+          }
+        ],
+        "right": [
+          {
+            "type": "info",
+            "id": "how-to-play-launch-diagram",
+            "title": {
+              "lang-store": {
+                "ja": "ロケットの発射",
+                "en": "Rocket Launch"
+              }
+            },
+            "cards": [
+              {
+                "rocketParts": {
+                  "chassis": "hull_light",
+                  "logic": "sensor_short",
+                  "modules": [
+                    "mod_analyzer"
+                  ]
+                }
+              },
+              { "registerId": "pad_standard_d2" },
+              { "registerId": "opt_fuel" }
+            ],
+            "canvasId": "how-to-play-launch-canvas",
+            "button": {
+              "text": "LAUNCH ENGINE",
+              "subtext": {
+                "lang-store": {
+                  "ja": "ロケットと発射台を選択すると発射できます",
+                  "en": "Available after choosing rocket and launcher"
+                }
+              },
+              "className": "state-primary state-disabled state-notable launch"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "navigation",
+      "title": {
+        "lang-store": {
+          "ja": "03. NAVIGATION (宇宙の航行)",
+          "en": "03. NAVIGATION"
+        }
+      },
+      "type": "full-text",
+      "bgClass": "bg-slide5",
+      "demo": "navigation",
+      "content": {
+        "layout": "split",
+        "left": [
+          {
+            "type": "info",
+            "intro": {
+              "lang-store": {
+                "ja": "発射したロケットは宇宙空間を自動航行します。",
+                "en": "Launched rockets fly automatically through space."
+              }
+            },
+            "list": {
+              "type": "ul",
+              "items": [
+                {
+                  "title": {
+                    "lang-store": {
+                      "ja": "GRAVITY (重力の利用)",
+                      "en": "GRAVITY"
+                    }
+                  },
+                  "text": {
+                    "lang-store": {
+                      "ja": "発射後は星々の重力に従って自動で航行します。",
+                      "en": "After launch, the rocket follows stellar gravity automatically."
+                    }
+                  }
+                },
+                {
+                  "title": {
+                    "lang-store": {
+                      "ja": "COLLECT (荷物の回収)",
+                      "en": "COLLECT"
+                    }
+                  },
+                  "text": {
+                    "lang-store": {
+                      "ja": "荷物に近づくと自動的に回収されます。回収範囲はパーツ構成で決まります。",
+                      "en": "Freight is collected automatically when the rocket comes close. Pickup range depends on the parts."
+                    }
+                  }
+                },
+                {
+                  "title": {
+                    "lang-store": {
+                      "ja": "ARC (次セクターへ)",
+                      "en": "ARC"
+                    }
+                  },
+                  "text": {
+                    "lang-store": {
+                      "ja": "出口（アーク）に到達することで次のセクターに移動します。",
+                      "en": "Reach an exit arc to move to the next sector."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "tip",
+            "text": {
+              "lang-store": {
+                "ja": "出口（アーク）に到達できず、境界線の外に出るか星へ激突すると、<span class=\"status-rockets\">ロケット</span>は失われます。激突した場合、回収していた荷物はすべてその場に残され、<span class=\"status-rockets\">ロケット</span>のパーツも一部が残ることがあります。これらは再び回収することができます。",
+                "en": "If the rocket fails to reach an exit arc and leaves the boundary or crashes into a star, the <span class=\"status-rockets\">rocket</span> is lost. On crash, carried items and some parts may remain in space and can be collected again."
+              }
+            }
+          }
+        ],
+        "right": [
+          {
+            "type": "info",
+            "title": {
+              "lang-store": {
+                "ja": "ロケットの航行",
+                "en": "Rocket Navigation"
+              }
+            },
+            "fullWidth": true,
+            "canvasId": "how-to-play-navigation-canvas"
+          }
+        ]
+      }
+    },
+    {
+      "id": "delivery",
+      "title": {
+        "lang-store": {
+          "ja": "04. DELIVERY (配送と施設)",
+          "en": "04. DELIVERY"
+        }
+      },
+      "type": "full-text",
+      "bgClass": "bg-slide6",
+      "content": {
+        "layout": "full",
+        "blocks": [
+          {
+            "type": "info",
+            "intro": {
+              "lang-store": {
+                "ja": "出口（アーク）を通過すると、その種類に応じた施設へと移動します。",
+                "en": "Passing through an exit arc moves you to the facility assigned to that arc."
+              }
+            },
+            "list": {
+              "type": "ul",
+              "items": [
+                {
+                  "title": "Trading Post",
+                  "className": "status-trading-post",
+                  "text": {
+                    "lang-store": {
+                      "ja": "貨物取引やパーツの売買ができる中継基地。\n不要なパーツを資金に変え、次なる航走の準備を整えるのに最適です。",
+                      "en": "A relay base for cargo trading and parts sales. Convert unwanted parts into funds and prepare for the next flight."
+                    }
+                  }
+                },
+                {
+                  "title": "Repair Dock",
+                  "className": "status-repair-dock",
+                  "text": {
+                    "lang-store": {
+                      "ja": "発射台の整備やロケットの分解・強化を行える高度な設備。\n発射台の耐久度を回復できるほか、ロケットを分解・整備して強化されたパーツとして回収することで、再構築したロケットの性能向上を図れます。",
+                      "en": "An advanced facility for launcher maintenance and rocket dismantling. Restore launcher charges or recover enhanced parts to improve future builds."
+                    }
+                  }
+                },
+                {
+                  "title": "Black Market",
+                  "className": "status-black-market",
+                  "text": {
+                    "lang-store": {
+                      "ja": "通常は流通しない希少なパーツや、性能が強化された一点物のパーツが取引される取引所。\n多額のコインを支払い、強化済みや高レアリティの強力なアイテムを複数入手できます。何が得られるかは運次第ですが、一気に任務を有利に進める好機です。",
+                      "en": "A market for rare and enhanced one-off parts. Pay a large amount of coins to receive multiple powerful items. The result is luck-based, but it can shift the contract strongly in your favor."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "tip",
+            "margin": "margin-top-lg",
+            "text": {
+              "lang-store": {
+                "ja": "荷物の中には、特定の施設への配送を目的としたものが存在します。その荷物を、対応した出口（アーク）に届けることで、様々なボーナスが獲得できます。",
+                "en": "Some freight is meant for specific facilities. Deliver it to the matching exit arc to receive bonuses."
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "strategy",
+      "title": {
+        "lang-store": {
+          "ja": "05. STRATEGY (母星の利用とリスク)",
+          "en": "05. STRATEGY"
+        }
+      },
+      "type": "full-text",
+      "bgClass": "bg-slide7",
+      "content": {
+        "layout": "full",
+        "blocks": [
+          {
+            "type": "info",
+            "list": {
+              "type": "ul",
+              "items": [
+                {
+                  "title": {
+                    "lang-store": {
+                      "ja": "HOME STAR (母星への帰還)",
+                      "en": "HOME STAR"
+                    }
+                  },
+                  "text": {
+                    "lang-store": {
+                      "ja": "航行中に母星（HOME STAR）へ着陸することで、回収したアイテムを安全にインベントリへ移し、確保することができます。",
+                      "en": "Landing on the home star during flight safely transfers collected items into inventory."
+                    }
+                  }
+                },
+                {
+                  "title": "REBOOT",
+                  "text": {
+                    "lang-store": {
+                      "ja": "母星へ帰還するたびに、そのセクターに限り<strong>発射パワーが +10% ずつ加算</strong>されます。重力が強すぎてエリアからの脱出が困難なときは、母星へ戻ってパワーを溜めることで状況を打開できます。",
+                      "en": "Each return to the home star adds <strong>+10% launch power</strong> for that sector. If gravity is too strong, return home and build power."
+                    }
+                  }
+                },
+                {
+                  "title": "DENSITY",
+                  "text": {
+                    "lang-store": {
+                      "ja": "セクターを進めていくと徐々に重力が高まっていきます。また<span class=\"status-black-market\">Black Market</span> を利用すると、以降の全セクターで出現する星の数が +1 増加します。一度増えた星は元に戻らず、銀河全体の重力密度が永久に高まっていくため、慎重な選択が必要です。",
+                      "en": "Gravity increases as sectors progress. Using the <span class=\"status-black-market\">Black Market</span> also adds +1 star to every later sector. Added stars do not disappear, so choose carefully."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "tip",
+            "text": {
+              "lang-store": {
+                "ja": "施設向けの荷物は、母星に戻ってもインベントリには保管されず、次回の発射時に再び積み込まれます。状況が苦しいときは無理に出口（アーク）を目指さず、一度母星に帰還して態勢を整えてから、改めて目的地を目指すのが賢明です。",
+                "en": "Facility freight is not stored in inventory when returning home; it is loaded again for the next launch. If conditions are bad, returning home and trying again is often wiser than forcing an exit."
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

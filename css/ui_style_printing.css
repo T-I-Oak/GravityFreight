@@ -22,14 +22,16 @@ main.theme-printing {
     display: flex;
     flex-direction: column;
     align-items: center;    /* 水平方向中央 */
-    justify-content: flex-end; /* 垂直方向下部 (レシートは画面下部から排出) */
-    padding-bottom: 5vh;
+    justify-content: flex-start;
+    padding: 5vh 0;
     z-index: calc(var(--z-system) + 200);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
 }
 
 #game-result-scene-container.theme-printing {
     background: transparent;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 #game-result-scene-container.theme-printing .Panel.receipt {
@@ -63,9 +65,16 @@ main.theme-printing.impact {
 
     width: 460px;
     max-width: 95vw;
-    max-height: 90vh;
+    max-height: none;
+    display: block;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
     margin: 0 auto;
     scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
     will-change: transform;
     
     /* Animation Initial State */
@@ -77,6 +86,14 @@ main.theme-printing.impact {
         100% 100%, 0% 100%
     );
     border: none;
+}
+
+.theme-printing .Panel.receipt .panel-header,
+.theme-printing .Panel.receipt .panel-body,
+.theme-printing .Panel.receipt .panel-footer {
+    display: block;
+    flex: none;
+    min-height: 0;
 }
 
 .theme-printing.state-active .Panel.receipt {
@@ -226,6 +243,33 @@ main.theme-printing.impact {
     transform: scale(0.98);
 }
 
+.theme-printing .receipt-actions {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.theme-printing .receipt-actions .Button {
+    margin: 0;
+}
+
+.theme-printing .game-end-return-button {
+    flex: 1 1 220px;
+}
+
+.theme-printing .game-end-share-button {
+    flex: 0 0 112px;
+    width: 112px;
+    color: var(--print-paper);
+    background: var(--print-ink-dim);
+}
+
+.theme-printing .game-end-share-button:hover:not(:disabled) {
+    background: #222222;
+}
+
 /* --- Stamp Zone & Official Seal --- */
 .theme-printing .receipt-stamp-zone {
     height: 146px;
@@ -327,6 +371,8 @@ main.theme-printing.impact {
 
 /* Footer Metadata */
 .theme-printing .panel-footer {
+    display: block;
+    flex: none;
     text-align: center;
     font-size: 10px;
     margin-top: 5px; 
@@ -344,4 +390,13 @@ main.theme-printing.impact {
 }
 .theme-printing *::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.15);
+}
+
+main.theme-printing::-webkit-scrollbar {
+    width: 8px;
+}
+
+#game-result-scene-container.theme-printing::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-pill);
 }

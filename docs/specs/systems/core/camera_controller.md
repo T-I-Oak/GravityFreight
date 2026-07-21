@@ -20,7 +20,7 @@
 ### メソッド (Methods)
 - **`initialize(): void`**
     - `GameDataRepository.getSavedCameraState(migrationMap)` を実行し、永続化されている設定値を自身に適用する。
-    - `migrationMap` の `init` では、デフォルトのカメラ状態（position: {0,0}, rotation: 0, zoomLevel: 1.0）を返す。
+    - `migrationMap` の `init` では、デフォルトのカメラ状態（position: {0,0}, rotation: 0, zoomLevel: 0.5）を返す。
     - ※カメラ状態はセクター遷移やミッション再開時に自動リセットされない。
 
 - **`toScreen(worldPos: Vector2): Vector2`**
@@ -48,6 +48,27 @@
 - **`getWorldToScreenMatrix(): Matrix`**
     - 上記の変換（回転・平行移動・スケーリング）を統合した変換行列を返す。
 
+- **`getState(): CameraState`**
+    - 現在の `position`、`rotation`、`zoomLevel` をコピーして返す。
+    - Tutorial などの一時的な camera focus で、復元用の状態として使用する。
+
+- **`applyState(state: CameraState): void`**
+    - 指定された camera state を適用する。
+    - `position`、`rotation`、`zoomLevel` は有限値でなければならない。
+    - `zoomLevel` は 0.1 ～ 2.0 の範囲に制限する。
+    - 状態適用だけを行い、永続化は行わない。
+
+- **`calculateFocusState(bounds, options?): CameraState`**
+    - 指定されたワールド座標の矩形 `bounds` が、表示領域内に収まる camera state を算出する。
+    - `options.padding` は viewport の上下左右に確保するスクリーン上の余白として扱う。
+    - カメラが回転している場合は、`bounds` の4隅を現在の `rotation` で回転した後の外接矩形を使って必要な表示サイズを計算する。
+    - これにより、回転中でも tutorial highlight などの対象が画面外にはみ出さないようにする。
+    - 算出のみを行い、camera state の変更や永続化は行わない。
+
+- **`focusWorldBounds(bounds, options?): CameraState`**
+    - `calculateFocusState()` で算出した state を `applyState()` で適用し、その state を返す。
+    - 一時表示用の操作であり、永続化は行わない。
+
 - **`zoom(factor: number, anchor?: Vector2): void`**
     - 現在の倍率に対して `factor`（倍率係数）を乗算してズームを行う。
     - ズーム基点はワールド原点 `(0, 0)`、つまり母星中心とする。
@@ -62,3 +83,12 @@
 - **`pan(screenDelta: Vector2): void`**
     - スクリーン上での移動量 `screenDelta`（ピクセル）を受け取り、現在の `zoom` を考慮して `position` を更新する。
     - `position` は回転後座標系で保持されるため、パン量をさらに `rotation` で逆回転してはならない。
+
+- **`reset(options?: { persist?: boolean }): void`**
+    - カメラ状態をデフォルト値へ戻す。
+    - `position` は `{ x: 0, y: 0 }`、`rotation` は `0`、`zoomLevel` は `0.5` とする。
+    - デフォルトではリセット後に `save()` を呼び、`GameDataRepository.setSavedCameraState()` 経由で永続化する。
+    - `options.persist === false` の場合は永続化しない。リプレイ開始時など、一時表示だけを標準カメラに戻す用途で使用する。
+
+- **`save(): void`**
+    - 現在の `position`、`rotation`、`zoomLevel` を `GameDataRepository.setSavedCameraState()` 経由で永続化する。

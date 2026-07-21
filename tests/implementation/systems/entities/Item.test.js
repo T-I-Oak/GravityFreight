@@ -111,6 +111,38 @@ describe('Item Class - Basic Methods', () => {
 
         expect(item.calculateAppraisalValue()).toBe(43);
     });
+
+    it('should expose deliveryGoalId in view data for delivery cargo', () => {
+        const item = new Item('cargo_safe', repository);
+
+        expect(item.getViewData().deliveryGoalId).toBe('TRADING_POST');
+    });
+
+    it('should resolve display text from the current language resource when creating view data', () => {
+        const localizedRepository = {
+            getItemDefinition: vi.fn()
+                .mockReturnValueOnce({
+                    id: 'localized_item',
+                    name: 'English Name',
+                    category: 'module',
+                    rarity: 'common',
+                    description: 'English description'
+                })
+                .mockReturnValueOnce({
+                    id: 'localized_item',
+                    name: '日本語名',
+                    category: 'module',
+                    rarity: 'common',
+                    description: '日本語説明'
+                })
+        };
+        const item = new Item('localized_item', localizedRepository);
+
+        expect(item.getViewData()).toMatchObject({
+            name: '日本語名',
+            description: '日本語説明'
+        });
+    });
 });
 
 describe('Item Class - applyMaintenance', () => {
@@ -124,10 +156,8 @@ describe('Item Class - applyMaintenance', () => {
         mathRandomSpy.mockRestore();
     });
 
-    it('should enhance normal properties and increase enhancementCount', () => {
-        const item = new Item('pad_standard_d2', repository);
-        // slots, precisionMultiplier, pickupMultiplier, maxCharges は常に候補 (このアイテムはマスタに maxCharges がある)
-        // 候補配列がどう組まれるかによるが、先頭の 'slots' が選ばれるように 0 を返す
+    it('should enhance slots for rocket composition parts', () => {
+        const item = new Item('hull_light', repository);
         mathRandomSpy.mockReturnValue(0.0);
 
         const initialSlots = item.slots;
@@ -136,6 +166,19 @@ describe('Item Class - applyMaintenance', () => {
         expect(result).toBe('slots');
         expect(item.enhancement['slots']).toBe(1);
         expect(item.slots).toBe(initialSlots + 1);
+        expect(item.enhancementCount).toBe(1);
+    });
+
+    it('should not enhance slots for launch gear items', () => {
+        const item = new Item('pad_standard_d2', repository);
+        mathRandomSpy.mockReturnValue(0.0);
+
+        const initialSlots = item.slots;
+        const result = item.applyMaintenance();
+
+        expect(result).toBe('precisionMultiplier');
+        expect(item.enhancement.slots).toBeUndefined();
+        expect(item.slots).toBe(initialSlots);
         expect(item.enhancementCount).toBe(1);
     });
 
@@ -220,7 +263,7 @@ describe('Item Class - Snapshot', () => {
     });
 
     it('should hydrate from snapshot and restore enhancements correctly', () => {
-        const originalItem = new Item('pad_standard_d2', repository);
+        const originalItem = new Item('hull_light', repository);
         
         // 強化をシミュレート
         // slots を選ばせる

@@ -1,0 +1,67 @@
+.how-to-play-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-height: 60px;
+    padding: 12px 25px;
+    background: rgba(0, 0, 0, 0.45);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.how-to-play-nav::before {
+    content: "";
+    display: block;
+    width: 90px;
+}
+
+.how-to-play-nav-controls {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.how-to-play-dots {
+    display: flex;
+    gap: 12px;
+}
+
+.how-to-play-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.how-to-play-dot.state-active {
+    background: var(--how-play-accent);
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
+    transform: scale(1.3);
+}
+
+.status-trading-post { color: var(--color-facility-trading-post); font-weight: 800; }
+.status-repair-dock { color: var(--color-facility-repair-dock); font-weight: 800; }
+.status-black-market { color: var(--color-facility-black-market); font-weight: 800; }
+.status-rockets { color: var(--color-category-rockets); font-weight: 800; }
+.status-chassis { color: var(--color-category-chassis); font-weight: 800; }
+.status-logic { color: var(--color-category-logic); font-weight: 800; }
+.status-launchers { color: var(--color-category-launchers); font-weight: 800; }
+.status-modules { color: var(--color-category-module); font-weight: 800; }
+.status-boosters { color: var(--color-category-boosters); font-weight: 800; }
+
+@media (max-width: 700px) {
+    .how-to-play-nav::before,
+    .how-to-play-dots {
+        display: none;
+    }
+
+    .how-to-play-nav-controls {
+        justify-content: flex-start;
+        gap: 10px;
+    }
+}

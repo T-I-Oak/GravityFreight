@@ -21,7 +21,7 @@ const achievementDefinitions = [
         condition: 'max',
         label: 'Stories',
         tiers: [
-            { goal: 39, title: 'All' },
+            { goal: 40, title: 'All' },
             { goal: 20, title: 'Many' },
             { goal: 5, title: 'Few' }
         ]
@@ -38,9 +38,9 @@ const achievementDefinitions = [
     }
 ];
 
-function createRepository() {
+function createRepository(definitions = achievementDefinitions) {
     return {
-        getAchievementDefinitions: vi.fn(() => achievementDefinitions)
+        getAchievementDefinitions: vi.fn(() => definitions)
     };
 }
 
@@ -142,5 +142,49 @@ describe('AchievementTracker', () => {
         tracker.initialize();
 
         expect(tracker.getAchievementCompletionRate()).toBe(2 / 3);
+    });
+
+    it('returns tier completion rate based on achieved tier stages', () => {
+        gameRecordTracker = createGameRecordTracker({ lifetime_contracts: 25 });
+        storySystem = createStorySystem({ total: 21, T: 13, R: 0, B: 0 });
+        tracker = new AchievementTracker(repository, gameRecordTracker, storySystem);
+        tracker.initialize();
+
+        expect(tracker.getAchievementTierCompletionRate()).toBe(5 / 7);
+    });
+
+    it('calculates tier completion rate from each definition tier count without assuming three tiers', () => {
+        repository = createRepository([
+            {
+                id: 'two_tier',
+                source: 'game_record',
+                key: 'two_tier_value',
+                condition: 'max',
+                tiers: [
+                    { goal: 10, title: 'Top' },
+                    { goal: 5, title: 'Entry' }
+                ]
+            },
+            {
+                id: 'four_tier',
+                source: 'game_record',
+                key: 'four_tier_value',
+                condition: 'max',
+                tiers: [
+                    { goal: 40, title: 'T1' },
+                    { goal: 30, title: 'T2' },
+                    { goal: 20, title: 'T3' },
+                    { goal: 10, title: 'T4' }
+                ]
+            }
+        ]);
+        gameRecordTracker = createGameRecordTracker({
+            two_tier_value: 6,
+            four_tier_value: 35
+        });
+        tracker = new AchievementTracker(repository, gameRecordTracker, storySystem);
+        tracker.initialize();
+
+        expect(tracker.getAchievementTierCompletionRate()).toBe(4 / 6);
     });
 });

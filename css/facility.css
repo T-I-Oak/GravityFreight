@@ -3,6 +3,13 @@
    Layer: Context / View (Specific)
    ========================================= */
 
+#facility-screen {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-panel) - 10);
+    pointer-events: none;
+}
+
 #facility-screen .Panel {
     width: 85vw;
     height: 85vh;
@@ -14,6 +21,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    pointer-events: auto;
 }
 
 #facility-screen .panel-header {
@@ -182,8 +190,21 @@
     line-height: 1.4;
 }
 
+#facility-screen .section-header.category-header {
+    margin-bottom: 4px;
+}
+
+#facility-screen .section-header.category-header .section-title {
+    color: var(--current-color);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--current-color), transparent 60%);
+}
+
 #facility-screen .Column .section-header:not(:first-child) {
     margin-top: var(--space-double);
+}
+
+#facility-screen .Column .section-header.category-header:not(:first-child) {
+    margin-top: 0;
 }
 
 #facility-screen .trade-item-area {

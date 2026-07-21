@@ -22,6 +22,11 @@ class ReplayProtectFlow {
             throw new Error('[ReplayProtectFlow] commitHandler is required.');
         }
 
+        if (options.source === 'result' && options.favorite && options.forceDialog) {
+            this.#showSelectionDialog(options);
+            return { status: 'pending', success: false };
+        }
+
         if (!options.favorite || !this.#needsReplacement(options.recordId)) {
             return this.#commitTarget(options);
         }
@@ -163,6 +168,7 @@ class ReplayProtectFlow {
             score: options.currentRecord?.score ?? options.currentRecord?.totalScore ?? 0,
             reachedSector: options.currentRecord?.reachedSector ?? '-',
             createdAt: options.currentRecord?.createdAt ?? null,
+            isNew: !!options.currentRecord?.isNew,
             favorite: true,
             current: true
         };
@@ -190,16 +196,23 @@ class ReplayProtectFlow {
         const view = this.#createRecordView(row);
         const currentClass = row.current ? ' state-current' : '';
         const selectedClass = row.selected ? ' state-active' : ' state-inactive';
+        const newClass = row.isNew ? ' state-new' : '';
+        const newBadge = row.isNew ? '<span class="Badge state-new">NEW</span>' : '';
 
         return `
-            <tr class="replay-protect-row${currentClass}${selectedClass}" data-replay-protect-row="${this.#escapeHtml(row.id)}">
+            <tr class="replay-protect-row${currentClass}${selectedClass}${newClass}" data-replay-protect-row="${this.#escapeHtml(row.id)}">
                 <td class="col-fav">
                     <button class="favorite-star state-clickable${selectedClass}" data-replay-protect-toggle="${this.#escapeHtml(row.id)}">★</button>
                 </td>
                 <td class="col-no">${this.#escapeHtml(row.displayNo ?? '-')}</td>
                 <td class="col-sector sector">${this.#escapeHtml(view.sectorValue)}</td>
                 <td class="col-score score">${this.#escapeHtml(view.scoreValue)}</td>
-                <td class="col-date">${this.#escapeHtml(view.dateLabel)}</td>
+                <td class="col-date">
+                    <span class="date-cell">
+                        <span class="date-label">${this.#escapeHtml(view.dateLabel)}</span>
+                        ${newBadge}
+                    </span>
+                </td>
             </tr>
         `;
     }

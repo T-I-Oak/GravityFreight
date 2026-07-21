@@ -65,7 +65,8 @@ class RankTracker {
             score: gameResult.totalScore ?? gameResult.score ?? 0,
             completedSectors: gameResult.completedSectors ?? 0,
             reachedSector: gameResult.reachedSector ?? 0,
-            collectedItemCount: gameResult.collectedItemCount ?? 0
+            collectedItemCount: gameResult.collectedItemCount ?? 0,
+            gameSessionId: gameResult.gameSessionId ?? null
         };
     }
 

@@ -5,19 +5,39 @@
       "source": "game_record",
       "key": "lifetime_contracts",
       "condition": "max",
-      "label": "累積契約回数",
+      "label": {
+        "lang-store": {
+          "ja": "累積契約回数",
+          "en": "Lifetime Contracts"
+        }
+      },
       "tiers": [
         {
           "goal": 100,
-          "title": "不屈のコントラクター"
+          "title": {
+            "lang-store": {
+              "ja": "不屈のコントラクター",
+              "en": "Indomitable Contractor"
+            }
+          }
         },
         {
           "goal": 20,
-          "title": "常連の運び屋"
+          "title": {
+            "lang-store": {
+              "ja": "常連の運び屋",
+              "en": "Regular Freight Runner"
+            }
+          }
         },
         {
           "goal": 5,
-          "title": "最初の契約"
+          "title": {
+            "lang-store": {
+              "ja": "最初の契約",
+              "en": "First Contract"
+            }
+          }
         }
       ]
     },
@@ -26,19 +46,39 @@
       "source": "game_record",
       "key": "max_reached_sector",
       "condition": "max",
-      "label": "最高到達セクター",
+      "label": {
+        "lang-store": {
+          "ja": "最高到達セクター",
+          "en": "Highest Reached Sector"
+        }
+      },
       "tiers": [
         {
           "goal": 25,
-          "title": "深淵を覗く者"
+          "title": {
+            "lang-store": {
+              "ja": "深淵を覗く者",
+              "en": "A Glimpse Into the Abyss"
+            }
+          }
         },
         {
           "goal": 10,
-          "title": "セクター開拓者"
+          "title": {
+            "lang-store": {
+              "ja": "セクター開拓者",
+              "en": "Sector Pioneer"
+            }
+          }
         },
         {
           "goal": 3,
-          "title": "軌道練習生"
+          "title": {
+            "lang-store": {
+              "ja": "軌道練習生",
+              "en": "Orbital Trainee"
+            }
+          }
         }
       ]
     },
@@ -47,19 +87,39 @@
       "source": "game_record",
       "key": "total_completed_sectors",
       "condition": "max",
-      "label": "累積到達セクター数",
+      "label": {
+        "lang-store": {
+          "ja": "累積到達セクター数",
+          "en": "Total Cleared Sectors"
+        }
+      },
       "tiers": [
         {
           "goal": 400,
-          "title": "銀河の踏破者"
+          "title": {
+            "lang-store": {
+              "ja": "銀河の踏破者",
+              "en": "Galactic Trailblazer"
+            }
+          }
         },
         {
           "goal": 10,
-          "title": "新米開拓員"
+          "title": {
+            "lang-store": {
+              "ja": "新米開拓員",
+              "en": "Rookie Pathfinder"
+            }
+          }
         },
         {
           "goal": 5,
-          "title": "パスファインダー"
+          "title": {
+            "lang-store": {
+              "ja": "パスファインダー",
+              "en": "Pathfinder"
+            }
+          }
         }
       ]
     },
@@ -68,19 +128,39 @@
       "source": "game_record",
       "key": "total_launches",
       "condition": "max",
-      "label": "累積発射回数",
+      "label": {
+        "lang-store": {
+          "ja": "累積発射回数",
+          "en": "Total Launches"
+        }
+      },
       "tiers": [
         {
           "goal": 1000,
-          "title": "銀河の英雄"
+          "title": {
+            "lang-store": {
+              "ja": "銀河の英雄",
+              "en": "Hero of the Galaxy"
+            }
+          }
         },
         {
           "goal": 150,
-          "title": "安定した打ち上げ"
+          "title": {
+            "lang-store": {
+              "ja": "安定した打ち上げ",
+              "en": "Steady Launches"
+            }
+          }
         },
         {
           "goal": 20,
-          "title": "最初の跳躍"
+          "title": {
+            "lang-store": {
+              "ja": "最初の跳躍",
+              "en": "First Leap"
+            }
+          }
         }
       ]
     },
@@ -89,19 +169,39 @@
       "source": "game_record",
       "key": "max_distance",
       "condition": "max",
-      "label": "最長航行距離",
+      "label": {
+        "lang-store": {
+          "ja": "最長航行距離",
+          "en": "Longest Flight Distance"
+        }
+      },
       "tiers": [
         {
           "goal": 10000,
-          "title": "宇宙の測量士"
+          "title": {
+            "lang-store": {
+              "ja": "宇宙の測量士",
+              "en": "Surveyor of Space"
+            }
+          }
         },
         {
           "goal": 5000,
-          "title": "無限の旅人"
+          "title": {
+            "lang-store": {
+              "ja": "無限の旅人",
+              "en": "Endless Voyager"
+            }
+          }
         },
         {
           "goal": 3000,
-          "title": "地平線の彼方"
+          "title": {
+            "lang-store": {
+              "ja": "地平線の彼方",
+              "en": "Beyond the Horizon"
+            }
+          }
         }
       ]
     },
@@ -110,19 +210,39 @@
       "source": "game_record",
       "key": "total_distance",
       "condition": "max",
-      "label": "累積航行距離",
+      "label": {
+        "lang-store": {
+          "ja": "累積航行距離",
+          "en": "Total Flight Distance"
+        }
+      },
       "tiers": [
         {
           "goal": 250000,
-          "title": "銀河放浪者"
+          "title": {
+            "lang-store": {
+              "ja": "銀河放浪者",
+              "en": "Galactic Wanderer"
+            }
+          }
         },
         {
           "goal": 30000,
-          "title": "星間航行者"
+          "title": {
+            "lang-store": {
+              "ja": "星間航行者",
+              "en": "Interstellar Navigator"
+            }
+          }
         },
         {
           "goal": 5000,
-          "title": "周回軌道の住人"
+          "title": {
+            "lang-store": {
+              "ja": "周回軌道の住人",
+              "en": "Orbital Resident"
+            }
+          }
         }
       ]
     },
@@ -131,19 +251,39 @@
       "source": "game_record",
       "key": "max_deliveries",
       "condition": "max",
-      "label": "最高配達数",
+      "label": {
+        "lang-store": {
+          "ja": "最高配達数",
+          "en": "Best Delivery Count"
+        }
+      },
       "tiers": [
         {
           "goal": 5,
-          "title": "伝説のデリバリー"
+          "title": {
+            "lang-store": {
+              "ja": "伝説のデリバリー",
+              "en": "Legendary Delivery"
+            }
+          }
         },
         {
           "goal": 3,
-          "title": "精鋭ロジスティクス"
+          "title": {
+            "lang-store": {
+              "ja": "精鋭ロジスティクス",
+              "en": "Elite Logistics"
+            }
+          }
         },
         {
           "goal": 1,
-          "title": "新米運び屋"
+          "title": {
+            "lang-store": {
+              "ja": "新米運び屋",
+              "en": "Rookie Courier"
+            }
+          }
         }
       ]
     },
@@ -152,19 +292,39 @@
       "source": "game_record",
       "key": "total_deliveries",
       "condition": "max",
-      "label": "累積配達数",
+      "label": {
+        "lang-store": {
+          "ja": "累積配達数",
+          "en": "Total Deliveries"
+        }
+      },
       "tiers": [
         {
           "goal": 75,
-          "title": "軌道の生命線"
+          "title": {
+            "lang-store": {
+              "ja": "軌道の生命線",
+              "en": "Orbital Lifeline"
+            }
+          }
         },
         {
           "goal": 10,
-          "title": "信頼の運送屋"
+          "title": {
+            "lang-store": {
+              "ja": "信頼の運送屋",
+              "en": "Trusted Carrier"
+            }
+          }
         },
         {
           "goal": 2,
-          "title": "航路の端緒"
+          "title": {
+            "lang-store": {
+              "ja": "航路の端緒",
+              "en": "First Trade Route"
+            }
+          }
         }
       ]
     },
@@ -173,19 +333,39 @@
       "source": "game_record",
       "key": "max_score",
       "condition": "max",
-      "label": "最高スコア",
+      "label": {
+        "lang-store": {
+          "ja": "最高スコア",
+          "en": "Highest Score"
+        }
+      },
       "tiers": [
         {
           "goal": 150000,
-          "title": "伝説の航跡"
+          "title": {
+            "lang-store": {
+              "ja": "伝説の航跡",
+              "en": "Legendary Trail"
+            }
+          }
         },
         {
           "goal": 50000,
-          "title": "スーパープレイ"
+          "title": {
+            "lang-store": {
+              "ja": "スーパープレイ",
+              "en": "Superb Flight"
+            }
+          }
         },
         {
           "goal": 15000,
-          "title": "ハイスコア"
+          "title": {
+            "lang-store": {
+              "ja": "ハイスコア",
+              "en": "High Score"
+            }
+          }
         }
       ]
     },
@@ -194,19 +374,39 @@
       "source": "game_record",
       "key": "total_score",
       "condition": "max",
-      "label": "累積獲得スコア",
+      "label": {
+        "lang-store": {
+          "ja": "累積獲得スコア",
+          "en": "Total Earned Score"
+        }
+      },
       "tiers": [
         {
           "goal": 2000000,
-          "title": "軌道の生ける伝説"
+          "title": {
+            "lang-store": {
+              "ja": "軌道の生ける伝説",
+              "en": "Living Orbital Legend"
+            }
+          }
         },
         {
           "goal": 200000,
-          "title": "高実績パイロット"
+          "title": {
+            "lang-store": {
+              "ja": "高実績パイロット",
+              "en": "Decorated Pilot"
+            }
+          }
         },
         {
           "goal": 30000,
-          "title": "蓄積者"
+          "title": {
+            "lang-store": {
+              "ja": "蓄積者",
+              "en": "Accumulator"
+            }
+          }
         }
       ]
     },
@@ -215,19 +415,39 @@
       "source": "game_record",
       "key": "max_earned_coins",
       "condition": "max",
-      "label": "最高獲得コイン",
+      "label": {
+        "lang-store": {
+          "ja": "最高獲得コイン",
+          "en": "Highest Earned Credits"
+        }
+      },
       "tiers": [
         {
           "goal": 2500,
-          "title": "ミリオネア・マインド"
+          "title": {
+            "lang-store": {
+              "ja": "ミリオネア・マインド",
+              "en": "Millionaire Mind"
+            }
+          }
         },
         {
           "goal": 1000,
-          "title": "リッチ・フライト"
+          "title": {
+            "lang-store": {
+              "ja": "リッチ・フライト",
+              "en": "Rich Flight"
+            }
+          }
         },
         {
           "goal": 300,
-          "title": "良い稼ぎ"
+          "title": {
+            "lang-store": {
+              "ja": "良い稼ぎ",
+              "en": "Good Earnings"
+            }
+          }
         }
       ]
     },
@@ -236,19 +456,39 @@
       "source": "game_record",
       "key": "total_earned_coins",
       "condition": "max",
-      "label": "累積獲得コイン",
+      "label": {
+        "lang-store": {
+          "ja": "累積獲得コイン",
+          "en": "Total Earned Credits"
+        }
+      },
       "tiers": [
         {
           "goal": 40000,
-          "title": "スター・ミリオネア"
+          "title": {
+            "lang-store": {
+              "ja": "スター・ミリオネア",
+              "en": "Star Millionaire"
+            }
+          }
         },
         {
           "goal": 5000,
-          "title": "豪商の卵"
+          "title": {
+            "lang-store": {
+              "ja": "豪商の卵",
+              "en": "Merchant in the Making"
+            }
+          }
         },
         {
           "goal": 1000,
-          "title": "小口取引家"
+          "title": {
+            "lang-store": {
+              "ja": "小口取引家",
+              "en": "Small-Scale Trader"
+            }
+          }
         }
       ]
     },
@@ -257,19 +497,39 @@
       "source": "game_record",
       "key": "total_spent_coins",
       "condition": "max",
-      "label": "累積消費コイン",
+      "label": {
+        "lang-store": {
+          "ja": "累積消費コイン",
+          "en": "Total Spent Credits"
+        }
+      },
       "tiers": [
         {
           "goal": 35000,
-          "title": "経済の心臓"
+          "title": {
+            "lang-store": {
+              "ja": "経済の心臓",
+              "en": "Heart of the Economy"
+            }
+          }
         },
         {
           "goal": 4000,
-          "title": "寛大な出資者"
+          "title": {
+            "lang-store": {
+              "ja": "寛大な出資者",
+              "en": "Generous Backer"
+            }
+          }
         },
         {
           "goal": 750,
-          "title": "良いお客様"
+          "title": {
+            "lang-store": {
+              "ja": "良いお客様",
+              "en": "Valued Customer"
+            }
+          }
         }
       ]
     },
@@ -278,19 +538,39 @@
       "source": "game_record",
       "key": "max_coins",
       "condition": "max",
-      "label": "最高所持コイン数",
+      "label": {
+        "lang-store": {
+          "ja": "最高所持コイン数",
+          "en": "Highest Credit Balance"
+        }
+      },
       "tiers": [
         {
           "goal": 1000,
-          "title": "金庫室の主"
+          "title": {
+            "lang-store": {
+              "ja": "金庫室の主",
+              "en": "Vault Keeper"
+            }
+          }
         },
         {
           "goal": 500,
-          "title": "膨らんだ財布"
+          "title": {
+            "lang-store": {
+              "ja": "膨らんだ財布",
+              "en": "Heavy Wallet"
+            }
+          }
         },
         {
           "goal": 300,
-          "title": "小銭入れ"
+          "title": {
+            "lang-store": {
+              "ja": "小銭入れ",
+              "en": "Coin Pouch"
+            }
+          }
         }
       ]
     },
@@ -299,19 +579,39 @@
       "source": "story_read",
       "key": "total",
       "condition": "max",
-      "label": "既読ストーリー数",
+      "label": {
+        "lang-store": {
+          "ja": "既読ストーリー数",
+          "en": "Stories Read"
+        }
+      },
       "tiers": [
         {
-          "goal": 39,
-          "title": "物語の全知者"
+          "goal": 40,
+          "title": {
+            "lang-store": {
+              "ja": "物語の全知者",
+              "en": "All-Knowing Archivist"
+            }
+          }
         },
         {
           "goal": 20,
-          "title": "語り部の守人"
+          "title": {
+            "lang-store": {
+              "ja": "語り部の守人",
+              "en": "Keeper of Tales"
+            }
+          }
         },
         {
           "goal": 5,
-          "title": "聞き手"
+          "title": {
+            "lang-store": {
+              "ja": "聞き手",
+              "en": "Listener"
+            }
+          }
         }
       ]
     },
@@ -320,11 +620,21 @@
       "source": "story_read",
       "key": "T",
       "condition": "max",
-      "label": "ストーリー「だれかの願い」",
+      "label": {
+        "lang-store": {
+          "ja": "ストーリー「だれかの願い」",
+          "en": "Story: Someone's Wish"
+        }
+      },
       "tiers": [
         {
           "goal": 13,
-          "title": "交易所の語り部"
+          "title": {
+            "lang-store": {
+              "ja": "交易所の語り部",
+              "en": "Trading Post Storyteller"
+            }
+          }
         }
       ]
     },
@@ -333,11 +643,21 @@
       "source": "story_read",
       "key": "R",
       "condition": "max",
-      "label": "ストーリー「つくる人たち」",
+      "label": {
+        "lang-store": {
+          "ja": "ストーリー「つくる人たち」",
+          "en": "Story: The Makers"
+        }
+      },
       "tiers": [
         {
           "goal": 13,
-          "title": "整備工場の語り部"
+          "title": {
+            "lang-store": {
+              "ja": "整備工場の語り部",
+              "en": "Repair Dock Storyteller"
+            }
+          }
         }
       ]
     },
@@ -346,11 +666,21 @@
       "source": "story_read",
       "key": "B",
       "condition": "max",
-      "label": "ストーリー「せかいの仕組み」",
+      "label": {
+        "lang-store": {
+          "ja": "ストーリー「せかいの仕組み」",
+          "en": "Story: How the World Works"
+        }
+      },
       "tiers": [
         {
           "goal": 13,
-          "title": "闇市場の語り部"
+          "title": {
+            "lang-store": {
+              "ja": "闇市場の語り部",
+              "en": "Black Market Storyteller"
+            }
+          }
         }
       ]
     }

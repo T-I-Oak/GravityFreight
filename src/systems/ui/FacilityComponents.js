@@ -8,7 +8,7 @@ export class FacilityComponents {
 
         return `
             <section class="Panel ${viewData.themeClass}">
-                <header class="panel-header">
+                <header id="facility-header" class="panel-header">
                     <div class="FacilityBadge">${viewData.icon}</div>
                     <div class="facility-title-group">
                         <h1 class="panel-title">${viewData.name}</h1>
@@ -29,7 +29,7 @@ export class FacilityComponents {
                         <span class="credits-label">${viewData.creditsLabel}</span>
                         <span class="credits-value num-coin" data-facility-credits-value="${viewData.coins}">${UIComponents.formatNumber(viewData.coins)} c</span>
                     </div>
-                    <button class="Button state-primary button-large facility-depart-button ${viewData.themeClass}">
+                    <button id="facility-depart-button" class="Button state-primary button-large facility-depart-button ${viewData.themeClass}">
                         <span class="btn-main-label">${viewData.departLabel}</span>
                     </button>
                 </footer>
@@ -39,19 +39,27 @@ export class FacilityComponents {
 
     static generateSectionHTML(section) {
         if (section.sections?.length > 0) {
+            const sectionHeaderHTML = section.title
+                ? this.generateSectionHeaderHTML(section)
+                : '';
             const sectionGroupsHTML = section.sections
-                .map(child => this.generateSectionContentHTML(child))
+                .map(child => `
+                    <div id="${this.#sectionElementId(child.id)}" class="facility-subsection" data-section-child="${child.id}">
+                        ${this.generateSectionContentHTML(child)}
+                    </div>
+                `)
                 .join('');
 
             return `
-                <section class="Column ScrollArea" data-section="${section.id}">
+                <section id="${this.#sectionElementId(section.id)}" class="Column ScrollArea" data-section="${section.id}">
+                    ${sectionHeaderHTML}
                     ${sectionGroupsHTML}
                 </section>
             `;
         }
 
         return `
-            <section class="Column ScrollArea" data-section="${section.id}">
+            <section id="${this.#sectionElementId(section.id)}" class="Column ScrollArea" data-section="${section.id}">
                 ${this.generateSectionContentHTML(section)}
             </section>
         `;
@@ -65,12 +73,23 @@ export class FacilityComponents {
         const listClass = staggerEntries && section.entries.length > 0 ? 'item-list state-staggered-list' : 'item-list';
 
         return `
-            <header class="section-header">
-                <h3 class="section-title">${section.title}</h3>
-                <span class="section-subtitle">${section.subtitle}</span>
-            </header>
+            ${this.generateSectionHeaderHTML(section)}
 
             <div class="${listClass}">${entriesHTML}</div>
+        `;
+    }
+
+    static generateSectionHeaderHTML(section) {
+        const variantClass = section.headerVariant === 'category' ? ' category-header' : '';
+        const themeClass = section.headerVariant === 'category' && section.themeClass ? ` ${section.themeClass}` : '';
+        const subtitleHTML = section.subtitle
+            ? `<span class="section-subtitle">${section.subtitle}</span>`
+            : '';
+        return `
+            <header class="section-header${variantClass}${themeClass}">
+                <h3 class="section-title">${section.title}</h3>
+                ${subtitleHTML}
+            </header>
         `;
     }
 
@@ -120,6 +139,10 @@ export class FacilityComponents {
     }
 
     static #shouldStaggerSection(sectionId) {
-        return sectionId === 'received' || sectionId === 'acquired';
+        return ['received', 'acquired', 'blackMarketAcquired'].includes(sectionId);
+    }
+
+    static #sectionElementId(sectionId) {
+        return `facility-section-${String(sectionId).replace(/[^a-zA-Z0-9_-]/g, '-')}`;
     }
 }

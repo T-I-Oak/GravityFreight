@@ -9,6 +9,7 @@
     - `#gameCanvas` と `window` の pointer / wheel event を購読する。
     - ブラウザ event をゲーム側の `CanvasInputEvent` へ変換する。
     - Canvas 外や UI パネル上へドラッグが継続した場合も、開始済みの操作を `pointerup` / `pointercancel` まで維持する。
+    - Canvas 上の touch / wheel 操作はブラウザのスクロール、戻る、ページズーム、ピンチズームへ渡さず、ゲーム内操作として扱う。
 
 ## 2. インターフェース (Interface)
 
@@ -19,6 +20,8 @@
 - **`setHandler(handler: (event: CanvasInputEvent) => void): void`**
     - 正規化後の入力通知先を登録する。
     - 初回のみ DOM event listener を登録し、再登録時は通知先だけを差し替える。
+    - pointer / wheel listener は `passive: false` で登録し、操作中のブラウザ既定動作を `preventDefault()` で抑止する。
+    - CSS 側では `#play-screen .play-viewport { touch-action: none; }` を維持し、2本指 pinch をブラウザ倍率操作に奪わせない。
 
 ## 3. CanvasInputEvent
 
@@ -36,6 +39,7 @@
 - `point` は Canvas 内部座標であり、`getBoundingClientRect()` と `canvas.width` / `canvas.height` の比率から算出する。
 - `displayPoint` はポップアップ配置用の CSS px 座標であり、Canvas 表示領域左上を原点とする。
 - hover はドラッグ中でない Canvas 内 pointermove だけで発生する。
+- タッチ端末では pointerdown / pointermove / pointerup と pinch を使用する。PC の hover 相当の情報表示は、意味付け側が touch pointerdown をタップとして扱う。
 
 ## 5. 責務境界
 

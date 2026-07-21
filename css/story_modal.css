@@ -4,9 +4,17 @@
    Focus: Narrative immersion and message delivery
    ========================================= */
 
+#story-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 300);
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.55);
+}
+
 .Panel.story-card {
     width: 90vw;
-    max-width: 480px;
+    max-width: 520px;
     height: auto;
     max-height: 90vh;
     

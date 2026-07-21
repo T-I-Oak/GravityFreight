@@ -67,9 +67,11 @@
     - **`maxCharges === 0` の場合（使い切りアイテム）**: `charges` の操作は行わず、即座に `true` を返す。
 - **`getViewData(): ItemViewData`**
     - UI 表示（アイテムカード）用のプレーンオブジェクトを生成して返す。
+    - `name` / `description` / `category` / `rarity` / `deliveryGoalId` は、呼び出し時点の `GameDataRepository.getItemDefinition(id)` から取得する。
+    - これにより、インスタンス生成後に言語設定が変わった場合でも、再描画時の item card は現在の言語リソースを使用する。
     - **マッピング**:
         - `uid`: 自身の `uid`
-        - `name`, `category`, `description`: 自身のプロパティ
+        - `name`, `category`, `description`: 現在の master data の表示情報
         - **`stats`**: 以下のプロパティを `{ value, enhanceCount }` 形式で格納する。
             - **Physical**: `mass`, `charges`, `maxCharges`
             - **Capability**: `precision`, `pickupRange`, `power`, `slots`
@@ -80,7 +82,8 @@
     - 自身に対してランダムな強化（または修理）を 1 つ実行する。
     - **抽選ルール**:
         - 自身の属性から有効な強化候補をリストアップし、その中からランダムに 1 つを選択する。
-        - 候補: `slots`, `precisionMultiplier`, `pickupMultiplier`
+        - 候補: `precisionMultiplier`, `pickupMultiplier`
+        - `slots` はロケット構成パーツ（`chassis`, `logic`, `module`）の場合のみ候補に含める。
         - 条件付き候補:
             - `gravityMultiplier`: 現在の値が `0.1` 超の場合に対象。
             - 耐久性向上: `maxCharges` が `0` 超の場合に対象。

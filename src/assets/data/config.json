@@ -1,12 +1,21 @@
 {
   "gameBalance": {
     "DEFAULT_SHIP_MASS": 10,
-    "DELIVERY_REWARD": { "SCORE": 1500, "COINS": 100 },
-    "UNMATCHED_DELIVERY_REWARD": { "SCORE": 0, "COINS": 10 },
+    "DELIVERY_REWARD": {
+      "SCORE": 1500,
+      "COINS": 100
+    },
+    "UNMATCHED_DELIVERY_REWARD": {
+      "SCORE": 0,
+      "COINS": 10
+    },
     "MAX_COIN_DISCOUNT": 0.5,
     "LUCKY_CARGO_DISCOUNT": 0.1,
     "SHIP_START_OFFSET": 12,
-    "GRADE_STEPS": { "SINGLE": 20, "TOTAL": 50 },
+    "GRADE_STEPS": {
+      "SINGLE": 20,
+      "TOTAL": 50
+    },
     "SECTOR_NOTIFICATION_DURATION": 3600,
     "SCORE_PER_STEP": 1,
     "TRAIL_MAX_LENGTH": 80,
@@ -16,12 +25,15 @@
     "SIMULATION_TICK_SECONDS": 0.002,
     "SAFE_DISTANCE_FROM_HOME": 30,
     "COLLISION_MARGIN": 1,
-    "CUSHION_BOUNCE": 1.0,
+    "CUSHION_BOUNCE": 1,
     "EMERGENCY_THRUST_MULT": 0.8
   },
   "mapConstants": {
     "BOUNDARY_RADIUS": 900,
-    "HOME_STAR_POSITION": { "x": 0, "y": 0 },
+    "HOME_STAR_POSITION": {
+      "x": 0,
+      "y": 0
+    },
     "MIN_STAR_DISTANCE": 180,
     "PLACEMENT_ATTEMPT_LIMIT": 100,
     "HOME_STAR_RADIUS": 25,
@@ -44,9 +56,73 @@
     "20": 100
   },
   "facilities": {
-    "TRADING_POST": { "id": "T", "type": "TRADING_POST", "name": "TRADING POST", "icon": "T", "className": "trading-post", "rewardScore": 2000, "rewardCoins": 20, "bonusItemCount": 1 },
-    "REPAIR_DOCK":  { "id": "R", "type": "REPAIR_DOCK",  "name": "REPAIR DOCK",  "icon": "R", "className": "repair-dock", "rewardScore": 3000, "rewardCoins": 30, "bonusItemCount": 2 },
-    "BLACK_MARKET": { "id": "B", "type": "BLACK_MARKET", "name": "BLACK MARKET", "icon": "B", "className": "black-market", "rewardScore": 5000, "rewardCoins": 50, "bonusItemCount": 3 }
+    "TRADING_POST": {
+      "id": "T",
+      "type": "TRADING_POST",
+      "name": {
+        "lang-store": {
+          "ja": "TRADING POST",
+          "en": "TRADING POST"
+        }
+      },
+      "icon": "T",
+      "className": "trading-post",
+      "rewardScore": 2000,
+      "rewardCoins": 20,
+      "bonusItemCount": 1
+    },
+    "REPAIR_DOCK": {
+      "id": "R",
+      "type": "REPAIR_DOCK",
+      "name": {
+        "lang-store": {
+          "ja": "REPAIR DOCK",
+          "en": "REPAIR DOCK"
+        }
+      },
+      "icon": "R",
+      "className": "repair-dock",
+      "rewardScore": 3000,
+      "rewardCoins": 30,
+      "bonusItemCount": 2
+    },
+    "BLACK_MARKET": {
+      "id": "B",
+      "type": "BLACK_MARKET",
+      "name": {
+        "lang-store": {
+          "ja": "BLACK MARKET",
+          "en": "BLACK MARKET"
+        }
+      },
+      "icon": "B",
+      "className": "black-market",
+      "rewardScore": 5000,
+      "rewardCoins": 50,
+      "bonusItemCount": 3
+    }
+  },
+  "storyCategories": {
+    "T": {
+      "id": "T",
+      "icon": "T",
+      "className": "trading-post"
+    },
+    "R": {
+      "id": "R",
+      "icon": "R",
+      "className": "repair-dock"
+    },
+    "B": {
+      "id": "B",
+      "icon": "B",
+      "className": "black-market"
+    },
+    "HOME": {
+      "id": "HOME",
+      "icon": "H",
+      "className": "home"
+    }
   },
   "initialSetup": {
     "initialInventory": [

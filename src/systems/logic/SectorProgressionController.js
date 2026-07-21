@@ -30,8 +30,9 @@ class SectorProgressionController {
         const achievements = updatedRecordKeys.length > 0
             ? this.achievementTracker.evaluateAchievements({ source: 'game_record', keys: updatedRecordKeys })
             : [];
+        this.uiController.showAchievementToasts?.(achievements);
 
-        this.worldRenderer?.playGameEndExitAnimation?.();
+        this.worldRenderer?.startWarpEffect?.(3200, { direction: 'reverse' });
         this.uiController.showGameEndSequence?.(gameResult, gameOver, {
             achievements
         });
@@ -48,15 +49,20 @@ class SectorProgressionController {
 
         const updatedRecordKeys = this.gameRecordTracker.recordSectorStart(this.sessionState);
         if (updatedRecordKeys.length > 0) {
-            this.achievementTracker.evaluateAchievements({
+            const achievements = this.achievementTracker.evaluateAchievements({
                 source: 'game_record',
                 keys: updatedRecordKeys
             });
+            this.uiController.showAchievementToasts?.(achievements);
         }
 
         this.worldRenderer?.setSector?.(sector);
         this.uiController.updateHUDValue?.('sector', this.sessionState.sectorNumber);
-        this.uiController.showSectorTitle?.(this.sessionState.sectorNumber, sector.isAnomaly);
+        this.uiController.showSectorTitle?.(
+            this.sessionState.sectorNumber,
+            sector.isAnomaly,
+            { type: options.sectorTitleType ?? 'default' }
+        );
 
         return sector;
     }

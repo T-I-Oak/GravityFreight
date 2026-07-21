@@ -9,6 +9,11 @@ class StarInfoPanel {
         this.list = this.document.querySelector('#star-info-list');
         this.currentBody = null;
         this.currentItemCount = 0;
+        this.currentMessageKey = null;
+        this.currentMessageTitle = null;
+        this.currentMessageBody = null;
+        this.currentPoint = null;
+        this.currentCanvas = null;
     }
 
     show(body, point, canvas) {
@@ -24,13 +29,57 @@ class StarInfoPanel {
         }
 
         this.#updatePosition(point, canvas);
+        this.currentPoint = point;
+        this.currentCanvas = canvas;
         this.panel.hidden = false;
         this.panel.classList.remove('state-hidden');
+    }
+
+    showMessage({ title, body, key }, point, canvas) {
+        if (!this.panel || !this.list) {
+            return;
+        }
+
+        if (
+            this.currentMessageKey !== key
+            || this.currentMessageTitle !== title
+            || this.currentMessageBody !== body
+        ) {
+            this.currentBody = null;
+            this.currentItemCount = 0;
+            this.currentMessageKey = key;
+            this.currentMessageTitle = title;
+            this.currentMessageBody = body;
+            if (this.title) {
+                this.title.textContent = title;
+            }
+            this.list.innerHTML = `<p class="star-info-message">${body}</p>`;
+        }
+
+        this.#updatePosition(point, canvas);
+        this.currentPoint = point;
+        this.currentCanvas = canvas;
+        this.panel.hidden = false;
+        this.panel.classList.remove('state-hidden');
+    }
+
+    refreshCurrent() {
+        if (this.currentBody) {
+            this.#renderBody(this.currentBody);
+        }
+        if (this.currentPoint) {
+            this.#updatePosition(this.currentPoint, this.currentCanvas);
+        }
     }
 
     hide() {
         this.currentBody = null;
         this.currentItemCount = 0;
+        this.currentMessageKey = null;
+        this.currentMessageTitle = null;
+        this.currentMessageBody = null;
+        this.currentPoint = null;
+        this.currentCanvas = null;
         if (this.panel) {
             this.panel.hidden = true;
             this.panel.classList.add('state-hidden');

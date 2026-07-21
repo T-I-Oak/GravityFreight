@@ -70,7 +70,7 @@ describe('Rocket', () => {
         expect(rocket.actualTrail).toEqual([{ x: 10, y: 20 }]);
     });
 
-    it('keeps real flight trail within the configured visible trail length', () => {
+    it('keeps the full real flight trail for share images and result data', () => {
         const { rocketItem, launcher } = createRocketParts();
         const rocket = new Rocket(rocketItem, launcher, null, 0);
 
@@ -78,12 +78,12 @@ describe('Rocket', () => {
             rocket.updateState({ x: index, y: 0 }, { x: 1, y: 0 });
         }
 
-        expect(rocket.actualTrail).toHaveLength(80);
-        expect(rocket.actualTrail[0]).toEqual({ x: 10, y: 0 });
+        expect(rocket.actualTrail).toHaveLength(90);
+        expect(rocket.actualTrail[0]).toEqual({ x: 0, y: 0 });
         expect(rocket.actualTrail.at(-1)).toEqual({ x: 89, y: 0 });
     });
 
-    it('does not trim ghost prediction trails by the visible trail length', () => {
+    it('keeps ghost prediction trails in the same full-history structure', () => {
         const { rocketItem, launcher } = createRocketParts();
         const rocket = new Rocket(rocketItem, launcher, null, 0);
         rocket.setGhost();
@@ -307,8 +307,8 @@ describe('Rocket', () => {
             method: 'star_breaker',
             destroyedTarget: target
         });
-        expect(rocketItem.modules.find(module => module.id === 'mod_star_breaker').charges).toBe(1);
-        expect(rocketItem.modules.find(module => module.id === 'mod_cushion').charges).toBe(2);
+        expect(rocketItem.modules.find(module => module.id === 'mod_star_breaker').charges).toBe(2);
+        expect(rocketItem.modules.find(module => module.id === 'mod_cushion').charges).toBe(3);
     });
 
     it('uses cushion on body collision when breaker is unavailable and reflects velocity', () => {
@@ -326,7 +326,7 @@ describe('Rocket', () => {
             destroyedTarget: null
         });
         expect(rocket.velocity).toEqual({ x: 4, y: 3 });
-        expect(rocketItem.modules.find(module => module.id === 'mod_cushion').charges).toBe(1);
+        expect(rocketItem.modules.find(module => module.id === 'mod_cushion').charges).toBe(2);
     });
 
     it('uses emergency thruster on boundary collision and reflects velocity across the boundary normal', () => {
@@ -341,7 +341,7 @@ describe('Rocket', () => {
             destroyedTarget: null
         });
         expect(rocket.velocity).toEqual({ x: -5, y: 2 });
-        expect(rocketItem.modules.find(module => module.id === 'mod_emergency').charges).toBe(1);
+        expect(rocketItem.modules.find(module => module.id === 'mod_emergency').charges).toBe(2);
     });
 
     it('ignores real modules and uses ghost modules without consuming charges when ghost', () => {
@@ -356,8 +356,8 @@ describe('Rocket', () => {
             method: 'star_breaker',
             destroyedTarget: target
         });
-        expect(rocketItem.modules.find(module => module.id === 'mod_star_breaker').charges).toBe(2);
-        expect(rocketItem.modules.find(module => module.id === 'mod_gst_breaker').charges).toBe(0);
+        expect(rocketItem.modules.find(module => module.id === 'mod_star_breaker').charges).toBe(3);
+        expect(rocketItem.modules.find(module => module.id === 'mod_gst_breaker').charges).toBe(1);
     });
 
     it('uses ghost breaker before ghost cushion when both are available', () => {
@@ -375,6 +375,7 @@ describe('Rocket', () => {
     it('returns null when matching avoidance modules are missing or depleted', () => {
         const { rocketItem, launcher } = createRocketPartsWithModules(['mod_star_breaker']);
         const breaker = rocketItem.modules.find(module => module.id === 'mod_star_breaker');
+        breaker.consumeCharge();
         breaker.consumeCharge();
         breaker.consumeCharge();
         const rocket = new Rocket(rocketItem, launcher, null, 0);

@@ -29,6 +29,7 @@
 - **`recordFlightResult(result: FlightResultContext): string[]`**
     - 航行終了時の結果を、航行単位で確定する記録値へ反映する。
     - 発射回数、`completedSectors`、航行距離、航行終了時に確定するスコア・コイン・回収数を更新する。
+    - ここでいう航行距離は、world px の移動量ではなく、航行 tick 数を記録値として扱う。
     - **呼び出しタイミング**: 航行結果が確定した時点。
     - **内部挙動**:
         1. `result` から更新対象の記録値を算出する。
@@ -85,7 +86,7 @@
     - `total_completed_sectors`: 踏破セクター数の累計。
     - `total_collected_item_count`: 回収アイテム数の累計。
     - `total_launches`: 発射回数の累計。
-    - `total_distance`: 航行距離の累計。
+    - `total_distance`: 航行距離の累計。記録値は航行 tick 数。
     - `total_deliveries`: 配達成功数の累計。
     - `total_score`: 獲得スコアの累計。
     - `total_earned_coins`: 獲得コインの累計。
@@ -93,7 +94,7 @@
     - `max_score`: 1契約内の最大スコア。
     - `max_reached_sector`: 1契約内の最大到達セクター。
     - `max_collected_item_count`: 1契約内の最大回収アイテム数。
-    - `max_distance`: 1航行内の最大航行距離。
+    - `max_distance`: 1航行内の最大航行距離。記録値は航行 tick 数。
     - `max_deliveries`: 1契約内の最大配達成功数。
     - `max_earned_coins`: 1契約内の最大獲得コイン。
     - `max_coins`: 最高所持コイン数。

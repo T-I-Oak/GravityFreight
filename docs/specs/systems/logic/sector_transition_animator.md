@@ -38,3 +38,4 @@
 - セクター番号更新、`Sector` 生成、記録・実績更新、HUD 更新は `SectorProgressionController.beginSectorTransition()` の責務とする。
 - ビルド画面の表示再開は `GameController.beginSectorTransition()` の責務とする。
 - 実際の Canvas 表現、マップ拡縮、背景星の光跡は `WorldRenderer` / `BackgroundManager` の責務とする。
+- ワープ音の開始・停止は、背景演出と必ず同期する必要があるため `WorldRenderer.startWarpEffect()` / `WorldRenderer.stopWarpEffect()` の内部責務とする。本クラスは音響システムを直接扱わない。

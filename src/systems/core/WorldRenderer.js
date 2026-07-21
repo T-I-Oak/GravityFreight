@@ -1,23 +1,16 @@
 import BackgroundManager from './BackgroundManager.js';
 import CanvasColorPalette from './CanvasColorPalette.js';
 import FlightVisualRenderer from './FlightVisualRenderer.js';
+import SectorMapRenderer from './SectorMapRenderer.js';
 
 const WORLD_VIEW_SCALE = 0.5;
 const WARP_OUT_SCALE = 100;
 const WARP_IN_START_SCALE = 0.01;
 const GAME_END_EXIT_SCALE = 0.01;
-const GAME_END_EXIT_DURATION = 3200;
-const GAME_END_RETURN_DURATION = 1600;
 const GAME_END_FADE_START_SCALE = 0.35;
 const GAME_END_FADE_END_SCALE = 0.08;
 const FINISH_ANIMATION_DURATION = 2000;
 const SONAR_RIPPLE_DURATION = 2000;
-
-const FACILITY_LABELS = {
-    TRADING_POST: 'TRADING POST',
-    REPAIR_DOCK: 'REPAIR DOCK',
-    BLACK_MARKET: 'BLACK MARKET'
-};
 
 class WorldRenderer {
     constructor(options = {}) {
@@ -28,6 +21,8 @@ class WorldRenderer {
         this.colorPalette = options.colorPalette || new CanvasColorPalette();
         this.backgroundManager = options.backgroundManager || new BackgroundManager({ colorPalette: this.colorPalette });
         this.flightVisualRenderer = options.flightVisualRenderer || new FlightVisualRenderer();
+        this.sectorMapRenderer = options.sectorMapRenderer || new SectorMapRenderer();
+        this.soundController = options.soundController || null;
         this.lastRenderTimestamp = null;
         this.animationFrameId = null;
         this.renderLoopActive = true;
@@ -69,6 +64,10 @@ class WorldRenderer {
         this.render();
     }
 
+    setSoundController(soundController) {
+        this.soundController = soundController || null;
+    }
+
     clearSector() {
         this.targetSector = null;
         this.render();
@@ -99,6 +98,14 @@ class WorldRenderer {
 
     clearPredictionPath() {
         this.predictionPath = [];
+        this.render();
+    }
+
+    resetMapWarp() {
+        this.mapWarp.scale = 1;
+        this.mapWarp.alpha = 1;
+        this.mapWarp.transition = null;
+        this.mapWarp.fadeMode = null;
         this.render();
     }
 
@@ -189,11 +196,15 @@ class WorldRenderer {
 
         this.context.save();
         this.context.globalAlpha *= this.#getMapWarpAlpha();
-        this.#drawBoundary(colors);
-        this.#drawExits(colors);
-        this.#drawBodies(colors);
-        this.flightVisualRenderer.render(this.context, this.#createTransform(), this.#getView(), {
-            navigationRocket: this.navigationRocket || this.aimRocket,
+        const transform = this.#createTransform();
+        const view = this.#getView();
+        const activeRocket = this.navigationRocket || this.aimRocket;
+        this.sectorMapRenderer.render(this.context, this.targetSector, transform, colors, {
+            timestamp: view.timestamp,
+            activeRocket
+        });
+        this.flightVisualRenderer.render(this.context, transform, view, {
+            navigationRocket: activeRocket,
             predictionPath: this.predictionPath,
             hideRocketBody: this.hideNavigationRocketBody,
             sonarEnabled: this.sonarEnabled,
@@ -202,62 +213,49 @@ class WorldRenderer {
         this.context.restore();
     }
 
-    startWarpEffect(duration = 0) {
-        this.backgroundManager.startWarpEffect(duration);
-        this.mapWarp.fadeMode = null;
-        this.#setMapWarpTransition({
-            fromScale: this.mapWarp.scale,
-            toScale: WARP_OUT_SCALE,
-            fromAlpha: this.mapWarp.alpha,
-            toAlpha: 0,
-            duration,
-            easing: progress => progress ** 3
-        });
+    startWarpEffect(duration = 0, options = {}) {
+        const direction = options.direction || 'forward';
+        if (direction === 'reverse') {
+            this.backgroundManager.startReverseWarpEffect(duration);
+            this.mapWarp.fadeMode = 'gameEndExit';
+            this.#setMapWarpTransition({
+                fromScale: this.mapWarp.scale,
+                toScale: GAME_END_EXIT_SCALE,
+                fromAlpha: this.mapWarp.alpha,
+                toAlpha: 1,
+                duration,
+                easing: progress => 1 - ((1 - progress) ** 3)
+            });
+        } else {
+            this.backgroundManager.startWarpEffect(duration);
+            this.mapWarp.fadeMode = null;
+            this.#setMapWarpTransition({
+                fromScale: this.mapWarp.scale,
+                toScale: WARP_OUT_SCALE,
+                fromAlpha: this.mapWarp.alpha,
+                toAlpha: 0,
+                duration,
+                easing: progress => progress ** 3
+            });
+        }
+
+        this.soundController?.startWarpEffect?.(this.#toSeconds(duration), { direction });
         this.render();
     }
 
-    stopWarpEffect(duration = 0) {
+    stopWarpEffect(duration = 0, options = {}) {
         this.backgroundManager.stopWarpEffect(duration);
         this.mapWarp.fadeMode = null;
         this.#setMapWarpTransition({
-            fromScale: WARP_IN_START_SCALE,
+            fromScale: options.fromCurrent ? this.mapWarp.scale : WARP_IN_START_SCALE,
             toScale: 1,
-            fromAlpha: 1,
+            fromAlpha: options.fromCurrent ? this.mapWarp.alpha : 1,
             toAlpha: 1,
             duration,
             easing: progress => 1 - ((1 - progress) ** 3)
         });
+        this.soundController?.stopWarpEffect?.(this.#toSeconds(duration));
         this.render();
-    }
-
-    playGameEndExitAnimation(duration = GAME_END_EXIT_DURATION) {
-        this.backgroundManager.startReverseWarpEffect(duration);
-        this.mapWarp.fadeMode = 'gameEndExit';
-        this.#setMapWarpTransition({
-            fromScale: this.mapWarp.scale,
-            toScale: GAME_END_EXIT_SCALE,
-            fromAlpha: this.mapWarp.alpha,
-            toAlpha: 1,
-            duration,
-            easing: progress => 1 - ((1 - progress) ** 3)
-        });
-        this.render();
-        return Promise.resolve();
-    }
-
-    stopGameEndExitAnimation(duration = GAME_END_RETURN_DURATION) {
-        this.backgroundManager.stopWarpEffect(duration);
-        this.mapWarp.fadeMode = null;
-        this.#setMapWarpTransition({
-            fromScale: this.mapWarp.scale,
-            toScale: 1,
-            fromAlpha: this.mapWarp.alpha,
-            toAlpha: 1,
-            duration,
-            easing: progress => 1 - ((1 - progress) ** 3)
-        });
-        this.render();
-        return Promise.resolve();
     }
 
     #fitCanvas() {
@@ -420,6 +418,10 @@ class WorldRenderer {
         return from + (to - from) * progress;
     }
 
+    #toSeconds(durationMs) {
+        return Math.max(0, durationMs ?? 0) / 1000;
+    }
+
     #expireStoppedSonar() {
         if (this.sonarEnabled || !Number.isFinite(this.sonarStopTimestamp)) {
             return;
@@ -430,240 +432,6 @@ class WorldRenderer {
         }
     }
 
-    #drawBoundary(colors) {
-        const exit = this.targetSector.exits[0];
-        if (!exit) {
-            return;
-        }
-
-        const transform = this.#createTransform();
-        const center = transform.toScreen({ x: 0, y: 0 });
-
-        this.context.save();
-        this.context.beginPath();
-        this.context.arc(center.x, center.y, transform.radius(exit.radius), 0, Math.PI * 2);
-        this.context.strokeStyle = colors.boundary;
-        this.context.lineWidth = Math.max(1, transform.scale);
-        this.context.stroke();
-        this.context.restore();
-    }
-
-    #drawExits(colors) {
-        const transform = this.#createTransform();
-        const center = transform.toScreen({ x: 0, y: 0 });
-
-        this.targetSector.exits.forEach(exit => {
-            const start = (exit.angle - exit.width / 2) * Math.PI / 180 + transform.rotation;
-            const end = (exit.angle + exit.width / 2) * Math.PI / 180 + transform.rotation;
-            const color = this.#facilityColor(exit.getFacilityType(), colors);
-
-            this.context.save();
-            this.context.beginPath();
-            this.context.arc(center.x, center.y, transform.radius(exit.radius), start, end);
-            this.context.strokeStyle = color;
-            this.context.lineWidth = Math.max(2, 6 * transform.scale);
-            this.context.shadowBlur = 15 * transform.scale;
-            this.context.shadowColor = color;
-            this.context.stroke();
-            this.context.restore();
-
-            this.#drawFacilityLabel(exit, transform, center, colors);
-            if (this.#hasDeliveryCargoForExit(exit)) {
-                this.#drawDeliveryCargoIcon(exit, transform, center, colors);
-            }
-        });
-    }
-
-    #drawDeliveryCargoIcon(exit, transform, center, colors) {
-        const angle = exit.angle * Math.PI / 180 + transform.rotation;
-        const iconRadius = transform.radius(exit.radius + 85);
-        const x = center.x + Math.cos(angle) * iconRadius;
-        const y = center.y + Math.sin(angle) * iconRadius;
-        const color = this.#facilityColor(exit.getFacilityType(), colors);
-        const alpha = 0.5 + 0.5 * Math.sin(this.#getView().timestamp / 333);
-        const normalized = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-        const isBottom = normalized > 0 && normalized < Math.PI;
-        const scale = transform.scale;
-        const widthLeft = -15 * scale;
-        const heightLeft = -9 * scale;
-        const widthRight = 30 * scale;
-        const heightRight = -4.5 * scale;
-        const height = 18 * scale;
-
-        this.context.save();
-        this.context.globalAlpha *= alpha;
-        this.context.translate(x, y);
-        this.context.rotate(isBottom ? angle - Math.PI / 2 : angle + Math.PI / 2);
-        this.context.translate(-2 * scale, 2 * scale);
-        this.context.strokeStyle = color;
-        this.context.lineWidth = Math.max(1, 2.5 * scale);
-        this.context.shadowBlur = 10 * scale;
-        this.context.shadowColor = color;
-
-        this.context.beginPath();
-        this.context.moveTo(widthLeft + widthRight, heightLeft + heightRight);
-        this.context.lineTo(widthLeft, heightLeft);
-        this.context.lineTo(widthLeft, heightLeft + height);
-        this.context.lineTo(0, height);
-        this.context.lineTo(widthRight, heightRight + height);
-        this.context.lineTo(widthRight, heightRight);
-        this.context.closePath();
-        this.context.stroke();
-
-        this.context.beginPath();
-        this.context.moveTo(0, 0);
-        this.context.lineTo(widthLeft, heightLeft);
-        this.context.stroke();
-
-        this.context.beginPath();
-        this.context.moveTo(0, 0);
-        this.context.lineTo(widthRight, heightRight);
-        this.context.stroke();
-
-        this.context.beginPath();
-        this.context.moveTo(0, 0);
-        this.context.lineTo(0, height);
-        this.context.stroke();
-
-        this.context.beginPath();
-        this.context.moveTo(widthLeft / 2, heightLeft / 2);
-        this.context.lineTo(widthLeft / 2 + widthRight, heightLeft / 2 + heightRight);
-        this.context.stroke();
-        this.context.restore();
-    }
-
-    #drawFacilityLabel(exit, transform, center, colors) {
-        const type = exit.getFacilityType();
-        const label = FACILITY_LABELS[type] || type;
-        const angle = exit.angle * Math.PI / 180 + transform.rotation;
-        const color = this.#facilityColor(type, colors);
-        const textRadius = transform.radius(exit.radius + 45);
-        const fontSize = 30 * transform.scale;
-
-        if (textRadius <= 0 || fontSize <= 0) {
-            return;
-        }
-
-        this.context.save();
-        this.context.font = `bold ${fontSize}px Orbitron, sans-serif`;
-        this.context.fillStyle = color;
-        this.context.textAlign = 'center';
-        this.context.textBaseline = 'middle';
-        this.context.shadowBlur = 15 * transform.scale;
-        this.context.shadowColor = color;
-
-        const charWidths = [...label].map(char => this.context.measureText(char).width + 6 * transform.scale);
-        const totalTextAngle = charWidths.reduce((total, width) => total + width, 0) / textRadius;
-        const normalized = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-        const isBottom = normalized > 0 && normalized < Math.PI;
-        let currentAngle = isBottom ? angle + totalTextAngle / 2 : angle - totalTextAngle / 2;
-
-        [...label].forEach((char, index) => {
-            const charWidth = charWidths[index];
-            const charAngle = isBottom
-                ? currentAngle - (charWidth / 2) / textRadius
-                : currentAngle + (charWidth / 2) / textRadius;
-
-            if (char !== ' ') {
-                this.context.save();
-                this.context.translate(
-                    center.x + Math.cos(charAngle) * textRadius,
-                    center.y + Math.sin(charAngle) * textRadius
-                );
-                this.context.rotate(isBottom ? charAngle - Math.PI / 2 : charAngle + Math.PI / 2);
-                this.context.fillText(char, 0, 0);
-                this.context.restore();
-            }
-
-            currentAngle += isBottom
-                ? -charWidth / textRadius
-                : charWidth / textRadius;
-        });
-
-        this.context.restore();
-    }
-
-    #drawBodies(colors) {
-        const transform = this.#createTransform();
-
-        this.targetSector.bodies.forEach(body => {
-            const position = transform.toScreen(body.position);
-            const radius = Math.max(4, transform.radius(body.radius));
-            const color = this.#bodyColor(body, colors);
-
-            this.context.save();
-            this.context.shadowBlur = 20 * transform.scale;
-            this.context.shadowColor = color;
-            this.context.fillStyle = color;
-            this.context.beginPath();
-            this.context.arc(position.x, position.y, radius, 0, Math.PI * 2);
-            this.context.fill();
-            this.context.restore();
-
-            if (body.items.length > 0) {
-                this.#drawItemRings(body, position, radius, transform, colors);
-            }
-        });
-    }
-
-    #drawItemRings(body, position, radius, transform, colors) {
-        const items = body.items || [];
-        const angleStep = (Math.PI * 2) / items.length;
-
-        items.forEach((item, index) => {
-            const category = this.#resolveItemCategory(item);
-            const color = colors.categories[category];
-            if (!color) {
-                return;
-            }
-
-            const startAngle = index * angleStep;
-            const gap = items.length > 1 ? 0.1 : 0;
-            this.context.save();
-            this.context.strokeStyle = color;
-            this.context.lineWidth = Math.max(1, 2 * transform.scale);
-            this.context.shadowBlur = 10 * transform.scale;
-            this.context.shadowColor = color;
-            this.context.beginPath();
-            this.context.arc(position.x, position.y, radius + 4 * transform.scale, startAngle, startAngle + angleStep - gap);
-            this.context.stroke();
-            this.context.restore();
-        });
-    }
-
-    #facilityColor(type, colors) {
-        return colors.facilities[type] || colors.rocket;
-    }
-
-    #bodyColor(body, colors) {
-        if (body.isHome) return colors.homeStar;
-        if (body.isRepulsion) return colors.repulsiveStar;
-        return colors.normalStar;
-    }
-
-    #resolveItemCategory(item) {
-        if (item?.category) {
-            return item.category;
-        }
-        if (item?.getViewData) {
-            return item.getViewData().category;
-        }
-        return null;
-    }
-
-    #hasDeliveryCargoForExit(exit) {
-        const facilityType = exit.getFacilityType();
-        return this.targetSector.bodies.some(body => (
-            (body.items || []).some(item => this.#isDeliveryCargoForFacility(item, facilityType))
-        ));
-    }
-
-    #isDeliveryCargoForFacility(item, facilityType) {
-        const viewData = item?.getViewData?.();
-        const category = item?.category ?? viewData?.category;
-        const deliveryGoalId = item?.deliveryGoalId ?? viewData?.deliveryGoalId;
-        return category === 'cargo' && deliveryGoalId === facilityType;
-    }
 }
 
 export default WorldRenderer;

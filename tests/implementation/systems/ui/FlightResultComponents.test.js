@@ -10,7 +10,7 @@ const repository = {
             branch: 'T'
         }
     })[id]),
-    getFacilityDefinition: vi.fn(id => ({
+    getStoryCategoryDefinition: vi.fn(id => ({
         T: { id: 'T', icon: 'T', className: 'trading-post' }
     })[id]),
     getUiText: vi.fn(key => ({
@@ -22,7 +22,10 @@ const repository = {
         'flightResult.sections.assets': 'COLLECTED SPACE ASSETS',
         'flightResult.stats.score': 'FLIGHT SCORE',
         'flightResult.stats.credits': 'CREDITS EARNED',
+        'flightResult.assets.emptyText': 'NO ASSETS COLLECTED',
+        'flightResult.assets.emptySubtext': 'Nothing was recovered during this flight.',
         'flightResult.actions.viewMap': 'VIEW MAP',
+        'flightResult.actions.share': 'SHARE',
         'flightResult.actions.continue': 'CONTINUE',
         'flightResult.bonusTitle': 'DELIVERY BONUS'
     })[key])
@@ -30,7 +33,7 @@ const repository = {
 
 beforeEach(() => {
     repository.getStoryContent.mockClear();
-    repository.getFacilityDefinition.mockClear();
+    repository.getStoryCategoryDefinition.mockClear();
     repository.getUiText.mockClear();
 });
 
@@ -89,12 +92,16 @@ describe('FlightResultComponents.generateHTML', () => {
         expect(html).toContain('state-recorded');
         expect(html).toContain('PROTECT RECORD');
         expect(html).toContain('通商物資');
+        expect(html).toContain('item-card-status state-delivered');
+        expect(html).toContain('DELIVERED');
         expect(html).toContain('DELIVERY BONUS');
         expect(html).toContain('Power Booster');
         expect(html).toContain('acquired-items-list state-staggered-list');
         expect(html).toContain('class="acquired-item-report state-staggered-item" style="--item-appear-index: 0;"');
         expect(html).toContain('母からの押し花');
         expect(html).toContain('TO TRADING POST');
+        expect(html).toContain('flight-result-share-button');
+        expect(html).toContain('SHARE');
     });
 
     it('renders pending replay state for unsaved records', () => {
@@ -113,5 +120,8 @@ describe('FlightResultComponents.generateHTML', () => {
         expect(html).toContain('state-not-recorded');
         expect(html).toContain('PROTECT RECORD');
         expect(html).toContain('BACK TO BASE');
+        expect(html).toContain('ItemCard placeholder-card');
+        expect(html).toContain('NO ASSETS COLLECTED');
+        expect(html).toContain('Nothing was recovered during this flight.');
     });
 });

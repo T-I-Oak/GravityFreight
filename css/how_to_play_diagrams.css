@@ -1,0 +1,164 @@
+.how-to-play-block-body.is-build-panel-demo {
+    padding: 0;
+}
+
+.how-to-play-build-panel {
+    --panel-border-color: color-mix(in srgb, var(--current-color), transparent 60%);
+    width: 100%;
+    max-height: 560px;
+    background: rgba(10, 20, 40, 0.4);
+}
+
+.how-to-play-build-panel .panel-body {
+    min-height: 0;
+    padding: var(--space-double);
+    overflow: hidden;
+}
+
+.how-to-play-build-panel .assembly-scroll {
+    min-height: 0;
+    max-height: 430px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 2px;
+}
+
+.how-to-play-build-panel .section-header {
+    margin: 12px 0 6px;
+}
+
+.how-to-play-build-panel .section:first-child .section-header {
+    margin-top: 0;
+}
+
+.how-to-play-build-panel .assembly-actions {
+    flex: 0 0 auto;
+    padding: var(--space-unit) var(--space-double) var(--space-double);
+    border-top: 1px solid var(--panel-border-color);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-bg-card), transparent 95%),
+        color-mix(in srgb, var(--color-bg-card), transparent 82%)
+    );
+}
+
+.how-to-play-build-panel .assembly {
+    --current-color: var(--color-theme-main);
+}
+
+.how-to-play-build-panel .launch {
+    --current-color: var(--color-category-launchers);
+}
+
+.how-to-play-build-panel .Button.button-large {
+    width: 100%;
+    height: 76px;
+    border-width: 3px;
+}
+
+.how-to-play-build-panel .assembly.state-disabled,
+.how-to-play-build-panel .launch.state-disabled {
+    filter: none;
+    opacity: 1;
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.how-to-play-build-panel .assembly.state-disabled.state-notable .btn-sub-label,
+.how-to-play-build-panel .launch.state-disabled.state-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+.how-to-play-build-panel .Button.state-pressed {
+    transform: translateY(3px) scale(0.99);
+    filter: brightness(1.2);
+}
+
+.how-to-play-build-panel .ItemCard.state-pressed {
+    transform: translateY(3px);
+    filter: brightness(1.16);
+}
+
+.how-to-play-launch-sequence {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-unit);
+    padding: var(--space-double);
+    background: rgba(10, 20, 40, 0.4);
+}
+
+.how-to-play-launch-equipment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-unit);
+}
+
+.how-to-play-launch-sequence .section-header {
+    margin: 0 0 4px;
+}
+
+.how-to-play-launch-sequence .item-list {
+    gap: var(--space-unit);
+}
+
+.how-to-play-launch-sequence .launch {
+    --current-color: var(--color-category-launchers);
+}
+
+.how-to-play-launch-sequence .Button.button-large {
+    width: 100%;
+    height: 76px;
+    border-width: 3px;
+}
+
+.how-to-play-launch-sequence .launch.state-disabled {
+    filter: none;
+    opacity: 1;
+    cursor: not-allowed;
+    background: color-mix(in srgb, var(--current-color), transparent 96%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.how-to-play-launch-sequence .launch.state-disabled.state-notable .btn-sub-label {
+    color: var(--current-color);
+    text-shadow: 0 0 12px var(--current-color);
+    animation: guide-pulse 2s infinite ease-in-out;
+    opacity: 1;
+}
+
+.how-to-play-launch-sequence .Button.state-pressed {
+    transform: translateY(3px) scale(0.99);
+    filter: brightness(1.2);
+}
+
+.how-to-play-launch-sequence .ItemCard.state-pressed {
+    transform: translateY(3px);
+    filter: brightness(1.16);
+}
+
+.how-to-play-demo-card {
+    pointer-events: none;
+}
+
+.how-to-play-canvas {
+    display: block;
+    width: 100%;
+    height: 140px;
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+#how-to-play-launch-canvas {
+    height: 88px;
+}
+
+.how-to-play-demo-button {
+    width: 100%;
+}

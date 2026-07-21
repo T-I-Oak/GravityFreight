@@ -11,7 +11,8 @@
     - `module` カテゴリについては、スロット数をカテゴリ上限として扱い、複数・重複選択を管理する。
     - ASSEMBLY タブの選択状態から `RocketItem` を生成し、inventory へ追加する。
     - UI から受け取った `{ category, uid }` を選択状態へ反映する。
-    - `BuildScreenPresenter` に view data 生成を委譲し、`UIController.showBuildScreen()` へ渡す。
+    - `BuildScreenPresenter` に view data 生成を委譲する。
+    - ビルドフェーズ開始など画面全体の表示切替が必要な場合のみ、生成した view data を `UIController.showBuildScreen()` へ渡す。
 - **責務外**:
     - inventory から表示データを抽出する処理は `BuildScreenPresenter` の責務。
     - スロット値や item 表示データの算出は各 item / `BuildScreenPresenter` の責務。
@@ -32,7 +33,8 @@
     - 上記以外の場合、対象 stack の選択数を `0` にリセットする。
     - `module` でスロットを持つ item を選択した場合、そのスロット増加分は即座にカテゴリ上限へ反映する。
     - chassis / logic の切り替えや module 選択数のリセットによって総スロット数が不足した場合、あふれた module は最後に選択されたものから順に自動解除する。
-    - 更新後に `showBuildScreen()` を呼び出し、最新 view data を返す。
+    - 更新後の最新 view data を返す。
+    - このメソッドは `UIController.showBuildScreen()` を呼び出さない。呼び出すと現在のタブ状態を初期化してしまうため、選択操作の再描画は呼び出し元 view が返却された view data を使って現在の表示状態のまま行う。
 
 - **`showBuildScreen(): BuildScreenViewData`**
     - 現在の `currentBuildSelection` を使って `BuildScreenPresenter.createViewData()` を呼び出す。

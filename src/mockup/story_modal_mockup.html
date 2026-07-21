@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravity Freight: Story Modal Mockup (Dynamic)</title>
-    
-    <!-- Google Fonts: Correctly including Italics, Bold Weights, and Special Decorative Fonts -->
+    <title>Gravity Freight: Story Modal Mockup</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Outfit:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
-    <!-- CSS Layers (V2 Architecture) -->
     <link rel="stylesheet" href="../../css/design_tokens.css">
     <link rel="stylesheet" href="../../css/ui_base.css">
     <link rel="stylesheet" href="../../css/ui_layout.css">
@@ -18,82 +16,241 @@
     <link rel="stylesheet" href="../../css/ui_style_neon.css">
     <link rel="stylesheet" href="../../css/ui_style_matte.css">
     <link rel="stylesheet" href="../../css/ui_facility_badge.css">
-    <!-- View Specific -->
     <link rel="stylesheet" href="../../css/story_modal.css">
 
     <style>
         body {
             margin: 0;
-            padding: 0;
             width: 100vw;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
-            background: #000;
+            background:
+                radial-gradient(circle at 50% 40%, rgba(0, 255, 209, 0.12), transparent 38%),
+                #050812;
+            color: #fff;
+            font-family: "Inter", "Noto Sans JP", sans-serif;
         }
-        .verification-background {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('../../assets/tutorial/slide1.png') no-repeat center center;
-            background-size: cover;
-            filter: brightness(0.7);
-            z-index: 0;
-        }
-        #modal-container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
-        }
-        /* Demo Controls Positioning */
-        .demo-overlay {
+
+        .story-mockup-shell {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 9999;
+            inset: 0;
+            display: grid;
+            grid-template-columns: minmax(260px, 340px) 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .story-mockup-controls {
+            position: relative;
+            z-index: calc(var(--z-system) + 500);
             display: flex;
-            gap: 12px;
+            min-height: 0;
+            flex-direction: column;
+            gap: var(--space-double);
+            padding: var(--space-double);
+            border: 1px solid rgba(0, 255, 209, 0.5);
+            border-radius: var(--radius-standard);
+            background: rgba(5, 10, 30, 0.88);
+            box-shadow: 0 0 24px rgba(0, 255, 209, 0.15);
+        }
+
+        .story-mockup-header {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .story-mockup-title {
+            margin: 0;
+            color: var(--color-accent-primary);
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .story-mockup-meta {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .story-mockup-language {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .story-mockup-language select {
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid rgba(0, 255, 209, 0.5);
+            background: rgba(0, 0, 0, 0.35);
+            color: #fff;
+            font: inherit;
+        }
+
+        .story-mockup-list {
+            min-height: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 6px;
+        }
+
+        .story-mockup-button {
+            display: grid;
+            grid-template-columns: 46px 1fr auto;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            min-height: 46px;
+            padding: 8px 10px;
+            border: 1px solid color-mix(in srgb, var(--current-color), transparent 50%);
+            border-radius: var(--radius-standard);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .story-mockup-button.state-active {
+            background: color-mix(in srgb, var(--current-color), transparent 78%);
+            box-shadow: inset 3px 0 0 var(--current-color);
+        }
+
+        .story-mockup-id {
+            color: var(--current-color);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+        }
+
+        .story-mockup-name {
+            overflow: hidden;
+            font-size: 13px;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .story-mockup-step {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        #story-overlay.story-mockup-preview {
+            position: relative;
+            inset: auto;
+            z-index: calc(var(--z-system) + 300);
+            min-width: 0;
+            min-height: 0;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-standard);
+        }
+
+        @media (max-width: 860px) {
+            .story-mockup-shell {
+                grid-template-columns: 1fr;
+                grid-template-rows: minmax(180px, 34vh) 1fr;
+            }
         }
     </style>
 </head>
 <body class="theme-neon">
-    
-    <div class="verification-background"></div>
+    <main class="story-mockup-shell">
+        <aside class="story-mockup-controls" aria-label="Story mockup controls">
+            <header class="story-mockup-header">
+                <h1 class="story-mockup-title">Story Modal</h1>
+                <div class="story-mockup-meta" id="story-count-label"></div>
+            </header>
 
-    <div class="demo-overlay">
-        <button class="Button state-primary" id="demo-random-story">SHOW RANDOM STORY</button>
-    </div>
+            <label class="story-mockup-language">
+                Language
+                <select id="story-language-select">
+                    <option value="ja">Japanese</option>
+                    <option value="en">English</option>
+                </select>
+            </label>
 
-    <div id="modal-container" class="FlexCenter">
-        <!-- Modal will be injected here via UIComponents -->
-    </div>
+            <nav class="story-mockup-list" id="story-list" aria-label="Story list"></nav>
+        </aside>
+
+        <section id="story-overlay" class="story-mockup-preview FlexCenter" aria-live="polite"></section>
+    </main>
 
     <script type="module">
         import { UIComponents } from '../systems/ui/UIComponents.js';
-        import { STORY_DATA, mockGameDataRepository } from './mock_data.js';
+        import {
+            STORY_DATA,
+            mockGameDataRepository,
+            setMockLanguage
+        } from './mock_data.js';
 
-        const container = document.getElementById('modal-container');
-        const demoBtn = document.getElementById('demo-random-story');
+        const overlay = document.getElementById('story-overlay');
+        const storyList = document.getElementById('story-list');
+        const languageSelect = document.getElementById('story-language-select');
+        const storyCountLabel = document.getElementById('story-count-label');
+        const storyIds = mockGameDataRepository.getStoryIds();
+        const regularCount = storyIds.filter(id => id !== 'HOME25').length;
+        const specialCount = storyIds.length - regularCount;
+        let selectedStoryId = storyIds[0];
 
-        function showRandomStory() {
-            const keys = Object.keys(STORY_DATA);
-            const randomKey = keys[Math.floor(Math.random() * keys.length)];
-            
-            // Generate HTML via UIComponents (Logic from src/systems/ui/UIComponents.js)
-            container.innerHTML = UIComponents.generateStoryModalHTML(randomKey, mockGameDataRepository);
+        storyCountLabel.textContent = `${regularCount} regular / ${specialCount} special / ${storyIds.length} total`;
 
-            // Setup Close Interaction
-            const closeBtn = document.getElementById('story-modal-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    container.innerHTML = '';
-                });
-            }
+        function renderStoryList() {
+            storyList.innerHTML = storyIds.map(storyId => {
+                const story = mockGameDataRepository.getStoryContent(storyId);
+                const category = mockGameDataRepository.getStoryCategoryDefinition(story.branch);
+                const activeClass = storyId === selectedStoryId ? 'state-active' : '';
+                const stepLabel = storyId === 'HOME25' ? 'SPECIAL' : `STEP ${STORY_DATA[storyId].step}`;
+
+                return `
+                    <button class="story-mockup-button ${category.className} ${activeClass}"
+                            type="button"
+                            data-story-id="${storyId}">
+                        <span class="story-mockup-id">${storyId}</span>
+                        <span class="story-mockup-name">${story.title}</span>
+                        <span class="story-mockup-step">${stepLabel}</span>
+                    </button>
+                `;
+            }).join('');
         }
 
-        demoBtn.addEventListener('click', showRandomStory);
+        function renderStoryModal() {
+            overlay.innerHTML = UIComponents.generateStoryModalHTML(selectedStoryId, mockGameDataRepository);
+            const closeButton = document.getElementById('story-modal-close');
+            closeButton.addEventListener('click', renderStoryModal);
+            renderStoryList();
+        }
 
-        // Initial Load for Mockup Verification
-        showRandomStory();
+        storyList.addEventListener('click', event => {
+            const button = event.target.closest('[data-story-id]');
+            if (!button) {
+                return;
+            }
+            selectedStoryId = button.dataset.storyId;
+            renderStoryModal();
+        });
+
+        languageSelect.addEventListener('change', event => {
+            setMockLanguage(event.target.value);
+            document.documentElement.lang = event.target.value;
+            renderStoryModal();
+        });
+
+        renderStoryModal();
     </script>
 </body>
 </html>

@@ -49,6 +49,7 @@ describe('FacilityComponents.generateHTML', () => {
         expect(html).toContain('data-facility-credits-value="120"');
         expect(html).toContain('data-action="buy"');
         expect(html).toContain('data-uid="item_1"');
+        expect(html).toContain('id="facility-depart-button"');
     });
 
     it('renders grouped sections in a single column', () => {
@@ -97,9 +98,81 @@ describe('FacilityComponents.generateHTML', () => {
         });
 
         expect(html).toContain('data-section="maintenance"');
+        expect(html).toContain('id="facility-section-repair"');
+        expect(html).toContain('id="facility-section-dismantle"');
         expect(html).toContain('発射台のメンテナンス');
         expect(html).toContain('ロケットの分解・強化');
         expect(html).toContain('data-section="received"');
+    });
+
+    it('renders an optional parent header for grouped sections', () => {
+        const html = FacilityComponents.generateHTML({
+            name: 'TRADING POST',
+            icon: 'T',
+            themeClass: 'trading-post',
+            description: '貨物取引やパーツの売買ができる中継基地。',
+            coins: 50,
+            creditsLabel: 'CREDITS:',
+            departLabel: 'TO NEXT SECTOR',
+            sections: [
+                {
+                    id: 'sell',
+                    title: 'パーツの売却',
+                    subtitle: '不要なパーツを売却して資金を獲得できます。',
+                    sections: [
+                        {
+                            id: 'sell-chassis',
+                            title: 'シャーシ',
+                            subtitle: 'ロケットの構成パーツを売却できます。',
+                            entries: [],
+                            emptyText: 'NO ITEMS',
+                            emptySubtext: '現在表示できる項目はありません。',
+                            themeClass: 'chassis'
+                        }
+                    ]
+                }
+            ]
+        });
+
+        expect(html).toContain('data-section="sell"');
+        expect(html).toContain('id="facility-section-sell-chassis"');
+        expect(html).toContain('パーツの売却');
+        expect(html).toContain('シャーシ');
+    });
+
+    it('renders Trading Post sell category headers like build panel section headers', () => {
+        const html = FacilityComponents.generateHTML({
+            name: 'TRADING POST',
+            icon: 'T',
+            themeClass: 'trading-post',
+            description: '貨物取引やパーツの売買ができる中継基地。',
+            coins: 120,
+            creditsLabel: 'CREDITS:',
+            departLabel: 'TO NEXT SECTOR',
+            sections: [
+                {
+                    id: 'sell',
+                    title: 'パーツの売却',
+                    subtitle: '不要なパーツを売却して資金を獲得できます。',
+                    sections: [
+                        {
+                            id: 'sell-rocket',
+                            title: 'ROCKET',
+                            subtitle: '',
+                            headerVariant: 'category',
+                            entries: [],
+                            emptyText: 'NO ITEMS',
+                            emptySubtext: '現在表示できる項目はありません。',
+                            themeClass: 'rocket'
+                        }
+                    ]
+                }
+            ]
+        });
+
+        expect(html).toContain('<header class="section-header category-header rocket">');
+        expect(html).toContain('<h3 class="section-title">ROCKET</h3>');
+        expect(html).not.toContain('<span class="section-subtitle"></span>');
     });
 
     it('applies entry button modifier classes', () => {
@@ -144,6 +217,51 @@ describe('FacilityComponents.generateHTML', () => {
         expect(html).toContain('Button state-primary facility-action-button color-theme-sub');
     });
 
+    it('renders a one-item sell selection for stacked Trading Post entries', () => {
+        const html = FacilityComponents.generateHTML({
+            name: 'TRADING POST',
+            icon: 'T',
+            themeClass: 'trading-post',
+            description: '貨物取引やパーツの売買ができる中継基地。',
+            coins: 120,
+            creditsLabel: 'CREDITS:',
+            departLabel: 'TO NEXT SECTOR',
+            sections: [
+                {
+                    id: 'sell',
+                    title: 'パーツの売却',
+                    subtitle: '不要なパーツを売却して資金を獲得できます。',
+                    entries: [
+                        {
+                            action: 'sell',
+                            actionLabel: 'SELL',
+                            uid: 'stack_logic',
+                            price: 20,
+                            discountPercent: 0,
+                            disabled: false,
+                            buttonClass: 'color-theme-sub',
+                            cardOptions: { selectedCount: 1 },
+                            itemViewData: {
+                                uid: 'stack_logic',
+                                id: 'sensor_short',
+                                name: 'Short Sensor',
+                                category: 'logic',
+                                count: 2,
+                                stats: {}
+                            }
+                        }
+                    ],
+                    emptyText: 'NO ITEMS',
+                    emptySubtext: '現在表示できる項目はありません。',
+                    themeClass: 'trading-post'
+                }
+            ]
+        });
+
+        expect(html).toContain('x1/2');
+        expect(html).toContain('20 c');
+    });
+
     it('stagger-animates received and acquired item lists only', () => {
         const html = FacilityComponents.generateHTML({
             name: 'BLACK MARKET',
@@ -180,7 +298,7 @@ describe('FacilityComponents.generateHTML', () => {
                     themeClass: 'black-market'
                 },
                 {
-                    id: 'acquired',
+                    id: 'blackMarketAcquired',
                     title: '獲得アイテム',
                     subtitle: '今回取得したアイテムです。',
                     entries: [
@@ -223,7 +341,7 @@ describe('FacilityComponents.generateHTML', () => {
         });
 
         expect(html).toContain('data-section="stock"');
-        expect(html).toContain('data-section="acquired"');
+        expect(html).toContain('data-section="blackMarketAcquired"');
         expect(html).toContain('<div class="item-list state-staggered-list">');
         expect(html).toContain('class="trade-entry SplitRow state-staggered-item" style="--item-appear-index: 0;" data-action="received" data-uid="acquired_1"');
         expect(html).toContain('class="trade-entry SplitRow state-staggered-item" style="--item-appear-index: 1;" data-action="received" data-uid="acquired_2"');

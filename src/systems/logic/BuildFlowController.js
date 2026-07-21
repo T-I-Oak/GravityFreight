@@ -24,16 +24,20 @@ class BuildFlowController {
             this.#toggleSelection(category, uid);
         }
 
-        return this.showBuildScreen();
+        return this.createViewData();
     }
 
     showBuildScreen() {
-        const viewData = this.buildScreenPresenter.createViewData(
+        const viewData = this.createViewData();
+        this.uiController.showBuildScreen?.(viewData);
+        return viewData;
+    }
+
+    createViewData() {
+        return this.buildScreenPresenter.createViewData(
             this.sessionState,
             this.currentBuildSelection
         );
-        this.uiController.showBuildScreen?.(viewData);
-        return viewData;
     }
 
     assembleRocket() {

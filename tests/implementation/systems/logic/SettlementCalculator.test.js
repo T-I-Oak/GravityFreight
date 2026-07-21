@@ -64,6 +64,13 @@ describe('SettlementCalculator', () => {
         expect(settlement.status).toBe('cleared');
         expect(settlement.totalScore).toBe(3512);
         expect(settlement.totalCoins).toBe(420);
+        expect(settlement.deliveryCount).toBe(1);
+        expect(settlement.entries).toEqual([
+            { label: 'Flight Duration Score', score: 12 },
+            { label: 'Goal Bonus', score: 2000, coin: 20 },
+            { label: 'Delivery Bonus', score: 1500, coin: 100 },
+            { label: 'Collected Coins', coin: 300 }
+        ]);
         expect(settlement.recoveredItems).toEqual([rocketItem]);
         expect(settlement.acquiredItems).not.toContain(rocketItem);
     });
@@ -106,8 +113,33 @@ describe('SettlementCalculator', () => {
         expect(settlement.entries).toEqual([
             { label: 'Flight Duration Score', score: 12 },
             { label: 'Goal Bonus', score: 2000, coin: 20 },
-            { label: 'Delivery Bonus', score: 1500, coin: 310 }
+            { label: 'Delivery Bonus', score: 1500, coin: 110 },
+            { label: 'Collected Coins', coin: 200 }
         ]);
+        expect(settlement.deliveryCount).toBe(1);
+    });
+
+    it('omits zero-score delivery fields for unmatched-only delivery bonus entries', () => {
+        const calculator = new SettlementCalculator(repository, lotteryService);
+        lotteryService.drawLottery.mockReturnValue([]);
+
+        const settlement = calculator.calculate({
+            type: 'arc',
+            target: { getFacilityType: () => 'TRADING_POST' }
+        }, {
+            ticks: 12,
+            heldCargo: [
+                new Item('cargo_normal', repository)
+            ],
+            rocketItem: createRocketItem()
+        }, session);
+
+        expect(settlement.entries).toEqual([
+            { label: 'Flight Duration Score', score: 12 },
+            { label: 'Goal Bonus', score: 2000, coin: 20 },
+            { label: 'Delivery Bonus', coin: 10 }
+        ]);
+        expect(settlement.deliveryCount).toBe(0);
     });
 
     it('reports lucky cargo without unmatched delivery status because it is not a delivery item', () => {

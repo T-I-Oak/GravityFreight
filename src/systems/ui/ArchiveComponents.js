@@ -11,7 +11,44 @@ function formatNumber(value) {
     return new Intl.NumberFormat('en-US').format(value ?? 0);
 }
 
-function createGraphSeries(records = [], field) {
+function formatRomanNumeral(value) {
+    let number = Number(value);
+    if (!Number.isInteger(number) || number <= 0) {
+        return escapeHtml(value);
+    }
+
+    const numerals = [
+        [1000, 'M'],
+        [900, 'CM'],
+        [500, 'D'],
+        [400, 'CD'],
+        [100, 'C'],
+        [90, 'XC'],
+        [50, 'L'],
+        [40, 'XL'],
+        [10, 'X'],
+        [9, 'IX'],
+        [5, 'V'],
+        [4, 'IV'],
+        [1, 'I']
+    ];
+    let result = '';
+    for (const [amount, label] of numerals) {
+        while (number >= amount) {
+            result += label;
+            number -= amount;
+        }
+    }
+    return result;
+}
+
+const GRAPH_BANDS = {
+    score: { topRatio: 0, bottomRatio: 0.8 },
+    collected: { topRatio: 0.1, bottomRatio: 0.9 },
+    sector: { topRatio: 0.2, bottomRatio: 1 }
+};
+
+function createGraphSeries(records = [], field, band = GRAPH_BANDS.score) {
     const points = [...records].reverse().map(record => Number(record[field] ?? 0));
     const maxValue = Math.max(...points, 1);
     if (points.length === 0) {
@@ -21,8 +58,11 @@ function createGraphSeries(records = [], field) {
     const width = 800;
     const top = 15;
     const bottom = 110;
+    const fullHeight = bottom - top;
+    const bandTop = top + fullHeight * band.topRatio;
+    const bandBottom = top + fullHeight * band.bottomRatio;
     const xStep = width / 19;
-    const toY = value => bottom - ((value / maxValue) * (bottom - top));
+    const toY = value => bandBottom - ((value / maxValue) * (bandBottom - bandTop));
     const path = points
         .map((value, index) => `${index === 0 ? 'M' : 'L'}${Math.round(index * xStep)},${Math.round(toY(value))}`)
         .join(' ');
@@ -40,17 +80,29 @@ function activeColumnClass(category, activeCategory) {
     return category === activeCategory ? 'state-active state-active-column' : '';
 }
 
+function createDateCell(createdAt, isNew) {
+    const newBadge = isNew ? '<span class="Badge state-new">NEW</span>' : '';
+    return `
+        <td class="col-date">
+            <span class="date-cell">
+                <span class="date-label">${escapeHtml(createdAt)}</span>
+                ${newBadge}
+            </span>
+        </td>
+    `;
+}
+
 function createRankingRows(rows = [], activeCategory = 'score') {
     if (rows.length === 0) {
         return '<tr><td colspan="5">NO RECORDS</td></tr>';
     }
     return rows.map(row => `
-        <tr>
+        <tr class="${row.isNew ? 'state-new' : ''}">
             <td class="col-rank">#${String(row.rank).padStart(2, '0')}</td>
             <td class="col-score score ${activeColumnClass('score', activeCategory)}">${formatNumber(row.score)}</td>
             <td class="col-sector sector ${activeColumnClass('sector', activeCategory)}">${formatNumber(row.reachedSector)}</td>
             <td class="col-count item-count ${activeColumnClass('collected', activeCategory)}">${formatNumber(row.collectedItemCount)}</td>
-            <td class="col-date">${escapeHtml(row.createdAt)}</td>
+            ${createDateCell(row.createdAt, row.isNew)}
         </tr>
     `).join('');
 }
@@ -60,12 +112,12 @@ function createReplayRows(rows = []) {
         return '<tr><td colspan="5">NO REPLAYS</td></tr>';
     }
     return rows.map(row => `
-        <tr class="state-inactive state-clickable" data-replay-id="${escapeHtml(row.id)}">
+        <tr class="state-inactive state-clickable ${row.isNew ? 'state-new' : ''}" data-replay-id="${escapeHtml(row.id)}">
             <td class="col-fav"><i class="favorite-star state-clickable ${row.favorite ? 'state-active' : 'state-inactive'}" data-replay-favorite="${escapeHtml(row.id)}">★</i></td>
             <td class="col-no">${escapeHtml(row.no)}</td>
             <td class="col-sector sector">${formatNumber(row.reachedSector)}</td>
             <td class="col-score score">${formatNumber(row.score)}</td>
-            <td class="col-date">${escapeHtml(row.createdAt)}</td>
+            ${createDateCell(row.createdAt, row.isNew)}
         </tr>
     `).join('');
 }
@@ -81,7 +133,7 @@ function createAchievementCards(rows = []) {
         return `
             <div class="theme-printing">
                 <div class="AchievementCard${lockedClass}">
-                    ${row.achievedTier ? `<div class="log-bg-seal-group ${tierClass}"><span class="seal-label-tier">TIER</span><span class="seal-num">${row.achievedTier}</span></div>` : ''}
+                    ${row.achievedTier ? `<div class="log-bg-seal-group ${tierClass}"><span class="seal-label-tier">TIER</span><span class="seal-num">${formatRomanNumeral(row.achievedTier)}</span></div>` : ''}
                     <div class="log-title">${escapeHtml(row.title)}</div>
                     <div class="log-data-group">
                         <div class="log-method-row">
@@ -96,6 +148,26 @@ function createAchievementCards(rows = []) {
     }).join('');
 }
 
+function createStoryArchiveCards(rows = []) {
+    if (rows.length === 0) {
+        return '<div class="archive-story-empty">NO STORIES</div>';
+    }
+    return rows.map(row => {
+        const stateClass = row.isRead ? 'state-clickable' : 'state-disabled';
+        const facilityClass = row.isRead ? row.className : '';
+        const title = row.isRead ? row.title : '???';
+        const dataAttribute = row.isRead ? ` data-story-id="${escapeHtml(row.id)}"` : '';
+        return `
+            <article class="ItemCard archive-story-card ${stateClass} ${facilityClass}"${dataAttribute}>
+                <div class="item-card-header">
+                    <i class="Icon mail"></i>
+                    <h3 class="item-card-title">${escapeHtml(title)}</h3>
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+
 export const ArchiveComponents = {
     generateHTML(viewData = {}) {
         const kpis = viewData.kpis || {};
@@ -103,6 +175,7 @@ export const ArchiveComponents = {
         const recentRows = viewData.recentResults || [];
         const replays = viewData.replays || [];
         const achievements = viewData.achievements || [];
+        const stories = viewData.stories || [];
         return `
             <article id="archive-screen" class="Panel color-theme-main archive">
                 <header class="panel-header SplitRow">
@@ -117,13 +190,14 @@ export const ArchiveComponents = {
                         <button class="Button state-primary state-active" data-tab="analytics">Analytics</button>
                         <button class="Button state-primary state-inactive" data-tab="replays">Replays</button>
                         <button class="Button state-primary state-inactive" data-tab="achievements">Achievements</button>
+                        <button class="Button state-primary state-inactive" data-tab="story">Story</button>
                     </div>
                 </header>
                 <div class="panel-body">
                     <div class="ColumnSet">
                         <section class="Column aside">
                             <div class="kpi-container">
-                                ${this.createKpi('MAX SECTOR', kpis.totalCompletedSectors, 'sector')}
+                                ${this.createKpi('TOTAL CLEAR SECTORS', kpis.totalCompletedSectors, 'sector')}
                                 ${this.createKpi('LIFETIME CONTRACTS', kpis.lifetimeContracts, 'contract')}
                                 ${this.createKpi('TOTAL ITEMS COLLECTED', kpis.totalCollectedItems, 'item-count')}
                                 ${this.createKpi('ACHIEVEMENT PROGRESS', `${kpis.achievementRate ?? 0}%`, 'achievement-rate')}
@@ -133,6 +207,7 @@ export const ArchiveComponents = {
                             ${this.createAnalyticsTab(rankings, recentRows)}
                             ${this.createReplayTab(replays)}
                             ${this.createAchievementTab(achievements)}
+                            ${this.createStoryTab(stories)}
                         </div>
                     </div>
                 </div>
@@ -202,9 +277,9 @@ export const ArchiveComponents = {
     },
 
     createTrendGraph(records = []) {
-        const score = createGraphSeries(records, 'score');
-        const sector = createGraphSeries(records, 'reachedSector');
-        const itemCount = createGraphSeries(records, 'collectedItemCount');
+        const score = createGraphSeries(records, 'score', GRAPH_BANDS.score);
+        const sector = createGraphSeries(records, 'reachedSector', GRAPH_BANDS.sector);
+        const itemCount = createGraphSeries(records, 'collectedItemCount', GRAPH_BANDS.collected);
         if (!score.path && !sector.path && !itemCount.path) {
             return '<svg class="graph-svg" viewBox="0 0 800 120" preserveAspectRatio="none"></svg>';
         }
@@ -251,5 +326,20 @@ export const ArchiveComponents = {
                 <div class="achievement-showcase">${createAchievementCards(rows)}</div>
             </section>
         `;
+    },
+
+    createStoryTab(rows) {
+        return `
+            <section id="tab-story" class="tab-content section">
+                <header class="section-header SplitRow">
+                    <div class="SplitColumn"><h3 class="section-title">STORY ARCHIVE</h3></div>
+                </header>
+                <div class="archive-story-grid">${createStoryArchiveCards(rows)}</div>
+            </section>
+        `;
+    },
+
+    createAchievementToastCard(row) {
+        return createAchievementCards([row]);
     }
 };

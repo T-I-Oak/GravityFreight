@@ -3,6 +3,9 @@
  * Standardized HTML generation logic for Gravity Freight.
  */
 
+import { FACILITY_LABELS, FACILITY_THEME_CLASSES } from '../logic/facilityViewConstants.js';
+import { generateDeliveryCargoIconSVG } from './deliveryCargoIconShape.js';
+
 export class UIComponents {
     static formatNumber(value) {
         return new Intl.NumberFormat('en-US').format(value ?? 0);
@@ -62,6 +65,7 @@ export class UIComponents {
     static generateHeaderRightHTML(item, options) {
         let html = '';
         const miniClass = options.isMini ? 'state-mini' : '';
+        html += this.generateDeliveryBadgeHTML(item, miniClass);
 
         // Durability Gauge (Explicit data only)
         if (item.maxCharges !== undefined && item.maxCharges > 0) {
@@ -78,12 +82,39 @@ export class UIComponents {
 
         // Status Badge
         if (options.status) {
-            const status = options.status.toLowerCase();
+            const statusView = this.normalizeCardStatus(options.status);
             const statusMiniClass = options.isMini ? 'state-mini' : '';
-            html += `<span class="item-card-status state-${status} ${statusMiniClass}">${status.toUpperCase()}</span>`;
+            html += `<span class="item-card-status state-${statusView.className} ${statusMiniClass}">${statusView.label}</span>`;
         }
 
         return html;
+    }
+
+    static generateDeliveryBadgeHTML(item, sizeClass = '') {
+        if (item.category !== 'cargo' || !item.deliveryGoalId) {
+            return '';
+        }
+
+        const themeClass = FACILITY_THEME_CLASSES[item.deliveryGoalId];
+        const facilityLabel = FACILITY_LABELS[item.deliveryGoalId];
+        if (!themeClass || !facilityLabel) {
+            return '';
+        }
+
+        const title = `Delivery Bonus: ${facilityLabel}`;
+        return `<span class="item-card-delivery-badge ${themeClass} ${sizeClass}" title="${title}" aria-label="${title}">${generateDeliveryCargoIconSVG('delivery-cargo-icon')}</span>`;
+    }
+
+    static normalizeCardStatus(status) {
+        const normalized = String(status).toLowerCase();
+        if (normalized === 'match' || normalized === 'delivered') {
+            return { className: 'delivered', label: 'DELIVERED' };
+        }
+        if (normalized === 'unmatched') {
+            return { className: 'unmatched', label: 'UNMATCHED' };
+        }
+
+        return { className: normalized, label: normalized.toUpperCase() };
     }
 
     /**
@@ -196,10 +227,10 @@ export class UIComponents {
         }
 
         const story = gameDataRepository.getStoryContent(storyId);
-        const facilityClass = gameDataRepository.getFacilityDefinition(story.branch).className;
+        const facilityClass = gameDataRepository.getStoryCategoryDefinition(story.branch).className;
 
         return `
-            <article class="ItemCard story-card state-clickable ${facilityClass}">
+            <article class="ItemCard story-card state-clickable ${facilityClass}" data-story-id="${storyId}">
                 <header class="item-card-header SplitRow">
                     <h3 class="item-card-title">${story.title}</h3>
                     <div class="item-card-header-right">
@@ -222,9 +253,9 @@ export class UIComponents {
 
         const story = gameDataRepository.getStoryContent(storyId);
 
-        const facility = gameDataRepository.getFacilityDefinition(story.branch);
-        const facilityClass = facility.className;
-        const icon = facility.icon;
+        const storyCategory = gameDataRepository.getStoryCategoryDefinition(story.branch);
+        const facilityClass = storyCategory.className;
+        const icon = storyCategory.icon;
 
         return `
             <article class="Panel ${facilityClass} story-card">

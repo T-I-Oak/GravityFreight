@@ -1,0 +1,110 @@
+/* =========================================
+   Gravity Freight V2: Replay Screen
+   Layer: Context / Individual
+   Focus: Archived flight playback controls
+   ========================================= */
+
+.ReplayOverlay {
+    position: fixed;
+    top: var(--space-double);
+    right: var(--space-double);
+    z-index: var(--z-panel);
+    width: 340px;
+    max-height: calc(100vh - var(--space-double) * 2);
+    pointer-events: none;
+}
+
+.ReplayOverlay.state-hidden,
+.ReplayOverlay[hidden] {
+    display: none;
+}
+
+.ReplayLoadoutPanel {
+    --panel-border-color: color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    padding: 0;
+    border-color: var(--panel-border-color);
+    pointer-events: auto;
+}
+
+.ReplayLoadoutPanel .panel-header {
+    padding: var(--space-unit) var(--space-double);
+    border-bottom-color: var(--panel-border-color);
+}
+
+.ReplayLoadoutPanel h2 {
+    margin: 0;
+    color: var(--color-theme-sub);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.ReplayLoadoutPanel .panel-body {
+    min-height: 0;
+    padding: var(--space-double);
+    overflow: hidden auto;
+}
+
+.replay-config-list {
+    display: grid;
+    gap: var(--space-double);
+}
+
+.replay-loadout-section {
+    display: grid;
+    gap: var(--space-unit);
+}
+
+.replay-loadout-section .section-title {
+    margin: 0;
+    color: var(--current-color, var(--color-theme-main));
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.replay-loadout-section.rocket { --current-color: var(--color-category-rockets); }
+.replay-loadout-section.launcher { --current-color: var(--color-category-launchers); }
+.replay-loadout-section.booster { --current-color: var(--color-category-boosters); }
+
+.replay-loadout-items {
+    display: grid;
+    gap: var(--space-unit);
+}
+
+.replay-loadout-items .ItemCard {
+    pointer-events: none;
+}
+
+.replay-empty {
+    margin: 0;
+    padding: var(--space-double);
+    border: 1px dashed color-mix(in srgb, var(--current-color), transparent 70%);
+    border-radius: var(--radius-standard);
+    color: color-mix(in srgb, var(--current-color), transparent 40%);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.ReplayLoadoutPanel .replay-actions {
+    border-top: 1px solid var(--panel-border-color);
+    padding: var(--space-unit) var(--space-double) var(--space-double);
+    background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--color-bg-card), transparent 82%),
+        color-mix(in srgb, var(--color-bg-card), transparent 95%)
+    );
+}
+
+.ReplayLoadoutPanel .replay-exit {
+    --current-color: var(--color-theme-sub);
+    width: 100%;
+    min-height: 74px;
+    border-width: 3px;
+}

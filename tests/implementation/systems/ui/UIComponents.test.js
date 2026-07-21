@@ -15,16 +15,29 @@ const storyRepository = {
                 discovery: '古い工具',
                 content: '整備記録が残されている。',
                 branch: 'R'
+            },
+            TR: {
+                title: 'レオの修理メモ',
+                discovery: '子供の書き置き',
+                content: 'ロケットを直した記録。',
+                branch: 'R'
+            },
+            HOME: {
+                title: '帰郷',
+                discovery: '懐かしい人々が出迎えた。',
+                content: 'お帰り。',
+                branch: 'HOME'
             }
         };
         return stories[id];
     }),
-    getFacilityDefinition: vi.fn(id => {
-        const facilities = {
+    getStoryCategoryDefinition: vi.fn(id => {
+        const categories = {
             T: { id: 'T', icon: 'T', className: 'trading-post' },
-            R: { id: 'R', icon: 'R', className: 'repair-dock' }
+            R: { id: 'R', icon: 'R', className: 'repair-dock' },
+            HOME: { id: 'HOME', icon: '⌂', className: 'home' }
         };
-        return facilities[id];
+        return categories[id];
     }),
     getUiText: vi.fn(key => ({
         'flightResult.replay.recorded': '● RECORDED',
@@ -43,7 +56,7 @@ const storyRepository = {
 
 beforeEach(() => {
     storyRepository.getStoryContent.mockClear();
-    storyRepository.getFacilityDefinition.mockClear();
+    storyRepository.getStoryCategoryDefinition.mockClear();
     storyRepository.getUiText.mockClear();
 });
 
@@ -196,6 +209,46 @@ describe('UIComponents.generateCardHTML (Core Logic)', () => {
         const html = UIComponents.generateCardHTML(mockItem, { status: 'DELIVERED' });
         expect(html).toContain('item-card-status state-delivered');
         expect(html).toContain('DELIVERED');
+    });
+
+    it('should render matched delivery cargo as delivered status', () => {
+        const html = UIComponents.generateCardHTML(mockItem, { status: 'match' });
+
+        expect(html).toContain('item-card-status state-delivered');
+        expect(html).toContain('DELIVERED');
+        expect(html).not.toContain('state-match');
+        expect(html).not.toContain('MATCH');
+    });
+
+    it('should render a delivery destination icon using the facility theme class', () => {
+        const deliveryCargo = {
+            ...mockItem,
+            id: 'cargo_safe',
+            name: '通商物資',
+            category: 'cargo',
+            deliveryGoalId: 'TRADING_POST'
+        };
+
+        const html = UIComponents.generateCardHTML(deliveryCargo);
+
+        expect(html).toContain('item-card-delivery-badge trading-post');
+        expect(html).toContain('delivery-cargo-icon');
+        expect(html).toContain('<polyline points="30,0 0,4.5 0,22.5 15,31.5 45,27 45,9 30,0"></polyline>');
+        expect(html).toContain('title="Delivery Bonus: TRADING POST"');
+        expect(html).toContain('aria-label="Delivery Bonus: TRADING POST"');
+    });
+
+    it('should not render a delivery destination icon for cargo without a delivery goal', () => {
+        const specialCargo = {
+            ...mockItem,
+            id: 'cargo_lucky',
+            name: '幸運の導き',
+            category: 'cargo'
+        };
+
+        const html = UIComponents.generateCardHTML(specialCargo);
+
+        expect(html).not.toContain('item-card-delivery-badge');
     });
 
     it('should apply state-selected for selected item cards', () => {
@@ -417,15 +470,24 @@ describe('UIComponents.generateStoryCardHTML', () => {
     it('should generate story card with correct title and discovery text', () => {
         const html = UIComponents.generateStoryCardHTML('T', storyRepository);
         expect(html).toContain('story-card');
+        expect(html).toContain('data-story-id="T"');
         expect(html).toContain('母からの押し花');
         expect(html).toContain('trading-post');
         expect(storyRepository.getStoryContent).toHaveBeenCalledWith('T');
-        expect(storyRepository.getFacilityDefinition).toHaveBeenCalledWith('T');
+        expect(storyRepository.getStoryCategoryDefinition).toHaveBeenCalledWith('T');
     });
 
     it('should apply is-new class to icon when isNew is true', () => {
         const html = UIComponents.generateStoryCardHTML('T', storyRepository, true);
         expect(html).toContain('mail state-new');
+    });
+
+    it('should resolve story card color from story branch instead of story id prefix', () => {
+        const html = UIComponents.generateStoryCardHTML('TR', storyRepository);
+
+        expect(html).toContain('repair-dock');
+        expect(html).not.toContain('trading-post');
+        expect(storyRepository.getStoryCategoryDefinition).toHaveBeenCalledWith('R');
     });
 });
 
@@ -443,6 +505,20 @@ describe('UIComponents.generateStoryModalHTML', () => {
         const html = UIComponents.generateStoryModalHTML('R', storyRepository);
         expect(html).toContain('FacilityBadge');
         expect(html).toContain('R');
+    });
+
+    it('should resolve special story categories without facility definitions', () => {
+        const html = UIComponents.generateStoryModalHTML('HOME', storyRepository);
+        expect(html).toContain('Panel home story-card');
+        expect(html).toContain('⌂');
+    });
+
+    it('should resolve modal color from story branch instead of story id prefix', () => {
+        const html = UIComponents.generateStoryModalHTML('TR', storyRepository);
+
+        expect(html).toContain('Panel repair-dock story-card');
+        expect(html).not.toContain('Panel trading-post story-card');
+        expect(storyRepository.getStoryCategoryDefinition).toHaveBeenCalledWith('R');
     });
 });
 

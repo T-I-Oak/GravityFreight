@@ -20,7 +20,7 @@
 - **`loadAllData(): Promise<void>`**
     - GravityFreight の静的マスタデータをロードし、内部に保持する。
     - `lang-store` を含む表示リソースは、共通 i18n ライブラリのロード・展開 API を通じて取得する。
-    - content 系データは用途別に `content_stories.json`、`content_achievements.json`、`content_ui.json` へ分割し、`GameDataRepository` が統合窓口として提供する。
+    - content 系データは用途別に `content_stories.json`、`content_achievements.json`、`content_ui.json`、`content_how_to_play.json` へ分割し、`GameDataRepository` が統合窓口として提供する。
     - 外部マスタデータのロード失敗時はエラーを投げ、アプリケーションの起動を停止させる。
 
 ## 3. マスタデータ取得

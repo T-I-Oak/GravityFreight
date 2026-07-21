@@ -38,11 +38,15 @@ describe('ArchiveComponents', () => {
                     progressRate: 0.5,
                     achievedTier: 2
                 }
+            ],
+            stories: [
+                { id: 'T', title: 'Read Story', isRead: true, className: 'trading-post', icon: 'T' },
+                { id: 'TR', title: '???', isRead: false, className: 'repair-dock', icon: 'R' }
             ]
         });
 
         expect(html).toContain('ANALYTIC ARCHIVE');
-        expect(html).toContain('MAX SECTOR');
+        expect(html).toContain('TOTAL CLEAR SECTORS');
         expect(html).toContain('graph-line score state-active');
         expect(html).toContain('avg-line sector');
         expect(html).toContain('archive-ranking-well');
@@ -52,10 +56,20 @@ describe('ArchiveComponents', () => {
         expect(html).toContain('★');
         expect(html).toContain('data-replay-id="flight_1"');
         expect(html).toContain('Pilot');
+        expect(html).toContain('data-tab="story"');
+        expect(html).toContain('STORY ARCHIVE');
+        expect(html).toContain('data-story-id="T"');
+        expect(html).toContain('Read Story');
+        expect(html).toContain('???');
+        expect(html).not.toContain('data-story-id="TR"');
+        expect(html).toContain('class="Icon mail"');
+        expect(html).not.toContain('facility-icon');
+        expect(html).not.toContain('>T</i>');
+        expect(html).not.toContain('>✉</i>');
         expect(html).toContain('width: 50%;');
     });
 
-    it('renders the trend graph from recent result data instead of the mockup path', () => {
+    it('renders the trend graph from recent result data with vertically offset series bands', () => {
         const html = ArchiveComponents.generateHTML({
             kpis: {},
             rankings: { score: [] },
@@ -69,7 +83,9 @@ describe('ArchiveComponents', () => {
         });
 
         expect(html).toContain('graph-line score state-active');
-        expect(html).toContain('d="M0,63 L42,15 L84,91"');
+        expect(html).toContain('class="graph-line score state-active" data-graph-series="score" fill="none" d="M0,53 L42,15 L84,76"');
+        expect(html).toContain('class="graph-line item-count" data-graph-series="collected" fill="none" d="M0,50 L42,25 L84,75"');
+        expect(html).toContain('class="graph-line sector" data-graph-series="sector" fill="none" d="M0,34 L42,80 L84,95"');
         expect(html).not.toContain('M0,60 L40,50 L80,55');
     });
 
@@ -85,8 +101,10 @@ describe('ArchiveComponents', () => {
             achievements: []
         });
 
-        expect(html).toContain('d="M0,110 L42,110"');
-        expect(html).toContain('y1="110" x2="800" y2="110"');
+        expect(html).toContain('class="graph-line score state-active" data-graph-series="score" fill="none" d="M0,91 L42,91"');
+        expect(html).toContain('class="graph-line item-count" data-graph-series="collected" fill="none" d="M0,101 L42,101"');
+        expect(html).toContain('class="graph-line sector" data-graph-series="sector" fill="none" d="M0,110 L42,110"');
+        expect(html).toContain('class="avg-line score" x1="0" y1="91" x2="800" y2="91"');
     });
 
     it('keeps required archive classes shared with the archive mockup', () => {
@@ -121,6 +139,10 @@ describe('ArchiveComponents', () => {
                     progressRate: 0,
                     achievedTier: null
                 }
+            ],
+            stories: [
+                { id: 'T', title: 'Read Story', isRead: true, className: 'trading-post', icon: 'T' },
+                { id: 'TR', title: '???', isRead: false, className: 'repair-dock', icon: 'R' }
             ]
         });
 
@@ -151,6 +173,8 @@ describe('ArchiveComponents', () => {
                 'table-body',
                 'archive-table-scroll-area',
                 'achievement-showcase',
+                'archive-story-grid',
+                'archive-story-card',
                 'AchievementCard',
                 'panel-footer',
                 'button-large',
@@ -170,6 +194,25 @@ describe('ArchiveComponents', () => {
         const mockupHtml = readFileSync('src/mockup/archive_screen_mockup.html', 'utf8');
 
         expectNoDuplicateIds(mockupHtml);
+    });
+
+    it('keeps archive mockup sidebar labels aligned with the generated archive screen', () => {
+        const mockupHtml = readFileSync('src/mockup/archive_screen_mockup.html', 'utf8');
+        const actualHtml = ArchiveComponents.generateHTML({
+            kpis: {
+                totalCompletedSectors: 1,
+                lifetimeContracts: 1,
+                totalCollectedItems: 1,
+                achievementRate: 0
+            },
+            rankings: {},
+            replays: [],
+            achievements: []
+        });
+
+        expect(mockupHtml).toContain('TOTAL CLEAR SECTORS');
+        expect(actualHtml).toContain('TOTAL CLEAR SECTORS');
+        expect(mockupHtml).not.toContain('MAX SECTOR');
     });
 
     it('uses one ranking well and marks the active ranking column', () => {
@@ -194,5 +237,55 @@ describe('ArchiveComponents', () => {
         expect(document.querySelector('[data-ranking-panel="sector"] td.col-sector').classList.contains('state-active')).toBe(true);
         expect(document.querySelector('[data-ranking-panel="collected"] th.col-count').classList.contains('state-active')).toBe(true);
         expect(document.querySelector('[data-ranking-panel="collected"] td.col-count').classList.contains('state-active')).toBe(true);
+    });
+
+    it('marks latest game ranking and replay records as new', () => {
+        const html = ArchiveComponents.generateHTML({
+            kpis: {},
+            rankings: {
+                score: [
+                    { rank: 1, score: 1000, reachedSector: 1, collectedItemCount: 1, createdAt: '2026.06.17 10:00', isNew: true },
+                    { rank: 2, score: 900, reachedSector: 1, collectedItemCount: 1, createdAt: '2026.06.16 10:00', isNew: false }
+                ],
+                sector: [],
+                collected: []
+            },
+            replays: [
+                { id: 'flight_1', no: '01', favorite: false, reachedSector: 1, score: 1000, createdAt: '2026.06.17 10:00', isNew: true }
+            ],
+            achievements: []
+        });
+
+        document.body.innerHTML = html;
+
+        expect(document.querySelectorAll('#tab-analytics .ArchiveTable tr.state-new')).toHaveLength(1);
+        expect(document.querySelector('#tab-analytics .ArchiveTable tr.state-new .date-cell')).not.toBeNull();
+        expect(document.querySelector('#tab-analytics .ArchiveTable tr.state-new .Badge.state-new').textContent).toBe('NEW');
+        expect(document.querySelector('#tab-analytics .ArchiveTable tr.state-new .date-label').textContent).toBe('2026.06.17 10:00');
+        expect(document.querySelectorAll('#tab-replays .ArchiveTable tr.state-new')).toHaveLength(1);
+        expect(document.querySelector('#tab-replays .ArchiveTable tr.state-new .date-cell')).not.toBeNull();
+        expect(document.querySelector('#tab-replays .ArchiveTable tr.state-new .Badge.state-new').textContent).toBe('NEW');
+        expect(document.querySelector('#tab-replays .ArchiveTable tr.state-new .date-label').textContent).toBe('2026.06.17 10:00');
+    });
+
+    it('renders achievement tier seals with roman numerals without assuming three tiers', () => {
+        const html = ArchiveComponents.generateHTML({
+            kpis: {},
+            rankings: {},
+            replays: [],
+            achievements: [
+                {
+                    title: 'Deep Archive',
+                    method: 'Read Stories',
+                    stats: '8 / 12',
+                    progressRate: 0.75,
+                    achievedTier: 4
+                }
+            ]
+        });
+
+        expect(html).toContain('log-bg-seal-group tier-4');
+        expect(html).toContain('<span class="seal-num">IV</span>');
+        expect(html).not.toContain('<span class="seal-num">4</span>');
     });
 });

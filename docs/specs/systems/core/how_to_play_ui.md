@@ -93,7 +93,11 @@
 - `background` はページ番号に対応する背景画像を指定し、1 ページにつき 1 枚の背景画像を画面全体に表示する。
 - `layout` は 1 カラムまたは 2 カラムを表せること。
 - `blocks` は、説明文、補足、リスト、カード、ボタン、canvas プレースホルダーを表せること。
-- アイテムカードは `UIComponents.generateCardHTML` などの共通生成処理を使う。
+- アイテムカードは `Item#getViewData()` など通常画面と同じ view data を作成し、`UIComponents.generateCardHTML` で表示する。
+- 説明用であっても、カード風の独自 HTML を作成して ItemCard を模倣してはならない。
+- 組み立て済みロケットのカードを表示する場合は、説明用の生データではなく `Item` と `RocketItem` から生成した view data を使う。
+- How To Play の通常カード表示では `state-compact` を強制しない。コンパクト表示が必要な場合は、ゲーム本編で同じ表示状態が使われていることを確認してから採用する。
+- 組み立てデモの選択表現は、外側の説明用ラッパーではなく `UIComponents.generateCardHTML` が生成した `.ItemCard` に `state-selected` を付与して表現する。
 - how-to-play 用 HTML 文字列を描画する場合でも、外部入力ではなくプロジェクト内の静的コンテンツのみを対象とする。
 - ボタン、ドット、ページ移動などの操作 UI は、β v2 の UI コンポーネント規約に合わせる。
 
@@ -131,3 +135,6 @@
 
 - ページ移動、非表示、言語再描画の前には必ず `HowToPlayDiagrams.stopAll()` を呼び出す。
 - `HowToPlayUI` はデモ内部の物理計算や canvas 描画を直接実装しない。
+- LAUNCH / NAVIGATION の canvas デモは、本編と同じ `SectorMapRenderer` / `FlightVisualRenderer` を利用して描画する。
+- 説明用のダミーデータを使う場合でも、予測線、ロケット、航跡、回収アイテム、ソナーなどを個別に独自描画してはならない。
+- デモに渡す対象も、手作りの描画用オブジェクトではなく `Sector.fromSnapshot()`、`Item`、`RocketItem`、`Rocket` などのゲーム本体のエンティティを使用する。

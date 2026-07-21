@@ -1,0 +1,155 @@
+/* Favorite (Star) Icon Styles */
+#archive-screen .favorite-star {
+    cursor: pointer;
+    font-style: normal;
+    font-size: 1.2em;
+    transition: all var(--motion-fast);
+    display: inline-block;
+    user-select: none;
+}
+
+#archive-screen .favorite-star.state-inactive {
+    color: rgba(255, 255, 255, 0.1);
+}
+
+#archive-screen .favorite-star.state-active {
+    color: var(--color-ui-favorite);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--color-ui-favorite), transparent 70%);
+}
+
+#archive-screen-overlay .archive-protect-toast {
+    position: fixed;
+    left: 50%;
+    top: calc(var(--space-double) * 2);
+    z-index: calc(var(--z-system) + 400);
+    margin: 0;
+    padding: var(--space-unit) var(--space-double);
+    transform: translateX(-50%);
+    border: 1px solid color-mix(in srgb, var(--color-ui-favorite), transparent 40%);
+    border-radius: var(--radius-standard);
+    background: rgba(18, 16, 24, 0.92);
+    color: var(--color-ui-favorite);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--color-ui-favorite), transparent 75%);
+    font-size: 12px;
+    font-weight: 900;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--motion-fast), transform var(--motion-fast);
+}
+
+#archive-screen-overlay .archive-protect-toast.state-active {
+    opacity: 1;
+    transform: translateX(-50%) translateY(4px);
+}
+
+#archive-screen-overlay .archive-protect-toast.state-exit {
+    opacity: 0;
+}
+
+#archive-screen-overlay .replay-protect-modal {
+    --current-color: #bb86fc;
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+}
+
+#archive-screen-overlay .archive-favorite-dialog {
+    --current-color: #bb86fc;
+    position: relative;
+    width: min(720px, calc(100vw - var(--space-double) * 4));
+    max-height: min(72vh, 560px);
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: var(--space-double);
+    padding: calc(var(--space-double) * 1.5);
+    background: color-mix(in srgb, var(--current-color), #404040 90%);
+    border-color: color-mix(in srgb, var(--current-color), transparent 80%);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--current-color), transparent 74%),
+        0 24px 80px rgba(0, 0, 0, 0.72);
+}
+
+#archive-screen-overlay .archive-favorite-dialog h2 {
+    margin: 0;
+    color: var(--current-color);
+    font-size: 18px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+}
+
+#archive-screen-overlay .archive-favorite-message {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#archive-screen-overlay .archive-favorite-options {
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 2px;
+}
+
+#archive-screen-overlay .replay-protect-count {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+#archive-screen-overlay .replay-protect-count.state-invalid {
+    color: var(--color-ui-favorite);
+}
+
+#archive-screen-overlay .replay-protect-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#archive-screen-overlay .replay-protect-table th,
+#archive-screen-overlay .replay-protect-table td {
+    padding: var(--space-unit);
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#archive-screen-overlay .replay-protect-table th {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 10px;
+    font-weight: 900;
+}
+
+#archive-screen-overlay .replay-protect-row.state-current {
+    background: color-mix(in srgb, var(--current-color), transparent 86%);
+}
+
+#archive-screen-overlay .replay-protect-row.state-active td:first-child {
+    box-shadow: inset 4px 0 0 var(--color-ui-favorite);
+}
+
+#archive-screen-overlay .replay-protect-table .favorite-star {
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+#archive-screen-overlay .replay-protect-table .favorite-star.state-active {
+    color: var(--color-ui-favorite);
+}
+
+#archive-screen-overlay .replay-protect-table .favorite-star.state-inactive {
+    color: rgba(255, 255, 255, 0.18);
+}
+
+#archive-screen-overlay .replay-protect-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-unit);
+}

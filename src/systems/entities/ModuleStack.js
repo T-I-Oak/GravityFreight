@@ -45,6 +45,7 @@ class ModuleStack extends Item {
     }
 
     getViewData() {
+        const representativeViewData = this.items[0].getViewData();
         const stats = {};
 
         ADDITIVE_STATS.forEach(key => {
@@ -64,8 +65,8 @@ class ModuleStack extends Item {
         return {
             uid: this.uid,
             id: this.id,
-            name: this.name,
-            category: this.category,
+            name: representativeViewData.name,
+            category: representativeViewData.category,
             count: this.count,
             stats
         };

@@ -22,7 +22,7 @@ describe('CameraController', () => {
         expect(repository.getSavedCameraState).toHaveBeenCalled();
         expect(camera.position).toEqual({ x: 0, y: 0 });
         expect(camera.rotation).toBe(0);
-        expect(camera.zoomLevel).toBe(1);
+        expect(camera.zoomLevel).toBe(0.5);
         expect(camera.viewportSize).toEqual({ x: 800, y: 600 });
     });
 
@@ -48,6 +48,7 @@ describe('CameraController', () => {
         camera.initialize();
         camera.handleResize(800, 600);
         camera.position = { x: 100, y: -50 };
+        camera.zoomLevel = 1;
         const originBefore = camera.toScreen({ x: 0, y: 0 });
         const anchor = { x: 500, y: 350 };
         const anchorWorldBefore = camera.toWorld(anchor);
@@ -96,6 +97,7 @@ describe('CameraController', () => {
 
         camera.initialize();
         camera.handleResize(800, 600);
+        camera.zoomLevel = 1;
         camera.pan({ x: 40, y: -20 });
         camera.rotate({ x: 400, y: 300 }, { x: 0, y: 40 });
 
@@ -109,6 +111,7 @@ describe('CameraController', () => {
         camera.initialize();
         camera.handleResize(800, 600);
         camera.position = { x: 100, y: 0 };
+        camera.zoomLevel = 1;
 
         camera.rotate({ x: 300, y: 200 }, { x: 100, y: 0 });
 
@@ -121,6 +124,7 @@ describe('CameraController', () => {
         camera.initialize();
         camera.handleResize(800, 600);
         camera.rotation = Math.PI / 2;
+        camera.zoomLevel = 1;
         camera.pan({ x: 40, y: -20 });
 
         expect(camera.position.x).toBeCloseTo(-40);
@@ -140,7 +144,107 @@ describe('CameraController', () => {
         expect(repository.setSavedCameraState).toHaveBeenCalledWith({
             position: { x: 0, y: 0 },
             rotation: 0,
-            zoomLevel: 1
+            zoomLevel: 0.5
         });
+    });
+
+    it('resets camera state to defaults and persists it', () => {
+        const repository = createRepository();
+        const camera = new CameraController(repository);
+
+        camera.initialize();
+        camera.position = { x: 120, y: -80 };
+        camera.rotation = Math.PI / 3;
+        camera.zoomLevel = 1.7;
+
+        camera.reset();
+
+        expect(camera.position).toEqual({ x: 0, y: 0 });
+        expect(camera.rotation).toBe(0);
+        expect(camera.zoomLevel).toBe(0.5);
+        expect(repository.setSavedCameraState).toHaveBeenCalledWith({
+            position: { x: 0, y: 0 },
+            rotation: 0,
+            zoomLevel: 0.5
+        });
+    });
+
+    it('can reset camera state without persisting it for temporary replay views', () => {
+        const repository = createRepository();
+        const camera = new CameraController(repository);
+
+        camera.initialize();
+        camera.position = { x: 120, y: -80 };
+        camera.rotation = Math.PI / 3;
+        camera.zoomLevel = 1.7;
+
+        camera.reset({ persist: false });
+
+        expect(camera.position).toEqual({ x: 0, y: 0 });
+        expect(camera.rotation).toBe(0);
+        expect(camera.zoomLevel).toBe(0.5);
+        expect(repository.setSavedCameraState).not.toHaveBeenCalled();
+    });
+
+    it('applies temporary focus bounds without persisting camera state', () => {
+        const repository = createRepository();
+        const camera = new CameraController(repository);
+
+        camera.initialize();
+        camera.handleResize(800, 600);
+        camera.position = { x: 100, y: -50 };
+        camera.rotation = 0;
+        camera.zoomLevel = 0.5;
+
+        const original = camera.getState();
+        const focusState = camera.focusWorldBounds(
+            { left: 200, top: 100, width: 300, height: 200 },
+            { padding: 100 }
+        );
+
+        expect(original).toEqual({ position: { x: 100, y: -50 }, rotation: 0, zoomLevel: 0.5 });
+        expect(focusState.position).toEqual({ x: 350, y: 200 });
+        expect(focusState.zoomLevel).toBe(2);
+        expect(camera.toScreen({ x: 350, y: 200 })).toEqual({ x: 400, y: 300 });
+        expect(repository.setSavedCameraState).not.toHaveBeenCalled();
+    });
+
+    it('does not increase focus zoom when focus padding is increased', () => {
+        const camera = new CameraController(createRepository());
+
+        camera.initialize();
+        camera.handleResize(1280, 720);
+
+        const bounds = { left: 280, top: 115, width: 220, height: 220 };
+        const compactFocus = camera.calculateFocusState(bounds, { padding: 120 });
+        const roomyFocus = camera.calculateFocusState(bounds, { padding: 200 });
+
+        expect(roomyFocus.zoomLevel).toBeLessThanOrEqual(compactFocus.zoomLevel);
+    });
+
+    it('fits rotated focus bounds within the padded viewport', () => {
+        const camera = new CameraController(createRepository());
+
+        camera.initialize();
+        camera.handleResize(1280, 720);
+        camera.rotation = Math.PI / 4;
+
+        const bounds = { left: -40, top: -40, width: 540, height: 375 };
+        const state = camera.calculateFocusState(bounds, { padding: 200 });
+        camera.applyState(state);
+
+        const corners = [
+            { x: bounds.left, y: bounds.top },
+            { x: bounds.left + bounds.width, y: bounds.top },
+            { x: bounds.left, y: bounds.top + bounds.height },
+            { x: bounds.left + bounds.width, y: bounds.top + bounds.height }
+        ].map(point => camera.toScreen(point));
+        const xs = corners.map(point => point.x);
+        const ys = corners.map(point => point.y);
+
+        expect(Math.min(...xs)).toBeGreaterThanOrEqual(200);
+        expect(Math.max(...xs)).toBeLessThanOrEqual(1280 - 200);
+        expect(Math.min(...ys)).toBeGreaterThanOrEqual(200);
+        expect(Math.max(...ys)).toBeLessThanOrEqual(720 - 200);
     });
 });

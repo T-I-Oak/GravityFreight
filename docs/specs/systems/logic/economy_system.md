@@ -71,6 +71,7 @@
                 - そのグループに属する全貨物から発生した **全ボーナスアイテム** を、`session.sectorNumber` を参照した `drawLottery()` で抽選し、`StackedItem` のルールに従って集約し、`bonusItems` に格納する。
                 - ボーナス実体のうち、コインは `totalCoins` に加算し、パーツ類は `acquiredItems` に追加する。
                 - `entries` に UI resource `flightResult.entries.deliveryBonus` の Label で、Score/Coin: 配送成功報酬 + ボーナスコインを追加する。
+                - `deliveryCount` に成功配送 cargo 数を加算する。スタックされた同一 cargo は個数ぶんを加算する。
                 - **物語解放**: `unlockedBranchId` に対象施設のブランチ ID を設定する。
             - **不一致配送（Unmatched）**:
                 - `deliveryGoalId` を持つ配送対象貨物が到達施設と一致しない場合、`ItemReportEntry (type: 'delivery', status: 'unmatched')` を作成。
@@ -151,6 +152,7 @@
 - **`totalCoins: number`**: 今回獲得した総コイン。
 - **`luckyDiscountRate: number`**: ゴール時に運んだ「幸運の導き」による割引率（0.0～0.5）。
 - **`flightTicks: number`**: 今回の航行で経過した Tick 数。ゲームリザルトの合計航行時間に加算される。
+- **`deliveryCount: number`**: 今回の航行で目的地と一致して配送成功した cargo 数。不一致配送および `deliveryGoalId` を持たない特殊 cargo は含めない。
 - **`entries: SettlementEntry[]`**: 報酬の明細リスト（一行にスコアとコインを併記）。
 - **`itemReport: ItemReportEntry[]`**: 航行結果画面の回収リストに表示する構造化されたアイテムリスト。正式回収・配送結果として提示するものだけを含み、大破・遭難で失われるものは含めない。
 - **`acquiredItems: Item[]`**: インベントリへ正式に追加され、今回の回収数にも加算されるアイテムの実体リスト（ボーナスアイテム + 航行中に回収したパーツ）。

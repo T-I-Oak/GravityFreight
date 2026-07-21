@@ -1,5 +1,21 @@
 {
   "ui": {
+    "map": {
+      "deliveryCargo": {
+        "title": {
+          "lang-store": {
+            "ja": "DELIVERY TARGET",
+            "en": "DELIVERY TARGET"
+          }
+        },
+        "body": {
+          "lang-store": {
+            "ja": "{itemName}をここに配送してください。",
+            "en": "Deliver {itemName} here."
+          }
+        }
+      }
+    },
     "flightResult": {
       "titles": {
         "cleared": {
@@ -63,6 +79,12 @@
             "ja": "BACK TO RESULT",
             "en": "BACK TO RESULT"
           }
+        },
+        "share": {
+          "lang-store": {
+            "ja": "SHARE",
+            "en": "SHARE"
+          }
         }
       },
       "sections": {
@@ -90,6 +112,20 @@
           "lang-store": {
             "ja": "CREDITS EARNED",
             "en": "CREDITS EARNED"
+          }
+        }
+      },
+      "assets": {
+        "emptyText": {
+          "lang-store": {
+            "ja": "NO ASSETS COLLECTED",
+            "en": "NO ASSETS COLLECTED"
+          }
+        },
+        "emptySubtext": {
+          "lang-store": {
+            "ja": "Nothing was recovered during this flight.",
+            "en": "Nothing was recovered during this flight."
           }
         }
       },
@@ -285,6 +321,12 @@
         "lang-store": {
           "ja": "END CONTRACT",
           "en": "END CONTRACT"
+        }
+      },
+      "share": {
+        "lang-store": {
+          "ja": "SHARE",
+          "en": "SHARE"
         }
       },
       "reasons": {
@@ -532,6 +574,92 @@
             }
           }
         },
+        "tradingPostSellCategories": {
+          "rocket": {
+            "title": {
+              "lang-store": {
+                "ja": "ロケット",
+                "en": "Rockets"
+              }
+            },
+            "subtitle": {
+              "lang-store": {
+                "ja": "待機中の完成機体を売却できます。",
+                "en": "Sell assembled rockets on standby."
+              }
+            }
+          },
+          "launcher": {
+            "title": {
+              "lang-store": {
+                "ja": "発射台",
+                "en": "Launchers"
+              }
+            },
+            "subtitle": {
+              "lang-store": {
+                "ja": "不要な発射台を売却できます。",
+                "en": "Sell unneeded launchers."
+              }
+            }
+          },
+          "booster": {
+            "title": {
+              "lang-store": {
+                "ja": "ブースター",
+                "en": "Boosters"
+              }
+            },
+            "subtitle": {
+              "lang-store": {
+                "ja": "補助装備を売却できます。",
+                "en": "Sell optional boosters."
+              }
+            }
+          },
+          "chassis": {
+            "title": {
+              "lang-store": {
+                "ja": "シャーシ",
+                "en": "Chassis"
+              }
+            },
+            "subtitle": {
+              "lang-store": {
+                "ja": "ロケットの構成パーツを売却できます。",
+                "en": "Sell rocket frame components."
+              }
+            }
+          },
+          "logic": {
+            "title": {
+              "lang-store": {
+                "ja": "ロジック",
+                "en": "Logic"
+              }
+            },
+            "subtitle": {
+              "lang-store": {
+                "ja": "航法ロジックを売却できます。",
+                "en": "Sell navigation logic parts."
+              }
+            }
+          },
+          "module": {
+            "title": {
+              "lang-store": {
+                "ja": "モジュール",
+                "en": "Modules"
+              }
+            },
+            "subtitle": {
+              "lang-store": {
+                "ja": "拡張モジュールを売却できます。",
+                "en": "Sell expansion modules."
+              }
+            }
+          }
+        },
         "repairDockRepair": {
           "title": {
             "lang-store": {
@@ -626,6 +754,210 @@
           "lang-store": {
             "ja": "資産価値 500c 以上のアイテムを入手します。",
             "en": "Acquire items worth at least 500c."
+          }
+        }
+      }
+    },
+    "tutorial": {
+      "title": {
+        "lang-store": {
+          "ja": "TUTORIAL",
+          "en": "TUTORIAL"
+        }
+      },
+      "titles": {
+        "buildIntro": {
+          "lang-store": {
+            "ja": "任務開始！",
+            "en": "Mission Start!"
+          }
+        },
+        "assemblyTab": {
+          "lang-store": {
+            "ja": "ロケットの建造",
+            "en": "Build a Rocket"
+          }
+        },
+        "launchPrep": {
+          "lang-store": {
+            "ja": "ロケットの発射準備",
+            "en": "Prepare for Launch"
+          }
+        },
+        "aim": {
+          "lang-store": {
+            "ja": "ロケット発射方向の調整",
+            "en": "Adjust Launch Direction"
+          }
+        },
+        "tradingPost": {
+          "lang-store": {
+            "ja": "Trading Post",
+            "en": "Trading Post"
+          }
+        },
+        "repairDock": {
+          "lang-store": {
+            "ja": "Repair Dock",
+            "en": "Repair Dock"
+          }
+        },
+        "blackMarket": {
+          "lang-store": {
+            "ja": "Black Market",
+            "en": "Black Market"
+          }
+        }
+      },
+      "messages": {
+        "buildIntro": {
+          "lang-store": {
+            "ja": "あなたは遠いセクターまで物資を配送する業務に就きました。母星からロケットを発射し、いずれかの出口（アーク）に到達させることを目指してください。",
+            "en": "You have taken a delivery job carrying supplies to distant sectors. Launch a rocket from the home star and aim to reach one of the exit arcs."
+          }
+        },
+        "assemblyTab": {
+          "lang-store": {
+            "ja": "最初にロケットを建造します。ロケットを建造するために ASSEMBLY タブを選択してください。",
+            "en": "First, build a rocket. Select the ASSEMBLY tab to build one."
+          }
+        },
+        "assemblyParts": {
+          "lang-store": {
+            "ja": "ロケットを構成するシャーシ(CHASSIS)とロジック(LOGIC)を1つずつ選択してください。",
+            "en": "Select one chassis (CHASSIS) and one logic (LOGIC) part for the rocket."
+          }
+        },
+        "assemblyModules": {
+          "lang-store": {
+            "ja": "ロケットの構成品にあるスロット(SLOT)の数だけモジュール(MODULES)を追加で搭載することができます。",
+            "en": "You can add modules (MODULES) up to the number of slots (SLOT) on the rocket components."
+          }
+        },
+        "assemblyButton": {
+          "lang-store": {
+            "ja": "ロケットの構成品が決まったら Assemble Rocket ボタンを押してください。ロケットが建造されます。",
+            "en": "Once the rocket components are set, press the Assemble Rocket button to build the rocket."
+          }
+        },
+        "flightParts": {
+          "lang-store": {
+            "ja": "発射に使用するロケット(ROCKET)と発射台(LAUNCHER)を1つずつ選択してください。",
+            "en": "Select one rocket (ROCKET) and one launcher (LAUNCHER) to use for launch."
+          }
+        },
+        "flightBooster": {
+          "lang-store": {
+            "ja": "このときブースター(BOOSTER)を1つ選択することができます。",
+            "en": "At this point, you can select one booster (BOOSTER)."
+          }
+        },
+        "aimPrediction": {
+          "lang-store": {
+            "ja": "ロケットと発射台を選択するとロケットの航路予測が表示されます。ロケットを飛ばしたい方向をタップすることでロケットの発射方向を調整することができます。",
+            "en": "When you select a rocket and launcher, the predicted route is displayed. Tap the direction you want the rocket to fly to adjust the launch direction."
+          }
+        },
+        "aimSectorClear": {
+          "lang-store": {
+            "ja": "ロケットが3か所の出口（アーク）のいずれかに到達したらセクタークリアーです。",
+            "en": "The sector is cleared when the rocket reaches any one of the three exit arcs."
+          }
+        },
+        "aimStarItems": {
+          "lang-store": {
+            "ja": "星にはアイテムが置かれています。どんなアイテムが置かれているかは、星をホバーするかタップすることで確認できます。星の近くをロケットが通過すると、ロケットはアイテムを自動で回収します。",
+            "en": "Items are placed on stars. Hover or tap a star to check which items are there. When the rocket passes near a star, it automatically collects the items."
+          }
+        },
+        "aimExitArc": {
+          "lang-store": {
+            "ja": "アイテムを回収したロケットが出口（アーク）に到達した場合、それらのアイテムを入手できます。貴重なアイテムを回収して出口（アーク）への到達を目指しましょう。",
+            "en": "If a rocket carrying collected items reaches an exit arc, you obtain those items. Collect valuable items and aim for an exit arc."
+          }
+        },
+        "aimReturnHome": {
+          "lang-store": {
+            "ja": "ロケットが母星に戻ってきた場合、回収していたアイテムを入手できます。さらにこのセクターに限り、帰還ボーナスとして発射速度が10%アップします。出口（アーク）への到達が難しい場合、帰還を狙って発射してみましょう。",
+            "en": "If the rocket returns to the home star, you obtain the collected items. In that sector only, the return bonus also increases launch speed by 10%. If reaching an exit arc looks difficult, try aiming for a return."
+          }
+        },
+        "aimDanger": {
+          "lang-store": {
+            "ja": "ロケットが星に激突した場合、回収していたアイテムは激突した星に置かれ、ロケットを失います。このとき運が良ければロケットの構成品が星に残ることがあります。出口（アーク）以外から領域の外に出た場合、回収していたアイテムやロケットは永遠に失われます。",
+            "en": "If the rocket crashes into a star, collected items are placed on that star and the rocket is lost. With some luck, rocket components may remain on the star. If the rocket leaves the sector outside an exit arc, the collected items and rocket are lost forever."
+          }
+        },
+        "aimLaunch": {
+          "lang-store": {
+            "ja": "ロケットの発射方向が決まったらいよいよ発射です。Launch Engineボタンを押して発射してください。ロケットを発射すると使用した発射台とブースターは消費されます。発射するためのロケットや発射台が尽きた場合、それ以上進むことができなくなりますのでアイテムの枯渇に注意してください。",
+            "en": "Once the launch direction is set, it is time to launch. Press the Launch Engine button to fire. Launching consumes the launcher and booster used. If you run out of rockets or launchers, you cannot continue, so be careful not to exhaust your items."
+          }
+        },
+        "tradingPostIntro": {
+          "lang-store": {
+            "ja": "ようこそ Trading Post へ。ここではアイテムを購入したり、不要になったアイテムを売ったりすることができます。",
+            "en": "Welcome to Trading Post. Here you can buy items and sell items you no longer need."
+          }
+        },
+        "tradingPostSell": {
+          "lang-store": {
+            "ja": "不要になったアイテムを売ることができます。アイテムを売りすぎて、ロケットが発射できなくならないように注意してください。",
+            "en": "You can sell items you no longer need. Be careful not to sell too much and leave yourself unable to launch a rocket."
+          }
+        },
+        "tradingPostBuy": {
+          "lang-store": {
+            "ja": "様々な商品が売りに出されています。セール品もありますのでお見逃しなく！",
+            "en": "A variety of goods are for sale here. Some items may be discounted, so do not miss them."
+          }
+        },
+        "repairDockIntro": {
+          "lang-store": {
+            "ja": "ようこそ Repair Dock へ。ここでは発射台にエネルギーを充填したり、所持しているロケットを分解して強化することができます。",
+            "en": "Welcome to Repair Dock. Here you can charge launchers and dismantle owned rockets to enhance their parts."
+          }
+        },
+        "repairDockRepair": {
+          "lang-store": {
+            "ja": "発射台の使用回数を回復することができます。",
+            "en": "You can restore launcher charges here."
+          }
+        },
+        "repairDockDismantle": {
+          "lang-store": {
+            "ja": "ロケットを分解してパーツに戻すことができます。分解したパーツは調整され、強化されます。使用するたびに価格が上がっていきますので使い過ぎに注意してください。",
+            "en": "You can dismantle rockets back into parts. Dismantled parts are adjusted and enhanced. The price rises each time you use this service, so do not overuse it."
+          }
+        },
+        "repairDockReceived": {
+          "lang-store": {
+            "ja": "ロケットを分解して強化されたパーツはこちらに表示されます。",
+            "en": "Parts enhanced by dismantling rockets are shown here."
+          }
+        },
+        "blackMarketIntro": {
+          "lang-store": {
+            "ja": "ようこそ Black Market へ。ここでは通常では流通していない強化済みのアイテムを入手できるかもしれません。",
+            "en": "Welcome to Black Market. Here you may obtain enhanced items that are not normally distributed."
+          }
+        },
+        "blackMarketBuy": {
+          "lang-store": {
+            "ja": "Black Market を訪れるたびに通常取引かプレミアム取引のどちらか1つだけ購入することができます。何が獲得できるかは買ってからのお楽しみですが、強化済みの貴重なアイテムが手に入るかもしれません。",
+            "en": "Each time you visit Black Market, you can buy either one standard deal or one premium deal. You will not know what you get until you buy, but you may obtain a valuable enhanced item."
+          }
+        },
+        "blackMarketAcquired": {
+          "lang-store": {
+            "ja": "獲得したアイテムはこちらに表示されます。",
+            "en": "Items you obtain are shown here."
+          }
+        },
+        "blackMarketRisk": {
+          "lang-store": {
+            "ja": "Black Market を経由するたびに、セクターの星の数が増えていきます。増えた星をアイテム源として活用するのか、星の重力から抜け出せなくなってしまうのか。それはあなたの実力しだいです。",
+            "en": "Each time you pass through Black Market, the number of stars in later sectors increases. Whether you use those stars as item sources or become trapped by their gravity is up to your skill."
           }
         }
       }

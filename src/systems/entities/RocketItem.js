@@ -78,6 +78,8 @@ class RocketItem extends Item {
 
     getViewData() {
         const stats = {};
+        const chassisViewData = this.chassis.getViewData();
+        const logicViewData = this.logic.getViewData();
 
         ADDITIVE_STATS.forEach(key => {
             stats[key] = {
@@ -96,7 +98,7 @@ class RocketItem extends Item {
         return {
             uid: this.uid,
             id: this.id,
-            name: this.name,
+            name: `${chassisViewData.name} ＋ ${logicViewData.name}`,
             category: this.category,
             rarity: this.rarity,
             description: this.description,

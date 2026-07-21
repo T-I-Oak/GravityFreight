@@ -15,6 +15,7 @@ function createCanvas() {
         restore: vi.fn(),
         translate: vi.fn(),
         rotate: vi.fn(),
+        scale: vi.fn(),
         moveTo: vi.fn(),
         lineTo: vi.fn(),
         closePath: vi.fn(),
@@ -103,6 +104,13 @@ function createColorPalette() {
     };
 }
 
+function createSoundController() {
+    return {
+        startWarpEffect: vi.fn(),
+        stopWarpEffect: vi.fn()
+    };
+}
+
 function createRenderer(options = {}) {
     return new WorldRenderer({
         colorPalette: createColorPalette(),
@@ -134,7 +142,8 @@ describe('WorldRenderer', () => {
     it('delegates warp background effects to BackgroundManager', async () => {
         const { canvas } = createCanvas();
         const backgroundManager = createBackgroundManager();
-        const renderer = createRenderer({ backgroundManager });
+        const soundController = createSoundController();
+        const renderer = createRenderer({ backgroundManager, soundController });
 
         await renderer.initialize(canvas);
         renderer.startWarpEffect(1400);
@@ -142,17 +151,34 @@ describe('WorldRenderer', () => {
 
         expect(backgroundManager.startWarpEffect).toHaveBeenCalledWith(1400);
         expect(backgroundManager.stopWarpEffect).toHaveBeenCalledWith(1400);
+        expect(soundController.startWarpEffect).toHaveBeenCalledWith(1.4, { direction: 'forward' });
+        expect(soundController.stopWarpEffect).toHaveBeenCalledWith(1.4);
+    });
+
+    it('can receive the SoundController after construction', async () => {
+        const { canvas } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const soundController = createSoundController();
+        const renderer = createRenderer({ backgroundManager });
+
+        await renderer.initialize(canvas);
+        renderer.setSoundController(soundController);
+        renderer.startWarpEffect(1000);
+
+        expect(soundController.startWarpEffect).toHaveBeenCalledWith(1, { direction: 'forward' });
     });
 
     it('runs the game-end exit warp as a reverse map zoom and slows it for title return', async () => {
         const { canvas } = createCanvas();
         const backgroundManager = createBackgroundManager();
-        const renderer = createRenderer({ backgroundManager });
+        const soundController = createSoundController();
+        const renderer = createRenderer({ backgroundManager, soundController });
 
         await renderer.initialize(canvas);
-        await renderer.playGameEndExitAnimation();
+        renderer.startWarpEffect(3200, { direction: 'reverse' });
         expect(backgroundManager.startReverseWarpEffect).toHaveBeenCalledWith(3200);
         expect(backgroundManager.startWarpEffect).not.toHaveBeenCalled();
+        expect(soundController.startWarpEffect).toHaveBeenCalledWith(3.2, { direction: 'reverse' });
         expect(renderer.mapWarp.scale).toBeGreaterThan(0.9);
         expect(renderer.mapWarp.transition).toEqual(expect.objectContaining({
             fromScale: 1,
@@ -160,8 +186,9 @@ describe('WorldRenderer', () => {
         }));
         expect(renderer.mapWarp.alpha).toBe(1);
 
-        await renderer.stopGameEndExitAnimation();
+        renderer.stopWarpEffect(1600, { fromCurrent: true });
         expect(backgroundManager.stopWarpEffect).toHaveBeenCalledWith(1600);
+        expect(soundController.stopWarpEffect).toHaveBeenCalledWith(1.6);
         expect(renderer.mapWarp.transition).toEqual(expect.objectContaining({
             toScale: 1
         }));
@@ -187,13 +214,34 @@ describe('WorldRenderer', () => {
             ]
         });
 
-        await renderer.playGameEndExitAnimation();
+        renderer.startWarpEffect(3200, { direction: 'reverse' });
         renderer.mapWarp.scale = 0.04;
         renderer.mapWarp.transition = null;
         context.globalAlphas.length = 0;
         renderer.render();
 
         expect(context.globalAlphas).toContain(0);
+    });
+
+    it('resets map warp so replay playback starts from the normal map scale', async () => {
+        const { canvas } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const renderer = createRenderer({ backgroundManager });
+
+        await renderer.initialize(canvas);
+        renderer.startWarpEffect(3200, { direction: 'reverse' });
+        renderer.mapWarp.scale = 0.04;
+        renderer.mapWarp.alpha = 0.2;
+        renderer.mapWarp.transition = { elapsed: 1 };
+
+        renderer.resetMapWarp();
+
+        expect(renderer.mapWarp).toEqual({
+            scale: 1,
+            alpha: 1,
+            transition: null,
+            fadeMode: null
+        });
     });
 
     it('applies map warp scale around the canvas center', async () => {
@@ -431,6 +479,52 @@ describe('WorldRenderer', () => {
         expect(exitArcCall[4]).toBeCloseTo(Math.PI / 2 + Math.PI / 6);
     });
 
+    it('applies AIM rocket arc multiplier to exit arc preview width', async () => {
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [
+                {
+                    angle: 0,
+                    width: 60,
+                    radius: 900,
+                    getFacilityType: () => 'TRADING_POST'
+                }
+            ],
+            bodies: []
+        });
+        context.arc.mockClear();
+        renderer.setAimRocket({
+            position: { x: 0, y: 0 },
+            velocity: { x: 1, y: 0 },
+            angle: 0,
+            actualTrail: [],
+            heldCargo: [],
+            getCollectionRange: vi.fn(() => 80),
+            getArcMultiplier: vi.fn(() => 2)
+        });
+
+        const exitArcCall = context.arc.mock.calls.find(call => (
+            call[0] === 320 && call[1] === 240 && call[2] === 900 && call[3] !== 0
+        ));
+
+        expect(exitArcCall[3]).toBeCloseTo(-Math.PI / 3);
+        expect(exitArcCall[4]).toBeCloseTo(Math.PI / 3);
+    });
+
     it('draws facility labels as zoom-scaled curved text along the exit arc', async () => {
         const { canvas, context } = createCanvas();
         const backgroundManager = createBackgroundManager();
@@ -510,10 +604,11 @@ describe('WorldRenderer', () => {
 
         expect(context.strokeStyles).toContain('token-facility-trading-post');
         expect(context.translate).toHaveBeenCalledWith(1305, 240);
+        expect(context.scale).toHaveBeenCalledWith(1, 1);
         expect(context.globalAlphas).toContain(0.5);
-        expect(context.moveTo).toHaveBeenCalledWith(15, -13.5);
-        expect(context.lineTo).toHaveBeenCalledWith(-15, -9);
-        expect(context.lineTo).toHaveBeenCalledWith(30, 13.5);
+        expect(context.moveTo).toHaveBeenCalledWith(30, 0);
+        expect(context.lineTo).toHaveBeenCalledWith(0, 4.5);
+        expect(context.lineTo).toHaveBeenCalledWith(15, 31.5);
     });
 
     it('does not draw an exit cargo icon for cargo targeting another facility', async () => {
@@ -553,6 +648,59 @@ describe('WorldRenderer', () => {
         });
 
         expect(context.translate).not.toHaveBeenCalledWith(1186, 240);
+    });
+
+    it('keeps the exit cargo icon visible after the rocket collects delivery cargo', async () => {
+        vi.stubGlobal('performance', { now: vi.fn(() => 0) });
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [
+                {
+                    angle: 0,
+                    width: 60,
+                    radius: 900,
+                    getFacilityType: () => 'TRADING_POST'
+                }
+            ],
+            bodies: [
+                {
+                    position: { x: 0, y: 0 },
+                    radius: 40,
+                    isHome: true,
+                    isRepulsion: false,
+                    items: []
+                }
+            ]
+        });
+        context.translate.mockClear();
+        context.moveTo.mockClear();
+        context.lineTo.mockClear();
+        renderer.startNavigation({
+            position: { x: 0, y: 0 },
+            velocity: { x: 1, y: 0 },
+            actualTrail: [],
+            heldCargo: [{ category: 'cargo', deliveryGoalId: 'TRADING_POST' }],
+            getCollectionRange: vi.fn(() => 80),
+            getArcMultiplier: vi.fn(() => 1)
+        });
+
+        expect(context.translate).toHaveBeenCalledWith(1305, 240);
+        expect(context.moveTo).toHaveBeenCalledWith(30, 0);
+        expect(context.lineTo).toHaveBeenCalledWith(15, 31.5);
     });
 
     it('renders navigation rocket, trail, cargo, and sonar using camera projection', async () => {
@@ -608,6 +756,40 @@ describe('WorldRenderer', () => {
         expect(context.arc).toHaveBeenCalledWith(350, 280, 80, 0, Math.PI * 2);
         expect(context.arc).toHaveBeenCalledWith(324, 248, 8, 0, Math.PI * 2);
         expect(context.arc).toHaveBeenCalledWith(320, 240, 8, 0, Math.PI * 2);
+    });
+
+    it('draws only the visible tail of a full navigation trail', async () => {
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+        const rocket = {
+            position: { x: 89, y: 0 },
+            velocity: { x: 1, y: 0 },
+            angle: 0,
+            actualTrail: Array.from({ length: 90 }, (_, index) => ({ x: index, y: 0 })),
+            heldCargo: [],
+            getCollectionRange: vi.fn(() => 0)
+        };
+
+        await renderer.initialize(canvas);
+        renderer.setSector({ exits: [], bodies: [] });
+        context.moveTo.mockClear();
+        context.lineTo.mockClear();
+        renderer.startNavigation(rocket);
+
+        expect(context.moveTo).not.toHaveBeenCalledWith(320, 240);
+        expect(context.moveTo).toHaveBeenCalledWith(330, 240);
+        expect(context.lineTo).toHaveBeenCalledWith(409, 240);
     });
 
     it('renders prediction path independently from the navigation rocket trail', async () => {

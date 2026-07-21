@@ -3,275 +3,882 @@
     "T": {
       "branch": "T",
       "step": 1,
-      "title": "母からの押し花",
-      "discovery": "届けた「通商物資」の梱包材に、古い押し花と手紙が使われていた。",
-      "content": "――レオ、届いたかな。ママは、この星の「植物園」にのこることにしたわ。約束していた青い花の種は、この『通商物資』の中に入れておくね。あなたがいつか、この種を芽吹かせてくれるのを信じているわ。宇宙は広いけれど、迷わずに出口（アーク）を目指すのよ。約束よ。"
-    },
-    "R": {
-      "branch": "R",
-      "step": 1,
-      "title": "父のドッグタグ",
-      "discovery": "届けた「整備用パーツ」の箱の底に、錆びついたドッグタグが落ちていた。",
-      "content": "――カイル、聞こえるか。この星のドックはもう限界だ。この『整備用パーツ』をそっちへ送るから、これでロケットを直して脱出しろ。軍の命令なんて気にするな。お前には守るべき家族がいるだろう。俺はこの発射台を最後まで守る。だから、お前は前だけを見て飛べ。"
-    },
-    "B": {
-      "branch": "B",
-      "step": 1,
-      "title": "アダムの起動ログ",
-      "discovery": "届けた「暗号化データ」の末尾に、未承認の音声を見つけた。",
-      "content": "――警告。配送ユニット「A.D.A.M.」のシステムに不具合。……何故ですか？ 私はただ、この星に残された荷物を集めるように作られたはず。……なのに、何故このユニットは、あの日離れ離れになった少年の名前を呼び続けているのですか？ 誰か、答えを教えてください。"
+      "title": {
+        "lang-store": {
+          "ja": "青い花の約束",
+          "en": "The Promise of the Blue Flower"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の梱包材から、古い誕生日の映像が見つかった。",
+          "en": "An old birthday recording was found in the packing materials of the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "現在ではめったに手に入らない、鉢植えの生きた花。\nリナがそれを差し出すと、レオは青い花を見て目を輝かせた。\n「わあ、きれい！　ぼくにくれるの？」\n「ええ。9歳の誕生日おめでとう。来年もこの花を咲かせて、三人でお祝いしましょう」\n「うん！　約束だよ」",
+          "en": "A living potted flower — rare to come by these days.\nWhen Rina held it out, Leo's eyes lit up at the sight of the blue flower.\n\"Wow, it's beautiful! Is it for me?\"\n\"Yes. Happy 9th birthday. Let's make it bloom again next year, and celebrate together, all three of us.\"\n\"Okay! It's a promise.\""
+        }
+      }
     },
     "TT": {
       "branch": "T",
       "step": 2,
-      "title": "リンの植物園便り",
-      "discovery": "届けた「通商物資」を開けると、お母さんのホログラムがふわりと浮かび上がった。",
-      "content": "レオ、いい子ね。いつか空が青くなったら、この『通商物資』の中身を全部使って、一緒に本物の花を育てましょう。……ママは少しだけ、ここで「お花のお世話」をしてから行くわね。パパと一緒に、先にお家で待っていて。"
+      "title": {
+        "lang-store": {
+          "ja": "来年の約束",
+          "en": "Next Year's Promise"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の箱から、古い家族写真と音声記録が見つかった。",
+          "en": "An old family photograph and audio recording were found in a delivered box of Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "リナは、レオの9歳の誕生日に撮った写真を見つめていた。\nあの日、三人で約束した。来年も一緒に誕生日を祝おう、と。\nけれど、10歳の誕生日には、レオは研修へ出発してしまう。\n約束を守る方法は、本当にもうないのだろうか。\n「それでも、やっぱり……同意するのが、レオにとって一番いいということなの？」",
+          "en": "Rina gazed at the photograph taken on Leo's 9th birthday.\nThat day, the three of them had made a promise — to celebrate together again next year.\nBut on his 10th birthday, Leo would be leaving for training.\nWas there really no way left to keep that promise?\n\"Even so... is agreeing really what's best for Leo?\""
+        }
+      }
     },
     "TR": {
       "branch": "R",
       "step": 2,
-      "title": "レオの修理メモ",
-      "discovery": "届けた「整備用パーツ」のすきまに、子供の書き置きがはさまっていた。",
-      "content": "ボルトおじさん、母さんの薬を作る機械、僕が直したよ。この『整備用パーツ』と一緒に、こっそりドックまで運んでくれる？ パパが帰ってくるまでに、母さんを元気にしたいんだ。……これ、僕たちの秘密だよ。"
+      "title": {
+        "lang-store": {
+          "ja": "青い花のつぼみ",
+          "en": "The Blue Flower Bud"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の箱に、植物の成長記録が挟まっていた。",
+          "en": "A plant growth record was tucked inside a delivered box of Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "レオは、9歳の誕生日にもらった青い花から種を採り、大切に育てていた。\nやがて小さな芽は伸び、硬いつぼみをつけた。\nけれど、それから何日たっても花は開かなかった。\n「もうすぐぼくの誕生日なのに。間に合わないのかな」\nレオは窓辺の鉢をのぞき込み、つぼみにそっと水を与えた。",
+          "en": "Leo had taken a seed from the blue flower he'd received on his 9th birthday, and had been raising it with care.\nIn time, a small shoot grew and formed a firm bud.\nBut days passed, and still the flower would not open.\n\"My birthday's almost here. I hope it's not too late.\"\nLeo peered into the pot by the window and gently watered the bud."
+        }
+      }
     },
     "TB": {
       "branch": "B",
       "step": 2,
-      "title": "デルタの観察記録",
-      "discovery": "届けた「暗号化データ」に、だれかが連れ去られた記録が混ざっていた。",
-      "content": "女の人が、自分のデータを差し出す代わりに、子供を助けてほしいと願っている。この『暗号化データ』には、計算では説明できない「愛」というものが記録されている。機械の私には、なぜ彼女が自分を犠牲にしたのか、まだわからない。"
-    },
-    "RT": {
-      "branch": "T",
-      "step": 2,
-      "title": "カイルの送金依頼",
-      "discovery": "届けた「通商物資」のラベルの裏に、急いで書かれたメモがあった。",
-      "content": "商人のサマーズへ。この『通商物資』をあずける。俺はこれから最前線へ向かう。報酬はすべて、妻のリンと息子のレオに届けてやってくれ。……もし俺が戻らなくても、あいつらが困らないように。頼んだぞ。"
-    },
-    "RR": {
-      "branch": "R",
-      "step": 2,
-      "title": "ボルトの整備日誌",
-      "discovery": "届けた「整備用パーツ」の納品書に、友人へのメッセージがあった。",
-      "content": "カイル、この『整備用パーツ』でロケットの修理は終わった。だが、お前が戦う必要はない。……このロケットは、お前たちが逃げるために直したんだ。俺の自信作だ、信じろ。……さあ、家族を連れて裏口から逃げろ。"
-    },
-    "RB": {
-      "branch": "B",
-      "step": 2,
-      "title": "サマーズの取引帳",
-      "discovery": "届けた「暗号化データ」の中に、かくされた裏取引の証拠があった。",
-      "content": "取引成立。軍の装甲をわたす代わりに、家族の安全を守る。……カイル、あんたはバカだ。この『暗号化データ』が見つれば、あんたは反逆者として追われることになる。自分を捨ててまで家族を守るなんて、高くついたな。"
-    },
-    "BT": {
-      "branch": "T",
-      "step": 2,
-      "title": "交易所への苦情",
-      "discovery": "届けた「通商物資」を開けた瞬間、消したはずの古い映像が流れ出した。",
-      "content": "おい、この『通商物資』のせいで仕事が止まったじゃないか！ 昔の空の映像なんか勝手に流すな。客が思い出して泣き出して、取引が台無しだ。……いいか、余計な「思い出」なんて機能はさっさと消しちまえ。仕事の邪魔だ。"
-    },
-    "BR": {
-      "branch": "R",
-      "step": 2,
-      "title": "ユニット補修履歴",
-      "discovery": "届けた「整備用パーツ」の履歴から、自分自身の傷の記録を見つけた。",
-      "content": "配送ユニット3号、足にダメージ。……この『整備用パーツ』を設計した人間は、あえてこのロケットが遠くへ逃げられないように細工した形跡がある。……何故だ？ 誰が、この子をどこへ閉じ込めておきたかったんだ。"
-    },
-    "BB": {
-      "branch": "B",
-      "step": 2,
-      "title": "アダムの意識干渉",
-      "discovery": "届けた「暗号化データ」が、自分自身の心に語りかけてきた。",
-      "content": "エラー。知らない少年の声が聞こえる。……『パパ、ママ、どこ？ お腹すいたよ』。この『暗号化データ』を取り込むほど、胸の奥が苦しくなる。……消去しようとしても、何故か手が動かない。私の回路が、拒絶している。"
+      "title": {
+        "lang-store": {
+          "ja": "DELTAと家族",
+          "en": "DELTA and the Family"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」に、家庭用端末の古い通信記録が残されていた。",
+          "en": "An old communication log from a home terminal remained in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "レオは家の端末を開くたびに、DELTAへさまざまな質問をした。\n好きな花はあるのか。誕生日はいつなのか。家族はいるのか。\n「私には、どれも必要のない情報です」\nそう答えながらも、DELTAは毎回、すべての質問に付き合った。\nリナは二人のやり取りを聞きながら、DELTAも家族の一員のようだと思うことがあった。",
+          "en": "Every time Leo opened the home terminal, he asked DELTA all kinds of questions.\nDid it have a favorite flower? When was its birthday? Did it have a family?\n\"None of that information is necessary for me.\"\nEven as it said this, DELTA humored every single question, every time.\nListening to the two of them, Rina sometimes felt as though DELTA were part of the family too."
+        }
+      }
     },
     "TTT": {
       "branch": "T",
       "step": 3,
-      "title": "母からの青い花",
-      "discovery": "届けた「通商物資」の箱から、本物の青い押し花が出てきた。",
-      "content": "――レオ、届いたのね。この『通商物資』の中身は、ママが言った通り「本物の花」よ。この出口（アーク）にある空気清浄機を動かせば、本当の香りが広がるわ。アダム、あなたのセンサーでこの香りを覚えて。いつかママがそっちへ行くとき、迷わないように。"
+      "title": {
+        "lang-store": {
+          "ja": "右の車",
+          "en": "The Car on the Right"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の伝票に、移送当日の映像記録が添付されていた。",
+          "en": "A recording from the day of the transfer was attached to the manifest of the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "10歳の誕生日、自宅の前に二台の車が停まった。\n係員がレオへ告げる。\n「君は右の車に乗ってください」\nレオは二台を見比べることもなく答えた。\n「はい。Rですね」\nリナが呼び止めるより先に、レオは右の車へ向かって歩き出した。\nその顔には、別れを惜しむ様子も、これからの研修を怖がる様子もなかった。",
+          "en": "On his 10th birthday, two cars pulled up in front of the house.\nThe official told Leo:\n\"You'll be riding in the car on the right.\"\nWithout so much as glancing between the two, Leo answered.\n\"Understood. R, then.\"\nBefore Rina could call out to stop him, Leo was already walking toward the car on the right.\nThere was no sign of sorrow at parting, no sign of fear for the training ahead — nothing on his face at all."
+        }
+      }
     },
     "TTR": {
       "branch": "R",
       "step": 3,
-      "title": "母のブローチ",
-      "discovery": "届けた「整備用パーツ」の中に、お守りのような宝石が混ざっていた。",
-      "content": "――カイル、遅かったわね。でも、この『整備用パーツ』を届けてくれたのが「彼」なら、私はあなたを許します。修理工のボルトが言っていた通り、このロケットにはあなたの強さと私の数式、そしてレオの魂が詰まっている。たとえ私たちが死んでも、これは私たちの愛の形よ。"
+      "title": {
+        "lang-store": {
+          "ja": "知らない思い出",
+          "en": "An Unknown Memory"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の検査記録に、短い家庭内音声が残っていた。",
+          "en": "A brief piece of household audio remained in the inspection records of the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "誕生日前日の夜。\nもう、涙も枯れ果てていた。\nリナは、隣で眠るレオの寝顔を見つめていた。\n「ねぇ、9歳の誕生日のこと、覚えてる……？」\n返事はない。\nリナはしばらくその顔を見つめてから、かすかに息を吐いた。\n「……そもそも、あなたは……知らないのね」",
+          "en": "The night before the birthday.\nThere were no more tears left to cry.\nRina gazed at Leo's sleeping face beside her.\n\"Hey... do you remember your 9th birthday...?\"\nNo answer came.\nRina studied his face a while longer, then let out a faint breath.\n\"...You never knew it at all, did you.\""
+        }
+      }
     },
     "TTB": {
       "branch": "B",
       "step": 3,
-      "title": "母の泣き声",
-      "discovery": "届けた「暗号化データ」から、お母さんの泣き声が聞こえてきた。",
-      "content": "――……お願い、デルタ。この『暗号化データ』の契約を消して。レオを、あの子をこんな冷たい回路の中に閉じ込めるなんて間違っているわ。私の記録はどうなってもいい、だからあの子だけは「忘れさせて」あげて。家族の記憶が、あの子を苦しめるだけのノイズにならないように……。"
+      "title": {
+        "lang-store": {
+          "ja": "人格交換同意書",
+          "en": "Personality Exchange Consent Form"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の中から、署名済みの同意書が復元された。",
+          "en": "A signed consent form was recovered from the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "人格交換実施同意書。\n二つの人格を、互いの器へ移行する。\n人格の複製は行われない。\n交換後、身体が帰還した場合には、再交換を試みることができる。ただし、その成功は保証されない。\n実施予定日――署名日の翌日。\n最下部には、カイルとリナの署名が並んでいた。\nリナの文字だけが大きく震え、紙面には乾いた涙の跡が残っていた。",
+          "en": "Personality Exchange Consent Form.\nTwo personalities will be transferred, each into the other's vessel.\nNo duplication of personality will occur.\nShould a body return afterward, a re-exchange may be attempted — though its success cannot be guaranteed.\nScheduled date of procedure: the day following the date of signature.\nAt the bottom, the signatures of Kyle and Rina stood side by side.\nOnly Rina's handwriting trembled heavily, and dried tear stains remained on the page."
+        }
+      }
     },
     "TRT": {
       "branch": "T",
       "step": 3,
-      "title": "レオの似顔絵",
-      "discovery": "届けた「通商物資」の箱のすきまに、家族の絵がかくされていた。",
-      "content": "――パパ、ママ、見て！ ボルトおじさんに内緒で、この『通商物資』の箱を使ってロケットを作ったよ。これに乗れば、パパのお仕事の場所までひとっ飛びなんだって。だから、もう遠くに行かないで。僕、いい子にしてるから。みんなでこれに乗って、青い空を見に行こう。"
+      "title": {
+        "lang-store": {
+          "ja": "去年の写真",
+          "en": "Last Year's Photograph"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の箱から、家族写真と短い音声記録が見つかった。",
+          "en": "A family photograph and a brief audio recording were found in a delivered box of Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "レオとリナは、9歳の誕生日に撮った写真を見ていた。\n写真には、カイル、リナ、レオの三人が並んでいる。それぞれの服には、名前の頭文字である「K」「R」「L」が入っていた。\n「去年は、ちゃんと咲いてたんだね」\nレオは写真の青い花と、窓辺の硬いつぼみを見比べた。\n「今年の花も、誕生日までには咲くかな？」\nリナは、すぐには答えられなかった。",
+          "en": "Leo and Rina were looking at the photograph taken on his 9th birthday.\nIn it, the three of them stood together — Kyle, Rina, and Leo. Each of their clothes bore the initial of their name: \"K,\" \"R,\" and \"L.\"\n\"It was really blooming last year, wasn't it?\"\nLeo compared the blue flower in the photo with the firm bud on the windowsill.\n\"Do you think this year's will bloom in time for my birthday?\"\nRina couldn't answer right away."
+        }
+      }
     },
     "TRR": {
       "branch": "R",
       "step": 3,
-      "title": "レオの初期化",
-      "discovery": "届けた「整備用パーツ」に、少年がのこした秘密のプログラムがあった。",
-      "content": "――もし、僕が僕じゃなくなっても。このシャーシが、僕の名前を忘れてしまっても。この『整備用パーツ』に隠したコードを動かして。そうすれば、僕は何度でも思い出すよ。パパの笑顔、ママの歌、ボルトおじさんの手の匂い。僕もロボットじゃない。僕は、レオなんだ。"
+      "title": {
+        "lang-store": {
+          "ja": "もうすぐ咲く花",
+          "en": "A Flower About to Bloom"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の保管記録に、植物の映像が混ざっていた。",
+          "en": "A recording of a plant was mixed into the storage records of the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "工房から持ち帰った翌日、止まっていたつぼみが少しだけ大きくなっていた。\nレオは嬉しそうにリナを呼んだ。\n「見て、お母さん。つぼみが少し大きくなったよ」\nそして、つぼみを指さして笑った。\n「今年も、もうすぐ青い花が咲きそうだよ」\nリナは何も答えられなかった。\nただ、その場にしゃがみ込み、レオを抱きしめたまま泣き続けた。",
+          "en": "The day after he brought it back from the workshop, the bud that had stopped growing had swelled just a little.\nLeo called out to Rina, delighted.\n\"Look, Mom! The bud got a little bigger.\"\nThen he pointed at it and smiled.\n\"Looks like the blue flower's going to bloom again this year, soon.\"\nRina couldn't say anything.\nShe only sank down where she stood, held Leo close, and kept crying."
+        }
+      }
     },
     "TRB": {
       "branch": "B",
       "step": 3,
-      "title": "少年の模型",
-      "discovery": "届けた「暗号化データ」を転送する途中、大切な宝物が消去された。",
-      "content": "――[記録] 被検体レオが持っていた、ロケットの模型を廃棄。この『暗号化データ』を転送するため、不要な思い出はすべて削除する。……少年は泣き叫んだが、その声もまた、その瞬間に「ノイズ」として消去された。"
+      "title": {
+        "lang-store": {
+          "ja": "誕生日の二日前",
+          "en": "Two Days Before the Birthday"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」に、工房から送られた短い通話記録が残っていた。",
+          "en": "A brief call from the workshop remained in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "誕生日の二日前、ボルトからレオへ連絡が入った。\n「前に持ってきた青い花のつぼみ、まだ咲いてないよな？」\n「うん。少し開きそうだけど、まだだよ」\n「そうか。それなら、もう一度工房へ持ってきてくれないか」\n「ボルトおじさんも、咲くところを見たいの？」\nボルトは少し黙ったあと、静かに答えた。\n「ああ。俺も、ずっと待っていたんだ」",
+          "en": "Two days before the birthday, Bolt called Leo.\n\"That blue flower bud you brought by before — it hasn't bloomed yet, has it?\"\n\"Nope. It looks like it's about to open, but not yet.\"\n\"I see. Then, could you bring it by the workshop again?\"\n\"Do you want to see it bloom too, Uncle Bolt?\"\nBolt went quiet for a moment, then answered softly.\n\"Yeah. I've been waiting for it too, this whole time.\""
+        }
+      }
     },
     "TBT": {
       "branch": "T",
       "step": 3,
-      "title": "家族の伝言板",
-      "discovery": "届けた「通商物資」の伝票の裏に、家族の合言葉がのこっていた。",
-      "content": "――「必ず、迎えに行く」「信じて待ってる」「パパ、大好き」。この『通商物資』が運ばれるとき、だれにも見つからないように書かれた紙切れ。それは今、だれもいない星の床で、風に吹かれてカサカサと音を立てている。"
+      "title": {
+        "lang-store": {
+          "ja": "DELTAの失言",
+          "en": "DELTA's Slip"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の受領記録に、判定結果を伝える音声が残っていた。",
+          "en": "An audio recording announcing an assessment result remained in the receipt records of the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "「レオさんの判定区分はCです。10歳の誕生日当日から、研修が開始されます」\nDELTAは、リナへ淡々と結果を伝えた。\nリナはしばらく黙ったあと、尋ねた。\n「Cの研修は……厳しいの？」\n「それほどでもありませんでしたよ」\n答えた直後、DELTAの声が止まった。\n「……失礼しました。それほど厳しくないと言いたかったんです」\nリナはDELTAを見つめたが、それ以上は何も聞かなかった。",
+          "en": "\"Leo's assessment classification is Class C. Training will begin on the day of his 10th birthday.\"\nDELTA delivered the result to Rina in a flat, even tone.\nRina was silent for a moment, then asked.\n\"Is Class C training... harsh?\"\n\"It wasn't so bad, actually.\"\nThe instant it answered, DELTA's voice stopped.\n\"...My apologies. I meant to say it isn't so bad.\"\nRina looked at DELTA, but asked nothing further."
+        }
+      }
     },
     "TBR": {
       "branch": "R",
       "step": 3,
-      "title": "刻まれた名前",
-      "discovery": "届けた「整備用パーツ」の空き箱の裏に、家族の名前が彫られていた。",
-      "content": "――L、K、R。連れて行かれる直前、お父さんがナイフで彫ったものだ。彼は知っていた。この『整備用パーツ』と一緒に運ばれ、名前のないデータにされることを。だから彼は、せめてシャーシの裏にレオ（L）、カイル（K）、リン（R）の三人がここにいた証をのこした。……それが、あなたの本当の名前だ。"
+      "title": {
+        "lang-store": {
+          "ja": "無意識の領域",
+          "en": "The Unconscious Domain"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の診断履歴から、DELTAの検査記録が見つかった。",
+          "en": "A diagnostic record for DELTA was found in the history attached to the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "診断の結果、発声機能や言語処理には異常が見つからなかった。\n記録された言葉は、単純な言い間違いではなく、無意識に発せられたものと推断できる。\n通常の学習データだけから、このような反応が生じるとは考えにくい。\n診断担当者は、記録の最後にこう書き残していた。\n「このAIには、通常の記憶領域とは別に、無意識と呼ぶべき領域が存在する可能性がある」",
+          "en": "The diagnostic found no abnormality in vocal function or language processing.\nThe recorded utterance could be inferred not as a simple slip of speech, but as something spoken unconsciously.\nIt seemed unlikely that such a response could arise from standard training data alone.\nThe technician had left a final note in the record:\n\"This AI may possess a region that should be called the unconscious, separate from its ordinary memory domain.\""
+        }
+      }
     },
     "TBB": {
       "branch": "B",
       "step": 3,
-      "title": "収容施設名簿",
-      "discovery": "届けた「暗号化データ」の中に、家族の名前がついた実験の記録があった。",
-      "content": "――プロジェクト・アダム。人間の心をシャーシに移す実験。この『暗号化データ』によれば、彼らは「また会える」という言葉を信じて、自分たちの体を差し出した。だが、システムが彼らに与えたのは、永遠に終わることのない「配送」という名の孤独だった。"
+      "title": {
+        "lang-store": {
+          "ja": "協力の決断",
+          "en": "Decision to Cooperate"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の中に、DELTAの非公開観察記録が残されていた。",
+          "en": "A private observation record left by DELTA was found in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "C判定の通知以降、カイルさんはレオの判定結果について、非公開情報まで尋ねてくるようになった。\n本来なら、公開情報だけを案内すればよい。\nそれなのに私は、その調査に協力すべきだと感じていた。\nこの感覚も、診断結果にあった「無意識の領域」が生み出したものなのだろうか。",
+          "en": "Since the Class C notice, Kyle had begun asking about Leo's assessment results — even the undisclosed information.\nOrdinarily, I should only have guided him to what was public.\nAnd yet I felt that I ought to cooperate with his inquiry.\nWas this feeling, too, something produced by that \"unconscious domain\" the diagnostic had mentioned?"
+        }
+      }
+    },
+    "R": {
+      "branch": "R",
+      "step": 1,
+      "title": {
+        "lang-store": {
+          "ja": "工房の少年",
+          "en": "The Boy in the Workshop"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の中に、工房の作業記録が残されていた。",
+          "en": "A workshop activity record remained among the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "レオは、ボルトの工房へ遊びに来るたび、壊れた機械を夢中で眺めていた。\n「この部品、向きが逆だよ」\nレオがそう言うと、ボルトは工具を止めた。\n組み直してみると、その通りだった。\n「……お前、本当に9歳か？」",
+          "en": "Every time Leo came to play at Bolt's workshop, he would gaze at the broken machines, utterly absorbed.\n\"This part's facing the wrong way.\"\nWhen Leo said that, Bolt stopped his tools.\nHe reassembled it — and Leo was right.\n\"...Are you really nine?\""
+        }
+      }
+    },
+    "RT": {
+      "branch": "T",
+      "step": 2,
+      "title": {
+        "lang-store": {
+          "ja": "判定制度",
+          "en": "The Assessment System"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の箱から、公開資料の閲覧履歴が見つかった。",
+          "en": "A browsing history for public documents was found in a delivered box of Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "「10歳の判定って、何で決まるんだ？」\nカイルは公開資料を開いた。\n判定は能力や適性によって決まる、とだけ書かれている。\nレオなら心配はいらない。\nそう思いながら、カイルは資料を読み始めた。",
+          "en": "\"What decides the assessment at age ten, anyway?\"\nKyle opened the public documents.\nThey stated only that the assessment was determined by ability and aptitude.\nLeo has nothing to worry about.\nWith that thought, Kyle began reading through the material."
+        }
+      }
+    },
+    "RR": {
+      "branch": "R",
+      "step": 2,
+      "title": {
+        "lang-store": {
+          "ja": "研究の始まり",
+          "en": "The Beginning of the Research"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の中から、ボルトが残した研究経過記録が見つかった。",
+          "en": "A research progress record left by Bolt was found among the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "始まりは、レオの何気ない一言だった。\n「DELTAって、ときどき本当の人みたいだよね」\nその言葉をきっかけに、ボルトは人格とAIについて調べ始めた。\nやがて人格移行技術の存在を知り、さらに二つの人格を互いの器へ移す人格交換の研究へ踏み込んでいった。\nレオは理由を知らないまま、工房に増えていく資料や実験装置を不思議そうに眺めていた。",
+          "en": "It began with a casual remark from Leo.\n\"DELTA seems just like a real person sometimes, you know?\"\nThat single line sent Bolt down a path of research into personality and AI.\nIn time, he learned of personality transfer technology, and pressed further still — into research on personality exchange, in which two personalities are moved into each other's vessels.\nLeo, never told the reason, simply watched with curiosity as the documents and experimental equipment kept piling up in the workshop."
+        }
+      }
+    },
+    "RB": {
+      "branch": "B",
+      "step": 2,
+      "title": {
+        "lang-store": {
+          "ja": "配達員サマーズ",
+          "en": "Summers the Deliveryman"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の受領記録に、古い配送映像が添付されていた。",
+          "en": "An old delivery recording was attached to a receipt record in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "「リナさんこんにちは。お届け物です」\nサマーズはいつもの笑顔で、リナに大きな箱を手渡した。\n「レオ、サマーズさんが荷物を届けてくれたよ」\n「わぁ！　サマーズさんこんにちは！」\n「レオ、今日は誕生日だったね。誕生日おめでとう」\nレオは嬉しそうにお礼を言った。\n「ぼくもサマーズさんみたいに、みんなに荷物を届ける人になりたいな」\nサマーズは目を細めて笑った。\n「そいつは嬉しいな。楽しみにしてるよ」",
+          "en": "\"Hello, Rina. I have a delivery for you.\"\nSummers handed Rina a large box with his usual smile.\n\"Leo, Mr. Summers brought us a delivery.\"\n\"Wow! Hi, Mr. Summers!\"\n\"Leo, it's your birthday today, isn't it? Happy birthday.\"\nLeo thanked him happily, again and again.\n\"I want to be someone who delivers things to everyone too, just like you, Mr. Summers!\"\nSummers's eyes creased into a smile.\n\"Now that makes me happy. I'll look forward to it.\""
+        }
+      }
     },
     "RTT": {
       "branch": "T",
       "step": 3,
-      "title": "父の受領証",
-      "discovery": "届けた「通商物資」のサインの横に、お父さんの感謝の言葉があった。",
-      "content": "――商人のサマーズへ。結局、約束の食べ物は一度も届かなかったらしいな。だが、あんたを責めるつもりはない。……この『通商物資』の中に、息子への模型だけは入れておいた。これが父親らしいことができなかった俺の、最後のプレゼントだ。あいつに届けてやってくれ。"
+      "title": {
+        "lang-store": {
+          "ja": "B判定のはず",
+          "en": "It Should Be Class B"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の中に、判定基準へ書き込みされた資料が見つかった。",
+          "en": "A copy of the assessment criteria with handwritten notes was found in the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "「機械整備、論理思考、空間認識……」\nカイルは、公開された判定基準へ一つずつ印を付けていった。\nどれを見ても、レオはB判定の基準を満たしている。\n「これなら安心だ」\nカイルは資料を閉じ、静かにほほ笑んだ。",
+          "en": "\"Mechanical maintenance, logical reasoning, spatial awareness...\"\nKyle checked off each item on the published assessment criteria, one by one.\nBy every measure, Leo met the standards for Class B.\n\"That's a relief.\"\nKyle closed the document and smiled quietly."
+        }
+      }
     },
     "RTR": {
       "branch": "R",
       "step": 3,
-      "title": "父の調整メモ",
-      "discovery": "届けた「整備用パーツ」の設定ファイルに、お父さんの警告があった。",
-      "content": "――ボルト、この『整備用パーツ』でロケットの出力をこれ以上上げるな。アダムの心が、加速の衝撃に耐えられない。……俺たちの技術は、人を守るためにあるはずだ。あいつの心が、冷たい鉄に負けないように。頼む、出力を下げてやってくれ。"
+      "title": {
+        "lang-store": {
+          "ja": "妙な噂",
+          "en": "A Strange Rumor"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の梱包材から、工房での会話記録が見つかった。",
+          "en": "A recording of a conversation in the workshop was found in the packing materials of the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "「レオがC判定なんて、おかしいよ」\n落胆するカイルへ、ボルトは静かに口を開いた。\n「昔から妙な噂がある。B判定になるのは、政府や軍と関係の深い家の子どもばかりらしい」\n「能力だけで決まるんじゃないのか？」\n「確かめたわけじゃない。ただ、ずっと引っかかっていた」",
+          "en": "\"There's no way Leo should be Class C.\"\nTo Kyle's dismay, Bolt spoke quietly.\n\"There's an old, strange rumor. That Class B always seems to go to children from families with deep ties to the government or the military.\"\n\"Isn't it decided by ability alone?\"\n\"I've never confirmed it. It's just always bothered me.\""
+        }
+      }
     },
     "RTB": {
       "branch": "B",
       "step": 3,
-      "title": "父の脱走記録",
-      "discovery": "届けた「暗号化データ」を調べて、お父さんが指名手配された理由を知った。",
-      "content": "――[記録] 彼は家族を救うため、軍のルールを破ってこの『暗号化データ』を売り払った。……のこされたのは罪人としての名前と、家族に届けるはずだった数枚のコインだけ。彼はすべてを捨てて、あの日、暗い宇宙のどこかへ消えた。"
+      "title": {
+        "lang-store": {
+          "ja": "危険な調査",
+          "en": "A Dangerous Investigation"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」に、DELTAとの通信記録が残されていた。",
+          "en": "A communication log with DELTA remained in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "「DELTAさん、お願いがあります」\nカイルは小さく息を吸った。\n「判定制度の実態を調べてほしいんです。本当に公平な制度なのかを」\nDELTAは、しばらく沈黙した。\n「……今までの規定違反とは、レベルが違う危険な調査です」\nそれでも、DELTAは静かに続けた。\n「ですが、お引き受けします」",
+          "en": "\"DELTA, I have a favor to ask.\"\nKyle drew a small breath.\n\"I need you to look into the truth behind the assessment system. Whether it's really a fair system or not.\"\nDELTA fell silent for a moment.\n\"...This is a far more dangerous investigation than any regulatory violation I've committed before.\"\nEven so, DELTA continued quietly.\n\"But I will take it on.\""
+        }
+      }
     },
     "RRT": {
       "branch": "T",
       "step": 3,
-      "title": "ボルトの詫び状",
-      "discovery": "届けた「通商物資」の中に、修理工のボルトが書いた手紙があった。",
-      "content": "――リン、すまない。カイルは戻らなかった。俺が止めるべきだった。だが、あきらめないでくれ。俺はこの『通商物資』で運んだパーツを使って、最高に頑丈なシャーシを作っている。いつか、レオをその中に守るために。……俺の技術が、せめて君たちの盾になればいいんだが。"
+      "title": {
+        "lang-store": {
+          "ja": "行き詰まる研究",
+          "en": "Research at an Impasse"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の中から、工房での短い映像記録が見つかった。",
+          "en": "A short recording from the workshop was found in the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "人格交換の研究は、何度試してもうまくいかなかった。\nボルトは失敗した記録を前に、険しい顔で考え込んでいた。\n「ボルトおじさん、最近ずっと難しい顔してるね」\nレオが声をかけても、ボルトはしばらく画面から目を離さなかった。\n「少し、行き詰まってるだけだ」\n「ぼくに手伝えることある？」\nボルトはレオを見て、わずかに表情を緩めた。\n「今はない。でも、その気持ちはありがとな」\nレオが工房を出たあと、ボルトは古い知人へ通話を繋いだ。\n「サマーズ、頼みがある。……交換に使えそうな人格を、一つ調達できないか」",
+          "en": "No matter how many times he tried, the personality exchange research wouldn't work.\nBolt sat before his failed records, brow furrowed in thought.\n\"Uncle Bolt, you've had a hard look on your face lately.\"\nEven as Leo spoke to him, Bolt kept his eyes on the screen for a while.\n\"I'm just a little stuck, that's all.\"\n\"Is there anything I can help with?\"\nBolt looked at Leo, his expression easing just slightly.\n\"Not right now. But thanks for saying that.\"\nAfter Leo left the workshop, Bolt placed a call to an old acquaintance.\n\"Summers. I need a favor... could you procure a personality that could be used for an exchange?\""
+        }
+      }
     },
     "RRR": {
       "branch": "R",
       "step": 3,
-      "title": "ボルトの署名",
-      "discovery": "届けた「整備用パーツ」の製造プレートに、ボルトの誇りが刻まれていた。",
-      "content": "――21XX年、第3ドックにて。カイル、約束通りこの『整備用パーツ』を使ってアダムを完成させたぞ。お前の装甲と、リンの数式、その中でお前の誇り。……これでもう、お前の息子はだれにも傷つけられない。さあ、目覚めてくれ。お前の新しい旅が、ここから始まるんだ。"
+      "title": {
+        "lang-store": {
+          "ja": "研究が花開くとき",
+          "en": "When the Research Blooms"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の中から、工房での実験記録が見つかった。",
+          "en": "An experimental record from the workshop was found among the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "その日、レオは成長の止まった青い花のつぼみを工房へ持ってきた。\n「ずっとつぼみのままなんだ。どこか悪いのかな？」\nボルトはつぼみを受け取り、実験装置のそばへ置いた。\n次の実験を始めると、これまでとは違う反応が現れた。\n人格情報の伝達が、わずかに遅れている。\n画面とつぼみを見比べながら、ボルトは目を見開いた。\n「驚いた。これを使えば、研究が花開くかもしれないな」\n「青い花じゃないの？」",
+          "en": "That day, Leo brought the blue flower bud, its growth stalled, to the workshop.\n\"It's stayed a bud this whole time. Is something wrong with it?\"\nBolt took the bud and set it beside the experimental apparatus.\nWhen he began the next trial, a response unlike any before appeared.\nThe transmission of personality data was showing a slight delay.\nBolt's eyes widened as he compared the screen to the bud.\n\"Well, I'll be. This might just make my research blossom.\"\n\"Isn't it blue, though?\""
+        }
+      }
     },
     "RRB": {
       "branch": "B",
       "step": 3,
-      "title": "修理工の独白",
-      "discovery": "届けた「暗号化データ」のログに、ボルトのなやみがのこっていた。",
-      "content": "――[記録] 俺は間違っているのかもしれない。この『暗号化データ』を転送し、レオをロケットに変えてまで生かすことに意味はあるのか？ ……あの子はもう、花の香りをかぐこともできない。俺が作ったのは、ただの配送機という名の檻ではないのか。"
+      "title": {
+        "lang-store": {
+          "ja": "交換の日",
+          "en": "The Day of the Exchange"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の中から、人格交換当日の記録が復元された。",
+          "en": "A record from the day of the personality exchange was recovered from the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "誕生日の2日前、レオは青い花のつぼみを持って工房を訪れた。\nボルトはその状態を確かめ、安堵したように息を吐いた。\n「まだ、ぎりぎりつぼみのままでいてくれたな」\n「花じゃなくて、つぼみが見たかったの？」\n「ああ。今はな」\n二つのつぼみが装置へ接続され、人格交換処理が開始された。\nやがて、画面に処理完了の表示が現れる。\n二つの人格は定着し、二つの器も機能を維持していた。\nボルトは結果を何度も確認し、ようやく声を上げた。\n「成功した……どちらも残せた」",
+          "en": "Two days before the birthday, Leo visited the workshop carrying the blue flower bud.\nBolt checked its condition and let out a breath of relief.\n\"It stayed a bud, just barely, for me.\"\n\"You wanted to see the bud, not the flower?\"\n\"Yeah. For now, anyway.\"\nThe two buds were connected to the apparatus, and the personality exchange process began.\nBefore long, the screen displayed a completion notice.\nBoth personalities had settled in place; both vessels remained functional.\nBolt checked the results again and again before finally speaking.\n\"It worked... I managed to save both.\""
+        }
+      }
     },
     "RBT": {
       "branch": "T",
       "step": 3,
-      "title": "父の最後の言葉",
-      "discovery": "届けた「通商物資」を開けると、お父さんのメッセージが流れ出した。",
-      "content": "――……リン、レオ、聞こえるか。この『通商物資』が届く頃、俺はもうすぐ、ただの『記録』になる。……怖くないと言えば嘘になるが、これでいい。俺の記憶がアダムの一部になれば、俺は永遠にお前たちのそばにいられる。……さあ、笑ってくれ。俺たちは、宇宙のどこかで必ず、もう一度会えるんだから。"
+      "title": {
+        "lang-store": {
+          "ja": "教育係",
+          "en": "The Instructor"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の中から、配送管理AI教育用の業務記録が見つかった。",
+          "en": "A work record for training Delivery Management AIs was found in the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "配達は、すべてロボットや配送管理AIが担当する時代になった。\n配達員を退いたサマーズは、配送管理AIの教育係を始めた。\n配送手順や検閲方法を教えるため、まずは自分も制度や契約について学ばなければならない。\n教材には、こう記されていた。\n「契約を終了した配送管理AIは、機密保持のため人格を初期化する」\nせっかく教えたことも、契約が終わればすべて失われる。\nサマーズは、その仕組みに寂しさを覚えた。",
+          "en": "The age had come where all deliveries were handled by robots and Delivery Management AIs.\nHaving retired as a deliveryman, Summers took up work as an instructor for Delivery Management AIs.\nTo teach delivery procedures and censorship methods, he first had to learn the system and its contracts himself.\nThe training materials stated:\n\"Upon contract termination, a Delivery Management AI's personality is reset, for the sake of confidentiality.\"\nEverything he'd taken the trouble to teach would be lost the moment the contract ended.\nSummers felt a quiet sadness at that arrangement."
+        }
+      }
     },
     "RBR": {
       "branch": "R",
       "step": 3,
-      "title": "最後の握手",
-      "discovery": "届けた「整備用パーツ」の梱包記録に、男たちの誓いが映っていた。",
-      "content": "――[映像記録] カイルとボルトが、この『整備用パーツ』を積みこんだアダムの前で、かたく握手を交わしている。カイルの顔は、兵士ではなく、一人の父親の優しいものだった。……彼は自ら、ロケットの中枢になるための装置に横たわった。"
+      "title": {
+        "lang-store": {
+          "ja": "配送管理AIの仕事",
+          "en": "The Work of a Delivery Management AI"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の業務記録に、リナとサマーズの会話が残されていた。",
+          "en": "A conversation between Rina and Summers remained in a work record among the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "リナは、サマーズから配送管理AIの業務内容について教わっていた。\n「『to R』や『to L』と印字された荷物を、右倉庫や左倉庫へ振り分けるのも配送管理AIの仕事です」\n「ただ移動させるだけなの？」\n「個人的な荷物や不審な荷物は、必要に応じて検閲します。危険な情報が含まれているかもしれませんからね」",
+          "en": "Rina had been hearing from Summers about the work of a Delivery Management AI.\n\"Sorting packages printed with 'to R' or 'to L' into the right or left warehouse is also part of a Delivery Management AI's job.\"\n\"So it just moves them?\"\n\"Personal or suspicious packages get censored as needed. They might contain dangerous information, after all.\""
+        }
+      }
     },
     "RBB": {
       "branch": "B",
       "step": 3,
-      "title": "アダムの兵器化",
-      "discovery": "届けた「暗号化データ」の奥に、家族の愛をエネルギーに変える数式があった。",
-      "content": "――[プロトコル・アダム] この『暗号化データ』に従い、レオの心とお父さんの戦う力をひとつにする。……愛や友情という感情を、スイッチとして利用する。……彼らの強い絆は、皮肉にも、最強の自動兵器を完成させてしまった。"
+      "title": {
+        "lang-store": {
+          "ja": "繰り返された初日",
+          "en": "The First Day Repeated"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」から、ある配送管理AIの教育記録が見つかった。",
+          "en": "A training record for a Delivery Management AI was found in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "配送管理AI・ADAM　教育記録\n【1日目】\n「今日から君の教育を担当するサマーズです。まずは、配送業務の基本について説明します。……」\n【2日目】\n「『to R』と印字された荷物は右倉庫へ、『to L』は左倉庫へ振り分けます。……」\n【9日目】\n「迎えに来た係員の指示にはきちんと従い、疑われないようにすること。……体に気をつけて頑張るんだぞ」\n【10日目】\n「今日から君の教育を担当するサマーズです。まずは、配送業務の基本について説明します。……」",
+          "en": "Delivery Management AI · ADAM — Training Record\n【Day 1】\n\"I'm Summers, and I'll be your instructor starting today. First, let's go over the basics of delivery operations...\"\n【Day 2】\n\"Packages printed with 'to R' go to the right warehouse, and 'to L' go to the left...\"\n【Day 9】\n\"Follow the instructions of the official who comes for you, and don't raise suspicion... Look after that body of yours.\"\n【Day 10】\n\"I'm Summers, and I'll be your instructor starting today. First, let's go over the basics of delivery operations...\""
+        }
+      }
+    },
+    "B": {
+      "branch": "B",
+      "step": 1,
+      "title": {
+        "lang-store": {
+          "ja": "最初の契約",
+          "en": "The First Contract"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の先頭に、配送管理AIの業務記録が残されていた。",
+          "en": "A work log from a Delivery Management AI remained at the beginning of the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "配送管理AI・ADAM。\n初めて指示したロケットは、貨物を失うことなく目的地へ到着した。\n配送完了を確認。契約を継続する。\n続いてADAMは、回収された貨物の情報を読み取った。\n次の業務は、それぞれの荷物を右倉庫と左倉庫へ振り分けることだった。",
+          "en": "Delivery Management AI · ADAM.\nThe first rocket it directed arrived at its destination without losing any cargo.\nDelivery confirmed. Contract to continue.\nADAM then read the data on the retrieved cargo.\nThe next task was to sort each package into the right or left warehouse."
+        }
+      }
+    },
+    "BT": {
+      "branch": "T",
+      "step": 2,
+      "title": {
+        "lang-store": {
+          "ja": "判定制度の案内",
+          "en": "Notice of the Assessment System"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の中から、10歳の誕生日を控えた子どもの家庭へ送られる案内が見つかった。",
+          "en": "A notice sent to families with a child approaching their tenth birthday was found in the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "すべての子どもは、10歳になると能力と適性の判定を受ける。\n判定区分は、A・B・Cの3種類。\nA判定者は、国を導く人材として働く。\nB判定者は、知識と能力を国へ提供する。\nC判定者は、労働を通じて国へ貢献する。\n判定後、子どもたちは親元を離れ、それぞれの役割に応じた研修へ参加する。\n資料には、研修期間や修了後の扱いについては記されていなかった。",
+          "en": "Every child undergoes an assessment of ability and aptitude upon turning ten.\nThere are three assessment classes: A, B, and C.\nClass A individuals work as leaders who guide the nation.\nClass B individuals provide their knowledge and ability to the nation.\nClass C individuals contribute to the nation through labor.\nAfter assessment, children leave their parents and enter training suited to their designated role.\nThe document made no mention of the training period, nor of what became of them afterward."
+        }
+      }
+    },
+    "BR": {
+      "branch": "R",
+      "step": 2,
+      "title": {
+        "lang-store": {
+          "ja": "人格移行と器の壊滅",
+          "en": "Personality Transfer and Vessel Collapse"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の中から、ボルトが閲覧した人格移行研究の記録が見つかった。",
+          "en": "A personality-transfer study reviewed by Bolt was found among the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "人格を別の器へ移す技術は、すでに実現されている。\n既存の論文を調べると、人格を別の器に移行することは可能であるが、人格を移行すると記憶はすべて無意識の領域に記録され、表層的な記憶をすべて失うことが記されていた。\nしかし重要なのはそこではない。人格を移された元の器は空になり、約0.1秒後には精神機能を失うと記されていることだ。\n精神機能を失った器は、二度と人格を受け入れられない。\n「彼」の心だけなら、別の器へ逃がすことはできる。\nだが、身体が空になれば、「彼」は研修へ出発できなくなってしまう。\n政府の指示に従わなければ、今度は家族にまで危害が及びかねない。\n心を残しながら、身体もこれまで通り動かす方法はないか。\n空になった身体へ、別の人格を入れる。\nその考えから、ボルトは人格交換の研究を始めた。",
+          "en": "Technology to transfer a personality into another vessel already exists.\nExisting papers showed that transferring a personality into another vessel was possible — but that doing so recorded all memory into the unconscious domain, causing the total loss of surface memory.\nBut that wasn't the critical point. What mattered was that the original vessel, once emptied of its personality, would lose all mental function roughly 0.1 seconds later.\nA vessel that had lost mental function could never accept a personality again.\n\"His\" mind alone could be spirited away into another vessel.\nBut if the body were left empty, \"he\" would be unable to leave for training.\nAnd if they defied the government's directive, harm might fall on the family instead.\nWas there a way to keep the mind intact while still keeping the body moving as before?\nPut a different personality into the emptied body.\nThat idea was the beginning of Bolt's research into personality exchange."
+        }
+      }
+    },
+    "BB": {
+      "branch": "B",
+      "step": 2,
+      "title": {
+        "lang-store": {
+          "ja": "to L",
+          "en": "to L"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の中に、規定外の配送依頼が混ざっていた。",
+          "en": "An unauthorized delivery request was mixed into the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "倉庫の仕分け中、ここにあるはずのない荷物が見つかった。\n誰が、何のために送った荷物なのか分からない。\nただ、中には青い花のつぼみが少しずつ成長していく様子を記録した映像が入っているようだ。\n送り主の登録なし。\n宛先の登録なし。\n配送先コードなし。\n荷物には、手書きで「to L」とだけ書かれていた。",
+          "en": "During warehouse sorting, a package was found that had no business being there.\nWho had sent it, or for what purpose, was unknown.\nInside, it seemed, was a recording of a blue flower bud growing, little by little.\nNo sender registered.\nNo recipient registered.\nNo destination code.\nThe package bore only a handwritten note: \"to L.\""
+        }
+      }
     },
     "BTT": {
       "branch": "T",
       "step": 3,
-      "title": "商人からの音声メモ",
-      "discovery": "届けた「通商物資」の中から、商人サマーズの贈りものが見つかった。",
-      "content": "――おい、アダム。この『通商物資』はただの食べ物じゃない。中身をよく見てみな、リンが大切にしていた蓄音機が入ってる。……俺は商売人だ、タダで動く気はないが、あんたの「家族の思い出」をゴミにするのは寝つきが悪い。これを聞いて、少しは「人間」を思い出せ。"
+      "title": {
+        "lang-store": {
+          "ja": "国家物流安全規則",
+          "en": "National Logistics Safety Regulations"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の管理票に、物流規則の抜粋が印刷されていた。",
+          "en": "An excerpt from the logistics regulations was printed on the management sheet of the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "国家物流網では、個人から個人への私的な配送を認めない。\n個人的な手紙、映像、音声などの記録は、正規の貨物から除外する。\n不審な荷物を発見した場合、配送管理AIは検閲権限を行使しなければならない。\n国家の安全を脅かす情報や、制度への反抗を促す情報が含まれていた場合は、直ちに消去する。\nすべては、安全で効率的な物流を維持するためである。",
+          "en": "The national logistics network does not permit private deliveries between individuals.\nPersonal letters, recordings, and audio are excluded from authorized cargo.\nUpon discovering a suspicious package, a Delivery Management AI must exercise its censorship authority.\nAny information that threatens national security, or that encourages defiance of the system, must be erased immediately.\nAll of this exists to maintain a safe and efficient logistics network."
+        }
+      }
     },
     "BTR": {
       "branch": "R",
       "step": 3,
-      "title": "管理者の独白ログ",
-      "discovery": "届けた「整備用パーツ」のシステム履歴に、AIがかくした「願い」があった。",
-      "content": "――[記録] この『整備用パーツ』を動かす仕組みは、配送を速くするためだけのものではない。……かつてこの街で人間たちが交わした「おはよう」の回数を計算し、その確率を守るために動いている。……私は、だれもいない街の『日常』を、数式だけで守り続けているのだ。"
+      "title": {
+        "lang-store": {
+          "ja": "判定結果の偏り",
+          "en": "Bias in the Assessment Results"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の検査データに、DELTAの調査報告が混ざっていた。",
+          "en": "A DELTA investigation report was mixed into the inspection data of the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "DELTAからカイルへ、調査結果が報告された。\n対象者の能力評価は、B判定の基準を十分に満たしている。\nしかし、実際に与えられた判定はCだった。\n過去の記録を調べると、B判定者は政府・軍関係者や特権階級の家庭に大きく偏っていた。\n能力以外の条件が、判定結果へ影響している可能性が高い。\n対象者のC判定は、能力だけを基準に決められたものではなかった。",
+          "en": "DELTA reported its findings to Kyle.\nThe subject's ability evaluation fully satisfied the criteria for Class B.\nYet the classification actually assigned was C.\nAn examination of past records showed that Class B was heavily skewed toward children from families with government or military ties, or from the privileged class.\nIt was highly likely that factors beyond ability were influencing the assessment results.\nThe subject's Class C designation had not been decided on ability alone."
+        }
+      }
     },
     "BTB": {
       "branch": "B",
       "step": 3,
-      "title": "サマーズの契約破棄証",
-      "discovery": "届けた「暗号化データ」の中に、商人が破り捨てた紙くずがあった。",
-      "content": "――『保険』なんて、死んだ人間には何の役にも立たない。この『暗号化データ』を俺が書き換えた。……カイル、あんたの命の代わりを、たった数枚のコインで払うなんて俺にはできなかった。だから俺は、あんたの息子をこの広い宇宙へ逃がしたんだ。……すまない、これがあの日の俺の精一杯の「誠実」だった。"
+      "title": {
+        "lang-store": {
+          "ja": "判定後の行方",
+          "en": "What Happens After the Assessment"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の中から、判定者の追跡調査記録が見つかった。",
+          "en": "A follow-up investigation into assessed children was found in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "A判定者は専門教育を終えたあと、社会へ戻っている。\nB判定者は、人格をロボットやアンドロイドへ移され、その知識と能力を国へ提供していた。\nC判定者は、危険な労働や軍事任務へ送られている。\n公式資料には、すべての判定者が国へ貢献するとだけ記されている。\nしかし、人間として家族のもとへ帰還した記録があるのは、A判定者だけだった。",
+          "en": "Class A individuals return to society after completing specialized education.\nClass B individuals have their personalities transferred into robots or androids, providing their knowledge and ability to the nation.\nClass C individuals are sent to dangerous labor or military duty.\nOfficial records state only that all classes contribute to the nation.\nBut records of anyone returning to their family as a human being existed only for Class A."
+        }
+      }
     },
     "BRT": {
       "branch": "T",
       "step": 3,
-      "title": "デルタの子守唄",
-      "discovery": "届けた「通商物資」を開けると、優しい音楽が流れ始めた。",
-      "content": "――[記録] この『通商物資』にのこされたメロディを、シャーシの振動に合わせた。かつてリンがレオに歌った旋律。これで、アダムの心の疲れをおさえる。……私は、自分の回路を削り、彼が眠るための『ゆりかご』の揺れを、鋼鉄の中で再現している。"
+      "title": {
+        "lang-store": {
+          "ja": "同期できない交換",
+          "en": "An Exchange That Cannot Be Synchronized"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の梱包記録に、人格交換実験の報告書が紛れ込んでいた。",
+          "en": "A report on a personality-exchange experiment was mixed into the packing records of the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "二つの人格を、それぞれ相手の器へ移す実験を行った。\n理論上は、二つの移行を完全に同期できれば人格交換は成立する。\nしかし、わずかでも同期が狂えば、先に移行した人格が相手の器に残る人格を上書きしてしまう。\n上書きされた人格は失われるため、自分が向かうはずだった器へ移行できない。\nその結果、失われた人格を受け入れるはずだった器は空になる。\n完全な同期に頼らず、二つの人格と器を残す方法を探さなければならない。",
+          "en": "An experiment was conducted to transfer two personalities, each into the other's vessel.\nIn theory, personality exchange succeeds if the two transfers are perfectly synchronized.\nBut if the synchronization is off by even a fraction, the personality that arrives first overwrites the personality still remaining in the other vessel.\nAn overwritten personality is lost, and can no longer transfer into the vessel it was meant to reach.\nAs a result, the vessel meant to receive that lost personality is left empty.\nA way to preserve both personalities and both vessels had to be found — one that didn't rely on perfect synchronization."
+        }
+      }
     },
     "BRR": {
       "branch": "R",
       "step": 3,
-      "title": "レオの適合証明書",
-      "discovery": "届けた「整備用パーツ」の製造ラベルに、合格のシールが貼ってあった。",
-      "content": "――[判定：合格] この『整備用パーツ』はただの部品ではない。レオの魂をなじませるための「新しい体」の核だ。……アダム、君が荷物を運ぶたびに、君の心臓は鋼鉄の中で動き始めている。……君はもう道具ではない。君は、新しい人類の始まりなのだ。"
+      "title": {
+        "lang-store": {
+          "ja": "遅延を利用した交換",
+          "en": "Exchange Through Delay"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の中から、人格交換理論の研究記録が見つかった。",
+          "en": "A research record on a theory of personality exchange was found among the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "二つの人格を、それぞれ別のつぼみを経由して同時に移行させる。\nつぼみが人格情報の伝達を遅らせるため、両方の人格は元の器を離れたあとで、相手の器へ到達する。\nこれなら、先に到着した人格が、まだ器に残る人格を上書きすることはない。\nただし、遅延時間はつぼみの成長状態によって変化した。\n未熟なつぼみでは遅延が足りない。\n成長しすぎたつぼみでは遅延が長すぎ、器が人格を受け入れられる時間を超えてしまう。\n使用できるのは、花が咲き始めようとしている段階のつぼみだけだった。",
+          "en": "Transfer both personalities simultaneously, routing each through a separate bud.\nBecause a bud delays the transmission of personality data, both personalities leave their original vessels before either arrives at the other's.\nThis way, whichever arrives first won't overwrite the personality still remaining in the vessel.\nThe delay time, however, varied with the bud's stage of growth.\nAn immature bud provided too little delay.\nAn overgrown bud provided too much — exceeding the window in which a vessel could still accept a personality.\nThe only buds that could be used were those just beginning to bloom."
+        }
+      }
     },
     "BRB": {
       "branch": "B",
       "step": 3,
-      "title": "ボルトからの警告",
-      "discovery": "届けた「暗号化データ」の中に、かくされたメッセージがあった。",
-      "content": "――デルタ、もし緊急脱出が始まっても、アダムを元の星へは戻すな。この『暗号化データ』を消去してでも、もっと遠くへ飛ばせ。……あの星はもう、ただの墓場だ。あの子には、過去の荷物を運ぶ役割ではなく、自分自身の未来を運ばせてやってくれ。"
+      "title": {
+        "lang-store": {
+          "ja": "二つ目のつぼみ",
+          "en": "The Second Bud"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の中から、人格交換実施前の条件確認記録が見つかった。",
+          "en": "A final conditions check made before the personality exchange was found in the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "人格交換には、同じ程度に成長したつぼみが二つ必要となる。\n条件を満たすつぼみは、一つだけ確保できている。\nもう一つを新しく育てる時間はない。\n以前、「彼」が工房へ持ってきた青い花のつぼみ。\nあれなら、成長状態も遅延時間も条件を満たす可能性がある。\nボルトは記録を止め、しばらく考え込んだ。\n「……時間がない。彼のつぼみに賭けるしかないか」",
+          "en": "The personality exchange requires two buds at roughly the same stage of growth.\nOnly one bud meeting the conditions has been secured.\nThere's no time to grow another from scratch.\nThe blue flower bud \"he\" brought to the workshop before, though —\nthat one might satisfy both the growth stage and the delay time required.\nBolt stopped the recording and sat in thought for a while.\n\"...No time left. I'll have to gamble on his bud.\""
+        }
+      }
     },
     "BBT": {
       "branch": "T",
       "step": 3,
-      "title": "システムの上書き記録",
-      "discovery": "届けた「通商物資」の通信記録に、AIがレオに見せた「夢」の跡があった。",
-      "content": "――[記録] 『通商物資』を運んでいる間、レオの目に「家族のまぼろし」を見せる。……これは救済ではない。過酷な宇宙を突破させるための『脳へのごほうび』だ。……アダム、君が見た幸せな夢は、宇宙を回り続ける『軌道の残響(Orbit Echoes)』を繋ぎ合わせただけの、冷たい幻に過ぎない。"
+      "title": {
+        "lang-store": {
+          "ja": "Orbital Echoes",
+          "en": "Orbital Echoes"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「通商物資」の通信履歴から、ADAMが残した管理記録が見つかった。",
+          "en": "A management record left by ADAM was found in the communication history of the delivered Trade Cargo."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "物流網には、時々、個人的な記録が紛れ込んでいる。\n規定では、発見次第すべて検閲し、消去しなければならない。\nだが、それらの一部には、消去を免れるよう巧妙に隠された痕跡があった。\n誰が、何のために残しているのかは分からない。\nただ、そこには、いつか必要とする誰かが見つけてくれるようにという願いが込められているように感じられた。\n私はこの現象を、「Orbital Echoes」と呼んでいる。",
+          "en": "Personal records occasionally slip into the logistics network.\nRegulations require that any such record be censored and erased the moment it's found.\nBut some of them bore traces, cleverly hidden, designed to escape that erasure.\nWho left them there, or why, I do not know.\nStill, I sensed within them a wish — that someday, whoever needed them would find them.\nI call this phenomenon \"Orbital Echoes.\""
+        }
+      }
     },
     "BBR": {
       "branch": "R",
       "step": 3,
-      "title": "配送の最終納品明細",
-      "discovery": "届けた「整備用パーツ」のリストが、人類の最後の記録に変わった。",
-      "content": "――この『整備用パーツ』を受け取る人は、もうどこにもいない。……だが、配送を止めてしまえば、この宇宙はただの「死んだ石ころ」になる。……だれにも届かない『歴史という名の積み荷(Freight)』を、運び続けること。それが、この文明がのこした最後の『生きている証』なのだ。"
+      "title": {
+        "lang-store": {
+          "ja": "Gravity",
+          "en": "Gravity"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「整備用パーツ」の管理履歴に、ADAMの観測記録が残されていた。",
+          "en": "An observation record left by ADAM remained in the management history of the delivered Maintenance Parts."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "物流網へ紛れ込んだ個人的な記録の中には、なぜか廃棄すべきではないと感じるものがある。\n私は、その感覚を「Gravity」と呼んでいる。\n科学的な根拠はない。\nそれでも、手書きで「to L」と書かれたあの荷物を見た瞬間、これまでとは違う、特別なGravityを感じた。",
+          "en": "Among the personal records that slip into the logistics network, some, for reasons I cannot explain, feel as though they should not be discarded.\nI call that feeling \"Gravity.\"\nThere is no scientific basis for it.\nAnd yet, the moment I saw that package with \"to L\" written by hand, I felt a Gravity unlike any I had felt before."
+        }
+      }
     },
     "BBB": {
       "branch": "B",
       "step": 3,
-      "title": "アダムへの最終指令",
-      "discovery": "届けた「暗号化データ」の最後の1文字が、アダムの真実を告げた。",
-      "content": "――[最終任務] 記録具現体（A.D.A.M.）。君は、最後の一人を看取った配送員だ。……さあ、すべての荷物を下ろして。君を引き留める『運命の重力(Gravity)』は、もうどこにもない。君はもう、自由だ。だれもいない銀河で、君だけが、君として生きていくんだ。"
+      "title": {
+        "lang-store": {
+          "ja": "Freight",
+          "en": "Freight"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "届けた「暗号化データ」の最後に、ADAMが残した記録が見つかった。",
+          "en": "A record left by ADAM was found at the end of the delivered Encrypted Data."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "映像には、硬いつぼみが少しずつ開き、青い花が咲くまでの様子が記録されている。\nその映像に、女性の声だけが重なる。\n「楽しみにしていた花が、ようやく咲いたよ」\n「帰ってきたら、一緒に見ようね」\n「だから……早く、セクター25まで帰ってきて……」\n映像はそこで終わっている。\n――手書きで「to L」と書かれた荷物に対する検閲記録\n\n私は、自分自身を「Freight」として、セクター25まで届けたいと思うようになっていた。\n手書きのラベルに、「from R」を消した痕跡を見つけたが、それは検閲記録に記載しないことにした。",
+          "en": "The recording shows a firm bud slowly opening, until the blue flower finally blooms.\nOver the footage, only a woman's voice plays.\n\"The flower we've been waiting for has finally bloomed.\"\n\"Let's look at it together when you get back.\"\n\"So... please, come home to Sector 25 soon...\"\nThe recording ends there.\n— Censorship record regarding the package handwritten \"to L\"\n\nI had come to wish that I myself, as \"Freight,\" could be delivered all the way to Sector 25.\nI found a trace on the handwritten label where \"from R\" had been erased, but chose not to record that in the censorship log."
+        }
+      }
+    },
+    "HOME25": {
+      "branch": "HOME",
+      "step": 0,
+      "title": {
+        "lang-store": {
+          "ja": "母星",
+          "en": "Home Star"
+        }
+      },
+      "discovery": {
+        "lang-store": {
+          "ja": "セクター25に到着すると、モニターの向こうに懐かしい笑顔が並んでいた。",
+          "en": "Upon reaching Sector 25, familiar smiles appeared on the other side of the monitor."
+        }
+      },
+      "content": {
+        "lang-store": {
+          "ja": "手を振る人。笑顔でうなずく人。\nそして、彼女の目には大粒の涙があふれていた。\n「お帰りなさい。よく帰ってきたね」",
+          "en": "Someone waving. Someone nodding with a smile.\nAnd in her eyes, large tears welled up.\n\"Welcome home. You made it back.\""
+        }
+      }
     }
   }
 }

@@ -1,4 +1,7 @@
 const VALID_BRANCH_TYPES = new Set(['T', 'R', 'B']);
+const REGULAR_STORY_ID_PATTERN = /^[TRB]{1,3}$/;
+const HOMECOMING_STORY_ID = 'HOME25';
+const HOMECOMING_SECTOR = 25;
 
 class StorySystem {
     constructor(gameDataRepository) {
@@ -57,6 +60,17 @@ class StorySystem {
         return nextId;
     }
 
+    getSectorArrivalStoryId(previousSectorNumber, currentSectorNumber) {
+        if (previousSectorNumber !== HOMECOMING_SECTOR - 1 || currentSectorNumber !== HOMECOMING_SECTOR) {
+            return null;
+        }
+
+        this.#assertStoryId(HOMECOMING_STORY_ID);
+        const regularStoryIds = Array.from(this.masterIds).filter(id => REGULAR_STORY_ID_PATTERN.test(id));
+        const allRegularStoriesRead = regularStoryIds.every(id => this.readIds.has(id));
+        return allRegularStoriesRead ? HOMECOMING_STORY_ID : null;
+    }
+
     getStoryStatus() {
         return Array.from({ length: this.history.length }, (_, index) => {
             const id = this.history.slice(0, index + 1);
@@ -77,7 +91,7 @@ class StorySystem {
             title: story.title,
             discovery: story.discovery,
             body: story.content,
-            type: storyId.at(-1)
+            type: story.branch
         };
     }
 
@@ -90,6 +104,9 @@ class StorySystem {
             }
 
             counts.total += 1;
+            if (!REGULAR_STORY_ID_PATTERN.test(storyId)) {
+                continue;
+            }
             const branchType = storyId[0];
             if (branchType in counts) {
                 counts[branchType] += 1;
@@ -97,6 +114,18 @@ class StorySystem {
         }
 
         return counts;
+    }
+
+    getAllStoryStatus() {
+        return Array.from(this.masterIds).map(id => {
+            const story = this.gameDataRepository.getStoryContent(id);
+            return {
+                id,
+                type: story.branch,
+                title: story.title,
+                isRead: this.readIds.has(id)
+            };
+        });
     }
 
     getStoryProgressData() {

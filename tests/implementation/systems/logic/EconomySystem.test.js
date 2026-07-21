@@ -29,6 +29,32 @@ afterEach(() => {
     vi.restoreAllMocks();
 });
 
+function randomValueForLotteryTarget(targetId, targetSession, options = {}) {
+    const excludeCategories = options.excludeCategories || [];
+    const bonusThreshold = options.bonusThreshold || 0;
+    const threshold = 14 + targetSession.sectorNumber + bonusThreshold;
+    const raritySettings = repository.getRaritySettings();
+    const pool = repository.getAllItemDefinitions()
+        .filter(definition => !excludeCategories.includes(definition.category))
+        .map(definition => ({
+            definition,
+            weight: threshold - raritySettings[definition.rarity.toUpperCase()]
+        }))
+        .filter(candidate => candidate.weight > 0);
+    const totalWeight = pool.reduce((sum, candidate) => sum + candidate.weight, 0);
+    let lowerBound = 0;
+
+    for (const candidate of pool) {
+        const upperBound = lowerBound + candidate.weight;
+        if (candidate.definition.id === targetId) {
+            return (lowerBound + candidate.weight / 2) / totalWeight;
+        }
+        lowerBound = upperBound;
+    }
+
+    throw new Error(`[EconomySystem.test] Lottery target not available: ${targetId}`);
+}
+
 describe('EconomySystem', () => {
     it('draws only weighted lottery candidates available at the current sector threshold', () => {
         vi.spyOn(Math, 'random').mockReturnValue(0);
@@ -51,6 +77,17 @@ describe('EconomySystem', () => {
         expect(items).toHaveLength(8);
         expect(items.every(item => item.category !== 'cargo' && item.category !== 'coin')).toBe(true);
         expect(items.some(item => item.rarity === 'rare')).toBe(true);
+    });
+
+    it('keeps delivery cargo in the normal sector lottery once rare candidates are available', () => {
+        session.incrementSector();
+        vi.spyOn(Math, 'random').mockReturnValue(randomValueForLotteryTarget('cargo_safe', session));
+
+        const [item] = economySystem.drawLottery(session, 1);
+
+        expect(item.id).toBe('cargo_safe');
+        expect(item.category).toBe('cargo');
+        expect(item.deliveryGoalId).toBe('TRADING_POST');
     });
 
     it('calculates appraisal values from rarity, durability, and enhancement count', () => {
@@ -191,8 +228,8 @@ describe('EconomySystem', () => {
         expect(settlement.entries).toEqual([
             { label: 'Flight Duration Score', score: 12 },
             { label: 'Goal Bonus', score: 2000, coin: 20 },
-            { label: 'Delivery Bonus', score: 1500, coin: 300 },
-            { label: 'Collected Coins', coin: 100 }
+            { label: 'Delivery Bonus', score: 1500, coin: 100 },
+            { label: 'Collected Coins', coin: 300 }
         ]);
         expect(settlement.itemReport).toHaveLength(4);
         expect(settlement.itemReport[0].type).toBe('delivery');
@@ -312,7 +349,11 @@ describe('EconomySystem', () => {
         expect(settlement.entries).toContainEqual({
             label: 'Delivery Bonus',
             score: 3000,
-            coin: 300
+            coin: 200
+        });
+        expect(settlement.entries).toContainEqual({
+            label: 'Collected Coins',
+            coin: 100
         });
         expect(settlement.acquiredItems).toEqual([bonusParts[0]]);
     });

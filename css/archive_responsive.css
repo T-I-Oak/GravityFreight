@@ -1,0 +1,70 @@
+/* モバイル・1カラム時のレスポンシブ対応 */
+@media screen and (max-width: 800px) {
+    #archive-screen .panel-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: var(--space-unit);
+    }
+
+    #archive-screen .panel-header > .TabGroup {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    #archive-screen .Column.aside {
+        flex: none;
+        width: 100%;
+        border: none;
+    }
+
+    #archive-screen .Column.main {
+        flex: none;
+        width: 100%;
+        min-width: 0;
+    }
+
+    #archive-screen .Well.ScrollArea {
+        flex: none;
+        height: auto;
+        min-height: 0;
+    }
+
+    #archive-screen #tab-analytics,
+    #archive-screen #tab-analytics .section {
+        flex: none;
+        display: block;
+    }
+
+    #archive-screen .Well:has(.graph-svg) {
+        flex: none;
+        height: auto;
+        min-height: 0;
+    }
+
+    #archive-screen .graph-svg {
+        height: 160px; /* モバイルでの視認性を確保するための固定高 */
+    }
+
+    #archive-screen .achievement-showcase {
+        grid-template-columns: 1fr;
+    }
+
+    #archive-screen .kpi-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* 1カラム時はボディ全体でスクロールを許可 */
+    #archive-screen .panel-body {
+        overflow-y: auto;
+    }
+
+    #archive-screen.Panel {
+        width: 95vw;
+        height: 90vh;
+        max-width: 95vw;
+        max-height: 90vh;
+    }
+}

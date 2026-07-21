@@ -3,8 +3,12 @@ import SectorTransitionAnimator from './SectorTransitionAnimator.js';
 import BuildScreenPresenter from './BuildScreenPresenter.js';
 import BuildFlowController from './BuildFlowController.js';
 import NavigationLoopController from './NavigationLoopController.js';
-import Rocket from '../entities/Rocket.js';
-import { FACILITY_LABELS, FACILITY_THEME_CLASSES } from './facilityViewConstants.js';
+import FacilityFlowController from './FacilityFlowController.js';
+import MapInteractionController from './MapInteractionController.js';
+import TutorialCanvasTargetResolver from './TutorialCanvasTargetResolver.js';
+import ShareMapViewDataFactory from './ShareMapViewDataFactory.js';
+import LaunchSelectionFactory from './LaunchSelectionFactory.js';
+import FlightResultViewDataFactory from './FlightResultViewDataFactory.js';
 
 class GameController {
     constructor(infrastructure = {}) {
@@ -29,11 +33,10 @@ class GameController {
         this.worldRenderer = infrastructure.worldRenderer;
         this.cameraController = infrastructure.cameraController;
         this.appOrchestrator = infrastructure.appOrchestrator;
+        this.tutorialFlowController = infrastructure.tutorialFlowController;
         this.currentSector = null;
         this.currentRocket = null;
-        this.currentLaunchAngle = 0;
         this.isFirstSectorTransition = true;
-        this.mapInteraction = null;
         this.lastReplayRecord = null;
         this.buildScreenPresenter = infrastructure.buildScreenPresenter
             || new BuildScreenPresenter(this.gameDataRepository);
@@ -43,12 +46,59 @@ class GameController {
                 uiController: this.uiController,
                 buildScreenPresenter: this.buildScreenPresenter
             });
-        this.repairDockDismantleCount = 0;
-        this.currentFacilityType = null;
-        this.currentFacilityViewData = null;
-        this.currentTradingPostStock = null;
-        this.currentFacilityAcquiredItems = [];
-        this.blackMarketPurchaseMade = false;
+        this.facilityFlowController = infrastructure.facilityFlowController
+            || new FacilityFlowController({
+                gameDataRepository: this.gameDataRepository,
+                sessionState: this.sessionState,
+                economySystem: this.economySystem,
+                gameRecordTracker: this.gameRecordTracker,
+                achievementTracker: this.achievementTracker,
+                uiController: this.uiController,
+                buildFlowController: this.buildFlowController,
+                getCurrentSector: () => this.currentSector,
+                getCurrentRocket: () => this.currentRocket,
+                setCurrentRocket: rocket => {
+                    this.currentRocket = rocket;
+                }
+            });
+        this.mapInteractionController = infrastructure.mapInteractionController
+            || new MapInteractionController({
+                gameDataRepository: this.gameDataRepository,
+                sessionState: this.sessionState,
+                buildFlowController: this.buildFlowController,
+                trajectoryPredictor: this.trajectoryPredictor,
+                uiController: this.uiController,
+                worldRenderer: this.worldRenderer,
+                cameraController: this.cameraController,
+                getCurrentSector: () => this.currentSector,
+                getLaunchPosition: angle => this.launchSelectionFactory.getLaunchPosition(angle)
+            });
+        this.launchSelectionFactory = infrastructure.launchSelectionFactory
+            || new LaunchSelectionFactory({
+                sessionState: this.sessionState,
+                buildFlowController: this.buildFlowController,
+                gameDataRepository: this.gameDataRepository,
+                getCurrentSector: () => this.currentSector,
+                getLaunchAngle: () => this.mapInteractionController.currentLaunchAngle
+            });
+        this.tutorialCanvasTargetResolver = infrastructure.tutorialCanvasTargetResolver
+            || new TutorialCanvasTargetResolver({
+                sessionState: this.sessionState,
+                buildFlowController: this.buildFlowController,
+                trajectoryPredictor: this.trajectoryPredictor,
+                uiController: this.uiController,
+                cameraController: this.cameraController,
+                mapInteractionController: this.mapInteractionController,
+                getCurrentSector: () => this.currentSector,
+                getLaunchPosition: angle => this.launchSelectionFactory.getLaunchPosition(angle)
+            });
+        this.tutorialFlowController?.setCanvasTargetResolver?.(
+            highlight => this.tutorialCanvasTargetResolver.calculateTargetRect(highlight)
+        );
+        this.tutorialFlowController?.setCanvasFocusBoundsResolver?.(
+            highlight => this.tutorialCanvasTargetResolver.calculateFocusBounds(highlight)
+        );
+        this.tutorialFlowController?.setMapInteractionController?.(this.mapInteractionController);
         this.sectorProgressionController = infrastructure.sectorProgressionController
             || new SectorProgressionController(infrastructure);
         this.sectorTransitionAnimator = infrastructure.sectorTransitionAnimator
@@ -56,6 +106,15 @@ class GameController {
                 worldRenderer: this.worldRenderer,
                 wait: infrastructure.wait,
                 durations: infrastructure.sectorTransitionDurations
+            });
+        this.shareMapViewDataFactory = infrastructure.shareMapViewDataFactory
+            || new ShareMapViewDataFactory({ gameDataRepository: this.gameDataRepository });
+        this.flightResultViewDataFactory = infrastructure.flightResultViewDataFactory
+            || new FlightResultViewDataFactory({
+                gameDataRepository: this.gameDataRepository,
+                sessionState: this.sessionState,
+                flightRecorder: this.flightRecorder,
+                storySystem: this.storySystem
             });
     }
 
@@ -68,63 +127,63 @@ class GameController {
         this.uiController.initHUD(this.sessionState);
         this.uiController.setResultHandler?.(() => this.confirmSettlement(this.lastSettlement));
         this.uiController.setMapToggleHandler?.(showMap => this.handleResultMapToggle(showMap));
+        this.uiController.setMailHandler?.(index => this.handleMailClick(index));
+        this.uiController.setResultStoryHandler?.(storyId => this.handleStoryOpen(storyId));
         this.uiController.setGameEndReturnHandler?.(() => this.returnToTitle());
         this.uiController.setBuildItemSelectionHandler?.(selection => {
             const viewData = this.buildFlowController.handleItemSelection(selection);
-            this.#refreshPredictionPath();
+            this.mapInteractionController.refreshPredictionPath();
+            this.#checkAimTutorial();
             return viewData;
         });
         this.uiController.setBuildAssembleHandler?.(
             () => this.buildFlowController.assembleRocket()
         );
         this.uiController.setLaunchHandler?.(() => this.launchSelectedRocket());
+        this.uiController.setBuildTabChangeHandler?.(tabId => this.#handleBuildTabChange(tabId));
         this.uiController.setCanvasInputHandler?.(event => this.handleCanvasInput(event));
 
         return this.beginSectorTransition();
     }
 
+    handleMailClick(index) {
+        const story = this.storySystem.getStoryStatus()[index];
+        if (!story) {
+            return null;
+        }
+
+        return this.handleStoryOpen(story.id);
+    }
+
+    handleStoryOpen(storyId) {
+        const storyStatus = this.storySystem.getStoryStatus();
+        const index = storyStatus.findIndex(story => story.id === storyId);
+        const story = storyStatus[index];
+        if (!story) {
+            return null;
+        }
+
+        this.uiController.showStoryModal?.(storyId);
+        if (story.isUnread) {
+            this.storySystem.updateReadStatus(storyId);
+            const achievements = this.achievementTracker.evaluateAchievements({
+                source: 'story_read',
+                keys: ['total', story.type]
+            });
+            this.uiController.showAchievementToasts?.(achievements);
+        }
+
+        const updatedStory = this.storySystem.getStoryStatus()[index] ?? { ...story, isUnread: false };
+        this.uiController.updateMailStatus?.(index, updatedStory.type, updatedStory.isUnread);
+        return updatedStory;
+    }
+
     handleCanvasInput(event) {
-        if (!this.cameraController || !event) {
-            return;
-        }
-
-        if (event.type === 'pointerdown') {
-            this.#beginMapInteraction(event);
-            return;
-        }
-
-        if (event.type === 'pointermove') {
-            this.#continueMapInteraction(event);
-            return;
-        }
-
-        if (event.type === 'pinch') {
-            this.#handlePinch(event);
-            return;
-        }
-
-        if (event.type === 'wheel') {
-            this.#handleWheel(event);
-            return;
-        }
-
-        if (event.type === 'hover') {
-            this.#handleBodyHover(event);
-            return;
-        }
-
-        if (event.type === 'hoverleave') {
-            this.uiController.hideStarInfo?.();
-            return;
-        }
-
-        if (event.type === 'pointerup') {
-            this.#endMapInteraction();
-        }
+        this.mapInteractionController.handleInput(event);
     }
 
     launchSelectedRocket() {
-        const rocket = this.#createRocketFromFlightSelection();
+        const rocket = this.launchSelectionFactory.createRocketFromSelection();
         return this.launchRocket(rocket);
     }
 
@@ -166,24 +225,45 @@ class GameController {
             this.#updateMailHud(unlockedStoryId);
         }
 
-        const resultContext = this.#createFlightResultContext(settlement);
+        const resultContext = this.flightResultViewDataFactory.createContext(settlement);
         const replayRecord = this.flightRecorder.recordFlightResult(resultContext);
         this.lastReplayRecord = replayRecord;
-        const updatedRecordKeys = this.gameRecordTracker.recordFlightResult({
+        let updatedRecordKeys = this.gameRecordTracker.recordFlightResult({
             completedSectors: settlement.status === 'cleared' ? 1 : 0,
-            distance: result.distance ?? flightData.distance ?? 0,
+            distance: flightData.ticks ?? 0,
             score: settlement.totalScore,
             earnedCoins: settlement.totalCoins,
             collectedItemCount: settlement.acquiredItems?.length ?? 0
         });
+        if ((settlement.deliveryCount ?? 0) > 0) {
+            updatedRecordKeys = [
+                ...updatedRecordKeys,
+                ...this.gameRecordTracker.recordDeliverySuccess({
+                    count: settlement.deliveryCount,
+                    currentContractDeliveries: this.sessionState.totalDeliveries
+                })
+            ];
+        }
         const achievements = updatedRecordKeys.length > 0
-            ? this.achievementTracker.evaluateAchievements({ source: 'game_record', keys: updatedRecordKeys })
+            ? this.achievementTracker.evaluateAchievements({ source: 'game_record', keys: [...new Set(updatedRecordKeys)] })
             : [];
+        this.uiController.showAchievementToasts?.(achievements);
 
+        const shareMap = this.shareMapViewDataFactory.create({
+            sector: this.currentSector,
+            rocket: this.currentRocket
+        });
         this.worldRenderer?.disableSonar?.();
+        this.uiController.playFlightEndSE?.(settlement.status);
         await this.worldRenderer?.playFinishAnimation?.(result);
 
-        const viewData = this.#createFlightResultViewData(settlement, replayRecord, achievements, unlockedStoryId);
+        const viewData = this.flightResultViewDataFactory.createViewData(
+            settlement,
+            replayRecord,
+            achievements,
+            unlockedStoryId,
+            shareMap
+        );
         this.uiController.showResultScreen(viewData);
         return viewData;
     }
@@ -201,45 +281,95 @@ class GameController {
         if (!this.checkGameOverAndStartEndSequence({
             completedSectors: Math.max(0, this.sessionState.sectorNumber - 1)
         })) {
+            this.uiController.setFlightMode?.(false);
             this.buildFlowController.showBuildScreen();
         }
     }
 
     enterFacility(type) {
-        this.currentFacilityType = type;
-        this.currentTradingPostStock = type === 'TRADING_POST'
-            ? this.economySystem.generateTradingPostStock(this.sessionState)
-            : null;
-        this.currentFacilityAcquiredItems = [];
-        this.blackMarketPurchaseMade = false;
-        const viewData = this.#createFacilityViewData(type);
-        this.#showFacilityView(type, viewData);
+        const viewData = this.facilityFlowController.enter(type);
+        this.#wireFacilityHandlers();
+        this.#checkFacilityTutorial(type);
         return viewData;
     }
 
     handleFacilityAction(action, context) {
-        const transaction = this.#createFacilityTransaction(action, context);
-        const previousCoins = this.sessionState.coins;
-        const delta = this.sessionState.applyTransaction(transaction);
-
-        this.#afterFacilityTransaction(action, context, delta, previousCoins);
+        const delta = this.facilityFlowController.handleAction(action, context);
+        this.#wireFacilityHandlers();
         return delta;
     }
 
+    refreshCurrentView() {
+        if (this.facilityFlowController.currentType) {
+            const viewData = this.facilityFlowController.refreshView();
+            this.#wireFacilityHandlers();
+            return viewData;
+        }
+
+        const viewData = this.buildFlowController.showBuildScreen();
+        this.mapInteractionController.refreshPredictionPath();
+        return viewData;
+    }
+
+    getTutorialScene() {
+        if (this.facilityFlowController.currentType) {
+            return 'facility';
+        }
+        return 'build';
+    }
+
     async leaveFacility() {
+        const departedFacilityType = this.facilityFlowController.currentType;
         if (this.checkGameOverAndStartEndSequence({
             completedSectors: this.sessionState.sectorNumber
         })) {
             return true;
         }
 
+        if (departedFacilityType === 'BLACK_MARKET') {
+            this.sessionState.recordBlackMarketVisit();
+        }
+        this.uiController.updateHUDValue?.('coin', this.sessionState.coins);
         await this.beginSectorTransition();
         return false;
     }
 
     async returnToTitle() {
-        await this.worldRenderer?.stopGameEndExitAnimation?.();
+        this.worldRenderer?.stopWarpEffect?.(1600, { fromCurrent: true });
         this.appOrchestrator?.returnToTitle?.();
+    }
+
+    #wireFacilityHandlers() {
+        this.uiController.setFacilityActionHandler?.((action, context) => this.handleFacilityAction(action, context));
+        this.uiController.setFacilityDepartHandler?.(() => this.leaveFacility());
+    }
+
+    #handleBuildTabChange(tabId) {
+        if (tabId === 'assembly') {
+            this.tutorialFlowController?.checkTrigger?.('assemblyTabReady', { currentScene: 'build' });
+            return;
+        }
+        if (tabId === 'flight') {
+            this.tutorialFlowController?.checkTrigger?.('flightTabReady', { currentScene: 'build' });
+        }
+    }
+
+    #checkAimTutorial() {
+        const selection = this.buildFlowController.currentBuildSelection;
+        if (selection.rocket && selection.launcher && this.currentSector) {
+            this.tutorialFlowController?.checkTrigger?.('aimStart', { currentScene: 'build' });
+        }
+    }
+
+    #checkFacilityTutorial(type) {
+        const triggerName = {
+            TRADING_POST: 'facilityTradingPost',
+            REPAIR_DOCK: 'facilityRepairDock',
+            BLACK_MARKET: 'facilityBlackMarket'
+        }[type];
+        if (triggerName) {
+            this.tutorialFlowController?.checkTrigger?.(triggerName, { currentScene: 'facility', facilityType: type });
+        }
     }
 
     handleResultMapToggle(showMap) {
@@ -276,9 +406,13 @@ class GameController {
     }
 
     async beginSectorTransition(options = {}) {
-        this.currentFacilityType = null;
-        this.currentFacilityViewData = null;
-        this.currentTradingPostStock = null;
+        const previousSectorNumber = this.sessionState.sectorNumber;
+        const nextSectorNumber = previousSectorNumber + 1;
+        const sectorArrivalStoryId = this.storySystem.getSectorArrivalStoryId(
+            previousSectorNumber,
+            nextSectorNumber
+        );
+        this.facilityFlowController.reset();
         this.currentRocket = null;
         this.navigationLoopController.stop();
         this.worldRenderer?.clearPredictionPath?.();
@@ -290,51 +424,25 @@ class GameController {
         }
 
         this.currentSector = await this.sectorTransitionAnimator.play(
-            () => this.sectorProgressionController.beginSectorTransition(options)
+            () => this.sectorProgressionController.beginSectorTransition({
+                ...options,
+                sectorTitleType: sectorArrivalStoryId ? 'home' : options.sectorTitleType
+            })
         );
         this.isFirstSectorTransition = false;
         this.uiController.setFlightMode?.(false);
         this.buildFlowController.showBuildScreen();
+        if (sectorArrivalStoryId) {
+            this.uiController.showStoryModal?.(sectorArrivalStoryId);
+            this.storySystem.updateReadStatus(sectorArrivalStoryId);
+            const achievements = this.achievementTracker.evaluateAchievements({
+                source: 'story_read',
+                keys: ['total']
+            });
+            this.uiController.showAchievementToasts?.(achievements);
+        }
+        this.tutorialFlowController?.checkTrigger?.('buildScreen', { currentScene: 'build' });
         return this.currentSector;
-    }
-
-    #createFlightResultContext(settlement) {
-        return {
-            resultType: settlement.status,
-            score: settlement.totalScore,
-            totalScore: settlement.totalScore,
-            reachedSector: this.sessionState.sectorNumber,
-            destinationType: settlement.destination ?? null
-        };
-    }
-
-    #createFlightResultViewData(settlement, replayRecord, achievements, unlockedStoryId = null) {
-        const pendingRecord = this.flightRecorder.getPendingRecord();
-        const storyStatus = this.storySystem.getStoryStatus();
-        const storyCards = storyStatus.filter(story => story.id === unlockedStoryId);
-
-        return {
-            title: this.#getTitle(settlement),
-            status: settlement.status,
-            themeClass: this.#getThemeClass(settlement),
-            totalScore: settlement.totalScore,
-            totalCoins: settlement.totalCoins,
-            actionLabel: this.#getActionLabel(settlement),
-            entries: settlement.entries || [],
-            itemReport: settlement.itemReport || [],
-            replay: {
-                id: replayRecord?.id ?? pendingRecord?.id ?? null,
-                recorded: !!replayRecord,
-                favorite: !!replayRecord?.favorite,
-                pending: !replayRecord && !!pendingRecord,
-                score: settlement.totalScore,
-                reachedSector: this.sessionState.sectorNumber,
-                createdAt: replayRecord?.createdAt ?? pendingRecord?.createdAt ?? null
-            },
-            achievements,
-            storyStatus,
-            storyCards
-        };
     }
 
     #updateMailHud(storyId) {
@@ -352,639 +460,6 @@ class GameController {
         this.uiController.updateMailStatus?.(index, story.type, story.isUnread);
     }
 
-    #getThemeClass(settlement) {
-        if (settlement.destination) {
-            return FACILITY_THEME_CLASSES[settlement.destination] || 'home';
-        }
-
-        return 'home';
-    }
-
-    #getActionLabel(settlement) {
-        if (settlement.status === 'cleared' && settlement.destination) {
-            return this.#formatText(
-                this.gameDataRepository.getUiText('flightResult.actions.toFacility'),
-                { facility: FACILITY_LABELS[settlement.destination] || settlement.destination }
-            );
-        }
-
-        if (settlement.status === 'returned' || settlement.status === 'crashed' || settlement.status === 'lost') {
-            return this.gameDataRepository.getUiText('flightResult.actions.backToBase');
-        }
-
-        return this.gameDataRepository.getUiText('flightResult.actions.continue');
-    }
-
-    #getTitle(settlement) {
-        const titleKey = settlement.status
-            ? `flightResult.titles.${settlement.status}`
-            : 'flightResult.titles.complete';
-        const title = this.gameDataRepository.getUiText(titleKey);
-
-        return this.#formatText(title, { sector: this.sessionState.sectorNumber });
-    }
-
-    #formatText(template, values) {
-        return Object.entries(values).reduce(
-            (text, [key, value]) => text.replaceAll(`{${key}}`, value),
-            template
-        );
-    }
-
-    #createFacilityViewData(type) {
-        const facility = this.gameDataRepository.getFacilityDefinition(type);
-        const luckyDiscount = this.currentSector?.luckyDiscountRate ?? 0;
-
-        return {
-            type,
-            name: facility.name,
-            icon: facility.icon,
-            themeClass: facility.className || FACILITY_THEME_CLASSES[type] || 'home',
-            description: this.#getFacilityText(type, 'descriptions'),
-            coins: this.sessionState.coins,
-            luckyDiscountRate: luckyDiscount,
-            creditsLabel: this.gameDataRepository.getUiText('facility.common.credits'),
-            departLabel: this.gameDataRepository.getUiText('facility.common.depart'),
-            sections: this.#createFacilitySections(type, luckyDiscount)
-        };
-    }
-
-    #createFacilitySections(type, luckyDiscount) {
-        if (type === 'TRADING_POST') {
-            return this.#createTradingPostSections(luckyDiscount);
-        }
-        if (type === 'REPAIR_DOCK') {
-            return this.#createRepairDockSections(luckyDiscount);
-        }
-        if (type === 'BLACK_MARKET') {
-            return this.#createBlackMarketSections(luckyDiscount);
-        }
-
-        throw new Error(`[GameController] Unknown facility type: ${type}`);
-    }
-
-    #createTradingPostSections(luckyDiscount) {
-        const stockEntries = this.currentTradingPostStock
-            .map(stock => this.#createTradeEntry({
-                action: 'buy',
-                actionLabel: this.gameDataRepository.getUiText('facility.actions.buy'),
-                item: stock.item,
-                price: this.economySystem.calculateFinalPrice(stock.originalPrice, luckyDiscount, stock.itemDiscount),
-                discountRate: luckyDiscount + stock.itemDiscount
-            }));
-        const sellEntries = this.sessionState.inventory.stacks
-            .filter(stack => !['cargo', 'coin'].includes(stack.representative.category))
-            .map(stack => this.#createTradeEntry({
-                action: 'sell',
-                actionLabel: this.gameDataRepository.getUiText('facility.actions.sell'),
-                item: stack.representative,
-                price: this.economySystem.calculateAppraisalValue(stack.representative),
-                uid: stack.uid,
-                disabled: false,
-                buttonClass: 'color-theme-sub'
-            }));
-
-        return [
-            this.#createFacilitySection('buy', 'tradingPostBuy', stockEntries),
-            this.#createFacilitySection('sell', 'tradingPostSell', sellEntries)
-        ];
-    }
-
-    #createRepairDockSections(luckyDiscount) {
-        const repairEntries = this.sessionState.inventory.getItemsByCategory('launcher')
-            .flatMap(stack => stack.items)
-            .map(item => this.#createTradeEntry({
-                action: 'repair',
-                actionLabel: this.gameDataRepository.getUiText('facility.actions.repair'),
-                item,
-                price: this.economySystem.calculateRepairCost(item, luckyDiscount),
-                disabled: item.charges >= item.maxCharges
-            }));
-        const rocketItem = this.currentRocket?.rocketItem;
-        const dismantleEntries = rocketItem ? [
-            this.#createTradeEntry({
-                action: 'dismantle',
-                actionLabel: this.gameDataRepository.getUiText('facility.actions.dismantle'),
-                item: rocketItem,
-                price: this.economySystem.calculateDismantleCost(this.repairDockDismantleCount, luckyDiscount)
-            })
-        ] : [];
-
-        const repairSection = this.#createFacilitySection('repair', 'repairDockRepair', repairEntries);
-        const dismantleSection = this.#createFacilitySection('dismantle', 'repairDockDismantle', dismantleEntries);
-        const receivedSection = this.#createFacilitySection('received', 'repairDockReceived', this.#createAcquiredFacilityEntries());
-
-        return [
-            {
-                id: 'maintenance',
-                sections: [repairSection, dismantleSection]
-            },
-            receivedSection
-        ];
-    }
-
-    #createBlackMarketSections(luckyDiscount) {
-        const entries = [
-            this.#createMenuEntry(
-                'black_market_normal',
-                this.gameDataRepository.getUiText('facility.blackMarket.normalName'),
-                this.gameDataRepository.getUiText('facility.blackMarket.normalDescription'),
-                'black-market',
-                'buy_normal',
-                this.gameDataRepository.getUiText('facility.actions.buy'),
-                this.economySystem.calculateFinalPrice(100, luckyDiscount)
-            ),
-            this.#createMenuEntry(
-                'black_market_premium',
-                this.gameDataRepository.getUiText('facility.blackMarket.premiumName'),
-                this.gameDataRepository.getUiText('facility.blackMarket.premiumDescription'),
-                'black-market',
-                'buy_premium',
-                this.gameDataRepository.getUiText('facility.actions.buy'),
-                this.economySystem.calculateFinalPrice(500, luckyDiscount)
-            )
-        ];
-
-        return [
-            this.#createFacilitySection('black-market', 'blackMarketStock', entries),
-            this.#createFacilitySection('acquired', 'blackMarketAcquired', this.#createAcquiredFacilityEntries())
-        ];
-    }
-
-    #createTradeEntry({ action, actionLabel, item, price, uid = item.uid, discountRate = 0, disabled = this.sessionState.coins < price, buttonClass = '' }) {
-        return {
-            action,
-            actionLabel,
-            uid,
-            item,
-            itemViewData: item.getViewData(),
-            price,
-            discountPercent: Math.round(Math.min(0.5, discountRate) * 100),
-            disabled,
-            buttonClass
-        };
-    }
-
-    #createMenuEntry(id, name, description, category, action, actionLabel, price) {
-        return {
-            action,
-            actionLabel,
-            uid: id,
-            itemViewData: {
-                uid: id,
-                id,
-                name,
-                category,
-                description,
-                stats: {}
-            },
-            price,
-            discountPercent: 0,
-            disabled: this.sessionState.coins < price || this.blackMarketPurchaseMade
-        };
-    }
-
-    #createAcquiredFacilityEntries() {
-        return this.currentFacilityAcquiredItems.map(item => ({
-            action: 'received',
-            actionLabel: '',
-            uid: item.uid,
-            item,
-            itemViewData: item.getViewData?.() ?? item,
-            price: 0,
-            discountPercent: 0,
-            disabled: true,
-            hideAction: true
-        }));
-    }
-
-    #createFacilitySection(id, resourceKey, entries) {
-        return {
-            id,
-            title: this.gameDataRepository.getUiText(`facility.sections.${resourceKey}.title`),
-            subtitle: this.gameDataRepository.getUiText(`facility.sections.${resourceKey}.subtitle`),
-            entries,
-            emptyText: this.gameDataRepository.getUiText('facility.common.emptyText'),
-            emptySubtext: this.gameDataRepository.getUiText('facility.common.emptySubtext'),
-            themeClass: 'home'
-        };
-    }
-
-    #getFacilityText(type, group) {
-        const key = {
-            TRADING_POST: 'tradingPost',
-            REPAIR_DOCK: 'repairDock',
-            BLACK_MARKET: 'blackMarket'
-        }[type];
-
-        return this.gameDataRepository.getUiText(`facility.${group}.${key}`);
-    }
-
-    #showFacilityView(type, viewData, options = {}) {
-        this.currentFacilityViewData = viewData;
-        const displayViewData = options.displayCoins === undefined
-            ? viewData
-            : { ...viewData, coins: options.displayCoins };
-        this.uiController.showFacilityScreen(type, displayViewData);
-        this.uiController.setFacilityActionHandler?.((action, context) => this.handleFacilityAction(action, context));
-        this.uiController.setFacilityDepartHandler?.(() => this.leaveFacility());
-    }
-
-    #refreshFacilityView(options = {}) {
-        const viewData = this.#createFacilityViewData(this.currentFacilityType);
-        this.#showFacilityView(this.currentFacilityType, viewData, options);
-    }
-
-    #createFacilityTransaction(action, context = {}) {
-        if (this.currentFacilityType === 'TRADING_POST' && action === 'buy') {
-            const entry = this.#findFacilityEntry(action, context.uid);
-            return {
-                spentCoins: entry.price,
-                earnedCoins: 0,
-                acquiredItems: [entry.item]
-            };
-        }
-
-        if (this.currentFacilityType === 'TRADING_POST' && action === 'sell') {
-            const stack = this.sessionState.inventory.stacks.find(candidate => candidate.uid === context.uid);
-            if (!stack) {
-                throw new Error(`[GameController] Sell target not found: ${context.uid}`);
-            }
-            const item = stack.items[stack.items.length - 1];
-            return {
-                spentCoins: 0,
-                earnedCoins: this.economySystem.calculateAppraisalValue(stack.representative),
-                removedItems: [item]
-            };
-        }
-
-        if (this.currentFacilityType === 'REPAIR_DOCK' && action === 'repair') {
-            return this.economySystem.createRepairTransaction(
-                this.#findInventoryItemByUid(context.uid),
-                this.currentSector?.luckyDiscountRate ?? 0
-            );
-        }
-
-        if (this.currentFacilityType === 'REPAIR_DOCK' && action === 'dismantle') {
-            const entry = this.#findFacilityEntry(action, context.uid);
-            return this.economySystem.createDismantleTransaction(
-                entry.item,
-                this.repairDockDismantleCount,
-                this.currentSector?.luckyDiscountRate ?? 0
-            );
-        }
-
-        if (this.currentFacilityType === 'BLACK_MARKET' && action === 'buy_normal') {
-            if (this.blackMarketPurchaseMade) {
-                throw new Error('[GameController] Black Market purchase is limited to once per facility stay.');
-            }
-            return this.economySystem.drawBlackMarketGacha('normal', this.sessionState, this.currentSector?.luckyDiscountRate ?? 0);
-        }
-
-        if (this.currentFacilityType === 'BLACK_MARKET' && action === 'buy_premium') {
-            if (this.blackMarketPurchaseMade) {
-                throw new Error('[GameController] Black Market purchase is limited to once per facility stay.');
-            }
-            return this.economySystem.drawBlackMarketGacha('premium', this.sessionState, this.currentSector?.luckyDiscountRate ?? 0);
-        }
-
-        throw new Error(`[GameController] Unknown facility action: ${action}`);
-    }
-
-    #afterFacilityTransaction(action, context, delta, previousCoins) {
-        if (this.currentFacilityType === 'TRADING_POST' && action === 'buy') {
-            this.currentTradingPostStock = this.currentTradingPostStock
-                .filter(stock => stock.item.uid !== context.uid);
-        }
-
-        if (this.currentFacilityType === 'REPAIR_DOCK' && action === 'dismantle') {
-            this.currentRocket = null;
-            this.repairDockDismantleCount += 1;
-        }
-        if (this.currentFacilityType === 'BLACK_MARKET' && action.startsWith('buy_')) {
-            this.blackMarketPurchaseMade = true;
-        }
-        if (delta.acquiredItems?.length > 0) {
-            this.currentFacilityAcquiredItems.push(...delta.acquiredItems);
-        }
-
-        const updatedKeys = this.gameRecordTracker.recordTransaction(delta, {
-            currentCoins: this.sessionState.coins
-        });
-        if (updatedKeys.length > 0) {
-            this.achievementTracker.evaluateAchievements({
-                source: 'game_record',
-                keys: updatedKeys
-            });
-        }
-
-        this.uiController.updateHUDValue?.('coin', this.sessionState.coins);
-        this.#refreshFacilityView({ displayCoins: previousCoins });
-        this.uiController.updateFacilityCredits?.(this.sessionState.coins);
-    }
-
-    #findFacilityEntry(action, uid) {
-        const entry = this.#flattenFacilitySections(this.currentFacilityViewData?.sections ?? [])
-            .flatMap(section => section.entries)
-            .find(candidate => candidate.action === action && candidate.uid === uid);
-        if (!entry) {
-            throw new Error(`[GameController] Facility entry not found: ${action} (${uid})`);
-        }
-        return entry;
-    }
-
-    #flattenFacilitySections(sections) {
-        return sections.flatMap(section => section.sections
-            ? this.#flattenFacilitySections(section.sections)
-            : [section]);
-    }
-
-    #findInventoryItemByUid(uid) {
-        const item = this.sessionState.inventory.stacks
-            .flatMap(stack => stack.items)
-            .find(candidate => candidate.uid === uid);
-        if (!item) {
-            throw new Error(`[GameController] Inventory item not found: ${uid}`);
-        }
-        return item;
-    }
-
-    #createRocketFromFlightSelection() {
-        const selection = this.buildFlowController.currentBuildSelection;
-        if (!selection.rocket || !selection.launcher) {
-            throw new Error('[GameController] rocket and launcher selections are required.');
-        }
-
-        const rocketItem = this.#popSelectedStack(selection.rocket, 'rocket');
-        const launcher = this.#popSelectedStack(selection.launcher, 'launcher');
-        const booster = selection.booster
-            ? this.#popSelectedStack(selection.booster, 'booster')
-            : null;
-        const angle = this.currentLaunchAngle;
-        const rocket = new Rocket(
-            rocketItem,
-            launcher,
-            booster,
-            angle,
-            this.#getLaunchPosition(angle)
-        );
-
-        this.#consumeLaunchPart(launcher, !booster?.preventsLauncherWear);
-        this.#consumeLaunchPart(booster, true);
-        this.buildFlowController.resetFlightSelection();
-        this.buildFlowController.showBuildScreen();
-        return rocket;
-    }
-
-    #popSelectedStack(uid, category) {
-        const item = this.sessionState.inventory.popItemByUid(uid);
-        if (!item) {
-            throw new Error(`[GameController] selected ${category} is not available.`);
-        }
-        return item;
-    }
-
-    #consumeLaunchPart(item, shouldConsume) {
-        if (!item) {
-            return;
-        }
-
-        const maxCharges = item.maxCharges ?? 0;
-        if (shouldConsume) {
-            if (maxCharges === 0) {
-                return;
-            }
-            item.consumeCharge?.(1);
-        }
-
-        if (maxCharges === 0 || (item.charges ?? 0) > 0) {
-            this.sessionState.inventory.addItem(item);
-        }
-    }
-
-    #getLaunchPosition(angle) {
-        const home = this.currentSector?.bodies?.find(body => body.isHome) ?? {
-            position: { x: 0, y: 0 },
-            radius: 0
-        };
-
-        return {
-            x: home.position.x + Math.cos(angle) * this.#getLaunchRadius(home),
-            y: home.position.y + Math.sin(angle) * this.#getLaunchRadius(home)
-        };
-    }
-
-    #getLaunchRadius(home) {
-        if (!Number.isFinite(home.radius)) {
-            throw new Error('[GameController] home body radius must be a finite number.');
-        }
-
-        const offset = this.gameDataRepository.getGameBalance().SHIP_START_OFFSET;
-        if (!Number.isFinite(offset)) {
-            throw new Error('[GameController] gameBalance.SHIP_START_OFFSET must be a finite number.');
-        }
-
-        return home.radius + offset;
-    }
-
-    #beginMapInteraction(event) {
-        const mode = this.#resolveMapInteractionMode(event);
-        this.mapInteraction = {
-            mode,
-            lastPoint: { ...event.point }
-        };
-
-        if (mode === 'aim') {
-            this.#updateLaunchAngle(event.point);
-        }
-    }
-
-    #continueMapInteraction(event) {
-        if (!this.mapInteraction) {
-            return;
-        }
-
-        const delta = {
-            x: event.point.x - this.mapInteraction.lastPoint.x,
-            y: event.point.y - this.mapInteraction.lastPoint.y
-        };
-
-        if (this.mapInteraction.mode === 'aim') {
-            this.#updateLaunchAngle(event.point);
-        } else if (this.mapInteraction.mode === 'rotate') {
-            this.cameraController.rotate(this.mapInteraction.lastPoint, delta);
-            this.#renderCameraChange();
-        } else {
-            this.cameraController.pan(delta);
-            this.#renderCameraChange();
-        }
-
-        this.mapInteraction.lastPoint = { ...event.point };
-    }
-
-    #handlePinch(event) {
-        this.mapInteraction = {
-            mode: 'pinch',
-            lastPoint: { ...event.point }
-        };
-        this.cameraController.pan(event.delta);
-        if (Number.isFinite(event.scale) && Math.abs(event.scale - 1) > 0.01) {
-            this.cameraController.zoom(event.scale, event.point);
-        }
-        this.#renderCameraChange();
-    }
-
-    #handleWheel(event) {
-        const zoomSpeed = 0.001;
-        const factor = 1 - event.deltaY * zoomSpeed;
-        this.cameraController.zoom(Math.max(0.1, Math.min(2, factor)), event.point);
-        this.#renderCameraChange();
-        this.cameraController.save?.();
-    }
-
-    #handleBodyHover(event) {
-        const body = this.#findHoveredBody(event.point);
-        if (body?.items?.length > 0) {
-            this.uiController.showStarInfo?.(body, event.displayPoint ?? event.point);
-            return;
-        }
-
-        this.uiController.hideStarInfo?.();
-    }
-
-    #endMapInteraction() {
-        if (this.mapInteraction?.mode !== 'aim') {
-            this.cameraController?.save?.();
-        }
-        this.mapInteraction = null;
-    }
-
-    #resolveMapInteractionMode(event) {
-        if (event.shiftKey || event.ctrlKey) {
-            return 'pan';
-        }
-
-        if (!this.cameraController.isInMapArea(event.point)) {
-            return 'rotate';
-        }
-
-        if (this.#canAim()) {
-            return 'aim';
-        }
-
-        return 'pan';
-    }
-
-    #findHoveredBody(screenPoint) {
-        if (!this.currentSector || !this.cameraController) {
-            return null;
-        }
-
-        const worldPoint = this.cameraController.toWorld(screenPoint);
-        const hitMargin = this.gameDataRepository.getMapConstants().STAR_HIT_MARGIN;
-        const zoomLevel = this.cameraController.zoomLevel || 1;
-
-        return this.currentSector.bodies.findLast(body => {
-            const distance = Math.hypot(
-                worldPoint.x - body.position.x,
-                worldPoint.y - body.position.y
-            );
-            return distance <= body.radius + hitMargin / zoomLevel;
-        }) ?? null;
-    }
-
-    #canAim() {
-        const selection = this.buildFlowController.currentBuildSelection;
-        return !!(selection.rocket && selection.launcher && this.currentSector);
-    }
-
-    #updateLaunchAngle(screenPoint) {
-        const home = this.currentSector?.bodies?.find(body => body.isHome);
-        if (!home) {
-            return;
-        }
-
-        const worldPoint = this.cameraController.toWorld(screenPoint);
-        this.currentLaunchAngle = Math.atan2(
-            worldPoint.y - home.position.y,
-            worldPoint.x - home.position.x
-        );
-        this.#refreshPredictionPath();
-    }
-
-    #renderCameraChange() {
-        this.worldRenderer?.render?.();
-    }
-
-    #refreshPredictionPath() {
-        if (!this.#canAim() || !this.trajectoryPredictor) {
-            this.worldRenderer?.clearPredictionPath?.();
-            this.worldRenderer?.clearAimRocket?.();
-            this.worldRenderer?.disableSonar?.();
-            this.worldRenderer?.render?.();
-            return;
-        }
-
-        const previewRocket = this.#createPreviewRocketFromFlightSelection();
-        if (!previewRocket) {
-            this.worldRenderer?.clearPredictionPath?.();
-            this.worldRenderer?.clearAimRocket?.();
-            this.worldRenderer?.disableSonar?.();
-            this.worldRenderer?.render?.();
-            return;
-        }
-
-        previewRocket.velocity = previewRocket.getInitialVelocity(this.sessionState.returnBonus);
-        const predictedRocket = this.trajectoryPredictor.predictPath(previewRocket, this.currentSector);
-        const predictionPath = this.#createPredictionPath(previewRocket, predictedRocket.actualTrail);
-
-        this.worldRenderer?.setAimRocket?.(previewRocket);
-        this.worldRenderer?.enableSonar?.();
-        this.worldRenderer?.setPredictionPath?.(predictionPath);
-    }
-
-    #createPredictionPath(previewRocket, predictedTrail) {
-        if (!Array.isArray(predictedTrail) || predictedTrail.length === 0) {
-            throw new Error('[GameController] AIM-ready prediction must return at least one trail point.');
-        }
-
-        const path = [
-            previewRocket.position,
-            ...predictedTrail
-        ];
-        return path;
-    }
-
-    #createPreviewRocketFromFlightSelection() {
-        const selection = this.buildFlowController.currentBuildSelection;
-        const rocketItem = this.#peekSelectedStack(selection.rocket, 'rocket');
-        const launcher = this.#peekSelectedStack(selection.launcher, 'launcher');
-        const booster = selection.booster
-            ? this.#peekSelectedStack(selection.booster, 'booster')
-            : null;
-
-        if (!rocketItem || !launcher) {
-            return null;
-        }
-
-        return new Rocket(
-            rocketItem,
-            launcher,
-            booster,
-            this.currentLaunchAngle,
-            this.#getLaunchPosition(this.currentLaunchAngle)
-        );
-    }
-
-    #peekSelectedStack(uid, category) {
-        if (!uid) {
-            return null;
-        }
-
-        const stack = this.sessionState.inventory.getItemsByCategory(category)
-            .find(candidate => candidate.uid === uid);
-        return stack?.items?.at(-1) ?? null;
-    }
 }
 
 export default GameController;

@@ -1,0 +1,129 @@
+# Architecture Specification: Infrastructure / UI Domain Roles
+
+本ドキュメントは class_roles.md から分割した、システムドメインおよび UI / インフラ層の役割定義である。
+
+## 7. システムドメイン (System Domain)
+
+描画、入力、全体制御などのインフラストラクチャ。
+
+- **AppOrchestrator**
+    - 生存期間: App Lifecycle
+    - 役割: アプリ基盤保持・全体指揮。
+    - 責務:
+        - アプリ共通のインフラクラスの保持と初期化。
+        - タイトル画面の管理と、ゲーム本編（GameController）の起動。
+        - Analytic Archive の表示データ生成と、選択されたリプレイ記録から `ReplayContext` を生成する入口を管理する。
+- **GameDataRepository**
+    - 生存期間: App Lifecycle
+    - 役割: GravityFreight のデータアクセス統合窓口。
+    - 責務:
+        - 静的なゲームマスタデータをロードし、各クラスへ提供する。
+        - ユーザーデータを共通 DataManager の `getSavedData` / `setSavedData` で読み書きする。
+        - 各クラスが共通 DataManager や `localStorage` へ直接依存しないようにする。
+- **UIController**
+    - 生存期間: App Lifecycle
+    - 役割: 表示管理。
+    - 責務:
+        - 画面遷移、ダイアログ表示の制御。
+        - HUDの制御。
+        - UI 操作イベントをアプリ側のハンドラへ中継する。
+        - ビルドパネル、航行結果画面、記録画面などの画面固有表示は専門 view クラスへ委譲する。
+- **BuildPanelView**
+    - 生存期間: App Lifecycle
+    - 役割: ビルドパネル表示。
+    - 責務:
+        - FLIGHT / ASSEMBLY タブ、item list、placeholder、ASSEMBLE / LAUNCH ボタンの DOM 表示を担当する。
+        - ビルドパネル内の操作を `UIController` の operation binder 経由で外部ハンドラへ中継する。
+        - item selection handler が返した view data を使って、現在のタブ状態を維持したままビルドパネル内部を再描画する。
+        - 航行結果のマップ確認や施設滞在中に、item selection を通知しない read-only 表示を提供する。
+- **FlightResultScreenView**
+    - 生存期間: App Lifecycle
+    - 役割: 航行結果画面表示。
+    - 責務:
+        - `FlightResultComponents` で生成した航行結果 HTML を表示する。
+        - スコア、コイン、明細値を 0 から最終値へ加算アニメーションする。
+        - 確定、VIEW MAP、リプレイ保護操作を外部ハンドラへ中継する。
+        - replay 保護上限時に既存 protected replay の置き換え候補を表示し、選択結果を外部ハンドラへ中継する。
+        - VIEW MAP 中のリザルト画面非表示、プレイシーン表示、戻りボタン表示を担当する。
+- **AppMetadataView**
+    - 生存期間: App Lifecycle
+    - 役割: アプリメタデータ表示。
+    - 責務: タイトル画面フッターのバージョン、コピーライト、ポータルリンクの DOM 表示を担当する。
+- **SettingsDialogView**
+    - 生存期間: App Lifecycle
+    - 役割: 設定ダイアログ表示。
+    - 責務: タイトル画面またはゲーム中 UI から設定オーバーレイを開き、閉じる / DONE 操作で閉じる。SE 音量、カメラリセット、言語切り替えの UI イベントを接続する。設定値の保存や適用は `SoundController`、`CameraController`、共通 i18n ライブラリへ委譲する。操作音などの共通 UI フィードバックは `UIController.setOperationHandler()` から渡される binder に委譲する。
+- **ArchiveDialogView**
+    - 生存期間: App Lifecycle
+    - 役割: Analytic Archive ダイアログ表示。
+    - 責務: タイトル画面の RECORDS ボタンから Archive overlay を開き、`ArchiveComponents` が生成した HTML を表示する。タブ切替、閉じる操作、リプレイ行選択、選択されたリプレイ記録 ID の通知、リプレイ保護状態変更の通知を管理し、表示データ生成、リプレイ再生本体、永続データ更新は担当しない。
+- **MapInputController**
+    - 生存期間: App Lifecycle
+    - 役割: Canvas 入力イベント正規化。
+    - 責務:
+        - `#gameCanvas` と `window` の pointer / wheel event を購読する。
+        - Canvas 内部座標、表示座標、pinch scale などを `CanvasInputEvent` へ変換する。
+        - ドラッグ継続、2本指操作、hover / hoverleave の通知を管理する。
+        - touch / wheel の既定ブラウザ操作を抑止し、スマートフォン・タブレットでもゲーム内パン、ピンチズーム、タップ情報表示として扱う。
+- **StarInfoPanel**
+    - 生存期間: App Lifecycle
+    - 役割: 天体ホバー時の保持アイテム表示。
+    - 責務:
+        - `CelestialBody.items` を `ItemCard` として表示する。
+        - 同一性能の item を `StackedItem` の規則で集約して表示する。
+        - ポップアップ位置をポインタ表示座標に追従させる。
+- **HowToPlayUI**
+    - 生存期間: App Lifecycle
+    - 役割: 説明書画面コントローラー。
+    - 責務:
+        - How To Play 画面の表示、非表示、ページ遷移を制御する。
+        - `GameDataRepository` から取得した説明書コンテンツを描画する。
+        - 説明書内デモの開始と停止を `HowToPlayDiagrams` へ委譲する。
+- **HowToPlayDiagrams**
+    - 生存期間: App Lifecycle
+    - 役割: 説明書内デモ描画。
+    - 責務:
+        - How To Play 画面内のカード選択デモと canvas アニメーションを管理する。
+        - 実ゲーム状態を変更せず、説明用サンプル状態だけで演出を完結させる。
+        - ページ移動や画面非表示時に、実行中の timer / animation frame を停止する。
+- **TutorialFlowController**
+    - 生存期間: App Lifecycle
+    - 役割: ゲーム中 tutorial 連携。
+    - 責務:
+        - GameWorks OAK 共通 `TutorialManager` に Gravity Freight の scenario と opaque な進捗 state を渡す。
+        - ビルド画面、AIM、各施設表示時の trigger を管理する。
+        - 設定モーダルからの tutorial reset 後、現在の画面状態に応じて再発火すべき trigger を判断する。
+        - Tutorial 用 highlight の DOM / ゲーム内オブジェクト矩形計算を担当する。
+        - Tutorial 進捗 state を中身を解釈せず `GameDataRepository` 経由で保存し、localStorage へ直接アクセスしない。
+- **BackgroundManager**
+    - 生存期間: App Lifecycle
+    - 役割: 遠景演出管理。
+    - 責務: Starfield の生成、ワープ演出の制御。タイトル画面と本編画面で共有される星背景状態を保持する。
+- **TitleScreenAnimator**
+    - 生存期間: App Lifecycle
+    - 役割: タイトル画面専用の Canvas 演出管理。
+    - 責務: 共有 `BackgroundManager` による星背景描画、タイトル用ロケット周回、航跡、貨物追従を描画する。ゲーム内 `Rocket` の物理・snapshot・航行結果責務は持たない。
+- **SoundController**
+    - 生存期間: App Lifecycle
+    - 役割: 音響演出管理。
+    - 責務: SE（効果音）および BGM の再生、ボリューム設定の管理。
+- **WorldRenderer**
+    - 生存期間: App Lifecycle
+    - 役割: ワールド（Canvas）描画エンジン。
+    - 責務: Canvas上における各要素の描画順序の制御、背景・セクター内マップ要素・航行中ビジュアルの統合、ワープ時のマップ変形、および描画ループの実行。
+- **CanvasColorPalette**
+    - 生存期間: App Lifecycle
+    - 役割: Canvas 描画色の token 解決。
+    - 責務: `css/design_tokens.css` の `--color-*` を Canvas 2D 描画で使用できる色文字列へ変換し、描画クラスが固定色を保持しないようにする。
+- **SectorMapRenderer**
+    - 生存期間: App Lifecycle
+    - 役割: セクター内マップ要素描画。
+    - 責務: `WorldRenderer` から渡された context / transform / colors を使用し、セクター境界、exit arc、施設ラベル、配送 cargo アイコン、天体、アイテムリングを描画する。
+- **FlightVisualRenderer**
+    - 生存期間: App Lifecycle
+    - 役割: 航行中・AIM中ビジュアル描画。
+    - 責務: `WorldRenderer` から渡された context / transform / view を使用し、予測線、航跡、保持アイテム、ロケット本体、ソナー波紋を描画する。
+- **CameraController**
+    - 生存期間: App Lifecycle
+    - 役割: 視界管理。
+    - 責務: ズーム、パン、座標変換。

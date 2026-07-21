@@ -3,12 +3,25 @@ import GameDataRepository from '../../src/core/GameDataRepository.js';
 
 let repository;
 
+function expandJa(value) {
+    if (Array.isArray(value)) {
+        return value.map(expandJa);
+    }
+    if (value && typeof value === 'object') {
+        if (value['lang-store']) {
+            return value['lang-store'].ja;
+        }
+        return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, expandJa(entry)]));
+    }
+    return value;
+}
+
 beforeAll(async () => {
     repository = new GameDataRepository({
         getSavedData: vi.fn(),
         setSavedData: vi.fn()
     }, {
-        expandLanguageResource: value => value
+        expandLanguageResource: expandJa
     });
     await repository.loadAllData();
 });
@@ -92,6 +105,26 @@ describe('item_catalog.md chapter 1: item categories and roles', () => {
             expect(item.mass).toBeUndefined();
             expect(item.power).toBeUndefined();
             expect(item.maxCharges).toBeUndefined();
+        });
+    });
+
+    it('defines current delivery cargo rarity and avoidance module durability', () => {
+        ['cargo_safe', 'cargo_normal', 'cargo_danger'].forEach(id => {
+            expect(repository.getItemDefinition(id).rarity).toBe('uncommon');
+        });
+
+        ['mod_star_breaker', 'mod_cushion', 'mod_emergency'].forEach(id => {
+            expect(repository.getItemDefinition(id).maxCharges).toBe(3);
+        });
+
+        [
+            ['mod_gst_breaker', 'スター・ブレイカー'],
+            ['mod_gst_cushion', 'インパクト・クッション'],
+            ['mod_gst_emergency', '緊急スラスター']
+        ].forEach(([id, targetName]) => {
+            const item = repository.getItemDefinition(id);
+            expect(item.maxCharges).toBe(1);
+            expect(item.description).toContain(`${targetName}1回分のお試し機能付き`);
         });
     });
 });

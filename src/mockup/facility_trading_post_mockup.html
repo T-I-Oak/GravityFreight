@@ -57,9 +57,23 @@
                                 <span class="section-subtitle">不要なパーツを売却して資金を獲得できます。</span>
                             </header>
 
-                            <div class="item-list" id="sell-list">
-                                <!-- Items will be injected here via script -->
-                            </div>
+                            <section data-sell-category="launcher">
+                                <header class="section-header category-header launcher">
+                                    <h3 class="section-title">LAUNCHER</h3>
+                                </header>
+                                <div class="item-list" id="sell-list-launcher">
+                                    <!-- Items will be injected here via script -->
+                                </div>
+                            </section>
+
+                            <section data-sell-category="chassis">
+                                <header class="section-header category-header chassis">
+                                    <h3 class="section-title">CHASSIS</h3>
+                                </header>
+                                <div class="item-list" id="sell-list-chassis">
+                                    <!-- Items will be injected here via script -->
+                                </div>
+                            </section>
                         </section>
                     </div> <!-- /.ColumnSet -->
                 </div> <!-- /.Well -->
@@ -126,7 +140,10 @@
         }
 
         const buyList = document.getElementById('buy-list');
-        const sellList = document.getElementById('sell-list');
+        const sellLists = {
+            launcher: document.getElementById('sell-list-launcher'),
+            chassis: document.getElementById('sell-list-chassis')
+        };
 
         // LEFT COLUMN: BUY (Logic[2], Module[0]x2, Launcher[0], Chassis[1], Chassis[3])
         const buyItems = [
@@ -144,16 +161,17 @@
 
         // RIGHT COLUMN: SELL (Chassis[2], Launcher[0] Durability 1/2)
         const sellItems = [
-            { item: createItemViewData(PARTS.chassis[2]), price: 20 },
             { 
+                category: 'launcher',
                 item: createItemViewData(PARTS.launcher[0], { charges: 1 }),
                 price: 13, 
                 card: {}
-            }
+            },
+            { category: 'chassis', item: createItemViewData(PARTS.chassis[2]), price: 20 }
         ];
 
         sellItems.forEach(cfg => {
-            sellList.appendChild(createTradeEntry(cfg.item, 'sell', cfg));
+            sellLists[cfg.category].appendChild(createTradeEntry(cfg.item, 'sell', cfg));
         });
 
     </script>

@@ -2,6 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import GameDataRepository from '../../../src/core/GameDataRepository.js';
 import packageData from '../../../package.json';
 
+function expandJa(value) {
+    if (Array.isArray(value)) {
+        return value.map(item => expandJa(item));
+    }
+    if (value && typeof value === 'object') {
+        if (value['lang-store']) {
+            return value['lang-store'].ja;
+        }
+        return Object.fromEntries(Object.entries(value).map(([key, child]) => [key, expandJa(child)]));
+    }
+    return value;
+}
+
 function createCommonDataManagerStub() {
     return {
         getSavedData: vi.fn((key, migrationMap) => migrationMap.init()),
@@ -96,6 +109,18 @@ describe('GameDataRepository', () => {
         expect(repository.getStoryIds()).not.toContain('missing');
     });
 
+    it('defines regular story branch from the delivered facility represented by the story id suffix', async () => {
+        expandLanguageResource.mockImplementation(expandJa);
+        await repository.loadAllData();
+
+        repository.getStoryIds()
+            .filter(storyId => storyId !== 'HOME25')
+            .forEach(storyId => {
+                const story = repository.getStoryContent(storyId);
+                expect(story.branch).toBe(storyId.at(-1));
+            });
+    });
+
     it('returns app metadata from package version', async () => {
         await repository.loadAllData();
 
@@ -145,6 +170,16 @@ describe('GameDataRepository', () => {
         expect(() => repository.getFacilityDefinition('missing')).toThrow('[GameDataRepository] Facility not found: missing');
     });
 
+    it('provides story category definitions including home without adding a facility', async () => {
+        await repository.loadAllData();
+
+        expect(repository.getStoryCategoryDefinition('HOME')).toMatchObject({
+            id: 'HOME',
+            className: 'home'
+        });
+        expect(() => repository.getFacilityDefinition('HOME')).toThrow('[GameDataRepository] Facility not found: HOME');
+    });
+
     it('returns i18n-expanded facility definitions', async () => {
         expandLanguageResource.mockImplementation(value => ({ expanded: value }));
         await repository.loadAllData();
@@ -154,6 +189,7 @@ describe('GameDataRepository', () => {
     });
 
     it('provides individual and full achievement definitions', async () => {
+        expandLanguageResource.mockImplementation(expandJa);
         await repository.loadAllData();
 
         expect(repository.getAchievementDefinition('stat_total_coins')).toMatchObject({
@@ -161,7 +197,10 @@ describe('GameDataRepository', () => {
             source: 'game_record',
             key: 'total_earned_coins',
             condition: 'max',
-            label: expect.any(String)
+            label: '累積獲得コイン',
+            tiers: expect.arrayContaining([
+                expect.objectContaining({ title: 'スター・ミリオネア' })
+            ])
         });
         expect(repository.getAchievementDefinitions().length).toBeGreaterThan(0);
     });
@@ -190,6 +229,8 @@ describe('GameDataRepository', () => {
         repository.setSavedRankData(data);
         repository.getSavedFlightRecordIndex(migrationMap);
         repository.setSavedFlightRecordIndex(data);
+        repository.getSavedTutorialState(migrationMap);
+        repository.setSavedTutorialState(data);
 
         expect(commonDataManager.getSavedData).toHaveBeenCalledWith('se_volume', migrationMap);
         expect(commonDataManager.getSavedData).toHaveBeenCalledWith('camera_state', migrationMap);
@@ -197,6 +238,7 @@ describe('GameDataRepository', () => {
         expect(commonDataManager.getSavedData).toHaveBeenCalledWith('game_record_data', migrationMap);
         expect(commonDataManager.getSavedData).toHaveBeenCalledWith('rank_data', migrationMap);
         expect(commonDataManager.getSavedData).toHaveBeenCalledWith('flight_record_index', migrationMap);
+        expect(commonDataManager.getSavedData).toHaveBeenCalledWith('tutorial_state', migrationMap);
 
         expect(commonDataManager.setSavedData).toHaveBeenCalledWith('se_volume', data);
         expect(commonDataManager.setSavedData).toHaveBeenCalledWith('camera_state', data);
@@ -204,6 +246,7 @@ describe('GameDataRepository', () => {
         expect(commonDataManager.setSavedData).toHaveBeenCalledWith('game_record_data', data);
         expect(commonDataManager.setSavedData).toHaveBeenCalledWith('rank_data', data);
         expect(commonDataManager.setSavedData).toHaveBeenCalledWith('flight_record_index', data);
+        expect(commonDataManager.setSavedData).toHaveBeenCalledWith('tutorial_state', data);
     });
 
     it('does not access localStorage directly', () => {

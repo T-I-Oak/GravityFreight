@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="../../css/ui_style_matte.css">
     <link rel="stylesheet" href="../../css/ui_style_printing.css">
     <link rel="stylesheet" href="../../css/archive.css">
+    <link rel="stylesheet" href="../../css/archive_layout.css">
+    <link rel="stylesheet" href="../../css/archive_achievements.css">
+    <link rel="stylesheet" href="../../css/archive_analytics.css">
+    <link rel="stylesheet" href="../../css/archive_tables.css">
+    <link rel="stylesheet" href="../../css/archive_replay_protect.css">
+    <link rel="stylesheet" href="../../css/archive_responsive.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,6 +40,7 @@
                     <button class="Button state-primary state-active" data-tab="analytics">Analytics</button>
                     <button class="Button state-primary state-inactive" data-tab="replays">Replays</button>
                     <button class="Button state-primary state-inactive" data-tab="achievements">Achievements</button>
+                    <button class="Button state-primary state-inactive" data-tab="story">Story</button>
                 </div>
             </header>
 
@@ -43,7 +50,7 @@
                 <section class="Column aside">
                     <div class="kpi-container">
                         <div class="SplitColumn kpi-group">
-                            <span class="stat-label">MAX SECTOR</span>
+                            <span class="stat-label">TOTAL CLEAR SECTORS</span>
                             <div class="Well">
                                 <span class="stat-value sector">12</span>
                             </div>
@@ -313,6 +320,53 @@
                                     </div>
                                 </div>
 
+                            </div>
+                        </section>
+
+                        <!-- TAB: STORY -->
+                        <section id="tab-story" class="tab-content section" style="display: none;">
+                            <header class="section-header SplitRow">
+                                <div class="SplitColumn">
+                                    <h3 class="section-title">STORY ARCHIVE</h3>
+                                </div>
+                            </header>
+                            <div class="archive-story-grid">
+                                <article class="ItemCard archive-story-card state-clickable trading-post" data-story-id="T">
+                                    <div class="item-card-header">
+                                        <i class="Icon mail"></i>
+                                        <h3 class="item-card-title">青い花の約束</h3>
+                                    </div>
+                                </article>
+                                <article class="ItemCard archive-story-card state-clickable repair-dock" data-story-id="TR">
+                                    <div class="item-card-header">
+                                        <i class="Icon mail"></i>
+                                        <h3 class="item-card-title">修理工場の記録</h3>
+                                    </div>
+                                </article>
+                                <article class="ItemCard archive-story-card state-clickable black-market" data-story-id="TB">
+                                    <div class="item-card-header">
+                                        <i class="Icon mail"></i>
+                                        <h3 class="item-card-title">暗号化された通信</h3>
+                                    </div>
+                                </article>
+                                <article class="ItemCard archive-story-card state-clickable home" data-story-id="HOME25">
+                                    <div class="item-card-header">
+                                        <i class="Icon mail"></i>
+                                        <h3 class="item-card-title">母星</h3>
+                                    </div>
+                                </article>
+                                <article class="ItemCard archive-story-card state-disabled">
+                                    <div class="item-card-header">
+                                        <i class="Icon mail"></i>
+                                        <h3 class="item-card-title">???</h3>
+                                    </div>
+                                </article>
+                                <article class="ItemCard archive-story-card state-disabled">
+                                    <div class="item-card-header">
+                                        <i class="Icon mail"></i>
+                                        <h3 class="item-card-title">???</h3>
+                                    </div>
+                                </article>
                             </div>
                         </section>
                 </div>

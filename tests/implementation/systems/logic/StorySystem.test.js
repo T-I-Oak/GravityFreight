@@ -108,6 +108,58 @@ describe('StorySystem', () => {
         });
     });
 
+    it('returns the homecoming story only when moving from sector 24 to 25 with all regular stories read', async () => {
+        const allRegularStoryIds = repository.getStoryIds()
+            .filter(storyId => /^[TRB]{1,3}$/.test(storyId));
+        ({ storySystem } = await createStorySystem({ readMessageIds: allRegularStoryIds }));
+
+        expect(storySystem.getSectorArrivalStoryId(23, 24)).toBeNull();
+        expect(storySystem.getSectorArrivalStoryId(24, 25)).toBe('HOME25');
+        expect(storySystem.getSectorArrivalStoryId(25, 25)).toBeNull();
+    });
+
+    it('does not return the homecoming story before regular stories are complete', async () => {
+        const allRegularStoryIds = repository.getStoryIds()
+            .filter(storyId => /^[TRB]{1,3}$/.test(storyId));
+
+        ({ storySystem } = await createStorySystem({ readMessageIds: allRegularStoryIds.slice(1) }));
+        expect(storySystem.getSectorArrivalStoryId(24, 25)).toBeNull();
+    });
+
+    it('counts HOME25 toward total story read achievements without adding it to branch counts', async () => {
+        ({ storySystem } = await createStorySystem({ readMessageIds: ['T', 'TR', 'HOME25'] }));
+
+        expect(storySystem.getReadCounts()).toEqual({
+            total: 3,
+            T: 2,
+            R: 0,
+            B: 0
+        });
+    });
+
+    it('returns all story statuses for archive browsing', async () => {
+        ({ storySystem } = await createStorySystem({ readMessageIds: ['T', 'HOME25'] }));
+
+        const rows = storySystem.getAllStoryStatus();
+
+        expect(rows).toHaveLength(40);
+        expect(rows.find(story => story.id === 'T')).toMatchObject({
+            id: 'T',
+            type: 'T',
+            isRead: true
+        });
+        expect(rows.find(story => story.id === 'TR')).toMatchObject({
+            id: 'TR',
+            type: 'R',
+            isRead: false
+        });
+        expect(rows.find(story => story.id === 'HOME25')).toMatchObject({
+            id: 'HOME25',
+            type: 'HOME',
+            isRead: true
+        });
+    });
+
     it('rejects unknown story ids and branch types', () => {
         expect(() => storySystem.updateReadStatus('missing')).toThrow('[StorySystem] Story not found: missing');
         expect(() => storySystem.getMessageData('missing')).toThrow('[StorySystem] Story not found: missing');

@@ -1,0 +1,152 @@
+# Architecture Specification: Logic Domain Roles
+
+本ドキュメントは class_roles.md から分割した、ロジックドメインの役割定義である。
+
+## 6. ロジックドメイン (Logic Domain)
+
+ゲームの物理・経済・進行などの「ルール」を実行するステートレスなサービス。
+
+- **PhysicsEngine**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 物理シミュレーター。
+    - 責務:
+        - ティック単位の積分計算、全天体からの重力合算。
+        - 算出された新しい物理状態（位置・速度）を `Rocket` に通知し、`rocket.updateState()` を実行させる。
+- **TrajectoryPredictor**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 軌道予測機。
+    - 責務:
+        - 未来の航跡計算。
+        - `Rocket` のクローンを作成し、`PhysicsEngine` を用いて指定ティック分ループ実行することでシミュレーションを行う。
+        - **計算完了後の `Rocket` クローンを返す**。このクローンが持つ `actualTrail`（移動履歴）が、UI 上での「予測軌道」として利用される。
+- **NavigationLoopController**
+    - 生存期間: Game Lifecycle
+    - 役割: 航行更新ループの実行者。
+    - 責務:
+        - v1 と同じ固定 timestep accumulator 方式で `PhysicsEngine.step()` を呼び出し、航行中の Rocket / Sector 状態を更新する。
+        - 航行中 HUD のスコア表示と WorldRenderer の再描画タイミングを通知する。
+        - `PhysicsEngine.step()` が返す `collision` を監視し、航行終了 callback へ渡す。
+        - 航行結果の精算、記録、画面遷移は担当しない。
+- **EconomySystem**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 経済・取引・抽選ロジックの外部窓口。
+    - 責務:
+        - セクター内のアイテム出現・抽選（マップ配置）の制御。
+        - 航行結果精算、交易所在庫、共通価格計算を内部サービスへ委譲する。
+        - 航行結果確定後および施設退出時に共通利用するゲームオーバー判定。
+- **SettlementCalculator**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 航行終了時精算ロジック。
+    - 責務:
+        - 衝突結果と `FlightResultData` から `SettlementResult` を生成する。
+        - 配送、拾得コイン、施設報酬、保険金、遺失物、割引率を集計する。
+- **PricingService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 共通価格計算。
+    - 責務:
+        - 共通割引ルール、修理費、解体費を計算する。
+        - アイテム自身が算出する査定額に対し、施設横断の価格補正を適用する。
+- **TradingPostService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: Trading Post 取引準備。
+    - 責務:
+        - 交易所在庫を生成し、特売品を設定する。
+        - アイテム抽選は `EconomySystem.drawLottery()` へ委譲する。
+- **BlackMarketService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: Black Market ガチャ取引準備。
+    - 責務:
+        - 100c / 500c の排出ライン、抽選補正、確率エンチャントを適用してガチャ結果を生成する。
+        - アイテム抽選は `EconomySystem.drawLottery()` へ委譲する。
+        - 所持金や inventory は直接変更せず、`SessionState.applyTransaction()` 用の `TransactionResult` を返す。
+- **RepairDockService**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: Repair Dock 取引準備。
+    - 責務:
+        - 発射台修理、ロケット解体・強化の `TransactionResult` を生成する。
+        - 支払い、対象 item の存在確認、inventory 反映は `SessionState.applyTransaction()` へ委譲する。
+        - 修理・強化の施設固有処理は、支払い成功後に実行される `onCommit` callback として定義する。
+- **GameController**
+    - 生存期間: Game Lifecycle
+    - 役割: ゲーム進行・シーン管理。
+    - 責務:
+        - プレイ中（ワープ〜航行〜リザルト〜施設〜ゲーム終了）の一連の画面遷移とロジックの統括。
+        - 施設入場・施設取引・施設退出など、画面入力からゲーム進行処理への入口を管理し、施設表示と取引処理は `FacilityFlowController` へ委譲する。
+        - 航行開始時に `NavigationLoopController` を起動し、航行終了後の精算・画面遷移を実行する。
+        - マップ入力、AIM、予測線更新は `MapInteractionController` へ委譲する。
+        - 航行結果画面の replay 保護操作を `FlightRecorder` へ接続し、上限時の置き換えでは既存 protected replay の解除後に現在の航行結果を保護する。
+        - セクター進行と契約終了判定は `SectorProgressionController` へ委譲する。
+- **FacilityFlowController**
+    - 生存期間: Game Lifecycle
+    - 役割: 施設滞在中の表示・取引フロー管理。
+    - 責務:
+        - 施設入場時の表示データ生成、施設種別ごとのセクション構成、施設アクションから `TransactionResult` 生成までを管理する。
+        - 取引確定後に inventory / coins / achievement 判定 / 施設表示更新を接続する。
+        - セクター遷移、契約終了判定、施設退出後の進行は担当しない。
+- **MapInteractionController**
+    - 生存期間: Game Lifecycle
+    - 役割: 本編マップ操作と AIM 表示管理。
+    - 責務:
+        - `MapInputController` から正規化された canvas 入力を受け取り、パン、回転、ズーム、ホバー、AIM を処理する。
+        - FLIGHT タブの選択状態から AIM 用 preview rocket を生成し、`TrajectoryPredictor` による予測線を `WorldRenderer` へ渡す。
+        - 実際の発射、inventory 消費、航行開始は担当しない。
+- **BuildFlowController**
+    - 生存期間: Game Lifecycle
+    - 役割: ビルド画面の選択状態と再描画の仲介。
+    - 責務:
+        - カテゴリ別の現在選択 stack uid を保持する。
+        - `module` カテゴリの複数・重複選択、スロット上限、あふれ時の自動解除を管理する。
+        - UI からの `{ category, uid }` 選択イベントを選択状態へ反映する。
+        - `BuildScreenPresenter` で最新 view data を生成する。
+        - ビルドフェーズ開始など画面全体の表示切替が必要な場合のみ、最新 view data を `UIController.showBuildScreen()` へ渡す。
+        - ASSEMBLY タブの選択パーツから `RocketItem` を生成し、inventory へ追加する。
+        - 発射、航行開始、FLIGHT タブの発射構成消費は担当しない。
+- **BuildScreenPresenter**
+    - 生存期間: Game Lifecycle
+    - 役割: ビルド画面表示用 view data 生成。
+    - 責務:
+        - `SessionState.inventory` と現在の選択状態から、ビルドパネルのカテゴリ別表示データを作成する。
+        - ビルド画面の空表示、発射ボタン文言、発射可能状態を表示用データとしてまとめる。
+        - DOM 更新や選択状態の変更は担当しない。
+- **ArchiveScreenPresenter**
+    - 生存期間: App Lifecycle
+    - 役割: Analytic Archive 表示用 view data 生成。
+    - 責務:
+        - `GameRecordTracker`, `RankTracker`, `AchievementTracker`, `FlightRecorder` の実データを読み取り、Archive 画面用の KPI、ランキング、リプレイ一覧、実績進捗へ変換する。
+        - DOM 生成、タブ切替、リプレイ再生開始、永続データ更新は担当しない。
+- **SectorProgressionController**
+    - 生存期間: Game Lifecycle
+    - 役割: セクター進行・契約終了判定。
+    - 責務:
+        - 次セクター開始時の `SessionState` 更新、`Sector` 生成、HUD / Renderer 更新を実行する。
+        - 施設退出時および航行結果確定後のゲームオーバー判定を実行する。
+        - 契約終了時に記録値・実績の確定処理を呼び出し、ゲーム終了画面へ結果を渡す。
+        - 契約終了が確定した場合のみ、ゲーム1プレイ単位のランキング登録を `RankTracker` へ委譲する。
+- **StorySystem**
+    - 生存期間: App Lifecycle (Service)
+    - 役割: 物語（Story）の選択・永続進捗管理。
+    - 責務:
+        - ストーリーIDごとの永続的な既読状態（isRead）の管理。
+        - 条件に応じたストーリーIDの選出。
+        - 既読フラグの更新と永続化。
+- **AchievementTracker**
+    - 生存期間: App Lifecycle
+    - 役割: 実績管理。
+    - 責務: 実績定義と `GameRecordTracker` の記録値を照合し、実績の達成状況と進捗を算出する。
+- **GameRecordTracker**
+    - 生存期間: App Lifecycle
+    - 役割: ゲーム全体の記録値管理。
+    - 責務: 契約終了時の `GameResultSummary` から、実績判定や Analytics のサイドKPIが参照する累計値・最大値などを保持する。
+- **RankTracker**
+    - 生存期間: App Lifecycle
+    - 役割: ランキング管理。
+    - 責務: ゲーム1プレイ単位の結果をもとに、スコア・到達セクター・回収数などの上位記録を保持する。
+- **FlightRecorder**
+    - 生存期間: App Lifecycle
+    - 役割: 航行記録・リプレイ管理。
+    - 責務:
+        - 発射時点の航行初期状態 snapshot を一時記憶する。
+        - 航行終了時メタ情報と結合して航行記録候補を確定する。
+        - 保存対象となった航行記録を永続化し、リプレイ再生時に初期状態を復元する。
+
+---

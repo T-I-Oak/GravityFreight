@@ -1,0 +1,99 @@
+/* 統計セクション (KPI) */
+#archive-screen .kpi-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-double);
+    align-items: center; /* 左右中央寄せ */
+}
+
+#archive-screen .kpi-group {
+    align-items: center;
+    gap: var(--space-unit);
+}
+
+#archive-screen .kpi-group .stat-label {
+    opacity: 0.6;
+    font-size: 0.7em;
+}
+
+#archive-screen .kpi-container .Well {
+    width: 120px; /* 左カラムの統計項目のみ固定幅 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-unit) 0;
+}
+
+#archive-screen .stat-value {
+    font-size: 1.7em;
+    font-weight: 950;
+    line-height: 1;
+}
+
+/* グラフセクション */
+#archive-screen .graph-svg {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 100%; /* コンテナに合わせて伸縮 */
+    overflow: hidden;
+}
+
+#archive-screen .Well:has(.graph-svg) {
+    grid-row: 2;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* グラフ凡例の強調 */
+#archive-screen .stat-label.legend.state-active {
+    font-size: 0.8em;
+    font-weight: 900;
+    opacity: 1;
+}
+
+/* グラフ折れ線スタイル */
+#archive-screen .graph-line {
+    transition: all var(--motion-fast);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#archive-screen .graph-line.score { stroke: var(--color-num-score); }
+#archive-screen .graph-line.sector { stroke: var(--color-num-sector); }
+#archive-screen .graph-line.item-count { stroke: var(--color-num-item-count); }
+
+#archive-screen .graph-line.state-active {
+    stroke-width: 3px;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+}
+
+#archive-screen .graph-line:not(.state-active) {
+    stroke-width: 1px;
+    opacity: 0.7;
+}
+
+/* 平均線（ドット線） */
+#archive-screen .avg-line {
+    stroke-width: 1.2px;
+    stroke-dasharray: 4, 2;
+    opacity: 0.8;
+}
+
+#archive-screen .avg-line.score { stroke: var(--color-num-score); }
+#archive-screen .avg-line.sector { stroke: var(--color-num-sector); }
+#archive-screen .avg-line.item-count { stroke: var(--color-num-item-count); }
+
+/* 凡例の装飾 (Context レイヤーで追加) */
+#archive-screen .stat-label.legend::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 2px;
+    vertical-align: middle;
+    margin-right: 8px;
+    background: currentColor;
+    opacity: 0.8;
+}
+

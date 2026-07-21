@@ -45,6 +45,36 @@
 
 #inventory-panel .panel-header {
     border-bottom-color: var(--panel-border-color);
+    gap: 14px;
+}
+
+#inventory-panel .panel-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+}
+
+#inventory-panel .settings-inline-btn {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin: 4px 0 4px 4px;
+    border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
+    border-radius: var(--radius-standard);
+    background: rgba(255, 255, 255, 0.05);
+    color: color-mix(in srgb, var(--color-theme-sub), transparent 40%);
+    font-size: 14px;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+#inventory-panel .settings-inline-btn:hover {
+    border-color: var(--color-theme-sub);
+    background: color-mix(in srgb, var(--color-theme-sub), transparent 80%);
+    color: #ffffff;
+    box-shadow: 0 0 15px var(--color-theme-sub);
 }
 
 #inventory-panel .panel-body {
@@ -208,6 +238,17 @@
     min-height: 0;
 }
 
+.StarInfoPanel .star-info-message {
+    margin: 0;
+    padding: var(--space-double);
+    background: rgba(8, 12, 18, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-standard);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 #sector-notification {
     position: fixed;
     top: 50%;
@@ -239,6 +280,41 @@
         0 0 10px rgba(225, 0, 255, 0.8),
         0 0 20px rgba(225, 0, 255, 0.4),
         0 0 40px rgba(225, 0, 255, 0.2);
+}
+
+#achievement-toast-container {
+    position: fixed;
+    top: var(--space-double);
+    left: 50%;
+    z-index: calc(var(--z-system) + 400);
+    display: grid;
+    width: min(360px, calc(100vw - var(--space-double) * 2));
+    gap: var(--space-unit);
+    pointer-events: none;
+    transform: translateX(-50%);
+}
+
+.AchievementToast {
+    --current-color: var(--color-num-achievement);
+    padding: var(--space-double);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 55%);
+    border-radius: var(--radius-standard);
+    background: rgba(18, 16, 24, 0.92);
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--current-color), transparent 75%);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity var(--motion-fast), transform var(--motion-fast);
+}
+
+.AchievementToast.state-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.AchievementToast.state-exit {
+    opacity: 0;
+    transform: translateY(-8px);
 }
 
 @keyframes sector-toast {

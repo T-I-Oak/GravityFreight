@@ -34,6 +34,9 @@ export function createController(settlement = createSettlement()) {
         getMapConstants: vi.fn(() => ({
             STAR_HIT_MARGIN: 15
         })),
+        getMasterConfig: vi.fn(() => ({
+            boundaryRadius: 900
+        })),
         getUiText: vi.fn(key => ({
             'flightResult.titles.cleared': 'SECTOR {sector} COMPLETED',
             'flightResult.titles.returned': 'ROCKET RECOVERED',
@@ -51,6 +54,8 @@ export function createController(settlement = createSettlement()) {
             'facility.actions.sell': 'SELL',
             'facility.actions.repair': 'REPAIR',
             'facility.actions.dismantle': 'DISMANTLE',
+            'map.deliveryCargo.title': 'DELIVERY TARGET',
+            'map.deliveryCargo.body': 'Deliver {itemName} to {facilityName}.',
             'facility.descriptions.tradingPost': 'Trading post description',
             'facility.descriptions.repairDock': 'Repair dock description',
             'facility.descriptions.blackMarket': 'Black market description',
@@ -58,6 +63,18 @@ export function createController(settlement = createSettlement()) {
             'facility.sections.tradingPostBuy.subtitle': 'Advanced parts available at this station.',
             'facility.sections.tradingPostSell.title': 'Sell Parts',
             'facility.sections.tradingPostSell.subtitle': 'Sell unneeded parts to earn credits.',
+            'facility.sections.tradingPostSellCategories.rocket.title': 'Rockets',
+            'facility.sections.tradingPostSellCategories.rocket.subtitle': 'Sell assembled rockets on standby.',
+            'facility.sections.tradingPostSellCategories.launcher.title': 'Launchers',
+            'facility.sections.tradingPostSellCategories.launcher.subtitle': 'Sell unneeded launchers.',
+            'facility.sections.tradingPostSellCategories.booster.title': 'Boosters',
+            'facility.sections.tradingPostSellCategories.booster.subtitle': 'Sell optional boosters.',
+            'facility.sections.tradingPostSellCategories.chassis.title': 'Chassis',
+            'facility.sections.tradingPostSellCategories.chassis.subtitle': 'Sell rocket frame components.',
+            'facility.sections.tradingPostSellCategories.logic.title': 'Logic',
+            'facility.sections.tradingPostSellCategories.logic.subtitle': 'Sell navigation logic parts.',
+            'facility.sections.tradingPostSellCategories.module.title': 'Modules',
+            'facility.sections.tradingPostSellCategories.module.subtitle': 'Sell expansion modules.',
             'facility.sections.repairDockRepair.title': 'Launcher Maintenance',
             'facility.sections.repairDockRepair.subtitle': 'Restore launcher charges.',
             'facility.sections.repairDockDismantle.title': 'Dismantle and Enhance',
@@ -94,9 +111,15 @@ export function createController(settlement = createSettlement()) {
         })[key])
     };
     const currentRocket = {
+        position: { x: 120, y: 70 },
+        velocity: { x: 5, y: 1 },
+        actualTrail: [
+            { x: 0, y: 0 },
+            { x: 80, y: 40 },
+            { x: 120, y: 70 }
+        ],
         getFlightResult: vi.fn(() => ({
             ticks: 260,
-            distance: 1400,
             heldCargo: [],
             rocketItem: { id: 'rocket_item' }
         }))
@@ -108,6 +131,14 @@ export function createController(settlement = createSettlement()) {
                 isHome: true,
                 radius: 40,
                 position: { x: 0, y: 0 }
+            }
+        ],
+        exits: [
+            {
+                angle: 30,
+                width: 26,
+                radius: 450,
+                getFacilityType: vi.fn(() => 'TRADING_POST')
             }
         ],
         createSnapshot: vi.fn(() => ({
@@ -175,9 +206,14 @@ export function createController(settlement = createSettlement()) {
     };
     const damagedLauncher = {
         uid: 'launcher_damaged',
+        id: 'pad_standard_d2',
         category: 'launcher',
         charges: 0,
         maxCharges: 2,
+        equals: vi.fn(item => item?.id === 'pad_standard_d2'
+            && item?.category === 'launcher'
+            && item?.charges === 0
+            && item?.maxCharges === 2),
         getViewData: vi.fn(() => ({
             uid: 'launcher_damaged',
             id: 'pad_standard_d2',
@@ -188,11 +224,16 @@ export function createController(settlement = createSettlement()) {
     };
     const readyLauncher = {
         uid: 'launcher_ready',
+        id: 'pad_standard_d2',
         category: 'launcher',
         charges: 2,
         maxCharges: 2,
         power: 8,
         powerMultiplier: 1,
+        equals: vi.fn(item => item?.id === 'pad_standard_d2'
+            && item?.category === 'launcher'
+            && item?.charges === readyLauncher.charges
+            && item?.maxCharges === 2),
         consumeCharge: vi.fn(amount => {
             readyLauncher.charges = Math.max(0, readyLauncher.charges - amount);
             return readyLauncher.charges;
@@ -275,7 +316,7 @@ export function createController(settlement = createSettlement()) {
         getViewData: vi.fn(() => ({
             ...chassisItem.getViewData(),
             uid: 'stack_chassis',
-            count: 1
+            count: chassisStack.count
         }))
     };
     const logicStack = {
@@ -286,33 +327,33 @@ export function createController(settlement = createSettlement()) {
         getViewData: vi.fn(() => ({
             ...logicItem.getViewData(),
             uid: 'stack_logic',
-            count: 1
+            count: logicStack.count
         }))
     };
     inventoryStack.getViewData = vi.fn(() => ({
         ...sellItem.getViewData(),
         uid: 'stack_sell',
-        count: 1
+        count: inventoryStack.count
     }));
     launcherStack.getViewData = vi.fn(() => ({
         ...damagedLauncher.getViewData(),
         uid: 'stack_launcher',
-        count: 1
+        count: launcherStack.count
     }));
     rocketStack.getViewData = vi.fn(() => ({
         ...rocketItem.getViewData(),
         uid: 'stack_rocket_ready',
-        count: 1
+        count: rocketStack.count
     }));
     readyLauncherStack.getViewData = vi.fn(() => ({
         ...readyLauncher.getViewData(),
         uid: 'stack_launcher_ready',
-        count: 1
+        count: readyLauncherStack.count
     }));
     boosterStack.getViewData = vi.fn(() => ({
         ...boosterItem.getViewData(),
         uid: 'stack_booster_ready',
-        count: 1
+        count: boosterStack.count
     }));
     const stacks = [
         inventoryStack,
@@ -351,15 +392,37 @@ export function createController(settlement = createSettlement()) {
                 return item ?? null;
             }),
             addItem: vi.fn(item => {
+                const viewData = item.getViewData?.() ?? {
+                    uid: item.uid,
+                    id: item.id ?? item.uid,
+                    name: item.name ?? item.uid,
+                    category: item.category ?? 'module',
+                    stats: {}
+                };
+                const existingStack = stacks.find(stack => {
+                    if (typeof stack.representative?.equals === 'function') {
+                        return stack.representative.equals(item);
+                    }
+                    const currentViewData = stack.getViewData?.() ?? stack.representative.getViewData?.() ?? {};
+                    return currentViewData.id === viewData.id && currentViewData.category === viewData.category;
+                });
+                if (existingStack) {
+                    existingStack.items.push(item);
+                    existingStack.count = existingStack.items.length;
+                    return;
+                }
                 const stack = {
                     uid: `stack_readded_${item.uid}`,
-                    representative: item,
+                    representative: {
+                        ...item,
+                        category: item.category ?? viewData.category
+                    },
                     items: [item],
                     count: 1,
                     getViewData: vi.fn(() => ({
-                        ...item.getViewData(),
+                        ...viewData,
                         uid: `stack_readded_${item.uid}`,
-                        count: 1
+                        count: stack.count
                     }))
                 };
                 stacks.push(stack);
@@ -368,21 +431,36 @@ export function createController(settlement = createSettlement()) {
         applyTransaction: vi.fn(transaction => {
             const spentCoins = transaction.spentCoins ?? 0;
             const earnedCoins = transaction.earnedCoins ?? 0;
-            const acquiredItemCount = transaction.acquiredItems?.length ?? 0;
-            const removedItemCount = transaction.removedItems?.length ?? 0;
+            const acquiredItems = transaction.acquiredItems ?? [];
+            const removedItems = transaction.removedItems ?? [];
+            removedItems.forEach(item => {
+                const stack = stacks.find(candidate => candidate.items.includes(item));
+                if (!stack) {
+                    return;
+                }
+                stack.items = stack.items.filter(candidate => candidate !== item);
+                stack.count = stack.items.length;
+                if (stack.count === 0) {
+                    stacks.splice(stacks.indexOf(stack), 1);
+                }
+            });
+            acquiredItems.forEach(item => sessionState.inventory.addItem(item));
             sessionState.coins = sessionState.coins - spentCoins + earnedCoins;
             return {
                 spentCoins,
                 earnedCoins,
-                acquiredItemCount,
-                removedItemCount,
-                acquiredItems: transaction.acquiredItems ?? [],
-                removedItems: transaction.removedItems ?? []
+                acquiredItemCount: acquiredItems.length,
+                removedItemCount: removedItems.length,
+                acquiredItems,
+                removedItems
             };
         }),
         applySettlement: vi.fn(),
         incrementSector: vi.fn(() => {
             sessionState.sectorNumber += 1;
+        }),
+        recordBlackMarketVisit: vi.fn(() => {
+            sessionState.blackMarketVisits = (sessionState.blackMarketVisits ?? 0) + 1;
         }),
         getGameResultSummary: vi.fn(() => ({
             totalScore: 3260,
@@ -399,6 +477,7 @@ export function createController(settlement = createSettlement()) {
             {
                 item: {
                     uid: 'stock_item',
+                    category: 'logic',
                     getViewData: vi.fn(() => ({
                         uid: 'stock_item',
                         id: 'sensor_long',
@@ -435,6 +514,7 @@ export function createController(settlement = createSettlement()) {
     };
     const gameRecordTracker = {
         recordFlightResult: vi.fn(() => ['total_launches', 'total_score']),
+        recordDeliverySuccess: vi.fn(() => ['total_deliveries', 'max_deliveries']),
         recordTransaction: vi.fn(() => ['total_spent_coins']),
         recordSectorStart: vi.fn(() => ['max_reached_sector']),
         recordGameResult: vi.fn(() => ['lifetime_contracts'])
@@ -462,6 +542,8 @@ export function createController(settlement = createSettlement()) {
     const storySystem = {
         resetSession: vi.fn(),
         unlockNextStep: vi.fn(branchId => branchId),
+        getSectorArrivalStoryId: vi.fn(() => null),
+        updateReadStatus: vi.fn(),
         getStoryStatus: vi.fn(() => [{ id: 'T', type: 'T', isUnread: true }])
     };
     const uiController = {
@@ -472,13 +554,19 @@ export function createController(settlement = createSettlement()) {
         setFacilityDepartHandler: vi.fn(),
         setResultHandler: vi.fn(),
         setMapToggleHandler: vi.fn(),
+        setMailHandler: vi.fn(),
+        setResultStoryHandler: vi.fn(),
         setGameEndReturnHandler: vi.fn(),
         setLaunchHandler: vi.fn(),
         showStarInfo: vi.fn(),
+        showDeliveryCargoInfo: vi.fn(),
         hideStarInfo: vi.fn(),
         updateFacilityCredits: vi.fn(),
         updateHUDValue: vi.fn(),
         updateMailStatus: vi.fn(),
+        showStoryModal: vi.fn(),
+        playFlightEndSE: vi.fn(),
+        showAchievementToasts: vi.fn(),
         setFlightMode: vi.fn(),
         showSectorTransitionScreen: vi.fn(),
         showSectorTitle: vi.fn(),
@@ -486,7 +574,24 @@ export function createController(settlement = createSettlement()) {
         showBuildScreen: vi.fn(),
         setBuildItemSelectionHandler: vi.fn(),
         setBuildAssembleHandler: vi.fn(),
+        setBuildTabChangeHandler: vi.fn(),
+        getMapCanvas: vi.fn(() => ({
+            width: 800,
+            height: 600,
+            getBoundingClientRect: () => ({
+                left: 10,
+                top: 20,
+                width: 800,
+                height: 600
+            })
+        })),
         setCanvasInputHandler: vi.fn()
+    };
+    const tutorialFlowController = {
+        checkTrigger: vi.fn(),
+        setCanvasTargetResolver: vi.fn(),
+        setCanvasFocusBoundsResolver: vi.fn(),
+        setMapInteractionController: vi.fn()
     };
     const cameraController = {
         isInMapArea: vi.fn(() => true),
@@ -494,6 +599,10 @@ export function createController(settlement = createSettlement()) {
         rotate: vi.fn(),
         zoom: vi.fn(),
         save: vi.fn(),
+        toScreen: vi.fn(point => ({
+            x: point.x * 0.5 + 400,
+            y: point.y * 0.5 + 300
+        })),
         toWorld: vi.fn(point => ({ ...point }))
     };
     const worldRenderer = {
@@ -502,8 +611,6 @@ export function createController(settlement = createSettlement()) {
         clearAimRocket: vi.fn(),
         clearPredictionPath: vi.fn(),
         playFinishAnimation: vi.fn(() => Promise.resolve()),
-        playGameEndExitAnimation: vi.fn(() => Promise.resolve()),
-        stopGameEndExitAnimation: vi.fn(() => Promise.resolve()),
         setSector: vi.fn(),
         clearSector: vi.fn(),
         setAimRocket: vi.fn(),
@@ -557,6 +664,7 @@ export function createController(settlement = createSettlement()) {
         navigationLoopController,
         gameDataRepository,
         appOrchestrator,
+        tutorialFlowController,
         sectorFactory,
         wait,
         sectorTransitionDurations
@@ -579,6 +687,7 @@ export function createController(settlement = createSettlement()) {
         flightRecorder,
         storySystem,
         uiController,
+        tutorialFlowController,
         worldRenderer,
         appOrchestrator,
         cameraController,

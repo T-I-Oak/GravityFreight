@@ -8,8 +8,9 @@
 - **責務**:
     - 航行結果画面 HTML の生成・表示。
     - スコア、コイン、明細値の表示を 0 から最終値へ加算アニメーションする。
-    - 航行結果画面内の確定、マップ確認、リプレイ保護操作の DOM イベント接続。
+    - 航行結果画面内の確定、マップ確認、共有、リプレイ保護、ストーリーカード操作の DOM イベント接続。
     - `VIEW MAP` 中のリザルト画面非表示、戻りボタン表示、マップ表示開始・終了通知。
+    - `PROTECT RECORD` 操作では、即時トグルせず、現在の航行結果を選択済みにした保護対象編集モーダルを開く。
 
 ## 2. インターフェース
 
@@ -38,6 +39,15 @@
     - `#map-action-dock` に `flightResult.actions.backToResult` の戻りボタンを表示する。
     - マップ表示開始時に `handler(true)`、戻りボタン押下時に `handler(false)` を通知する。
 
+- **`setShareHandler(handler: (viewData: FlightResultViewData) => void): void`**
+    - `SHARE` ボタンの操作を登録する。
+    - 押下時に現在保持している `viewData` を handler へ渡す。
+    - 共有画像生成や共有 API 呼び出しは handler 側へ委譲する。
+
+- **`setStoryHandler(handler: (storyId: string) => void): void`**
+    - 航行結果画面内の `.story-card[data-story-id]` の操作を登録する。
+    - クリックされたカードの `data-story-id` を handler へ渡す。
+
 - **`clearMapActionDock(): void`**
     - `#map-action-dock` の内容を消去する。
 
@@ -46,6 +56,7 @@
 - 航行結果 view data の生成は `GameController` の責務。
 - replay protect 操作の上限判定、航行結果画面の保護対象編集モーダル、永続更新 handler 呼び出しは `ReplayProtectFlow` の責務。
 - `FlightResultScreenView` は `ReplayProtectFlow.request()` の結果に基づいて protect 表示を更新する。
+- 航行結果画面では `PROTECT RECORD` / `PROTECTED` ボタンを押しても保存前に表示を切り替えない。`ReplayProtectFlow` の OK 確定結果を受けてから protect 表示を更新する。
 - 航行結果画面で未保存 replay を protect した場合、protect 成功時点で replay は保存済みとして扱い、recorded 表示も `RECORDED` に更新する。
 - `FlightResultScreenView` は保護対象編集モーダル用に、今回の航行結果のスコア、到達セクター、日時を `ReplayProtectFlow` へ渡す。
 - マップ再描画は `GameController` / `WorldRenderer` の責務。

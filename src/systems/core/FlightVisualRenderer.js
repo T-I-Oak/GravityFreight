@@ -1,4 +1,6 @@
 class FlightVisualRenderer {
+    static VISIBLE_TRAIL_LENGTH = 80;
+
     render(context, transform, view, state, colors) {
         this.#drawPredictionPath(context, transform, state.predictionPath, colors);
         this.#drawRocketTrail(context, transform, state.navigationRocket, colors);
@@ -34,7 +36,7 @@ class FlightVisualRenderer {
     }
 
     #drawRocketTrail(context, transform, rocket, colors) {
-        const trail = rocket?.actualTrail || [];
+        const trail = this.#visibleTrail(rocket);
         if (trail.length < 2) {
             return;
         }
@@ -51,7 +53,8 @@ class FlightVisualRenderer {
             const to = transform.toScreen(trail[index]);
 
             context.save();
-            context.globalAlpha = index / trail.length;
+            const pointAlpha = Number.isFinite(trail[index]?.alpha) ? trail[index].alpha : 1;
+            context.globalAlpha = (index / trail.length) * pointAlpha;
             context.beginPath();
             context.moveTo(from.x, from.y);
             context.lineTo(to.x, to.y);
@@ -69,7 +72,7 @@ class FlightVisualRenderer {
             return;
         }
 
-        const trail = rocket?.actualTrail || [];
+        const trail = this.#visibleTrail(rocket);
         if (trail.length < 5) {
             return;
         }
@@ -185,6 +188,11 @@ class FlightVisualRenderer {
             return item.getViewData().category;
         }
         return null;
+    }
+
+    #visibleTrail(rocket) {
+        const trail = rocket?.actualTrail || [];
+        return trail.slice(-FlightVisualRenderer.VISIBLE_TRAIL_LENGTH);
     }
 }
 

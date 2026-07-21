@@ -26,9 +26,11 @@ describe('SessionState', () => {
         expect(session.totalScore).toBe(0);
         expect(session.totalEarnedCoins).toBe(0);
         expect(session.totalFlightTicks).toBe(0);
+        expect(session.totalDeliveries).toBe(0);
         expect(session.collectedItemCount).toBe(0);
         expect(session.blackMarketVisits).toBe(0);
         expect(session.returnBonus).toBe(0);
+        expect(session.gameSessionId).toMatch(/^game_/);
         expect(session.coins).toBe(0);
         expect(session.inventory).toBeInstanceOf(ItemContainer);
         expect(session.inventory.getItemsByCategory('chassis')).toHaveLength(2);
@@ -68,6 +70,7 @@ describe('SessionState', () => {
             totalCoins: 150,
             totalScore: 2400,
             flightTicks: 720,
+            deliveryCount: 2,
             acquiredItems,
             lostToTarget: {
                 target,
@@ -79,6 +82,7 @@ describe('SessionState', () => {
         expect(session.totalEarnedCoins).toBe(150);
         expect(session.totalScore).toBe(2400);
         expect(session.totalFlightTicks).toBe(720);
+        expect(session.totalDeliveries).toBe(2);
         expect(session.collectedItemCount).toBe(2);
         expect(session.inventory.getItemsByCategory('coin')).toHaveLength(1);
         expect(session.inventory.getItemsByCategory('cargo')).toHaveLength(1);
@@ -227,6 +231,7 @@ describe('SessionState', () => {
         });
 
         expect(session.getGameResultSummary({ completedSectors: 1 })).toEqual({
+            gameSessionId: session.gameSessionId,
             totalScore: 1200,
             totalCoins: 80,
             completedSectors: 1,
@@ -234,6 +239,17 @@ describe('SessionState', () => {
             totalFlightTicks: 500,
             collectedItemCount: 1
         });
+    });
+
+    it('creates a new game session id when initialized for a new contract', () => {
+        const session = new SessionState(repository);
+        session.initialize();
+        const firstId = session.gameSessionId;
+
+        session.initialize();
+
+        expect(session.gameSessionId).toMatch(/^game_/);
+        expect(session.gameSessionId).not.toBe(firstId);
     });
 
     it('rejects ambiguous game result summary calls without completed sector context', () => {

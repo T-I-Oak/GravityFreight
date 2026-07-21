@@ -89,6 +89,16 @@ describe('BuildFlowController', () => {
         expect(uiController.showBuildScreen).toHaveBeenCalledWith(viewData);
     });
 
+    it('creates build view data without changing the current screen', () => {
+        const { controller, sessionState, uiController, buildScreenPresenter } = createContext();
+
+        const viewData = controller.createViewData();
+
+        expect(buildScreenPresenter.createViewData).toHaveBeenCalledWith(sessionState, {});
+        expect(viewData).toEqual({ state: sessionState, selection: {} });
+        expect(uiController.showBuildScreen).not.toHaveBeenCalled();
+    });
+
     it('switches single selection categories and resets when selecting the same stack again', () => {
         const { controller, uiController, stacks } = createContext();
         stacks.launcher = [
@@ -96,15 +106,16 @@ describe('BuildFlowController', () => {
             createStack('stack_launcher_next', 'launcher')
         ];
 
-        controller.handleItemSelection({ category: 'launcher', uid: 'stack_launcher' });
+        let viewData = controller.handleItemSelection({ category: 'launcher', uid: 'stack_launcher' });
         expect(controller.currentBuildSelection.launcher).toBe('stack_launcher');
-        expect(uiController.showBuildScreen.mock.calls.at(-1)[0].selection).toEqual({
+        expect(viewData.selection).toEqual({
             launcher: 'stack_launcher'
         });
+        expect(uiController.showBuildScreen).not.toHaveBeenCalled();
 
-        controller.handleItemSelection({ category: 'launcher', uid: 'stack_launcher_next' });
+        viewData = controller.handleItemSelection({ category: 'launcher', uid: 'stack_launcher_next' });
         expect(controller.currentBuildSelection.launcher).toBe('stack_launcher_next');
-        expect(uiController.showBuildScreen.mock.calls.at(-1)[0].selection).toEqual({
+        expect(viewData.selection).toEqual({
             launcher: 'stack_launcher_next'
         });
 

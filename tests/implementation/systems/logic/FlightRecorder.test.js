@@ -5,6 +5,8 @@ import Item from '../../../../src/systems/entities/Item.js';
 import Rocket from '../../../../src/systems/entities/Rocket.js';
 import RocketItem from '../../../../src/systems/entities/RocketItem.js';
 import SessionState from '../../../../src/systems/entities/SessionState.js';
+import CelestialBody from '../../../../src/systems/world/CelestialBody.js';
+import ExitArc from '../../../../src/systems/world/ExitArc.js';
 import Sector from '../../../../src/systems/world/Sector.js';
 
 function createRepository(savedIndex = { records: [] }) {
@@ -31,13 +33,15 @@ function createRecord({
     score,
     createdAt = '2026-06-01T00:00:00.000Z',
     favorite = false,
-    reachedSector = 1
+    reachedSector = 1,
+    gameSessionId = null
 }) {
     return {
         id,
         createdAt,
         score,
         reachedSector,
+        gameSessionId,
         resultType: 'cleared',
         destinationType: 'TRADING_POST',
         favorite,
@@ -52,6 +56,70 @@ function capture(recorder) {
     const rocket = { createSnapshot: vi.fn(() => ({ rocket: 'snapshot' })) };
     const sector = { createSnapshot: vi.fn(() => ({ sector: 'snapshot' })) };
     recorder.captureLaunchSnapshot(rocket, sector);
+    return { rocket, sector };
+}
+
+function createRepresentativeReplayFixture(gameDataRepository) {
+    const session = new SessionState(gameDataRepository);
+    session.initialize();
+    session.incrementSector();
+
+    const economySystem = {
+        drawLottery: vi.fn(() => [])
+    };
+    const sector = new Sector(session, false, gameDataRepository, economySystem);
+    const config = gameDataRepository.getMasterConfig();
+    const starCount = config.baseCelestialCount + 2;
+    const starItemIds = ['coin_100', 'coin_200', 'cargo_safe', 'cargo_normal', 'cargo_danger', 'cargo_lucky'];
+
+    sector.bodies = [
+        new CelestialBody({
+            position: config.homeStarPosition,
+            isHome: true
+        }, gameDataRepository),
+        ...Array.from({ length: starCount }, (_, index) => {
+            const angle = (Math.PI * 2 * index) / starCount;
+            const radius = 260 + (index % 3) * 95;
+            return new CelestialBody({
+                position: {
+                    x: Math.round(Math.cos(angle) * radius),
+                    y: Math.round(Math.sin(angle) * radius)
+                },
+                radius: 18 + (index % 4),
+                isRepulsion: index % 2 === 1,
+                items: [
+                    new Item(starItemIds[index % starItemIds.length], gameDataRepository),
+                    new Item(starItemIds[(index + 2) % starItemIds.length], gameDataRepository)
+                ]
+            }, gameDataRepository);
+        })
+    ];
+    sector.exits = [
+        new ExitArc({ angle: 20, type: 'TRADING_POST' }, gameDataRepository),
+        new ExitArc({ angle: 160, type: 'REPAIR_DOCK' }, gameDataRepository),
+        new ExitArc({ angle: 280, type: 'BLACK_MARKET' }, gameDataRepository)
+    ];
+
+    const rocketItem = new RocketItem(
+        new Item('hull_heavy', gameDataRepository),
+        new Item('sensor_normal', gameDataRepository),
+        [
+            new Item('mod_capacity', gameDataRepository),
+            new Item('mod_analyzer', gameDataRepository),
+            new Item('mod_star_breaker', gameDataRepository),
+            new Item('mod_cushion', gameDataRepository),
+            new Item('mod_emergency', gameDataRepository)
+        ]
+    );
+    const rocket = new Rocket(
+        rocketItem,
+        new Item('pad_standard_d4', gameDataRepository),
+        new Item('boost_power', gameDataRepository),
+        0.5,
+        { x: config.homeStarRadius, y: 0 }
+    );
+    rocket.velocity = rocket.getInitialVelocity(0.1);
+
     return { rocket, sector };
 }
 
@@ -77,7 +145,8 @@ describe('FlightRecorder', () => {
             resultType: 'cleared',
             score: 1200,
             reachedSector: 3,
-            destinationType: 'REPAIR_DOCK'
+            destinationType: 'REPAIR_DOCK',
+            gameSessionId: 'session_1'
         });
 
         expect(rocket.createSnapshot).toHaveBeenCalled();
@@ -87,6 +156,7 @@ describe('FlightRecorder', () => {
             createdAt: '2026-06-04T00:00:00.000Z',
             score: 1200,
             reachedSector: 3,
+            gameSessionId: 'session_1',
             resultType: 'cleared',
             destinationType: 'REPAIR_DOCK',
             favorite: false,
@@ -226,28 +296,7 @@ describe('FlightRecorder', () => {
             expandLanguageResource: value => value
         });
         await gameDataRepository.loadAllData();
-        const session = new SessionState(gameDataRepository);
-        session.initialize();
-        session.incrementSector();
-        const economySystem = {
-            drawLottery: vi.fn((currentSession, count) => (
-                Array.from({ length: count }, () => new Item('coin_100', gameDataRepository))
-            ))
-        };
-        const sector = new Sector(session, false, gameDataRepository, economySystem);
-        const rocketItem = new RocketItem(
-            new Item('hull_medium', gameDataRepository),
-            new Item('sensor_normal', gameDataRepository),
-            [new Item('mod_capacity', gameDataRepository), new Item('mod_star_breaker', gameDataRepository)]
-        );
-        const rocket = new Rocket(
-            rocketItem,
-            new Item('pad_standard_d2', gameDataRepository),
-            new Item('boost_power', gameDataRepository),
-            0.5,
-            { x: 25, y: 0 }
-        );
-        rocket.velocity = rocket.getInitialVelocity(0.1);
+        const { rocket, sector } = createRepresentativeReplayFixture(gameDataRepository);
         let nextId = 1;
         let nextSecond = 0;
         ({ recorder } = createRecorder({ records: [] }, {
@@ -268,8 +317,16 @@ describe('FlightRecorder', () => {
         const serialized = JSON.stringify(recorder.getFlightRecordIndex());
         const utf16Bytes = serialized.length * 2;
         const utf8Bytes = new TextEncoder().encode(serialized).length;
+        const warningThresholdBytes = 700 * 1024;
+        const hardLimitBytes = 800 * 1024;
+
+        if (utf16Bytes > warningThresholdBytes) {
+            console.warn(`[FlightRecorder] Representative replay index size is ${utf16Bytes} bytes UTF-16.`);
+        }
 
         expect(utf16Bytes).toBeLessThanOrEqual(600 * 1024);
+        expect(utf16Bytes).toBeLessThanOrEqual(warningThresholdBytes);
+        expect(utf16Bytes).toBeLessThanOrEqual(hardLimitBytes);
         expect(utf8Bytes).toBeLessThanOrEqual(utf16Bytes);
         expect(JSON.parse(serialized)).toEqual(recorder.getFlightRecordIndex());
     });

@@ -12,6 +12,31 @@ export const ITEM_REGISTRY = Object.fromEntries(
 export const STORY_DATA = storiesData.stories;
 export const RARITY = configData.rarity;
 
+let mockLanguage = 'ja';
+
+function expandLanguageResource(source) {
+    if (Array.isArray(source)) {
+        return source.map(item => expandLanguageResource(item));
+    }
+
+    if (source && typeof source === 'object') {
+        const store = source['lang-store'];
+        if (store) {
+            return store[mockLanguage] ?? store.ja ?? store.en ?? '';
+        }
+
+        return Object.fromEntries(
+            Object.entries(source).map(([key, value]) => [key, expandLanguageResource(value)])
+        );
+    }
+
+    return source;
+}
+
+export function setMockLanguage(language) {
+    mockLanguage = language;
+}
+
 export const mockGameDataRepository = {
     getItemDefinition(id) {
         const item = Object.values(itemsData).flat().find(candidate => candidate.id === id);
@@ -22,7 +47,23 @@ export const mockGameDataRepository = {
     },
 
     getStoryContent(id) {
-        return storiesData.stories[id];
+        const story = storiesData.stories[id];
+        if (!story) {
+            throw new Error(`[mockGameDataRepository] Story not found: ${id}`);
+        }
+        return expandLanguageResource(story);
+    },
+
+    getStoryIds() {
+        return Object.keys(storiesData.stories);
+    },
+
+    getStoryCategoryDefinition(id) {
+        const category = configData.storyCategories[id];
+        if (!category) {
+            throw new Error(`[mockGameDataRepository] Story category not found: ${id}`);
+        }
+        return expandLanguageResource(category);
     },
 
     getUiText(path) {

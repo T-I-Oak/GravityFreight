@@ -158,6 +158,6 @@ describe('TrajectoryPredictor', () => {
         expect(predicted.velocity.x).toBeLessThan(0);
         expect(rocket.isGhost).toBe(false);
         expect(rocket.actualTrail).toEqual([]);
-        expect(rocket.rocketItem.modules[0].charges).toBe(0);
+        expect(rocket.rocketItem.modules[0].charges).toBe(1);
     });
 });

@@ -25,11 +25,13 @@ function createRecord({
     score,
     createdAt = '2026-06-01T00:00:00.000Z',
     favorite = false,
-    reachedSector = 1
+    reachedSector = 1,
+    gameSessionId = null
 }) {
     return {
         id,
         createdAt,
+        gameSessionId,
         score,
         reachedSector,
         resultType: 'cleared',

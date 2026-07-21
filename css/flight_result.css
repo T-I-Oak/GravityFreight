@@ -178,7 +178,7 @@
     max-width: min(880px, calc(100vw - var(--space-double) * 4));
     max-height: min(78vh, 620px);
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto;
     gap: var(--space-double);
     margin: 0;
     padding: calc(var(--space-double) * 1.5);
@@ -273,6 +273,37 @@
     width: auto;
 }
 
+#flight-result-screen .replay-protect-table .date-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+    width: 100%;
+    min-width: 0;
+}
+
+#flight-result-screen .replay-protect-table .date-cell .date-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#flight-result-screen .replay-protect-table .date-cell .Badge.state-new {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+#flight-result-screen .replay-protect-table .Badge.state-new {
+    background: var(--color-theme-main);
+    color: rgba(0, 0, 0, 0.9);
+    font-size: 8px;
+    font-weight: 950;
+    padding: 1px 4px;
+    vertical-align: middle;
+    animation: none;
+}
+
 #flight-result-screen .replay-protect-table th.score {
     color: var(--color-num-score);
 }
@@ -308,4 +339,56 @@
     display: flex;
     justify-content: flex-end;
     gap: var(--space-unit);
+}
+
+.ShareConfirmOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+}
+
+.ShareConfirmOverlay.state-hidden,
+.ShareConfirmOverlay[hidden] {
+    display: none;
+}
+
+.ShareConfirmDialog {
+    width: min(420px, calc(100vw - var(--space-double) * 2));
+    padding: calc(var(--space-double) * 1.25);
+    gap: var(--space-double);
+    text-align: center;
+}
+
+.ShareConfirmDialog .panel-header,
+.ShareConfirmDialog .panel-body,
+.ShareConfirmDialog .panel-footer {
+    padding: 0;
+}
+
+.ShareConfirmDialog h2 {
+    margin: 0;
+    color: var(--color-theme-main);
+    font-size: 18px;
+    font-weight: 950;
+    letter-spacing: 0.12em;
+}
+
+.ShareConfirmDialog p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.7;
+}
+
+.ShareConfirmDialog .panel-footer {
+    display: flex;
+    gap: var(--space-unit);
+    justify-content: center;
 }

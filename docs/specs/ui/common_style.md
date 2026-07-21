@@ -59,18 +59,6 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 | `.theme-matte` | Draft | 施設内端末を表す非発光・実用寄りテーマ | 施設、建造、通常パネル |
 | `.theme-printing` | Draft | 紙に印刷された事務的な通知を表すテーマ | 実績カード、リザルト、記録証 |
 
-### 4.1 移行期間中の対応
-この節は v2 作成中の移行指針であり、初版リリース時の仕様書からは削除する。
-リリース版ドキュメントには β v1 / 旧仕様の class 名を残さない。
-
-| v1 / 旧仕様 | v2 | 備考 |
-| :--- | :--- | :--- |
-| `ui-style--neon` | `.theme-neon` | Style Layer ではなく Theme として扱う |
-| `ui-style--matte` | `.theme-matte` | Style Layer ではなく Theme として扱う |
-| `ui-style--print` / `ui-style--printing` | `.theme-printing` | 表記は `.theme-printing` に統一する |
-| `success-theme` / `failure-theme` | `.state-success` / `.state-failure` | リザルト状態であり、画面全体テーマではない |
-| `theme-trading` / `theme-repair` / `theme-blackmarket` | `.trading-post` / `.repair-dock` / `.black-market` | 施設種別であり、Theme ではない |
-
 ## 5. Function Classes
 構造や操作単位を表す class。見た目の質感や状態は `texture-*` と `state-*` で追加する。
 

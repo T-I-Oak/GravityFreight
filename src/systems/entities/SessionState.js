@@ -1,5 +1,6 @@
 import Item from './Item.js';
 import ItemContainer from './ItemContainer.js';
+import IDGenerator from '../../core/utils/IDGenerator.js';
 
 class SessionState {
     constructor(gameDataRepository) {
@@ -77,6 +78,7 @@ class SessionState {
         const totalCoins = result.totalCoins ?? 0;
         const totalScore = result.totalScore ?? 0;
         const flightTicks = result.flightTicks ?? 0;
+        const deliveryCount = result.deliveryCount ?? 0;
         const acquiredItems = result.acquiredItems ?? [];
         const recoveredItems = result.recoveredItems ?? [];
 
@@ -84,6 +86,7 @@ class SessionState {
         this.totalEarnedCoins += totalCoins;
         this.totalScore += totalScore;
         this.totalFlightTicks += flightTicks;
+        this.totalDeliveries += deliveryCount;
         this.collectedItemCount += acquiredItems.length;
         acquiredItems.forEach(item => this.inventory.addItem(item));
         recoveredItems.forEach(item => this.inventory.addItem(item));
@@ -103,6 +106,7 @@ class SessionState {
         }
 
         return {
+            gameSessionId: this.gameSessionId,
             totalScore: this.totalScore,
             totalCoins: this.totalEarnedCoins,
             completedSectors: context.completedSectors,
@@ -117,10 +121,12 @@ class SessionState {
         this.totalScore = 0;
         this.totalEarnedCoins = 0;
         this.totalFlightTicks = 0;
+        this.totalDeliveries = 0;
         this.collectedItemCount = 0;
         this.coins = 0;
         this.blackMarketVisits = 0;
         this.returnBonus = 0;
+        this.gameSessionId = IDGenerator.generate('game');
     }
 }
 

@@ -16,6 +16,7 @@
 - **`totalScore: number`**: 現在の累計スコア。
 - **`totalEarnedCoins: number`**: 現在のゲームプレイ中に獲得したコインの累計。
 - **`totalFlightTicks: number`**: 現在のゲームプレイ中に経過した航行 Tick 数の合計。
+- **`totalDeliveries: number`**: 現在のゲームプレイ中に成功した配送 cargo 数の累計。
 - **`collectedItemCount: number`**: 現在のゲームプレイ中に回収したアイテム数の累計。
 - **`coins: number`**: 現在の所持金。
 - **`inventory: ItemContainer`**: プレイヤーのグローバルインベントリ（未装備アイテム等）。
@@ -30,7 +31,7 @@
         1. `GameDataRepository.getInitialSetup()` を参照し、初期パラメータを取得。
         2. 取得した所持金を自身の `coins` にセット。
         3. セクター番号を `0` にセット。
-        4. 累計スコア、総獲得コイン、合計航行 Tick 数、総回収アイテム数、闇市場訪問回数、帰還ボーナスを `0` にセット。
+        4. 累計スコア、総獲得コイン、合計航行 Tick 数、総配送成功数、総回収アイテム数、闇市場訪問回数、帰還ボーナスを `0` にセット。
         5. 初期装備アイテムのインスタンスを生成し、`inventory` に追加。
 
 - **`incrementSector(): void`**
@@ -45,11 +46,12 @@
     - **内部挙動**:
         1. **金銭・スコア**: `coins += result.totalCoins`, `totalEarnedCoins += result.totalCoins`, `totalScore += result.totalScore` を実行。
         2. **航行時間**: `totalFlightTicks += result.flightTicks` を実行。
-        3. **回収数**: `result.acquiredItems` から今回正式に獲得したアイテム数を集計し、`collectedItemCount` へ加算する。
-        4. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
-        5. **回収装備追加**: `result.recoveredItems` の各アイテムを `inventory` へ追加する。ただし発射前から所有していた装備の復帰であるため、`collectedItemCount` には加算しない。
-        6. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
-        7. **帰還ボーナス**: `result.status === 'returned'` の場合、`gameBalance.RETURN_BONUS_INCREMENT` を `returnBonus` に加算する。
+        3. **配送成功数**: `totalDeliveries += result.deliveryCount` を実行する。
+        4. **回収数**: `result.acquiredItems` から今回正式に獲得したアイテム数を集計し、`collectedItemCount` へ加算する。
+        5. **新規アイテム追加**: `result.acquiredItems` の各アイテムを `inventory` へ追加。
+        6. **回収装備追加**: `result.recoveredItems` の各アイテムを `inventory` へ追加する。ただし発射前から所有していた装備の復帰であるため、`collectedItemCount` には加算しない。
+        7. **天体へのアイテム移動**: `result.lostToTarget` が存在する場合、対象の天体（母星またはクラッシュ先）にアイテムを移動する（`result.lostToTarget.target.addItems(result.lostToTarget.items)`）。
+        8. **帰還ボーナス**: `result.status === 'returned'` の場合、`gameBalance.RETURN_BONUS_INCREMENT` を `returnBonus` に加算する。
 
 - **`applyTransaction(transaction: TransactionResult): TransactionDelta`**
     - 施設取引などの資産変化を現在の状態に適用する。

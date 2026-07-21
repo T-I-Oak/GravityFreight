@@ -40,7 +40,9 @@ describe('RankTracker', () => {
     it('records a game result and returns category ranks', () => {
         tracker.initialize();
 
-        const ranks = tracker.recordGameResult(result(1000, 3, 8, '2026-01-01T00:00:00.000Z'));
+        const ranks = tracker.recordGameResult(result(1000, 3, 8, '2026-01-01T00:00:00.000Z', {
+            gameSessionId: 'session_1'
+        }));
 
         expect(ranks).toEqual({
             scoreRank: 1,
@@ -54,7 +56,8 @@ describe('RankTracker', () => {
                 score: 1000,
                 completedSectors: 2,
                 reachedSector: 3,
-                collectedItemCount: 8
+                collectedItemCount: 8,
+                gameSessionId: 'session_1'
             }
         ]);
         expect(repository.setSavedRankData).toHaveBeenCalledWith(tracker.getRankData());

@@ -33,11 +33,12 @@ function createController() {
         showSectorTitle: vi.fn(),
         showBuildScreen: vi.fn(),
         setFlightMode: vi.fn(),
-        showGameEndSequence: vi.fn()
+        showGameEndSequence: vi.fn(),
+        showAchievementToasts: vi.fn()
     };
     const worldRenderer = {
         setSector: vi.fn(),
-        playGameEndExitAnimation: vi.fn()
+        startWarpEffect: vi.fn()
     };
     const sectorFactory = vi.fn(({ sessionState: currentSession, isAnomaly }) => ({
         sectorNumber: currentSession.sectorNumber,
@@ -93,9 +94,12 @@ describe('SectorProgressionController', () => {
             source: 'game_record',
             keys: ['max_reached_sector']
         });
+        expect(context.uiController.showAchievementToasts).toHaveBeenCalledWith([
+            { achievementId: 'contract', tier: 1 }
+        ]);
         expect(context.worldRenderer.setSector).toHaveBeenCalledWith(sector);
         expect(context.uiController.updateHUDValue).toHaveBeenCalledWith('sector', 4);
-        expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(4, true);
+        expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(4, true, { type: 'default' });
         expect(context.uiController.showBuildScreen).not.toHaveBeenCalled();
         expect(context.uiController.setFlightMode).not.toHaveBeenCalled();
     });
@@ -110,7 +114,15 @@ describe('SectorProgressionController', () => {
             isAnomaly: true
         });
         expect(sector.isAnomaly).toBe(true);
-        expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(5, true);
+        expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(5, true, { type: 'default' });
+    });
+
+    it('passes the home sector title type to the ready notification', async () => {
+        context.sessionState.sectorNumber = 1;
+
+        await context.controller.beginSectorTransition({ sectorTitleType: 'home' });
+
+        expect(context.uiController.showSectorTitle).toHaveBeenCalledWith(2, false, { type: 'home' });
     });
 
     it('returns false when the session can continue', () => {
@@ -132,7 +144,10 @@ describe('SectorProgressionController', () => {
         expect(context.gameRecordTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
         expect(context.rankTracker.recordGameResult).toHaveBeenCalledWith(gameResult);
         expect(gameResult.rankings).toEqual({ scoreRank: 1, sectorRank: 2, collectedRank: 3 });
-        expect(context.worldRenderer.playGameEndExitAnimation).toHaveBeenCalledTimes(1);
+        expect(context.worldRenderer.startWarpEffect).toHaveBeenCalledWith(3200, { direction: 'reverse' });
+        expect(context.uiController.showAchievementToasts).toHaveBeenCalledWith([
+            { achievementId: 'contract', tier: 1 }
+        ]);
         expect(context.uiController.showGameEndSequence).toHaveBeenCalledWith(gameResult, gameOver, {
             achievements: [{ achievementId: 'contract', tier: 1 }]
         });

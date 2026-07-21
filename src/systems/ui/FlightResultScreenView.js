@@ -25,6 +25,8 @@ class FlightResultScreenView {
         this.countAnimationFrameId = null;
         this.resultHandler = null;
         this.mapToggleHandler = null;
+        this.shareHandler = null;
+        this.storyHandler = null;
         this.replayProtectFlow = replayProtectFlow;
         this.viewData = null;
         this.resultScreen = this.#requiredElement('#flight-result-screen');
@@ -54,6 +56,16 @@ class FlightResultScreenView {
 
     setMapToggleHandler(handler) {
         this.mapToggleHandler = handler;
+        this.#wireHandlers();
+    }
+
+    setShareHandler(handler) {
+        this.shareHandler = handler;
+        this.#wireHandlers();
+    }
+
+    setStoryHandler(handler) {
+        this.storyHandler = handler;
         this.#wireHandlers();
     }
 
@@ -128,13 +140,19 @@ class FlightResultScreenView {
             });
         }
 
+        if (this.shareHandler) {
+            this.#setOperationHandler('.flight-result-share-button', () => {
+                this.shareHandler(this.viewData);
+            });
+        }
+
         if (this.replayProtectFlow) {
             this.#setOperationHandler('.Badge.favorite', element => {
-                const isProtected = !element.classList.contains('state-active');
                 const result = this.replayProtectFlow.request({
                     source: 'result',
                     recordId: this.viewData?.replay?.id ?? null,
-                    favorite: isProtected,
+                    favorite: true,
+                    forceDialog: true,
                     root: this.resultScreen,
                     dialogSelector: '.flight-result-favorite-dialog',
                     dialogClassName: 'flight-result-favorite-dialog Panel color-theme-main',
@@ -144,11 +162,23 @@ class FlightResultScreenView {
                     currentRecord: {
                         score: this.viewData?.replay?.score ?? this.viewData?.totalScore ?? 0,
                         reachedSector: this.viewData?.replay?.reachedSector ?? this.viewData?.reachedSector ?? '-',
-                        createdAt: this.viewData?.replay?.createdAt ?? null
+                        createdAt: this.viewData?.replay?.createdAt ?? null,
+                        isNew: true
                     },
                     onComplete: completed => this.#applyProtectResult(element, completed)
                 });
                 this.#applyProtectResult(element, result);
+            });
+        }
+
+        if (this.storyHandler) {
+            this.resultScreen.querySelectorAll('.story-card[data-story-id]').forEach(card => {
+                if (card.dataset.handlerReady === 'true') {
+                    return;
+                }
+
+                card.dataset.handlerReady = 'true';
+                this.operationBinder(card, element => this.storyHandler(element.dataset.storyId));
             });
         }
     }

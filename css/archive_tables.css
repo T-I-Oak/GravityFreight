@@ -1,0 +1,163 @@
+/* テーブルの調整 */
+#archive-screen .panel-body {
+    padding: 0 var(--space-double);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#archive-screen .Well.ScrollArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    padding: 0; /* スクロールバーを端に寄せるために 0 に戻す */
+}
+
+#archive-screen .archive-ranking-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#archive-screen .archive-ranking-panel[hidden] {
+    display: none;
+}
+
+#archive-screen .archive-table-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-gutter: stable;
+}
+
+#archive-screen .archive-table-header-area {
+    padding-right: 12px;
+}
+
+#archive-screen .ArchiveTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* 特別な行の状態 */
+#archive-screen .ArchiveTable tr.state-new {
+    background: color-mix(in srgb, var(--color-theme-main), transparent 92%);
+    position: relative;
+}
+
+#archive-screen .ArchiveTable tr.state-new td:first-child {
+    border-left: 2px solid var(--color-theme-main);
+}
+
+/* NEW バッジの装飾 */
+#archive-screen .Badge.state-new,
+#archive-screen-overlay .Badge.state-new {
+    background: var(--color-theme-main);
+    color: rgba(0, 0, 0, 0.9);
+    font-weight: 950;
+    padding: 1px 4px;
+    font-size: 8px;
+    vertical-align: middle;
+    margin-left: var(--space-unit);
+    animation: none;
+}
+
+#archive-screen .ArchiveTable.table-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#archive-screen .ArchiveTable th {
+    text-align: left;
+    padding: var(--space-unit) var(--space-double);
+    font-size: 0.7em;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* num-* クラスが直接指定されている場合はその色を優先 */
+#archive-screen .ArchiveTable th.score { color: var(--color-num-score); }
+#archive-screen .ArchiveTable th.sector { color: var(--color-num-sector); }
+#archive-screen .ArchiveTable th.item-count { color: var(--color-num-item-count); }
+
+/* 選択中のカラム（軸）の強調 */
+#archive-screen .ArchiveTable .state-active-column {
+    opacity: 1;
+}
+
+#archive-screen .ArchiveTable th.state-active-column {
+    font-size: 0.8em;
+}
+
+#archive-screen .ArchiveTable td.state-active-column {
+    font-size: 1em;
+}
+
+#archive-screen .ArchiveTable.table-header th.state-active,
+#archive-screen .ArchiveTable.table-body td.state-active {
+    background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* Analytics Tab Column Layout */
+#archive-screen #tab-analytics .col-rank   { width: 10%; }
+#archive-screen #tab-analytics .col-score  { width: 22%; }
+#archive-screen #tab-analytics .col-sector { width: 15%; }
+#archive-screen #tab-analytics .col-count  { width: 23%; }
+#archive-screen #tab-analytics .col-date   { width: 30%; }
+
+/* Replay Tab Column Layout */
+#archive-screen #tab-replays .col-fav    { width: 64px; }
+#archive-screen #tab-replays .col-no     { width: 64px; }
+#archive-screen #tab-replays .col-sector { width: 20%; }
+#archive-screen #tab-replays .col-score  { width: 25%; }
+#archive-screen #tab-replays .col-date   { width: 55%; }
+
+#archive-screen .ArchiveTable td {
+    padding: var(--space-unit) var(--space-double);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#archive-screen .ArchiveTable .date-cell,
+#archive-screen-overlay .replay-protect-table .date-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-unit);
+    width: 100%;
+    min-width: 0;
+}
+
+#archive-screen .ArchiveTable .date-cell .date-label,
+#archive-screen-overlay .replay-protect-table .date-cell .date-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#archive-screen .ArchiveTable .date-cell .Badge.state-new,
+#archive-screen-overlay .replay-protect-table .date-cell .Badge.state-new {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+#archive-screen .ArchiveTable tr.state-active {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active {
+    background: transparent;
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td {
+    background: color-mix(in srgb, var(--color-theme-main), transparent 82%);
+}
+
+#archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td:first-child {
+    box-shadow: inset 4px 0 0 var(--color-theme-main);
+}

@@ -80,6 +80,25 @@ class AchievementTracker {
         return achievedCount / this.definitions.length;
     }
 
+    getAchievementTierCompletionRate() {
+        const totalTierCount = this.definitions.reduce(
+            (total, definition) => total + definition.tiers.length,
+            0
+        );
+        if (totalTierCount === 0) {
+            return 0;
+        }
+
+        const achievedTierCount = this.definitions.reduce((total, definition) => {
+            const achievedTier = this.#calculateAchievedTier(definition, this.#getValue(definition));
+            if (achievedTier === null) {
+                return total;
+            }
+            return total + (definition.tiers.length - achievedTier + 1);
+        }, 0);
+        return achievedTierCount / totalTierCount;
+    }
+
     #getValue(definition) {
         if (definition.source === 'game_record') {
             return this.gameRecordTracker.getRecordValue(definition.key);

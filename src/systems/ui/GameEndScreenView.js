@@ -17,12 +17,14 @@ const GRADE_TARGETS = {
 };
 
 class GameEndScreenView {
-    constructor({ document, gameDataRepository, operationBinder }) {
+    constructor({ document, gameDataRepository, operationBinder, playSE }) {
         this.document = document;
         this.gameDataRepository = gameDataRepository;
         this.operationBinder = operationBinder;
+        this.playSE = playSE || (() => {});
         this.root = this.#requiredElement('#game-result-scene-container');
         this.returnHandler = null;
+        this.shareHandler = null;
         this.showTimer = null;
     }
 
@@ -39,6 +41,7 @@ class GameEndScreenView {
             this.showTimer = null;
         }, RECEIPT_SHOW_DELAY_MS);
         this.#wireReturnButton();
+        this.#wireShareButton();
         this.#startStampAnimation();
     }
 
@@ -58,13 +61,18 @@ class GameEndScreenView {
         this.#wireReturnButton();
     }
 
+    setShareHandler(handler) {
+        this.shareHandler = handler;
+        this.#wireShareButton();
+    }
+
     #createHTML(gameResult, gameOver) {
         const evaluation = this.#createEvaluation(gameResult);
         const tier = this.#gradeToTier(evaluation.total.grade);
         const timestamp = this.#formatTimestamp(gameResult.createdAt);
 
         return `
-            <section class="Panel receipt ScrollArea" id="receipt-content-area">
+            <section class="Panel receipt" id="receipt-content-area">
                 <header class="panel-header TitleBox">
                     <h1 class="text-display text-center">${this.#text('gameEnd.title', 'TERMINAL REPORT')}</h1>
                     <p class="text-sub-display text-center">${this.#text('gameEnd.subtitle', 'GRAVITY FREIGHT CO. - FINAL EVALUATION')}</p>
@@ -103,9 +111,14 @@ class GameEndScreenView {
                 <footer class="panel-footer FlexCenter">
                     <div class="auth-status">${this.#text('gameEnd.authStatus', 'OFFICIAL PERFORMANCE LOG GRANTED')}</div>
                     <div class="timestamp">${escapeHtml(timestamp)}</div>
-                    <button class="Button state-primary button-large game-end-return-button" id="receipt-exit-btn">
-                        <span class="btn-main-label">${this.#text('gameEnd.endContract', 'END CONTRACT')}</span>
-                    </button>
+                    <div class="receipt-actions">
+                        <button class="Button state-primary button-large game-end-return-button" id="receipt-exit-btn">
+                            <span class="btn-main-label">${this.#text('gameEnd.endContract', 'END CONTRACT')}</span>
+                        </button>
+                        <button class="Button button-large game-end-share-button">
+                            <span class="btn-main-label">${this.#text('gameEnd.share', 'SHARE')}</span>
+                        </button>
+                    </div>
                 </footer>
             </section>
         `;
@@ -142,6 +155,18 @@ class GameEndScreenView {
         this.operationBinder(button, () => this.returnHandler());
     }
 
+    #wireShareButton() {
+        const button = this.root.querySelector('.game-end-share-button');
+        if (!button || !this.shareHandler || button.dataset.handlerReady === 'true') {
+            return;
+        }
+
+        button.dataset.handlerReady = 'true';
+        this.operationBinder(button, () => this.shareHandler({
+            receiptElement: this.root.querySelector('#receipt-content-area')
+        }));
+    }
+
     #startStampAnimation() {
         const stamp = this.root.querySelector('#report-stamp');
         if (!stamp) {
@@ -154,6 +179,7 @@ class GameEndScreenView {
             stamp.style.setProperty('--stamp-y', '0px');
             stamp.classList.add('state-active');
             this.root.classList.add('impact');
+            this.playSE('stamp');
         }, RECEIPT_SHOW_DELAY_MS + 1650);
     }
 

@@ -5,6 +5,9 @@ class BuildPanelView {
         this.document = document;
         this.operationBinder = operationBinder;
         this.selectionHandler = null;
+        this.assembleHandler = null;
+        this.launchHandler = null;
+        this.tabChangeHandler = null;
         this.selectionEnabled = true;
         this.panel = this.document.querySelector('#inventory-panel');
         this.buildButton = this.document.querySelector('#build-btn');
@@ -29,6 +32,7 @@ class BuildPanelView {
     show(viewData = null) {
         this.setSelectionEnabled(true);
         this.#open();
+        this.#activateTab('flight');
         this.#show(this.panel);
         if (viewData) {
             this.render(viewData);
@@ -44,10 +48,21 @@ class BuildPanelView {
         this.#hide(this.launchControl);
     }
 
-    showReadOnly() {
+    showReadOnly(viewData = null, options = {}) {
         this.setSelectionEnabled(false);
+        if (viewData) {
+            this.render(viewData);
+        }
+        if (options.activeTab) {
+            this.#activateTab(options.activeTab);
+        }
+        if (options.collapse !== false) {
+            this.close();
+        }
         this.#show(this.panel);
         this.#show(this.launchControl);
+        this.#disableActionButton(this.buildButton);
+        this.#disableActionButton(this.launchButton);
     }
 
     close() {
@@ -85,20 +100,59 @@ class BuildPanelView {
     }
 
     setAssembleHandler(handler) {
+        this.assembleHandler = handler;
         if (!this.buildButton) {
             return;
         }
+        if (this.buildButton.dataset.assembleHandlerReady === 'true') {
+            return;
+        }
 
+        this.buildButton.dataset.assembleHandlerReady = 'true';
         this.operationBinder(this.buildButton, element => {
-            const result = handler(element);
-            this.#activateTab('flight');
-            return result;
+            return this.#runLockedOperation(element, () => {
+                const result = this.assembleHandler?.(element);
+                this.#activateTab('flight');
+                return result;
+            });
         });
     }
 
     setLaunchHandler(handler) {
+        this.launchHandler = handler;
         if (this.launchButton) {
-            this.operationBinder(this.launchButton, () => handler());
+            if (this.launchButton.dataset.launchHandlerReady === 'true') {
+                return;
+            }
+
+            this.launchButton.dataset.launchHandlerReady = 'true';
+            this.operationBinder(this.launchButton, element => (
+                this.#runLockedOperation(element, () => this.launchHandler?.())
+            ));
+        }
+    }
+
+    setTabChangeHandler(handler) {
+        this.tabChangeHandler = handler;
+    }
+
+    #runLockedOperation(button, handler) {
+        if (button.dataset.operationLocked === 'true') {
+            return null;
+        }
+
+        button.dataset.operationLocked = 'true';
+        button.disabled = true;
+        button.classList.add('state-disabled');
+        button.classList.remove('state-notable');
+
+        try {
+            return handler();
+        } catch (error) {
+            delete button.dataset.operationLocked;
+            button.disabled = false;
+            button.classList.remove('state-disabled');
+            throw error;
         }
     }
 
@@ -130,12 +184,23 @@ class BuildPanelView {
         }
 
         const ready = !!launch.ready;
+        this.#unlockOperationButton(this.launchButton);
         this.launchButton.disabled = !ready;
         this.launchButton.classList.remove('state-hidden');
         this.launchButton.classList.toggle('state-disabled', !ready);
         this.launchButton.classList.toggle('state-notable', !ready);
         this.#setButtonText(this.launchButton, launch);
         this.#updateLaunchBonus(launch.bonusText);
+    }
+
+    #disableActionButton(button) {
+        if (!button) {
+            return;
+        }
+
+        button.disabled = true;
+        button.classList.add('state-disabled');
+        button.classList.remove('state-notable');
     }
 
     #updateLaunchBonus(bonusText = '') {
@@ -154,10 +219,15 @@ class BuildPanelView {
         }
 
         const ready = !!assembly.ready;
+        this.#unlockOperationButton(this.buildButton);
         this.buildButton.disabled = !ready;
         this.buildButton.classList.toggle('state-disabled', !ready);
         this.buildButton.classList.toggle('state-notable', !ready);
         this.#setButtonText(this.buildButton, assembly);
+    }
+
+    #unlockOperationButton(button) {
+        delete button.dataset.operationLocked;
     }
 
     #setButtonText(button, viewData) {
@@ -193,6 +263,7 @@ class BuildPanelView {
             const element = this.document.querySelector(`#${elementId}`);
             element?.classList.toggle('state-hidden', key !== tabId);
         });
+        this.tabChangeHandler?.(tabId);
     }
 
     #wirePanelToggle() {
@@ -225,11 +296,14 @@ class BuildPanelView {
                 if (!this.selectionEnabled) {
                     return;
                 }
-                this.selectionHandler({
+                const viewData = this.selectionHandler({
                     category,
                     uid: element.dataset.uid
                 });
-            }, 'select');
+                if (viewData) {
+                    this.render(viewData);
+                }
+            });
         });
     }
 

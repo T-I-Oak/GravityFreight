@@ -132,7 +132,6 @@ class Rocket {
 
     recordTrailPoint(point = this.position) {
         this.actualTrail.push(copyVector(point));
-        this.#trimTrail();
     }
 
     setRocketItem(item) {
@@ -315,16 +314,6 @@ class Rocket {
         return Math.max(0, Math.floor(this.booster.duration));
     }
 
-    #trimTrail() {
-        if (this.isGhost) {
-            return;
-        }
-
-        const maxLength = this.#getGameDataRepository()?.getGameBalance?.().TRAIL_MAX_LENGTH ?? 80;
-        if (this.actualTrail.length > maxLength) {
-            this.actualTrail.splice(0, this.actualTrail.length - maxLength);
-        }
-    }
 }
 
 export default Rocket;

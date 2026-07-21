@@ -7,17 +7,18 @@
 - **役割**: リプレイ保護操作の共通フロー。
 - **責務**:
     - 航行結果画面と Archive Replays タブから呼ばれる replay protect 操作を共通化する。
-    - protect 設定時に既存 protected replay が 5 件ある場合、呼び出し元に応じて処理を分岐する。
-    - 航行結果画面では、現在の航行結果を含めた保護対象編集モーダルを表示する。
+    - protect 設定要求を、呼び出し元に応じて即時更新または保護対象編集モーダルへ振り分ける。
+    - 航行結果画面では、既存 protected replay 件数に関わらず、現在の航行結果を含めた保護対象編集モーダルを表示する。
     - Archive Replays タブでは、画面内で自由に protect / unprotect できるため、6件目の protect は保存せず、上限到達結果を呼び出し元へ返す。
     - 航行結果画面のモーダルでは、先頭に今回の航行結果を表示し、保存済み replay record 全件を続けて表示する。
+    - 航行結果画面のモーダルで表示する `NEW` バッジは、Archive Replays タブと同じ date-cell 構造とスタイル規約を使用する。日時または `CURRENT FLIGHT` のラベルが長い場合はラベル側を省略し、`NEW` バッジを右寄せで維持する。
     - 表示順はスコア降順、同点の場合は新しい記録を上位とする。今回の航行結果も同じ基準で並べ、現在どの順位相当か判断できるようにする。
     - `No.` 欄は、今回の航行結果では `CURRENT` と表示する。
     - 保存済み replay record の `No.` 欄は、Archive Replays タブと同じソート規則で付与した2桁の表示番号を表示する。
     - `No.` は永続データではなく、画面表示用に生成する値として扱う。
     - モーダル内の protect 選択数が最大5件以内になるようにユーザーが選択する。
     - OK 確定時、既存 protected replay のうち選択解除されたものを先に unprotect し、その後に今回の航行結果の protect 状態を保存する。
-    - キャンセルされた場合は操作対象 replay を protect せず、失敗結果を呼び出し元へ返す。
+    - キャンセルされた場合は今回の航行結果を protect せず、失敗結果を呼び出し元へ返す。
     - モーダルは、呼び出し元画面の横に並べず、画面中央に表示する。
     - 候補テーブルは Archive Replays タブと同様に `Well` 内へ配置し、行数が多い場合はテーブル本体をスクロールする。
     - 候補は record id ではなく、整形済み日時、到達セクター、スコアなど、ユーザーが識別できる航行記録情報で表示する。
@@ -37,8 +38,9 @@
 - **`request(options): ReplayProtectResult`**
     - `options.source` は `archive` または `result` を指定する。
     - `options.recordId` は操作対象の replay record id を指定する。
-    - `options.favorite` が `false` の場合は確認なしで commit する。
-    - `options.favorite` が `true` かつ protected replay が 5 件未満の場合は確認なしで commit する。
+    - `options.source === 'result'` かつ `options.favorite === true` かつ `options.forceDialog === true` の場合は、保護対象編集モーダルを表示し、`{ status: 'pending', success: false }` を返す。
+    - 上記以外で `options.favorite` が `false` の場合は確認なしで commit する。
+    - 上記以外で `options.favorite` が `true` かつ protected replay が 5 件未満の場合は確認なしで commit する。
     - `options.favorite` が `true` かつ protected replay が 5 件あり、操作対象が未 protected の場合:
         - `options.source === 'result'` では保護対象編集モーダルを表示し、`{ status: 'pending', success: false }` を返す。
         - `options.source === 'archive'` では保存せず、`{ status: 'limit', success: false }` を返す。

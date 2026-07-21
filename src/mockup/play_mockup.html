@@ -68,7 +68,7 @@
             <div class="panel-body ScrollArea" id="panel-content">
                 <!-- Tab: FLIGHT -->
                 <div class="tab-content" id="tab-flight">
-                    <div class="flight-scroll ScrollArea">
+                    <div id="flight-inventory-list" class="flight-scroll ScrollArea">
                         <section class="section rocket" id="section-rocket">
                             <header class="section-header">
                                 <h3 class="section-title">ROCKET</h3>
@@ -102,7 +102,7 @@
 
                 <!-- Tab: ASSEMBLY -->
                 <div id="tab-assembly" class="tab-content state-hidden">
-                    <div class="assembly-scroll ScrollArea">
+                    <div id="assembly-inventory-list" class="assembly-scroll ScrollArea">
                         <section class="section chassis">
                             <header class="section-header">
                                 <h3 class="section-title">CHASSIS</h3>
@@ -181,7 +181,7 @@
                 ],
                 module: [
                     createItemViewData(ITEM_REGISTRY['mod_capacity']),
-                    createItemViewData(ITEM_REGISTRY['mod_star_breaker'], { maxCharges: 2, charges: 2 })
+                    createItemViewData(ITEM_REGISTRY['mod_star_breaker'], { maxCharges: 3, charges: 3 })
                 ]
             }
         };

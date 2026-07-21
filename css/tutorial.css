@@ -1,0 +1,78 @@
+:root {
+    --tutorial-mask-color: rgba(0, 0, 0, 0.68);
+    --tutorial-highlight-stroke: color-mix(in srgb, var(--color-theme-main), transparent 8%);
+    --tutorial-highlight-shadow: color-mix(in srgb, var(--color-theme-main), transparent 10%);
+    --tutorial-highlight-shadow-blur: 16;
+}
+
+#tutorial-mask-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: var(--z-system);
+    pointer-events: auto;
+}
+
+#tutorial-mask-canvas.hidden,
+#tutorial-tooltip.hidden {
+    display: none;
+}
+
+.TutorialTooltip {
+    position: fixed;
+    z-index: calc(var(--z-system) + 1);
+    width: min(320px, calc(100vw - 32px));
+    padding: 16px;
+    border: 1px solid var(--color-theme-main);
+    border-radius: 8px;
+    background: rgba(5, 8, 18, 0.94);
+    color: var(--color-text-base);
+    box-shadow: 0 0 18px rgba(0, 255, 204, 0.22);
+    overflow: visible;
+}
+
+.TutorialTooltip > :not(.tooltip-arrow) {
+    position: relative;
+    z-index: 1;
+}
+
+.TutorialTooltip h2 {
+    margin: 0 0 8px;
+    color: var(--color-theme-main);
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0;
+}
+
+.TutorialTooltip p {
+    margin: 0 0 12px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.TutorialTooltip .Button {
+    width: 100%;
+}
+
+.tooltip-arrow {
+    position: absolute;
+    left: calc(50% - 8px);
+    width: 16px;
+    height: 16px;
+    background: rgba(5, 8, 18, 0.94);
+    border-color: var(--color-theme-main);
+    border-style: solid;
+    transform: rotate(45deg);
+    z-index: 0;
+}
+
+.tooltip-arrow.arrow-up {
+    top: -8px;
+    border-width: 1px 0 0 1px;
+}
+
+.tooltip-arrow.arrow-down {
+    bottom: -8px;
+    border-width: 0 1px 1px 0;
+}

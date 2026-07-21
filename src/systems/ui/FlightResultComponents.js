@@ -20,6 +20,7 @@ export class FlightResultComponents {
         const scoreLabel = gameDataRepository.getUiText('flightResult.stats.score');
         const creditsLabel = gameDataRepository.getUiText('flightResult.stats.credits');
         const viewMapLabel = gameDataRepository.getUiText('flightResult.actions.viewMap');
+        const shareLabel = gameDataRepository.getUiText('flightResult.actions.share');
         const continueLabel = gameDataRepository.getUiText('flightResult.actions.continue');
         const entriesHTML = (viewData.entries || [])
             .map(entry => this.generateEntryHTML(entry))
@@ -27,9 +28,7 @@ export class FlightResultComponents {
         const storyHTML = (viewData.storyCards || [])
             .map(story => UIComponents.generateStoryCardHTML(story.id, gameDataRepository, story.isUnread))
             .join('');
-        const itemReportHTML = (viewData.itemReport || [])
-            .map((entry, index) => this.generateItemReportHTML(entry, gameDataRepository, index))
-            .join('');
+        const itemReportHTML = this.generateItemReportListHTML(viewData.itemReport || [], gameDataRepository);
 
         return `
             <section class="Panel home">
@@ -81,6 +80,9 @@ export class FlightResultComponents {
                     <button class="Button button-large flight-result-map-button">
                         <span class="btn-main-label">${viewMapLabel}</span>
                     </button>
+                    <button class="Button button-large flight-result-share-button">
+                        <span class="btn-main-label">${shareLabel}</span>
+                    </button>
                     <button class="Button state-primary button-large flight-result-action-button ${viewData.themeClass || 'home'}">
                         <span class="btn-main-label">${viewData.actionLabel || continueLabel}</span>
                     </button>
@@ -104,6 +106,24 @@ export class FlightResultComponents {
                 <span class="report-data-value num-coin">${coin}</span>
             </div>
         `;
+    }
+
+    static generateItemReportListHTML(itemReport, gameDataRepository) {
+        if (itemReport.length === 0) {
+            return `
+                <div class="acquired-item-report state-staggered-item" style="--item-appear-index: 0;">
+                    ${UIComponents.generatePlaceholderHTML(
+        gameDataRepository.getUiText('flightResult.assets.emptyText'),
+        gameDataRepository.getUiText('flightResult.assets.emptySubtext'),
+        { category: 'cargo' }
+    )}
+                </div>
+            `;
+        }
+
+        return itemReport
+            .map((entry, index) => this.generateItemReportHTML(entry, gameDataRepository, index))
+            .join('');
     }
 
     static generateItemReportHTML(entry, gameDataRepository, index = 0) {

@@ -227,6 +227,7 @@
     - 施設画面全体の HTML を生成する。
     - `UIComponents.generateCardHTML` と `UIComponents.generatePlaceholderHTML` を組み合わせる。
     - 施設メタ情報、セクション、取引候補、所持コインを `GameController` が作成した view data から描画する。
+    - `section.headerVariant === 'category'` の場合は、ビルドパネルのカテゴリ見出しと同じ意味のヘッダーとして扱い、カテゴリ名だけを表示する。サブテキストは表示しない。
 - **境界**: 取引成立時の資産反映、記録・実績更新、施設固有の副作用は `GameController` / `EconomySystem` / `SessionState` の責務であり、Facility 生成処理は表示だけを担当する。
 
 ---

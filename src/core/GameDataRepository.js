@@ -2,6 +2,7 @@ import itemsData from '../assets/data/items.json';
 import storiesData from '../assets/data/content_stories.json';
 import achievementsData from '../assets/data/content_achievements.json';
 import uiData from '../assets/data/content_ui.json';
+import howToPlayData from '../assets/data/content_how_to_play.json';
 import configData from '../assets/data/config.json';
 import packageData from '../../package.json';
 import { expandLanguageResource as defaultExpandLanguageResource } from '../../../GameWorksOAK/src/lib/core/i18n.js';
@@ -12,7 +13,8 @@ const SAVE_KEYS = {
     storyProgress: 'story_progress',
     gameRecordData: 'game_record_data',
     rankData: 'rank_data',
-    flightRecordIndex: 'flight_record_index'
+    flightRecordIndex: 'flight_record_index',
+    tutorialState: 'tutorial_state'
 };
 
 const ARC_FACILITY_WIDTHS = {
@@ -47,6 +49,7 @@ class GameDataRepository {
         this.content = {
             ...storiesData,
             ...achievementsData,
+            ...howToPlayData,
             ...uiData
         };
         this.config = configData;
@@ -106,6 +109,15 @@ class GameDataRepository {
             throw new Error(`[GameDataRepository] Facility not found: ${idOrType}`);
         }
         return this.expandLanguageResource(facility);
+    }
+
+    getStoryCategoryDefinition(id) {
+        this.#ensureLoaded();
+        const category = this.config.storyCategories?.[id];
+        if (!category) {
+            throw new Error(`[GameDataRepository] Story category not found: ${id}`);
+        }
+        return this.expandLanguageResource(category);
     }
 
     getStoryContent(id) {
@@ -211,6 +223,14 @@ class GameDataRepository {
 
     setSavedFlightRecordIndex(data) {
         this.#setSaved(SAVE_KEYS.flightRecordIndex, data);
+    }
+
+    getSavedTutorialState(migrationMap) {
+        return this.#getSaved(SAVE_KEYS.tutorialState, migrationMap);
+    }
+
+    setSavedTutorialState(data) {
+        this.#setSaved(SAVE_KEYS.tutorialState, data);
     }
 
     #getSaved(key, migrationMap) {

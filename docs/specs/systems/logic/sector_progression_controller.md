@@ -26,7 +26,7 @@
         2. `GameRecordTracker.recordGameResult(gameResult)` を呼び出す。
         3. `RankTracker.recordGameResult(gameResult)` を呼び出し、戻り値の `scoreRank`、`sectorRank`、`collectedRank` を `gameResult.rankings` として保持する。
         4. 更新キーがある場合、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
-        5. `WorldRenderer.playGameEndExitAnimation()` を呼び出し、現在セクターのマップを背景に逆方向ワープを開始する。
+        5. `WorldRenderer.startWarpEffect(3200, { direction: 'reverse' })` を呼び出し、現在セクターのマップを背景に逆方向ワープを開始する。
         6. `UIController.showGameEndSequence(gameResult, gameOver, { achievements })` を呼び出す。
         7. `true` を返す。
     - ランキング登録は、ゲームオーバー判定が成立し、ゲーム終了画面へ遷移する確定タイミングでのみ行う。航行終了後または施設退出後でも、契約が継続する場合は登録しない。
@@ -38,7 +38,9 @@
         2. `Sector` を生成する。`options.isAnomaly` が未指定の場合は、インクリメント後のセクター番号が5の倍数なら `true`、それ以外は `false` とする。
         3. `GameRecordTracker.recordSectorStart(sessionState)` を呼び出す。
         4. 更新キーがある場合、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出す。
-        5. `WorldRenderer.setSector(sector)`、`UIController.updateHUDValue('sector', sectorNumber)`、`UIController.showSectorTitle(sectorNumber, sector.isAnomaly)` を呼び出す。
+        5. `WorldRenderer.setSector(sector)`、`UIController.updateHUDValue('sector', sectorNumber)`、`UIController.showSectorTitle(sectorNumber, sector.isAnomaly, { type })` を呼び出す。
+            - `options.sectorTitleType` が指定された場合は、その値を `type` として渡す。
+            - 未指定の場合は `type: 'default'` とする。
         6. 生成した `Sector` を返す。
 
 ## 3. 備考

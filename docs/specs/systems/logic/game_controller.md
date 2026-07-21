@@ -8,8 +8,9 @@
 - **責務**:
     - **ゲーム内遷移の統括**: ワープ演出、ビルド画面、航行画面、リザルト画面、および**各施設画面**の遷移制御。
     - **ゲーム内入力の処理**: ビルドパネル操作、Canvas 入力（パン・回転・AIM）、および**施設内取引ボタン**の処理。
-    - **ロジックの実行**: セクター生成、パーツ消費、物理計算サービスの呼び出し、終了判定。
-    - **表示データ生成の委譲**: ビルド画面の inventory 表示データは `BuildScreenPresenter` へ委譲し、`GameController` は現在状態と選択状態を渡す。
+    - **ロジックの実行**: セクター生成、航行開始、物理計算サービスの呼び出し、終了判定。
+    - **表示データ生成の委譲**: ビルド画面の inventory 表示データは `BuildScreenPresenter`、航行結果 view data は `FlightResultViewDataFactory`、共有用 map data は `ShareMapViewDataFactory` へ委譲し、`GameController` は現在状態を渡して進行を制御する。
+    - **入力補助の委譲**: Canvas 入力の意味付けは `MapInteractionController`、チュートリアル用 canvas target / focus bounds の解決は `TutorialCanvasTargetResolver` へ委譲する。
 
 ## 2. インターフェース (Interface)
 
@@ -24,6 +25,8 @@
 - **`constructor(infrastructure: object)`**
     - `AppOrchestrator` から渡される共通基盤（UI, Renderer, Sound, Data, Services 等）への参照を保持する。
     - `BuildScreenPresenter` を保持し、ビルド画面表示用 view data 生成に使用する。
+    - `LaunchSelectionFactory` を保持し、FLIGHT タブの選択状態から航行用 `Rocket` を生成する。
+    - `FlightResultViewDataFactory`、`ShareMapViewDataFactory`、`TutorialCanvasTargetResolver` を保持し、それぞれ航行結果 view data、共有 map data、チュートリアル canvas 座標解決に使用する。
 
 - **`start(): void`**
     - ゲームを開始する。
@@ -49,6 +52,7 @@
         1. **データ準備**:
             - 交易所の場合、`EconomySystem.generateTradingPostStock(sessionState)` を実行。
             - Trading Post は、販売在庫と inventory 内の売却候補を表示用データへ変換する。
+            - Trading Post の売却候補はビルドパネルと同じカテゴリ順 (`rocket`, `launcher`, `booster`, `chassis`, `logic`, `module`) で section を分け、各 section はカテゴリ名のみのヘッダーを持つ。サブテキストは付けない。
         - Repair Dock は、所持している全 launcher の修理候補と、現在の RocketItem の分解候補を表示用データへ変換する。最大耐久度まで回復済みの launcher は disabled とする。
             - Black Market は、100c / 500c 取引メニューを表示用データへ変換する。
             - 施設入場時に、その滞在中の獲得アイテム表示と Black Market 購入済み状態をリセットする。
@@ -72,12 +76,19 @@
         - 施設画面の再生成時、フッターの coin 表示は取引前の値で描画し、その後 `UIController.updateFacilityCredits()` に取引後の値を渡してカウントアップ/カウントダウンさせる。再生成後の操作判定に使う `currentFacilityViewData` は取引後の値を保持する。
         - HUD の coin 表示は取引後の `SessionState.coins` を即時反映する。
 
+- **`refreshCurrentView(): BuildScreenViewData | FacilityViewData | null`**
+    - 言語設定など、表示リソースが切り替わったときに現在画面を再生成する。
+    - 施設滞在中は `FacilityFlowController.refreshView({ collapseBuildPanel: false })` を呼び、施設 view data と read-only build panel の表示を現在リソースで再生成する。
+    - 施設外では `BuildFlowController.showBuildScreen()` を呼び、ビルドパネル内の item card と操作ラベルを現在リソースで再生成する。
+    - 再生成後、必要な操作ハンドラを再登録し、AIM 可能状態であれば予測線を再計算する。
+
 - **`leaveFacility(): void`**
     - 施設を出発し、次セクターへ向かう。
     - **内部挙動**:
         1. `checkGameOverAndStartEndSequence()` を実行する。
-        2. ゲームオーバーでない場合は、`this.beginSectorTransition()` を実行。
-        3. ※ 次セクター生成時に `Sector` インスタンスが新しくなるため、割引率は自動的に 0 にリセットされる。
+        2. ゲームオーバーでない場合、退場元施設が Black Market なら `SessionState.recordBlackMarketVisit()` を実行する。
+        3. `this.beginSectorTransition()` を実行。
+        4. ※ 次セクター生成時に `Sector` インスタンスが新しくなるため、割引率は自動的に 0 にリセットされる。
     - セクター進行と契約終了判定の具体処理は `SectorProgressionController` に委譲する。
 
 - **`checkGameOverAndStartEndSequence(): boolean`**
@@ -90,7 +101,7 @@
         4. `GameRecordTracker.recordGameResult(gameResult)` を呼び出し、契約完了回数など契約終了時にのみ確定する記録値を更新する。
         5. `RankTracker.recordGameResult(gameResult)` を呼び出し、ゲーム1プレイ単位のランキング・推移記録へ反映する。
         6. `AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['lifetime_contracts'] })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
-        7. `worldRenderer.playGameEndExitAnimation()` で現在セクターから離脱する逆方向ワープを開始する。
+        7. `worldRenderer.startWarpEffect(3200, { direction: 'reverse' })` で現在セクターから離脱する逆方向ワープを開始する。
         8. `uiController.showGameEndSequence(gameResult, gameOver)` を実行し、`true` を返す。
     - ランキング登録はゲーム終了画面へ遷移する確定タイミングでのみ行い、契約が継続する航行終了・施設退出では行わない。
 
@@ -140,6 +151,7 @@
         7. プレビュー用 `Rocket` の初速は `Rocket.getInitialVelocity(sessionState.returnBonus)` で算出し、同一セクター内の帰還ボーナスを AIM 予測へ反映する。
         8. `TrajectoryPredictor.predictPath(previewRocket, currentSector)` の結果から `actualTrail` を取り出し、発射位置を先頭に加えた座標列を `WorldRenderer.setPredictionPath()` へ渡す。AIM 可能状態の間、予測線は常に表示対象とする。AIM 可能状態で `actualTrail` が空になる場合は、予測計算またはパーツ性能定義の不整合として扱い、代替線で隠蔽しない。
         9. `hover` は `CameraController.toWorld()` でワールド座標へ変換し、`CelestialBody` の半径に `mapConstants.STAR_HIT_MARGIN` を加味して対象天体を判定する。対象天体が item を保持している場合のみ `UIController.showStarInfo(body, displayPoint)` を呼び出し、それ以外は `UIController.hideStarInfo()` を呼び出す。`hoverleave` では必ず非表示にする。
+        10. `pointerType: "touch"` の `pointerdown` が item を保持する天体、または配送 cargo の exit arc アイコン上で発生した場合は、PC の hover 相当として情報パネルを表示する。この場合は同じ pointerdown を pan / rotate / AIM としては処理しない。
     - **責務境界**: ブラウザイベントの購読や2本指入力の正規化は `UIController`、座標変換・パン・回転・ズームの実計算は `CameraController`、描画更新は `WorldRenderer` の責務とする。
 
 - **`beginSectorTransition(): Promise<void>`**
@@ -155,6 +167,8 @@
         - **`this.currentSector = new Sector(sessionState, isAnomaly)`** を実行して新マップを生成。
         - `SessionState.reachedSector` が更新された場合は、`GameRecordTracker.recordSectorStart(sessionState)` を呼び出し、`AchievementTracker.evaluateAchievements({ source: 'game_record', keys: ['max_reached_sector'] })` を呼び出す。
     3. **同期**: HUDの数値表示（セクター番号等）を最新状態に更新し、`worldRenderer` への新マップセット、セクタータイトル表示を行う。
+        - セクター到達時の特殊ストーリーが有効な場合、`SectorProgressionController.beginSectorTransition()` へ `sectorTitleType: 'home'` を渡し、セクター開始表示を `HOME SECTOR {sectorNumber} READY` にする。
+        - 特殊ストーリーが表示された場合、表示後に `StorySystem.updateReadStatus(storyId)` を呼び出して既読化し、`AchievementTracker.evaluateAchievements({ source: 'story_read', keys: ['total'] })` を呼び出す。`HOME25` は T/R/B 系列別実績には含めないため、評価キーは `total` のみとする。
     4. **演出終了**: 各演出の完了後に `uiController.setFlightMode(false)` で操作ロックを解除し、`BuildFlowController.showBuildScreen()` を実行する。ビルドパネルはワープ演出中には表示せず、このタイミングで初めて表示する。
 
 - **`launchRocket(rocket: Rocket, angle: number): void`**
@@ -170,14 +184,13 @@
 - **`launchSelectedRocket(): Rocket`**
     - FLIGHT タブで選択済みの発射構成から `Rocket` を生成し、`launchRocket()` へ渡す。
     - **内部挙動**:
-        1. `BuildFlowController.currentBuildSelection` から `rocket`, `launcher`, `booster` の stack uid を取得する。`rocket` と `launcher` が未選択のまま呼び出された場合は UI 状態とロジック状態の不整合としてエラーを投げる。
-        2. `sessionState.inventory.popItemByUid()` で選択中の RocketItem, Launcher, Booster を inventory から抽出する。
-        3. 抽出した構成で `Rocket` を生成する。発射角度は最新の AIM 操作で保持した角度を使用し、初期位置はその角度に対応する母星中心から `home.radius + gameBalance.SHIP_START_OFFSET` world px の位置とする。
-        4. Launcher / Booster の使用状態を反映する。Booster が `preventsLauncherWear` を持つ場合は Launcher の耐久度消費を免除し、Launcher は inventory へ戻す。
+        1. `LaunchSelectionFactory.createRocketFromSelection()` を呼び出す。
+        2. `LaunchSelectionFactory` は `BuildFlowController.currentBuildSelection` から `rocket`, `launcher`, `booster` の stack uid を取得する。`rocket` と `launcher` が未選択のまま呼び出された場合は UI 状態とロジック状態の不整合としてエラーを投げる。
+        3. `LaunchSelectionFactory` は `sessionState.inventory.popItemByUid()` で選択中の RocketItem, Launcher, Booster を inventory から抽出し、最新の AIM 角度と母星からの発射位置で `Rocket` を生成する。
+        4. `LaunchSelectionFactory` は Launcher / Booster の使用状態を反映する。Booster が `preventsLauncherWear` を持つ場合は Launcher の耐久度消費を免除し、Launcher は inventory へ戻す。
         5. `maxCharges > 0` の発射装備は耐久度を減算し、耐久度が残っている場合のみ inventory へ戻す。`maxCharges` を持たない Booster は1回限りの消耗品として扱い、使用後は inventory へ戻さない。
-        6. 発射構成の抽出後、`BuildFlowController.resetFlightSelection()` で FLIGHT タブの選択状態を解除し、`WorldRenderer.clearAimRocket()` と `WorldRenderer.clearPredictionPath()` で AIM 中の表示を消去する。
-        7. `BuildFlowController.showBuildScreen()` で消費後の inventory と launch button 状態を再描画する。
-        8. `launchRocket(rocket)` を呼び出し、生成した `Rocket` を返す。
+        6. `LaunchSelectionFactory` は発射構成の抽出後、`BuildFlowController.resetFlightSelection()` と `BuildFlowController.showBuildScreen()` を呼び出し、消費後の inventory と launch button 状態を再描画する。
+        7. `GameController` は生成された `Rocket` を `launchRocket(rocket)` へ渡し、その `Rocket` を返す。
 
 - **航行更新ループ**
     - 航行中の物理更新、HUD 更新、終了判定の監視は `NavigationLoopController` へ委譲する。
@@ -195,12 +208,15 @@
             - **物語解放**: `settlement.unlockedBranchId` が存在する場合、その ID を用いて `StorySystem.unlockNextStep(id)` を実行する。
             - **リプレイ記録**: 航行単位のリプレイ記録は、この航行終了処理内で `FlightRecorder.recordFlightResult(resultContext)` を呼び出して確定する。`resultContext` には航行終了時メタ情報のみを含め、発射時 snapshot は `FlightRecorder` が保持している `pendingRecordDraft` を使用する。
             - **実績記録**: 航行終了時点で `GameRecordTracker.recordFlightResult(resultContext)` を必ず呼び出す。その後、航行終了時に更新された記録キーを指定して `AchievementTracker.evaluateAchievements({ source: 'game_record', keys })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
+            - **共有用マップ情報**: `ShareMapViewDataFactory.create({ sector, rocket })` を呼び出し、航行結果画面の `viewData.shareMap` に航行終了時点の sector body / exit arc / exit facility name / rocket trail / rocket final position / velocity を純データとして含める。共有画像ではこのデータを使い、通常画面とは別に薄く残る航跡、到着地点のロケット、施設名を描画する。
+            - **配送実績記録**: `settlement.deliveryCount > 0` の場合は `GameRecordTracker.recordDeliverySuccess({ count: settlement.deliveryCount, currentContractDeliveries: sessionState.totalDeliveries })` を呼び出し、累積配達数と1契約内最高配達数を更新する。返却された記録キーは航行終了時の実績判定キーに合流させる。
         4. **演出開始**:
             - `worldRenderer.disableSonar()`。
+            - `uiController.playFlightEndSE(settlement.status)` を実行し、航行終了種別に対応する SE を再生する。
             - `worldRenderer.playFinishAnimation(result)` を実行。
         5. **演出完了待機**: `await` により演出完了を待機する。
         6. **画面遷移**:
-            - `settlement`、リプレイ保存状態、実績通知、ストーリー状態から航行結果表示用 view data を生成する。
+            - `FlightResultViewDataFactory.createViewData()` で、`settlement`、リプレイ保存状態、実績通知、ストーリー状態から航行結果表示用 view data を生成する。
             - 航行結果タイトルと遷移ボタン文言は `GameDataRepository.getUiText()` で UI resource から取得する。セクター番号や施設名が必要な文言は取得後に `{sector}` / `{facility}` を置換する。
             - `uiController.showResultScreen(viewData)` を呼び出す。
 
@@ -208,7 +224,13 @@
     - 指定されたインデックス（0〜2）のメールボタンがクリックされた際の処理。
     - **内部挙動**:
         1. **状況確認**: `StorySystem.getStoryStatus()[index]` から対象の物語 ID を取得する。
-        2. **メッセージ取得**: `StorySystem.getMessageData(status.id)` から詳細データを取得。
-        3. **モーダル表示**: `uiController.showStoryModal(message)` を実行。
-        4. **既読化・保存**: `StorySystem.updateReadStatus(message.id)` を実行する。その後 `AchievementTracker.evaluateAchievements({ source: 'story_read', keys: ['total', 'T', 'R', 'B'] })` を呼び出し、新規到達 tier があれば UI 通知へ渡す。
-        5. **通知停止**: 該当スロットの明滅を停止させるため、再度 `uiController.updateMailStatus` で状態を更新する。
+        2. 対象 ID を `handleStoryOpen(storyId)` へ渡す。
+- **`handleStoryOpen(storyId: string): object | null`**
+    - HUD のメールアイコン、または航行結果画面のストーリーカードから呼ばれる共通のストーリー閲覧処理。
+    - **内部挙動**:
+        1. `StorySystem.getStoryStatus()` から対象のストーリー状態とスロット index を取得する。
+        2. `uiController.showStoryModal(storyId)` を実行する。
+        3. 対象が未読の場合のみ `StorySystem.updateReadStatus(storyId)` を実行し、`AchievementTracker.evaluateAchievements({ source: 'story_read', keys: ['total', type] })` を呼び出す。
+        4. 新規到達 tier があれば `uiController.showAchievementToasts(events)` へ渡す。
+        5. 該当スロットの未読明滅を停止させるため、更新後の状態で `uiController.updateMailStatus(index, type, isUnread)` を呼び出す。
+        6. 対象ストーリーが現在の story status に存在しない場合は何もせず `null` を返す。

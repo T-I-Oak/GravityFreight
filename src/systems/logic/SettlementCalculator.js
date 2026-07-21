@@ -25,6 +25,7 @@ class SettlementCalculator {
         let totalScore = flightData.ticks || 0;
         let totalCoins = 0;
         let unlockedBranchId = null;
+        let deliveryCount = 0;
 
         entries.push({
             label: this.gameDataRepository.getUiText('flightResult.entries.flightDuration'),
@@ -42,19 +43,22 @@ class SettlementCalculator {
         }
 
         const isRecoveryResult = status === 'cleared' || status === 'returned';
-        const collectedCoin = isRecoveryResult
+        let collectedCoin = isRecoveryResult
             ? this.#sumCoinValues(heldItems.filter(item => item.category === 'coin'))
             : 0;
-        if (collectedCoin > 0) {
-            totalCoins += collectedCoin;
-        }
 
         if (status === 'cleared') {
             const deliveryResult = this.#settleDeliveries(heldItems, destination, facility, session, itemReport, acquiredItems);
             totalScore += deliveryResult.score;
             totalCoins += deliveryResult.coins;
+            collectedCoin += deliveryResult.collectedCoins;
+            deliveryCount = deliveryResult.deliveryCount;
             unlockedBranchId = deliveryResult.unlockedBranchId;
             entries.push(...deliveryResult.entries);
+        }
+
+        if (collectedCoin > 0) {
+            totalCoins += collectedCoin;
         }
 
         if (isRecoveryResult) {
@@ -93,6 +97,7 @@ class SettlementCalculator {
             totalCoins,
             luckyDiscountRate: this.#calculateLuckyDiscount(status, heldItems),
             flightTicks: flightData.ticks || 0,
+            deliveryCount,
             entries,
             itemReport,
             acquiredItems,
@@ -119,6 +124,8 @@ class SettlementCalculator {
         const result = {
             score: 0,
             coins: 0,
+            collectedCoins: 0,
+            deliveryCount: 0,
             entries: [],
             unlockedBranchId: null
         };
@@ -135,11 +142,10 @@ class SettlementCalculator {
                     const score = balance.UNMATCHED_DELIVERY_REWARD.SCORE * cargoGroup.length;
                     result.coins += coins;
                     result.score += score;
-                    this.#appendSettlementEntry(result.entries, {
-                        label: this.gameDataRepository.getUiText('flightResult.entries.deliveryBonus'),
-                        score,
-                        coin: coins
-                    });
+                    this.#appendSettlementEntry(
+                        result.entries,
+                        this.#createRewardEntry('flightResult.entries.deliveryBonus', score, coins)
+                    );
                     return;
                 }
 
@@ -154,23 +160,39 @@ class SettlementCalculator {
                 entry.bonusItems = this.#createStacks(bonusItems);
 
                 const bonusCoins = this.#sumCoinValues(bonusItems.filter(item => item.category === 'coin'));
+                result.collectedCoins += bonusCoins;
                 bonusItems
                     .filter(item => INVENTORY_REWARD_CATEGORIES.includes(item.category))
                     .forEach(item => acquiredItems.push(item));
 
                 const deliveryScore = balance.DELIVERY_REWARD.SCORE * cargoGroup.length;
-                const deliveryCoins = balance.DELIVERY_REWARD.COINS * cargoGroup.length + bonusCoins;
+                const deliveryCoins = balance.DELIVERY_REWARD.COINS * cargoGroup.length;
                 result.score += deliveryScore;
                 result.coins += deliveryCoins;
+                result.deliveryCount += cargoGroup.length;
                 result.unlockedBranchId = facility.id;
-                this.#appendSettlementEntry(result.entries, {
-                    label: this.gameDataRepository.getUiText('flightResult.entries.deliveryBonus'),
-                    score: deliveryScore,
-                    coin: deliveryCoins
-                });
+                this.#appendSettlementEntry(
+                    result.entries,
+                    this.#createRewardEntry('flightResult.entries.deliveryBonus', deliveryScore, deliveryCoins)
+                );
             });
 
         return result;
+    }
+
+    #createRewardEntry(labelKey, score, coin) {
+        const entry = {
+            label: this.gameDataRepository.getUiText(labelKey)
+        };
+
+        if (score > 0) {
+            entry.score = score;
+        }
+        if (coin > 0) {
+            entry.coin = coin;
+        }
+
+        return entry;
     }
 
     #appendSettlementEntry(entries, nextEntry) {

@@ -10,6 +10,7 @@ class ArchiveDialogView {
         this.root = this.document.querySelector('#archive-screen-root') || this.overlay;
         this.openButton = this.document.querySelector('#archive-btn');
         this.replayStartHandler = null;
+        this.storyOpenHandler = null;
         this.replayRows = [];
         this.protectToastTimer = null;
     }
@@ -18,23 +19,44 @@ class ArchiveDialogView {
         this.#hide();
     }
 
+    hide() {
+        this.#hide();
+    }
+
+    getState() {
+        if (!this.overlay || this.overlay.hidden) {
+            return {
+                visible: false,
+                activeTab: null
+            };
+        }
+
+        const activeTab = this.root?.querySelector('.TabGroup .Button[data-tab].state-active')?.dataset.tab
+            ?? 'analytics';
+        return {
+            visible: true,
+            activeTab
+        };
+    }
+
     setOpenHandler(handler) {
         if (this.openButton) {
             this.operationBinder(this.openButton, handler);
         }
     }
 
-    show(viewData, components) {
+    show(viewData, components, options = {}) {
         if (!this.overlay || !this.root) {
             return;
         }
         this.replayRows = [...(viewData.replays || [])];
         this.root.innerHTML = components.generateHTML(viewData);
         this.#show();
-        this.#wireTabs();
+        this.#wireTabs(options.activeTab);
         this.#wireRankingTabs();
         this.#wireReplaySelection();
         this.#wireReplayFavorite();
+        this.#wireStoryCards();
         this.root.querySelectorAll('.archive-close-button').forEach(button => {
             this.operationBinder(button, () => this.#hide());
         });
@@ -42,6 +64,10 @@ class ArchiveDialogView {
 
     setReplayStartHandler(handler) {
         this.replayStartHandler = handler;
+    }
+
+    setStoryOpenHandler(handler) {
+        this.storyOpenHandler = handler;
     }
 
     #show() {
@@ -57,9 +83,9 @@ class ArchiveDialogView {
         this.overlay.classList.add('state-hidden');
     }
 
-    #wireTabs() {
+    #wireTabs(activeTab = 'analytics') {
         const tabs = [...this.root.querySelectorAll('.TabGroup .Button[data-tab]')];
-        const sections = [...this.root.querySelectorAll('#tab-analytics, #tab-replays, #tab-achievements')];
+        const sections = [...this.root.querySelectorAll('#tab-analytics, #tab-replays, #tab-achievements, #tab-story')];
         const activate = tabId => {
             tabs.forEach(tab => {
                 const active = tab.dataset.tab === tabId;
@@ -72,7 +98,7 @@ class ArchiveDialogView {
             });
         };
         tabs.forEach(tab => this.operationBinder(tab, () => activate(tab.dataset.tab)));
-        activate('analytics');
+        activate(activeTab);
     }
 
     #wireRankingTabs() {
@@ -148,6 +174,12 @@ class ArchiveDialogView {
                 });
                 this.#applyProtectResult(result);
             });
+        });
+    }
+
+    #wireStoryCards() {
+        this.root.querySelectorAll('#tab-story [data-story-id]').forEach(card => {
+            this.operationBinder(card, element => this.storyOpenHandler?.(element.dataset.storyId));
         });
     }
 

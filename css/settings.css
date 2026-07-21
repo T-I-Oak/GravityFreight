@@ -1,0 +1,96 @@
+#settings-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-system) + 200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-double);
+    background: rgba(0, 0, 0, 0.55);
+}
+
+#settings-overlay.state-hidden,
+#settings-overlay[hidden] {
+    display: none;
+}
+
+.settings-modal {
+    width: min(520px, calc(100vw - 48px));
+    max-height: calc(100vh - 48px);
+}
+
+.settings-modal .panel-header,
+.settings-modal .panel-body,
+.settings-modal .panel-footer {
+    padding: var(--space-double);
+}
+
+.settings-modal .panel-header {
+    display: flex;
+    justify-content: center;
+}
+
+.settings-modal .panel-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-double);
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-unit);
+}
+
+.setting-info {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-double);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+}
+
+.setting-name {
+    color: var(--current-color);
+}
+
+.setting-value {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.premium-slider,
+.settings-select {
+    width: 100%;
+}
+
+.settings-modal .panel-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.settings-modal #settings-done-btn {
+    min-width: 160px;
+}
+
+.settings-select {
+    min-height: 42px;
+    padding: 0 var(--space-double);
+    color: #ffffff;
+    background: rgba(3, 9, 14, 0.92);
+    border: 1px solid color-mix(in srgb, var(--current-color), transparent 45%);
+    font: inherit;
+    font-weight: 800;
+}
+
+.settings-select option {
+    color: #ffffff;
+    background: #03090e;
+}

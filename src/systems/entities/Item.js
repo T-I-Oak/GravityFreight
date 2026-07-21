@@ -119,7 +119,10 @@ class Item {
      * @returns {string} 実行された内容（項目名または "repair"）
      */
     applyMaintenance() {
-        const candidates = ['slots', 'precisionMultiplier', 'pickupMultiplier'];
+        const candidates = ['precisionMultiplier', 'pickupMultiplier'];
+        if (['chassis', 'logic', 'module'].includes(this.category)) {
+            candidates.unshift('slots');
+        }
 
         if (this.#master.gravityMultiplier !== undefined && this.gravityMultiplier > 0.1) {
             candidates.push('gravityMultiplier');
@@ -178,6 +181,7 @@ class Item {
     }
 
     getViewData() {
+        const currentMaster = this.#getCurrentMaster();
         const stats = {};
         [
             'mass',
@@ -202,10 +206,11 @@ class Item {
         return {
             uid: this.uid,
             id: this.id,
-            name: this.name,
-            category: this.category,
-            rarity: this.rarity,
-            description: this.description,
+            name: currentMaster.name ?? this.name,
+            category: currentMaster.category ?? this.category,
+            rarity: currentMaster.rarity ?? this.rarity,
+            description: currentMaster.description ?? this.description,
+            deliveryGoalId: currentMaster.deliveryGoalId ?? this.deliveryGoalId,
             stats
         };
     }
@@ -261,6 +266,10 @@ class Item {
         }
 
         return (this.charges + 1) / (this.maxCharges + 1);
+    }
+
+    #getCurrentMaster() {
+        return this.gameDataRepository.getItemDefinition?.(this.id) ?? this.#master;
     }
 }
 
