@@ -281,6 +281,38 @@ describe('WorldRenderer', () => {
         expect(context.arc).toHaveBeenLastCalledWith(330, 240, 5, 0, Math.PI * 2);
     });
 
+    it('converts world coordinates to viewport coordinates with the same map warp used for drawing', async () => {
+        const { canvas } = createCanvas();
+        canvas.getBoundingClientRect = vi.fn(() => ({
+            left: 20,
+            top: 30,
+            width: 320,
+            height: 240
+        }));
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+
+        await renderer.initialize(canvas);
+        renderer.mapWarp.scale = 0.5;
+        camera.handleResize.mockClear();
+
+        expect(renderer.worldToViewport({ x: 100, y: 80 })).toEqual({
+            x: 205,
+            y: 170
+        });
+        expect(camera.handleResize).not.toHaveBeenCalled();
+    });
+
     it('keeps rendering on requestAnimationFrame so the background can animate', async () => {
         const { canvas } = createCanvas();
         const backgroundManager = createBackgroundManager();

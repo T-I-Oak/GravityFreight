@@ -44,7 +44,7 @@ main {
 }
 
 .Panel.state-collapsed {
-    height: 32px;
+    height: calc(32px * var(--ui-scale));
     overflow: visible;
 }
 
@@ -113,16 +113,16 @@ main {
 
 /* --- 4. Sectioning --- */
 .section {
-    margin-bottom: var(--space-unit);
+    margin-bottom: calc(var(--space-unit) * var(--ui-scale));
 }
 
 .section-header {
-    margin-bottom: 4px;
+    margin-bottom: calc(4px * var(--ui-scale));
 }
 
 .section-title {
     margin: 0;
-    font-size: 12px;
+    font-size: calc(12px * var(--ui-scale));
     font-weight: 950;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -130,7 +130,7 @@ main {
 
 .section-subtitle {
     display: block;
-    font-size: 10px;
+    font-size: calc(10px * var(--ui-scale));
     line-height: 1.4;
 }
 
@@ -143,14 +143,14 @@ main {
 
 .Tab {
     flex: 1;
-    height: 32px;
+    height: calc(32px * var(--ui-scale));
     display: flex;
     align-items: center;
     justify-content: center;
     background: transparent;
     border: none;
     padding: 0;
-    font-size: 11px;
+    font-size: calc(11px * var(--ui-scale));
     font-weight: 800;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -168,7 +168,7 @@ main {
 .SplitColumn {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: calc(4px * var(--ui-scale));
 }
 
 .TitleBox {
@@ -185,7 +185,7 @@ main {
 /* --- 7. Data Visualization Layouts --- */
 .stat-group {
     display: flex;
-    gap: var(--space-double);
+    gap: calc(var(--space-double) * var(--ui-scale));
     flex-wrap: wrap;
 }
 
@@ -195,6 +195,6 @@ main {
 }
 
 .SplitColumn.hero .stat-value {
-    font-size: 24px;
+    font-size: calc(24px * var(--ui-scale));
     font-weight: 900;
 }

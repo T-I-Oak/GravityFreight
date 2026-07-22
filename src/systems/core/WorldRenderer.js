@@ -213,6 +213,23 @@ class WorldRenderer {
         this.context.restore();
     }
 
+    worldToViewport(worldPoint) {
+        if (!this.canvas) {
+            throw new Error('[WorldRenderer] canvas is required to convert world coordinates.');
+        }
+
+        const canvasRect = this.canvas.getBoundingClientRect?.();
+        if (!canvasRect?.width || !canvasRect?.height) {
+            throw new Error('[WorldRenderer] measurable canvas is required to convert world coordinates.');
+        }
+
+        const screenPoint = this.#createTransform().toScreen(worldPoint);
+        return {
+            x: canvasRect.left + screenPoint.x * (canvasRect.width / this.canvas.width),
+            y: canvasRect.top + screenPoint.y * (canvasRect.height / this.canvas.height)
+        };
+    }
+
     startWarpEffect(duration = 0, options = {}) {
         const direction = options.direction || 'forward';
         if (direction === 'reverse') {

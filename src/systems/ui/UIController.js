@@ -85,6 +85,8 @@ class UIController {
         });
         this.soundController = options.soundController || null;
         this.canvasInputHandler = null;
+        this.tutorialBuildPanelHidden = false;
+        this.tutorialBuildPanelWasVisible = false;
 
         this.titleScreen = this.document.querySelector('#title-screen');
         this.resultScreen = this.flightResultScreenView.resultScreen;
@@ -240,6 +242,30 @@ class UIController {
 
     setFlightMode(isFlight) {
         this.buildPanelView.setFlightMode(isFlight);
+    }
+
+    hideBuildPanelForTutorialFocus() {
+        if (this.tutorialBuildPanelHidden) {
+            return;
+        }
+
+        this.tutorialBuildPanelWasVisible = this.buildPanelView.isVisible();
+        this.tutorialBuildPanelHidden = true;
+        if (this.tutorialBuildPanelWasVisible) {
+            this.buildPanelView.hideForTutorialFocus();
+        }
+    }
+
+    restoreBuildPanelAfterTutorialFocus() {
+        if (!this.tutorialBuildPanelHidden) {
+            return;
+        }
+
+        if (this.tutorialBuildPanelWasVisible) {
+            this.buildPanelView.restoreAfterTutorialFocus();
+        }
+        this.tutorialBuildPanelHidden = false;
+        this.tutorialBuildPanelWasVisible = false;
     }
 
     playFlightEndSE(status) {

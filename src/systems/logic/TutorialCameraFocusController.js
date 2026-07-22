@@ -8,6 +8,8 @@ class TutorialCameraFocusController {
         worldBoundsResolver,
         focusPadding = 120,
         transitionDurationMs = DEFAULT_TRANSITION_DURATION_MS,
+        onCanvasFocusStart = null,
+        onCanvasFocusEnd = null,
         requestAnimationFrame = globalThis.requestAnimationFrame?.bind(globalThis),
         now = () => globalThis.performance?.now?.() ?? Date.now()
     } = {}) {
@@ -21,11 +23,14 @@ class TutorialCameraFocusController {
         this.worldBoundsResolver = worldBoundsResolver || null;
         this.focusPadding = focusPadding;
         this.transitionDurationMs = transitionDurationMs;
+        this.onCanvasFocusStart = onCanvasFocusStart;
+        this.onCanvasFocusEnd = onCanvasFocusEnd;
         this.now = now;
         this.requestAnimationFrame = requestAnimationFrame
             ?? (callback => setTimeout(() => callback(this.now()), 16));
         this.savedCameraState = null;
         this.scenarioActive = false;
+        this.canvasFocusActive = false;
     }
 
     setWorldBoundsResolver(resolver) {
@@ -45,6 +50,7 @@ class TutorialCameraFocusController {
         const canvasHighlights = highlights.filter(highlight => highlight.targetType);
         if (canvasHighlights.length === 0) {
             await this.#restoreCameraState();
+            this.#endCanvasFocus();
             return false;
         }
 
@@ -57,6 +63,7 @@ class TutorialCameraFocusController {
         }
 
         this.mapInteractionController?.setInputLocked?.(true);
+        this.#beginCanvasFocus();
         const focusBounds = this.#mergeBounds(
             canvasHighlights.map(highlight => this.#resolveBounds(highlight))
         );
@@ -71,9 +78,28 @@ class TutorialCameraFocusController {
 
     async endScenario() {
         const restored = await this.#restoreCameraState();
+        this.#endCanvasFocus();
         this.scenarioActive = false;
         this.mapInteractionController?.setInputLocked?.(false);
         return restored;
+    }
+
+    #beginCanvasFocus() {
+        if (this.canvasFocusActive) {
+            return;
+        }
+
+        this.canvasFocusActive = true;
+        this.onCanvasFocusStart?.();
+    }
+
+    #endCanvasFocus() {
+        if (!this.canvasFocusActive) {
+            return;
+        }
+
+        this.canvasFocusActive = false;
+        this.onCanvasFocusEnd?.();
     }
 
     async #restoreCameraState() {

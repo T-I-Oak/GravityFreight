@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-double);
+    padding: calc(var(--space-double) * var(--ui-scale));
     background: rgba(0, 0, 0, 0.55);
 }
 
@@ -15,15 +15,15 @@
 }
 
 .settings-modal {
-    width: min(520px, calc(100vw - 48px));
-    max-height: calc(100vh - 48px);
-    max-height: calc(100dvh - 48px);
+    width: min(calc(520px * var(--ui-scale)), calc(100vw - (48px * var(--ui-scale))));
+    max-height: calc(100vh - (48px * var(--ui-scale)));
+    max-height: calc(100dvh - (48px * var(--ui-scale)));
 }
 
 .settings-modal .panel-header,
 .settings-modal .panel-body,
 .settings-modal .panel-footer {
-    padding: var(--space-double);
+    padding: calc(var(--space-double) * var(--ui-scale));
 }
 
 .settings-modal .panel-header {
@@ -33,7 +33,7 @@
 
 .settings-modal .panel-header h2 {
     margin: 0;
-    font-size: 22px;
+    font-size: calc(22px * var(--ui-scale));
     font-weight: 950;
     letter-spacing: 0.08em;
 }
@@ -41,20 +41,20 @@
 .settings-section {
     display: flex;
     flex-direction: column;
-    gap: var(--space-double);
+    gap: calc(var(--space-double) * var(--ui-scale));
 }
 
 .setting-item {
     display: flex;
     flex-direction: column;
-    gap: var(--space-unit);
+    gap: calc(var(--space-unit) * var(--ui-scale));
 }
 
 .setting-info {
     display: flex;
     justify-content: space-between;
-    gap: var(--space-double);
-    font-size: 12px;
+    gap: calc(var(--space-double) * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));
     font-weight: 900;
     letter-spacing: 0.05em;
 }
@@ -78,16 +78,17 @@
 }
 
 .settings-modal #settings-done-btn {
-    min-width: 160px;
+    min-width: calc(160px * var(--ui-scale));
 }
 
 .settings-select {
-    min-height: 42px;
-    padding: 0 var(--space-double);
+    min-height: calc(42px * var(--ui-scale));
+    padding: 0 calc(var(--space-double) * var(--ui-scale));
     color: #ffffff;
     background: rgba(3, 9, 14, 0.92);
     border: 1px solid color-mix(in srgb, var(--current-color), transparent 45%);
     font: inherit;
+    font-size: calc(var(--text-size-main) * var(--ui-scale));
     font-weight: 800;
 }
 

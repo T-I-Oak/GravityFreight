@@ -79,8 +79,9 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 16px;
+    padding: calc(6px * var(--ui-scale)) calc(16px * var(--ui-scale));
     font-family: var(--font-main);
+    font-size: calc(var(--text-size-main) * var(--ui-scale));
     font-weight: 800;
     border-radius: var(--radius-standard);
     border: 1px solid transparent;
@@ -91,22 +92,22 @@ body {
 
 /* button-large: Specialized large action button (Capsule shape) */
 .Button.button-large {
-    height: 48px;
-    padding: 0 32px;
+    height: calc(48px * var(--ui-scale));
+    padding: 0 calc(32px * var(--ui-scale));
     border-radius: var(--radius-pill);
     border-width: 2px;
     flex-direction: column;
 }
 
 .Button.button-large .btn-main-label {
-    font-size: 16px;
+    font-size: calc(16px * var(--ui-scale));
     font-weight: 950;
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 
 .Button.button-large .btn-sub-label {
-    font-size: 10px;
+    font-size: calc(10px * var(--ui-scale));
     font-weight: 800;
     opacity: 0.6;
     margin-top: -2px;
@@ -146,11 +147,11 @@ body {
 .footer,
 .screen-footer {
     position: absolute;
-    bottom: var(--space-unit);
-    left: var(--space-double);
+    bottom: calc(var(--space-unit) * var(--ui-scale));
+    left: calc(var(--space-double) * var(--ui-scale));
     display: flex;
-    gap: var(--space-double);
-    font-size: var(--text-size-caption);
+    gap: calc(var(--space-double) * var(--ui-scale));
+    font-size: calc(var(--text-size-caption) * var(--ui-scale));
     opacity: 0.3;
     z-index: var(--z-hud);
     pointer-events: none;

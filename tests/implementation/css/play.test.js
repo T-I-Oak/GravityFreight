@@ -26,17 +26,27 @@ describe('play.css', () => {
         expect(css).toContain('touch-action: none;');
     });
 
+    it('sizes play UI from the shared ui scale without transform scaling', () => {
+        const css = readFileSync('css/play.css', 'utf-8');
+
+        expect(css).toContain('--play-ui-scale: var(--ui-scale);');
+        expect(css).toContain('top: calc(var(--space-double) * var(--play-ui-scale));');
+        expect(css).toContain('width: calc(340px * var(--play-ui-scale));');
+        expect(css).toContain('font-size: calc(20px * var(--play-ui-scale));');
+        expect(css).not.toContain('transform: scale(var(--play-ui-scale));');
+    });
+
     it('keeps build panel settings and minimize controls visually paired', () => {
         const css = readFileSync('css/play.css', 'utf-8');
 
         expect(css).toContain('#inventory-panel .panel-header');
-        expect(css).toContain('gap: 14px;');
+        expect(css).toContain('gap: calc(14px * var(--play-ui-scale));');
         expect(css).toContain('#inventory-panel .panel-header-actions');
-        expect(css).toContain('gap: 2px;');
+        expect(css).toContain('gap: calc(2px * var(--play-ui-scale));');
         expect(css).toContain('flex: 0 0 auto;');
         expect(css).toContain('#inventory-panel .settings-inline-btn');
-        expect(css).toContain('width: 24px;');
-        expect(css).toContain('height: 24px;');
+        expect(css).toContain('width: calc(24px * var(--play-ui-scale));');
+        expect(css).toContain('height: calc(24px * var(--play-ui-scale));');
         expect(css).toContain('padding: 0;');
         expect(css).toContain('border-radius: var(--radius-standard);');
         expect(css).toContain('background: rgba(255, 255, 255, 0.05);');

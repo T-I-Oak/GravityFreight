@@ -193,7 +193,9 @@ class AppOrchestrator {
         const backgroundManager = new BackgroundManager();
         const tutorialCameraFocusController = new TutorialCameraFocusController({
             cameraController,
-            worldRenderer: this.worldRenderer
+            worldRenderer: this.worldRenderer,
+            onCanvasFocusStart: () => this.uiController.hideBuildPanelForTutorialFocus?.(),
+            onCanvasFocusEnd: () => this.uiController.restoreBuildPanelAfterTutorialFocus?.()
         });
         const tutorialFlowController = new this.tutorialFlowControllerClass({
             gameDataRepository: this.gameDataRepository,

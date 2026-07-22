@@ -21,17 +21,24 @@ describe('TutorialCameraFocusController', () => {
             width: 100,
             height: 90
         }));
+        const canvasFocusController = {
+            hide: vi.fn(),
+            restore: vi.fn()
+        };
 
         return {
             cameraController,
             mapInteractionController,
             worldRenderer,
             worldBoundsResolver,
+            canvasFocusController,
             controller: new TutorialCameraFocusController({
                 cameraController,
                 mapInteractionController,
                 worldRenderer,
                 worldBoundsResolver,
+                onCanvasFocusStart: canvasFocusController.hide,
+                onCanvasFocusEnd: canvasFocusController.restore,
                 transitionDurationMs: 0
             })
         };
@@ -53,6 +60,7 @@ describe('TutorialCameraFocusController', () => {
 
         expect(focused).toBe(false);
         expect(context.mapInteractionController.setInputLocked).not.toHaveBeenCalled();
+        expect(context.canvasFocusController.hide).not.toHaveBeenCalled();
     });
 
     it('focuses merged world bounds and locks map input for canvas tutorial pages', async () => {
@@ -69,6 +77,7 @@ describe('TutorialCameraFocusController', () => {
         expect(focused).toBe(true);
         expect(context.cameraController.getState).toHaveBeenCalledTimes(1);
         expect(context.mapInteractionController.setInputLocked).toHaveBeenCalledWith(true);
+        expect(context.canvasFocusController.hide).toHaveBeenCalledTimes(1);
         expect(context.cameraController.calculateFocusState).toHaveBeenCalledWith(
             { left: -50, top: -40, width: 250, height: 210 },
             { padding: 120 }
@@ -95,10 +104,11 @@ describe('TutorialCameraFocusController', () => {
             zoomLevel: 0.8
         });
         expect(context.mapInteractionController.setInputLocked).toHaveBeenLastCalledWith(false);
+        expect(context.canvasFocusController.restore).toHaveBeenCalledTimes(1);
         expect(context.worldRenderer.render).toHaveBeenCalledTimes(2);
     });
 
-    it('restores camera without unlocking input when a non-canvas tutorial page follows a focused page', async () => {
+    it('restores camera and build panel without unlocking input when a non-canvas tutorial page follows a focused page', async () => {
         const context = createContext();
 
         context.controller.beginScenario();
@@ -108,8 +118,20 @@ describe('TutorialCameraFocusController', () => {
         expect(focused).toBe(false);
         expect(context.cameraController.applyState).toHaveBeenCalledTimes(2);
         expect(context.mapInteractionController.setInputLocked).not.toHaveBeenLastCalledWith(false);
+        expect(context.canvasFocusController.restore).toHaveBeenCalledTimes(1);
         await context.controller.endScenario();
         expect(context.mapInteractionController.setInputLocked).toHaveBeenLastCalledWith(false);
+    });
+
+    it('does not toggle the build panel repeatedly across consecutive canvas tutorial pages', async () => {
+        const context = createContext();
+
+        context.controller.beginScenario();
+        await context.controller.focusPage({ highlights: [{ targetType: 'home-star' }] });
+        await context.controller.focusPage({ highlights: [{ targetType: 'exit-arc' }] });
+
+        expect(context.canvasFocusController.hide).toHaveBeenCalledTimes(1);
+        expect(context.canvasFocusController.restore).not.toHaveBeenCalled();
     });
 
     it('keeps restore() as an end-of-scenario compatibility alias', async () => {

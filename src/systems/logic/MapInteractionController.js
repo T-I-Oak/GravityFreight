@@ -192,13 +192,13 @@ class MapInteractionController {
     #showTouchInspectTarget(event) {
         const body = this.#findHoveredBody(event.point);
         if (body?.items?.length > 0) {
-            this.uiController.showStarInfo?.(body, event.point);
+            this.uiController.showStarInfo?.(body, event.displayPoint ?? event.point);
             return true;
         }
 
         const deliveryTarget = this.#findHoveredDeliveryExit(event.point);
         if (deliveryTarget) {
-            this.uiController.showDeliveryCargoInfo?.(deliveryTarget, event.point);
+            this.uiController.showDeliveryCargoInfo?.(deliveryTarget, event.displayPoint ?? event.point);
             return true;
         }
 

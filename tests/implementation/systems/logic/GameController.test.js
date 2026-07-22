@@ -193,6 +193,44 @@ describe('GameController', () => {
         expect(rect.height).toBeGreaterThan(24);
     });
 
+    it('resolves tutorial canvas targets through the renderer transform used for map drawing', () => {
+        const resolver = context.tutorialFlowController.setCanvasTargetResolver.mock.calls.at(-1)[0];
+        context.worldRenderer.worldToViewport.mockImplementation(point => ({
+            x: point.x * 2 + 100,
+            y: point.y * 2 + 200
+        }));
+
+        const rect = resolver({ targetType: 'home-star' });
+
+        expect(context.worldRenderer.worldToViewport).toHaveBeenCalledWith({ x: 0, y: 0 });
+        expect(context.worldRenderer.worldToViewport).toHaveBeenCalledWith({ x: 40, y: 0 });
+        expect(rect).toEqual({
+            left: 20,
+            top: 120,
+            width: 160,
+            height: 160
+        });
+    });
+
+    it('centers circular tutorial canvas targets on the rendered world point', () => {
+        const resolver = context.tutorialFlowController.setCanvasTargetResolver.mock.calls.at(-1)[0];
+        const renderedHomeCenter = { x: 240, y: 320 };
+        context.worldRenderer.worldToViewport.mockImplementation(point => (
+            point.x === 0 && point.y === 0
+                ? renderedHomeCenter
+                : {
+                    x: point.x * 2 + 240,
+                    y: point.y * 2 + 320
+                }
+        ));
+
+        const rect = resolver({ targetType: 'home-star' });
+
+        expect(context.worldRenderer.worldToViewport).toHaveBeenCalledWith({ x: 0, y: 0 });
+        expect(rect.left + rect.width / 2).toBe(renderedHomeCenter.x);
+        expect(rect.top + rect.height / 2).toBe(renderedHomeCenter.y);
+    });
+
     it('resolves tutorial canvas focus bounds in world coordinates', () => {
         const resolver = context.tutorialFlowController.setCanvasFocusBoundsResolver.mock.calls.at(-1)[0];
 
@@ -502,12 +540,13 @@ describe('GameController', () => {
         context.controller.handleCanvasInput({
             type: 'pointerdown',
             pointerType: 'touch',
-            point: { x: 500, y: 240 }
+            point: { x: 500, y: 240 },
+            displayPoint: { x: 250, y: 120 }
         });
 
         expect(context.uiController.showStarInfo).toHaveBeenCalledWith(
             context.controller.currentSector.bodies.at(-1),
-            { x: 500, y: 240 }
+            { x: 250, y: 120 }
         );
         expect(context.cameraController.pan).not.toHaveBeenCalled();
         expect(context.cameraController.rotate).not.toHaveBeenCalled();
@@ -609,7 +648,8 @@ describe('GameController', () => {
         context.controller.handleCanvasInput({
             type: 'pointerdown',
             pointerType: 'touch',
-            point: { x: 500, y: 240 }
+            point: { x: 500, y: 240 },
+            displayPoint: { x: 250, y: 120 }
         });
 
         expect(context.uiController.showDeliveryCargoInfo).toHaveBeenCalledWith(
@@ -617,7 +657,7 @@ describe('GameController', () => {
                 facilityType: 'TRADING_POST',
                 itemId: 'cargo_safe'
             },
-            { x: 500, y: 240 }
+            { x: 250, y: 120 }
         );
         expect(context.cameraController.pan).not.toHaveBeenCalled();
         expect(context.cameraController.rotate).not.toHaveBeenCalled();

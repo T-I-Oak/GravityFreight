@@ -139,23 +139,6 @@
 
 /* --- Durability Gauge (Overrides Disabled) --- */
 
-/* Footer & Layout Sync with Base */
-
-.theme-neon .item-card-prop-group {
-    display: flex;
-    gap: var(--space-double);
-}
-
-/* Property structure unified in base */
-
-.theme-neon .item-card-prop-value {
-    color: #ffffff;
-    font-family: var(--font-num);
-    font-size: 11px;
-    font-weight: 800;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-}
-
 .theme-neon .module-row {
     display: flex;
     justify-content: space-between;

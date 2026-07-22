@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TutorialFlowController from '../../../../src/systems/logic/TutorialFlowController.js';
 import TutorialCameraFocusController from '../../../../src/systems/logic/TutorialCameraFocusController.js';
+import { TutorialManager } from '../../../../../GameWorksOAK/src/lib/core/tutorialManager.js';
 
 class FakeTutorialManager {
     static instances = [];
@@ -205,6 +206,97 @@ describe('TutorialFlowController', () => {
             width: 120,
             height: 30
         });
+    });
+
+    it('scales tutorial highlight padding and radius by the shared ui scale', () => {
+        const controller = new TutorialFlowController({
+            gameDataRepository: repository,
+            tutorialManagerClass: FakeTutorialManager,
+            document: documentRef,
+            uiScaleProvider: () => 0.5
+        });
+
+        controller.initialize();
+        const manager = FakeTutorialManager.instances[0];
+        const defaults = manager.scenarios[0].highlightDefaults;
+        const buildIntro = manager.scenarios.find(scenario => scenario.id === 'build-intro');
+        const aimScenario = manager.scenarios.find(scenario => scenario.id === 'aim');
+
+        expect(defaults.padding).toEqual({ x: 4, y: 3 });
+        expect(defaults.radius).toBe(6);
+        expect(buildIntro.pages[0].highlight[0].padding).toEqual({ x: 5, y: 5 });
+        expect(buildIntro.pages[0].highlight[1].padding).toEqual({ x: 36, y: 28 });
+        expect(aimScenario.pages[1].highlight[0]).toMatchObject({
+            targetType: 'exit-arc',
+            shape: 'circle',
+            padding: 36
+        });
+    });
+
+    it('refreshes scaled highlight visuals before a trigger starts', () => {
+        let uiScale = 1;
+        const controller = new TutorialFlowController({
+            gameDataRepository: repository,
+            tutorialManagerClass: FakeTutorialManager,
+            document: documentRef,
+            uiScaleProvider: () => uiScale
+        });
+
+        controller.initialize();
+        uiScale = 0.5;
+        controller.checkTrigger('buildScreen', { currentScene: 'build' });
+
+        const manager = FakeTutorialManager.instances[0];
+        expect(manager.scenarios[0].highlightDefaults).toMatchObject({
+            padding: { x: 4, y: 3 },
+            radius: 6
+        });
+        expect(manager.scenarios.find(scenario => scenario.id === 'build-intro').pages[0].highlight[0].padding)
+            .toEqual({ x: 5, y: 5 });
+    });
+
+    it('starts the common tutorial manager with scaled rectangular highlight radius', () => {
+        document.body.innerHTML = `
+            <canvas id="tutorial-mask-canvas" class="TutorialMask hidden"></canvas>
+            <section id="tutorial-tooltip" class="Panel TutorialTooltip hidden">
+                <h2 id="tutorial-title"></h2>
+                <p id="tutorial-message"></p>
+                <span class="tooltip-arrow"></span>
+                <button id="tutorial-next-btn"></button>
+            </section>
+            <div id="assembly-inventory-list"></div>
+        `;
+        document.getElementById('tutorial-mask-canvas').getContext = () => ({
+            beginPath: vi.fn(),
+            arc: vi.fn(),
+            clearRect: vi.fn(),
+            closePath: vi.fn(),
+            createRadialGradient: () => ({ addColorStop: vi.fn() }),
+            ellipse: vi.fn(),
+            fill: vi.fn(),
+            fillRect: vi.fn(),
+            lineTo: vi.fn(),
+            moveTo: vi.fn(),
+            quadraticCurveTo: vi.fn(),
+            restore: vi.fn(),
+            save: vi.fn(),
+            scale: vi.fn(),
+            stroke: vi.fn(),
+            translate: vi.fn()
+        });
+        const controller = new TutorialFlowController({
+            gameDataRepository: repository,
+            tutorialManagerClass: TutorialManager,
+            document: documentRef,
+            canvasTargetResolver: () => ({ left: 10, top: 20, width: 80, height: 80 }),
+            uiScaleProvider: () => 0.5
+        });
+
+        controller.initialize();
+        expect(controller.checkTrigger('buildScreen', { currentScene: 'build' })).toBe(true);
+
+        expect(controller.manager.currentHighlightDefaults.radius).toBe(6);
+        expect(controller.manager.resolveHighlight({ elementId: 'assembly-inventory-list' }).radius).toBe(6);
     });
 
     it('saves the opaque state without inspecting it', () => {

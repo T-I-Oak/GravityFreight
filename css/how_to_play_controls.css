@@ -2,9 +2,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 15px;
-    min-height: 60px;
-    padding: 12px 25px;
+    gap: calc(15px * var(--how-play-text-scale));
+    min-height: calc(60px * var(--how-play-text-scale));
+    padding: calc(12px * var(--how-play-text-scale)) calc(25px * var(--how-play-text-scale));
     background: rgba(0, 0, 0, 0.45);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -12,7 +12,7 @@
 .how-to-play-nav::before {
     content: "";
     display: block;
-    width: 90px;
+    width: calc(90px * var(--how-play-text-scale));
 }
 
 .how-to-play-nav-controls {
@@ -20,17 +20,17 @@
     flex: 1;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: calc(20px * var(--how-play-text-scale));
 }
 
 .how-to-play-dots {
     display: flex;
-    gap: 12px;
+    gap: calc(12px * var(--how-play-text-scale));
 }
 
 .how-to-play-dot {
-    width: 8px;
-    height: 8px;
+    width: calc(8px * var(--how-play-text-scale));
+    height: calc(8px * var(--how-play-text-scale));
     padding: 0;
     border: 0;
     border-radius: 50%;
@@ -55,13 +55,31 @@
 .status-boosters { color: var(--color-category-boosters); font-weight: 800; }
 
 @media (max-width: 700px) {
-    .how-to-play-nav::before,
-    .how-to-play-dots {
+    .how-to-play-nav::before {
         display: none;
     }
 
     .how-to-play-nav-controls {
-        justify-content: flex-start;
-        gap: 10px;
+        justify-content: center;
+        gap: calc(10px * var(--how-play-text-scale));
+    }
+
+    .how-to-play-nav .Button {
+        min-width: 0;
+        padding: calc(6px * var(--how-play-text-scale)) calc(16px * var(--how-play-text-scale));
+        font-size: calc(var(--text-size-main) * var(--how-play-text-scale));
+    }
+
+    .how-to-play-nav .Button.button-large {
+        height: calc(48px * var(--how-play-text-scale));
+        padding: 0 calc(32px * var(--how-play-text-scale));
+    }
+
+    .how-to-play-nav .Button.button-large .btn-main-label {
+        font-size: calc(16px * var(--how-play-text-scale));
+    }
+
+    .how-to-play-nav .Button.button-large .btn-sub-label {
+        font-size: calc(10px * var(--how-play-text-scale));
     }
 }

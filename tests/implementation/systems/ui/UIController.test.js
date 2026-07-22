@@ -208,6 +208,30 @@ describe('UIController', () => {
         expect(document.querySelector('#flight-result-screen').textContent).toContain('SHARE');
     });
 
+    it('temporarily hides and restores the build panel during tutorial canvas focus', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+
+        controller.showBuildScreen();
+        controller.hideBuildPanelForTutorialFocus();
+
+        expect(document.querySelector('#inventory-panel').hidden).toBe(true);
+
+        controller.restoreBuildPanelAfterTutorialFocus();
+
+        expect(document.querySelector('#inventory-panel').hidden).toBe(false);
+        expect(document.querySelector('#inventory-panel').classList.contains('state-hidden')).toBe(false);
+    });
+
+    it('does not show the build panel after tutorial canvas focus if it was already hidden', () => {
+        const controller = new UIController({ gameDataRepository: repository, soundController });
+
+        controller.showTitleScreen();
+        controller.hideBuildPanelForTutorialFocus();
+        controller.restoreBuildPanelAfterTutorialFocus();
+
+        expect(document.querySelector('#inventory-panel').hidden).toBe(true);
+    });
+
     it('animates flight result scores and coins from zero to final values', () => {
         const frames = [];
         const requestFrame = vi.fn(callback => {
@@ -2372,16 +2396,28 @@ describe('UIController', () => {
             clientX: 220,
             clientY: 180
         });
+        const contextMenu = new Event('contextmenu', { bubbles: true, cancelable: true });
+        const selectStart = new Event('selectstart', { bubbles: true, cancelable: true });
 
         canvas.dispatchEvent(firstTouch);
         canvas.dispatchEvent(secondTouch);
         window.dispatchEvent(pinchMove);
         canvas.dispatchEvent(wheel);
+        canvas.dispatchEvent(contextMenu);
+        canvas.dispatchEvent(selectStart);
 
         expect(firstTouch.defaultPrevented).toBe(true);
         expect(secondTouch.defaultPrevented).toBe(true);
         expect(pinchMove.defaultPrevented).toBe(true);
         expect(wheel.defaultPrevented).toBe(true);
+        expect(contextMenu.defaultPrevented).toBe(true);
+        expect(selectStart.defaultPrevented).toBe(true);
+        expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+            type: 'pointerdown',
+            point: { x: 160, y: 120 },
+            displayPoint: { x: 80, y: 60 },
+            pointerType: 'touch'
+        }));
         expect(handler).toHaveBeenCalledWith(expect.objectContaining({ type: 'pinch' }));
         expect(handler).toHaveBeenCalledWith(expect.objectContaining({ type: 'wheel' }));
     });

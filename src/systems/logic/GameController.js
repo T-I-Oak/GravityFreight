@@ -86,8 +86,7 @@ class GameController {
                 sessionState: this.sessionState,
                 buildFlowController: this.buildFlowController,
                 trajectoryPredictor: this.trajectoryPredictor,
-                uiController: this.uiController,
-                cameraController: this.cameraController,
+                worldRenderer: this.worldRenderer,
                 mapInteractionController: this.mapInteractionController,
                 getCurrentSector: () => this.currentSector,
                 getLaunchPosition: angle => this.launchSelectionFactory.getLaunchPosition(angle)

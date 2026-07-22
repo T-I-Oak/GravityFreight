@@ -18,6 +18,8 @@ class MapInputController {
         this.canvas.addEventListener('pointerdown', event => this.#handlePointerDown(event), { passive: false });
         this.canvas.addEventListener('pointermove', event => this.#handleHover(event), { passive: false });
         this.canvas.addEventListener('pointerleave', () => this.#handleHoverLeave(), { passive: false });
+        this.canvas.addEventListener('contextmenu', event => event.preventDefault(), { passive: false });
+        this.canvas.addEventListener('selectstart', event => event.preventDefault(), { passive: false });
         this.document.defaultView?.addEventListener('pointermove', event => this.#handlePointerMove(event), { passive: false });
         this.document.defaultView?.addEventListener('pointerup', event => this.#handlePointerUp(event), { passive: false });
         this.document.defaultView?.addEventListener('pointercancel', event => this.#handlePointerUp(event), { passive: false });
@@ -37,6 +39,7 @@ class MapInputController {
             this.handler({
                 type: 'pointerdown',
                 point: this.#createPoint(event),
+                displayPoint: this.#createDisplayPoint(event),
                 shiftKey: !!event.shiftKey,
                 ctrlKey: !!event.ctrlKey,
                 pointerType: event.pointerType

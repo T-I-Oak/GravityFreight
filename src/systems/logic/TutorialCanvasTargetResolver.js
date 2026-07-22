@@ -5,8 +5,7 @@ class TutorialCanvasTargetResolver {
         sessionState,
         buildFlowController,
         trajectoryPredictor,
-        uiController,
-        cameraController,
+        worldRenderer,
         mapInteractionController,
         getCurrentSector,
         getLaunchPosition
@@ -14,8 +13,7 @@ class TutorialCanvasTargetResolver {
         this.sessionState = sessionState;
         this.buildFlowController = buildFlowController;
         this.trajectoryPredictor = trajectoryPredictor;
-        this.uiController = uiController;
-        this.cameraController = cameraController;
+        this.worldRenderer = worldRenderer;
         this.mapInteractionController = mapInteractionController;
         this.getCurrentSector = getCurrentSector;
         this.getLaunchPosition = getLaunchPosition;
@@ -167,12 +165,15 @@ class TutorialCanvasTargetResolver {
 
     #createWorldRect(center, worldSize) {
         const half = worldSize / 2;
-        return this.#createWorldBoundsRect([
-            { x: center.x - half, y: center.y - half },
-            { x: center.x + half, y: center.y - half },
-            { x: center.x - half, y: center.y + half },
-            { x: center.x + half, y: center.y + half }
-        ]);
+        const screenCenter = this.#worldToViewport(center);
+        const edge = this.#worldToViewport({ x: center.x + half, y: center.y });
+        const radius = Math.max(12, Math.hypot(edge.x - screenCenter.x, edge.y - screenCenter.y));
+        return {
+            left: screenCenter.x - radius,
+            top: screenCenter.y - radius,
+            width: radius * 2,
+            height: radius * 2
+        };
     }
 
     #createWorldFocusRect(center, worldSize) {
@@ -220,22 +221,11 @@ class TutorialCanvasTargetResolver {
     }
 
     #worldToViewport(worldPoint) {
-        const canvas = this.uiController.getMapCanvas?.();
-        if (!canvas) {
-            throw new Error('[TutorialCanvasTargetResolver] tutorial canvas target requires map canvas.');
-        }
-        const canvasRect = canvas.getBoundingClientRect();
-        const screenPoint = this.cameraController.toScreen(worldPoint);
-        const widthScale = canvasRect.width / canvas.width;
-        const heightScale = canvasRect.height / canvas.height;
-        if (!Number.isFinite(widthScale) || !Number.isFinite(heightScale)) {
-            throw new Error('[TutorialCanvasTargetResolver] tutorial canvas target requires a measurable canvas.');
+        if (typeof this.worldRenderer?.worldToViewport !== 'function') {
+            throw new Error('[TutorialCanvasTargetResolver] worldRenderer.worldToViewport is required.');
         }
 
-        return {
-            x: canvasRect.left + screenPoint.x * widthScale,
-            y: canvasRect.top + screenPoint.y * heightScale
-        };
+        return this.worldRenderer.worldToViewport(worldPoint);
     }
 }
 

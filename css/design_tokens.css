@@ -89,6 +89,9 @@
        Strictly minimized options to ensure standardization. */
    --space-unit: 8px;
    --space-double: 16px;
+   --ui-scale: 1;
+   --mobile-ui-scale-standard: 0.74;
+   --mobile-ui-scale-compact: 0.62;
 
    --radius-standard: 4px;
    --radius-pill: 100px;
@@ -122,4 +125,16 @@
    /* Snappy interaction feedback */
    --motion-normal: 300ms;
    /* Standard transition timing */
+}
+
+@media screen and (max-width: 700px) {
+   :root {
+      --ui-scale: var(--mobile-ui-scale-standard);
+   }
+}
+
+@media screen and (max-width: 430px) {
+   :root {
+      --ui-scale: var(--mobile-ui-scale-compact);
+   }
 }

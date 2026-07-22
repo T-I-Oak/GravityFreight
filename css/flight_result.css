@@ -23,6 +23,16 @@
         width: 95vw;
         height: 90vh;
     }
+
+    #flight-result-screen .panel-header.SplitRow {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #flight-result-screen .panel-header.SplitRow .flight-report-status {
+        justify-content: flex-start;
+    }
 }
 
 /* Panel Layout: Sections now inherit panel-level padding/gap logic */
@@ -53,8 +63,16 @@
 
 .flight-report-status {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-unit);
     align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.flight-report-status .Badge {
+    max-width: 100%;
+    white-space: normal;
 }
 
 /* Local State: RECORDED Visuals */

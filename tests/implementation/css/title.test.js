@@ -8,7 +8,23 @@ describe('title.css', () => {
         expect(css).toContain('.title-content-wrapper');
         expect(css).toContain('animation: title-idle-float 6s ease-in-out infinite;');
         expect(css).toContain('@keyframes title-idle-float');
-        expect(css).toContain('50% { transform: translateY(-12px); }');
+        expect(css).toContain('50% { transform: translateY(calc(-12px * var(--ui-scale))); }');
+    });
+
+    it('sizes the title menu from the shared ui scale without transform scaling', () => {
+        const css = readFileSync('css/title.css', 'utf-8');
+
+        expect(css).toContain('--title-ui-scale: var(--ui-scale);');
+        expect(css).toContain('gap: calc(32px * var(--ui-scale));');
+        expect(css).toContain('width: min(calc(980px * var(--ui-scale)), 82vw);');
+        expect(css).toContain('width: calc(640px * var(--ui-scale));');
+        expect(css).toContain('#title-settings-btn');
+        expect(css).toContain('width: calc(32px * var(--title-ui-scale));');
+        expect(css).toContain('font-size: calc(32px * var(--title-ui-scale));');
+        expect(css).toContain('#title-screen .screen-footer');
+        expect(css).toContain('font-size: calc(13px * var(--title-ui-scale));');
+        expect(css).toContain('white-space: nowrap;');
+        expect(css).not.toContain('transform: scale(var(--title-ui-scale));');
     });
 
     it('uses dynamic viewport height so mobile Safari browser chrome does not hide the title controls', () => {
@@ -32,14 +48,16 @@ describe('title.css', () => {
         const css = readFileSync('css/title.css', 'utf-8');
 
         expect(css).toContain('#title-screen .screen-footer');
-        expect(css).toContain('bottom: 30px;');
-        expect(css).toContain('left: 40px;');
+        expect(css).toContain('bottom: calc(30px * var(--title-ui-scale));');
+        expect(css).toContain('left: calc(40px * var(--title-ui-scale));');
+        expect(css).toContain('gap: calc(var(--space-double) * var(--title-ui-scale));');
         expect(css).toContain('color: rgba(255, 255, 255, 0.55);');
-        expect(css).toContain('font-size: 13px;');
-        expect(css).toContain('letter-spacing: 1.5px;');
+        expect(css).toContain('font-size: calc(13px * var(--title-ui-scale));');
+        expect(css).toContain('letter-spacing: calc(1.5px * var(--title-ui-scale));');
         expect(css).toContain("font-family: 'Inter', sans-serif;");
         expect(css).toContain('font-weight: 700;');
         expect(css).toContain('opacity: 1;');
+        expect(css).toContain('white-space: nowrap;');
         expect(css).toContain('#title-screen .screen-footer #version,');
         expect(css).toContain('#title-screen .screen-footer .copyright,');
         expect(css).toContain('#title-screen .screen-footer .copyright *,');

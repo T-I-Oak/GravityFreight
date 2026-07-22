@@ -21,4 +21,23 @@ describe('tutorial.css', () => {
         expect(css).toContain('opacity: 0;');
         expect(css).not.toContain('#tutorial-tooltip.hidden {\n    display: none;');
     });
+
+    it('scales tutorial tooltip text and layout with the shared ui scale', () => {
+        const css = readFileSync('css/tutorial.css', 'utf-8');
+
+        expect(css).toContain('width: min(calc(320px * var(--ui-scale)), calc(100vw - (32px * var(--ui-scale))));');
+        expect(css).toContain('padding: calc(16px * var(--ui-scale));');
+        expect(css).toContain('border-radius: calc(8px * var(--ui-scale));');
+        expect(css).toContain('font-size: calc(14px * var(--ui-scale));');
+        expect(css).toContain('font-size: calc(12px * var(--ui-scale));');
+        expect(css).toContain('width: calc(16px * var(--ui-scale));');
+    });
+
+    it('uses the standard button size for the tutorial confirmation action', () => {
+        const html = readFileSync('index.html', 'utf-8');
+        const match = html.match(/<button id="tutorial-next-btn" class="([^"]+)">OK<\/button>/);
+
+        expect(match).not.toBeNull();
+        expect(match[1].split(/\s+/)).toEqual(['Button', 'state-primary']);
+    });
 });

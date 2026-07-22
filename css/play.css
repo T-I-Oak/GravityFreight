@@ -5,6 +5,7 @@
    ========================================= */
 
 #play-scene-container {
+    --play-ui-scale: var(--ui-scale);
     display: flex;
     flex-direction: column;
 }
@@ -12,12 +13,12 @@
 /* --- 1. HUD Layout --- */
 #play-hud {
     position: absolute;
-    top: var(--space-double);
-    left: var(--space-double);
+    top: calc(var(--space-double) * var(--play-ui-scale));
+    left: calc(var(--space-double) * var(--play-ui-scale));
     display: flex;
     flex-direction: column;
     z-index: var(--z-hud);
-    min-width: 320px;
+    min-width: calc(320px * var(--play-ui-scale));
     pointer-events: none; /* Allow clicks to pass through empty space */
 }
 
@@ -30,13 +31,13 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    gap: 16px;
-    padding: var(--space-double);
+    gap: calc(16px * var(--play-ui-scale));
+    padding: calc(var(--space-double) * var(--play-ui-scale));
     border-bottom: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
 }
 
 #play-scene-container .panel-body {
-    padding: var(--space-double);
+    padding: calc(var(--space-double) * var(--play-ui-scale));
 }
 
 #inventory-panel {
@@ -45,35 +46,35 @@
 
 #inventory-panel .panel-header {
     border-bottom-color: var(--panel-border-color);
-    gap: 14px;
+    gap: calc(14px * var(--play-ui-scale));
 }
 
 #inventory-panel .panel-header-actions {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: calc(2px * var(--play-ui-scale));
     flex: 0 0 auto;
 }
 
 #inventory-panel .settings-inline-btn {
     display: grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
-    margin: 4px 0 4px 4px;
+    width: calc(24px * var(--play-ui-scale));
+    height: calc(24px * var(--play-ui-scale));
+    margin: calc(4px * var(--play-ui-scale)) 0 calc(4px * var(--play-ui-scale)) calc(4px * var(--play-ui-scale));
     padding: 0;
     border: 1px solid color-mix(in srgb, var(--color-theme-sub), transparent 60%);
     border-radius: var(--radius-standard);
     background: rgba(255, 255, 255, 0.05);
     box-sizing: border-box;
     color: color-mix(in srgb, var(--color-theme-sub), transparent 40%);
-    font-size: 14px;
+    font-size: calc(14px * var(--play-ui-scale));
     line-height: 1;
     transition: all 0.2s ease;
 }
 
 #inventory-panel .settings-inline-btn .icon-symbol {
-    font-size: 18px;
+    font-size: calc(18px * var(--play-ui-scale));
 }
 
 #inventory-panel .settings-inline-btn:hover {
@@ -95,7 +96,7 @@
 #inventory-panel #tab-flight {
     height: 100%;
     flex-direction: column;
-    gap: var(--space-double);
+    gap: calc(var(--space-double) * var(--play-ui-scale));
 }
 
 #inventory-panel #tab-flight:not(.state-hidden) {
@@ -105,7 +106,7 @@
 #inventory-panel #tab-assembly {
     height: 100%;
     flex-direction: column;
-    gap: var(--space-double);
+    gap: calc(var(--space-double) * var(--play-ui-scale));
 }
 
 #inventory-panel #tab-assembly:not(.state-hidden) {
@@ -124,8 +125,8 @@
 #inventory-panel .flight-actions,
 #inventory-panel .assembly-actions {
     flex: 0 0 auto;
-    margin: 0 calc(-1 * var(--space-double));
-    padding: var(--space-unit) var(--space-double) 0;
+    margin: 0 calc(-1 * var(--space-double) * var(--play-ui-scale));
+    padding: calc(var(--space-unit) * var(--play-ui-scale)) calc(var(--space-double) * var(--play-ui-scale)) 0;
     border-top: 1px solid var(--panel-border-color);
     background: linear-gradient(
         to bottom,
@@ -136,7 +137,7 @@
 
 #inventory-panel .launch-return-bonus {
     color: var(--color-category-launchers);
-    font-size: 11px;
+    font-size: calc(11px * var(--play-ui-scale));
     font-weight: 950;
     letter-spacing: 0.08em;
     margin-bottom: 6px;
@@ -152,17 +153,17 @@
 /* Logic: Grouped message indicators with defined spatial density */
 #play-hud .hud-messages {
     display: flex;
-    gap: 4px;
+    gap: calc(4px * var(--play-ui-scale));
 }
 
 #play-hud .hud-stats {
     display: flex;
-    gap: var(--space-double);
-    padding: var(--space-double);
+    gap: calc(var(--space-double) * var(--play-ui-scale));
+    padding: calc(var(--space-double) * var(--play-ui-scale));
 }
 
 #play-hud .stat-label {
-    font-size: var(--text-size-caption);
+    font-size: calc(var(--text-size-caption) * var(--play-ui-scale));
     font-weight: 800;
     opacity: 0.6;
     letter-spacing: 0.05em;
@@ -170,7 +171,7 @@
 
 #play-hud .stat-value {
     font-family: var(--font-num);
-    font-size: 20px;
+    font-size: calc(20px * var(--play-ui-scale));
     font-weight: 900;
     line-height: 1.1;
 }
@@ -192,10 +193,10 @@
 /* --- 3. Sidebar (Inventory Panel) --- */
 #inventory-panel {
     position: absolute;
-    top: var(--space-double);
-    right: var(--space-double);
-    width: 340px;
-    max-height: calc(100% - (var(--space-double) * 2));
+    top: calc(var(--space-double) * var(--play-ui-scale));
+    right: calc(var(--space-double) * var(--play-ui-scale));
+    width: calc(340px * var(--play-ui-scale));
+    max-height: calc(100% - (var(--space-double) * var(--play-ui-scale) * 2));
     display: flex;
     flex-direction: column;
     z-index: var(--z-panel);
@@ -205,10 +206,10 @@
 /* Positioned at bottom-right corner, aligned perfectly with the build panel width. */
 #play-scene-container .action-dock {
     position: absolute;
-    bottom: var(--space-double);
-    right: var(--space-double);
-    width: 340px;
-    min-height: 76px;
+    bottom: calc(var(--space-double) * var(--play-ui-scale));
+    right: calc(var(--space-double) * var(--play-ui-scale));
+    width: calc(340px * var(--play-ui-scale));
+    min-height: calc(76px * var(--play-ui-scale));
     display: flex;
     justify-content: center;
     pointer-events: none;
@@ -225,7 +226,7 @@
 
 /* Play scene specific overrides for large action buttons */
 #play-screen .Button.button-large {
-    height: 76px;
+    height: calc(76px * var(--play-ui-scale));
     border-width: 3px;
     width: 100%;
 }
@@ -249,6 +250,5 @@
     animation: guide-pulse 2s infinite ease-in-out;
     opacity: 1;
 }
-
 
 /* --- 6. Global Footer (Moved to ui_base.css) --- */

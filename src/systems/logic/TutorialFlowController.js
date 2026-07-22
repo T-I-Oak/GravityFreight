@@ -215,6 +215,7 @@ class TutorialFlowController {
         this.canvasTargetResolver = options.canvasTargetResolver || null;
         this.canvasFocusBoundsResolver = options.canvasFocusBoundsResolver || null;
         this.cameraFocusController = options.cameraFocusController || null;
+        this.uiScaleProvider = options.uiScaleProvider || (() => this.#readUiScale());
         this.manager = null;
         this.maskLoopFrame = null;
         this.lastTriggerName = null;
@@ -251,6 +252,7 @@ class TutorialFlowController {
         if (this.triggersBlocked) {
             return false;
         }
+        this.#refreshScaledScenarios();
         const shown = this.manager.checkTrigger(triggerName, context);
         if (shown) {
             this.lastTriggerName = triggerName;
@@ -265,6 +267,7 @@ class TutorialFlowController {
         if (this.triggersBlocked) {
             return false;
         }
+        this.#refreshScaledScenarios();
         return this.manager.willTrigger(triggerName, context);
     }
 
@@ -277,6 +280,7 @@ class TutorialFlowController {
         if (this.triggersBlocked) {
             return false;
         }
+        this.#refreshScaledScenarios();
         if (context.currentScene === 'build') {
             return this.checkTrigger('buildScreen', { source: context.source || 'sceneResume' });
         }
@@ -353,14 +357,14 @@ class TutorialFlowController {
 
     #localizeScenario(scenario) {
         if (scenario.type === 'defaults') {
-            return { ...scenario };
+            return this.#scaleHighlightVisuals({ ...scenario });
         }
         const { titleKey, pages = [], ...rest } = scenario;
-        return {
+        return this.#scaleHighlightVisuals({
             ...rest,
             title: this.#text(titleKey),
             pages: pages.map(page => this.#localizePage(page))
-        };
+        });
     }
 
     #localizePage(page) {
@@ -369,6 +373,87 @@ class TutorialFlowController {
             ...rest,
             message: this.#text(messageKey)
         };
+    }
+
+    #scaleHighlightVisuals(scenario) {
+        const scale = this.#getUiScale();
+        return {
+            ...scenario,
+            highlightDefaults: this.#scaleHighlightDefaults(scenario.highlightDefaults, scale),
+            pages: Array.isArray(scenario.pages)
+                ? scenario.pages.map(page => ({
+                    ...page,
+                    highlightDefaults: this.#scaleHighlightDefaults(page.highlightDefaults, scale),
+                    highlight: Array.isArray(page.highlight)
+                        ? page.highlight.map(highlight => this.#scaleHighlight(highlight, scale))
+                        : page.highlight
+                }))
+                : scenario.pages
+        };
+    }
+
+    #scaleHighlightDefaults(defaults, scale) {
+        if (!defaults || typeof defaults !== 'object') {
+            return defaults;
+        }
+        return this.#scaleHighlight(defaults, scale);
+    }
+
+    #scaleHighlight(highlight, scale) {
+        if (!highlight || typeof highlight !== 'object') {
+            return highlight;
+        }
+        return {
+            ...highlight,
+            padding: this.#scalePadding(highlight.padding, scale),
+            radius: this.#scaleNumber(highlight.radius, scale)
+        };
+    }
+
+    #scalePadding(padding, scale) {
+        if (padding === undefined) {
+            return padding;
+        }
+        if (typeof padding === 'number') {
+            return this.#scaleNumber(padding, scale);
+        }
+        if (padding && typeof padding === 'object') {
+            return {
+                ...padding,
+                x: this.#scaleNumber(padding.x, scale),
+                y: this.#scaleNumber(padding.y, scale)
+            };
+        }
+        return padding;
+    }
+
+    #scaleNumber(value, scale) {
+        return typeof value === 'number' ? value * scale : value;
+    }
+
+    #getUiScale() {
+        const scale = Number(this.uiScaleProvider());
+        return Number.isFinite(scale) && scale > 0 ? scale : 1;
+    }
+
+    #refreshScaledScenarios() {
+        if (!this.manager || this.manager.isShowing) {
+            return;
+        }
+        this.manager.scenarios = this.getScenarios();
+        if (typeof this.manager.buildDisplayScenarioRawIndexes === 'function') {
+            this.manager.displayScenarioRawIndexes = this.manager.buildDisplayScenarioRawIndexes();
+        }
+    }
+
+    #readUiScale() {
+        if (typeof window === 'undefined' || !this.document?.documentElement) {
+            return 1;
+        }
+        const value = window.getComputedStyle(this.document.documentElement)
+            .getPropertyValue('--ui-scale')
+            .trim();
+        return Number(value || 1);
     }
 
     #text(path) {

@@ -1,3 +1,23 @@
+@media screen and (max-width: 700px) {
+    #archive-screen.Panel {
+        width: 96vw;
+        height: 96dvh;
+        max-width: 96vw;
+        max-height: 96dvh;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 430px) {
+    #archive-screen.Panel {
+        width: 98vw;
+        height: 96dvh;
+        max-width: 98vw;
+        max-height: 96dvh;
+        font-size: 11px;
+    }
+}
+
 /* モバイル・1カラム時のレスポンシブ対応 */
 @media screen and (max-width: 800px) {
     #archive-screen .panel-header {
@@ -62,9 +82,9 @@
     }
 
     #archive-screen.Panel {
-        width: 95vw;
-        height: 90vh;
-        max-width: 95vw;
-        max-height: 90vh;
+        width: 96vw;
+        height: 96dvh;
+        max-width: 96vw;
+        max-height: 96dvh;
     }
 }

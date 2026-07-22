@@ -104,4 +104,31 @@ describe('archive.css', () => {
         expect(css).toContain('flex: 0 1 auto;');
         expect(css).toContain('width: 100%;');
     });
+
+    it('keeps archive panel large on narrow screens while reducing text size', () => {
+        const css = readArchiveCss();
+
+        expect(css).not.toContain('--archive-ui-scale');
+        expect(css).not.toContain('transform: scale(var(--archive-ui-scale));');
+        expect(css).toContain('@media screen and (max-width: 700px)');
+        expect(css).toContain('width: 96vw;');
+        expect(css).toContain('height: 96dvh;');
+        expect(css).toContain('font-size: 12px;');
+        expect(css).toContain('@media screen and (max-width: 430px)');
+        expect(css).toContain('width: 98vw;');
+        expect(css).toContain('font-size: 11px;');
+    });
+
+    it('keeps archive ranking columns readable on narrow screens', () => {
+        const css = readArchiveCss();
+
+        expect(css).toContain('@media screen and (max-width: 700px)');
+        expect(css).toContain('#archive-screen .ArchiveTable th,');
+        expect(css).toContain('padding: 6px 4px;');
+        expect(css).toContain('font-size: 9px;');
+        expect(css).toContain('#archive-screen #tab-analytics .col-rank   { width: 13%; }');
+        expect(css).toContain('#archive-screen #tab-analytics .col-date   { width: 34%; }');
+        expect(css).toContain('#archive-screen .ArchiveTable .date-cell');
+        expect(css).toContain('gap: 4px;');
+    });
 });

@@ -175,3 +175,34 @@
 #archive-screen #tab-replays .ArchiveTable.table-body tr.state-active td:first-child {
     box-shadow: inset 4px 0 0 var(--color-theme-main);
 }
+
+@media screen and (max-width: 700px) {
+    #archive-screen .ArchiveTable th,
+    #archive-screen .ArchiveTable td {
+        padding: 6px 4px;
+        font-size: 9px;
+    }
+
+    #archive-screen .ArchiveTable th.state-active-column {
+        font-size: 9px;
+    }
+
+    #archive-screen .ArchiveTable td.state-active-column {
+        font-size: 10px;
+    }
+
+    #archive-screen #tab-analytics .col-rank   { width: 13%; }
+    #archive-screen #tab-analytics .col-score  { width: 21%; }
+    #archive-screen #tab-analytics .col-sector { width: 13%; }
+    #archive-screen #tab-analytics .col-count  { width: 19%; }
+    #archive-screen #tab-analytics .col-date   { width: 34%; }
+
+    #archive-screen .ArchiveTable .date-cell {
+        gap: 4px;
+    }
+
+    #archive-screen .Badge.state-new {
+        padding: 1px 3px;
+        font-size: 7px;
+    }
+}

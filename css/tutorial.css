@@ -29,10 +29,10 @@
 .TutorialTooltip {
     position: fixed;
     z-index: calc(var(--z-system) + 1);
-    width: min(320px, calc(100vw - 32px));
-    padding: 16px;
+    width: min(calc(320px * var(--ui-scale)), calc(100vw - (32px * var(--ui-scale))));
+    padding: calc(16px * var(--ui-scale));
     border: 1px solid var(--color-theme-main);
-    border-radius: 8px;
+    border-radius: calc(8px * var(--ui-scale));
     background: rgba(5, 8, 18, 0.94);
     color: var(--color-text-base);
     box-shadow: 0 0 18px rgba(0, 255, 204, 0.22);
@@ -45,16 +45,16 @@
 }
 
 .TutorialTooltip h2 {
-    margin: 0 0 8px;
+    margin: 0 0 calc(8px * var(--ui-scale));
     color: var(--color-theme-main);
-    font-size: 14px;
+    font-size: calc(14px * var(--ui-scale));
     font-weight: 900;
     letter-spacing: 0;
 }
 
 .TutorialTooltip p {
-    margin: 0 0 12px;
-    font-size: 12px;
+    margin: 0 0 calc(12px * var(--ui-scale));
+    font-size: calc(12px * var(--ui-scale));
     line-height: 1.6;
 }
 
@@ -64,9 +64,9 @@
 
 .tooltip-arrow {
     position: absolute;
-    left: calc(50% - 8px);
-    width: 16px;
-    height: 16px;
+    left: calc(50% - (8px * var(--ui-scale)));
+    width: calc(16px * var(--ui-scale));
+    height: calc(16px * var(--ui-scale));
     background: rgba(5, 8, 18, 0.94);
     border-color: var(--color-theme-main);
     border-style: solid;
@@ -75,11 +75,11 @@
 }
 
 .tooltip-arrow.arrow-up {
-    top: -8px;
+    top: calc(-8px * var(--ui-scale));
     border-width: 1px 0 0 1px;
 }
 
 .tooltip-arrow.arrow-down {
-    bottom: -8px;
+    bottom: calc(-8px * var(--ui-scale));
     border-width: 0 1px 1px 0;
 }

@@ -48,6 +48,20 @@ class BuildPanelView {
         this.#hide(this.launchControl);
     }
 
+    isVisible() {
+        return !!this.panel
+            && !this.panel.hidden
+            && !this.panel.classList.contains('state-hidden');
+    }
+
+    hideForTutorialFocus() {
+        this.#hide(this.panel);
+    }
+
+    restoreAfterTutorialFocus() {
+        this.#show(this.panel);
+    }
+
     showReadOnly(viewData = null, options = {}) {
         this.setSelectionEnabled(false);
         if (viewData) {

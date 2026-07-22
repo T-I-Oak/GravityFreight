@@ -5,6 +5,7 @@
    ========================================= */
 
 #title-screen {
+    --title-ui-scale: var(--ui-scale);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -41,7 +42,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 32px;
+    gap: calc(32px * var(--ui-scale));
     z-index: var(--z-hud);
     position: relative;
     animation: title-idle-float 6s ease-in-out infinite;
@@ -56,19 +57,19 @@
 }
 
 .title-logo {
-    width: min(980px, 82vw);
+    width: min(calc(980px * var(--ui-scale)), 82vw);
 }
 
 .hud-logo {
-    width: 220px;
+    width: calc(220px * var(--ui-scale));
     max-width: 100%;
 }
 
 .menu-buttons {
     display: flex;
     flex-direction: column;
-    gap: var(--space-double);
-    width: 640px;
+    gap: calc(var(--space-double) * var(--ui-scale));
+    width: calc(640px * var(--ui-scale));
     max-width: 90vw;
     min-width: 240px;
     margin: 0 auto;
@@ -82,12 +83,12 @@
 /* Specific position for the settings control on the title screen */
 #title-settings-btn {
     position: absolute;
-    top: var(--space-double);
-    right: var(--space-double);
+    top: calc(var(--space-double) * var(--title-ui-scale));
+    right: calc(var(--space-double) * var(--title-ui-scale));
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: calc(32px * var(--title-ui-scale));
+    height: calc(32px * var(--title-ui-scale));
     padding: 0;
     
     /* Subtle minimalist style */
@@ -96,7 +97,7 @@
     box-shadow: none;
     text-shadow: none; /* Override global neon text-shadow */
     color: rgba(255, 255, 255, 0.55);
-    font-size: 32px;
+    font-size: calc(32px * var(--title-ui-scale));
     line-height: 1;
     transition: color var(--motion-fast), transform var(--motion-normal) ease;
     cursor: pointer;
@@ -113,20 +114,22 @@
 }
 
 #title-settings-btn:active {
-    transform: rotate(90deg) scale(0.9);
+    transform: scale(0.9) rotate(90deg);
     filter: brightness(1.2);
     transition: transform 0.05s; /* Snappy feedback */
 }
 
 #title-screen .screen-footer {
-    bottom: 30px;
-    left: 40px;
+    bottom: calc(30px * var(--title-ui-scale));
+    left: calc(40px * var(--title-ui-scale));
+    gap: calc(var(--space-double) * var(--title-ui-scale));
     color: rgba(255, 255, 255, 0.55);
-    font-size: 13px;
-    letter-spacing: 1.5px;
+    font-size: calc(13px * var(--title-ui-scale));
+    letter-spacing: calc(1.5px * var(--title-ui-scale));
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     opacity: 1;
+    white-space: nowrap;
 }
 
 #title-screen .screen-footer #version,
@@ -141,5 +144,5 @@
 
 @keyframes title-idle-float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
+    50% { transform: translateY(calc(-12px * var(--ui-scale))); }
 }

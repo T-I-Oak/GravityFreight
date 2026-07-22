@@ -618,7 +618,11 @@ export function createController(settlement = createSettlement()) {
         startWarpEffect: vi.fn(),
         stopWarpEffect: vi.fn(),
         startNavigation: vi.fn(),
-        render: vi.fn()
+        render: vi.fn(),
+        worldToViewport: vi.fn(point => {
+            const screen = cameraController.toScreen(point);
+            return { x: screen.x + 10, y: screen.y + 20 };
+        })
     };
     const trajectoryPredictor = {
         predictPath: vi.fn(() => ({

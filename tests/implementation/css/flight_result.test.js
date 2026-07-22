@@ -28,4 +28,26 @@ describe('flight_result.css', () => {
         expect(css).toContain('background: var(--color-theme-main);');
         expect(css).toContain('font-size: 8px;');
     });
+
+    it('allows result record and protect badges to wrap on narrow screens', () => {
+        const css = readFileSync('css/flight_result.css', 'utf-8');
+
+        expect(css).toContain('.flight-report-status');
+        expect(css).toContain('flex-wrap: wrap;');
+        expect(css).toContain('.flight-report-status .Badge');
+        expect(css).toContain('max-width: 100%;');
+        expect(css).toContain('white-space: normal;');
+    });
+
+    it('stacks the result title above record and protect badges on narrow screens', () => {
+        const css = readFileSync('css/flight_result.css', 'utf-8');
+
+        expect(css).toContain('@media screen and (max-width: 600px)');
+        expect(css).toContain('#flight-result-screen .panel-header.SplitRow');
+        expect(css).toContain('display: flex;');
+        expect(css).toContain('flex-direction: column;');
+        expect(css).toContain('align-items: flex-start;');
+        expect(css).toContain('#flight-result-screen .panel-header.SplitRow .flight-report-status');
+        expect(css).toContain('justify-content: flex-start;');
+    });
 });
