@@ -117,7 +117,6 @@ class AppOrchestrator {
         this.titleScreenAnimator.stop();
         this.systems.navigationLoopController.stop();
         this.replayContext = this.systems.flightRecorder.createReplayContext(recordId);
-        this.systems.cameraController.reset({ persist: false });
         this.worldRenderer.resetMapWarp?.();
         this.uiController.hideRecordScreen?.();
         this.uiController.showReplayScreen?.(

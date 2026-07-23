@@ -224,18 +224,6 @@ class UIController {
         this.hudView.updateValue(key, value);
     }
 
-    updateNavigationProbe(metrics) {
-        const element = this.#ensureNavigationProbeOverlay();
-        element.textContent = [
-            'NAV PROBE',
-            `FPS  ${this.#formatProbeNumber(metrics.fps, 1)}`,
-            `TICK ${this.#formatProbeNumber(metrics.tickProgressRate, 3)}`,
-            `STEP ${Math.round(metrics.actualTicks)}/${Math.round(metrics.expectedTicks)}`,
-            `CAP  ${metrics.cappedFrames}/${metrics.frames}`,
-            `LAST ${metrics.lastSteps}/${this.#formatProbeNumber(metrics.lastExpectedSteps, 1)} max${metrics.maxStepsPerFrame}`
-        ].join('\n');
-    }
-
     updateMailStatus(index, type, isUnread = false) {
         this.hudView.updateMailStatus(index, type, isUnread);
     }
@@ -518,24 +506,6 @@ class UIController {
     }
 
     #formatNumber(value) { return new Intl.NumberFormat('en-US').format(value ?? 0); }
-
-    #formatProbeNumber(value, fractionDigits) {
-        return Number.isFinite(value) ? value.toFixed(fractionDigits) : 'n/a';
-    }
-
-    #ensureNavigationProbeOverlay() {
-        const existing = this.document.querySelector('#navigation-probe-overlay');
-        if (existing) {
-            return existing;
-        }
-
-        const element = this.document.createElement('div');
-        element.id = 'navigation-probe-overlay';
-        element.className = 'NavigationProbeOverlay';
-        element.textContent = 'NAV PROBE\nwaiting';
-        this.document.body.append(element);
-        return element;
-    }
 
 }
 
