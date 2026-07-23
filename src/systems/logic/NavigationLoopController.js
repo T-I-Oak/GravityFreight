@@ -22,6 +22,7 @@ class NavigationLoopController {
         this.accumulator = 0;
         this.maxStepsPerFrame = infrastructure.maxStepsPerFrame ?? 10;
         this.running = false;
+        this.probeMetrics = this.#createProbeMetrics();
     }
 
     start({ rocket, sector, onNavigationEnd } = {}) {
@@ -38,6 +39,7 @@ class NavigationLoopController {
         this.onNavigationEnd = onNavigationEnd;
         this.lastFrameTime = null;
         this.accumulator = 0;
+        this.probeMetrics = this.#createProbeMetrics();
         this.running = true;
         this.#scheduleNextFrame();
     }
@@ -87,6 +89,7 @@ class NavigationLoopController {
 
         const tickSeconds = this.#getTickSeconds();
         let steps = 0;
+        const expectedSteps = elapsedSeconds / tickSeconds;
 
         this.accumulator += elapsedSeconds;
         while (this.accumulator >= tickSeconds && steps < this.maxStepsPerFrame && this.running) {
@@ -99,6 +102,7 @@ class NavigationLoopController {
             this.worldRenderer?.render?.();
         }
 
+        this.#reportProbeMetrics({ elapsedSeconds, expectedSteps, steps });
         return steps;
     }
 
@@ -135,6 +139,42 @@ class NavigationLoopController {
         }
 
         return tickSeconds;
+    }
+
+    #createProbeMetrics() {
+        return {
+            frames: 0,
+            elapsedSeconds: 0,
+            expectedSteps: 0,
+            actualSteps: 0,
+            cappedFrames: 0
+        };
+    }
+
+    #reportProbeMetrics({ elapsedSeconds, expectedSteps, steps }) {
+        this.probeMetrics.frames += 1;
+        this.probeMetrics.elapsedSeconds += elapsedSeconds;
+        this.probeMetrics.expectedSteps += expectedSteps;
+        this.probeMetrics.actualSteps += steps;
+        if (expectedSteps > this.maxStepsPerFrame && steps >= this.maxStepsPerFrame) {
+            this.probeMetrics.cappedFrames += 1;
+        }
+
+        const tickProgressRate = this.probeMetrics.expectedSteps > 0
+            ? this.probeMetrics.actualSteps / this.probeMetrics.expectedSteps
+            : 1;
+        this.uiController?.updateNavigationProbe?.({
+            fps: elapsedSeconds > 0 ? 1 / elapsedSeconds : 0,
+            tickProgressRate,
+            expectedTicks: this.probeMetrics.expectedSteps,
+            actualTicks: this.probeMetrics.actualSteps,
+            lastExpectedSteps: expectedSteps,
+            lastSteps: steps,
+            maxStepsPerFrame: this.maxStepsPerFrame,
+            cappedFrames: this.probeMetrics.cappedFrames,
+            frames: this.probeMetrics.frames,
+            elapsedSeconds: this.probeMetrics.elapsedSeconds
+        });
     }
 }
 

@@ -51,6 +51,10 @@ describe('play.css', () => {
         expect(css).toContain('border-radius: var(--radius-standard);');
         expect(css).toContain('background: rgba(255, 255, 255, 0.05);');
         expect(css).toContain('box-sizing: border-box;');
+        expect(css).toContain('#inventory-panel .PanelToggle');
+        expect(css).toContain('width: calc(24px * var(--play-ui-scale));');
+        expect(css).toContain('height: calc(24px * var(--play-ui-scale));');
+        expect(css).toContain('margin: calc(4px * var(--play-ui-scale)) 0 calc(4px * var(--play-ui-scale)) calc(4px * var(--play-ui-scale));');
     });
 
     it('keeps replay controls below the play HUD instead of overlapping it', () => {

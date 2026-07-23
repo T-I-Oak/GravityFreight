@@ -78,6 +78,8 @@ describe('FlightResultComponents.generateHTML', () => {
         }, repository);
 
         expect(html).toContain('SECTOR 3 COMPLETED');
+        expect(html).toContain('<header class="panel-header flight-result-header">');
+        expect(html).not.toContain('<header class="panel-header SplitRow">');
         expect(html).toContain('data-count-to="3260"');
         expect(html).toContain('data-count-to="3000"');
         expect(html).toContain('data-count-to="30"');
