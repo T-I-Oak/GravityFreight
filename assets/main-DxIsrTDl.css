@@ -307,6 +307,25 @@ body {
 .screen-footer a:hover {
     color: var(--color-theme-main);
 }
+
+/* Temporary navigation measurement overlay. Remove after iPad timing diagnosis. */
+.NavigationProbeOverlay {
+    position: fixed;
+    left: calc(var(--space-double) * var(--ui-scale));
+    bottom: calc(48px * var(--ui-scale));
+    z-index: var(--z-system);
+    min-width: calc(160px * var(--ui-scale));
+    padding: calc(6px * var(--ui-scale)) calc(8px * var(--ui-scale));
+    border: 1px solid rgba(0, 255, 224, 0.65);
+    border-radius: calc(4px * var(--ui-scale));
+    background: rgba(0, 0, 0, 0.78);
+    color: var(--color-theme-main);
+    font-family: var(--font-num);
+    font-size: calc(10px * var(--ui-scale));
+    line-height: 1.35;
+    white-space: pre;
+    pointer-events: none;
+}
 /* =========================================
    Gravity Freight V2: Layout & Structure
    Layer: Base / Capability (A-Axis)
@@ -2226,6 +2245,12 @@ main.theme-printing::-webkit-scrollbar {
     box-shadow: 0 0 15px var(--color-theme-sub);
 }
 
+#inventory-panel .PanelToggle {
+    width: calc(24px * var(--play-ui-scale));
+    height: calc(24px * var(--play-ui-scale));
+    margin: calc(4px * var(--play-ui-scale)) 0 calc(4px * var(--play-ui-scale)) calc(4px * var(--play-ui-scale));
+}
+
 #inventory-panel .panel-body {
     min-height: 0;
     overflow: hidden;
@@ -2658,16 +2683,6 @@ main.theme-printing::-webkit-scrollbar {
         width: 95vw;
         height: 90vh;
     }
-
-    #flight-result-screen .panel-header.SplitRow {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    #flight-result-screen .panel-header.SplitRow .flight-report-status {
-        justify-content: flex-start;
-    }
 }
 
 /* Panel Layout: Sections now inherit panel-level padding/gap logic */
@@ -2688,6 +2703,24 @@ main.theme-printing::-webkit-scrollbar {
 }
 
 /* Header Specific Adjustments */
+#flight-result-screen .flight-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-unit) var(--space-double);
+}
+
+#flight-result-screen .flight-result-header .panel-title {
+    flex: 1 1 18ch;
+    min-width: min(100%, 18ch);
+}
+
+#flight-result-screen .flight-result-header .flight-report-status {
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+}
+
 #flight-result-screen .panel-title {
     margin: var(--space-unit) 0 0 0;
     font-size: 24px;
@@ -2707,7 +2740,7 @@ main.theme-printing::-webkit-scrollbar {
 
 .flight-report-status .Badge {
     max-width: 100%;
-    white-space: normal;
+    white-space: nowrap;
 }
 
 /* Local State: RECORDED Visuals */
@@ -3169,9 +3202,11 @@ main.theme-printing::-webkit-scrollbar {
 
 /* Trading Post Specific Layout Fixes */
 #facility-screen .trade-entry {
-    margin-bottom: var(--space-standard);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) calc(132px * var(--ui-scale));
+    margin-bottom: calc(var(--space-unit) * var(--ui-scale));
     min-width: 0;
-    gap: var(--space-standard);
+    gap: calc(var(--space-unit) * var(--ui-scale));
     align-items: stretch;
 }
 
@@ -3182,25 +3217,11 @@ main.theme-printing::-webkit-scrollbar {
 
 #facility-screen .trade-action-area {
     flex-shrink: 0;
-    width: 90px;
+    width: calc(132px * var(--ui-scale));
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: var(--space-unit);
-}
-
-#facility-screen .trade-price {
-    font-family: var(--font-num);
-    font-size: 14px;
-    font-weight: 900;
-    text-align: right;
-}
-
-#facility-screen .trade-action-group {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 4px;
+    justify-content: flex-start;
+    gap: calc(2px * var(--ui-scale));
 }
 
 #facility-screen .facility-badge,
@@ -3254,18 +3275,8 @@ main.theme-printing::-webkit-scrollbar {
     margin-top: 0;
 }
 
-#facility-screen .trade-item-area {
-    flex: 1;
-    min-width: 0; /* 防止 flex 項目溢出 */
-}
-
-#facility-screen .trade-action-area {
-    width: 110px;
-    flex-shrink: 0;
-}
-
 #facility-screen .SplitRow {
-    gap: var(--space-unit);
+    gap: calc(var(--space-unit) * var(--ui-scale));
 }
 
 #facility-screen .trade-action-group {
@@ -3274,7 +3285,7 @@ main.theme-printing::-webkit-scrollbar {
     align-items: center;
     justify-content: center;
     gap: 0;
-    margin-bottom: 4px;
+    margin-bottom: calc(2px * var(--ui-scale));
 }
 
 #facility-screen .trade-price {
@@ -3283,6 +3294,7 @@ main.theme-printing::-webkit-scrollbar {
     font-weight: 900;
     color: var(--color-category-coin);
     text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+    text-align: right;
     line-height: 1;
     letter-spacing: -1px;
 }
