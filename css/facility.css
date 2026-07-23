@@ -122,9 +122,11 @@
 
 /* Trading Post Specific Layout Fixes */
 #facility-screen .trade-entry {
-    margin-bottom: var(--space-standard);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) calc(132px * var(--ui-scale));
+    margin-bottom: calc(var(--space-unit) * var(--ui-scale));
     min-width: 0;
-    gap: var(--space-standard);
+    gap: calc(var(--space-unit) * var(--ui-scale));
     align-items: stretch;
 }
 
@@ -135,25 +137,11 @@
 
 #facility-screen .trade-action-area {
     flex-shrink: 0;
-    width: 90px;
+    width: calc(132px * var(--ui-scale));
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: var(--space-unit);
-}
-
-#facility-screen .trade-price {
-    font-family: var(--font-num);
-    font-size: 14px;
-    font-weight: 900;
-    text-align: right;
-}
-
-#facility-screen .trade-action-group {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 4px;
+    justify-content: flex-start;
+    gap: calc(2px * var(--ui-scale));
 }
 
 #facility-screen .facility-badge,
@@ -207,18 +195,8 @@
     margin-top: 0;
 }
 
-#facility-screen .trade-item-area {
-    flex: 1;
-    min-width: 0; /* 防止 flex 項目溢出 */
-}
-
-#facility-screen .trade-action-area {
-    width: 110px;
-    flex-shrink: 0;
-}
-
 #facility-screen .SplitRow {
-    gap: var(--space-unit);
+    gap: calc(var(--space-unit) * var(--ui-scale));
 }
 
 #facility-screen .trade-action-group {
@@ -227,7 +205,7 @@
     align-items: center;
     justify-content: center;
     gap: 0;
-    margin-bottom: 4px;
+    margin-bottom: calc(2px * var(--ui-scale));
 }
 
 #facility-screen .trade-price {
@@ -236,6 +214,7 @@
     font-weight: 900;
     color: var(--color-category-coin);
     text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+    text-align: right;
     line-height: 1;
     letter-spacing: -1px;
 }

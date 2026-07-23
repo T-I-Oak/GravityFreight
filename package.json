@@ -1,6 +1,6 @@
 {
   "name": "gravityfreight",
-  "version": "0.94.193",
+  "version": "0.95.4",
   "description": "Gravity Freight: ORBITAL ECHOES - A 2D space simulation roguelike game",
   "type": "module",
   "scripts": {

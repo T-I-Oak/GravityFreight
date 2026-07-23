@@ -32,7 +32,7 @@ export class FlightResultComponents {
 
         return `
             <section class="Panel home">
-                <header class="panel-header SplitRow">
+                <header class="panel-header flight-result-header">
                     <h2 class="panel-title ${viewData.themeClass || 'home'}">${viewData.title}</h2>
                     <div class="flight-report-status">
                         <div class="Badge ${recordedState} capsule" data-replay-recorded-status><span class="recorded-text">${recordedLabel}</span></div>

@@ -29,25 +29,30 @@ describe('flight_result.css', () => {
         expect(css).toContain('font-size: 8px;');
     });
 
-    it('allows result record and protect badges to wrap on narrow screens', () => {
+    it('allows result header title and replay badges to wrap by available width', () => {
         const css = readFileSync('css/flight_result.css', 'utf-8');
+        const headerRule = css.match(/#flight-result-screen \.flight-result-header \{[\s\S]*?\}/)?.[0] ?? '';
+        const titleRule = css.match(/#flight-result-screen \.flight-result-header \.panel-title \{[\s\S]*?\}/)?.[0] ?? '';
+        const statusRule = css.match(/#flight-result-screen \.flight-result-header \.flight-report-status \{[\s\S]*?\}/)?.[0] ?? '';
+        const badgeRule = css.match(/\.flight-report-status \.Badge \{[\s\S]*?\}/)?.[0] ?? '';
 
+        expect(headerRule).toContain('display: flex;');
+        expect(headerRule).toContain('justify-content: space-between;');
+        expect(headerRule).toContain('flex-wrap: wrap;');
+        expect(headerRule).toContain('gap: var(--space-unit) var(--space-double);');
+        expect(titleRule).toContain('flex: 1 1 18ch;');
+        expect(titleRule).toContain('min-width: min(100%, 18ch);');
         expect(css).toContain('.flight-report-status');
-        expect(css).toContain('flex-wrap: wrap;');
+        expect(statusRule).toContain('flex: 0 1 auto;');
+        expect(statusRule).toContain('flex-wrap: wrap;');
         expect(css).toContain('.flight-report-status .Badge');
-        expect(css).toContain('max-width: 100%;');
-        expect(css).toContain('white-space: normal;');
+        expect(badgeRule).toContain('white-space: nowrap;');
     });
 
-    it('stacks the result title above record and protect badges on narrow screens', () => {
+    it('does not rely on a viewport breakpoint to stack the result header', () => {
         const css = readFileSync('css/flight_result.css', 'utf-8');
 
-        expect(css).toContain('@media screen and (max-width: 600px)');
-        expect(css).toContain('#flight-result-screen .panel-header.SplitRow');
-        expect(css).toContain('display: flex;');
-        expect(css).toContain('flex-direction: column;');
-        expect(css).toContain('align-items: flex-start;');
-        expect(css).toContain('#flight-result-screen .panel-header.SplitRow .flight-report-status');
-        expect(css).toContain('justify-content: flex-start;');
+        expect(css).not.toContain('#flight-result-screen .panel-header.SplitRow');
+        expect(css).not.toContain('#flight-result-screen .panel-header.SplitRow .flight-report-status');
     });
 });

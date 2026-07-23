@@ -84,6 +84,12 @@
     box-shadow: 0 0 15px var(--color-theme-sub);
 }
 
+#inventory-panel .PanelToggle {
+    width: calc(24px * var(--play-ui-scale));
+    height: calc(24px * var(--play-ui-scale));
+    margin: calc(4px * var(--play-ui-scale)) 0 calc(4px * var(--play-ui-scale)) calc(4px * var(--play-ui-scale));
+}
+
 #inventory-panel .panel-body {
     min-height: 0;
     overflow: hidden;

@@ -45,6 +45,14 @@ describe('ui_base.css', () => {
         expect(css).toContain('display: none;');
         expect(css).not.toContain('display: none !important;');
     });
+
+    it('defines a temporary navigation probe overlay without taking pointer input', () => {
+        const css = readFileSync('css/ui_base.css', 'utf-8');
+
+        expect(css).toContain('.NavigationProbeOverlay');
+        expect(css).toContain('pointer-events: none;');
+        expect(css).toContain('z-index: var(--z-system);');
+    });
 });
 
 describe('ui_primitives.css', () => {
