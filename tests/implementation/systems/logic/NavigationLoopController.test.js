@@ -10,8 +10,7 @@ function createController(overrides = {}) {
         }))
     };
     const uiController = {
-        updateHUDValue: vi.fn(),
-        updateNavigationProbe: vi.fn()
+        updateHUDValue: vi.fn()
     };
     const worldRenderer = {
         render: vi.fn()
@@ -81,27 +80,6 @@ describe('NavigationLoopController', () => {
 
         expect(steps).toBe(30);
         expect(context.physicsEngine.step).toHaveBeenCalledTimes(30);
-    });
-
-    it('reports navigation probe metrics so frame-rate driven slowdown can be measured', () => {
-        const context = createController();
-
-        context.controller.start({
-            rocket: context.rocket,
-            sector: context.sector,
-            onNavigationEnd: vi.fn()
-        });
-        context.controller.advance(1 / 30);
-
-        expect(context.uiController.updateNavigationProbe).toHaveBeenCalledWith(expect.objectContaining({
-            fps: 30,
-            tickProgressRate: 0.96,
-            lastExpectedSteps: expect.closeTo(16.666, 2),
-            lastSteps: 16,
-            maxStepsPerFrame: 30,
-            cappedFrames: 0,
-            frames: 1
-        }));
     });
 
     it('stops the loop and reports navigation end when physics returns a collision', () => {

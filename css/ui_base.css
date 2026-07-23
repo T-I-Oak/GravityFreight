@@ -167,22 +167,3 @@ body {
 .screen-footer a:hover {
     color: var(--color-theme-main);
 }
-
-/* Temporary navigation measurement overlay. Remove after iPad timing diagnosis. */
-.NavigationProbeOverlay {
-    position: fixed;
-    left: calc(var(--space-double) * var(--ui-scale));
-    bottom: calc(48px * var(--ui-scale));
-    z-index: var(--z-system);
-    min-width: calc(160px * var(--ui-scale));
-    padding: calc(6px * var(--ui-scale)) calc(8px * var(--ui-scale));
-    border: 1px solid rgba(0, 255, 224, 0.65);
-    border-radius: calc(4px * var(--ui-scale));
-    background: rgba(0, 0, 0, 0.78);
-    color: var(--color-theme-main);
-    font-family: var(--font-num);
-    font-size: calc(10px * var(--ui-scale));
-    line-height: 1.35;
-    white-space: pre;
-    pointer-events: none;
-}

@@ -320,7 +320,7 @@ describe('AppOrchestrator', () => {
         expect(orchestrator.systems.flightRecorder.createReplayContext).toHaveBeenCalledWith('flight_1');
         expect(context.record.id).toBe('flight_1');
         expect(orchestrator.replayContext).toBe(context);
-        expect(cameraResetSpy).toHaveBeenCalledWith({ persist: false });
+        expect(cameraResetSpy).not.toHaveBeenCalled();
         expect(renderer.resetMapWarp).toHaveBeenCalledTimes(1);
         expect(uiController.hideRecordScreen).toHaveBeenCalled();
         expect(uiController.showReplayScreen).toHaveBeenCalledWith(
