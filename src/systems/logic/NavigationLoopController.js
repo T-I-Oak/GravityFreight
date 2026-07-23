@@ -20,7 +20,7 @@ class NavigationLoopController {
         this.frameId = null;
         this.lastFrameTime = null;
         this.accumulator = 0;
-        this.maxStepsPerFrame = infrastructure.maxStepsPerFrame ?? 10;
+        this.maxStepsPerFrame = infrastructure.maxStepsPerFrame ?? 30;
         this.running = false;
         this.probeMetrics = this.#createProbeMetrics();
     }

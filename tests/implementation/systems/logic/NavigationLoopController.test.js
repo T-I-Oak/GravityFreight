@@ -79,8 +79,8 @@ describe('NavigationLoopController', () => {
         });
         const steps = context.controller.advance(1);
 
-        expect(steps).toBe(10);
-        expect(context.physicsEngine.step).toHaveBeenCalledTimes(10);
+        expect(steps).toBe(30);
+        expect(context.physicsEngine.step).toHaveBeenCalledTimes(30);
     });
 
     it('reports navigation probe metrics so frame-rate driven slowdown can be measured', () => {
@@ -95,11 +95,11 @@ describe('NavigationLoopController', () => {
 
         expect(context.uiController.updateNavigationProbe).toHaveBeenCalledWith(expect.objectContaining({
             fps: 30,
-            tickProgressRate: 0.6,
+            tickProgressRate: 0.96,
             lastExpectedSteps: expect.closeTo(16.666, 2),
-            lastSteps: 10,
-            maxStepsPerFrame: 10,
-            cappedFrames: 1,
+            lastSteps: 16,
+            maxStepsPerFrame: 30,
+            cappedFrames: 0,
             frames: 1
         }));
     });
