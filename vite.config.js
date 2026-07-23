@@ -41,7 +41,7 @@ export default defineConfig({
   },
 
   test: {
-    exclude: ['**/GravityFreight_v1/**', '**/node_modules/**'],
+    exclude: ['**/node_modules/**'],
     environment: 'jsdom',
   },
 });

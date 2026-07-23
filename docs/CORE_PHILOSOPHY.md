@@ -1,6 +1,6 @@
-# Gravity Freight V2: Core Development Philosophy
+# Gravity Freight: Core Development Philosophy
 
-V2開発におけるあらゆる意思決定（設計、コーディング、ドキュメンテーション）は、以下の三原則を絶対的な基準とする。
+開発におけるあらゆる意思決定（設計、コーディング、ドキュメンテーション）は、以下の三原則を絶対的な基準とする。
 
 ---
 

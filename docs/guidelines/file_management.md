@@ -1,4 +1,4 @@
-# File Management Guidelines: Gravity Freight V2
+# File Management Guidelines: Gravity Freight
 
 本ドキュメントは、プロジェクトにおける非公開（Git管理外）ファイルの命名規則と運用ルールを定義する。
 

@@ -1,4 +1,4 @@
-# Update History Standard: Gravity Freight V2
+# Update History Standard: Gravity Freight
 
 ## 1. 目的
 `update_history.json` は、プロジェクトの進化を「ユーザー体験（機能・品質）」の観点から記録し、ユーザーが最新版へのアップデートを検討する際の判断材料を提供するためのものである。
