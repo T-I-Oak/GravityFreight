@@ -38,22 +38,22 @@
   "badge": {
     "content": {
       "lang-store": {
-        "ja": "鋭意作成中！",
-        "en": "In active development!"
+        "ja": "7月23日 v1.0 公開！",
+        "en": "July 23 v1.0 Released!"
       }
     },
     "type": "info",
-    "featuredUntil": "2026-06-30"
+    "featuredUntil": "2026-08-31"
   },
   "button": {
     "content": {
       "lang-store": {
-        "ja": "COMING SOON",
-        "en": "COMING SOON"
+        "ja": "PLAY NOW",
+        "en": "PLAY NOW"
       }
     },
     "url": "https://t-i-oak.github.io/GravityFreight/",
-    "type": "pending"
+    "type": "published"
   },
   "image": "assets/thumbnail.png"
 }
