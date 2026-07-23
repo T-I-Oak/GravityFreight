@@ -2,14 +2,14 @@
 
 ## 1. 目的と役割 (Purpose and Roles)
 
-本ドキュメントは、Gravity Freight V2 の最終実装において必要となるクラスの役割（Roles）、責務の境界、およびその生存期間（Lifecycle）を定義する。
+本ドキュメントは、Gravity Freight の最終実装において必要となるクラスの役割（Roles）、責務の境界、およびその生存期間（Lifecycle）を定義する。
 設計原理（階層性、単純性、明晰性）に基づき、各クラスの責任を分離することで、拡張性が高くデバッグの容易なアーキテクチャを実現することを目的とする。
 
 ---
 
 ## 2. システム構造図 (System Hierarchy)
 
-Gravity Freight V2 は、`AppOrchestrator` をルートとした階層構造を採用している。上位レイヤーが下位レイヤーを所有し、そのライフサイクルと依存関係を管理する。
+Gravity Freight は、`AppOrchestrator` をルートとした階層構造を採用している。上位レイヤーが下位レイヤーを所有し、そのライフサイクルと依存関係を管理する。
 
 ```mermaid
 graph TD

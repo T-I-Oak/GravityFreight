@@ -30,7 +30,7 @@
     - **ライフサイクル**: `TrajectoryPredictor` が実体をクローンした直後、`setGhost()` を介して `true` に設定される。
 - `isSafeToReturn: boolean`: 母星から一度安全距離外へ脱出し、母星への帰還衝突を判定してよい状態であるかを示すフラグ（初期値 false）。
     - **ライフサイクル**: 発射直後は false。`PhysicsEngine` が母星中心から `home.radius + gameBalance.SAFE_DISTANCE_FROM_HOME` より外側へ出たことを検知した時点で true にする。
-- `gravityEffectTicksRemaining: number`: Booster などによる時限重力倍率効果の残り tick 数。
+- `gravityEffectTicksRemaining: number`: Booster などによる時限い力倍率効果の残り tick 数。
 - `lastEvasionBody: CelestialBody | null`: `cushion` による天体衝突回避直後、再吸着を防ぐため一時的に除外する天体への参照。保存対象ではない。
 
 ### メソッド (Methods)
@@ -90,7 +90,7 @@
     - 現在セットされている `launcher`, `booster`, `angle` に基づいて初速ベクトルを算出して返す。
     - **内部計算**: `(rocketItem.getPower() + launcher.power + (booster?.power ?? 0)) * rocketItem.getPowerMultiplier() * launcher.powerMultiplier * (booster?.powerMultiplier ?? 1.0) * (1.0 + powerBonus) * sqrt(M_ref / rocketItem.getMass())` を基準速とし、`angle` 方向のベクトルを生成。
         - `M_ref` は `GameDataRepository.getGameBalance().DEFAULT_SHIP_MASS` を使用する。取得できない場合は `10` を既定値とする。
-        - β v1 と同様に、重いロケットほど初速が下がる。
+        - 重いロケットほど初速が下がる。
         - 現時点の item catalog に定義されている booster は `powerMultiplier` による補正を持つ。今後 `power` を持つ booster が追加された場合も、この式に従って加算値と倍率を集計する。
         - 基準速は小数第4位までのロジック用精度に正規化してから、角度方向の速度ベクトルへ変換する。
     - **呼び出し**: 航行開始直前に `GameController` が実行し自身の `velocity` にセットするほか、`PhysicsEngine` が予測線の初速として参照する。
@@ -101,12 +101,12 @@
     - 現在の構成（RocketItem, Launcher, Booster）から、出口判定に適用する開口幅倍率を算出して返す。
     - 戻り値は小数第4位までのロジック用精度に正規化する。
 - `getGravityMultiplier(): number`
-    - 現在の構成（RocketItem, Launcher, Booster）から、重力加速度に適用する倍率を算出して返す。
+    - 現在の構成（RocketItem, Launcher, Booster）から、い力加速度に適用する倍率を算出して返す。
     - RocketItem と Launcher の `gravityMultiplier` は常時倍率として乗算する。
     - Booster が `gravityMultiplier` を持つ場合、`duration` が未定義なら常時倍率として扱い、`duration` が有限値なら `gravityEffectTicksRemaining > 0` の間だけ乗算する。
     - 戻り値は小数第4位までのロジック用精度に正規化する。
 - `advanceGravityEffectTick(): void`
-    - 時限重力効果の残り tick 数を 1 減らす。
+    - 時限い力効果の残り tick 数を 1 減らす。
     - `PhysicsEngine` が 1 tick の加速度計算後に呼び出す。
 - `addHeldItem(item: Item): void`
     - 取得したアイテムを `heldCargo` リストに追加する。
@@ -122,7 +122,7 @@
     - **body 衝突時の優先順位**:
         1. `mod_star_breaker` / `mod_gst_breaker`: 対象天体を破壊し、`method: 'star_breaker'`, `destroyedTarget: target` を返す。天体上の未回収アイテムは破壊に伴い失われる。
         2. `mod_cushion` / `mod_gst_cushion`: 対象天体の中心からロケット位置へ向かう法線で速度を反射し、`method: 'cushion'`, `destroyedTarget: null` を返す。
-            - 成功時は `lastEvasionBody` に対象天体を保持する。`PhysicsEngine` はロケットが十分離れるまで、この天体を重力計算と衝突判定から一時除外する。
+            - 成功時は `lastEvasionBody` に対象天体を保持する。`PhysicsEngine` はロケットが十分離れるまで、この天体をい力計算と衝突判定から一時除外する。
     - **boundary 到達時**:
         - `mod_emergency` / `mod_gst_emergency`: 原点からロケット位置へ向かう境界法線で速度を反射し、`method: 'emergency'`, `destroyedTarget: null` を返す。
     - **速度制限**:

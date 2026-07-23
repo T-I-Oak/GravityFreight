@@ -1,4 +1,4 @@
-# UI Component Standard: Gravity Freight V2
+# UI Component Standard: Gravity Freight
 
 本ドキュメントでは、UIを構成する各要素の意味、実装（HTMLタグ）、およびデザイン基準を定義する。
 クラス命名と共通スタイルの責務は `design_philosophy.md` および `common_style.md` に従う。

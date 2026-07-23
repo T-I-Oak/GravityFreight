@@ -18,7 +18,7 @@
 - **`mass: number`**: 天体の質量。重力計算の係数として使用される。
 - **`isRepulsion: boolean`**: 重力の極性。`true` の場合は斥力（反発）、`false` の場合は引力。
 - **`isHome: boolean`**: 母星フラグ。`(0, 0)` に位置する唯一の引力源であれば `true`。
-- **`items: ItemBase[]`**: この天体が保持しているアイテムのリスト。
+- **`items: ItemBase[]`**: のの天体が保持しているアイテムのリスト。
 
 ### メソッド (Methods)
 
@@ -28,7 +28,7 @@
     - **挙動**:
         - **`radius` が指定された場合**:
             - 母星・通常天体のどちらであっても、指定された `radius` を使用し、`mass = ((radius - 2) * 5)^2` として算出する。
-            - この換算式は、β v1 の通常天体質量レンジ `5000-20000` と描画半径の関係を維持するためのもの。
+            - この換算式により、通常天体の質量は描画半径に応じて `5000-20000` 程度の範囲に分布する。
         - **`isHome` が `true` かつ `radius` が省略された場合**:
             - `GameDataRepository.getMasterConfig()` から `homeStarRadius` および `homeStarMass` を取得してセットする。
         - **通常天体で `radius` が省略された場合**:
@@ -37,8 +37,8 @@
         - その他 `position`, `isRepulsion`, `items` 等を初期化する。
 
 - **`getGravityFieldVector(targetPos: Vector2): Vector2`**
-    - 指定された座標に対して、この天体が提供する重力場ベクトルを計算する。
-    - この戻り値は、最終的なロケット加速度ではない。
+    - 指定された座標に対して、のの天体が提供する重力場ベクトルを計算する。
+    - のの戻り値は、最終的なロケット加速度ではない。
     - ロケット重量補正、重力定数、セクター重力倍率、全天体からの合算は `PhysicsEngine` の責務とする。
     - **計算式**:
         1. 距離 `r = distance(this.position, targetPos)`。
