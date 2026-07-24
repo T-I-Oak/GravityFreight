@@ -1591,7 +1591,7 @@ main {
     filter: brightness(0.9);
 }
 /* =========================================
-   Gravity Freight V2: Printing Style Layer
+   Gravity Freight: Printing Style Layer
    Layer: Style / Expression (C-Axis)
    Managing Paper & Ink textures and Receipt animations
    ========================================= */
@@ -1602,6 +1602,7 @@ main {
     --print-ink: #1a1a1a;
     --print-ink-dim: #444444;
     --print-ink-red: #b22d2d;
+    --receipt-scale: var(--ui-scale);
     
     background: #000000;
 }
@@ -1615,7 +1616,7 @@ main.theme-printing {
     flex-direction: column;
     align-items: center;    /* 水平方向中央 */
     justify-content: flex-start;
-    padding: 5vh 0;
+    padding: calc(5vh * var(--receipt-scale)) 0;
     z-index: calc(var(--z-system) + 200);
     overflow-y: auto;
     scrollbar-gutter: stable;
@@ -1647,7 +1648,7 @@ main.theme-printing.impact {
 .theme-printing .Panel.receipt {
     background: var(--print-paper);
     color: var(--print-ink);
-    padding: 50px 40px;
+    padding: calc(50px * var(--receipt-scale)) calc(40px * var(--receipt-scale));
     border-radius: 0;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1);
     
@@ -1655,7 +1656,7 @@ main.theme-printing.impact {
     font-family: 'Courier New', Courier, monospace;
     text-shadow: none;
 
-    width: 460px;
+    width: calc(460px * var(--receipt-scale));
     max-width: 95vw;
     max-height: none;
     display: block;
@@ -1716,7 +1717,7 @@ main.theme-printing.impact {
 
 .theme-printing .panel-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: calc(30px * var(--receipt-scale));
 }
 
 .theme-printing .stat-label {
@@ -1745,34 +1746,34 @@ main.theme-printing.impact {
 /* --- Component: Rows & Sections --- */
 .theme-printing .SplitRow {
     color: var(--print-ink);
-    font-size: 16px;
+    font-size: calc(16px * var(--receipt-scale));
     font-weight: 600;
-    margin: 10px 0 2px 0;
+    margin: calc(10px * var(--receipt-scale)) 0 calc(2px * var(--receipt-scale)) 0;
 }
 
 .theme-printing .SplitRow.data-row {
     display: flex;
     justify-content: space-between;
-    gap: 24px;
+    gap: calc(24px * var(--receipt-scale));
     align-items: baseline;
-    padding: 8px 0;
+    padding: calc(8px * var(--receipt-scale)) 0;
 }
 
 .theme-printing .section.hero .SplitRow.data-row {
-    font-size: 24px;
+    font-size: calc(24px * var(--receipt-scale));
     font-weight: 600;
-    margin-top: 15px;
+    margin-top: calc(15px * var(--receipt-scale));
     white-space: nowrap;
 }
 
 .theme-printing .section-subtitle {
     text-align: right;
-    font-size: 14px;
+    font-size: calc(14px * var(--receipt-scale));
     opacity: 0.9;
     font-weight: 600;
-    margin-top: 5px;
-    padding-right: 15px;
-    letter-spacing: 0.5px;
+    margin-top: calc(5px * var(--receipt-scale));
+    padding-right: calc(15px * var(--receipt-scale));
+    letter-spacing: calc(0.5px * var(--receipt-scale));
 }
 
 /* Ranking & Grade specific size tuning */
@@ -1801,8 +1802,8 @@ main.theme-printing.impact {
     color: var(--print-ink);
     text-shadow: none;
     font-size: inherit; /* Row のサイズを継承 */
-    font-weight: inherit; /* V2 デフォルトの 900 を上書きし、Row のウェイトを継承 */
-    font-family: inherit; /* V2 デフォルトの Courier Prime を上書きし、レシートのフォントを継承 */
+    font-weight: inherit; /* 印刷テーマのデフォルト 900 を上書きし、Row のウェイトを継承 */
+    font-family: inherit; /* 印刷テーマのデフォルト Courier Prime を上書きし、レシートのフォントを継承 */
 }
 
 .theme-printing .state-top-rank {
@@ -1818,12 +1819,12 @@ main.theme-printing.impact {
     box-shadow: none;
     font-family: inherit;
     transition: all var(--motion-fast);
-    margin: 30px auto 0;
+    margin: calc(30px * var(--receipt-scale)) auto 0;
     width: 65%;
-    max-width: 280px;
-    padding: 16px;
-    font-size: 16px;
-    letter-spacing: 2px;
+    max-width: calc(280px * var(--receipt-scale));
+    padding: calc(16px * var(--receipt-scale));
+    font-size: calc(16px * var(--receipt-scale));
+    letter-spacing: calc(2px * var(--receipt-scale));
 }
 
 .theme-printing .Button:hover:not(:disabled) {
@@ -1839,8 +1840,8 @@ main.theme-printing.impact {
     display: flex;
     justify-content: center;
     align-items: stretch;
-    gap: 12px;
-    margin-top: 30px;
+    gap: calc(12px * var(--receipt-scale));
+    margin-top: calc(30px * var(--receipt-scale));
 }
 
 .theme-printing .receipt-actions .Button {
@@ -1848,12 +1849,12 @@ main.theme-printing.impact {
 }
 
 .theme-printing .game-end-return-button {
-    flex: 1 1 220px;
+    flex: 1 1 calc(220px * var(--receipt-scale));
 }
 
 .theme-printing .game-end-share-button {
-    flex: 0 0 112px;
-    width: 112px;
+    flex: 0 0 calc(112px * var(--receipt-scale));
+    width: calc(112px * var(--receipt-scale));
     color: var(--print-paper);
     background: var(--print-ink-dim);
 }
@@ -1864,8 +1865,8 @@ main.theme-printing.impact {
 
 /* --- Stamp Zone & Official Seal --- */
 .theme-printing .receipt-stamp-zone {
-    height: 146px;
-    margin: 35px 0 15px 0;
+    height: calc(146px * var(--receipt-scale));
+    margin: calc(35px * var(--receipt-scale)) 0 calc(15px * var(--receipt-scale)) 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1892,9 +1893,9 @@ main.theme-printing.impact {
     --stamp-y: 0px;
 }
 
-.theme-printing .receipt-official-seal.huge { border-width: 8px; }
-.theme-printing .receipt-official-seal.normal { border-width: 6px; }
-.theme-printing .receipt-official-seal.mini { border-width: 5px; }
+.theme-printing .receipt-official-seal.huge { border-width: calc(8px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.normal { border-width: calc(6px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.mini { border-width: calc(5px * var(--receipt-scale)); }
 
 .theme-printing .receipt-official-seal.state-active {
     animation: receiptStampImpact 0.4s cubic-bezier(0.1, 0.9, 0.2, 1.2) forwards;
@@ -1914,27 +1915,27 @@ main.theme-printing.impact {
     width: auto;
 }
 
-.theme-printing .receipt-official-seal.huge .receipt-stamp-left-half { padding: 0 15px; border-right-width: 6px; gap: 6px; height: 140px; }
-.theme-printing .receipt-official-seal.normal .receipt-stamp-left-half { padding: 0 11.5px; border-right-width: 4.6px; gap: 4.6px; height: 108px; }
-.theme-printing .receipt-official-seal.mini .receipt-stamp-left-half { padding: 0 10.5px; border-right-width: 4.2px; gap: 4.2px; height: 98px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-left-half { padding: 0 calc(15px * var(--receipt-scale)); border-right-width: calc(6px * var(--receipt-scale)); gap: calc(6px * var(--receipt-scale)); height: calc(140px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-left-half { padding: 0 calc(11.5px * var(--receipt-scale)); border-right-width: calc(4.6px * var(--receipt-scale)); gap: calc(4.6px * var(--receipt-scale)); height: calc(108px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-left-half { padding: 0 calc(10.5px * var(--receipt-scale)); border-right-width: calc(4.2px * var(--receipt-scale)); gap: calc(4.2px * var(--receipt-scale)); height: calc(98px * var(--receipt-scale)); }
 
 .theme-printing .receipt-stamp-text-line { font-weight: 950; white-space: nowrap; text-transform: uppercase; }
-.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.small { font-size: 11px; letter-spacing: 2.8px; }
-.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.small { font-size: 8.5px; letter-spacing: 2.1px; }
-.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.small { font-size: 7.7px; letter-spacing: 1.9px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.small { font-size: calc(11px * var(--receipt-scale)); letter-spacing: calc(2.8px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.small { font-size: calc(8.5px * var(--receipt-scale)); letter-spacing: calc(2.1px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.small { font-size: calc(7.7px * var(--receipt-scale)); letter-spacing: calc(1.9px * var(--receipt-scale)); }
 
-.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.medium { font-size: 16px; letter-spacing: 0.1px; }
-.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.medium { font-size: 12.4px; letter-spacing: 0.08px; }
-.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.medium { font-size: 11.2px; letter-spacing: 0.07px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.medium { font-size: calc(16px * var(--receipt-scale)); letter-spacing: calc(0.1px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.medium { font-size: calc(12.4px * var(--receipt-scale)); letter-spacing: calc(0.08px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.medium { font-size: calc(11.2px * var(--receipt-scale)); letter-spacing: calc(0.07px * var(--receipt-scale)); }
 
-.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.large { font-size: 32px; letter-spacing: 8px; }
-.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.large { font-size: 25px; letter-spacing: 6.2px; }
-.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.large { font-size: 22.4px; letter-spacing: 5.6px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-text-line.large { font-size: calc(32px * var(--receipt-scale)); letter-spacing: calc(8px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-text-line.large { font-size: calc(25px * var(--receipt-scale)); letter-spacing: calc(6.2px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-text-line.large { font-size: calc(22.4px * var(--receipt-scale)); letter-spacing: calc(5.6px * var(--receipt-scale)); }
 
 .theme-printing .receipt-stamp-right-half { font-weight: 950; line-height: 1; text-align: center; display: flex; align-items: center; justify-content: center; width: auto; }
-.theme-printing .receipt-official-seal.huge .receipt-stamp-right-half { font-size: 100px; padding: 0 20px; }
-.theme-printing .receipt-official-seal.normal .receipt-stamp-right-half { font-size: 78px; padding: 0 15.6px; }
-.theme-printing .receipt-official-seal.mini .receipt-stamp-right-half { font-size: 70px; padding: 0 14px; }
+.theme-printing .receipt-official-seal.huge .receipt-stamp-right-half { font-size: calc(100px * var(--receipt-scale)); padding: 0 calc(20px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.normal .receipt-stamp-right-half { font-size: calc(78px * var(--receipt-scale)); padding: 0 calc(15.6px * var(--receipt-scale)); }
+.theme-printing .receipt-official-seal.mini .receipt-stamp-right-half { font-size: calc(70px * var(--receipt-scale)); padding: 0 calc(14px * var(--receipt-scale)); }
 
 .theme-printing .tier-1 { color: #b8860b; }
 .theme-printing .tier-2 { color: #a52a2a; }
@@ -1946,9 +1947,9 @@ main.theme-printing.impact {
 
 /* Barcode */
 .theme-printing .barcode-container {
-    margin: 10px 0 5px;
-    height: 55px;
-    min-height: 55px;
+    margin: calc(10px * var(--receipt-scale)) 0 calc(5px * var(--receipt-scale));
+    height: calc(55px * var(--receipt-scale));
+    min-height: calc(55px * var(--receipt-scale));
     flex-shrink: 0;
     width: 100%;
     background: 
@@ -1966,8 +1967,8 @@ main.theme-printing.impact {
     display: block;
     flex: none;
     text-align: center;
-    font-size: 10px;
-    margin-top: 5px; 
+    font-size: calc(10px * var(--receipt-scale));
+    margin-top: calc(5px * var(--receipt-scale));
     line-height: 1.6;
 }
 
@@ -3060,7 +3061,7 @@ main.theme-printing::-webkit-scrollbar {
     justify-content: center;
 }
 /* =========================================
-   Gravity Freight V2: Facility Screen
+   Gravity Freight: Facility Screen
    Layer: Context / View (Specific)
    ========================================= */
 
@@ -3184,7 +3185,7 @@ main.theme-printing::-webkit-scrollbar {
 /* Trading Post Specific Layout Fixes */
 #facility-screen .trade-entry {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) calc(132px * var(--ui-scale));
+    grid-template-columns: minmax(0, 1fr) calc(150px * var(--ui-scale));
     margin-bottom: calc(var(--space-unit) * var(--ui-scale));
     min-width: 0;
     gap: calc(var(--space-unit) * var(--ui-scale));
@@ -3198,7 +3199,7 @@ main.theme-printing::-webkit-scrollbar {
 
 #facility-screen .trade-action-area {
     flex-shrink: 0;
-    width: calc(132px * var(--ui-scale));
+    width: calc(150px * var(--ui-scale));
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -3278,6 +3279,7 @@ main.theme-printing::-webkit-scrollbar {
     text-align: right;
     line-height: 1;
     letter-spacing: -1px;
+    white-space: nowrap;
 }
 
 #facility-screen .trade-action-area .Button {

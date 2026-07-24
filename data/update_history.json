@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.1",
+    "date": "2026-07-24",
+    "content": [
+      {
+        "type": "fix",
+        "text": {
+          "lang-store": {
+            "ja": "一部の画面表示とゴースト系モジュールの挙動を修正しました。",
+            "en": "Fixed several display issues and ghost module behavior."
+          }
+        }
+      }
+    ]
+  },
+  {
     "version": "1.0",
     "date": "2026-07-23",
     "content": [
