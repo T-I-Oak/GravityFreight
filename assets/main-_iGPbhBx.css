@@ -2337,6 +2337,9 @@ main.theme-printing::-webkit-scrollbar {
     height: 100%;
     z-index: var(--z-world);
     touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 /* --- 3. Sidebar (Inventory Panel) --- */
