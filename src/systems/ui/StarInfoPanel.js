@@ -120,8 +120,11 @@ class StarInfoPanel {
         const offset = 20;
         const panelWidth = this.panel.offsetWidth || 280;
         const panelHeight = this.panel.offsetHeight || 160;
-        const viewWidth = canvas?.width || this.document.documentElement.clientWidth;
-        const viewHeight = canvas?.height || this.document.documentElement.clientHeight;
+        const canvasRect = canvas?.getBoundingClientRect?.();
+        const viewWidth = canvasRect?.width
+            || this.document.documentElement.clientWidth;
+        const viewHeight = canvasRect?.height
+            || this.document.documentElement.clientHeight;
 
         let left = point.x + offset;
         let top = point.y + offset;
@@ -133,8 +136,11 @@ class StarInfoPanel {
             top = point.y - panelHeight - offset;
         }
 
-        this.panel.style.left = `${Math.max(offset / 2, left)}px`;
-        this.panel.style.top = `${Math.max(offset / 2, top)}px`;
+        const min = offset / 2;
+        const maxLeft = Math.max(min, viewWidth - panelWidth - min);
+        const maxTop = Math.max(min, viewHeight - panelHeight - min);
+        this.panel.style.left = `${Math.min(maxLeft, Math.max(min, left))}px`;
+        this.panel.style.top = `${Math.min(maxTop, Math.max(min, top))}px`;
     }
 }
 

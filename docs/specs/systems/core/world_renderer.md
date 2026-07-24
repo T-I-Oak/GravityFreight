@@ -39,6 +39,7 @@
 - **`sonarStopTimestamp: number | null`**: ソナーの新規波紋生成を停止した時刻。既存波紋の自然消滅に使用する。
 - **`hideNavigationRocketBody: boolean`**: 航行終了演出中に、ロケット本体だけを非表示にする状態。
 - **`mapWarp: object`**: セクター遷移中のマップ表示倍率・透明度・補間状態。背景ではなくセクター内オブジェクト全体の拡縮を担当する。
+    - `mapWarp.alpha` はセクター内オブジェクト全体へ親 alpha として明示的に適用し、前フレームや背景描画の alpha 状態には依存しない。軌跡、ソナー、配送 cargo アイコンなど個別 alpha を持つ子描画は、親 alpha を上書きせず乗算して描画する。
 
 ### メソッド (Methods)
 

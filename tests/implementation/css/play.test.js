@@ -100,6 +100,18 @@ describe('play.css', () => {
         expect(css).toContain('background: rgba(255, 255, 255, 0.14);');
     });
 
+    it('scales the game end receipt with the shared ui scale on responsive viewports', () => {
+        const css = readFileSync('css/ui_style_printing.css', 'utf-8');
+
+        expect(css).toContain('--receipt-scale: var(--ui-scale);');
+        expect(css).toContain('width: calc(460px * var(--receipt-scale));');
+        expect(css).toContain('padding: calc(50px * var(--receipt-scale)) calc(40px * var(--receipt-scale));');
+        expect(css).toContain('font-size: calc(16px * var(--receipt-scale));');
+        expect(css).toContain('font-size: calc(24px * var(--receipt-scale));');
+        expect(css).toContain('height: calc(146px * var(--receipt-scale));');
+        expect(css).toContain('height: calc(55px * var(--receipt-scale));');
+    });
+
     it('colors every facility mail icon in the HUD', () => {
         const css = readFileSync('css/ui_style_neon.css', 'utf-8');
 

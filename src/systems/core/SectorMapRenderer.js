@@ -96,7 +96,7 @@ class SectorMapRenderer {
         const iconScale = scale;
 
         context.save();
-        context.globalAlpha *= alpha;
+        context.globalAlpha = context.globalAlpha * alpha;
         context.translate(x, y);
         context.rotate(isBottom ? angle - Math.PI / 2 : angle + Math.PI / 2);
         context.translate(

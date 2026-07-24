@@ -40,10 +40,17 @@ describe('facility.css', () => {
         expect(css.match(/#facility-screen \.trade-action-group \{/g)).toHaveLength(1);
         expect(css.match(/#facility-screen \.trade-price \{/g)).toHaveLength(1);
         expect(entryRule).toContain('display: grid;');
-        expect(entryRule).toContain('grid-template-columns: minmax(0, 1fr) calc(132px * var(--ui-scale));');
+        expect(entryRule).toContain('grid-template-columns: minmax(0, 1fr) calc(150px * var(--ui-scale));');
         expect(entryRule).toContain('align-items: stretch;');
-        expect(actionRule).toContain('width: calc(132px * var(--ui-scale));');
+        expect(actionRule).toContain('width: calc(150px * var(--ui-scale));');
         expect(actionRule).toContain('justify-content: flex-start;');
         expect(actionRule).toContain('gap: calc(2px * var(--ui-scale));');
+    });
+
+    it('keeps facility prices on one line in responsive layouts', () => {
+        const css = readFileSync('css/facility.css', 'utf-8');
+        const priceRule = css.match(/#facility-screen \.trade-price \{[\s\S]*?\}/)?.[0] ?? '';
+
+        expect(priceRule).toContain('white-space: nowrap;');
     });
 });

@@ -344,7 +344,22 @@ describe('Rocket', () => {
         expect(rocketItem.modules.find(module => module.id === 'mod_emergency').charges).toBe(2);
     });
 
-    it('ignores real modules and uses ghost modules without consuming charges when ghost', () => {
+    it('uses ghost modules as one-shot trial avoidance modules during real flight', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_gst_breaker']);
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+        const target = { position: { x: 10, y: 0 } };
+
+        const result = rocket.useAvoidanceModule('body', target);
+
+        expect(result).toEqual({
+            method: 'star_breaker',
+            destroyedTarget: target
+        });
+        expect(rocketItem.modules.find(module => module.id === 'mod_gst_breaker').charges).toBe(0);
+        expect(rocket.useAvoidanceModule('body', target)).toBeNull();
+    });
+
+    it('ignores real modules and does not consume ghost module charges when predicting', () => {
         const { rocketItem, launcher } = createRocketPartsWithModules(['mod_star_breaker', 'mod_gst_breaker']);
         const rocket = new Rocket(rocketItem, launcher, null, 0);
         const target = { position: { x: 10, y: 0 } };
@@ -360,6 +375,21 @@ describe('Rocket', () => {
         expect(rocketItem.modules.find(module => module.id === 'mod_gst_breaker').charges).toBe(1);
     });
 
+    it('keeps ghost module prediction effects after their real-flight trial charge is depleted', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_gst_breaker']);
+        const breaker = rocketItem.modules.find(module => module.id === 'mod_gst_breaker');
+        breaker.consumeCharge();
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+        const target = { position: { x: 10, y: 0 } };
+        rocket.setGhost();
+
+        expect(rocket.useAvoidanceModule('body', target)).toEqual({
+            method: 'star_breaker',
+            destroyedTarget: target
+        });
+        expect(breaker.charges).toBe(0);
+    });
+
     it('uses ghost breaker before ghost cushion when both are available', () => {
         const { rocketItem, launcher } = createRocketPartsWithModules(['mod_gst_breaker', 'mod_gst_cushion']);
         const rocket = new Rocket(rocketItem, launcher, null, 0, { x: 10, y: 0 });
@@ -370,6 +400,20 @@ describe('Rocket', () => {
 
         expect(result.method).toBe('star_breaker');
         expect(rocket.velocity).toEqual({ x: -4, y: 0 });
+        expect(rocketItem.modules.find(module => module.id === 'mod_gst_breaker').charges).toBe(1);
+        expect(rocketItem.modules.find(module => module.id === 'mod_gst_cushion').charges).toBe(1);
+    });
+
+    it('returns null for real-flight ghost avoidance modules after their trial charge is depleted', () => {
+        const { rocketItem, launcher } = createRocketPartsWithModules(['mod_gst_breaker']);
+        const rocket = new Rocket(rocketItem, launcher, null, 0);
+        const target = { position: { x: 10, y: 0 } };
+
+        expect(rocket.useAvoidanceModule('body', target)).toEqual({
+            method: 'star_breaker',
+            destroyedTarget: target
+        });
+        expect(rocket.useAvoidanceModule('body', target)).toBeNull();
     });
 
     it('returns null when matching avoidance modules are missing or depleted', () => {

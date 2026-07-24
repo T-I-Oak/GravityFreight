@@ -281,8 +281,11 @@ class Rocket {
     }
 
     #findAvoidanceModule(kind) {
-        const id = this.isGhost ? GHOST_AVOIDANCE_MODULES[kind] : REAL_AVOIDANCE_MODULES[kind];
-        return this.rocketItem?.modules?.find(module => module.id === id);
+        const ids = this.isGhost
+            ? [GHOST_AVOIDANCE_MODULES[kind]]
+            : [REAL_AVOIDANCE_MODULES[kind], GHOST_AVOIDANCE_MODULES[kind]];
+
+        return this.rocketItem?.modules?.find(module => ids.includes(module.id));
     }
 
     #getBodyNormal(target) {

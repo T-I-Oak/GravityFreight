@@ -2,6 +2,8 @@ import { afterEach, describe, it, expect, vi } from 'vitest';
 import WorldRenderer from '../../../../src/systems/core/WorldRenderer.js';
 
 function createCanvas() {
+    let globalAlpha = 1;
+    const alphaStack = [];
     const context = {
         canvas: null,
         clearRect: vi.fn(),
@@ -11,8 +13,12 @@ function createCanvas() {
         stroke: vi.fn(),
         fill: vi.fn(),
         fillText: vi.fn(),
-        save: vi.fn(),
-        restore: vi.fn(),
+        save: vi.fn(() => {
+            alphaStack.push(globalAlpha);
+        }),
+        restore: vi.fn(() => {
+            globalAlpha = alphaStack.pop() ?? 1;
+        }),
         translate: vi.fn(),
         rotate: vi.fn(),
         scale: vi.fn(),
@@ -33,7 +39,6 @@ function createCanvas() {
         lineJoin: ''
     };
     let strokeStyle = '';
-    let globalAlpha = 1;
     Object.defineProperty(context, 'strokeStyle', {
         get: () => strokeStyle,
         set: value => {
@@ -221,6 +226,81 @@ describe('WorldRenderer', () => {
         renderer.render();
 
         expect(context.globalAlphas).toContain(0);
+    });
+
+    it('keeps local map element alpha multiplied by the active map warp alpha', async () => {
+        vi.stubGlobal('performance', { now: vi.fn(() => 0) });
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const camera = {
+            zoomLevel: 1,
+            rotation: 0,
+            position: { x: 0, y: 0 },
+            handleResize: vi.fn(),
+            toScreen: vi.fn(point => ({
+                x: point.x + 320,
+                y: point.y + 240
+            }))
+        };
+        const renderer = createRenderer({ backgroundManager, camera });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [
+                {
+                    radius: 900,
+                    width: 40,
+                    angle: 0,
+                    getFacilityType: () => 'TRADING_POST'
+                }
+            ],
+            bodies: [
+                {
+                    position: { x: 0, y: 0 },
+                    radius: 40,
+                    isHome: true,
+                    isRepulsion: false,
+                    items: [
+                        { category: 'cargo', deliveryGoalId: 'TRADING_POST' }
+                    ]
+                }
+            ]
+        });
+        renderer.mapWarp.alpha = 0.5;
+        context.globalAlphas.length = 0;
+
+        renderer.render();
+
+        expect(context.globalAlphas).toContain(0.25);
+    });
+
+    it('sets the active map warp alpha without inheriting the previous canvas alpha state', async () => {
+        vi.stubGlobal('performance', { now: vi.fn(() => 0) });
+        const { canvas, context } = createCanvas();
+        const backgroundManager = createBackgroundManager();
+        const renderer = createRenderer({ backgroundManager });
+
+        await renderer.initialize(canvas);
+        renderer.setSector({
+            exits: [],
+            bodies: [
+                {
+                    position: { x: 0, y: 0 },
+                    radius: 40,
+                    isHome: true,
+                    isRepulsion: false,
+                    items: []
+                }
+            ]
+        });
+        context.globalAlpha = 0.3;
+        context.globalAlphas.length = 0;
+        renderer.mapWarp.alpha = 0.5;
+
+        renderer.render();
+
+        expect(context.globalAlphas[0]).toBe(0.5);
+        expect(context.globalAlphas).not.toContain(0.15);
     });
 
     it('resets map warp so replay playback starts from the normal map scale', async () => {

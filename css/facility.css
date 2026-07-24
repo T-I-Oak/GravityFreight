@@ -1,5 +1,5 @@
 /* =========================================
-   Gravity Freight V2: Facility Screen
+   Gravity Freight: Facility Screen
    Layer: Context / View (Specific)
    ========================================= */
 
@@ -123,7 +123,7 @@
 /* Trading Post Specific Layout Fixes */
 #facility-screen .trade-entry {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) calc(132px * var(--ui-scale));
+    grid-template-columns: minmax(0, 1fr) calc(150px * var(--ui-scale));
     margin-bottom: calc(var(--space-unit) * var(--ui-scale));
     min-width: 0;
     gap: calc(var(--space-unit) * var(--ui-scale));
@@ -137,7 +137,7 @@
 
 #facility-screen .trade-action-area {
     flex-shrink: 0;
-    width: calc(132px * var(--ui-scale));
+    width: calc(150px * var(--ui-scale));
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -217,6 +217,7 @@
     text-align: right;
     line-height: 1;
     letter-spacing: -1px;
+    white-space: nowrap;
 }
 
 #facility-screen .trade-action-area .Button {

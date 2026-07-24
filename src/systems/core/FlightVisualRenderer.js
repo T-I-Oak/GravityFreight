@@ -54,7 +54,7 @@ class FlightVisualRenderer {
 
             context.save();
             const pointAlpha = Number.isFinite(trail[index]?.alpha) ? trail[index].alpha : 1;
-            context.globalAlpha = (index / trail.length) * pointAlpha;
+            context.globalAlpha = context.globalAlpha * (index / trail.length) * pointAlpha;
             context.beginPath();
             context.moveTo(from.x, from.y);
             context.lineTo(to.x, to.y);
@@ -157,7 +157,7 @@ class FlightVisualRenderer {
             }
 
             context.save();
-            context.globalAlpha = alpha;
+            context.globalAlpha = context.globalAlpha * alpha;
             context.beginPath();
             context.arc(position.x, position.y, radius, 0, Math.PI * 2);
             context.strokeStyle = colors.sonar;
@@ -166,7 +166,7 @@ class FlightVisualRenderer {
             context.shadowBlur = 10 * transform.scale;
             context.shadowColor = colors.sonar;
             context.stroke();
-            context.globalAlpha = alpha * 0.15;
+            context.globalAlpha = context.globalAlpha * 0.15;
             context.fill();
             context.restore();
         });

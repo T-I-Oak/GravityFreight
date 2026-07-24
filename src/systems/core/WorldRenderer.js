@@ -195,7 +195,7 @@ class WorldRenderer {
         }
 
         this.context.save();
-        this.context.globalAlpha *= this.#getMapWarpAlpha();
+        this.context.globalAlpha = this.#getMapWarpAlpha();
         const transform = this.#createTransform();
         const view = this.#getView();
         const activeRocket = this.navigationRocket || this.aimRocket;
