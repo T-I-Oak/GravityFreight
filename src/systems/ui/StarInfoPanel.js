@@ -28,11 +28,11 @@ class StarInfoPanel {
             this.#renderBody(body);
         }
 
+        this.panel.hidden = false;
+        this.panel.classList.remove('state-hidden');
         this.#updatePosition(point, canvas);
         this.currentPoint = point;
         this.currentCanvas = canvas;
-        this.panel.hidden = false;
-        this.panel.classList.remove('state-hidden');
     }
 
     showMessage({ title, body, key }, point, canvas) {
@@ -56,11 +56,11 @@ class StarInfoPanel {
             this.list.innerHTML = `<p class="star-info-message">${body}</p>`;
         }
 
+        this.panel.hidden = false;
+        this.panel.classList.remove('state-hidden');
         this.#updatePosition(point, canvas);
         this.currentPoint = point;
         this.currentCanvas = canvas;
-        this.panel.hidden = false;
-        this.panel.classList.remove('state-hidden');
     }
 
     refreshCurrent() {

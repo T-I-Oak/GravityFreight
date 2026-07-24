@@ -176,3 +176,47 @@ Gravity Freight の class は GameWorks OAK 共通 Style Guide に従う。
 
 単一画面だけで必要な class は、まず画面仕様に定義する。
 後から複数画面で同じ用途が確認できた場合に、名称と責務を整理してこの台帳へ昇格する。
+
+## 12. Mobile / Safari Compatibility Notes
+
+Gravity Freight のモバイル対応では、特に iPad / iPhone Safari で PC ブラウザと異なる挙動が出やすい。
+以下は他ゲームへ展開する際にも同じ注意点として扱う。
+
+### 12.1 Viewport Height
+
+- Safari では上部タブやアドレスバーの表示状態により、固定的な `100vh` が実際に操作できる表示領域と一致しない場合がある。
+- 画面ルートは `100dvh` を優先し、必要に応じて `100svh` / `100vh` を fallback として扱う。
+- 画面全体をスクロール不可にする場合でも、Safari のブラウザ UI によって上端が隠れないよう、実表示領域基準の高さを使う。
+- 端末の safe area が影響する領域では `env(safe-area-inset-*)` を考慮する。
+
+### 12.2 Shared UI Scale
+
+- レスポンシブ縮小は `transform: scale()` で見た目だけを縮小しない。
+    - `transform` は layout 上の占有サイズを変えないため、折り返し判定、スクロール範囲、hit area、tooltip 位置が表示とずれやすい。
+- フォント、padding、margin、gap、border radius、固定幅、ボタンサイズ、canvas 周辺 UI は共通 scale 変数を使い、layout 計算そのものに縮小を反映する。
+- ItemCard のような共通コンポーネントは、表示場所ごとに個別 scale を上書きせず、同じ共通 scale が伝播する構造にする。
+
+### 12.3 Canvas Input
+
+- マップ canvas は `touch-action: none` を指定し、2本指 pan / pinch をブラウザのページスクロールや表示倍率操作に奪わせない。
+- Pointer / wheel listener は `passive: false` で登録し、ゲーム操作中の既定動作を `preventDefault()` で抑止する。
+- iPad Safari では long tap がテキスト選択や callout 表示に化けることがあるため、canvas には `user-select: none`, `-webkit-user-select: none`, `-webkit-touch-callout: none` を指定する。
+- PC の hover 相当の情報表示は、タッチ端末では tap / pointerdown で代替する。hover 専用の情報は作らない。
+
+### 12.4 Tutorial Highlight Coordinates
+
+- Tutorial の highlight は CSS px の表示矩形で扱う。
+- Canvas 内オブジェクトを highlight する場合は、world 座標を canvas backing store 座標へ変換した後、`getBoundingClientRect()` の表示サイズ比率で CSS px へ戻す。
+- `canvas.width / height` と `getBoundingClientRect().width / height` は device pixel ratio やレスポンシブ scale により一致しないため、片方だけを基準にしない。
+- Tutorial camera focus 後に map / camera が動くと highlight がずれるため、tutorial 表示中は pan / zoom / rotate / AIM drag をロックする。
+- Canvas 対象の highlight は、camera focus 遷移完了後に再計算してから表示する。
+- 対象矩形を解決できない場合は必須データ欠落として扱い、画面を暗くするだけの fallback で隠蔽しない。
+
+### 12.5 Verification
+
+- モバイル対応は PC の responsive emulator だけでは完了扱いにしない。
+- 少なくとも iPad / iPhone Safari 実機で、以下を確認する。
+    - 画面上部がブラウザ UI に隠れて操作不能にならないこと。
+    - canvas の pan / pinch / tap / long tap がゲーム操作として成立すること。
+    - Tutorial の DOM highlight と Canvas highlight が対象位置からずれないこと。
+    - Responsive scale 適用後も、共通コンポーネントの文字、padding、button、badge、ItemCard 表示が局所的に大きく残らないこと。

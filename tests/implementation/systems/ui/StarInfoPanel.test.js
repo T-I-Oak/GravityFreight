@@ -56,4 +56,32 @@ describe('StarInfoPanel', () => {
         expect(parseFloat(panel.style.left) + panel.offsetWidth).toBeLessThanOrEqual(400);
         expect(parseFloat(panel.style.top) + panel.offsetHeight).toBeLessThanOrEqual(600);
     });
+
+    it('measures the popup after it is visible so hidden layout does not bypass clamping', () => {
+        const panel = setupPanel();
+        Object.defineProperty(panel, 'offsetWidth', {
+            configurable: true,
+            get: () => (panel.hidden || panel.classList.contains('state-hidden') ? 0 : 280)
+        });
+        Object.defineProperty(panel, 'offsetHeight', {
+            configurable: true,
+            get: () => (panel.hidden || panel.classList.contains('state-hidden') ? 0 : 160)
+        });
+        const canvas = {
+            getBoundingClientRect: () => ({
+                left: 0,
+                top: 0,
+                width: 400,
+                height: 600
+            })
+        };
+        const view = new StarInfoPanel({ document });
+
+        view.show({ isHome: false, items: [item()] }, { x: 390, y: 590 }, canvas);
+
+        expect(panel.hidden).toBe(false);
+        expect(panel.classList.contains('state-hidden')).toBe(false);
+        expect(parseFloat(panel.style.left) + panel.offsetWidth).toBeLessThanOrEqual(400);
+        expect(parseFloat(panel.style.top) + panel.offsetHeight).toBeLessThanOrEqual(600);
+    });
 });

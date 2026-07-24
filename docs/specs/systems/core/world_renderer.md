@@ -32,6 +32,7 @@
 - **`colorPalette: CanvasColorPalette`**: Canvas 描画色を `css/design_tokens.css` の token から解決する参照。
 - **`sectorMapRenderer: SectorMapRenderer`**: セクター境界、exit arc、施設ラベル、天体、アイテムリングなどのマップ要素描画を担当する補助描画クラス。
 - **`flightVisualRenderer: FlightVisualRenderer`**: 航行中および AIM 中のロケット周辺ビジュアル描画を担当する補助描画クラス。
+- **`mapLayerCanvas: HTMLCanvasElement | null`**: ワープ中のセクター内オブジェクトを一時描画する内部 Canvas。背景とは別に、マップ・航行ビジュアル全体へ `mapWarp.alpha` を適用するために使用する。
 - **`navigationRocket: Rocket | null`**: 航行中に描画対象となるロケットインスタンスへの参照。
 - **`aimRocket: Rocket | null`**: AIM 中に描画対象となるプレビュー用ロケットインスタンスへの参照。
 - **`predictionPath: { x: number, y: number }[]`**: AIM 中に描画する予測軌道の座標列。
@@ -39,7 +40,7 @@
 - **`sonarStopTimestamp: number | null`**: ソナーの新規波紋生成を停止した時刻。既存波紋の自然消滅に使用する。
 - **`hideNavigationRocketBody: boolean`**: 航行終了演出中に、ロケット本体だけを非表示にする状態。
 - **`mapWarp: object`**: セクター遷移中のマップ表示倍率・透明度・補間状態。背景ではなくセクター内オブジェクト全体の拡縮を担当する。
-    - `mapWarp.alpha` はセクター内オブジェクト全体へ親 alpha として明示的に適用し、前フレームや背景描画の alpha 状態には依存しない。軌跡、ソナー、配送 cargo アイコンなど個別 alpha を持つ子描画は、親 alpha を上書きせず乗算して描画する。
+    - `mapWarp.alpha` が 1 未満の場合、セクター内オブジェクト全体を内部 map layer へ alpha 1.0 で描画し、その完成画像を `#gameCanvas` へ `mapWarp.alpha` で合成する。前フレームや背景描画の alpha 状態には依存しない。軌跡、ソナー、配送 cargo アイコンなど個別 alpha を持つ子描画は、map layer 内で個別 alpha を保持し、最終合成時に `mapWarp.alpha` と乗算される。
 
 ### メソッド (Methods)
 
@@ -59,6 +60,7 @@
     2. `BackgroundManager.update(deltaSeconds)` と `BackgroundManager.render(context, view)` を呼び出し、背景を描画する。
     3. `targetSector` が存在する場合、`SectorMapRenderer.render()` にセクター境界、出口、天体などのマップ要素描画を委譲する。
     4. `predictionPath` または `navigationRocket` が存在する場合、`FlightVisualRenderer.render()` に航行中ビジュアルの描画を委譲する。
+    5. ワープ alpha が 1 未満の場合、3-4 は内部 map layer に描画し、完成した map layer を `#gameCanvas` へワープ alpha 付きで合成する。
     - `render()` は `requestAnimationFrame` から継続的に呼び出される。入力イベント等から即時再描画が必要な場合も同じ `render()` を呼び出してよい。
 
 - **`setSector(sector: Sector | null): void`**

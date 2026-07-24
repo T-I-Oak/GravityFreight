@@ -22,6 +22,9 @@ class WorldRenderer {
         this.backgroundManager = options.backgroundManager || new BackgroundManager({ colorPalette: this.colorPalette });
         this.flightVisualRenderer = options.flightVisualRenderer || new FlightVisualRenderer();
         this.sectorMapRenderer = options.sectorMapRenderer || new SectorMapRenderer();
+        this.mapLayerCanvasFactory = options.mapLayerCanvasFactory || null;
+        this.mapLayerCanvas = null;
+        this.mapLayerContext = null;
         this.soundController = options.soundController || null;
         this.lastRenderTimestamp = null;
         this.animationFrameId = null;
@@ -194,23 +197,38 @@ class WorldRenderer {
             return;
         }
 
-        this.context.save();
-        this.context.globalAlpha = this.#getMapWarpAlpha();
         const transform = this.#createTransform();
         const view = this.#getView();
         const activeRocket = this.navigationRocket || this.aimRocket;
-        this.sectorMapRenderer.render(this.context, this.targetSector, transform, colors, {
+        const mapWarpAlpha = this.#getMapWarpAlpha();
+        if (mapWarpAlpha < 1) {
+            const mapContext = this.#prepareMapLayer();
+            this.#renderMapLayer(mapContext, transform, view, activeRocket, colors);
+            this.context.save();
+            this.context.globalAlpha = mapWarpAlpha;
+            this.context.drawImage(this.mapLayerCanvas, 0, 0);
+            this.context.restore();
+            return;
+        }
+
+        this.context.save();
+        this.context.globalAlpha = 1;
+        this.#renderMapLayer(this.context, transform, view, activeRocket, colors);
+        this.context.restore();
+    }
+
+    #renderMapLayer(context, transform, view, activeRocket, colors) {
+        this.sectorMapRenderer.render(context, this.targetSector, transform, colors, {
             timestamp: view.timestamp,
             activeRocket
         });
-        this.flightVisualRenderer.render(this.context, transform, view, {
+        this.flightVisualRenderer.render(context, transform, view, {
             navigationRocket: activeRocket,
             predictionPath: this.predictionPath,
             hideRocketBody: this.hideNavigationRocketBody,
             sonarEnabled: this.sonarEnabled,
             sonarStopTimestamp: this.sonarStopTimestamp
         }, colors);
-        this.context.restore();
     }
 
     worldToViewport(worldPoint) {
@@ -283,6 +301,42 @@ class WorldRenderer {
         this.canvas.width = Math.max(1, Math.round(width * scale));
         this.canvas.height = Math.max(1, Math.round(height * scale));
         this.camera?.handleResize?.(this.canvas.width, this.canvas.height);
+    }
+
+    #prepareMapLayer() {
+        if (!this.mapLayerCanvas) {
+            this.mapLayerCanvas = this.#createMapLayerCanvas();
+            this.mapLayerContext = this.mapLayerCanvas.getContext?.('2d') || null;
+            if (!this.mapLayerContext) {
+                throw new Error('[WorldRenderer] map layer 2D context is required.');
+            }
+        }
+
+        if (this.mapLayerCanvas.width !== this.canvas.width) {
+            this.mapLayerCanvas.width = this.canvas.width;
+        }
+        if (this.mapLayerCanvas.height !== this.canvas.height) {
+            this.mapLayerCanvas.height = this.canvas.height;
+        }
+
+        this.mapLayerContext.save();
+        this.mapLayerContext.globalAlpha = 1;
+        this.mapLayerContext.clearRect(0, 0, this.mapLayerCanvas.width, this.mapLayerCanvas.height);
+        this.mapLayerContext.restore();
+        this.mapLayerContext.globalAlpha = 1;
+        return this.mapLayerContext;
+    }
+
+    #createMapLayerCanvas() {
+        if (this.mapLayerCanvasFactory) {
+            return this.mapLayerCanvasFactory();
+        }
+
+        const ownerDocument = this.canvas?.ownerDocument || globalThis.document;
+        if (!ownerDocument?.createElement) {
+            throw new Error('[WorldRenderer] document is required to create map layer canvas.');
+        }
+        return ownerDocument.createElement('canvas');
     }
 
     #getView() {

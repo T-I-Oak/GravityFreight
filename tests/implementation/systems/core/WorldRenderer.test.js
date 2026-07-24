@@ -8,6 +8,7 @@ function createCanvas() {
         canvas: null,
         clearRect: vi.fn(),
         fillRect: vi.fn(),
+        drawImage: vi.fn(),
         beginPath: vi.fn(),
         arc: vi.fn(),
         stroke: vi.fn(),
@@ -47,12 +48,16 @@ function createCanvas() {
         }
     });
     context.globalAlphas = [];
+    context.drawImageAlphas = [];
     Object.defineProperty(context, 'globalAlpha', {
         get: () => globalAlpha,
         set: value => {
             globalAlpha = value;
             context.globalAlphas.push(value);
         }
+    });
+    context.drawImage.mockImplementation(() => {
+        context.drawImageAlphas.push(globalAlpha);
     });
     const canvas = {
         width: 640,
@@ -121,6 +126,15 @@ function createRenderer(options = {}) {
         colorPalette: createColorPalette(),
         ...options
     });
+}
+
+function createRendererWithMapLayer(options = {}) {
+    const layer = createCanvas();
+    const renderer = createRenderer({
+        mapLayerCanvasFactory: () => layer.canvas,
+        ...options
+    });
+    return { renderer, layer };
 }
 
 describe('WorldRenderer', () => {
@@ -203,7 +217,7 @@ describe('WorldRenderer', () => {
     it('fades the map after the game-end exit zoom has moved it away', async () => {
         const { canvas, context } = createCanvas();
         const backgroundManager = createBackgroundManager();
-        const renderer = createRenderer({ backgroundManager });
+        const { renderer } = createRendererWithMapLayer({ backgroundManager });
 
         await renderer.initialize(canvas);
         renderer.setSector({
@@ -225,13 +239,14 @@ describe('WorldRenderer', () => {
         context.globalAlphas.length = 0;
         renderer.render();
 
-        expect(context.globalAlphas).toContain(0);
+        expect(context.drawImageAlphas).toContain(0);
     });
 
     it('keeps local map element alpha multiplied by the active map warp alpha', async () => {
         vi.stubGlobal('performance', { now: vi.fn(() => 0) });
         const { canvas, context } = createCanvas();
         const backgroundManager = createBackgroundManager();
+        const { renderer, layer } = createRendererWithMapLayer({ backgroundManager, camera: null });
         const camera = {
             zoomLevel: 1,
             rotation: 0,
@@ -242,7 +257,7 @@ describe('WorldRenderer', () => {
                 y: point.y + 240
             }))
         };
-        const renderer = createRenderer({ backgroundManager, camera });
+        renderer.camera = camera;
 
         await renderer.initialize(canvas);
         renderer.setSector({
@@ -271,14 +286,15 @@ describe('WorldRenderer', () => {
 
         renderer.render();
 
-        expect(context.globalAlphas).toContain(0.25);
+        expect(layer.context.globalAlphas).toContain(0.5);
+        expect(context.drawImageAlphas).toContain(0.5);
     });
 
-    it('sets the active map warp alpha without inheriting the previous canvas alpha state', async () => {
+    it('composites the active map layer alpha without inheriting the previous canvas alpha state', async () => {
         vi.stubGlobal('performance', { now: vi.fn(() => 0) });
         const { canvas, context } = createCanvas();
         const backgroundManager = createBackgroundManager();
-        const renderer = createRenderer({ backgroundManager });
+        const { renderer, layer } = createRendererWithMapLayer({ backgroundManager });
 
         await renderer.initialize(canvas);
         renderer.setSector({
@@ -299,7 +315,9 @@ describe('WorldRenderer', () => {
 
         renderer.render();
 
-        expect(context.globalAlphas[0]).toBe(0.5);
+        expect(layer.context.clearRect).toHaveBeenCalledWith(0, 0, 640, 480);
+        expect(context.drawImage).toHaveBeenCalledWith(layer.canvas, 0, 0);
+        expect(context.drawImageAlphas).toContain(0.5);
         expect(context.globalAlphas).not.toContain(0.15);
     });
 
@@ -337,7 +355,7 @@ describe('WorldRenderer', () => {
                 y: point.y + 240
             }))
         };
-        const renderer = createRenderer({ backgroundManager, camera });
+        const { renderer, layer } = createRendererWithMapLayer({ backgroundManager, camera });
 
         await renderer.initialize(canvas);
         renderer.setSector({
@@ -354,7 +372,7 @@ describe('WorldRenderer', () => {
         });
         renderer.startWarpEffect();
 
-        expect(context.arc).toHaveBeenLastCalledWith(1320, 240, 500, 0, Math.PI * 2);
+        expect(layer.context.arc).toHaveBeenLastCalledWith(1320, 240, 500, 0, Math.PI * 2);
 
         renderer.stopWarpEffect();
 

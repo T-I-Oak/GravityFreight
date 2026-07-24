@@ -24,6 +24,8 @@ describe('play.css', () => {
 
         expect(css).toContain('#play-screen .play-viewport');
         expect(css).toContain('touch-action: none;');
+        expect(css).toContain('-webkit-user-select: none;');
+        expect(css).toContain('-webkit-touch-callout: none;');
     });
 
     it('sizes play UI from the shared ui scale without transform scaling', () => {
